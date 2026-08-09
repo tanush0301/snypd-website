@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>SNYPD Plans</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+    window.SNYPD = window.SNYPD || {};
+    if (!SNYPD.supabase) {
+      SNYPD.supabase = supabase.createClient(
+        'https://igbuqanjocfmahlzzupc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
+      );
+    }
+  </script>
+<style>
+    
+    body {
+      display: flex;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow-x: hidden;
+      color: #fff;
+    }
+    .main-content {
+      flex-grow: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .dash-wrap {
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px;
+      box-sizing: border-box;
+      max-width: 1440px;
+    }
+    @media (max-width: 768px) {
+      .dash-wrap {
+        padding: 24px 16px;
+      }
+    }
+    .mobile-header {
+      display: none;
+      padding: 16px;
+      background: #000;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .mobile-header .hamburger {
+      background: none;
+      border: none;
+      color: #fff;
+      padding: 8px;
+      cursor: pointer;
+    }
+    @media (max-width: 991px) {
+      .mobile-header { display: flex; justify-content: space-between; }
+    }
+
+    
+  /* Scope everything */
+  .snypd-sidebar {
+    --bg: #0A0A0A; 
+    --panel: #111111;
+    --border: #262626;
+    --border-hover: #404040;
+    --text-primary: #F5F5F5;
+    --text-muted: #8A8A8A;
+    --brand: #A200FF; 
+    --brand-hover: #B533FF;
+    --success: #10B981;
+    --w: 260px;          
+    --wFocus: 260px;     
+    --radius: 10px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+  .snypd-sidebar__shell {
+    height: 100vh;
+    width: var(--w);
+    border-right: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+  }
+  .snypd-sidebar__top {
+    padding: 24px 20px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .snypd-sidebar__brand {
+    display: flex; flex-direction: column; gap: 8px; min-width: 0;
+  }
+  .snypd-sidebar__logoRow { display: flex; align-items: center; }
+  .snypd-sidebar__wordmark {
+    font-size: 22px; color: var(--brand); letter-spacing: 12px; position: relative; display: inline-block; font-weight: 500; margin-right: -12px; text-transform: uppercase;
+  }
+  .snypd-sidebar__wordmark::after {
+    content: ''; position: absolute; top: 50%; left: -4px; right: -4px; height: 2px; background-color: var(--brand); transform: translateY(-50%); pointer-events: none;
+  }
+  .snypd-sidebar__tagline {
+    font-size: 12px; color: var(--text-muted); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .snypd-sidebar__status {
+    display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted);
+  }
+  .snypd-orb {
+    width: 8px; height: 8px; border-radius: 50%; background: #555; transition: all 0.3s var(--ease);
+  }
+  .snypd-sidebar[data-state="live"] .snypd-orb {
+    background: var(--success); box-shadow: 0 0 8px rgba(16,185,129,0.4);
+  }
+  .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
+    color: var(--success);
+  }
+  .snypd-sidebar__navWrap {
+    padding: 16px 12px; overflow: auto; flex: 1 1 auto;
+  }
+  .snypd-sidebar__nav {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .snypd-navItem {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 6px; text-decoration: none; color: var(--text-muted); transition: all 0.2s var(--ease); border: 1px solid transparent; position: relative;
+  }
+  .snypd-navItem:hover {
+    color: var(--text-primary); background: rgba(255,255,255,0.03);
+  }
+  .snypd-navIcon {
+    width: 18px; height: 18px; opacity: 0.8; transition: transform 0.2s var(--ease); flex: 0 0 auto;
+  }
+  .snypd-navItem:hover .snypd-navIcon { transform: scale(1.05); opacity: 1; }
+  .snypd-navLabel {
+    font-weight: 500; font-size: 14px;
+  }
+  .snypd-navItem[data-active="true"] {
+    background: rgba(255,255,255,0.06); color: var(--text-primary); border: 1px solid var(--border);
+  }
+  .snypd-navItem[data-active="true"] .snypd-navIcon {
+    color: var(--brand); opacity: 1;
+  }
+  .snypd-navItem[data-active="true"]::before {
+    content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 16px; border-radius: 0 4px 4px 0; background: var(--brand); transform: translateY(-50%);
+  }
+  .snypd-sidebar__bottom {
+    padding: 16px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2);
+  }
+  .snypd-bottomRow {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px;
+  }
+  .snypd-pill {
+    padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: var(--text-muted);
+  }
+  .snypd-cta {
+    width: 100%; border: none; border-radius: 6px; padding: 10px 14px; font-weight: 600; font-size: 13px; color: #fff; cursor: pointer; background: var(--brand); transition: all 0.2s var(--ease); display: flex; align-items: center; justify-content: center;
+  }
+  .snypd-cta:hover { 
+    background: var(--brand-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(162,0,255,0.3);
+  }
+  .snypd-dim {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s var(--ease); z-index: 9998;
+  }
+  @media (max-width: 991px) {
+    .snypd-sidebar {
+      position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 9999;
+    }
+    .snypd-sidebar[data-open="true"] { pointer-events: auto; }
+    .snypd-sidebar__shell {
+      position: absolute; left: 0; top: 0; transform: translateX(-100%); transition: transform 0.3s ease; height: 100dvh;
+    }
+    .snypd-sidebar[data-open="true"] .snypd-sidebar__shell { transform: translateX(0); }
+    .snypd-sidebar[data-open="true"] .snypd-dim { opacity: 1; pointer-events: auto; }
+  }
+
+    
+:root {
+  --bg: #000000;
+  --panel: rgba(20, 20, 20, 0.7);
+  --panel-header: rgba(30, 30, 30, 0.4);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.2);
+  --text-primary: #FFFFFF;
+  --text-muted: #888888;
+  --brand: #A200FF; 
+  --brand-hover: #C54BFF;
+  --brand-fg: #FFFFFF;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --font: 'Inter', -apple-system, sans-serif;
+  --smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.main-content {
+  background-image: radial-gradient(circle at 50% -20%, rgba(162, 0, 255, 0.1), transparent 60%);
+}
+.hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+.brand { display: flex; align-items: center; }
+.brand-logo { font-family: var(--font); font-size: 26px; color: var(--brand); letter-spacing: 16px; position: relative; display: inline-block; font-weight: 500; margin-right: -16px; text-transform: uppercase; }
+.brand-logo::after { content: ''; position: absolute; top: 50%; left: -6px; right: -6px; height: 2px; background-color: var(--brand); transform: translateY(-50%); pointer-events: none; }
+.sub { font-size: 13px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; }
+.activation-gate { background: var(--panel); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 12px; padding: 48px; text-align: center; margin-bottom: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); transform: translateY(0); transition: transform 0.4s var(--smooth); }
+.activation-gate:hover { transform: translateY(-2px); }
+.activation-gate h2 { font-size: 28px; font-weight: 700; margin: 0 0 12px; letter-spacing:-0.02em; color: var(--text-primary); }
+.activation-gate p { color: var(--text-muted); max-width: 500px; margin: 0 auto 24px; line-height: 1.6; font-size: 15px; }
+.activation-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+.activation-note { font-size: 13px !important; color: #555 !important; margin-bottom: 0 !important; }
+.is-hidden { display: none !important; opacity: 0; pointer-events: none; }
+.panel { background: var(--panel); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+.panel .hd { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--panel-header); }
+.status-bar { display: flex; gap: 12px; }
+.chip { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border); display:flex; align-items:center; gap:8px; }
+.chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #666; }
+.chip.ok { color: var(--success); background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); }
+.chip.ok::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.chip.warn { color: var(--warning); background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
+.chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.chip.err { color: var(--danger); background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+.chip.err::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.controls { width: 100% !important; display: flex !important; flex-direction: column !important; gap: 12px !important; }
+.btn { border: none; border-radius: 8px; padding: 0 20px; height: 38px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s var(--smooth); font-family: var(--font); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn-prim { background: var(--brand); color: var(--brand-fg); border: 1px solid var(--brand); }
+.btn-prim:hover:not(:disabled) { background: var(--brand-hover); border-color: var(--brand-hover); }
+.btn-ghost { background: rgba(255,255,255,0.02); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.08); border-color: var(--border-hover); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.panel .bd { padding: 24px; }
+.list { display: grid; gap: 12px; }
+.list.loading { opacity: 0.6; pointer-events: none; transition: opacity 0.3s ease; }
+.card { display: grid; grid-template-columns: 88px 1fr; gap: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 12px; transition: all 0.3s var(--smooth); align-items: center; }
+.card.enter { animation: slideUp 0.5s var(--smooth) both; }
+@keyframes slideUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+.card.enter:nth-child(1) { animation-delay: 0.04s; } .card.enter:nth-child(2) { animation-delay: 0.08s; } .card.enter:nth-child(3) { animation-delay: 0.12s; }
+.card.enter:nth-child(4) { animation-delay: 0.16s; } .card.enter:nth-child(5) { animation-delay: 0.20s; } .card.enter:nth-child(6) { animation-delay: 0.24s; }
+.card:hover { transform: translateY(-2px); border-color: var(--border-hover); background: rgba(255,255,255,0.05); box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+.thumb { width: 88px; height: 88px; border-radius: 6px; object-fit: cover; background: rgba(255,255,255,0.05); }
+.thumb.fallback { border: 1px solid var(--border); }
+.meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; }
+.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.tiny { display: none; }
+.empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
+.skeleton { display: flex; gap: 16px; align-items: center; padding: 12px; border-radius: 10px; border: 1px solid var(--border); }
+.skeleton-thumb { width: 60px; height: 60px; border-radius: 6px; flex-shrink: 0; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02)); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+.skeleton-content { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-line { height: 14px; border-radius: 4px; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02)); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+.skeleton-line.w-80 { width: 80%; } .skeleton-line.w-50 { width: 50%; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@media (min-width: 768px) {
+  .controls { width: auto !important; flex-direction: row !important; }
+}
+
+  
+  /* Mini Sidebar Overrides */
+  .snypd-sidebar[data-focus="true"] { width: 88px; }
+  .snypd-sidebar[data-focus="true"] .snypd-navItem { justify-content: center; padding: 12px; }
+  .snypd-sidebar[data-focus="true"] .snypd-navItem span.nav-text { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__brand h1,
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__tagline { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__profile { justify-content: center; padding: 16px; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__profile-text { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-icon { margin-right: 0; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__header { padding: 24px 16px; }
+</style>
+</head>
+<body>
+<div class="snypd-sidebar" data-focus="false" data-open="false" data-snypd-sidebar="" data-state="idle">
+<div class="snypd-dim" data-snypd-action="close"></div>
+<aside aria-label="SNYPD navigation" class="snypd-sidebar__shell">
+<div class="snypd-sidebar__top">
+<div class="snypd-sidebar__brand">
+<div class="snypd-sidebar__logoRow">
+<div class="snypd-sidebar__wordmark">SNYPD</div>
+</div>
+<div class="snypd-sidebar__tagline">Be first. Stay ahead.</div>
+<div class="snypd-sidebar__status">
+<span class="snypd-orb"></span>
+<span data-snypd-status-label="">IDLE</span>
+</div>
+</div>
+</div>
+<div class="snypd-sidebar__navWrap">
+<nav class="snypd-sidebar__nav" data-snypd-nav="">
+<a class="snypd-navItem" data-key="dashboard" data-snypd-navitem="" href="/dashboard">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24"><path d="M4 4h7v7H4V4Z" stroke="currentColor" stroke-width="2"></path><path d="M13 4h7v7h-7V4Z" stroke="currentColor" stroke-width="2"></path><path d="M4 13h7v7H4v-7Z" stroke="currentColor" stroke-width="2"></path><path d="M13 13h7v7h-7v-7Z" stroke="currentColor" stroke-width="2"></path></svg>
+<span class="snypd-navLabel">Dashboard</span>
+</a>
+<a class="snypd-navItem" data-key="filters" data-snypd-navitem="" href="/filters">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path></svg>
+<span class="snypd-navLabel">Filters</span>
+</a>
+<a class="snypd-navItem" data-key="stockx" data-snypd-navitem="" href="https://stockx.com/" target="_blank">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24"><path d="M7 7h10v10H7V7Z" stroke="currentColor" stroke-width="2"></path><path d="M9 9h6v6H9V9Z" opacity=".7" stroke="currentColor" stroke-width="2"></path></svg>
+<span class="snypd-navLabel">StockX</span>
+</a>
+<a class="snypd-navItem" data-key="account" data-snypd-navitem="" href="/account">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2"></path><path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path></svg>
+<span class="snypd-navLabel">Account</span>
+</a>
+</nav>
+</div>
+<div class="snypd-sidebar__bottom">
+<div class="snypd-bottomRow">
+<div class="snypd-pill" data-snypd-plan="">PLAN - ELITE</div>
+</div>
+<button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
+</div>
+</aside>
+</div>
+<div class="main-content">
+<div class="mobile-header">
+<div style="font-weight: 700; letter-spacing: 2px; color: #A200FF; text-transform: uppercase;">SNYPD</div>
+<button class="hamburger" data-snypd-action="toggle" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'">
+<svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="24"><path d="M3 12h18M3 6h18M3 18h18"></path></svg>
+</button>
+</div>
+<div class="dash-wrap">
+<div class="w-container">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->﻿<section aria-labelledby="snypd-pricing-title" class="snypd-pricing" id="pricing">
+<style>
+    .snypd-pricing,
+    .snypd-pricing * {
+      box-sizing: border-box;
+    }
+
+    .snypd-pricing {
+      --bg: #030409;
+      --card-bg: rgba(18, 20, 28, 0.45);
+      --card-bg-hover: rgba(22, 24, 34, 0.6);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --card-border-hover: rgba(255, 255, 255, 0.12);
+      
+      --purple: #8b5cff;
+      --teal: #35e7dc;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      
+      position: relative;
+      width: 100%;
+      padding: 140px 0;
+      background: var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Ambient Lighting */
+    .snypd-pricing__glow-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .snypd-pricing__glow-1 {
+      position: absolute;
+      top: 10%;
+      left: 15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(139, 92, 255, 0.15) 0%, transparent 60%);
+      filter: blur(60px);
+    }
+    .snypd-pricing__glow-2 {
+      position: absolute;
+      bottom: 10%;
+      right: 15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(53, 231, 220, 0.1) 0%, transparent 60%);
+      filter: blur(60px);
+    }
+
+    .snypd-pricing__inner {
+      position: relative;
+      z-index: 2;
+      width: min(1240px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .snypd-pricing__header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .snypd-pricing__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(139, 92, 255, 0.08);
+      border: 1px solid rgba(139, 92, 255, 0.15);
+      color: #d7c5ff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .snypd-pricing__eyebrow::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 0 12px var(--purple);
+    }
+
+    .snypd-pricing__title {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .snypd-pricing__subtitle {
+      max-width: 580px;
+      margin: 20px auto 0;
+      color: var(--text-muted);
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* Grid Layout */
+    .snypd-pricing__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    /* Card Base */
+    .snypd-pricing__card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border-radius: 20px;
+      padding: 40px 32px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      
+      /* Premium Figma Details: Inner top highlight & deep drop shadow */
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.03),
+        0 12px 32px rgba(0, 0, 0, 0.4);
+      
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .snypd-pricing__card:hover {
+      transform: translateY(-6px);
+      background: var(--card-bg-hover);
+      border-color: var(--card-border-hover);
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.06),
+        0 24px 48px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(139, 92, 255, 0.05);
+    }
+
+    /* Pro Card Override */
+    .snypd-pricing__card--pro {
+      /* Uses a padding-box gradient border trick for a static, premium gradient border */
+      background: 
+        linear-gradient(180deg, rgba(22, 24, 36, 0.8) 0%, rgba(14, 16, 24, 0.95) 100%) padding-box,
+        linear-gradient(135deg, rgba(139, 92, 255, 0.5), rgba(53, 231, 220, 0.3)) border-box;
+      border: 1px solid transparent;
+      
+      /* Distinctive shadow */
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.08),
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(139, 92, 255, 0.12);
+        
+      /* Physically slightly larger to dominate the layout */
+      transform: scale(1.04);
+      z-index: 10;
+    }
+
+    .snypd-pricing__card--pro:hover {
+      transform: scale(1.04) translateY(-6px);
+      background: 
+        linear-gradient(180deg, rgba(26, 28, 42, 0.9) 0%, rgba(14, 16, 24, 0.95) 100%) padding-box,
+        linear-gradient(135deg, rgba(139, 92, 255, 0.8), rgba(53, 231, 220, 0.5)) border-box;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.12),
+        0 30px 60px rgba(0, 0, 0, 0.7),
+        0 0 80px rgba(139, 92, 255, 0.2);
+    }
+
+    /* Topline: Title & Badges */
+    .snypd-pricing__topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      min-height: 28px;
+    }
+
+    .snypd-pricing__name {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .snypd-pricing__badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(139, 92, 255, 0.15);
+      border: 1px solid rgba(139, 92, 255, 0.3);
+      color: #d7c5ff;
+    }
+
+    /* Price display */
+    .snypd-pricing__price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .snypd-pricing__amount {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .snypd-pricing__period {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .snypd-pricing__blurb {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0 0 32px 0;
+      min-height: 42px;
+    }
+
+    /* Feature List */
+    .snypd-pricing__features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 40px 0;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .snypd-pricing__features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+
+    /* Clean, minimal SVG checkmarks */
+    .snypd-pricing__features svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      color: var(--teal);
+      margin-top: 1px;
+    }
+
+    /* CTAs */
+    .snypd-pricing__cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 48px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      
+      /* Ghost style for normal cards */
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .snypd-pricing__cta:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Solid premium CTA for Pro */
+    .snypd-pricing__card--pro .snypd-pricing__cta {
+      background: var(--text-main);
+      color: #030409;
+      border: none;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    }
+
+    .snypd-pricing__card--pro .snypd-pricing__cta:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.25);
+    }
+
+    /* State management classes */
+    .snypd-pricing__current-badge {
+      display: none;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    .snypd-pricing__card.is-current .snypd-pricing__current-badge {
+      display: inline-block;
+    }
+    .snypd-pricing__card.is-current {
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.05),
+        0 0 0 1px rgba(16, 185, 129, 0.2), 
+        0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .snypd-pricing__current {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .snypd-pricing__current.is-visible { 
+      display: inline-flex; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      position: relative; 
+    }
+    .snypd-pricing__current strong { color: #34d399; font-weight: 700; }
+    .snypd-pricing__current a { color: #fff; text-decoration: underline; font-weight: 600; text-underline-offset: 4px; }
+    .snypd-pricing__current a:hover { color: #34d399; }
+
+    /* Footer Note */
+    .snypd-pricing__note {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 1180px) {
+      .snypd-pricing__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+      }
+      .snypd-pricing__card--pro {
+        transform: none;
+      }
+      .snypd-pricing__card--pro:hover {
+        transform: translateY(-6px);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .snypd-pricing__grid { grid-template-columns: 1fr; }
+      .snypd-pricing__title { font-size: 36px; }
+      .snypd-pricing__card { padding: 32px 24px; }
+      .snypd-pricing__glow-1, .snypd-pricing__glow-2 { display: none; }
+    }
+  </style>
+<div class="snypd-pricing__glow-wrap">
+<div class="snypd-pricing__glow-1"></div>
+<div class="snypd-pricing__glow-2"></div>
+</div>
+<div class="snypd-pricing__inner">
+<header class="snypd-pricing__header">
+<div class="snypd-pricing__eyebrow">Unlock Full Power</div>
+<h2 class="snypd-pricing__title" id="snypd-pricing-title">Simple, transparent pricing</h2>
+<p class="snypd-pricing__subtitle">
+        Start with one search for free. Upgrade when you want more filters and faster checking.
+      </p>
+</header>
+<div class="snypd-pricing__current" data-current-plan-banner="">
+<span>Your current plan: <strong data-current-plan-text="">FREE</strong></span>
+<a data-manage-link="" href="https://whop.com/@me/settings/orders/">Manage subscription</a>
+</div>
+<div class="snypd-pricing__grid">
+<!-- FREE -->
+<article class="snypd-pricing__card snypd-pricing__card--free" data-plan-card="free">
+<div class="snypd-pricing__topline">
+<h3 class="snypd-pricing__name">Free</h3>
+<span class="snypd-pricing__current-badge">Current</span>
+</div>
+<div class="snypd-pricing__price">
+<span class="snypd-pricing__amount">€0</span>
+<span class="snypd-pricing__period">/ mo</span>
+</div>
+<p class="snypd-pricing__blurb">Try SNYPD with one real search.</p>
+<ul class="snypd-pricing__features">
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 1 active Vinted search</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> New ads in your dashboard</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Free Discord community</li>
+</ul>
+<a class="snypd-pricing__cta" data-plan="free" data-whop-link="https://whop.com/checkout/plan_jPBUwsY7FaO3w" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Start free</a>
+</article>
+<!-- KICKSTART -->
+<article class="snypd-pricing__card snypd-pricing__card--kickstart" data-plan-card="kickstart">
+<div class="snypd-pricing__topline">
+<h3 class="snypd-pricing__name">Kickstart</h3>
+<span class="snypd-pricing__current-badge">Current</span>
+</div>
+<div class="snypd-pricing__price">
+<span class="snypd-pricing__amount">€14.99</span>
+<span class="snypd-pricing__period">/ mo</span>
+</div>
+<p class="snypd-pricing__blurb">For light hunting.</p>
+<ul class="snypd-pricing__features">
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 2 active Vinted searches</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Much faster Monitoring</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Fresh matches in your dashboard</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Paid Discord access</li>
+</ul>
+<a class="snypd-pricing__cta" data-plan="kickstart" data-whop-link="https://whop.com/checkout/plan_LThAkWvHKdWHd" href="https://whop.com/checkout/plan_LThAkWvHKdWHd">Start Kickstart</a>
+</article>
+<!-- PRO -->
+<article class="snypd-pricing__card snypd-pricing__card--pro" data-plan-card="pro">
+<div class="snypd-pricing__topline">
+<h3 class="snypd-pricing__name">Pro</h3>
+<span class="snypd-pricing__badge">Best value</span>
+<span class="snypd-pricing__current-badge">Current</span>
+</div>
+<div class="snypd-pricing__price">
+<span class="snypd-pricing__amount">€24.99</span>
+<span class="snypd-pricing__period">/ mo</span>
+</div>
+<p class="snypd-pricing__blurb">Best for active resellers.</p>
+<ul class="snypd-pricing__features">
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 5 active Vinted searches</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Faster checking, around every 30s</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Track more brands, sizes, or markets</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Fresh matches in your dashboard</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Paid Discord access</li>
+</ul>
+<a class="snypd-pricing__cta" data-plan="pro" data-whop-link="https://whop.com/checkout/plan_AMgmgP4AEPcOB" href="https://whop.com/checkout/plan_AMgmgP4AEPcOB">Start Pro</a>
+</article>
+<!-- ELITE -->
+<article class="snypd-pricing__card snypd-pricing__card--elite" data-plan-card="elite">
+<div class="snypd-pricing__topline">
+<h3 class="snypd-pricing__name">Elite</h3>
+<span class="snypd-pricing__current-badge">Current</span>
+</div>
+<div class="snypd-pricing__price">
+<span class="snypd-pricing__amount">€39.99</span>
+<span class="snypd-pricing__period">/ mo</span>
+</div>
+<p class="snypd-pricing__blurb">Maximum coverage for serious sourcing.</p>
+<ul class="snypd-pricing__features">
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 7 active Vinted searches</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Faster checking, around every 30s</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Maximum filter coverage</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Fresh matches in your dashboard</li>
+<li><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Paid Discord access</li>
+</ul>
+<a class="snypd-pricing__cta" data-plan="elite" data-whop-link="https://whop.com/checkout/plan_NyA2CkiHNzymG" href="https://whop.com/checkout/plan_NyA2CkiHNzymG">Start Elite</a>
+</article>
+</div>
+<p class="snypd-pricing__note">
+      Free uses a slower refresh rate. Paid plans check active searches around every 30 seconds.
+    </p>
+</div>
+<script>
+    (function () {
+      var root = document.currentScript.closest(".snypd-pricing");
+      if (!root) return;
+
+      var signupUrl = "/signup";
+      var fallbackManageUrl = "https://whop.com/@me/settings/orders/";
+      var activeStatuses = ["active", "trialing", "past_due", "unpaid"];
+      var planLabels = {
+        free: "FREE",
+        kickstart: "KICKSTART",
+        pro: "PRO",
+        elite: "ELITE"
+      };
+
+      var banner = root.querySelector("[data-current-plan-banner]");
+      var bannerText = root.querySelector("[data-current-plan-text]");
+      var manageLink = root.querySelector("[data-manage-link]");
+      var cards = Array.prototype.slice.call(root.querySelectorAll("[data-plan-card]"));
+      var ctas = Array.prototype.slice.call(root.querySelectorAll("[data-whop-link]"));
+
+      var authState = {
+        isLoggedIn: false,
+        currentPlan: null,
+        status: null,
+        manageUrl: fallbackManageUrl
+      };
+
+      function normalizePlan(plan) {
+        var value = String(plan || "").trim().toLowerCase();
+        if (value === "starter") return "kickstart";
+        if (value === "kickoff") return "kickstart";
+        if (value === "kickstart" || value === "pro" || value === "elite" || value === "free") return value;
+        return null;
+      }
+
+      function isActiveStatus(status) {
+        return activeStatuses.indexOf(String(status || "").trim().toLowerCase()) !== -1;
+      }
+
+      function setCurrentPlan(plan, manageUrl, status) {
+        var normalizedPlan = normalizePlan(plan) || "free";
+        var active = normalizedPlan === "free" || isActiveStatus(status);
+
+        if (!active) return;
+
+        authState.currentPlan = normalizedPlan;
+        authState.status = status || null;
+        authState.manageUrl = manageUrl || fallbackManageUrl;
+
+        cards.forEach(function (card) {
+          var cardPlan = card.getAttribute("data-plan-card");
+          card.classList.toggle("is-current", cardPlan === normalizedPlan);
+        });
+
+        if (banner && bannerText) {
+          bannerText.textContent = planLabels[normalizedPlan] || normalizedPlan.toUpperCase();
+          banner.classList.add("is-visible");
+        }
+
+        if (manageLink) {
+          manageLink.href = authState.manageUrl;
+          manageLink.classList.toggle("is-visible", normalizedPlan !== "free");
+        }
+
+        ctas.forEach(function (cta) {
+          var ctaPlan = normalizePlan(cta.getAttribute("data-plan"));
+          var whopUrl = cta.getAttribute("data-whop-link");
+
+          cta.removeAttribute("aria-disabled");
+
+          if (ctaPlan === normalizedPlan) {
+            if (normalizedPlan === "free") {
+              cta.textContent = "Current plan";
+              cta.setAttribute("aria-disabled", "true");
+              cta.removeAttribute("href");
+            } else {
+              cta.textContent = "Manage subscription";
+              cta.href = authState.manageUrl;
+            }
+            return;
+          }
+
+          if (ctaPlan === "free") {
+            cta.textContent = "Start free";
+          }
+
+          if (ctaPlan === "kickstart") {
+            cta.textContent = "Start Kickstart";
+          }
+
+          if (ctaPlan === "pro") {
+            cta.textContent = "Start Pro";
+          }
+
+          if (ctaPlan === "elite") {
+            cta.textContent = "Start Elite";
+          }
+
+          if (whopUrl) {
+            cta.href = whopUrl;
+          }
+        });
+      }
+
+      function getSupabaseClient() {
+        return window.SNYPD && window.SNYPD.supabase ? window.SNYPD.supabase : null;
+      }
+
+      async function loadUserPlan() {
+        var supabase = getSupabaseClient();
+        if (!supabase || !supabase.auth || !supabase.auth.getSession) return;
+
+        try {
+          var sessionResponse = await supabase.auth.getSession();
+          var session = sessionResponse && sessionResponse.data ? sessionResponse.data.session : null;
+          var user = session && session.user ? session.user : null;
+
+          if (!user) return;
+
+          authState.isLoggedIn = true;
+
+          if (!supabase.from) return;
+
+          var profileResponse = await supabase
+            .from("users")
+            .select("subscription_plan, sub_status, whop_manage_url")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          var profile = profileResponse && profileResponse.data ? profileResponse.data : null;
+
+          if (profile) {
+            setCurrentPlan(profile.subscription_plan || "free", profile.whop_manage_url, profile.sub_status);
+          } else {
+            setCurrentPlan("free", null, "active");
+          }
+        } catch (error) {
+          authState.isLoggedIn = false;
+        }
+      }
+
+      ctas.forEach(function (cta) {
+        cta.addEventListener("click", function (event) {
+          if (cta.getAttribute("aria-disabled") === "true") {
+            event.preventDefault();
+            return;
+          }
+
+          if (!authState.isLoggedIn) {
+            event.preventDefault();
+            window.location.href = signupUrl;
+            return;
+          }
+
+          var href = cta.getAttribute("href") || cta.getAttribute("data-whop-link");
+          if (!href || href === "https://whop.com/checkout/plan_jPBUwsY7FaO3w") {
+            event.preventDefault();
+            window.location.href = signupUrl;
+          }
+        });
+      });
+
+      loadUserPlan();
+    })();
+  </script>
+</section>
+</div>
+
+ Google Tag Manager (noscript) 
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+ End Google Tag Manager (noscript) 
+    </div>
+</div>
+<script>
+    (() => {
+      const root = document.querySelector('[data-snypd-sidebar]');
+      if (!root) return;
+
+      const statusLabel = root.querySelector('[data-snypd-status-label]');
+      const isMobile = () => window.matchMedia('(max-width: 991px)').matches;
+
+      const setState = (state) => {
+        root.dataset.state = state;
+        if (statusLabel) statusLabel.textContent = (state || 'idle').toUpperCase();
+      };
+      setState(root.dataset.state || 'idle');
+
+      // Highlight active nav based on path
+      const path = window.location.pathname.replace('/', '').replace('.html', '');
+      const defaultKey = path || 'dashboard';
+      root.querySelectorAll('[data-snypd-navitem]').forEach(a => {
+        a.dataset.active = (a.dataset.key === defaultKey) ? 'true' : 'false';
+      });
+
+      const openMobile = (flag) => {
+        root.dataset.open = flag ? 'true' : 'false';
+      };
+
+      // Event delegation
+      root.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-snypd-action]');
+        
+        if (btn) {
+          const action = btn.getAttribute('data-snypd-action');
+          if (action === 'close') {
+            openMobile(false);
+            return;
+          }
+          if (action === 'upgrade') {
+            window.location.href = '/plans';
+            return;
+          }
+        }
+      });
+
+      // Listen for hamburger clicks
+      document.addEventListener('click', e => {
+        const hamburger = e.target.closest('.hamburger');
+        if (hamburger) {
+          const next = root.dataset.open !== 'true';
+          root.dataset.open = next ? 'true' : 'false';
+        }
+      });
+
+      window.SNYPD = window.SNYPD || {};
+      window.SNYPD.setSidebarState = (s) => setState(s);
+    })();
+  </script>
+</body>
+</html>

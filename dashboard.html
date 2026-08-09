@@ -1,0 +1,1257 @@
+﻿
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SNYPD Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  /* Scope everything */
+  .snypd-sidebar {
+    --bg: #0A0A0A; 
+    --panel: #111111;
+    --border: #262626;
+    --border-hover: #404040;
+    --text-primary: #F5F5F5;
+    --text-muted: #8A8A8A;
+    --brand: #A200FF; /* Matches logo exact purple */
+    --brand-hover: #B533FF;
+    --success: #10B981;
+    
+    --w: 260px;          
+    --wFocus: 260px;     
+    --radius: 10px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+
+  /* Support for Obsidian translucent background if placed on absolute black */
+  .snypd-sidebar.obsidian-mode {
+    --panel: rgba(20, 20, 20, 0.7);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.2);
+  }
+
+  .snypd-sidebar__shell {
+    height: calc(100vh - 24px);
+    margin: 12px;
+    width: var(--w);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--panel);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    position: sticky;
+    top: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top area */
+  .snypd-sidebar__top {
+    position: relative;
+    z-index: 1;
+    padding: 24px 20px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .snypd-sidebar__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  
+  /* Exact Logo Replication */
+  .snypd-sidebar__logoRow { display: flex; align-items: center; }
+  .snypd-sidebar__wordmark {
+    font-size: 22px;
+    color: var(--brand);
+    letter-spacing: 12px;
+    position: relative;
+    display: inline-block;
+    font-weight: 500;
+    margin-right: -12px;
+    text-transform: uppercase;
+  }
+  .snypd-sidebar__wordmark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -4px;
+    right: -4px;
+    height: 2px;
+    background-color: var(--brand);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .snypd-sidebar__tagline {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Status orb */
+  .snypd-sidebar__status {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .snypd-orb {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #555;
+    transition: all 0.3s var(--ease);
+  }
+  .snypd-sidebar[data-state="live"] .snypd-orb {
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(16,185,129,0.4);
+  }
+  .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
+    color: var(--success);
+  }
+
+  /* Button (hamburger / focus) */
+  .snypd-sidebar__toggle {
+    border: 1px solid var(--border);
+    background: transparent;
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    flex: 0 0 auto;
+    color: var(--text-muted);
+  }
+  .snypd-sidebar__toggle:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+  }
+  .snypd-ico { width: 16px; height: 16px; }
+
+  /* Nav list area */
+  .snypd-sidebar__navWrap {
+    position: relative;
+    z-index: 1;
+    padding: 16px 12px;
+    overflow: auto;
+    flex: 1 1 auto;
+  }
+  .snypd-sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Nav item */
+  .snypd-navItem {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: all 0.2s var(--ease);
+    border: 1px solid transparent;
+  }
+  .snypd-navItem:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.03);
+  }
+  .snypd-navIcon {
+    width: 18px; height: 18px;
+    opacity: 0.8;
+    transition: transform 0.2s var(--ease);
+    flex: 0 0 auto;
+  }
+  .snypd-navItem:hover .snypd-navIcon { transform: scale(1.05); opacity: 1; }
+  .snypd-navLabel {
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  /* Active state */
+  .snypd-navItem[data-active="true"] {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .snypd-navItem[data-active="true"] .snypd-navIcon {
+    color: var(--brand);
+    opacity: 1;
+  }
+  .snypd-navItem[data-active="true"]::before {
+    content: "";
+    position: absolute; left: 0; top: 50%;
+    width: 3px; height: 16px;
+    border-radius: 0 4px 4px 0;
+    background: var(--brand);
+    transform: translateY(-50%);
+  }
+
+  /* Bottom pinned area */
+  .snypd-sidebar__bottom {
+    position: relative;
+    z-index: 1;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+  .snypd-bottomRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .snypd-pill {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+  .snypd-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s var(--ease);
+  }
+  .snypd-link:hover { color: var(--text-primary); }
+
+  .snypd-cta {
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 13px;
+    font-family: var(--font);
+    color: var(--brand-fg);
+    cursor: pointer;
+    background: var(--brand);
+    transition: all 0.2s var(--ease);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .snypd-cta:hover { 
+    background: var(--brand-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(162,0,255,0.3);
+  }
+  .snypd-cta:active { transform: translateY(0); }
+
+  /* -------- Desktop Focus Mode -------- */
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__tagline { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__status { opacity: 0.5; }
+  .snypd-sidebar[data-focus="true"] .snypd-navItem { padding: 8px 12px; }
+
+  /* -------- Mobile Drawer -------- */
+  .snypd-dim {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s var(--ease);
+    z-index: 9998;
+  }
+
+  @media (max-width: 991px) {
+    .snypd-sidebar__shell {
+      position: fixed; left: 0; top: 0;
+      height: 100vh; margin: 0;
+      border-radius: 0;
+      border: none;
+      border-right: 1px solid var(--border);
+      transform: translateX(-100%);
+      transition: transform 0.3s var(--ease);
+      z-index: 9999;
+    }
+    .snypd-sidebar[data-open="true"] .snypd-sidebar__shell { transform: translateX(0); }
+    .snypd-sidebar[data-open="true"] .snypd-dim { opacity: 1; pointer-events: auto; }
+    .snypd-sidebar__toggle { border: none; background: transparent; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .snypd-sidebar * { animation: none !important; transition: none !important; }
+  }
+
+  /* Mini Sidebar Overrides */
+  .snypd-sidebar[data-focus="true"] { width: 88px; }
+  .snypd-sidebar[data-focus="true"] .snypd-navItem { justify-content: center; padding: 12px; }
+  .snypd-sidebar[data-focus="true"] .snypd-navItem span.nav-text { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__brand h1,
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__tagline { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__profile { justify-content: center; padding: 16px; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__profile-text { display: none; }
+  .snypd-sidebar[data-focus="true"] .snypd-icon { margin-right: 0; }
+  .snypd-sidebar[data-focus="true"] .snypd-sidebar__header { padding: 24px 16px; }
+</style><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #000000;
+  --panel: rgba(20, 20, 20, 0.7);
+  --panel-header: rgba(30, 30, 30, 0.4);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.2);
+  --text-primary: #FFFFFF;
+  --text-muted: #888888;
+  --brand: #A200FF; 
+  --brand-hover: #C54BFF;
+  --brand-fg: #FFFFFF;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --font: 'Inter', -apple-system, sans-serif;
+  --smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  background: var(--bg);
+  background-image: radial-gradient(circle at 50% -20%, rgba(162, 0, 255, 0.1), transparent 60%);
+  color: var(--text-primary);
+  font-family: var(--font);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  /* TO MAKE SIDEBAR WORK, ADD FLEX: */
+  display: flex;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-wrap { max-width: 1080px; margin: 40px auto; padding: 0 24px; }
+
+/* Header */
+.hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+.brand { display: flex; align-items: center; }
+
+/* Exact Logo Replication */
+.brand-logo {
+  font-family: var(--font);
+  font-size: 26px;
+  color: var(--brand);
+  letter-spacing: 16px;
+  position: relative;
+  display: inline-block;
+  font-weight: 500;
+  margin-right: -16px; /* offset trailing letter space */
+  text-transform: uppercase;
+}
+.brand-logo::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  right: -6px;
+  height: 2px;
+  background-color: var(--brand);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.sub { font-size: 13px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; }
+
+/* Gate */
+.activation-gate { 
+  background: var(--panel); 
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border); 
+  border-radius: 12px; 
+  padding: 48px; 
+  text-align: center; 
+  margin-bottom: 32px; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+  transform: translateY(0);
+  transition: transform 0.4s var(--smooth);
+}
+.activation-gate:hover { transform: translateY(-2px); }
+.activation-gate h2 { font-size: 28px; font-weight: 700; margin: 0 0 12px; letter-spacing:-0.02em; color: var(--text-primary); }
+.activation-gate p { color: var(--text-muted); max-width: 500px; margin: 0 auto 24px; line-height: 1.6; font-size: 15px; }
+.activation-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+.activation-note { font-size: 13px !important; color: #555 !important; margin-bottom: 0 !important; }
+.is-hidden { display: none !important; opacity: 0; pointer-events: none; }
+
+/* Panel */
+.panel { 
+  background: var(--panel); 
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border); 
+  border-radius: 12px; 
+  overflow: hidden; 
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
+}
+.panel .hd { 
+  padding: 20px 24px; 
+  border-bottom: 1px solid var(--border); 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  background: var(--panel-header); 
+}
+.status-bar { display: flex; gap: 12px; flex-wrap: wrap; }
+.chip { 
+  padding: 6px 12px; 
+  border-radius: 6px; 
+  font-size: 12px; 
+  font-weight: 600; 
+  background: rgba(255,255,255,0.05); 
+  color: var(--text-muted); 
+  border: 1px solid var(--border); 
+  display:flex; 
+  align-items:center; 
+  gap:8px;
+}
+.chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #666; }
+.chip.ok { color: var(--success); background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); }
+.chip.ok::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.chip.warn { color: var(--warning); background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
+.chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.chip.err { color: var(--danger); background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+.chip.err::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.controls { display: flex; gap: 12px; }
+
+/* Buttons */
+.btn { 
+  border: none; 
+  border-radius: 8px; 
+  padding: 0 20px; 
+  height: 38px; 
+  font-size: 13px; 
+  font-weight: 600; 
+  cursor: pointer; 
+  transition: all 0.2s var(--smooth); 
+  font-family: var(--font); 
+  text-decoration: none; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+}
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn-prim { 
+  background: var(--brand); 
+  color: var(--brand-fg); 
+  border: 1px solid var(--brand);
+}
+.btn-prim:hover:not(:disabled) { 
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+.btn-ghost { 
+  background: rgba(255,255,255,0.02); 
+  color: var(--text-primary); 
+  border: 1px solid var(--border); 
+}
+.btn-ghost:hover:not(:disabled) { 
+  background: rgba(255,255,255,0.08); 
+  border-color: var(--border-hover);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* List */
+.panel .bd { padding: 24px; }
+.list { display: grid; gap: 12px; }
+.list.loading { opacity: 0.6; pointer-events: none; transition: opacity 0.3s ease; }
+
+/* Horizontal Card */
+.card { 
+  display: grid; 
+  grid-template-columns: 88px 1fr; 
+  gap: 16px; 
+  background: rgba(255,255,255,0.02); 
+  border: 1px solid var(--border); 
+  border-radius: 10px; 
+  padding: 12px; 
+  transition: all 0.3s var(--smooth); 
+  align-items: center; 
+}
+.card.enter { animation: slideUp 0.5s var(--smooth) both; }
+@keyframes slideUp { 
+  0% { opacity: 0; transform: translateY(10px); } 
+  100% { opacity: 1; transform: translateY(0); } 
+}
+/* Staggering for list loads */
+.card.enter:nth-child(1) { animation-delay: 0.04s; }
+.card.enter:nth-child(2) { animation-delay: 0.08s; }
+.card.enter:nth-child(3) { animation-delay: 0.12s; }
+.card.enter:nth-child(4) { animation-delay: 0.16s; }
+.card.enter:nth-child(5) { animation-delay: 0.20s; }
+.card.enter:nth-child(6) { animation-delay: 0.24s; }
+.card.enter:nth-child(7) { animation-delay: 0.28s; }
+.card.enter:nth-child(8) { animation-delay: 0.32s; }
+
+.card:hover { 
+  transform: translateY(-2px); 
+  border-color: var(--border-hover); 
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.thumb { 
+  width: 88px; 
+  height: 88px; 
+  border-radius: 6px; 
+  object-fit: cover; 
+  background: rgba(255,255,255,0.05); 
+}
+.thumb.fallback { border: 1px solid var(--border); }
+
+.meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; }
+.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.tiny { display: none; }
+
+.empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
+
+/* Skeleton animation */
+.skeleton { 
+  height: 114px; 
+  border-radius: 10px; 
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02)); 
+  background-size: 200% 100%; 
+  animation: shimmer 1.5s infinite linear; 
+  border: 1px solid var(--border); 
+}
+@keyframes shimmer { 
+  0% { background-position: 200% 0; } 
+  100% { background-position: -200% 0; } 
+}
+</style><style>
+    @media (max-width: 991px) {
+      #mobile-header { display: block !important; }
+      .hdr { display: none !important; }
+      .dash-wrap { padding-top: 16px; margin-top: 0; }
+    }
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    if (window.supabase) {
+      window.SNYPD = window.SNYPD || {};
+      window.SNYPD.supabase = window.supabase.createClient(
+        'https://igbuqanjocfmahlzzupc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
+      );
+    }
+  </script>
+</head>
+<body>
+<div class="snypd-sidebar obsidian-mode" data-focus="false" data-open="false" data-snypd-sidebar="" data-state="idle">
+<div class="snypd-dim" data-snypd-action="close"></div>
+<aside aria-label="SNYPD navigation" class="snypd-sidebar__shell">
+<div class="snypd-sidebar__top">
+<div class="snypd-sidebar__brand">
+<div class="snypd-sidebar__logoRow">
+<!-- Logo replicated exactly -->
+<div class="snypd-sidebar__wordmark">SNYPD</div>
+</div>
+<div class="snypd-sidebar__tagline">Be first. Stay ahead.</div>
+<div class="snypd-sidebar__status">
+<span class="snypd-orb"></span>
+<span data-snypd-status-label="">IDLE</span>
+</div>
+</div>
+<button aria-label="Toggle sidebar" class="snypd-sidebar__toggle" data-snypd-action="toggle" type="button">
+<svg class="snypd-ico" fill="none" viewbox="0 0 24 24">
+<path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<div class="snypd-sidebar__navWrap">
+<nav class="snypd-sidebar__nav" data-snypd-nav="">
+<a class="snypd-navItem" data-active="true" data-key="dashboard" data-snypd-navitem="" href="/dashboard">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
+<path d="M4 4h7v7H4V4Z" stroke="currentColor" stroke-width="2"></path>
+<path d="M13 4h7v7h-7V4Z" stroke="currentColor" stroke-width="2"></path>
+<path d="M4 13h7v7H4v-7Z" stroke="currentColor" stroke-width="2"></path>
+<path d="M13 13h7v7h-7v-7Z" stroke="currentColor" stroke-width="2"></path>
+</svg>
+<span class="snypd-navLabel">Dashboard</span>
+</a>
+<a class="snypd-navItem" data-key="filters" data-snypd-navitem="" href="/filters">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
+<path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<span class="snypd-navLabel">Filters</span>
+</a>
+<a class="snypd-navItem" data-key="stockx" data-snypd-navitem="" href="https://stockx.com/" target="_blank">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
+<path d="M7 7h10v10H7V7Z" stroke="currentColor" stroke-width="2"></path>
+<path d="M9 9h6v6H9V9Z" opacity=".7" stroke="currentColor" stroke-width="2"></path>
+</svg>
+<span class="snypd-navLabel">StockX</span>
+</a>
+<a class="snypd-navItem" data-key="account" data-snypd-navitem="" href="/account">
+<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
+<path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2"></path>
+<path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<span class="snypd-navLabel">Account</span>
+</a>
+</nav>
+</div>
+<div class="snypd-sidebar__bottom">
+<div class="snypd-bottomRow">
+<div class="snypd-pill" data-snypd-plan="">PLAN â€” ELITE</div>
+<a class="snypd-link" data-snypd-support="" href="/support">Support</a>
+</div>
+<button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
+</div>
+</aside>
+</div><div class="main-content">
+<!-- HAMBURGER FOR MOBILE -->
+<div id="mobile-header" style="display:none;">
+<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px;">â˜°</button>
+</div>
+<div class="dash-wrap">
+<div class="hdr">
+<div class="brand">
+<div class="brand-logo">SNYPD</div>
+</div>
+<div class="sub" id="user-bar"></div>
+</div>
+<div class="activation-gate is-hidden" id="activation-gate">
+<h2>Unlock Your Arsenal</h2>
+<p>Your SNYPD account is primed. Start the free plan on Whop to unlock your first search lane and dominate the market.</p>
+<div class="activation-actions">
+<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Start Free Trial</a>
+<a class="btn btn-ghost" href="/#pricing">View Plans</a>
+</div>
+<p class="activation-note">Use the same email as your SNYPD account for instant access.</p>
+</div>
+<div class="panel" id="dashboard-panel" style="margin-bottom:16px">
+<div class="hd">
+<div class="status-bar">
+<div class="chip plan" id="plan-banner">Plan: â€”</div>
+<div class="chip warn" id="status-chip">Status: Idle</div>
+<div class="chip neutral" id="tick-chip">Last check: â€”</div>
+<div class="chip err" id="err-chip" style="display:none"></div>
+</div>
+<div class="controls">
+<button class="btn btn-prim" id="btn-start">Start Sniping</button>
+<button class="btn btn-ghost" id="btn-stop">Stop</button>
+</div>
+</div>
+<div class="bd">
+<div class="empty" id="empty" style="display:none">No results yet. Press â€œStart Sniping Nowâ€.</div>
+<div class="list" id="list">
+<div class="skeleton"></div>
+<div class="skeleton"></div>
+<div class="skeleton"></div>
+</div>
+<div class="tiny" id="msg" style="margin-top:10px; display:none;"></div>
+</div>
+</div>
+</div>
+</div><script>
+(() => {
+  const root = document.querySelector('[data-snypd-sidebar]');
+  if (!root) return;
+
+  const statusLabel = root.querySelector('[data-snypd-status-label]');
+
+  const isMobile = () => window.matchMedia('(max-width: 991px)').matches;
+
+  // Persist focus mode (desktop only)
+  const savedFocus = localStorage.getItem('snypd_sidebar_focus');
+  if (savedFocus === '1') root.dataset.focus = 'true';
+
+  const setState = (state) => {
+    root.dataset.state = state;
+    if (statusLabel) statusLabel.textContent = (state || 'idle').toUpperCase();
+  };
+  setState(root.dataset.state || 'idle');
+
+  // We set active purely by path to ensure robustness
+  const path = window.location.pathname;
+  const setActive = () => {
+    root.querySelectorAll('[data-snypd-navitem]').forEach(a => {
+      a.dataset.active = (path.includes(a.dataset.key)) ? 'true' : 'false';
+    });
+  };
+  setActive();
+
+  const openMobile = (flag) => {
+    root.dataset.open = flag ? 'true' : 'false';
+  };
+
+  // Event delegation
+  root.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-snypd-action]');
+    const nav = e.target.closest('[data-snypd-navitem]');
+    if (btn) {
+      const action = btn.getAttribute('data-snypd-action');
+
+      if (action === 'toggle') {
+        if (isMobile()) {
+          openMobile(root.dataset.open !== 'true');
+        } else {
+          // Desktop: Focus mode (NOT collapse)
+          const next = root.dataset.focus !== 'true';
+          root.dataset.focus = next ? 'true' : 'false';
+          localStorage.setItem('snypd_sidebar_focus', next ? '1' : '0');
+        }
+        return;
+      }
+
+      if (action === 'close') {
+        openMobile(false);
+        return;
+      }
+
+      if (action === 'upgrade') {
+        window.location.href = '/plans';
+        return;
+      }
+    }
+
+    if (nav) {
+      if (isMobile()) openMobile(false);
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isMobile()) openMobile(false);
+  });
+
+  window.addEventListener('resize', () => {
+    if (!isMobile()) openMobile(false);
+  });
+
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.setSidebarState = (s) => setState(s);
+})();
+</script><script>
+const SUPABASE_ADS_FETCH_INTERVALL = 20;
+const DASHBOARD_MAX_AGE_MIN = 30; // only show ads fetched in last 30 minutes
+
+// heartbeat endpoint (prod vs VPS)
+const HEARTBEAT_URL = (() => {
+  const isProd = /(^|\.)snypd\.store$/i.test(location.hostname);
+  if (isProd) return 'https://api.snypd.store/api/v1/heartbeat';
+  const scheme = location.protocol === 'https:' ? 'https' : 'http';
+  return `${scheme}://82.165.195.178/api/v1/heartbeat`;
+})();
+
+(async () => {
+  // wait for SNYPD.supabase to be injected
+  for (let i = 0; i < 120 && (!window.SNYPD || !SNYPD.supabase); i++) {
+    await new Promise(r => setTimeout(r, 25));
+  }
+  const sb = window.SNYPD?.supabase;
+
+  const set  = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt ?? 'â€”'; };
+  const show = (id, flag)  => { const n = document.getElementById(id); if (n) n.style.display = flag ? '' : 'none'; };
+  const msg  = (t)        => set('msg', t);
+
+  const esc = t =>
+    String(t || '').replace(/[&<>"']/g, m => (
+      { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
+    ));
+
+  const fmtPrice = (amt, curr = 'EUR') =>
+    amt == null ? '' :
+      new Intl.NumberFormat('nl-BE', { style: 'currency', currency: curr })
+        .format(Number(amt));
+
+  if (!sb) {
+    msg('Supabase client missing');
+    return;
+  }
+
+  // auth
+  const { data: { session }, error: authErr } = await sb.auth.getSession();
+  if (authErr) {
+    msg('Auth error: ' + authErr.message);
+    return;
+  }
+  if (!session?.user) {
+    location.href = '/login';
+    return;
+  }
+  const uid   = session.user.id;
+  const email = session.user.email || '';
+  set('user-bar', `Logged in as ${email}`);
+
+  // plan + Whop activation check
+  const ACTIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid']);
+  const VALID_PLANS = new Set(['free', 'kickstart', 'pro', 'elite']);
+  
+  const PLAN_LABELS = {
+    free: 'FREE',
+    kickstart: 'KICKSTART',
+    pro: 'PRO',
+    elite: 'ELITE'
+  };
+  
+  const me = await sb.from('users')
+    .select('subscription_plan, sub_status, billing_provider, whop_product_id, whop_manage_url')
+    .eq('id', uid)
+    .maybeSingle();
+  
+  const profile = me.data || {};
+  const rawPlan = String(profile.subscription_plan || '').toLowerCase().trim();
+  const rawStatus = String(profile.sub_status || '').toLowerCase().trim();
+  const billingProvider = String(profile.billing_provider || '').toLowerCase().trim();
+  const whopProductId = String(profile.whop_product_id || '').trim();
+  const whopManageUrl = String(profile.whop_manage_url || '').trim();
+  
+  const hasWhopEvidence =
+    billingProvider === 'whop' ||
+    !!whopManageUrl ||
+    !!whopProductId;
+  
+  const isActiveWhopPlan =
+    VALID_PLANS.has(rawPlan) &&
+    ACTIVE_STATUSES.has(rawStatus) &&
+    !!whopProductId;
+  
+  console.log('SNYPD activation check', {
+    plan: rawPlan,
+    status: rawStatus,
+    billingProvider,
+    whopProductId,
+    whopManageUrl,
+    hasWhopEvidence,
+    isActiveWhopPlan
+  });
+  
+  const activationGate = document.getElementById('activation-gate');
+  const dashboardPanel = document.getElementById('dashboard-panel');
+  
+  if (!isActiveWhopPlan) {
+    if (activationGate) activationGate.classList.remove('is-hidden');
+    if (dashboardPanel) dashboardPanel.classList.add('is-hidden');
+  
+    set('plan-banner', 'Plan: NOT ACTIVE');
+    set('status-chip', 'Status: activation needed');
+  
+    return;
+  }
+  
+  if (activationGate) activationGate.classList.add('is-hidden');
+  if (dashboardPanel) dashboardPanel.classList.remove('is-hidden');
+  
+  set('plan-banner', `Plan: ${PLAN_LABELS[rawPlan] || rawPlan.toUpperCase()}`);
+
+  const list    = document.getElementById('list');
+  const empty   = document.getElementById('empty');
+  const btnStart = document.getElementById('btn-start');
+  const btnStop  = document.getElementById('btn-stop');
+
+  let running = false;
+
+  function updateEmptyUI(hasRows) {
+    if (hasRows) {
+      empty.style.display = 'none';
+      return;
+    }
+    empty.textContent = running
+      ? 'No results yet. Sniping is runningâ€¦'
+      : 'No results yet. Press â€œStart Sniping Nowâ€.';
+    empty.style.display = 'block';
+  }
+
+    // -------- freshness + ordering helpers ----------
+
+  function uploadedTimeMs(row) {
+    if (row?.uploaded_at_ts) {
+      const t = Date.parse(row.uploaded_at_ts);
+      if (Number.isFinite(t)) return t;
+    }
+
+    if (row?.uploaded_ts != null) {
+      const n = Number(row.uploaded_ts);
+      if (Number.isFinite(n) && n > 0) return n * 1000;
+    }
+
+    if (row?.fetched_at) {
+      const t = Date.parse(row.fetched_at);
+      if (Number.isFinite(t)) return t;
+    }
+
+    if (row?.created_at) {
+      const t = Date.parse(row.created_at);
+      if (Number.isFinite(t)) return t;
+    }
+
+    return 0;
+  }
+
+  function isFreshListing(row) {
+    const t = uploadedTimeMs(row);
+    if (!t) return true; // keep unknowns rather than accidentally hiding valid rows
+    return (Date.now() - t) <= DASHBOARD_MAX_AGE_MIN * 60 * 1000;
+  }
+
+  function sortNewestUploadedFirst(a, b) {
+    const bt = uploadedTimeMs(b);
+    const at = uploadedTimeMs(a);
+    if (bt !== at) return bt - at;
+    return (Number(b.listing_id) || 0) - (Number(a.listing_id) || 0);
+  }
+  // -------- helpers for mapping row â†’ card ----------
+
+  function getImageUrl(row) {
+    if (typeof row?.image_url === 'string' && /^https?:\/\//i.test(row.image_url)) {
+      return row.image_url;
+    }
+    const b = row?.item_box || {};
+    const paths = [
+      ['image_url'],
+      ['photo', 'url'], ['photo', 'full_url'], ['photo', 'original_url'], ['photo', 'thumbnails', 2, 'url'],
+      ['photos', 0, 'url'], ['photos', 0, 'full_url'], ['photos', 0, 'original_url'], ['photos', 0, 'thumbnails', 2, 'url'],
+      ['images', 0, 'url'], ['images', 0, 'src'], ['image', 'url'], ['image_url'],
+    ];
+    for (const p of paths) {
+      let v = b; let ok = true;
+      for (const k of p) {
+        v = (v == null) ? undefined : v[k];
+        if (v == null) { ok = false; break; }
+      }
+      if (ok && typeof v === 'string' && /^https?:\/\//i.test(v)) return v;
+    }
+    return '';
+  }
+
+  function derivePrice(row) {
+    const p  = row?.price || {};
+    const tp = row?.total_item_price || {};
+    const amt = (p?.amount ?? tp?.amount ?? null);
+    const cur = (p?.currency ?? tp?.currency ?? 'EUR');
+    return { amount: amt, currency: cur };
+  }
+
+  const cardHTML = (r) => {
+    const { amount, currency } = derivePrice(r);
+    const img = getImageUrl(r);
+    const cls = img ? 'thumb' : 'thumb fallback';
+
+    const brand = r.brand_title;
+    const size  = r.size_title;
+    const status = r.status;
+    const src   = r.content_source;
+
+    const dt = new Date(uploadedTimeMs(r) || Date.now());
+    const fetchedLabel =
+      `Uploaded on Vinted at ${new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Berlin',
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(dt)}`;
+
+    const imgHtml = img
+      ? `<img class="${cls}" loading="lazy" src="${esc(img)}"
+               alt="${esc(r.title || 'Listing')}"
+               onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb fallback'}))" />`
+      : `<div class="thumb fallback"></div>`;
+
+    return `
+      <a href="${r.url || '#'}"
+         target="_blank"
+         rel="noopener"
+         class="card"
+         data-id="${r.listing_id}"
+         style="text-decoration:none;color:inherit">
+        ${imgHtml}
+        <div>
+          <div class="meta-top">
+            <div class="t">${esc(r.title) || 'View listing'}</div>
+            <div class="p">${fmtPrice(amount, currency)}</div>
+          </div>
+          <div class="muted">
+            ${[brand, size, status, src, fetchedLabel].filter(Boolean).map(esc).join(' â€¢ ')}
+          </div>
+          <div class="tiny"></div>
+        </div>
+      </a>`;
+  };
+
+  function renderRows(rows) {
+    if (!rows.length) {
+      list.innerHTML = '';
+      updateEmptyUI(false);
+      return;
+    }
+    updateEmptyUI(true);
+    list.innerHTML = rows.map(r => cardHTML(r)).join('');
+    list.querySelectorAll('.card').forEach((c, i) => { if (i < 8) c.classList.add('enter'); });
+    list.querySelectorAll('.skeleton').forEach(s => s.remove());
+  }
+
+  function setLoading(flag) {
+    list.classList.toggle('loading', !!flag);
+  }
+
+  // ----------------- LOAD ADS (main logic) -----------------
+
+  async function loadAds() {
+    setLoading(true);
+    try {
+      console.log('Dashboard user_id:', uid);
+
+      const cutoffIso = new Date(Date.now() - DASHBOARD_MAX_AGE_MIN * 60 * 1000).toISOString();
+
+      const { data, error } = await sb
+        .from('current_ads')
+        .select(`
+          listing_id,
+          user_id,
+          title,
+          price,
+          brand_title,
+          size_title,
+          url,
+          status,
+          content_source,
+          item_box,
+          image_url,
+          photo,
+          fetched_at,
+          created_at,
+          uploaded_ts,
+          uploaded_at_ts,
+          is_visible,
+          promoted,
+          favourite_count,
+          view_count,
+          total_item_price
+        `)
+        .eq('user_id', uid)
+        .eq('is_visible', true)
+        .gte('uploaded_at_ts', cutoffIso)
+        .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
+        .order('listing_id', { ascending: false })
+        .limit(80);
+
+      if (error) throw error;
+
+      const rows = (data || [])
+        .filter(r => !(r.promoted || r.content_source === 'search_promoted_items'))
+        .filter(isFreshListing)
+        .sort(sortNewestUploadedFirst)
+        .slice(0, 60);
+
+      console.log('Dashboard rows:', rows.map(r => ({
+        id: r.listing_id,
+        uploaded_at_ts: r.uploaded_at_ts,
+        uploaded_ts: r.uploaded_ts,
+        fetched_at: r.fetched_at,
+        src: r.content_source,
+        promoted: r.promoted
+      })));
+
+      renderRows(rows);
+      set('tick-chip', `Last check: ${new Date().toLocaleString()}`);
+      show('err-chip', false);
+    } catch (e) {
+      console.error(e);
+      set('err-chip', e?.message || 'Fetch error');
+      show('err-chip', true);
+    } finally {
+      setLoading(false);
+      msg('');
+    }
+  }
+  
+  // ----------------- STATUS + HEARTBEAT (VISIBLE=ON, HIDDEN=OFF) -----------------
+
+  function setStatus(next) {
+    set('status-chip', `Status: ${next}`);
+    const chip = document.getElementById('status-chip');
+    const cls  = next === 'running' ? 'ok' : (next === 'stopped' ? '' : 'warn');
+    chip.className = 'chip ' + cls;
+  }
+
+  const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
+
+  async function sendHeartbeat() {
+    try {
+      await fetch(HEARTBEAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: uid })
+      });
+    } catch (e) {
+      console.error(e);
+      set('err-chip', 'Heartbeat failed');
+      show('err-chip', true);
+    }
+  }
+
+  async function sendStop() {
+    try {
+      await fetch(STOP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: uid })
+      });
+    } catch (e) {
+      console.warn('Stop failed', e);
+    }
+  }
+
+  let adsTimer = null;
+  let hbTimer  = null;
+
+  // If user clicks Stop, we respect it and wonâ€™t auto-start until Start is clicked again.
+  let manualPaused = (localStorage.getItem('snypd_manual_paused') === 'true');
+
+  async function start() {
+    if (running) return;
+    if (manualPaused) return;
+
+    running = true;
+    setStatus('running');
+    btnStart.disabled = true;
+    btnStart.textContent = 'Runningâ€¦';
+
+    await sendHeartbeat();
+    hbTimer = setInterval(sendHeartbeat, 30000);
+
+    await loadAds();
+    adsTimer = setInterval(loadAds, Math.max(5, SUPABASE_ADS_FETCH_INTERVALL) * 1000);
+  }
+
+  async function stop(statusLabel = 'stopped') {
+    if (!running) {
+      setStatus(statusLabel);
+      btnStart.disabled = false;
+      btnStart.textContent = 'Start Sniping Now';
+      return;
+    }
+
+    running = false;
+    setStatus(statusLabel);
+
+    if (hbTimer)  clearInterval(hbTimer);
+    if (adsTimer) clearInterval(adsTimer);
+    hbTimer = adsTimer = null;
+
+    btnStart.disabled = false;
+    btnStart.textContent = 'Start Sniping Now';
+
+    // IMPORTANT: stop backend immediately so proxies stop burning
+    await sendStop();
+  }
+
+  btnStart.onclick = async () => {
+    manualPaused = false;
+    localStorage.setItem('snypd_manual_paused', 'false');
+    await start();
+  };
+
+  btnStop.onclick = async () => {
+    manualPaused = true;
+    localStorage.setItem('snypd_manual_paused', 'true');
+    await stop('stopped');
+  };
+
+  // ----------------- AUTO-RUN (5-min grace + activity-based) -----------------
+
+  const IDLE_MS = 5 * 60 * 1000;        // 5 minutes
+  const CHECK_EVERY_MS = 5000;          // check every 5s
+
+  let lastActivity = Date.now();
+  let hiddenSince = null;
+  let idleChecker = null;
+
+  function touchActivity() {
+    lastActivity = Date.now();
+
+    // If we're visible again and not manually paused, resume instantly (spontaneous)
+    if (!manualPaused && document.visibilityState === 'visible' && !running) {
+      start().catch(console.error);
+    }
+  }
+
+  // Track real user activity
+  ['mousemove','keydown','scroll','click','touchstart'].forEach(ev => {
+    window.addEventListener(ev, touchActivity, { passive: true });
+  });
+
+  // Track tab visibility, BUT don't stop instantly
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      hiddenSince = null;
+      touchActivity(); // coming back counts as activity â†’ resumes immediately
+    } else {
+      hiddenSince = Date.now(); // start grace timer
+    }
+  });
+
+  function startIdleChecker() {
+    if (idleChecker) return;
+    idleChecker = setInterval(async () => {
+      if (manualPaused) return; // user pressed Stop â†’ never auto-resume
+
+      const now = Date.now();
+
+      // If tab is hidden: only stop after 5 minutes hidden
+      if (document.visibilityState !== 'visible') {
+        if (hiddenSince && (now - hiddenSince) >= IDLE_MS) {
+          await stop('idle');
+        }
+        return;
+      }
+
+      // If visible but user inactive: stop after 5 minutes idle
+      if (running && (now - lastActivity) >= IDLE_MS) {
+        await stop('idle');
+      }
+    }, CHECK_EVERY_MS);
+  }
+
+  // Start checker + start immediately on page load (spontaneous)
+  startIdleChecker();
+  if (!manualPaused && document.visibilityState === 'visible') {
+    start().catch(console.error);
+  }
+
+  // When closing tab: send stop reliably
+  window.addEventListener('beforeunload', () => {
+    try {
+      const payload = new Blob([JSON.stringify({ user_id: uid })], { type: 'application/json' });
+      navigator.sendBeacon(STOP_URL, payload);
+    } catch (e) {}
+  });
+  
+})();
+</script></body>
+</html>
