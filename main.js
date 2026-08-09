@@ -37,11 +37,11 @@ document.addEventListener("DOMContentLoaded", function() {
   const feedContainer = document.getElementById('feed-container');
   if (feedContainer) {
     const sampleData = [
-      { img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f591f2b3031b92a87da3_1783074655.webp', name: 'Supreme 99 Football Top Black', meta: 'Supreme • L • Very Good • search', price: '€ 120,00' },
-      { img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f4c0a4873ec61828a489_1783146176.jpeg', name: 'Jordan 4 Bred OG', meta: 'Jordan • 42 • Very Good • catalog', price: '€ 140,00' },
-      { img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a4e03733184f099d185451d_jordan%201%20travis%20scott%20velvet.jpg', name: 'Air Jordan 1 Low Travis Scott Velvet Brown', meta: 'Jordan • 42.5 • Very Good • catalog', price: '€ 225,00' },
-      { img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f4c0088ffb1e4478ccba_1772617611.png', name: 'Jordan 1 High "Mocha"', meta: 'Jordan • 43 • Good • catalog', price: '€ 84,00' },
-      { img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f4c0e0c8a747768678bb_1783110478.jpg', name: 'Yeezy Slide Onyx', meta: 'Yeezy • 42 • Brand New • catalog', price: '€ 23,00' }
+      { img: '/assets/webflow/img/6a49f591f2b3031b92a87da3_1783074655.webp', name: 'Supreme 99 Football Top Black', meta: 'Supreme • L • Very Good • search', price: '€ 120,00' },
+      { img: '/assets/webflow/img/6a49f4c0a4873ec61828a489_1783146176.jpeg', name: 'Jordan 4 Bred OG', meta: 'Jordan • 42 • Very Good • catalog', price: '€ 140,00' },
+      { img: '/assets/webflow/img/6a4e03733184f099d185451d_jordan-1-travis-scott-velvet.jpg', name: 'Air Jordan 1 Low Travis Scott Velvet Brown', meta: 'Jordan • 42.5 • Very Good • catalog', price: '€ 225,00' },
+      { img: '/assets/webflow/img/6a49f4c0088ffb1e4478ccba_1772617611.png', name: 'Jordan 1 High "Mocha"', meta: 'Jordan • 43 • Good • catalog', price: '€ 84,00' },
+      { img: '/assets/webflow/img/6a49f4c0e0c8a747768678bb_1783110478.jpg', name: 'Yeezy Slide Onyx', meta: 'Yeezy • 42 • Brand New • catalog', price: '€ 23,00' }
     ];
 
     let dataIndex = 1;
@@ -141,11 +141,11 @@ document.addEventListener("DOMContentLoaded", function() {
   
   if (queueList && focusStage) {
     const galleryData = [
-      { id: 0, img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f591f2b3031b92a87da3_1783074655.webp', title: "Supreme 99 Football Top Black", price: "€ 120,00", market: "Est: €200+", size: "L", cond: "Very Good", time: "Just now", source: "search", label: "Primary Slot" },
-      { id: 1, img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f4c0a4873ec61828a489_1783146176.jpeg', title: "Jordan 4 Bred OG", price: "€ 140,00", market: "Est: €300+", size: "42", cond: "Very Good", time: "1m ago", source: "catalog", label: "Example Slot" },
-      { id: 2, img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a4e03733184f099d185451d_jordan%201%20travis%20scott%20velvet.jpg', title: "Air Jordan 1 Low Travis Scott Velvet Brown", price: "€ 225,00", market: "Est: €750+", size: "42.5", cond: "Very Good", time: "5m ago", source: "catalog", label: "Example Slot" },
-      { id: 3, img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f4c0088ffb1e4478ccba_1772617611.png', title: "Jordan 1 High \"Mocha\"", price: "€ 84,00", market: "Est: €400+", size: "43", cond: "Good", time: "12m ago", source: "catalog", label: "Example Slot" },
-      { id: 4, img: 'https://cdn.prod.website-files.com/688250a54526a1ea797d1519/6a49f4c0e0c8a747768678bb_1783110478.jpg', title: "Yeezy Slide Onyx", price: "€ 23,00", market: "Est: €90+", size: "42", cond: "Brand New", time: "20m ago", source: "catalog", label: "Example Slot" }
+      { id: 0, img: '/assets/webflow/img/6a49f591f2b3031b92a87da3_1783074655.webp', title: "Supreme 99 Football Top Black", price: "€ 120,00", market: "Est: €200+", size: "L", cond: "Very Good", time: "Just now", source: "search", label: "Primary Slot" },
+      { id: 1, img: '/assets/webflow/img/6a49f4c0a4873ec61828a489_1783146176.jpeg', title: "Jordan 4 Bred OG", price: "€ 140,00", market: "Est: €300+", size: "42", cond: "Very Good", time: "1m ago", source: "catalog", label: "Example Slot" },
+      { id: 2, img: '/assets/webflow/img/6a4e03733184f099d185451d_jordan-1-travis-scott-velvet.jpg', title: "Air Jordan 1 Low Travis Scott Velvet Brown", price: "€ 225,00", market: "Est: €750+", size: "42.5", cond: "Very Good", time: "5m ago", source: "catalog", label: "Example Slot" },
+      { id: 3, img: '/assets/webflow/img/6a49f4c0088ffb1e4478ccba_1772617611.png', title: "Jordan 1 High \"Mocha\"", price: "€ 84,00", market: "Est: €400+", size: "43", cond: "Good", time: "12m ago", source: "catalog", label: "Example Slot" },
+      { id: 4, img: '/assets/webflow/img/6a49f4c0e0c8a747768678bb_1783110478.jpg', title: "Yeezy Slide Onyx", price: "€ 23,00", market: "Est: €90+", size: "42", cond: "Brand New", time: "20m ago", source: "catalog", label: "Example Slot" }
     ];
 
     let activeId = 0;

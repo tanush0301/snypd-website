@@ -1,0 +1,11 @@
+# Vendored Webflow assets are byte-exact copies of the CDN originals, verified
+# against the SRI hashes that used to be in the HTML. core.autocrlf=true would
+# rewrite their line endings on checkout, so pin them and leave them untouched.
+assets/webflow/** -text
+
+# Binary assets: never diff, never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
