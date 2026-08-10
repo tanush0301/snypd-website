@@ -2061,16 +2061,14 @@ margin: 0rem !important;
       // 4. SUPABASE AUTHENTICATION
       // ----------------------------------------------------------------------
       function initSupabase() {
-        if (!window.supabase || !window.supabase.createClient) {
+        if (!window.SNYPD || !window.SNYPD.supabase) {
           console.error("Supabase failed to load.");
           return;
         }
 
-        // Initialize Client (Using user's provided keys)
-        const sb = window.supabase.createClient(
-          'https://igbuqanjocfmahlzzupc.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
-        );
+        // Reuse the single client created in <head>. A second GoTrue instance on
+        // the same origin is what makes sessions flaky.
+        const sb = window.SNYPD.supabase;
 
         // --- EMAIL / PASSWORD LOGIN ---
         form.addEventListener('submit', async (e) => {
