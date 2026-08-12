@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>SNYPD Partners</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noindex, nofollow" name="robots"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+    // Pinned to 2.45.4 and guarded, matching every other page. Two GoTrue
+    // instances on one origin cause flaky sessions, which is exactly the bug that
+    // was fixed across the site on 2026-08-10 -- do not add a second client here.
+    window.SNYPD = window.SNYPD || {};
+    if (!SNYPD.supabase) {
+      SNYPD.supabase = supabase.createClient(
+        'https://igbuqanjocfmahlzzupc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
+      );
+    }
+  </script>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-N75WVFD3');</script>
+<!-- End Google Tag Manager -->
+<style>
+    :root {
+      --bg: #000;
+      --panel: #0E0E0E;
+      --panel-2: #141414;
+      --border: #262626;
+      --border-hover: #404040;
+      --text: #F5F5F5;
+      --muted: #8A8A8A;
+      --brand: #A200FF;
+      --brand-hover: #B533FF;
+      --success: #10B981;
+      --warn: #F59E0B;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      /* Every page on this site overflows horizontally somewhere; this one will
+         not join them. Nothing inside is allowed to be wider than the viewport. */
+      overflow-x: hidden;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+    @media (max-width: 768px) { .wrap { padding: 28px 16px 72px; } }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .brandmark {
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      font-size: 18px;
+    }
+    .backlink {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .backlink:hover { color: var(--text); }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 40px);
+      line-height: 1.1;
+      margin: 0 0 10px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .sub { color: var(--muted); font-size: 15px; margin: 0 0 36px; max-width: 60ch; }
+
+    /* ---- states ---- */
+    .state {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+    .state h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; }
+    .state p { margin: 0 0 20px; color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 58ch; }
+    .hidden { display: none !important; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 18px;
+      border-radius: 9px;
+      background: var(--brand);
+      color: #fff;
+      text-decoration: none;
+      transition: background 140ms ease;
+    }
+    .btn:hover { background: var(--brand-hover); }
+    .btn.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn.ghost:hover { border-color: var(--border-hover); }
+
+    /* ---- stats ---- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .card .value {
+      font-size: 27px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      /* Whop returns money as a pre-formatted string. Tabular figures keep the
+         columns from jittering as values change on refresh. */
+      font-variant-numeric: tabular-nums;
+    }
+    .card.accent { border-color: rgba(162, 0, 255, 0.4); }
+    .card.accent .value { color: var(--brand); }
+
+    /* ---- referral link ---- */
+    .linkbox {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 32px;
+    }
+    .linkbox .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .linkrow { display: flex; gap: 10px; flex-wrap: wrap; }
+    .linkrow input {
+      flex: 1 1 260px;
+      min-width: 0;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      padding: 11px 13px;
+    }
+    .hint { color: var(--muted); font-size: 13px; margin: 12px 0 0; line-height: 1.6; }
+
+    /* ---- leaderboard ---- */
+    .tablewrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 320px; }
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    td.num { font-variant-numeric: tabular-nums; }
+    tr.me { background: rgba(162, 0, 255, 0.08); }
+    tr.me td { font-weight: 600; }
+
+    h2.section {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .pill.ok { background: rgba(16, 185, 129, 0.14); color: var(--success); }
+
+    .skeleton {
+      background: linear-gradient(90deg, #141414 25%, #1c1c1c 50%, #141414 75%);
+      background-size: 200% 100%;
+      animation: sk 1.3s ease-in-out infinite;
+      border-radius: 6px;
+      color: transparent !important;
+    }
+    @keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div class="wrap">
+
+<div class="top">
+<div class="brandmark">SNYPD</div>
+<a class="backlink" href="/dashboard">&larr; Back to dashboard</a>
+</div>
+
+<h1>Partner earnings</h1>
+<p class="sub">Your referrals and commission, live from Whop. You are already signed in &mdash; there is nothing else to log into.</p>
+
+<!-- Loading -->
+<div class="state" id="stateLoading">
+<h2 class="skeleton" style="width:200px">Loading</h2>
+<p class="skeleton" style="width:320px">Loading your partner data</p>
+</div>
+
+<!-- Signed out -->
+<div class="state hidden" id="stateSignedOut">
+<h2>Please sign in</h2>
+<p>You need to be signed in to see your partner earnings.</p>
+<a class="btn" href="/login">Sign in</a>
+</div>
+
+<!-- Not an affiliate -->
+<div class="state hidden" id="stateNotPartner">
+<h2>You are not a partner yet</h2>
+<p id="notPartnerCopy">Partners earn recurring commission on every subscriber they bring in, for as long as that subscriber stays. Ask about joining and we will set you up.</p>
+<a class="btn" href="/support">Apply to become a partner</a>
+</div>
+
+<!-- Provider / config problem -->
+<div class="state hidden" id="stateUnavailable">
+<h2>Earnings are temporarily unavailable</h2>
+<p id="unavailableCopy">We could not reach the billing provider. Your referrals and commission are unaffected &mdash; this is a display problem on our side. Try again in a minute.</p>
+<button class="btn ghost" id="retryBtn" type="button">Try again</button>
+</div>
+
+<!-- The dashboard -->
+<div class="hidden" id="stateOk">
+
+<div class="grid">
+<div class="card accent">
+<div class="label">Total commission</div>
+<div class="value" id="mEarnings">&mdash;</div>
+</div>
+<div class="card">
+<div class="label">Referrals</div>
+<div class="value" id="mReferrals">&mdash;</div>
+</div>
+<div class="card">
+<div class="label">Active members</div>
+<div class="value" id="mActive">&mdash;</div>
+</div>
+<div class="card">
+<div class="label">Monthly recurring</div>
+<div class="value" id="mMrr">&mdash;</div>
+</div>
+</div>
+
+<div class="linkbox">
+<div class="label">Your referral link</div>
+<div class="linkrow">
+<input id="refLink" readonly type="text"/>
+<button class="btn" id="copyBtn" type="button">Copy</button>
+</div>
+<p class="hint" id="refHint">Anyone who subscribes within 30 days of clicking this link is credited to you.</p>
+</div>
+
+<div class="linkbox hidden" id="lbBox">
+<h2 class="section">Top partners this month</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th>#</th><th>Partner</th><th>Referrals</th></tr></thead>
+<tbody id="lbBody"></tbody>
+</table>
+</div>
+</div>
+
+<p class="hint" id="metaLine"></p>
+</div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var API = 'https://api.snypd.store';
+  var sb = window.SNYPD && window.SNYPD.supabase;
+
+  function el(id) { return document.getElementById(id); }
+  function show(id) {
+    ['stateLoading', 'stateSignedOut', 'stateNotPartner', 'stateUnavailable', 'stateOk']
+      .forEach(function (s) { el(s).classList.toggle('hidden', s !== id); });
+  }
+  function text(id, v) {
+    var n = el(id);
+    if (n) { n.textContent = (v === null || v === undefined || v === '') ? '—' : String(v); }
+  }
+
+  // Whop hands money over as an already-formatted string ("$1,234.56"). It is
+  // displayed exactly as received: reformatting it here would mean parsing a
+  // localised currency string in the browser, and getting that subtly wrong on
+  // someone's income is worse than showing Whop's own formatting.
+  function money(v) {
+    return (typeof v === 'string' && v.trim()) ? v : '—';
+  }
+
+  function fail(copy) {
+    if (copy) { el('unavailableCopy').textContent = copy; }
+    show('stateUnavailable');
+  }
+
+  async function authedGet(path, token) {
+    var res = await fetch(API + path, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+    });
+    var body = null;
+    try { body = await res.json(); } catch (e) { body = null; }
+    return { status: res.status, body: body };
+  }
+
+  function renderLeaderboard(rows, myUsername) {
+    if (!rows || !rows.length) { return; }
+    var tb = el('lbBody');
+    tb.textContent = '';
+    rows.forEach(function (r) {
+      var tr = document.createElement('tr');
+      if (myUsername && r.username === myUsername) { tr.className = 'me'; }
+      // Built with createElement/textContent rather than innerHTML: these
+      // usernames come from Whop accounts we do not control, so they are
+      // untrusted input and must never be parsed as markup.
+      var c1 = document.createElement('td');
+      c1.className = 'num';
+      c1.textContent = r.rank;
+      var c2 = document.createElement('td');
+      c2.textContent = r.username || '—';
+      var c3 = document.createElement('td');
+      c3.className = 'num';
+      c3.textContent = r.referrals;
+      tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3);
+      tb.appendChild(tr);
+    });
+    el('lbBox').classList.remove('hidden');
+  }
+
+  async function load() {
+    show('stateLoading');
+
+    if (!sb) { fail('The page could not start up. Please reload.'); return; }
+
+    var session;
+    try {
+      var got = await sb.auth.getSession();
+      session = got && got.data ? got.data.session : null;
+    } catch (e) {
+      fail('We could not verify your session. Please reload.');
+      return;
+    }
+
+    if (!session || !session.access_token) { show('stateSignedOut'); return; }
+
+    var token = session.access_token;
+    var me;
+    try {
+      me = await authedGet('/api/v1/affiliate/me', token);
+    } catch (e) {
+      // Network-level failure: offline, DNS, TLS, or CORS.
+      fail('We could not reach our servers. Check your connection and try again.');
+      return;
+    }
+
+    if (me.status === 401) { show('stateSignedOut'); return; }
+
+    if (me.status === 404) {
+      // Two very different situations arrive as 404, and the copy has to match
+      // which one it is, or the page tells people something untrue.
+      var detail = (me.body && me.body.detail) || '';
+      if (detail.indexOf('not linked') !== -1) {
+        el('notPartnerCopy').textContent =
+          'This account has no Whop subscription linked to it yet. Start a plan first, '
+          + 'then you can join the partner programme.';
+      }
+      show('stateNotPartner');
+      return;
+    }
+
+    if (me.status === 503) {
+      fail('Earnings are not available right now. This is a configuration issue on our side, not a problem with your account.');
+      return;
+    }
+
+    if (me.status !== 200 || !me.body) {
+      fail('We could not load your earnings. Try again in a minute.');
+      return;
+    }
+
+    var d = me.body;
+    text('mEarnings', money(d.total_referral_earnings));
+    text('mReferrals', d.referrals);
+    text('mActive', d.active_members);
+    text('mMrr', money(d.monthly_recurring_revenue));
+
+    if (d.referral_link) {
+      el('refLink').value = d.referral_link;
+    } else {
+      el('refLink').value = '';
+      el('refHint').textContent =
+        'Your referral link is not ready yet. It appears once Whop has finished setting up your partner account.';
+    }
+
+    var bits = [];
+    if (d.username) { bits.push('Partner @' + d.username); }
+    if (d.retention_rate) { bits.push(d.retention_rate + ' retention'); }
+    bits.push('Figures come from Whop and can lag a couple of minutes.');
+    el('metaLine').textContent = bits.join(' · ');
+
+    show('stateOk');
+
+    // Optional and off by default on the server. A 404 here is the expected
+    // response, not an error, so it is handled silently.
+    try {
+      var lb = await authedGet('/api/v1/affiliate/leaderboard', token);
+      if (lb.status === 200 && lb.body && lb.body.leaderboard) {
+        renderLeaderboard(lb.body.leaderboard, d.username);
+      }
+    } catch (e) { /* leaderboard is decoration; never let it break the page */ }
+  }
+
+  el('copyBtn').addEventListener('click', async function () {
+    var input = el('refLink');
+    if (!input.value) { return; }
+    var btn = el('copyBtn');
+    try {
+      await navigator.clipboard.writeText(input.value);
+    } catch (e) {
+      // Clipboard API needs a secure context and permission; selecting the text
+      // is a useful fallback rather than a dead button.
+      input.select();
+      btn.textContent = 'Press Ctrl+C';
+      setTimeout(function () { btn.textContent = 'Copy'; }, 2400);
+      return;
+    }
+    btn.textContent = 'Copied';
+    setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+  });
+
+  el('retryBtn').addEventListener('click', load);
+
+  load();
+})();
+</script>
+</body>
+</html>

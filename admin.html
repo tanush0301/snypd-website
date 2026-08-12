@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>SNYPD Controls</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noindex, nofollow" name="robots"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+    // Pinned 2.45.4, single guarded client, same as every other page. Two GoTrue
+    // instances on one origin cause flaky sessions.
+    window.SNYPD = window.SNYPD || {};
+    if (!SNYPD.supabase) {
+      SNYPD.supabase = supabase.createClient(
+        'https://igbuqanjocfmahlzzupc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
+      );
+    }
+  </script>
+<style>
+    :root {
+      --bg: #000; --panel: #0E0E0E; --panel-2: #141414;
+      --border: #262626; --border-hover: #404040;
+      --text: #F5F5F5; --muted: #8A8A8A;
+      --brand: #A200FF; --brand-hover: #B533FF;
+      --success: #10B981; --warn: #F59E0B; --danger: #EF4444;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100dvh; background: var(--bg); color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+    .wrap { width: 100%; max-width: 860px; margin: 0 auto; padding: 48px 24px 96px; }
+    @media (max-width: 768px) { .wrap { padding: 28px 16px 72px; } }
+
+    .top { display: flex; align-items: center; justify-content: space-between;
+           gap: 16px; flex-wrap: wrap; margin-bottom: 36px; }
+    .brandmark { font-weight: 800; letter-spacing: 0.14em; font-size: 18px; }
+    .backlink { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .backlink:hover { color: var(--text); }
+
+    h1 { font-size: clamp(26px, 5vw, 36px); line-height: 1.1; margin: 0 0 10px;
+         font-weight: 800; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); font-size: 15px; margin: 0 0 32px; max-width: 62ch; line-height: 1.6; }
+
+    .state { border: 1px solid var(--border); background: var(--panel);
+             border-radius: var(--radius); padding: 32px; }
+    .state h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; }
+    .state p { margin: 0 0 20px; color: var(--muted); font-size: 15px;
+               line-height: 1.6; max-width: 58ch; }
+    .hidden { display: none !important; }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; border: 0;
+           cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600;
+           padding: 11px 18px; border-radius: 9px; background: var(--brand);
+           color: #fff; text-decoration: none; transition: background 140ms ease; }
+    .btn:hover { background: var(--brand-hover); }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn.ghost:hover { border-color: var(--border-hover); }
+
+    .setting { border: 1px solid var(--border); background: var(--panel);
+               border-radius: var(--radius); padding: 20px 22px; margin-bottom: 14px; }
+    .setting.danger { border-color: rgba(239, 68, 68, 0.35); }
+    .setting.busy { opacity: 0.55; pointer-events: none; }
+
+    .srow { display: flex; align-items: flex-start; justify-content: space-between;
+            gap: 20px; flex-wrap: wrap; }
+    .sinfo { flex: 1 1 320px; min-width: 0; }
+    .slabel { font-size: 16px; font-weight: 650; margin-bottom: 6px;
+              display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+    .sdesc { color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .sctl { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; }
+
+    .tag { font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+           text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+    .tag.danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .tag.fallback { background: rgba(245, 158, 11, 0.15); color: var(--warn); }
+
+    /* Toggle */
+    .toggle { position: relative; width: 52px; height: 30px; flex: 0 0 auto; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .track { position: absolute; inset: 0; background: #2A2A2A; border-radius: 999px;
+             cursor: pointer; transition: background 160ms ease; }
+    .track::after { content: ''; position: absolute; top: 3px; left: 3px;
+                    width: 24px; height: 24px; border-radius: 50%; background: #777;
+                    transition: transform 160ms ease, background 160ms ease; }
+    .toggle input:checked + .track { background: rgba(162, 0, 255, 0.35); }
+    .toggle input:checked + .track::after { transform: translateX(22px); background: var(--brand); }
+    .toggle input:focus-visible + .track { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+    /* Number */
+    .num { display: flex; align-items: center; gap: 8px; }
+    .num input {
+      width: 96px; background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 9px; color: var(--text); font-family: inherit;
+      font-size: 15px; font-weight: 600; padding: 9px 11px; text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .num input:focus { outline: none; border-color: var(--brand); }
+    .bounds { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 18px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.6); z-index: 50;
+      opacity: 0; pointer-events: none; transition: opacity 180ms ease;
+      max-width: calc(100vw - 32px);
+    }
+    .toast.show { opacity: 1; }
+    .toast.ok { border-color: rgba(16, 185, 129, 0.45); }
+    .toast.err { border-color: rgba(239, 68, 68, 0.5); }
+
+    .foot { color: var(--muted); font-size: 13px; margin-top: 26px; line-height: 1.7; }
+    .skeleton { background: linear-gradient(90deg,#141414 25%,#1c1c1c 50%,#141414 75%);
+                background-size: 200% 100%; animation: sk 1.3s ease-in-out infinite;
+                border-radius: 6px; color: transparent !important; }
+    @keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } .track, .track::after { transition: none; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+<div class="brandmark">SNYPD</div>
+<a class="backlink" href="/dashboard">&larr; Back to dashboard</a>
+</div>
+
+<h1>Controls</h1>
+<p class="sub">Live settings for the scraper. Changes save immediately and reach the servers within about a minute &mdash; no deploy, no terminal.</p>
+
+<div class="state" id="stateLoading">
+<h2 class="skeleton" style="width:180px">Loading</h2>
+<p class="skeleton" style="width:300px">Loading settings</p>
+</div>
+
+<div class="state hidden" id="stateSignedOut">
+<h2>Please sign in</h2>
+<p>You need to be signed in to change settings.</p>
+<a class="btn" href="/login">Sign in</a>
+</div>
+
+<div class="state hidden" id="stateDenied">
+<h2>Not available</h2>
+<p>This page is not available on your account.</p>
+<a class="btn ghost" href="/dashboard">Back to dashboard</a>
+</div>
+
+<div class="state hidden" id="stateError">
+<h2>Could not load settings</h2>
+<p id="errCopy">Something went wrong reaching the server.</p>
+<button class="btn ghost" id="retryBtn" type="button">Try again</button>
+</div>
+
+<div class="hidden" id="stateOk">
+<div id="settingList"></div>
+<p class="foot" id="footNote"></p>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var API = 'https://api.snypd.store';
+  var sb = window.SNYPD && window.SNYPD.supabase;
+  var token = null;
+
+  function el(id) { return document.getElementById(id); }
+  function show(id) {
+    ['stateLoading','stateSignedOut','stateDenied','stateError','stateOk']
+      .forEach(function (s) { el(s).classList.toggle('hidden', s !== id); });
+  }
+
+  var toastTimer = null;
+  function toast(msg, kind) {
+    var t = el('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (kind || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.className = 'toast ' + (kind || ''); }, 3200);
+  }
+
+  async function api(path, method, body) {
+    var opts = {
+      method: method || 'GET',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+    };
+    if (body) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    var res = await fetch(API + path, opts);
+    var payload = null;
+    try { payload = await res.json(); } catch (e) { payload = null; }
+    return { status: res.status, body: payload };
+  }
+
+  function makeToggle(s, onChange) {
+    var wrap = document.createElement('label');
+    wrap.className = 'toggle';
+    var input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = !!s.value;
+    var track = document.createElement('span');
+    track.className = 'track';
+    wrap.appendChild(input);
+    wrap.appendChild(track);
+    input.addEventListener('change', function () { onChange(input.checked, input); });
+    return wrap;
+  }
+
+  function makeNumber(s, onChange) {
+    var wrap = document.createElement('div');
+    wrap.className = 'num';
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.value = s.value;
+    if (s.min !== null && s.min !== undefined) { input.min = s.min; }
+    if (s.max !== null && s.max !== undefined) { input.max = s.max; }
+    var bounds = document.createElement('span');
+    bounds.className = 'bounds';
+    bounds.textContent = (s.min !== null && s.max !== null) ? (s.min + '–' + s.max) : '';
+    wrap.appendChild(input);
+    wrap.appendChild(bounds);
+
+    // Commit on blur or Enter rather than on every keystroke: typing "120" would
+    // otherwise fire a write for "1" and then "12", and "1" is below the minimum.
+    var last = String(s.value);
+    function commit() {
+      if (input.value === last) { return; }
+      last = input.value;
+      onChange(Number(input.value), input);
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { input.blur(); } });
+    return wrap;
+  }
+
+  function render(snapshot) {
+    var list = el('settingList');
+    list.textContent = '';
+
+    snapshot.settings.forEach(function (s) {
+      var card = document.createElement('div');
+      card.className = 'setting' + (s.danger ? ' danger' : '');
+
+      var row = document.createElement('div');
+      row.className = 'srow';
+
+      var info = document.createElement('div');
+      info.className = 'sinfo';
+
+      var label = document.createElement('div');
+      label.className = 'slabel';
+      // textContent, not innerHTML: labels and descriptions come from a database
+      // row and are treated as untrusted text.
+      label.appendChild(document.createTextNode(s.label));
+      if (s.danger) {
+        var d = document.createElement('span');
+        d.className = 'tag danger';
+        d.textContent = 'careful';
+        label.appendChild(d);
+      }
+      if (!s.from_db) {
+        var f = document.createElement('span');
+        f.className = 'tag fallback';
+        f.textContent = 'not saved yet';
+        f.title = 'This value comes from the server configuration, not the database. '
+                + 'Run migration 002_runtime_config.sql to make it editable.';
+        label.appendChild(f);
+      }
+      info.appendChild(label);
+
+      var desc = document.createElement('div');
+      desc.className = 'sdesc';
+      desc.textContent = s.description;
+      info.appendChild(desc);
+
+      var ctl = document.createElement('div');
+      ctl.className = 'sctl';
+
+      function save(newValue, inputEl) {
+        if (s.danger) {
+          var human = (s.type === 'bool')
+            ? (newValue ? 'ON' : 'OFF')
+            : String(newValue);
+          if (!window.confirm('Set "' + s.label + '" to ' + human + '?\n\n'
+                              + s.description)) {
+            // Put the control back the way it was.
+            if (s.type === 'bool') { inputEl.checked = !!s.value; }
+            else { inputEl.value = s.value; }
+            return;
+          }
+        }
+        card.classList.add('busy');
+        api('/api/v1/admin/config', 'PUT', { key: s.key, value: newValue })
+          .then(function (res) {
+            card.classList.remove('busy');
+            if (res.status === 200 && res.body) {
+              s.value = res.body.value;
+              toast(s.label + ' saved', 'ok');
+              // Re-render so any server-side coercion is reflected.
+              render(res.body);
+            } else if (res.status === 400) {
+              toast((res.body && res.body.detail) || 'Value not allowed', 'err');
+              if (s.type === 'bool') { inputEl.checked = !!s.value; }
+              else { inputEl.value = s.value; }
+            } else {
+              toast('Could not save. Nothing changed.', 'err');
+              if (s.type === 'bool') { inputEl.checked = !!s.value; }
+              else { inputEl.value = s.value; }
+            }
+          })
+          .catch(function () {
+            card.classList.remove('busy');
+            toast('Could not reach the server. Nothing changed.', 'err');
+            if (s.type === 'bool') { inputEl.checked = !!s.value; }
+            else { inputEl.value = s.value; }
+          });
+      }
+
+      ctl.appendChild(s.type === 'bool' ? makeToggle(s, save) : makeNumber(s, save));
+      row.appendChild(info);
+      row.appendChild(ctl);
+      card.appendChild(row);
+      list.appendChild(card);
+    });
+
+    var secs = snapshot.refresh_seconds || 30;
+    el('footNote').textContent =
+      'Servers re-read these every ' + secs + ' seconds, so a change is live within '
+      + 'about a minute. Values marked "not saved yet" are falling back to the '
+      + 'server configuration — run migration 002_runtime_config.sql to make '
+      + 'them editable.';
+  }
+
+  async function load() {
+    show('stateLoading');
+    if (!sb) { el('errCopy').textContent = 'The page could not start up. Please reload.'; show('stateError'); return; }
+
+    var session;
+    try {
+      var got = await sb.auth.getSession();
+      session = got && got.data ? got.data.session : null;
+    } catch (e) { session = null; }
+
+    if (!session || !session.access_token) { show('stateSignedOut'); return; }
+    token = session.access_token;
+
+    var res;
+    try {
+      res = await api('/api/v1/admin/config');
+    } catch (e) {
+      el('errCopy').textContent = 'Could not reach the server. Check your connection.';
+      show('stateError');
+      return;
+    }
+
+    if (res.status === 401) { show('stateSignedOut'); return; }
+    // 404 is what a non-admin gets, on purpose: the routes should not announce
+    // themselves to accounts that cannot use them.
+    if (res.status === 404) { show('stateDenied'); return; }
+    if (res.status === 503) {
+      el('errCopy').textContent =
+        'Admin access is not configured on the server yet. Set ADMIN_USER_IDS in the '
+        + 'backend environment to your Supabase user id.';
+      show('stateError');
+      return;
+    }
+    if (res.status !== 200 || !res.body) {
+      el('errCopy').textContent = 'The server returned an unexpected response (' + res.status + ').';
+      show('stateError');
+      return;
+    }
+
+    render(res.body);
+    show('stateOk');
+  }
+
+  el('retryBtn').addEventListener('click', load);
+  load();
+})();
+</script>
+</body>
+</html>
