@@ -492,7 +492,7 @@
 </div>
 <div class="snypd-sidebar__bottom">
 <div class="snypd-bottomRow">
-<div class="snypd-pill" data-snypd-plan="">PLAN â€” ELITE</div>
+<div class="snypd-pill" data-snypd-plan="">PLAN — ELITE</div>
 <a class="snypd-link" data-snypd-support="" href="/support">Support</a>
 </div>
 <button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
@@ -502,7 +502,7 @@
 <div id="mobile-header" style="display:none;">
 <button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px; cursor:pointer;">â˜°</button>
 </div>
-<section class="section-signup account"><div class="padding-global"><div class="container-large"></div></div><div class="w-embed w-script"><!-- SNYPD Account Page â€” FINAL Whop-only -->
+<section class="section-signup account"><div class="padding-global"><div class="container-large"></div></div><div class="w-embed w-script"><!-- SNYPD Account Page — FINAL Whop-only -->
 <style>
   .snypd-account-final{
     --bg:#0f0b16;
@@ -888,19 +888,19 @@
 <div class="rows">
 <div class="row">
 <div class="k">Email</div>
-<div class="v" data-snypd="email">â€”</div>
+<div class="v" data-snypd="email">—</div>
 </div>
 <div class="row">
 <div class="k">Plan</div>
-<div class="v" data-snypd="plan">â€”</div>
+<div class="v" data-snypd="plan">—</div>
 </div>
 <div class="row">
 <div class="k">Billing status</div>
-<div class="v" data-snypd="status">â€”</div>
+<div class="v" data-snypd="status">—</div>
 </div>
 <div class="row">
 <div class="k">Renews on</div>
-<div class="v" data-snypd="renews">â€”</div>
+<div class="v" data-snypd="renews">—</div>
 </div>
 </div>
 <div class="notice" data-snypd="notice"></div>
@@ -933,13 +933,13 @@
 <div class="mini-title">Billing</div>
 <a class="mini-link" data-snypd-action="billingLink" href="#">Manage</a>
 </div>
-<p class="mini-p" data-snypd="billingCopy">Loadingâ€¦</p>
+<p class="mini-p" data-snypd="billingCopy">Loading…</p>
 </div>
 <div class="mini">
 <div class="mini-hd">
 <div class="mini-title">Sync</div>
 </div>
-<p class="mini-p" data-snypd="lastUpdated">Last updated â€”</p>
+<p class="mini-p" data-snypd="lastUpdated">Last updated —</p>
 </div>
 <div class="mini">
 <div class="mini-hd">
@@ -980,9 +980,9 @@
   }
 
   function fmtDate(ts){
-    if (!ts) return "â€”";
+    if (!ts) return "—";
     const d = new Date(ts);
-    if (Number.isNaN(d.getTime())) return "â€”";
+    if (Number.isNaN(d.getTime())) return "—";
     return new Intl.DateTimeFormat("en-GB", {
       year:"numeric",
       month:"2-digit",
@@ -1089,7 +1089,7 @@
   (async () => {
     const sb = await waitForSupabase();
     if (!sb){
-      setText("userline", "Couldnâ€™t load account.");
+      setText("userline", "Couldn’t load account.");
       return;
     }
 
@@ -1125,8 +1125,8 @@
 
     if (error){
       console.error(error);
-      setText("status", "Couldnâ€™t load");
-      setText("billingCopy", "Couldnâ€™t load billing information.");
+      setText("status", "Couldn’t load");
+      setText("billingCopy", "Couldn’t load billing information.");
       return;
     }
 
