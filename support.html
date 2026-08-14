@@ -18,7 +18,7 @@
       const { data: { session } } = await SNYPD.supabase.auth.getSession();
       // Only redirect on pages you want protected (change /dashboard as needed)
       if (!session && location.pathname.startsWith('/dashboard')) {
-        location.href = '/sign-in';
+        location.href = '/login';
       }
     } catch (e) { console.error(e); }
   })();
@@ -36,7 +36,19 @@
   gtag('js', new Date());
 
   gtag('config', 'G-VBC0SXPR6F');
-</script><script type="text/javascript">window.__WEBFLOW_CURRENCY_SETTINGS = {"currencyCode":"USD","symbol":"$","decimal":".","fractionDigits":2,"group":",","template":"{{wf {\"path\":\"symbol\",\"type\":\"PlainText\"} }} {{wf {\"path\":\"amount\",\"type\":\"CommercePrice\"} }} {{wf {\"path\":\"currencyCode\",\"type\":\"PlainText\"} }}","hideDecimalForWholeNumbers":false};</script><!-- stray /head --><!-- stray body --><section><div class="w-embed w-script"><!-- Copy Everything Below This Line -->
+</script><script type="text/javascript">window.__WEBFLOW_CURRENCY_SETTINGS = {"currencyCode":"USD","symbol":"$","decimal":".","fractionDigits":2,"group":",","template":"{{wf {\"path\":\"symbol\",\"type\":\"PlainText\"} }} {{wf {\"path\":\"amount\",\"type\":\"CommercePrice\"} }} {{wf {\"path\":\"currencyCode\",\"type\":\"PlainText\"} }}","hideDecimalForWholeNumbers":false};</script><!-- snypd:seo -->
+<link rel="canonical" href="https://www.snypd.store/support"/>
+<meta property="og:url" content="https://www.snypd.store/support"/>
+<meta property="og:site_name" content="SNYPD"/>
+<meta property="og:locale" content="en"/>
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="SNYPD - Snype Vinted steals. Before anyone else."/>
+<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta property="og:type" content="website"/>
+<!-- stray /head --><!-- stray body --><section><div class="w-embed w-script"><!-- Copy Everything Below This Line -->
 <div class="snypd-island-nav-wrapper">
   <style>
     .snypd-island-nav-wrapper, .snypd-island-nav-wrapper * {
@@ -288,6 +300,29 @@
         padding: 0 16px;
       }
     }
+
+    /* On narrow phones the wordmark's 16px letter-spacing made the brand wide
+       enough to collide with the CTA, clipping the logo mid-letter. Scale the
+       wordmark and the button down together so the pill still fits at 360px. */
+    @media (max-width: 520px) {
+      .snypd-island-nav {
+        padding: 0 8px 0 14px;
+        gap: 10px;
+      }
+      .snypd-island__logo {
+        font-size: 19px;
+        letter-spacing: 9px;
+        margin-right: -9px;
+      }
+      .snypd-island__btn {
+        height: 38px;
+        padding: 0 13px;
+        font-size: 13px;
+      }
+      .snypd-island__btn span {
+        white-space: nowrap;
+      }
+    }
   </style>
 
   <nav class="snypd-island-nav">
@@ -421,6 +456,12 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+
+  /* The nav is position:fixed at top:24px over a 64px pill, so anything
+     scrolled to by the browser (e.g. tabbing to a focusable) must clear ~88px. */
+  html {
+    scroll-padding-top: 104px;
   }
 
   body {
@@ -693,21 +734,67 @@
     background: var(--c-bg-input);
     border: 1px solid var(--c-border-strong);
     border-radius: 12px;
-    padding: 16px;
+    padding: 24px 16px 10px; /* matches .f-input, leaves room for the floating label */
+    font-family: var(--font-sans);
     font-size: 15px;
-    color: var(--c-text-200);
+    color: var(--c-text-100);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     transition: all var(--time-fast) ease;
   }
+  /* The value is a flex item, so while it is empty it would collapse to 0 and
+     let the 16px chevron define the trigger's height — leaving it visibly
+     shorter than the .f-input fields beside it. */
+  .custom-select-value {
+    min-height: 1.25em;
+    line-height: 1.25;
+  }
+
   .custom-select-trigger:hover {
     border-color: var(--c-border-focus);
+  }
+  /* Keyboard focus. Mirrors .f-input:focus. The bare :focus rule is a fallback
+     for engines without :focus-visible (Safari < 15.4), which would otherwise
+     get no indicator at all now that the trigger is tabbable. */
+  .custom-select-trigger:focus {
+    border-color: var(--c-brand);
+    background: var(--c-bg-base);
+    box-shadow: 0 0 0 4px var(--c-brand-glow);
+  }
+  .custom-select-trigger:focus:not(:focus-visible) {
+    background: var(--c-bg-input);
+    box-shadow: none;
   }
   .custom-select-wrapper.open .custom-select-trigger {
     border-color: var(--c-brand);
     box-shadow: 0 0 0 4px var(--c-brand-glow);
+  }
+  /* Must stay AFTER the .open rule above: both are specificity (0,2,0), so
+     source order decides. Placed earlier, the error styling would silently
+     disappear the moment the panel opens. */
+  .input-group.error .custom-select-trigger {
+    border-color: var(--c-error);
+    box-shadow: 0 0 0 4px var(--c-error-glow);
+    animation: shake 0.4s ease-in-out;
+  }
+
+  /* Floating label — mirrors the .f-input / .f-label system above, but driven
+     by .has-value instead of :not(:placeholder-shown). */
+  .custom-select-wrapper.has-value .f-label,
+  .custom-select-wrapper.open .f-label,
+  .custom-select-trigger:focus-visible ~ .f-label {
+    transform: translateY(-10px) scale(0.75);
+    color: var(--c-text-300);
+  }
+  .custom-select-wrapper.open .f-label,
+  .custom-select-trigger:focus-visible ~ .f-label {
+    color: var(--c-brand);
+  }
+  .input-group.error .custom-select-wrapper .f-label {
+    color: var(--c-error) !important;
   }
 
   .chevron-icon {
@@ -720,6 +807,14 @@
     stroke: var(--c-brand);
   }
 
+  /* `transition: all` used to animate `visibility` too, which makes the panel's
+     open state depend on the animation clock: in any context that isn't
+     producing frames (backgrounded tab, throttled/headless renderer) the
+     transition sits at currentTime 0 and reports its START value forever, so
+     the panel stays visibility:hidden no matter what the cascade says.
+     Transition parameters come from the after-change style, so the .open rule
+     governs opening (visibility flips instantly) and the base rule governs
+     closing (visibility holds through the 200ms fade-out). */
   .custom-options {
     position: absolute;
     top: calc(100% + 8px);
@@ -730,15 +825,26 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.8);
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transform: translateY(-10px);
-    transition: all var(--time-fast) var(--ease-out-expo);
+    transition: opacity   var(--time-fast) var(--ease-out-expo),
+                transform var(--time-fast) var(--ease-out-expo),
+                visibility 0s linear var(--time-fast);
     z-index: 100;
-    overflow: hidden;
+    max-height: 240px;
+    overflow-x: hidden; /* not `overflow: hidden` — still clips the radius */
+    overflow-y: auto;
   }
   .custom-select-wrapper.open .custom-options {
     opacity: 1;
     visibility: visible;
+    /* pointer-events is never transitioned, so it flips immediately. Without
+       this the fading-out panel keeps swallowing clicks for 200ms. */
+    pointer-events: auto;
     transform: translateY(0);
+    transition: opacity   var(--time-fast) var(--ease-out-expo),
+                transform var(--time-fast) var(--ease-out-expo),
+                visibility 0s linear 0s;
   }
 
   .custom-option {
@@ -746,23 +852,83 @@
     font-size: 14px;
     color: var(--c-text-300);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     transition: background 0.2s, color 0.2s;
   }
-  .custom-option:hover {
+  /* No :hover rule — the highlight is driven from JS (mouseenter sets .active)
+     so the pointer and the keyboard cursor can never highlight two different
+     options at once. */
+  .custom-option.active {
     background: rgba(162, 0, 255, 0.08);
     color: var(--c-text-100);
   }
   .custom-option.selected {
     color: var(--c-brand);
     font-weight: 600;
-    background: var(--c-bg-input);
+  }
+  .custom-option.active.selected {
+    color: var(--c-brand);
+  }
+  .opt-check {
+    width: 16px; height: 16px;
+    flex: none;
+    opacity: 0;
+    stroke: var(--c-brand);
+    transition: opacity var(--time-fast) ease;
+  }
+  .custom-option.selected .opt-check {
+    opacity: 1;
+  }
+
+  /* Media queries add no specificity, so the .open rule must be named
+     explicitly here — targeting .custom-options alone would leave the open
+     animation running. */
+  @media (prefers-reduced-motion: reduce) {
+    .custom-options,
+    .custom-select-wrapper.open .custom-options {
+      transition: none;
+    }
+    .chevron-icon,
+    .opt-check,
+    .custom-option {
+      transition: none;
+    }
+    .input-group.error .f-input,
+    .input-group.error .custom-select-trigger {
+      animation: none;
+    }
+  }
+
+  /* Windows High Contrast strips box-shadow and rgba backgrounds, which is the
+     entire focus/selection language above. Restore real outlines. */
+  @media (forced-colors: active) {
+    .custom-select-trigger:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+    .custom-option.active {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .custom-option.selected {
+      font-weight: 700;
+    }
+    .opt-check {
+      stroke: CanvasText;
+    }
   }
 
   /* --- Multi-State Submit Button --- */
   .btn-submit {
     width: 100%;
     background: var(--c-text-100);
-    color: var(--c-bg-pure);
+    /* was var(--c-bg-pure), which is defined nowhere: the declaration was
+       invalid at computed-value time, so `color` inherited #E5E5E5 onto a
+       #FFFFFF button (~1.1:1). */
+    color: var(--c-bg-base);
     border: none;
     border-radius: 12px;
     padding: 18px;
@@ -789,9 +955,19 @@
     transform: translateY(0);
   }
 
+  .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .btn-submit:disabled:hover {
+    background: var(--c-text-100);
+    transform: none;
+  }
+
   /* States */
   .btn-submit .state-loading,
-  .btn-submit .state-success {
+  .btn-submit .state-success,
+  .btn-submit .state-error {
     position: absolute;
     inset: 0;
     display: flex;
@@ -819,6 +995,27 @@
     background: var(--c-success-glow);
     border-color: var(--c-success);
     color: var(--c-success);
+  }
+
+  .btn-submit.is-error .state-default { opacity: 0; }
+  .btn-submit.is-error .state-error {
+    opacity: 1; visibility: visible; transform: translateY(0);
+    background: var(--c-error-glow);
+    border-color: var(--c-error);
+    color: var(--c-error);
+  }
+
+  /* Submit outcome announced to screen readers; the button states are purely
+     visual (they animate opacity, not visibility, so they all stay in the
+     accessibility tree and get read as one run-on string). */
+  .form-status {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0; border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   /* Loading Spinner */
@@ -1079,7 +1276,13 @@
           <p>Transmissions are encrypted and reviewed within 24 hours.</p>
         </div>
 
-        <form id="snypdContactForm" class="form-grid" onsubmit="return false;">
+        <!-- novalidate: interactive constraint validation runs BEFORE the submit
+             event, so without it the browser's own bubble fires on the `required`
+             fields and the custom .error styling below never runs.
+             onsubmit="return false" is kept deliberately as the no-JS safety net:
+             if the script fails to load, a native submit would navigate away and
+             discard whatever the user typed. -->
+        <form id="snypdContactForm" class="form-grid" novalidate onsubmit="return false;">
           
           <!-- Name Input -->
           <div class="input-group" id="grpName">
@@ -1094,21 +1297,39 @@
           </div>
 
           <!-- Custom Dropdown (Topic) -->
-          <div class="input-group fg-full">
+          <div class="input-group fg-full" id="grpTopic">
             <div class="custom-select-wrapper" id="topicSelect">
-              <div class="custom-select-trigger" id="topicTrigger">
-                <span>Select Query Type</span>
-                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <div class="custom-select-trigger" id="topicTrigger"
+                   role="combobox" tabindex="0" aria-haspopup="listbox"
+                   aria-expanded="false" aria-controls="topicOptions"
+                   aria-labelledby="topicLabel">
+                <span class="custom-select-value" id="topicTriggerText"></span>
+                <svg class="chevron-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </div>
-              <div class="custom-options">
-                <div class="custom-option" data-value="tech">Technical & Engine Support</div>
-                <div class="custom-option" data-value="billing">Billing & Subscriptions</div>
-                <div class="custom-option" data-value="discord">Discord Webhook Setup</div>
-                <div class="custom-option" data-value="bug">Report a System Bug</div>
+              <label class="f-label" id="topicLabel">Query Type</label>
+              <div class="custom-options" id="topicOptions" role="listbox" aria-labelledby="topicLabel">
+                <div class="custom-option" role="option" id="topicOpt-tech" data-value="tech">
+                  <span class="opt-label">Technical & Engine Support</span>
+                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="custom-option" role="option" id="topicOpt-billing" data-value="billing">
+                  <span class="opt-label">Billing & Subscriptions</span>
+                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="custom-option" role="option" id="topicOpt-discord" data-value="discord">
+                  <span class="opt-label">Discord Webhook Setup</span>
+                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="custom-option" role="option" id="topicOpt-bug" data-value="bug">
+                  <span class="opt-label">Report a System Bug</span>
+                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
               </div>
             </div>
-            <!-- Hidden real input for form submission logic -->
-            <input type="hidden" id="topicValue" required>
+            <!-- Hidden real input for form submission logic. `required` was
+                 removed: hidden inputs are barred from constraint validation,
+                 so it never did anything. The topic is validated in JS. -->
+            <input type="hidden" id="topicValue" name="topic">
           </div>
 
           <!-- Message Textarea -->
@@ -1137,7 +1358,13 @@
                 SECURED.
               </div>
 
+              <div class="state-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12" y2="16"></line><circle cx="12" cy="12" r="9"></circle></svg>
+                TRANSMISSION FAILED
+              </div>
+
             </button>
+            <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
           </div>
 
         </form>
@@ -1215,7 +1442,7 @@
             </button>
             <div class="faq-content">
               <div class="faq-content-inner">
-                SNYPD operates <strong>entirely independently</strong> of your personal Vinted account. We do not use your session tokens to scrape. You only use your personal account to make the final manual purchase, keeping you 100% safe.
+                SNYPD operates <strong>entirely independently</strong> of your personal Vinted account. We do not use your session tokens to scrape. You only use your personal account to make the final manual purchase &mdash; so nothing about how your account behaves on Vinted changes.
               </div>
             </div>
           </div>
@@ -1282,44 +1509,198 @@
     });
 
 
-    /* --- B. Custom Select Dropdown Engine --- */
+    /* --- B. Custom Select Dropdown Engine ---
+       ARIA APG "select-only combobox": focus never leaves the trigger, the
+       listbox is never focusable, and the highlighted option is communicated
+       via aria-activedescendant.
+       Every lookup is scoped to the wrapper on purpose — this page is several
+       concatenated Webflow embeds, so a document-wide `.custom-option` query is
+       a live collision risk. */
     const selectWrapper = document.getElementById('topicSelect');
     const selectTrigger = document.getElementById('topicTrigger');
-    const triggerText = selectTrigger.querySelector('span');
-    const options = document.querySelectorAll('.custom-option');
+    const optionsPanel  = document.getElementById('topicOptions');
+    const triggerText   = document.getElementById('topicTriggerText');
+    const grpTopic      = document.getElementById('grpTopic');
+    const options = Array.from(selectWrapper.querySelectorAll('.custom-option'));
     const hiddenInput = document.getElementById('topicValue');
+    const TRIGGER_PLACEHOLDER = '';
 
-    // Toggle dropdown
-    selectTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectWrapper.classList.toggle('open');
-    });
+    let activeIndex = -1;
+    let typeahead = '';
+    let typeaheadTimer = null;
 
-    // Handle selection
-    options.forEach(option => {
-      option.addEventListener('click', (e) => {
-        e.stopPropagation();
-        
-        // Remove active state from all
-        options.forEach(opt => opt.classList.remove('selected'));
-        
-        // Set new active state
-        option.classList.add('selected');
-        triggerText.textContent = option.textContent;
-        triggerText.style.color = 'var(--c-text-100)'; // highlight text
-        
-        // Set hidden input value for form submission
-        hiddenInput.value = option.getAttribute('data-value');
-        
-        // Close dropdown
-        selectWrapper.classList.remove('open');
-      });
-    });
+    const isOpen = () => selectWrapper.classList.contains('open');
+    const selectedIndex = () => options.findIndex(o => o.classList.contains('selected'));
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', () => {
+    // Don't use scrollIntoView(): .terminal-panel is overflow:hidden, which is
+    // still programmatically scrollable, so it would silently shift the whole
+    // form inside its own rounded box with no scrollbar to explain it.
+    function scrollActiveIntoView(el) {
+      if (el.offsetTop < optionsPanel.scrollTop) {
+        optionsPanel.scrollTop = el.offsetTop;
+      } else if (el.offsetTop + el.offsetHeight > optionsPanel.scrollTop + optionsPanel.clientHeight) {
+        optionsPanel.scrollTop = el.offsetTop + el.offsetHeight - optionsPanel.clientHeight;
+      }
+    }
+
+    function setActive(index) {
+      if (!options.length) return;
+      activeIndex = (index + options.length) % options.length;
+      options.forEach((opt, i) => opt.classList.toggle('active', i === activeIndex));
+      const el = options[activeIndex];
+      selectTrigger.setAttribute('aria-activedescendant', el.id);
+      scrollActiveIntoView(el);
+    }
+
+    function openPanel() {
+      if (isOpen()) return;
+      selectWrapper.classList.add('open');
+      selectTrigger.setAttribute('aria-expanded', 'true');
+      // APG: open on the selected option if there is one, else the first.
+      setActive(selectedIndex() >= 0 ? selectedIndex() : 0);
+    }
+
+    function closePanel() {
+      if (!isOpen()) return;
       selectWrapper.classList.remove('open');
+      selectTrigger.setAttribute('aria-expanded', 'false');
+      selectTrigger.removeAttribute('aria-activedescendant');
+      options.forEach(opt => opt.classList.remove('active'));
+      activeIndex = -1;
+    }
+
+    function selectOption(option) {
+      options.forEach(opt => {
+        const on = opt === option;
+        opt.classList.toggle('selected', on);
+        // APG: mark only the selected option. Setting aria-selected="false" on
+        // the rest makes several screen readers announce "not selected" on
+        // every arrow press.
+        if (on) opt.setAttribute('aria-selected', 'true');
+        else opt.removeAttribute('aria-selected');
+      });
+      triggerText.textContent = option.querySelector('.opt-label').textContent;
+      selectWrapper.classList.add('has-value');
+      hiddenInput.value = option.getAttribute('data-value');
+      clearTopicError();
+    }
+
+    function clearSelection() {
+      options.forEach(opt => {
+        opt.classList.remove('selected', 'active');
+        opt.removeAttribute('aria-selected');
+      });
+      triggerText.textContent = TRIGGER_PLACEHOLDER;
+      selectWrapper.classList.remove('has-value');
+      hiddenInput.value = '';
+      clearTopicError();
+    }
+
+    function clearTopicError() {
+      grpTopic.classList.remove('error');
+      selectTrigger.removeAttribute('aria-invalid');
+    }
+
+    selectTrigger.addEventListener('click', () => {
+      // No stopPropagation: it silently breaks unrelated global click handlers
+      // (this page has another one for the mobile nav). The outside-click
+      // closer below uses a containment check instead.
+      selectTrigger.focus();
+      isOpen() ? closePanel() : openPanel();
     });
+
+    // Options aren't focusable, so clicking one moves focus to <body>, which
+    // fires focusout BEFORE the option's click and would cancel the selection.
+    // Suppressing mousedown's default keeps focus on the trigger throughout.
+    optionsPanel.addEventListener('mousedown', (e) => e.preventDefault());
+
+    options.forEach((option, i) => {
+      option.addEventListener('click', () => {
+        selectOption(option);
+        closePanel();
+        selectTrigger.focus();
+      });
+      // Pointer highlight is driven through the same .active class as the
+      // keyboard cursor, so the two can never disagree.
+      option.addEventListener('mouseenter', () => { if (isOpen()) setActive(i); });
+    });
+
+    selectTrigger.addEventListener('keydown', (e) => {
+      const open = isOpen();
+
+      switch (e.key) {
+        case 'Enter':
+        case ' ':
+        case 'Spacebar':
+          e.preventDefault(); // Space would scroll the page off a div[tabindex]
+          if (open) {
+            if (activeIndex >= 0) selectOption(options[activeIndex]);
+            closePanel();
+          } else {
+            openPanel();
+          }
+          return;
+
+        case 'ArrowDown':
+          e.preventDefault();
+          if (e.altKey) { openPanel(); return; }
+          if (open) setActive(activeIndex + 1); else openPanel();
+          return;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          if (e.altKey) { closePanel(); return; }
+          if (open) setActive(activeIndex - 1); else openPanel();
+          return;
+
+        case 'Home':
+          e.preventDefault();
+          if (!open) openPanel();
+          setActive(0);
+          return;
+
+        case 'End':
+          e.preventDefault();
+          if (!open) openPanel();
+          setActive(options.length - 1);
+          return;
+
+        case 'Escape':
+          // Only intercept when open, so Escape stays available to anything else.
+          if (open) { e.preventDefault(); closePanel(); }
+          return;
+
+        case 'Tab':
+          // Never preventDefault — focus must be allowed to move on.
+          closePanel();
+          return;
+      }
+
+      // Typeahead. The modifier guard stops Ctrl+R / Cmd+V being swallowed.
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        if (!open) openPanel();
+        typeahead += e.key.toLowerCase();
+        clearTimeout(typeaheadTimer);
+        typeaheadTimer = setTimeout(() => { typeahead = ''; }, 500);
+        const match = options.findIndex(
+          o => o.querySelector('.opt-label').textContent.trim().toLowerCase().startsWith(typeahead)
+        );
+        if (match >= 0) setActive(match);
+      }
+    });
+
+    // Close when focus leaves the widget by any route.
+    selectWrapper.addEventListener('focusout', (e) => {
+      if (!selectWrapper.contains(e.relatedTarget)) closePanel();
+    });
+
+    // Capture phase, so this still runs even though other handlers on this page
+    // call stopPropagation() during the bubble phase (e.g. the mobile nav
+    // toggle). pointerdown rather than click matches native menu behaviour.
+    document.addEventListener('pointerdown', (e) => {
+      if (!selectWrapper.contains(e.target)) closePanel();
+    }, true);
 
 
     /* --- C. Form Validation & Character Counter --- */
@@ -1352,48 +1733,172 @@
     emailInput.addEventListener('input', () => {
       grpEmail.classList.remove('error');
     });
+    document.getElementById('pilotName').addEventListener('input', (e) => {
+      if (e.target.value.trim()) e.target.closest('.input-group').classList.remove('error');
+    });
 
     // Character Counter
     msgInput.addEventListener('input', () => {
       charCount.textContent = msgInput.value.length;
+      if (msgInput.value.trim()) msgInput.closest('.input-group').classList.remove('error');
     });
 
 
     /* --- D. Multi-State Submit Button Engine --- */
     const form = document.getElementById('snypdContactForm');
     const btnSubmit = document.getElementById('btnSubmit');
+    const nameInput = document.getElementById('pilotName');
+    const grpName = document.getElementById('grpName');
+    const formStatus = document.getElementById('formStatus');
 
-    form.addEventListener('submit', (e) => {
+    /* ── Support ticket endpoint ──────────────────────────────────────────
+       TODO: set this to the API route once it exists on the backend, e.g.
+             '/api/v1/support-ticket'
+       While it is null the form reports a real failure instead of faking
+       success — this page previously animated "SECURED." and then silently
+       discarded every message. Mirrors the prod-vs-VPS derivation used by
+       HEARTBEAT_URL in dashboard.html.
+       Backend note: sending JSON cross-origin (snypd.store -> api.snypd.store)
+       triggers a CORS preflight, so the route needs OPTIONS handling. */
+    const SUPPORT_TICKET_ROUTE = null;
+    const SUPPORT_TICKET_TIMEOUT_MS = 15000;
+
+    const SUPPORT_TICKET_URL = (() => {
+      if (!SUPPORT_TICKET_ROUTE) return null;
+      const isProd = /(^|\.)snypd\.store$/i.test(location.hostname);
+      if (isProd) return `https://api.snypd.store${SUPPORT_TICKET_ROUTE}`;
+      const scheme = location.protocol === 'https:' ? 'https' : 'http';
+      return `${scheme}://82.165.195.178${SUPPORT_TICKET_ROUTE}`;
+    })();
+
+    let resetTimer = null;
+    let inFlight = false;
+
+    function setButtonState(state) {
+      btnSubmit.classList.remove('is-loading', 'is-success', 'is-error');
+      if (state) btnSubmit.classList.add(state);
+      // These panels animate opacity, not visibility, so without this they all
+      // stay in the accessibility tree and get read as one run-on string.
+      btnSubmit.querySelectorAll('.state-default, .state-loading, .state-success, .state-error')
+        .forEach(el => {
+          const shown = el.classList.contains(state ? `state-${state.replace('is-', '')}` : 'state-default');
+          el.setAttribute('aria-hidden', shown ? 'false' : 'true');
+        });
+    }
+
+    function announce(message) {
+      formStatus.textContent = message;
+    }
+
+    // Any keystroke cancels a pending reset: the 3s timer used to wipe whatever
+    // the user had started typing, and two submits stacked two timers.
+    function cancelPendingReset() {
+      if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
+    }
+    form.addEventListener('input', cancelPendingReset);
+
+    // Centralised so every reset path stays consistent, including a native
+    // reset button if one is ever added.
+    form.addEventListener('reset', () => {
+      clearSelection();
+      charCount.textContent = '0';
+      grpEmail.classList.remove('success', 'error');
+      grpName.classList.remove('error');
+      grpTopic.classList.remove('error');
+    });
+
+    function validateForm() {
+      let firstInvalid = null;
+
+      grpName.classList.toggle('error', !nameInput.value.trim());
+      if (!nameInput.value.trim()) firstInvalid = firstInvalid || nameInput;
+
+      const emailOk = validateEmail(emailInput.value);
+      grpEmail.classList.toggle('error', !emailOk);
+      if (!emailOk) firstInvalid = firstInvalid || emailInput;
+
+      // The topic was never validated before: `required` on a hidden input is
+      // inert, so a ticket could be filed with no category at all.
+      const topicOk = !!hiddenInput.value;
+      grpTopic.classList.toggle('error', !topicOk);
+      selectTrigger.setAttribute('aria-invalid', topicOk ? 'false' : 'true');
+      if (!topicOk) firstInvalid = firstInvalid || selectTrigger;
+
+      const msgOk = !!msgInput.value.trim();
+      msgInput.closest('.input-group').classList.toggle('error', !msgOk);
+      if (!msgOk) firstInvalid = firstInvalid || msgInput;
+
+      return firstInvalid;
+    }
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      // Basic check
-      if(!validateEmail(emailInput.value)) {
-        grpEmail.classList.add('error');
+      if (inFlight) return;
+      cancelPendingReset();
+
+      const firstInvalid = validateForm();
+      if (firstInvalid) {
+        announce('Some fields need attention before this can be sent.');
+        firstInvalid.focus();
         return;
       }
 
-      // Enter Loading State
-      btnSubmit.classList.add('is-loading');
+      const payload = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        topic: hiddenInput.value,
+        message: msgInput.value.trim(),
+      };
 
-      // Simulate Network Request (1.5 seconds)
-      setTimeout(() => {
-        // Enter Success State
-        btnSubmit.classList.remove('is-loading');
-        btnSubmit.classList.add('is-success');
+      inFlight = true;
+      btnSubmit.disabled = true;
+      setButtonState('is-loading');
+      announce('Sending your message.');
 
-        // Optional: Reset form fields after delay
-        setTimeout(() => {
+      try {
+        if (!SUPPORT_TICKET_URL) {
+          throw new Error('SUPPORT_TICKET_ROUTE is not configured');
+        }
+
+        // Without an abort the button can stay disabled forever on a hung request.
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), SUPPORT_TICKET_TIMEOUT_MS);
+        let res;
+        try {
+          res = await fetch(SUPPORT_TICKET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
+        if (!res.ok) throw new Error(`Support endpoint returned ${res.status}`);
+
+        setButtonState('is-success');
+        announce('Message sent. We reply within 24 hours.');
+        resetTimer = setTimeout(() => {
+          resetTimer = null;
           form.reset();
-          btnSubmit.classList.remove('is-success');
-          charCount.textContent = '0';
-          triggerText.textContent = 'Select Query Type';
-          triggerText.style.color = 'var(--c-text-200)';
-          hiddenInput.value = '';
-          grpEmail.classList.remove('success', 'error');
+          setButtonState(null);
         }, 3000);
-
-      }, 1500);
+      } catch (err) {
+        console.error('[snypd] support ticket failed:', err);
+        setButtonState('is-error');
+        announce('Your message could not be sent. Please email us or try again.');
+        resetTimer = setTimeout(() => {
+          resetTimer = null;
+          setButtonState(null);
+        }, 4000);
+      } finally {
+        inFlight = false;
+        btnSubmit.disabled = false;
+      }
     });
+
+    // Establish the initial aria-hidden bookkeeping on the button states.
+    setButtonState(null);
 
   });
 </script>

@@ -20,7 +20,7 @@
       const { data: { session } } = await SNYPD.supabase.auth.getSession();
       // Only redirect on pages you want protected (change /dashboard as needed)
       if (!session && location.pathname.startsWith('/dashboard')) {
-        location.href = '/sign-in';
+        location.href = '/login';
       }
     } catch (e) { console.error(e); }
   })();
@@ -52,9 +52,19 @@
   } catch (e) {
     console.error('Error checking session:', e);
   }
-</script><script src="/assets/webflow/js/vvprocess-1.0.0.js" type="text/javascript"></script><script src="/assets/webflow/js/vvbootstrap.js" type="text/javascript"></script><script type="text/javascript">window.__WEBFLOW_CURRENCY_SETTINGS = {"currencyCode":"USD","symbol":"$","decimal":".","fractionDigits":2,"group":",","template":"{{wf {\"path\":\"symbol\",\"type\":\"PlainText\"} }} {{wf {\"path\":\"amount\",\"type\":\"CommercePrice\"} }} {{wf {\"path\":\"currencyCode\",\"type\":\"PlainText\"} }}","hideDecimalForWholeNumbers":false};</script><!-- stray /head --><!-- stray body -->
+</script><script src="/assets/webflow/js/vvprocess-1.0.0.js" type="text/javascript"></script><script src="/assets/webflow/js/vvbootstrap.js" type="text/javascript"></script><script type="text/javascript">window.__WEBFLOW_CURRENCY_SETTINGS = {"currencyCode":"USD","symbol":"$","decimal":".","fractionDigits":2,"group":",","template":"{{wf {\"path\":\"symbol\",\"type\":\"PlainText\"} }} {{wf {\"path\":\"amount\",\"type\":\"CommercePrice\"} }} {{wf {\"path\":\"currencyCode\",\"type\":\"PlainText\"} }}","hideDecimalForWholeNumbers":false};</script><!-- snypd:seo -->
+<link rel="canonical" href="https://www.snypd.store/faq"/>
+<meta property="og:url" content="https://www.snypd.store/faq"/>
+<meta property="og:site_name" content="SNYPD"/>
+<meta property="og:locale" content="en"/>
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="SNYPD - Snype Vinted steals. Before anyone else."/>
+<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<!-- stray /head --><!-- stray body -->
 
-<div class="w-container"><!-- =============== SNYPD FAQ — ICON + CREATIVE LAYOUT (Webflow Embed) ================= -->
+<div class="w-container"><!-- =============== SNYPD FAQ â ICON + CREATIVE LAYOUT (Webflow Embed) ================= -->
 <section id="faq" class="faq faq--cards sn-faq reveal" data-brand="snypd">
   <!-- SVG sprite (icons reused, tiny) -->
   <svg width="0" height="0" style="position:absolute"><defs>
@@ -76,7 +86,7 @@
 
     <!-- Search + Category chips -->
     <div class="faq__controls">
-      <input type="search" class="faq__search" placeholder="Search FAQs (speed, login, markets…)" aria-label="Search FAQs">
+      <input type="search" class="faq__search" placeholder="Search FAQs (speed, login, marketsâ¦)" aria-label="Search FAQs">
       <div class="faq__chips" role="tablist" aria-label="FAQ categories">
         <button class="chip is-active" data-cat="all" role="tab" aria-selected="true">All</button>
         <button class="chip" data-cat="start" role="tab">Getting started</button>
@@ -94,7 +104,7 @@
       <div class="help-card">
         <div class="help-card__icon" aria-hidden="true"></div>
         <h3>Need a hand?</h3>
-        <p>We reply fast. Ask anything—filters, offers, markets.</p>
+        <p>We reply fast. Ask anythingâfilters, offers, markets.</p>
         <a class="btn outline" href="mailto:snypd@gmail.com">Email support</a>
       </div>
     </aside>
@@ -109,7 +119,7 @@
         </summary>
         <div class="faq__content">
           Paste your <b>Vinted search URL</b> (brand, size, price caps), give it a short name, switch it <b>Active</b>.  
-          We’ll send an <b>instant email alert</b> when a fresh match hits—open the listing and make the offer.
+          Weâll send an <b>instant email alert</b> when a fresh match hitsâopen the listing and make the offer.
           <div class="faq__cta">
             <a href="/plans" class="btn gradient-cta" data-ev="faq_cta_click" data-dest="plans-from-start">See plans</a>
           </div>
@@ -123,8 +133,8 @@
           <a class="faq__deeplink" href="#faq-speed" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Near real-time for new listings. Speed varies by site latency and your email provider, but SNYPD is tuned for <b>“be first.”</b>  
-          Noise control gives you <b>one alert per item</b>—re-lists and obvious duplicates are silenced.
+          Near real-time for new listings. Speed varies by site latency and your email provider, but SNYPD is tuned for <b>âbe first.â</b>  
+          Noise control gives you <b>one alert per item</b>âre-lists and obvious duplicates are silenced.
         </div>
       </details>
 
@@ -146,7 +156,7 @@
           <a class="faq__deeplink" href="#faq-markets" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          EU focus: <b>.be / .fr / .de / .nl / .it</b>, with more coming. Your filters travel with you—same alert format across markets.
+          EU focus: <b>.be / .fr / .de / .nl / .it</b>, with more coming. Your filters travel with youâsame alert format across markets.
         </div>
       </details>
 
@@ -157,7 +167,7 @@
           <a class="faq__deeplink" href="#faq-pause" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Yes. Use <b>Safe-pause</b> anytime. A friendly <b>quota guard</b> nudges you near limits—Kickstart <b>2</b>, Pro <b>5</b>, Elite <b>7</b> active filters.
+          Yes. Use <b>Safe-pause</b> anytime. A friendly <b>quota guard</b> nudges you near limitsâKickstart <b>2</b>, Pro <b>5</b>, Elite <b>7</b> active filters.
         </div>
       </details>
 
@@ -193,7 +203,7 @@
           <a class="faq__deeplink" href="#faq-discord" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          We’re piloting a private Discord for <b>legit checks</b>, playbooks, and reseller Q&A. Optional—alerts work without it.  
+          Weâre piloting a private Discord for <b>legit checks</b>, playbooks, and reseller Q&A. Optionalâalerts work without it.  
           Early users get invite priority. Email us for <b>Discord beta access</b>.
           <div class="faq__cta">
             <a href="mailto:snypd@gmail.com?subject=Discord%20beta" class="btn outline" data-ev="faq_cta_click" data-dest="email-discord-beta">Request invite</a>
@@ -224,7 +234,7 @@
         </summary>
         <div class="faq__content">
           We publish <b>market snapshots</b> (SNKRS heat, size velocity, price floors).  
-          Useful for setting caps on your filters. Join the beta list—email us to be notified.
+          Useful for setting caps on your filters. Join the beta listâemail us to be notified.
           <div class="faq__cta">
             <a href="mailto:snypd@gmail.com?subject=Market%20insights%20beta" class="btn outline" data-ev="faq_cta_click" data-dest="email-insights">Join insights beta</a>
           </div>
@@ -234,7 +244,7 @@
       <details id="faq-support" data-cat="support">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-help"/></svg></span>
-          <span>Didn’t find what you need?</span>
+          <span>Didnât find what you need?</span>
           <a class="faq__deeplink" href="#faq-support" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
@@ -250,7 +260,7 @@
 </section>
 
 <style>
-/* ====== Tokens (dark glass, lilac→teal) ====== */
+/* ====== Tokens (dark glass, lilacâteal) ====== */
 :root{
   --bg:#0B0F14; --surface:#0F1520; --text:#E8ECF2; --muted:#9AA4B2;
   --brand1:#A855F7; --brand2:#06B6D4; --ring:rgba(168,85,247,.45);
@@ -381,7 +391,7 @@
 })();
 </script>
 <!-- ==================================================================== --></div>
-<footer class="footer is-inverse"><div class="container"><div class="w-layout-grid grid_4-col gap-small"><ul role="list" class="margin-bottom_none w-list-unstyled"><li><h2 class="heading_h6 text-color_secondary">Socials</h2></li><li><a href="#" class="footer_link on-inverse w-inline-block"><div>Instagram</div></a></li><li><a href="/" aria-current="page" class="footer_link on-inverse w-inline-block w--current"><div>Perks</div></a></li></ul><ul role="list" class="margin-bottom_none w-list-unstyled"><li><h2 class="heading_h6 text-color_secondary">Get started</h2></li><li><a href="#" class="footer_link on-inverse w-inline-block"><div>Login</div></a></li><li><a href="#" class="footer_link on-inverse w-inline-block"><div>Demo</div></a></li></ul></div><div class="footer_bottom-3-col"><div id="w-node-_9e12d28a-a203-35aa-fcc5-36ac3be47ae6-8afe22f8" class="text-color_secondary w-node-_707e6def-b789-da4a-aaff-6a126eadbc3c-6eadbbd8">� 2024 Snypd. Be first. Stay ahead.</div><div class="nav_left">SNYPD<br/></div><ul id="w-node-_11ac9e46-92ae-12f1-c825-50e98dadbe36-8afe22f8" aria-label="Social media links" role="list" class="footer_icon-group w-node-_707e6def-b789-da4a-aaff-6a126eadbc44-6eadbbd8 w-list-unstyled"><li class="margin-bottom_none"><a href="#" class="footer_icon-link w-inline-block"><div class="screen-reader">Facebook</div></a></li><li class="margin-bottom_none"><a href="#" class="footer_icon-link w-inline-block"><div class="icon_small-1x1 text-color_inherit"><svg width="100%" height="100%" viewBox="0 0 16 16"><path d="M8,1.441c2.136,0,2.389.009,3.233.047a4.419,4.419,0,0,1,1.485.276,2.472,2.472,0,0,1,.92.6,2.472,2.472,0,0,1,.6.92,4.419,4.419,0,0,1,.276,1.485c.038.844.047,1.1.047,3.233s-.009,2.389-.047,3.233a4.419,4.419,0,0,1-.276,1.485,2.644,2.644,0,0,1-1.518,1.518,4.419,4.419,0,0,1-1.485.276c-.844.038-1.1.047-3.233.047s-2.389-.009-3.233-.047a4.419,4.419,0,0,1-1.485-.276,2.472,2.472,0,0,1-.92-.6,2.472,2.472,0,0,1-.6-.92,4.419,4.419,0,0,1-.276-1.485c-.038-.844-.047-1.1-.047-3.233s.009-2.389.047-3.233a4.419,4.419,0,0,1,.276-1.485,2.472,2.472,0,0,1,.6-.92,2.472,2.472,0,0,1,.92-.6,4.419,4.419,0,0,1,1.485-.276c.844-.038,1.1-.047,3.233-.047M8,0C5.827,0,5.555.009,4.7.048A5.868,5.868,0,0,0,2.76.42a3.908,3.908,0,0,0-1.417.923A3.908,3.908,0,0,0,.42,2.76,5.868,5.868,0,0,0,.048,4.7C.009,5.555,0,5.827,0,8s.009,2.445.048,3.3A5.868,5.868,0,0,0,.42,13.24a3.908,3.908,0,0,0,.923,1.417,3.908,3.908,0,0,0,1.417.923,5.868,5.868,0,0,0,1.942.372C5.555,15.991,5.827,16,8,16s2.445-.009,3.3-.048a5.868,5.868,0,0,0,1.942-.372,4.094,4.094,0,0,0,2.34-2.34,5.868,5.868,0,0,0,.372-1.942c.039-.853.048-1.125.048-3.3s-.009-2.445-.048-3.3A5.868,5.868,0,0,0,15.58,2.76a3.908,3.908,0,0,0-.923-1.417A3.908,3.908,0,0,0,13.24.42,5.868,5.868,0,0,0,11.3.048C10.445.009,10.173,0,8,0Z" fill="currentColor"></path><path d="M8,3.892A4.108,4.108,0,1,0,12.108,8,4.108,4.108,0,0,0,8,3.892Zm0,6.775A2.667,2.667,0,1,1,10.667,8,2.667,2.667,0,0,1,8,10.667Z" fill="currentColor"></path><circle cx="12.27" cy="3.73" r="0.96" fill="currentColor"></circle></svg></div><div class="screen-reader">Instagram</div></a></li></ul></div></div></footer><script src="/assets/webflow/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script><script src="/assets/webflow/js/webflow.schunk.1a807f015b216e46.js" type="text/javascript"></script><script src="/assets/webflow/js/webflow.schunk.bc05f67f6ffde94d.js" type="text/javascript"></script><script src="/assets/webflow/js/webflow.af23ce43.9be76c77531c84a5.js" type="text/javascript"></script><script src="/assets/webflow/js/gsap.min.js" type="text/javascript"></script><!-- Google Tag Manager (noscript) -->
+<footer class="footer is-inverse"><div class="container"><div class="w-layout-grid grid_4-col gap-small"><ul role="list" class="margin-bottom_none w-list-unstyled"><li><h2 class="heading_h6 text-color_secondary">Socials</h2></li><li><a href="https://discord.gg/4RUtXW78vc" class="footer_link on-inverse w-inline-block" target="_blank" rel="noopener"><div>Discord</div></a></li><li><a href="/" aria-current="page" class="footer_link on-inverse w-inline-block w--current"><div>Perks</div></a></li></ul><ul role="list" class="margin-bottom_none w-list-unstyled"><li><h2 class="heading_h6 text-color_secondary">Get started</h2></li><li><a href="/login" class="footer_link on-inverse w-inline-block"><div>Log in</div></a></li><li><a href="/#how-it-works" class="footer_link on-inverse w-inline-block"><div>How it works</div></a></li></ul></div><div class="footer_bottom-3-col"><div id="w-node-_9e12d28a-a203-35aa-fcc5-36ac3be47ae6-8afe22f8" class="text-color_secondary w-node-_707e6def-b789-da4a-aaff-6a126eadbc3c-6eadbbd8">© 2026 Snypd. Be first. Stay ahead.</div><div class="nav_left">SNYPD<br/></div><ul id="w-node-_11ac9e46-92ae-12f1-c825-50e98dadbe36-8afe22f8" aria-label="Social media links" role="list" class="footer_icon-group w-node-_707e6def-b789-da4a-aaff-6a126eadbc44-6eadbbd8 w-list-unstyled"><li class="margin-bottom_none"><a href="https://discord.gg/4RUtXW78vc" target="_blank" rel="noopener" class="footer_icon-link w-inline-block"><div class="screen-reader">Facebook</div></a></li><li class="margin-bottom_none"><a href="https://discord.gg/4RUtXW78vc" target="_blank" rel="noopener" class="footer_icon-link w-inline-block"><div class="icon_small-1x1 text-color_inherit"><svg width="100%" height="100%" viewBox="0 0 16 16"><path d="M8,1.441c2.136,0,2.389.009,3.233.047a4.419,4.419,0,0,1,1.485.276,2.472,2.472,0,0,1,.92.6,2.472,2.472,0,0,1,.6.92,4.419,4.419,0,0,1,.276,1.485c.038.844.047,1.1.047,3.233s-.009,2.389-.047,3.233a4.419,4.419,0,0,1-.276,1.485,2.644,2.644,0,0,1-1.518,1.518,4.419,4.419,0,0,1-1.485.276c-.844.038-1.1.047-3.233.047s-2.389-.009-3.233-.047a4.419,4.419,0,0,1-1.485-.276,2.472,2.472,0,0,1-.92-.6,2.472,2.472,0,0,1-.6-.92,4.419,4.419,0,0,1-.276-1.485c-.038-.844-.047-1.1-.047-3.233s.009-2.389.047-3.233a4.419,4.419,0,0,1,.276-1.485,2.472,2.472,0,0,1,.6-.92,2.472,2.472,0,0,1,.92-.6,4.419,4.419,0,0,1,1.485-.276c.844-.038,1.1-.047,3.233-.047M8,0C5.827,0,5.555.009,4.7.048A5.868,5.868,0,0,0,2.76.42a3.908,3.908,0,0,0-1.417.923A3.908,3.908,0,0,0,.42,2.76,5.868,5.868,0,0,0,.048,4.7C.009,5.555,0,5.827,0,8s.009,2.445.048,3.3A5.868,5.868,0,0,0,.42,13.24a3.908,3.908,0,0,0,.923,1.417,3.908,3.908,0,0,0,1.417.923,5.868,5.868,0,0,0,1.942.372C5.555,15.991,5.827,16,8,16s2.445-.009,3.3-.048a5.868,5.868,0,0,0,1.942-.372,4.094,4.094,0,0,0,2.34-2.34,5.868,5.868,0,0,0,.372-1.942c.039-.853.048-1.125.048-3.3s-.009-2.445-.048-3.3A5.868,5.868,0,0,0,15.58,2.76a3.908,3.908,0,0,0-.923-1.417A3.908,3.908,0,0,0,13.24.42,5.868,5.868,0,0,0,11.3.048C10.445.009,10.173,0,8,0Z" fill="currentColor"></path><path d="M8,3.892A4.108,4.108,0,1,0,12.108,8,4.108,4.108,0,0,0,8,3.892Zm0,6.775A2.667,2.667,0,1,1,10.667,8,2.667,2.667,0,0,1,8,10.667Z" fill="currentColor"></path><circle cx="12.27" cy="3.73" r="0.96" fill="currentColor"></circle></svg></div><div class="screen-reader">Instagram</div></a></li></ul></div></div></footer><script src="/assets/webflow/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script><script src="/assets/webflow/js/webflow.schunk.1a807f015b216e46.js" type="text/javascript"></script><script src="/assets/webflow/js/webflow.schunk.bc05f67f6ffde94d.js" type="text/javascript"></script><script src="/assets/webflow/js/webflow.af23ce43.9be76c77531c84a5.js" type="text/javascript"></script><script src="/assets/webflow/js/gsap.min.js" type="text/javascript"></script><!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) --><!-- stray /body --><!-- stray /html -->

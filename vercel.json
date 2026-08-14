@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/sign-in", "destination": "/login", "permanent": false },
+    { "source": "/sign-up", "destination": "/signup", "permanent": false },
+    { "source": "/pricing", "destination": "/plans", "permanent": false }
+  ]
 }

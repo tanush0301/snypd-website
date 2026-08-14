@@ -24,7 +24,7 @@ body, html { min-height: 100vh; margin: 0; background-color: #030409 !important;
       const { data: { session } } = await SNYPD.supabase.auth.getSession();
       // Only redirect on pages you want protected (change /dashboard as needed)
       if (!session && location.pathname.startsWith('/dashboard')) {
-        location.href = '/sign-in';
+        location.href = '/login';
       }
     } catch (e) { console.error(e); }
   })();
@@ -40,7 +40,19 @@ body, html { min-height: 100vh; margin: 0; background-color: #030409 !important;
   gtag('js', new Date());
 
   gtag('config', 'G-VBC0SXPR6F');
-</script><script src="/assets/webflow/js/vvprocess-1.0.0.js" type="text/javascript"></script><script src="/assets/webflow/js/vvbootstrap.js" type="text/javascript"></script><script type="text/javascript">window.__WEBFLOW_CURRENCY_SETTINGS = {"currencyCode":"USD","symbol":"$","decimal":".","fractionDigits":2,"group":",","template":"{{wf {\"path\":\"symbol\",\"type\":\"PlainText\"} }} {{wf {\"path\":\"amount\",\"type\":\"CommercePrice\"} }} {{wf {\"path\":\"currencyCode\",\"type\":\"PlainText\"} }}","hideDecimalForWholeNumbers":false};</script><style>html, body, .body-2, .page-wrapper { overflow-x: hidden !important; overflow-x: clip !important; width: 100%; }</style>
+</script><script src="/assets/webflow/js/vvprocess-1.0.0.js" type="text/javascript"></script><script src="/assets/webflow/js/vvbootstrap.js" type="text/javascript"></script><script type="text/javascript">window.__WEBFLOW_CURRENCY_SETTINGS = {"currencyCode":"USD","symbol":"$","decimal":".","fractionDigits":2,"group":",","template":"{{wf {\"path\":\"symbol\",\"type\":\"PlainText\"} }} {{wf {\"path\":\"amount\",\"type\":\"CommercePrice\"} }} {{wf {\"path\":\"currencyCode\",\"type\":\"PlainText\"} }}","hideDecimalForWholeNumbers":false};</script><style>body, .body-2, .page-wrapper { overflow-x: hidden !important; width: 100%; }</style>
+<!-- snypd:seo -->
+<link rel="canonical" href="https://www.snypd.store/login"/>
+<meta property="og:url" content="https://www.snypd.store/login"/>
+<meta property="og:site_name" content="SNYPD"/>
+<meta property="og:locale" content="en"/>
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="SNYPD - Snype Vinted steals. Before anyone else."/>
+<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta property="og:type" content="website"/>
 </head><body class="body-4">﻿<div class="snypd-island-nav-wrapper">
 <style>
     .snypd-island-nav-wrapper, .snypd-island-nav-wrapper * {
@@ -290,6 +302,29 @@ body, html { min-height: 100vh; margin: 0; background-color: #030409 !important;
       .snypd-island__btn {
         height: 40px;
         padding: 0 16px;
+      }
+    }
+
+    /* On narrow phones the wordmark's 16px letter-spacing made the brand wide
+       enough to collide with the CTA, clipping the logo mid-letter. Scale the
+       wordmark and the button down together so the pill still fits at 360px. */
+    @media (max-width: 520px) {
+      .snypd-island-nav {
+        padding: 0 8px 0 14px;
+        gap: 10px;
+      }
+      .snypd-island__logo {
+        font-size: 19px;
+        letter-spacing: 9px;
+        margin-right: -9px;
+      }
+      .snypd-island__btn {
+        height: 38px;
+        padding: 0 13px;
+        font-size: 13px;
+      }
+      .snypd-island__btn span {
+        white-space: nowrap;
       }
     }
   </style>
@@ -1814,7 +1849,7 @@ margin: 0rem !important;
           try {
             const { error } = await sb.auth.signInWithOAuth({
               provider: 'google',
-              options: { redirectTo: 'https://snypd.store/dashboard' }
+              options: { redirectTo: 'https://www.snypd.store/dashboard' }
             });
             if (error) throw error;
           } catch (err) {
@@ -1839,7 +1874,7 @@ margin: 0rem !important;
 
           try {
             const { error } = await sb.auth.resetPasswordForEmail(email, {
-              redirectTo: 'https://snypd.store/reset-password'
+              redirectTo: 'https://www.snypd.store/reset-password'
             });
             if (error) throw error;
             
