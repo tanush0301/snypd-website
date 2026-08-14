@@ -832,10 +832,22 @@ const HEARTBEAT_URL = (() => {
     !!whopManageUrl ||
     !!whopProductId;
   
-  const isActiveWhopPlan =
+  // Whop decides whether this account gets MORE than the free tier. It does not
+  // decide whether the account gets in at all.
+  //
+  // Until 2026-08-14 it did, and it demanded both a whop_product_id and a
+  // billing status from ACTIVE_STATUSES even on the free plan. Signup writes
+  // sub_status='free', which is in neither, so no free account could ever pass.
+  // 34 of 44 registered users sat on the activation screen having never seen
+  // the product. A lapsed paid plan now falls back to free rather than locking
+  // the account out, which is the better direction to fail in.
+  const isActivePaidPlan =
     VALID_PLANS.has(rawPlan) &&
+    rawPlan !== 'free' &&
     ACTIVE_STATUSES.has(rawStatus) &&
     !!whopProductId;
+
+  const effectivePlan = isActivePaidPlan ? rawPlan : 'free';
   
   console.log('SNYPD activation check', {
     plan: rawPlan,
@@ -844,13 +856,16 @@ const HEARTBEAT_URL = (() => {
     whopProductId,
     whopManageUrl,
     hasWhopEvidence,
-    isActiveWhopPlan
+    isActivePaidPlan,
+    effectivePlan
   });
   
   const activationGate = document.getElementById('activation-gate');
   const dashboardPanel = document.getElementById('dashboard-panel');
   
-  if (!isActiveWhopPlan) {
+  // Deliberately unreachable: kept so the gate markup and its copy stay in the
+  // file for a future "upgrade" prompt, without gating access on it.
+  if (false) {
     if (activationGate) activationGate.classList.remove('is-hidden');
     if (dashboardPanel) dashboardPanel.classList.add('is-hidden');
   
@@ -863,7 +878,7 @@ const HEARTBEAT_URL = (() => {
   if (activationGate) activationGate.classList.add('is-hidden');
   if (dashboardPanel) dashboardPanel.classList.remove('is-hidden');
   
-  set('plan-banner', `Plan: ${PLAN_LABELS[rawPlan] || rawPlan.toUpperCase()}`);
+  set('plan-banner', `Plan: ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`);
 
   const list    = document.getElementById('list');
   const empty   = document.getElementById('empty');
