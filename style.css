@@ -308,14 +308,14 @@ body {
 }
 
 /* ==========================================================================
-   2. HERO SECTION & DASHBOARD REVEAL
+   2. HERO SECTION & 3D INTERACTIVE SHOWCASE STAGE
    ========================================================================== */
 .hero-bg {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 0;
   overflow: hidden;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .hero-bg::before {
@@ -339,7 +339,328 @@ body {
   height: 600px;
   background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
   filter: blur(80px);
+  opacity: 0.6;
+  animation: pulseGlow 6s ease-in-out infinite alternate;
+}
+
+.glow-blob-teal {
+  top: 10%;
+  left: 65%;
+  width: 600px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(53, 231, 220, 0.18) 0%, transparent 70%);
+  filter: blur(90px);
   opacity: 0.5;
+  animation: pulseGlow 8s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes pulseGlow {
+  0% { transform: translateX(-50%) scale(0.95); opacity: 0.45; }
+  100% { transform: translateX(-50%) scale(1.1); opacity: 0.75; }
+}
+
+/* 3D Stage Wrapper */
+.hero-3d-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  perspective: 1400px;
+  perspective-origin: center center;
+  z-index: 10;
+}
+
+/* Floating 3D Hologram Cards */
+.hero-3d-card {
+  position: absolute;
+  width: 290px;
+  z-index: 20;
+  transform-style: preserve-3d;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.hero-3d-card.card-left {
+  top: 140px;
+  left: 2%;
+  animation: floatLeft 6s ease-in-out infinite alternate;
+}
+
+.hero-3d-card.card-right {
+  top: 180px;
+  right: 2%;
+  animation: floatRight 7s ease-in-out infinite alternate;
+}
+
+@keyframes floatLeft {
+  0% { transform: translateY(0px) rotateY(12deg) rotateX(4deg) translateZ(30px); }
+  100% { transform: translateY(-18px) rotateY(8deg) rotateX(-2deg) translateZ(45px); }
+}
+
+@keyframes floatRight {
+  0% { transform: translateY(0px) rotateY(-12deg) rotateX(4deg) translateZ(30px); }
+  100% { transform: translateY(-22px) rotateY(-8deg) rotateX(-3deg) translateZ(50px); }
+}
+
+.card-3d-inner {
+  position: relative;
+  background: rgba(10, 12, 22, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 
+    0 30px 60px -15px rgba(0, 0, 0, 0.8),
+    0 0 35px rgba(162, 0, 255, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.card-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(162, 0, 255, 0.25), transparent 70%);
+  pointer-events: none;
+}
+
+/* HUD Brackets */
+.hud-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(162, 0, 255, 0.8);
+  pointer-events: none;
+  z-index: 5;
+}
+.hud-corner.top-left { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
+.hud-corner.top-right { top: 8px; right: 8px; border-top: 2px solid; border-right: 2px solid; }
+.hud-corner.bottom-left { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
+.hud-corner.bottom-right { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* Telemetry Header */
+.card-telemetry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+}
+
+.telemetry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(162, 0, 255, 0.15);
+  border: 1px solid rgba(162, 0, 255, 0.4);
+  color: #df80ff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: #00ff88;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00ff88;
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.pulse-dot-green {
+  width: 6px;
+  height: 6px;
+  background: #35e7dc;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #35e7dc;
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.telemetry-tag {
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Image & Laser Scanner */
+.card-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 155px;
+  background: rgba(3, 4, 9, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-product-img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.7));
+  transform: translateZ(20px);
+  transition: transform 0.3s ease;
+}
+
+.hero-3d-card:hover .card-product-img {
+  transform: scale(1.06) translateZ(30px);
+}
+
+.laser-scanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #35e7dc, #df80ff, transparent);
+  box-shadow: 0 0 12px #35e7dc, 0 0 20px #df80ff;
+  z-index: 3;
+  animation: scanSweep 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes scanSweep {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.hud-scan-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(162, 0, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(162, 0, 255, 0.06) 1px, transparent 1px);
+  background-size: 15px 15px;
+  pointer-events: none;
+}
+
+/* Card Metadata */
+.card-info {
+  text-align: left;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 10px;
+}
+
+.card-pricing {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.price-vinted span {
+  color: #ff5555;
+  font-weight: 700;
+}
+
+.price-resell span {
+  color: #00ff88;
+  font-weight: 700;
+}
+
+.profit-highlight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(162, 0, 255, 0.2), rgba(80, 0, 160, 0.3));
+  border: 1px solid rgba(162, 0, 255, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.profit-highlight span {
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
+}
+
+.profit-highlight strong {
+  font-size: 14px;
+  color: #00ff88;
+  font-family: var(--font-mono, monospace);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.profit-highlight-green {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.12), rgba(53, 231, 220, 0.2));
+  border-color: rgba(53, 231, 220, 0.4);
+}
+
+/* Hero Pill Badge */
+.hero-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  background: rgba(162, 0, 255, 0.1);
+  border: 1px solid rgba(162, 0, 255, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #df80ff;
+  margin-bottom: 24px;
+  box-shadow: 0 0 20px rgba(162, 0, 255, 0.2);
+}
+
+.pill-badge-live {
+  background: #00ff88;
+  color: #000;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Shimmer Gradient Text */
+.text-gradient-shimmer {
+  background: linear-gradient(135deg, #ffffff 0%, #df80ff 50%, #35e7dc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(162, 0, 255, 0.4);
+}
+
+.btn-glow {
+  box-shadow: 0 0 35px rgba(162, 0, 255, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Responsive adjustments for 3D Hero */
+@media (max-width: 1200px) {
+  .hero-3d-card {
+    display: none;
+  }
 }
 
 .hero-section {

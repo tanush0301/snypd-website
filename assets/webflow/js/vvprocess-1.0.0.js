@@ -1,1 +1,0 @@
-window.vv_process = { env: { "VV_ISSUER_URL": 'https://dev-cmialm.vvkey.io',"VV_CLIENT_ID": 'VmYRU27h0D0yexgr',"WF_SAMPLE_ID": '68b03eed32ce2196069d4553',"WF_USER_ID": '6880ab8fdf1ab8f66f126cdb',"WF_SITE_ID": '688250a54526a1ea797d1519' }};
