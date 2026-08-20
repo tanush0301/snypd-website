@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ==========================================================================
-  // 7. HIGH-PERFORMANCE 60FPS VIDEO SCRUBBING & STORY ENGINE
+  // 7. LENIS ULTRA-SMOOTH SCROLL & VIDEO SEEKING ENGINE
   // ==========================================================================
   const track = document.getElementById('storyTrack');
   const storyVideo = document.getElementById('storyVideo');
@@ -381,38 +381,77 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('chapter4')
   ];
 
-  let targetVideoTime = 0;
-  let currentVideoTime = 0;
-  let isVideoReady = false;
+  // Initialize Lenis Smooth Scrolling
+  let lenis = null;
+  if (typeof Lenis !== 'undefined') {
+    lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential smooth decay
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.8,
+      infinite: false
+    });
+
+    function rafLenis(time) {
+      lenis.raf(time);
+      requestAnimationFrame(rafLenis);
+    }
+    requestAnimationFrame(rafLenis);
+
+    if (typeof ScrollTrigger !== 'undefined') {
+      lenis.on('scroll', ScrollTrigger.update);
+    }
+  }
+
+  // Non-blocking Hardware Video Seeking
+  let targetProgress = 0;
+  let isSeeking = false;
+  let pendingTime = null;
+
+  function performSeek(time) {
+    if (!storyVideo || isNaN(storyVideo.duration) || !storyVideo.duration) return;
+    const clamped = Math.max(0, Math.min(time, storyVideo.duration - 0.05));
+    
+    if (!isSeeking) {
+      isSeeking = true;
+      if (typeof storyVideo.fastSeek === 'function') {
+        storyVideo.fastSeek(clamped);
+      } else {
+        storyVideo.currentTime = clamped;
+      }
+    } else {
+      pendingTime = clamped;
+    }
+  }
 
   if (storyVideo) {
+    storyVideo.addEventListener('seeked', () => {
+      isSeeking = false;
+      if (pendingTime !== null) {
+        const nextTime = pendingTime;
+        pendingTime = null;
+        performSeek(nextTime);
+      }
+    });
+
     storyVideo.addEventListener('loadedmetadata', () => {
-      isVideoReady = true;
       storyVideo.currentTime = 0;
       storyVideo.pause();
     });
 
-    storyVideo.addEventListener('canplay', () => {
-      isVideoReady = true;
-    });
-
-    // Make sure it doesn't autoplay/loop over user's scroll
     storyVideo.pause();
   }
 
-  function updateStoryScroll() {
-    if (!track) return;
+  function onScrollProgress(progress) {
+    targetProgress = progress;
 
-    const rect = track.getBoundingClientRect();
-    const totalScrollable = track.offsetHeight - window.innerHeight;
-    if (totalScrollable <= 0) return;
-
-    // Normalize progress 0.0 to 1.0
-    const progress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
-
-    // Target video frame
-    if (storyVideo && storyVideo.duration && !isNaN(storyVideo.duration)) {
-      targetVideoTime = progress * storyVideo.duration;
+    // Direct, throttled seek
+    if (storyVideo && storyVideo.duration) {
+      const targetTime = progress * storyVideo.duration;
+      performSeek(targetTime);
     }
 
     // Update Progress Indicator Bar
@@ -420,13 +459,13 @@ document.addEventListener("DOMContentLoaded", function() {
       progressBar.style.height = `${(progress * 100).toFixed(1)}%`;
     }
 
-    // Determine Active Chapter Step
+    // Determine Active Chapter Step with Hysteresis / Smooth Thresholds
     let activeStep = 1;
-    if (progress >= 0.75) {
+    if (progress >= 0.72) {
       activeStep = 4;
-    } else if (progress >= 0.50) {
+    } else if (progress >= 0.46) {
       activeStep = 3;
-    } else if (progress >= 0.22) {
+    } else if (progress >= 0.20) {
       activeStep = 2;
     } else {
       activeStep = 1;
@@ -453,23 +492,22 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // High-FPS Lerp Damping for Video Frame Seeking
-  function renderVideoScrubLoop() {
-    if (storyVideo && storyVideo.duration && !isNaN(storyVideo.duration)) {
-      // Lerp with 0.12 damping factor for organic optical inertia
-      currentVideoTime += (targetVideoTime - currentVideoTime) * 0.14;
-      if (Math.abs(storyVideo.currentTime - currentVideoTime) > 0.02) {
-        storyVideo.currentTime = currentVideoTime;
-      }
-    }
-    requestAnimationFrame(renderVideoScrubLoop);
+  function computeScroll() {
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    const totalScrollable = track.offsetHeight - window.innerHeight;
+    if (totalScrollable <= 0) return;
+    const progress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
+    onScrollProgress(progress);
   }
 
-  window.addEventListener('scroll', updateStoryScroll, { passive: true });
-  window.addEventListener('resize', updateStoryScroll);
-  renderVideoScrubLoop();
+  if (lenis) {
+    lenis.on('scroll', computeScroll);
+  } else {
+    window.addEventListener('scroll', computeScroll, { passive: true });
+  }
 
-  // Click on Dots to Jump to Chapter
+  // Click on Dots to Jump to Chapter smoothly with Lenis
   chapterDots.forEach((dot) => {
     dot.addEventListener('click', () => {
       const step = parseInt(dot.getAttribute('data-step') || '1', 10);
@@ -477,7 +515,12 @@ document.addEventListener("DOMContentLoaded", function() {
       const totalScrollable = track.offsetHeight - window.innerHeight;
       const stepProgress = (step - 1) / 3.0; // 0, 0.33, 0.66, 1.0
       const targetScroll = track.offsetTop + (stepProgress * totalScrollable);
-      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+      
+      if (lenis) {
+        lenis.scrollTo(targetScroll, { duration: 1.4 });
+      } else {
+        window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+      }
     });
   });
 
