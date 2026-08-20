@@ -368,10 +368,11 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ==========================================================================
-  // 7. LENIS ULTRA-SMOOTH SCROLL & VIDEO SEEKING ENGINE
+  // 7. APPLE-STANDARD 60FPS CANVAS FRAME SCRUBBING ENGINE
   // ==========================================================================
   const track = document.getElementById('storyTrack');
-  const storyVideo = document.getElementById('storyVideo');
+  const canvas = document.getElementById('storyCanvas');
+  const ctx = canvas ? canvas.getContext('2d') : null;
   const progressBar = document.getElementById('storyProgressBar');
   const chapterDots = document.querySelectorAll('.story-chapter-dots .dot');
   const chapters = [
@@ -381,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('chapter4')
   ];
 
-  // Initialize Lenis Smooth Scrolling
+  // Initialize Lenis Luxury Smooth Scrolling
   let lenis = null;
   if (typeof Lenis !== 'undefined') {
     lenis = new Lenis({
@@ -406,53 +407,38 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // Non-blocking Hardware Video Seeking
-  let targetProgress = 0;
-  let isSeeking = false;
-  let pendingTime = null;
+  // Preload 75 High-Res 3D Laser Frames
+  const frameCount = 75;
+  const frameImages = [];
+  let currentRenderedFrame = 0;
+  let targetFrameIndex = 0;
+  let smoothFrameIndex = 0;
 
-  function performSeek(time) {
-    if (!storyVideo || isNaN(storyVideo.duration) || !storyVideo.duration) return;
-    const clamped = Math.max(0, Math.min(time, storyVideo.duration - 0.05));
-    
-    if (!isSeeking) {
-      isSeeking = true;
-      if (typeof storyVideo.fastSeek === 'function') {
-        storyVideo.fastSeek(clamped);
-      } else {
-        storyVideo.currentTime = clamped;
+  for (let i = 0; i < frameCount; i++) {
+    const img = new Image();
+    const padIndex = String(i).padStart(3, '0');
+    img.src = `/assets/frames/frame_${padIndex}.jpg`;
+    img.onload = () => {
+      if (i === 0 && ctx) {
+        drawCanvasFrame(0);
       }
-    } else {
-      pendingTime = clamped;
-    }
+    };
+    frameImages.push(img);
   }
 
-  if (storyVideo) {
-    storyVideo.addEventListener('seeked', () => {
-      isSeeking = false;
-      if (pendingTime !== null) {
-        const nextTime = pendingTime;
-        pendingTime = null;
-        performSeek(nextTime);
-      }
-    });
-
-    storyVideo.addEventListener('loadedmetadata', () => {
-      storyVideo.currentTime = 0;
-      storyVideo.pause();
-    });
-
-    storyVideo.pause();
+  function drawCanvasFrame(idx) {
+    if (!ctx || !canvas || !frameImages[idx]) return;
+    const img = frameImages[idx];
+    if (img.complete && img.naturalWidth > 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      currentRenderedFrame = idx;
+    }
   }
 
   function onScrollProgress(progress) {
-    targetProgress = progress;
-
-    // Direct, throttled seek
-    if (storyVideo && storyVideo.duration) {
-      const targetTime = progress * storyVideo.duration;
-      performSeek(targetTime);
-    }
+    // Exact target frame index
+    targetFrameIndex = Math.min(Math.max(progress * (frameCount - 1), 0), frameCount - 1);
 
     // Update Progress Indicator Bar
     if (progressBar) {
@@ -491,6 +477,18 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   }
+
+  // 60FPS High-Precision Lerp Frame Drawing Loop
+  function renderCanvasScrubLoop() {
+    // Lerp with 0.25 damping factor for organic fluid response
+    smoothFrameIndex += (targetFrameIndex - smoothFrameIndex) * 0.25;
+    const rounded = Math.round(smoothFrameIndex);
+    if (rounded !== currentRenderedFrame) {
+      drawCanvasFrame(rounded);
+    }
+    requestAnimationFrame(renderCanvasScrubLoop);
+  }
+  requestAnimationFrame(renderCanvasScrubLoop);
 
   function computeScroll() {
     if (!track) return;

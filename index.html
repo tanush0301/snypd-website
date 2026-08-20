@@ -1081,11 +1081,9 @@
   <section class="story-scroll-track" id="storyTrack">
     <div class="pinned-story-stage" id="pinnedStage">
       
-      <!-- High-Precision Video Scrub Canvas Layer -->
+      <!-- High-Precision 60FPS Canvas Scrub Layer (Apple Standard) -->
       <div class="story-video-wrap">
-        <video id="storyVideo" muted playsinline preload="auto" class="story-video-canvas">
-          <source src="/assets/video/hero-laser.mp4" type="video/mp4">
-        </video>
+        <canvas id="storyCanvas" class="story-canvas" width="720" height="1280"></canvas>
         <div class="story-video-vignette"></div>
         <div class="story-video-grid"></div>
         <div class="glow-blob"></div>

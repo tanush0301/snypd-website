@@ -513,7 +513,7 @@ body {
   pointer-events: none;
 }
 
-.story-video-canvas {
+.story-canvas {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -523,9 +523,9 @@ body {
   height: auto;
   transform: translate(-50%, -50%) scale(1.05);
   object-fit: cover;
-  opacity: 0.55;
+  opacity: 0.65;
   filter: saturate(1.25) contrast(1.15);
-  will-change: transform, opacity;
+  will-change: transform;
 }
 
 .story-video-vignette {
