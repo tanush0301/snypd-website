@@ -368,55 +368,92 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ==========================================================================
-  // 7. HIGGSFIELD 3D MOUSE PARALLAX & TILT ENGINE
+  // 7. IMAGICA-STYLE SEARCH & VAULT 3D SHOWCASE ENGINE
   // ==========================================================================
-  const stage = document.getElementById('hero3dStage');
-  const cardLeft = document.getElementById('cardLeft');
-  const cardRight = document.getElementById('cardRight');
+  const searchInput = document.getElementById('snipeSearchInput');
+  const snipeBtn = document.getElementById('snipeSimulateBtn');
+  const filterPills = document.querySelectorAll('.filter-pill');
+  const vaultCards = document.querySelectorAll('.vault-card');
 
-  if (stage && cardLeft && cardRight && window.innerWidth > 1200) {
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetLeftX = 0;
-    let targetLeftY = 0;
-    let targetRightX = 0;
-    let targetRightY = 0;
+  function filterVault(query) {
+    const q = query.trim().toLowerCase();
+    
+    vaultCards.forEach(card => {
+      const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+      const title = (card.querySelector('.vault-card-title')?.textContent || '').toLowerCase();
+      
+      if (q === '' || q === 'all' || tags.includes(q) || title.includes(q)) {
+        card.style.display = 'block';
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'scale(1)';
+        }, 30);
+      } else {
+        card.style.opacity = '0.2';
+        card.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          if (card.style.opacity === '0.2') {
+            card.style.display = 'none';
+          }
+        }, 250);
+      }
+    });
+  }
 
-    let currentLeftX = 0;
-    let currentLeftY = 0;
-    let currentRightX = 0;
-    let currentRightY = 0;
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      filterVault(e.target.value);
+      filterPills.forEach(p => p.classList.remove('active'));
+    });
+  }
 
-    window.addEventListener('mousemove', (e) => {
-      const { innerWidth, innerHeight } = window;
-      const normX = (e.clientX / innerWidth) * 2 - 1; // -1 to 1
-      const normY = (e.clientY / innerHeight) * 2 - 1; // -1 to 1
+  if (snipeBtn && searchInput) {
+    snipeBtn.addEventListener('click', () => {
+      snipeBtn.innerHTML = '<span>⚡ Scanning...</span>';
+      setTimeout(() => {
+        snipeBtn.innerHTML = '<span>Snyped!</span><kbd>0.018s</kbd>';
+        const vault = document.getElementById('vaultSection');
+        if (vault) {
+          vault.scrollIntoView({ behavior: 'smooth' });
+        }
+        setTimeout(() => {
+          snipeBtn.innerHTML = '<span>Snype Scan</span><kbd>⚡ 18ms</kbd>';
+        }, 2000);
+      }, 300);
+    });
+  }
 
-      // Left card tilt parameters
-      targetLeftX = normY * -16 + 4;  // rotateX
-      targetLeftY = normX * 22 + 12; // rotateY
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      filterPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const query = pill.getAttribute('data-query') || '';
+      if (searchInput) {
+        searchInput.value = query === 'all' ? '' : query;
+      }
+      filterVault(query);
+    });
+  });
 
-      // Right card tilt parameters
-      targetRightX = normY * -16 + 4; // rotateX
-      targetRightY = normX * 22 - 12; // rotateY
+  // Alias-Style 3D Mouse Tilt on Vault Cards
+  vaultCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = ((y - centerY) / centerY) * -10;
+      const rotateY = ((x - centerX) / centerX) * 10;
+      
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(1)}deg) rotateY(${rotateY.toFixed(1)}deg) translateY(-8px) scale(1.02)`;
     });
 
-    // High-FPS Smooth Inertia Loop
-    function render3DParallax() {
-      // Lerp damping
-      currentLeftX += (targetLeftX - currentLeftX) * 0.08;
-      currentLeftY += (targetLeftY - currentLeftY) * 0.08;
-      currentRightX += (targetRightX - currentRightX) * 0.08;
-      currentRightY += (targetRightY - currentRightY) * 0.08;
-
-      cardLeft.style.transform = `rotateX(${currentLeftX.toFixed(2)}deg) rotateY(${currentLeftY.toFixed(2)}deg) translateZ(40px)`;
-      cardRight.style.transform = `rotateX(${currentRightX.toFixed(2)}deg) rotateY(${currentRightY.toFixed(2)}deg) translateZ(40px)`;
-
-      requestAnimationFrame(render3DParallax);
-    }
-
-    render3DParallax();
-  }
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
+    });
+  });
 
 });
 
