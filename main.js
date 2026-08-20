@@ -455,5 +455,95 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
+  // ==========================================================================
+  // 8. GSAP SCROLLTRIGGER ANIMATION ENGINE
+  // ==========================================================================
+  if (typeof gsap !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero Entrance Sequence on Load
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.hero-pill-badge', { y: -15, opacity: 0, duration: 0.7, delay: 0.1 })
+      .from('.hero-title', { y: 25, opacity: 0, duration: 0.8 }, '-=0.4')
+      .from('.hero-sub', { y: 20, opacity: 0, duration: 0.8 }, '-=0.5')
+      .from('.sniper-command-bar', { y: 25, opacity: 0, scale: 0.97, duration: 0.8 }, '-=0.5')
+      .from('.hero-actions', { y: 20, opacity: 0, duration: 0.7 }, '-=0.4');
+
+    // Background Video Scroll Parallax & Zoom
+    const bgVideo = document.getElementById('bgLaserVideo');
+    if (bgVideo) {
+      gsap.to(bgVideo, {
+        scrollTrigger: {
+          trigger: 'body',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1.5
+        },
+        scale: 1.25,
+        opacity: 0.22,
+        ease: 'none'
+      });
+    }
+
+    // Vault Section Scroll Reveal
+    gsap.from('.vault-header', {
+      scrollTrigger: {
+        trigger: '#vaultSection',
+        start: 'top 85%'
+      },
+      y: 40,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    gsap.from('.vault-card', {
+      scrollTrigger: {
+        trigger: '#vaultGrid',
+        start: 'top 80%'
+      },
+      y: 60,
+      opacity: 0,
+      scale: 0.94,
+      stagger: 0.1,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
+
+    // App Reveal (Dashboard Window) Scroll Scale
+    const appWindow = document.querySelector('.app-window');
+    if (appWindow) {
+      gsap.from(appWindow, {
+        scrollTrigger: {
+          trigger: '.app-reveal-wrapper',
+          start: 'top 85%',
+          end: 'top 30%',
+          scrub: 1
+        },
+        scale: 0.88,
+        y: 60,
+        opacity: 0.5,
+        ease: 'power2.out'
+      });
+    }
+
+    // Proof & Features Section Scroll Reveal
+    const featureSections = document.querySelectorAll('#proofSection, #features, #pricing, .faq-section');
+    featureSections.forEach(section => {
+      gsap.from(section.children, {
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 80%'
+        },
+        y: 40,
+        opacity: 0,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+    });
+  }
+
 });
+
 

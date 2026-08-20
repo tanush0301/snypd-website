@@ -1076,11 +1076,15 @@
 
 
 
-  <!-- Background Effects & 3D Lighting Stage -->
-  <div class="hero-bg">
+  <!-- Fixed Cinematic 3D Video Background & Lighting Layer -->
+  <div class="cinematic-bg-video-layer">
+    <video autoplay loop muted playsinline class="bg-video-element" id="bgLaserVideo">
+      <source src="/assets/video/hero-laser.mp4" type="video/mp4">
+    </video>
+    <div class="video-vignette-overlay"></div>
+    <div class="video-grid-overlay"></div>
     <div class="glow-blob"></div>
     <div class="glow-blob glow-blob-teal"></div>
-    <div class="hero-grid-overlay"></div>
   </div>
 
   <!-- Content Section -->
@@ -1121,21 +1125,7 @@
       </div>
     </div>
 
-    <!-- Cinematic 3D Glass Video Capsule (Google Flow 3D Laser Engine) -->
-    <div class="hero-cinematic-capsule">
-      <div class="capsule-glow"></div>
-      <div class="capsule-video-container">
-        <video autoplay loop muted playsinline class="hero-laser-video">
-          <source src="/assets/video/hero-laser.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay-hud">
-          <div class="hud-tag"><span class="hud-dot"></span> OPTICAL LASER ENGINE ACTIVE</div>
-          <div class="hud-latency">SPEED: 0.018s DETECTION</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-actions" style="margin-top: 40px;">
+    <div class="hero-actions">
       <div class="btn-group">
         <a href="/signup" class="btn btn-primary btn-glow">
           <span>Start now for free</span>
