@@ -368,54 +368,156 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ==========================================================================
-  // 7. IMAGICA-STYLE SEARCH & VAULT 3D SHOWCASE ENGINE
+  // 7. HIGH-PERFORMANCE 60FPS VIDEO SCRUBBING & STORY ENGINE
+  // ==========================================================================
+  const track = document.getElementById('storyTrack');
+  const storyVideo = document.getElementById('storyVideo');
+  const progressBar = document.getElementById('storyProgressBar');
+  const chapterDots = document.querySelectorAll('.story-chapter-dots .dot');
+  const chapters = [
+    document.getElementById('chapter1'),
+    document.getElementById('chapter2'),
+    document.getElementById('chapter3'),
+    document.getElementById('chapter4')
+  ];
+
+  let targetVideoTime = 0;
+  let currentVideoTime = 0;
+  let isVideoReady = false;
+
+  if (storyVideo) {
+    storyVideo.addEventListener('loadedmetadata', () => {
+      isVideoReady = true;
+      storyVideo.currentTime = 0;
+      storyVideo.pause();
+    });
+
+    storyVideo.addEventListener('canplay', () => {
+      isVideoReady = true;
+    });
+
+    // Make sure it doesn't autoplay/loop over user's scroll
+    storyVideo.pause();
+  }
+
+  function updateStoryScroll() {
+    if (!track) return;
+
+    const rect = track.getBoundingClientRect();
+    const totalScrollable = track.offsetHeight - window.innerHeight;
+    if (totalScrollable <= 0) return;
+
+    // Normalize progress 0.0 to 1.0
+    const progress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
+
+    // Target video frame
+    if (storyVideo && storyVideo.duration && !isNaN(storyVideo.duration)) {
+      targetVideoTime = progress * storyVideo.duration;
+    }
+
+    // Update Progress Indicator Bar
+    if (progressBar) {
+      progressBar.style.height = `${(progress * 100).toFixed(1)}%`;
+    }
+
+    // Determine Active Chapter Step
+    let activeStep = 1;
+    if (progress >= 0.75) {
+      activeStep = 4;
+    } else if (progress >= 0.50) {
+      activeStep = 3;
+    } else if (progress >= 0.22) {
+      activeStep = 2;
+    } else {
+      activeStep = 1;
+    }
+
+    chapters.forEach((chap, idx) => {
+      const stepNum = idx + 1;
+      if (chap) {
+        if (stepNum === activeStep) {
+          chap.classList.add('active');
+        } else {
+          chap.classList.remove('active');
+        }
+      }
+    });
+
+    chapterDots.forEach((dot) => {
+      const stepNum = parseInt(dot.getAttribute('data-step') || '1', 10);
+      if (stepNum === activeStep) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
+  // High-FPS Lerp Damping for Video Frame Seeking
+  function renderVideoScrubLoop() {
+    if (storyVideo && storyVideo.duration && !isNaN(storyVideo.duration)) {
+      // Lerp with 0.12 damping factor for organic optical inertia
+      currentVideoTime += (targetVideoTime - currentVideoTime) * 0.14;
+      if (Math.abs(storyVideo.currentTime - currentVideoTime) > 0.02) {
+        storyVideo.currentTime = currentVideoTime;
+      }
+    }
+    requestAnimationFrame(renderVideoScrubLoop);
+  }
+
+  window.addEventListener('scroll', updateStoryScroll, { passive: true });
+  window.addEventListener('resize', updateStoryScroll);
+  renderVideoScrubLoop();
+
+  // Click on Dots to Jump to Chapter
+  chapterDots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const step = parseInt(dot.getAttribute('data-step') || '1', 10);
+      if (!track) return;
+      const totalScrollable = track.offsetHeight - window.innerHeight;
+      const stepProgress = (step - 1) / 3.0; // 0, 0.33, 0.66, 1.0
+      const targetScroll = track.offsetTop + (stepProgress * totalScrollable);
+      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    });
+  });
+
+  // ==========================================================================
+  // 8. SEARCH & FILTER INTERACTION IN CHAPTER 2
   // ==========================================================================
   const searchInput = document.getElementById('snipeSearchInput');
   const snipeBtn = document.getElementById('snipeSimulateBtn');
   const filterPills = document.querySelectorAll('.filter-pill');
-  const vaultCards = document.querySelectorAll('.vault-card');
+  const vaultCards = document.querySelectorAll('.vault-card-mini');
 
-  function filterVault(query) {
+  function filterMiniVault(query) {
     const q = query.trim().toLowerCase();
-    
     vaultCards.forEach(card => {
       const tags = (card.getAttribute('data-tags') || '').toLowerCase();
-      const title = (card.querySelector('.vault-card-title')?.textContent || '').toLowerCase();
-      
+      const title = (card.querySelector('strong')?.textContent || '').toLowerCase();
       if (q === '' || q === 'all' || tags.includes(q) || title.includes(q)) {
-        card.style.display = 'block';
-        setTimeout(() => {
-          card.style.opacity = '1';
-          card.style.transform = 'scale(1)';
-        }, 30);
+        card.style.display = 'flex';
+        card.style.opacity = '1';
       } else {
         card.style.opacity = '0.2';
-        card.style.transform = 'scale(0.95)';
         setTimeout(() => {
-          if (card.style.opacity === '0.2') {
-            card.style.display = 'none';
-          }
-        }, 250);
+          if (card.style.opacity === '0.2') card.style.display = 'none';
+        }, 200);
       }
     });
   }
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
-      filterVault(e.target.value);
+      filterMiniVault(e.target.value);
       filterPills.forEach(p => p.classList.remove('active'));
     });
   }
 
-  if (snipeBtn && searchInput) {
+  if (snipeBtn) {
     snipeBtn.addEventListener('click', () => {
       snipeBtn.innerHTML = '<span>⚡ Scanning...</span>';
       setTimeout(() => {
         snipeBtn.innerHTML = '<span>Snyped!</span><kbd>0.018s</kbd>';
-        const vault = document.getElementById('vaultSection');
-        if (vault) {
-          vault.scrollIntoView({ behavior: 'smooth' });
-        }
         setTimeout(() => {
           snipeBtn.innerHTML = '<span>Snype Scan</span><kbd>⚡ 18ms</kbd>';
         }, 2000);
@@ -431,86 +533,17 @@ document.addEventListener("DOMContentLoaded", function() {
       if (searchInput) {
         searchInput.value = query === 'all' ? '' : query;
       }
-      filterVault(query);
-    });
-  });
-
-  // Alias-Style 3D Mouse Tilt on Vault Cards
-  vaultCards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      const rotateX = ((y - centerY) / centerY) * -10;
-      const rotateY = ((x - centerX) / centerX) * 10;
-      
-      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(1)}deg) rotateY(${rotateY.toFixed(1)}deg) translateY(-8px) scale(1.02)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
+      filterMiniVault(query);
     });
   });
 
   // ==========================================================================
-  // 8. GSAP SCROLLTRIGGER ANIMATION ENGINE
+  // 9. GSAP SCROLL REVEALS FOR POST-HERO SECTIONS
   // ==========================================================================
-  if (typeof gsap !== 'undefined') {
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Hero Entrance Sequence on Load
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.from('.hero-pill-badge', { y: -15, opacity: 0, duration: 0.7, delay: 0.1 })
-      .from('.hero-title', { y: 25, opacity: 0, duration: 0.8 }, '-=0.4')
-      .from('.hero-sub', { y: 20, opacity: 0, duration: 0.8 }, '-=0.5')
-      .from('.sniper-command-bar', { y: 25, opacity: 0, scale: 0.97, duration: 0.8 }, '-=0.5')
-      .from('.hero-actions', { y: 20, opacity: 0, duration: 0.7 }, '-=0.4');
-
-    // Background Video Scroll Parallax & Zoom
-    const bgVideo = document.getElementById('bgLaserVideo');
-    if (bgVideo) {
-      gsap.to(bgVideo, {
-        scrollTrigger: {
-          trigger: 'body',
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1.5
-        },
-        scale: 1.25,
-        opacity: 0.22,
-        ease: 'none'
-      });
-    }
-
-    // Vault Section Scroll Reveal
-    gsap.from('.vault-header', {
-      scrollTrigger: {
-        trigger: '#vaultSection',
-        start: 'top 85%'
-      },
-      y: 40,
-      opacity: 0,
-      duration: 0.8,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.vault-card', {
-      scrollTrigger: {
-        trigger: '#vaultGrid',
-        start: 'top 80%'
-      },
-      y: 60,
-      opacity: 0,
-      scale: 0.94,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: 'power3.out'
-    });
-
-    // App Reveal (Dashboard Window) Scroll Scale
+    // App Window Reveal
     const appWindow = document.querySelector('.app-window');
     if (appWindow) {
       gsap.from(appWindow, {
@@ -527,17 +560,17 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
 
-    // Proof & Features Section Scroll Reveal
-    const featureSections = document.querySelectorAll('#proofSection, #features, #pricing, .faq-section');
-    featureSections.forEach(section => {
-      gsap.from(section.children, {
+    // Other Sections
+    const sections = document.querySelectorAll('.ultra-section, #proofSection, #features, #pricing, .faq-section');
+    sections.forEach(sec => {
+      gsap.from(sec.children, {
         scrollTrigger: {
-          trigger: section,
+          trigger: sec,
           start: 'top 80%'
         },
         y: 40,
         opacity: 0,
-        stagger: 0.15,
+        stagger: 0.12,
         duration: 0.8,
         ease: 'power3.out'
       });
@@ -545,5 +578,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
 });
+
 
 

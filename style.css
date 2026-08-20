@@ -480,21 +480,40 @@ body {
 }
 
 /* ==========================================================================
-   CINEMATIC 3D FIXED BACKGROUND VIDEO LAYER
+   PINNED 400VH STORYTELLING SCROLL STAGE
    ========================================================================== */
-.cinematic-bg-video-layer {
-  position: fixed;
+.story-scroll-track {
+  position: relative;
+  width: 100%;
+  height: 400vh; /* 4x Viewport height scroll runway */
+  background: #030408;
+}
+
+.pinned-story-stage {
+  position: sticky;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -1;
   overflow: hidden;
-  pointer-events: none;
-  background: #030408;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
 }
 
-.bg-video-element {
+/* Video Canvas Layer */
+.story-video-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.story-video-canvas {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -502,238 +521,229 @@ body {
   min-height: 100%;
   width: auto;
   height: auto;
-  transform: translate(-50%, -50%) scale(1.08);
+  transform: translate(-50%, -50%) scale(1.05);
   object-fit: cover;
-  opacity: 0.38;
+  opacity: 0.55;
   filter: saturate(1.25) contrast(1.15);
   will-change: transform, opacity;
-  transition: opacity 0.5s ease;
 }
 
-.video-vignette-overlay {
+.story-video-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(3, 4, 8, 0.45) 0%, rgba(3, 4, 8, 0.85) 65%, #030408 100%);
+  background: radial-gradient(circle at center, rgba(3, 4, 8, 0.4) 0%, rgba(3, 4, 8, 0.85) 65%, #030408 100%);
   z-index: 1;
 }
 
-.video-grid-overlay {
+.story-video-grid {
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
   -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
   z-index: 2;
 }
 
-.hud-dot {
-  width: 6px;
-  height: 6px;
-  background: #00ff88;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #00ff88;
-  animation: blink 1.2s infinite ease-in-out;
-}
-
-.hud-latency {
-  color: #35e7dc;
-}
-
-/* ==========================================================================
-   ALIAS.STUDIO-STYLE 3D DEAL VAULT SHOWCASE
-   ========================================================================== */
-.snypd-vault-section {
-  position: relative;
-  z-index: 10;
-  max-width: 1300px;
-  margin: 120px auto 80px auto;
-  padding: 0 24px;
-}
-
-.vault-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.vault-eyebrow {
-  display: inline-flex;
+/* Scroll Progress Indicators */
+.story-progress-indicator {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+  z-index: 30;
+}
+
+.story-progress-bar {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.story-chapter-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.story-chapter-dots .dot {
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   font-weight: 700;
-  color: #35e7dc;
-  letter-spacing: 1.5px;
-  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 4px 6px;
+  border-radius: 6px;
 }
 
-.vault-title {
-  font-size: clamp(36px, 5vw, 56px);
+.story-chapter-dots .dot.active {
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+  transform: scale(1.15);
+}
+
+/* Narrative Story Chapters */
+.story-chapter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%);
+  width: min(920px, calc(100% - 48px));
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 20;
+}
+
+.story-chapter.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
+.story-title {
+  font-size: clamp(40px, 6vw, 76px);
   font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: #fff;
-  letter-spacing: -0.02em;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
-.vault-subtitle {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.6);
-  max-width: 550px;
+.story-sub {
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 620px;
+  margin: 0 auto 32px auto;
+}
+
+/* Scroll Mouse Cue */
+.scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 24px;
+}
+
+.scroll-mouse-icon {
+  width: 18px;
+  height: 28px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  position: relative;
+}
+
+.scroll-wheel {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 3px;
+  height: 6px;
+  background: #00ff88;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  animation: scrollWheel 1.5s infinite ease-in-out;
+}
+
+@keyframes scrollWheel {
+  0% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, 10px); opacity: 0; }
+}
+
+/* Vault Mini Grid for Chapter 3 */
+.vault-grid-mini {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
-.vault-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  perspective: 1200px;
-}
-
-.vault-card {
-  position: relative;
-  border-radius: 20px;
-  background: rgba(12, 14, 24, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: hidden;
-}
-
-.vault-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  border-color: rgba(162, 0, 255, 0.4);
-  box-shadow: 
-    0 30px 60px -15px rgba(0, 0, 0, 0.8),
-    0 0 30px rgba(162, 0, 255, 0.25);
-}
-
-.vault-card-inner {
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.vault-badge-speed {
-  align-self: flex-start;
-  font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  font-weight: 700;
-  color: #00ff88;
-  background: rgba(0, 255, 136, 0.1);
-  border: 1px solid rgba(0, 255, 136, 0.3);
-  padding: 3px 8px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-}
-
-.vault-img-wrap {
-  width: 100%;
-  height: 180px;
-  background: rgba(3, 4, 9, 0.6);
-  border-radius: 14px;
+.vault-card-mini {
+  background: rgba(12, 14, 24, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 14px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 12px;
+  text-align: left;
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.6);
+  transition: all 0.25s ease;
 }
 
-.vault-img-wrap img {
-  width: 85%;
-  height: 85%;
+.vault-card-mini:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(162, 0, 255, 0.5);
+  box-shadow: 0 20px 40px -10px rgba(162, 0, 255, 0.3);
+}
+
+.vault-card-mini img {
+  width: 54px;
+  height: 54px;
   object-fit: contain;
-  filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.8));
-  transition: transform 0.35s ease;
+  border-radius: 8px;
+  background: rgba(3, 4, 9, 0.5);
 }
 
-.vault-card:hover .vault-img-wrap img {
-  transform: scale(1.08) rotate(-3deg);
-}
-
-.vault-card-title {
-  font-size: 15px;
-  font-weight: 700;
+.mini-info strong {
+  font-size: 13px;
   color: #fff;
+  display: block;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.mini-pricing {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
   margin-bottom: 4px;
-  line-height: 1.3;
 }
 
-.vault-card-meta {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 14px;
-}
-
-.vault-price-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 8px 12px;
-  margin-bottom: 12px;
-}
-
-.price-box {
-  display: flex;
-  flex-direction: column;
-}
-
-.price-box label {
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.vinted-box span {
-  font-size: 13px;
-  font-weight: 700;
-  color: #ff5555;
-}
-
-.stockx-box span {
-  font-size: 13px;
-  font-weight: 700;
-  color: #00ff88;
-}
-
-.price-arrow {
-  color: rgba(255, 255, 255, 0.3);
-  font-weight: bold;
-}
-
-.vault-profit-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, rgba(162, 0, 255, 0.15), rgba(0, 255, 136, 0.1));
-  border: 1px solid rgba(162, 0, 255, 0.3);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-size: 11px;
+.mini-profit {
+  font-size: 12px;
   font-weight: 800;
-  margin-top: auto;
-}
-
-.vault-profit-bar span {
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.5px;
-}
-
-.profit-amount {
-  font-size: 14px;
-  color: #00ff88;
   font-family: var(--font-mono, monospace);
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+}
+
+@media (max-width: 768px) {
+  .story-progress-indicator {
+    display: none;
+  }
+  .vault-grid-mini {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .hero-section {
