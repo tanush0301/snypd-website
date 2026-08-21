@@ -618,7 +618,7 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
-/* Narrative Story Chapters */
+/* Narrative Story Chapters & Laser-Integrated Typography */
 .story-chapter {
   position: absolute;
   top: 50%;
@@ -647,20 +647,57 @@ html.lenis, html.lenis body {
 }
 
 .story-title {
+  position: relative;
   font-size: clamp(40px, 6vw, 76px);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.03em;
   color: #fff;
   margin-bottom: 20px;
+  text-shadow: 0 0 35px rgba(162, 0, 255, 0.4), 0 0 70px rgba(53, 231, 220, 0.15);
+  display: inline-block;
+}
+
+/* Horizontal Laser Sweep Under Heading */
+.story-title::after {
+  content: '';
+  position: absolute;
+  left: 5%;
+  bottom: -10px;
+  width: 90%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #35e7dc, #df80ff, #ffffff, #df80ff, #35e7dc, transparent);
+  box-shadow: 0 0 15px #35e7dc, 0 0 30px #df80ff, 0 0 45px #a200ff;
+  border-radius: 2px;
+  opacity: 0;
+  transform: scaleX(0.1);
+  transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.story-chapter.active .story-title::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .story-sub {
   font-size: clamp(16px, 2vw, 20px);
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
   max-width: 620px;
   margin: 0 auto 32px auto;
+  transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+}
+
+.story-chapter:not(.active) .story-sub {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.story-chapter.active .story-sub {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Scroll Mouse Cue */
