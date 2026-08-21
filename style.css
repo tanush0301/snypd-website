@@ -360,12 +360,21 @@ body {
 }
 
 /* ==========================================================================
-   IMAGICA-STYLE COMMAND SEARCH BAR
+   CLEAN SNIPER COMMAND CENTER
    ========================================================================== */
+.sniper-center-section {
+  position: relative;
+  z-index: 20;
+  max-width: 900px;
+  margin: 40px auto 80px auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
 .sniper-command-bar {
   width: 100%;
   max-width: 680px;
-  margin: 0 auto 36px auto;
+  margin: 0 auto;
   position: relative;
   z-index: 20;
 }

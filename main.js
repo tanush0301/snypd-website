@@ -439,43 +439,6 @@ document.addEventListener("DOMContentLoaded", function() {
   function onScrollProgress(progress) {
     // Exact target frame index
     targetFrameIndex = Math.min(Math.max(progress * (frameCount - 1), 0), frameCount - 1);
-
-    // Update Progress Indicator Bar
-    if (progressBar) {
-      progressBar.style.height = `${(progress * 100).toFixed(1)}%`;
-    }
-
-    // Determine Active Chapter Step with Hysteresis / Smooth Thresholds
-    let activeStep = 1;
-    if (progress >= 0.72) {
-      activeStep = 4;
-    } else if (progress >= 0.46) {
-      activeStep = 3;
-    } else if (progress >= 0.20) {
-      activeStep = 2;
-    } else {
-      activeStep = 1;
-    }
-
-    chapters.forEach((chap, idx) => {
-      const stepNum = idx + 1;
-      if (chap) {
-        if (stepNum === activeStep) {
-          chap.classList.add('active');
-        } else {
-          chap.classList.remove('active');
-        }
-      }
-    });
-
-    chapterDots.forEach((dot) => {
-      const stepNum = parseInt(dot.getAttribute('data-step') || '1', 10);
-      if (stepNum === activeStep) {
-        dot.classList.add('active');
-      } else {
-        dot.classList.remove('active');
-      }
-    });
   }
 
   // 60FPS High-Precision Lerp Frame Drawing Loop
