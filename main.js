@@ -407,8 +407,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // Preload 75 High-Res 3D Laser Frames
-  const frameCount = 75;
+  // Preload 80 High-Res 3D Obsidian Sphere Frames
+  const frameCount = 80;
   const frameImages = [];
   let currentRenderedFrame = 0;
   let targetFrameIndex = 0;
