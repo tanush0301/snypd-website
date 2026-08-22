@@ -1317,7 +1317,7 @@
                   <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
                 <div class="custom-option" role="option" id="topicOpt-discord" data-value="discord">
-                  <span class="opt-label">Discord Webhook Setup</span>
+                  <span class="opt-label">Push Notification Setup</span>
                   <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
                 <div class="custom-option" role="option" id="topicOpt-bug" data-value="bug">
@@ -1403,7 +1403,7 @@
             </button>
             <div class="faq-content">
               <div class="faq-content-inner">
-                Our engine operates with <strong>sub-second latency</strong>. The moment a listing hits the Vinted database that matches your exact filters, it is pushed directly to your dashboard. You see it and can react before it hits the public feed.
+                Our engine polls Vinted continuously and speeds up automatically on searches that are actively finding new items, checking as often as every 30 seconds. When a match is found it lands on your dashboard and triggers a push notification right away.
               </div>
             </div>
           </div>
@@ -1429,7 +1429,7 @@
             </button>
             <div class="faq-content">
               <div class="faq-content-inner">
-                Yes, the web dashboard connection needs to remain active to receive real-time web-socket pushes. We recommend keeping it <strong>pinned in a background tab</strong> while you work on other tasks.
+                Depends on your plan. On the <strong>Free</strong> tier, monitoring runs while your dashboard tab is open, so keep it pinned in the background while you work. On paid tiers, your searches keep running <strong>24/7</strong> even after you close the tab &mdash; enable push notifications once and you'll be alerted the moment something matches, dashboard closed or not.
               </div>
             </div>
           </div>
@@ -1455,7 +1455,7 @@
             </button>
             <div class="faq-content">
               <div class="faq-content-inner">
-                Premium tiers include <strong>Discord Webhook integration</strong>. You can route specific high-value searches directly to your private Discord server for instant push notifications on your phone, so you never miss a snipe even when away from your PC.
+                Discord webhook delivery isn't available yet &mdash; it's on our roadmap. Today, the way to get alerts on your phone away from your PC is to install SNYPD to your home screen and enable push notifications; you'll get notified the moment we detect a match, even with the dashboard closed.
               </div>
             </div>
           </div>

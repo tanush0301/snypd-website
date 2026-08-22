@@ -1331,3 +1331,347 @@ html.lenis, html.lenis body {
   .faq-question { font-size: 16px; padding: 24px; }
   .faq-answer-inner { padding: 0 24px 24px 24px; font-size: 15px; }
 }
+
+/* ================================================================
+   SNYPD DEFECT 1 — HORIZONTAL OVERFLOW DEFENSE
+   ================================================================ */
+
+html {
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+body {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+@supports not (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+#page-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg,
+iframe {
+  max-width: 100%;
+}
+
+[style*="width: 100vw"],
+[style*="width:100vw"],
+[style*="width : 100vw"] {
+  width: 100% !important;
+  max-width: 100vw !important;
+}
+
+[style*="min-width: 100vw"],
+[style*="min-width:100vw"],
+[style*="min-width : 100vw"] {
+  min-width: 100% !important;
+}
+
+[style*="max-width: 100vw"],
+[style*="max-width:100vw"],
+[style*="max-width : 100vw"] {
+  max-width: 100% !important;
+}
+
+/* ================================================================
+   SNYPD DEFECT 2 — DUPLICATE HERO BREAKPOINT COLLISION
+   ================================================================ */
+
+@media screen and (max-width: 991px) {
+  .hero-desktop {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .hero-mobile {
+    display: none !important;
+  }
+}
+
+/* ================================================================
+   SNYPD DEFECT 3 — MOBILE NAVBAR VISIBILITY (CUSTOM ISLAND NAV)
+   ================================================================ */
+
+#snypdMobileToggle,
+.snypd-island__mobile-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 2100;
+  cursor: pointer;
+}
+
+#snypdMobileMenu,
+.snypd-mobile-menu {
+  z-index: 3000;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+#snypdMobileMenu a,
+.snypd-mobile-menu a {
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+/* ================================================================
+   SNYPD DEFECT 4 — IX2 PRE-HIDE TRAP & VISIBILITY OVERRIDE
+   ================================================================ */
+html.w-mod-js *:not(.w-mod-ix3),
+html.w-mod-js *:not(.w-mod-ix) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html.w-mod-js .heading_h3,
+html.w-mod-js .heading_h2,
+html.w-mod-js .heading_h1,
+html.w-mod-js .paragraph,
+html.w-mod-js .text-block,
+html.w-mod-js [class*="heading"],
+html.w-mod-js [class*="text"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: revert !important;
+}
+
+[data-wf--hidden],
+.w--hidden,
+[style*="visibility: hidden"],
+[style*="visibility:hidden"],
+[style*="opacity: 0"],
+[style*="opacity:0"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* ================================================================
+   SNYPD DEFECT 5 — CROPPED LIVE-FIND PREVIEW CARDS
+   ================================================================ */
+.w-dyn-item,
+.w-dyn-list,
+.collection-list-wrapper,
+[class*="card"],
+[class*="Card"],
+[class*="find"],
+[class*="proof"],
+[class*="item"] {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.w-dyn-item img,
+[class*="card"] img,
+[class*="find"] img,
+[class*="proof"] img {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: cover;
+}
+
+.w-dyn-item p,
+.w-dyn-item h3,
+.w-dyn-item h4,
+[class*="card"] p,
+[class*="card"] h3,
+[class*="card"] h4,
+[class*="find"] p,
+[class*="proof"] p {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-height: none !important;
+  display: block !important;
+}
+
+/* ================================================================
+   SNYPD FINAL POLISH — MOBILE CONVERSION HARDENING
+   ================================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* ---------------------------------------------------------------
+   Mobile navbar / island menu final state
+   --------------------------------------------------------------- */
+
+#snypdMobileToggle,
+.snypd-island__mobile-btn {
+  min-width: 44px;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#snypdMobileMenu,
+.snypd-mobile-menu {
+  max-height: calc(100vh - 88px);
+  max-height: calc(100dvh - 88px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+#snypdMobileMenu a,
+.snypd-mobile-menu a {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 991px) {
+  #snypdMobileMenu:not(.active),
+  .snypd-mobile-menu:not(.active) {
+    display: none !important;
+  }
+
+  #snypdMobileMenu.active,
+  .snypd-mobile-menu.active {
+    display: flex !important;
+    flex-direction: column;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  #snypdMobileToggle,
+  .snypd-island__mobile-btn {
+    display: none !important;
+  }
+
+  #snypdMobileMenu,
+  .snypd-mobile-menu {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Engine / Refresh Loop visibility
+   --------------------------------------------------------------- */
+
+.board-wrapper,
+.vs-board,
+.board-side,
+.card-stack,
+.action-card,
+.ui-radar-box,
+.ui-terminal,
+.ui-spinner,
+.ui-match-card {
+  max-width: 100%;
+  visibility: visible;
+}
+
+.board-wrapper,
+.vs-board {
+  width: 100%;
+}
+
+.board-side {
+  min-height: 120px;
+}
+
+.card-stack {
+  min-height: 88px;
+}
+
+.action-card {
+  min-height: 48px;
+}
+
+.ui-radar-box,
+.ui-terminal,
+.ui-spinner,
+.ui-match-card {
+  min-height: 28px;
+}
+
+/* ---------------------------------------------------------------
+   Proof stage / live-find cards
+   --------------------------------------------------------------- */
+
+.section-proof,
+.focus-stage,
+.asset-image-box,
+.queue-list,
+.stat-box {
+  max-width: 100%;
+  overflow: visible;
+}
+
+.asset-image-box {
+  min-height: 220px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.data-title,
+.data-price,
+.stat-box {
+  overflow-wrap: anywhere;
+}
+
+.queue-list {
+  width: 100%;
+}
+
+/* Prevent interactive sections from reintroducing horizontal overflow */
+#boardWrapper,
+#proofSection,
+#focusStage,
+#queueList {
+  max-width: 100%;
+}

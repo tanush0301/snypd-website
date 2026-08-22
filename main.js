@@ -585,3 +585,101 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
+/* ================================================================
+   SNYPD DEFECT 3 — MOBILE NAVBAR TOGGLE (CUSTOM ISLAND NAV)
+   ================================================================ */
+(function () {
+  function initSnypdCustomMobileNav() {
+    var toggleBtn = document.getElementById('snypdMobileToggle');
+    var mobileMenu = document.getElementById('snypdMobileMenu');
+
+    if (!toggleBtn) toggleBtn = document.querySelector('.snypd-island__mobile-btn');
+    if (!mobileMenu) mobileMenu = document.querySelector('.snypd-mobile-menu');
+
+    if (!toggleBtn || !mobileMenu) return;
+
+    if (toggleBtn.getAttribute('data-snypd-nav-bound') === '1') return;
+    toggleBtn.setAttribute('data-snypd-nav-bound', '1');
+
+    toggleBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      var isActive = mobileMenu.classList.contains('active');
+      
+      if (isActive) {
+        mobileMenu.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+      } else {
+        mobileMenu.classList.add('active');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        mobileMenu.removeAttribute('aria-hidden');
+      }
+    });
+
+    var menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(function (link) {
+      link.addEventListener('click', function () {
+        mobileMenu.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!mobileMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+        if (mobileMenu.classList.contains('active')) {
+          mobileMenu.classList.remove('active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSnypdCustomMobileNav);
+  } else {
+    initSnypdCustomMobileNav();
+  }
+})();
+
+/* ================================================================
+   SNYPD FINAL POLISH — NAV STATE GUARDS
+   ================================================================ */
+(function () {
+  function initSnypdFinalNavGuards() {
+    var menu = document.getElementById('snypdMobileMenu') || document.querySelector('.snypd-mobile-menu');
+    var toggle = document.getElementById('snypdMobileToggle') || document.querySelector('.snypd-island__mobile-btn');
+
+    if (!menu || !toggle) {
+      return;
+    }
+
+    function closeMenu() {
+      menu.classList.remove('active');
+      toggle.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+    }
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 991 && menu.classList.contains('active')) {
+        closeMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && menu.classList.contains('active')) {
+        closeMenu();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSnypdFinalNavGuards);
+  } else {
+    initSnypdFinalNavGuards();
+  }
+})();
