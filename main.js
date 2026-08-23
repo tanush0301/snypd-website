@@ -529,44 +529,22 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ==========================================================================
-  // 9. GSAP SCROLL REVEALS FOR POST-HERO SECTIONS
+  // 9. GSAP SCROLL REVEALS FOR POST-HERO SECTIONS -- REMOVED 2026-08-24
   // ==========================================================================
-  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
-
-    // App Window Reveal
-    const appWindow = document.querySelector('.app-window');
-    if (appWindow) {
-      gsap.from(appWindow, {
-        scrollTrigger: {
-          trigger: '.app-reveal-wrapper',
-          start: 'top 85%',
-          end: 'top 30%',
-          scrub: 1
-        },
-        scale: 0.88,
-        y: 60,
-        opacity: 0.5,
-        ease: 'power2.out'
-      });
-    }
-
-    // Other Sections
-    const sections = document.querySelectorAll('.ultra-section, #proofSection, #features, #pricing, .faq-section');
-    sections.forEach(sec => {
-      gsap.from(sec.children, {
-        scrollTrigger: {
-          trigger: sec,
-          start: 'top 80%'
-        },
-        y: 40,
-        opacity: 0,
-        stagger: 0.12,
-        duration: 0.8,
-        ease: 'power3.out'
-      });
-    });
-  }
+  // This animated the dashboard mockup and set .ultra-section/#proofSection/
+  // #pricing/.faq-section to opacity:0 until a Lenis+ScrollTrigger reveal
+  // fired on scroll. It never ran on this site before main.js was wired into
+  // index.html for the (now-removed) video hero -- confirmed the pre-redesign
+  // index.html never loaded main.js at all, so pricing/FAQ/etc. were always
+  // just plain visible content. The reveal stopped completing reliably
+  // (reported live: pricing and the FAQ section not showing), most likely a
+  // Lenis/ScrollTrigger scroll-position sync issue that gets worse the
+  // further a section sits from the top of the page -- exactly matching
+  // which sections broke. Removed rather than debugged further: nothing here
+  // could be visually re-verified in this environment, and every section
+  // this touched is real content that must always be visible, not a nice-to-
+  // have animation worth that risk. Do not re-add without a live, human-
+  // confirmed check that the reveal actually completes on a real scroll.
 
 });
 
