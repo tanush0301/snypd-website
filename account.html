@@ -1,6 +1,8 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 
-<html     lang="en"><head><meta charset="utf-8"/><title>account</title><meta content="account" property="og:title"/><meta content="account" name="twitter:title"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}</style><!-- 1) Load Supabase UMD + init global client -->
+<html     lang="en"><head><meta charset="utf-8"/><title>account</title><meta content="account" property="og:title"/><meta content="account" name="twitter:title"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}
+*, *::before, *::after { box-sizing: border-box; }
+</style><!-- 1) Load Supabase UMD + init global client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
   window.SNYPD = window.SNYPD || {};
@@ -479,7 +481,7 @@
 </div>
 <div class="snypd-sidebar__bottom">
 <div class="snypd-bottomRow">
-<div class="snypd-pill" data-snypd-plan="">PLAN — ELITE</div>
+<div class="snypd-pill" data-snypd-plan="">PLAN â€” ELITE</div>
 <a class="snypd-link" data-snypd-support="" href="/support">Support</a>
 </div>
 <button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
@@ -489,7 +491,7 @@
 <div id="mobile-header" style="display:none;">
 <button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px; cursor:pointer;">â˜°</button>
 </div>
-<section class="section-signup account"><div class="padding-global"><div class="container-large"></div></div><div><!-- SNYPD Account Page — FINAL Whop-only -->
+<section class="section-signup account"><div class="padding-global"><div class="container-large"></div></div><div><!-- SNYPD Account Page â€” FINAL Whop-only -->
 <style>
   .snypd-account-final{
     --bg:#0f0b16;
@@ -875,19 +877,19 @@
 <div class="rows">
 <div class="row">
 <div class="k">Email</div>
-<div class="v" data-snypd="email">—</div>
+<div class="v" data-snypd="email">â€”</div>
 </div>
 <div class="row">
 <div class="k">Plan</div>
-<div class="v" data-snypd="plan">—</div>
+<div class="v" data-snypd="plan">â€”</div>
 </div>
 <div class="row">
 <div class="k">Billing status</div>
-<div class="v" data-snypd="status">—</div>
+<div class="v" data-snypd="status">â€”</div>
 </div>
 <div class="row">
 <div class="k">Renews on</div>
-<div class="v" data-snypd="renews">—</div>
+<div class="v" data-snypd="renews">â€”</div>
 </div>
 </div>
 <div class="notice" data-snypd="notice"></div>
@@ -919,13 +921,13 @@
 <div class="mini-title">Billing</div>
 <a class="mini-link" data-snypd-action="billingLink" href="#">Manage</a>
 </div>
-<p class="mini-p" data-snypd="billingCopy">Loading…</p>
+<p class="mini-p" data-snypd="billingCopy">Loadingâ€¦</p>
 </div>
 <div class="mini">
 <div class="mini-hd">
 <div class="mini-title">Sync</div>
 </div>
-<p class="mini-p" data-snypd="lastUpdated">Last updated —</p>
+<p class="mini-p" data-snypd="lastUpdated">Last updated â€”</p>
 </div>
 <div class="mini">
 <div class="mini-hd">
@@ -966,9 +968,9 @@
   }
 
   function fmtDate(ts){
-    if (!ts) return "—";
+    if (!ts) return "â€”";
     const d = new Date(ts);
-    if (Number.isNaN(d.getTime())) return "—";
+    if (Number.isNaN(d.getTime())) return "â€”";
     return new Intl.DateTimeFormat("en-GB", {
       year:"numeric",
       month:"2-digit",
@@ -1075,7 +1077,7 @@
   (async () => {
     const sb = await waitForSupabase();
     if (!sb){
-      setText("userline", "Couldn’t load account.");
+      setText("userline", "Couldnâ€™t load account.");
       return;
     }
 
@@ -1111,8 +1113,8 @@
 
     if (error){
       console.error(error);
-      setText("status", "Couldn’t load");
-      setText("billingCopy", "Couldn’t load billing information.");
+      setText("status", "Couldnâ€™t load");
+      setText("billingCopy", "Couldnâ€™t load billing information.");
       return;
     }
 

@@ -4,32 +4,12 @@
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", function() {
-  
-  // ==========================================================================
-  // 1. FLOATING ISLAND NAVBAR & MOBILE TOGGLE
-  // ==========================================================================
-  const toggleBtn = document.getElementById("snypdMobileToggle");
-  const mobileMenu = document.getElementById("snypdMobileMenu");
-  const menuLinks = document.querySelectorAll(".mobile-menu-link");
 
-  if (toggleBtn && mobileMenu) {
-    toggleBtn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      mobileMenu.classList.toggle("active");
-    });
-
-    document.addEventListener("click", function(e) {
-      if (!mobileMenu.contains(e.target) && e.target !== toggleBtn) {
-        mobileMenu.classList.remove("active");
-      }
-    });
-
-    menuLinks.forEach(link => {
-      link.addEventListener("click", () => {
-        mobileMenu.classList.remove("active");
-      });
-    });
-  }
+  // Mobile navbar toggle lives in the "DEFECT 3" + "FINAL POLISH" IIFEs
+  // further down this file -- do not re-add a duplicate handler here, it
+  // was previously bound three times across this file and index.html's
+  // inline script, and relied on an accidental even-count cancellation to
+  // appear to work at all.
 
   // ==========================================================================
   // 2. HERO DASHBOARD MOCKUP LIVE FEED SIMULATION

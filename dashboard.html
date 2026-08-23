@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 
 <html lang="en">
@@ -627,7 +627,7 @@ body {
 </div>
 <div class="snypd-sidebar__bottom">
 <div class="snypd-bottomRow">
-<div class="snypd-pill" data-snypd-plan="">PLAN � ELITE</div>
+<div class="snypd-pill" data-snypd-plan="">PLAN — ELITE</div>
 <a class="snypd-link" data-snypd-support="" href="/support">Support</a>
 </div>
 <button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
@@ -636,7 +636,7 @@ body {
 </div><div class="main-content">
 <!-- HAMBURGER FOR MOBILE -->
 <div id="mobile-header" style="display:none;">
-<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px;">☰</button>
+<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px;">â˜°</button>
 </div>
 <div class="dash-wrap">
 <div class="hdr">
@@ -657,9 +657,9 @@ body {
 <div class="panel" id="dashboard-panel" style="margin-bottom:16px">
 <div class="hd">
 <div class="status-bar">
-<div class="chip plan" id="plan-banner">Plan: �</div>
+<div class="chip plan" id="plan-banner">Plan: —</div>
 <div class="chip warn" id="status-chip">Status: Idle</div>
-<div class="chip neutral" id="tick-chip">Last check: �</div>
+<div class="chip neutral" id="tick-chip">Last check: —</div>
 <div class="chip err" id="err-chip" style="display:none"></div>
 </div>
 <div class="controls">
@@ -670,7 +670,7 @@ body {
 <p id="notify-note" style="display:none;margin:8px 0 0;font-size:13px;color:#8A8A8A;line-height:1.5;max-width:56ch"></p>
 </div>
 <div class="bd">
-<div class="empty" id="empty" style="display:none">No results yet. Press �Start Sniping Now�.</div>
+<div class="empty" id="empty" style="display:none">No results yet. Press “Start Sniping Now”.</div>
 <div class="list" id="list">
 <div class="skeleton"></div>
 <div class="skeleton"></div>
@@ -777,7 +777,7 @@ const HEARTBEAT_URL = (() => {
   }
   const sb = window.SNYPD?.supabase;
 
-  const set  = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt ?? '�'; };
+  const set  = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt ?? '—'; };
   const show = (id, flag)  => { const n = document.getElementById(id); if (n) n.style.display = flag ? '' : 'none'; };
   const msg  = (t)        => set('msg', t);
 
@@ -899,8 +899,8 @@ const HEARTBEAT_URL = (() => {
       return;
     }
     empty.textContent = running
-      ? 'No results yet. Sniping is running�'
-      : 'No results yet. Press �Start Sniping Now�.';
+      ? 'No results yet. Sniping is running…'
+      : 'No results yet. Press “Start Sniping Now”.';
     empty.style.display = 'block';
   }
 
@@ -942,7 +942,7 @@ const HEARTBEAT_URL = (() => {
     if (bt !== at) return bt - at;
     return (Number(b.listing_id) || 0) - (Number(a.listing_id) || 0);
   }
-  // -------- helpers for mapping row → card ----------
+  // -------- helpers for mapping row â†’ card ----------
 
   function getImageUrl(row) {
     if (typeof row?.image_url === 'string' && /^https?:\/\//i.test(row.image_url)) {
@@ -1017,7 +1017,7 @@ const HEARTBEAT_URL = (() => {
             <div class="p">${fmtPrice(amount, currency)}</div>
           </div>
           <div class="muted">
-            ${[brand, size, status, src, fetchedLabel].filter(Boolean).map(esc).join(' � ')}
+            ${[brand, size, status, src, fetchedLabel].filter(Boolean).map(esc).join(' • ')}
           </div>
           <div class="tiny"></div>
         </div>
@@ -1151,7 +1151,7 @@ const HEARTBEAT_URL = (() => {
   let adsTimer = null;
   let hbTimer  = null;
 
-  // If user clicks Stop, we respect it and won�t auto-start until Start is clicked again.
+  // If user clicks Stop, we respect it and won’t auto-start until Start is clicked again.
   let manualPaused = (localStorage.getItem('snypd_manual_paused') === 'true');
 
   async function start() {
@@ -1161,7 +1161,7 @@ const HEARTBEAT_URL = (() => {
     running = true;
     setStatus('running');
     btnStart.disabled = true;
-    btnStart.textContent = 'Running�';
+    btnStart.textContent = 'Running…';
 
     await sendHeartbeat();
     hbTimer = setInterval(sendHeartbeat, 30000);
@@ -1231,7 +1231,7 @@ const HEARTBEAT_URL = (() => {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       hiddenSince = null;
-      touchActivity(); // coming back counts as activity → resumes immediately
+      touchActivity(); // coming back counts as activity â†’ resumes immediately
     } else {
       hiddenSince = Date.now(); // start grace timer
     }
@@ -1240,7 +1240,7 @@ const HEARTBEAT_URL = (() => {
   function startIdleChecker() {
     if (idleChecker) return;
     idleChecker = setInterval(async () => {
-      if (manualPaused) return; // user pressed Stop → never auto-resume
+      if (manualPaused) return; // user pressed Stop â†’ never auto-resume
 
       const now = Date.now();
 
@@ -1479,4 +1479,3 @@ const HEARTBEAT_URL = (() => {
 </script>
 </body>
 </html>
-
