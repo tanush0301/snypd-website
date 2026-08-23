@@ -387,24 +387,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // Preload 80 High-Res 3D Obsidian Sphere Frames
+  // Frame preloading and the scrub-render loop only make sense while the
+  // #storyTrack/#storyCanvas hero section actually exists in the page. It was
+  // pulled from index.html (2026-08-23, homepage regression -- see CLAUDE.md),
+  // so skip all of it rather than silently fetching 80 unused JPGs on every
+  // homepage load. Re-adding the section's HTML is enough to bring this back.
   const frameCount = 80;
   const frameImages = [];
   let currentRenderedFrame = 0;
   let targetFrameIndex = 0;
   let smoothFrameIndex = 0;
-
-  for (let i = 0; i < frameCount; i++) {
-    const img = new Image();
-    const padIndex = String(i).padStart(3, '0');
-    img.src = `/assets/frames/frame_${padIndex}.jpg`;
-    img.onload = () => {
-      if (i === 0 && ctx) {
-        drawCanvasFrame(0);
-      }
-    };
-    frameImages.push(img);
-  }
 
   function drawCanvasFrame(idx) {
     if (!ctx || !canvas || !frameImages[idx]) return;
@@ -431,7 +423,22 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     requestAnimationFrame(renderCanvasScrubLoop);
   }
-  requestAnimationFrame(renderCanvasScrubLoop);
+
+  if (canvas && track) {
+    // Preload 80 High-Res 3D Obsidian Sphere Frames
+    for (let i = 0; i < frameCount; i++) {
+      const img = new Image();
+      const padIndex = String(i).padStart(3, '0');
+      img.src = `/assets/frames/frame_${padIndex}.jpg`;
+      img.onload = () => {
+        if (i === 0 && ctx) {
+          drawCanvasFrame(0);
+        }
+      };
+      frameImages.push(img);
+    }
+    requestAnimationFrame(renderCanvasScrubLoop);
+  }
 
   function computeScroll() {
     if (!track) return;
