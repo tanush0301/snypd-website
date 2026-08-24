@@ -11,6 +11,13 @@ document.addEventListener("DOMContentLoaded", function() {
   // inline script, and relied on an accidental even-count cancellation to
   // appear to work at all.
 
+  // Footer copyright year -- was hardcoded and had already drifted 2 years
+  // stale (2024) before this fix. Self-updating so it can't happen again.
+  const copyYearEl = document.getElementById('copyYear');
+  if (copyYearEl) {
+    copyYearEl.textContent = new Date().getFullYear();
+  }
+
   // ==========================================================================
   // 2. HERO DASHBOARD MOCKUP LIVE FEED SIMULATION
   // ==========================================================================
@@ -121,11 +128,11 @@ document.addEventListener("DOMContentLoaded", function() {
   
   if (queueList && focusStage) {
     const galleryData = [
-      { id: 0, img: '/assets/img/6a49f591f2b3031b92a87da3_1783074655.webp', title: "Supreme 99 Football Top Black", price: "€ 120,00", market: "Est: €200+", size: "L", cond: "Very Good", time: "Just now", source: "search", label: "Primary Slot" },
-      { id: 1, img: '/assets/img/6a49f4c0a4873ec61828a489_1783146176.jpeg', title: "Jordan 4 Bred OG", price: "€ 140,00", market: "Est: €300+", size: "42", cond: "Very Good", time: "1m ago", source: "catalog", label: "Example Slot" },
-      { id: 2, img: '/assets/img/6a4e03733184f099d185451d_jordan-1-travis-scott-velvet.jpg', title: "Air Jordan 1 Low Travis Scott Velvet Brown", price: "€ 225,00", market: "Est: €750+", size: "42.5", cond: "Very Good", time: "5m ago", source: "catalog", label: "Example Slot" },
-      { id: 3, img: '/assets/img/6a49f4c0088ffb1e4478ccba_1772617611.png', title: "Jordan 1 High \"Mocha\"", price: "€ 84,00", market: "Est: €400+", size: "43", cond: "Good", time: "12m ago", source: "catalog", label: "Example Slot" },
-      { id: 4, img: '/assets/img/6a49f4c0e0c8a747768678bb_1783110478.jpg', title: "Yeezy Slide Onyx", price: "€ 23,00", market: "Est: €90+", size: "42", cond: "Brand New", time: "20m ago", source: "catalog", label: "Example Slot" }
+      { id: 0, img: '/assets/img/6a49f591f2b3031b92a87da3_1783074655.webp', title: "Supreme 99 Football Top Black", price: "€ 120,00", market: "Est: €200+", size: "L", cond: "Very Good", time: "Just now", source: "search", label: "Example" },
+      { id: 1, img: '/assets/img/6a49f4c0a4873ec61828a489_1783146176.jpeg', title: "Jordan 4 Bred OG", price: "€ 140,00", market: "Est: €300+", size: "42", cond: "Very Good", time: "1m ago", source: "catalog", label: "Example" },
+      { id: 2, img: '/assets/img/6a4e03733184f099d185451d_jordan-1-travis-scott-velvet.jpg', title: "Air Jordan 1 Low Travis Scott Velvet Brown", price: "€ 225,00", market: "Est: €750+", size: "42.5", cond: "Very Good", time: "5m ago", source: "catalog", label: "Example" },
+      { id: 3, img: '/assets/img/6a49f4c0088ffb1e4478ccba_1772617611.png', title: "Jordan 1 High \"Mocha\"", price: "€ 84,00", market: "Est: €400+", size: "43", cond: "Good", time: "12m ago", source: "catalog", label: "Example" },
+      { id: 4, img: '/assets/img/6a49f4c0e0c8a747768678bb_1783110478.jpg', title: "Yeezy Slide Onyx", price: "€ 23,00", market: "Est: €90+", size: "42", cond: "Brand New", time: "20m ago", source: "catalog", label: "Example" }
     ];
 
     let activeId = 0;
@@ -348,185 +355,16 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // ==========================================================================
-  // 7. APPLE-STANDARD 60FPS CANVAS FRAME SCRUBBING ENGINE
+  // 7 & 8 (canvas frame-scrubbing engine, Lenis smooth scroll, chapter-dot
+  // nav, snipe search/filter demo) -- REMOVED 2026-08-24. All of it targeted
+  // #storyTrack/#storyCanvas/.story-chapter-dots/#snipeSearchInput/
+  // .vault-card-mini, which belonged to the video-hero story track pulled on
+  // 2026-08-23 (see CLAUDE.md). None of those elements exist in the current
+  // page, so every function here was a guarded no-op -- except the Lenis
+  // instance, which had no such guard: it was replacing native scroll
+  // physics site-wide for a feature that no longer exists. Removed rather
+  // than left running.
   // ==========================================================================
-  const track = document.getElementById('storyTrack');
-  const canvas = document.getElementById('storyCanvas');
-  const ctx = canvas ? canvas.getContext('2d') : null;
-  const progressBar = document.getElementById('storyProgressBar');
-  const chapterDots = document.querySelectorAll('.story-chapter-dots .dot');
-  const chapters = [
-    document.getElementById('chapter1'),
-    document.getElementById('chapter2'),
-    document.getElementById('chapter3'),
-    document.getElementById('chapter4')
-  ];
-
-  // Initialize Lenis Luxury Smooth Scrolling
-  let lenis = null;
-  if (typeof Lenis !== 'undefined') {
-    lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential smooth decay
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.8,
-      infinite: false
-    });
-
-    function rafLenis(time) {
-      lenis.raf(time);
-      requestAnimationFrame(rafLenis);
-    }
-    requestAnimationFrame(rafLenis);
-
-    if (typeof ScrollTrigger !== 'undefined') {
-      lenis.on('scroll', ScrollTrigger.update);
-    }
-  }
-
-  // Frame preloading and the scrub-render loop only make sense while the
-  // #storyTrack/#storyCanvas hero section actually exists in the page. It was
-  // pulled from index.html (2026-08-23, homepage regression -- see CLAUDE.md),
-  // so skip all of it rather than silently fetching 80 unused JPGs on every
-  // homepage load. Re-adding the section's HTML is enough to bring this back.
-  const frameCount = 80;
-  const frameImages = [];
-  let currentRenderedFrame = 0;
-  let targetFrameIndex = 0;
-  let smoothFrameIndex = 0;
-
-  function drawCanvasFrame(idx) {
-    if (!ctx || !canvas || !frameImages[idx]) return;
-    const img = frameImages[idx];
-    if (img.complete && img.naturalWidth > 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      currentRenderedFrame = idx;
-    }
-  }
-
-  function onScrollProgress(progress) {
-    // Exact target frame index
-    targetFrameIndex = Math.min(Math.max(progress * (frameCount - 1), 0), frameCount - 1);
-  }
-
-  // 60FPS High-Precision Lerp Frame Drawing Loop
-  function renderCanvasScrubLoop() {
-    // Lerp with 0.25 damping factor for organic fluid response
-    smoothFrameIndex += (targetFrameIndex - smoothFrameIndex) * 0.25;
-    const rounded = Math.round(smoothFrameIndex);
-    if (rounded !== currentRenderedFrame) {
-      drawCanvasFrame(rounded);
-    }
-    requestAnimationFrame(renderCanvasScrubLoop);
-  }
-
-  if (canvas && track) {
-    // Preload 80 High-Res 3D Obsidian Sphere Frames
-    for (let i = 0; i < frameCount; i++) {
-      const img = new Image();
-      const padIndex = String(i).padStart(3, '0');
-      img.src = `/assets/frames/frame_${padIndex}.jpg`;
-      img.onload = () => {
-        if (i === 0 && ctx) {
-          drawCanvasFrame(0);
-        }
-      };
-      frameImages.push(img);
-    }
-    requestAnimationFrame(renderCanvasScrubLoop);
-  }
-
-  function computeScroll() {
-    if (!track) return;
-    const rect = track.getBoundingClientRect();
-    const totalScrollable = track.offsetHeight - window.innerHeight;
-    if (totalScrollable <= 0) return;
-    const progress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
-    onScrollProgress(progress);
-  }
-
-  if (lenis) {
-    lenis.on('scroll', computeScroll);
-  } else {
-    window.addEventListener('scroll', computeScroll, { passive: true });
-  }
-
-  // Click on Dots to Jump to Chapter smoothly with Lenis
-  chapterDots.forEach((dot) => {
-    dot.addEventListener('click', () => {
-      const step = parseInt(dot.getAttribute('data-step') || '1', 10);
-      if (!track) return;
-      const totalScrollable = track.offsetHeight - window.innerHeight;
-      const stepProgress = (step - 1) / 3.0; // 0, 0.33, 0.66, 1.0
-      const targetScroll = track.offsetTop + (stepProgress * totalScrollable);
-      
-      if (lenis) {
-        lenis.scrollTo(targetScroll, { duration: 1.4 });
-      } else {
-        window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-      }
-    });
-  });
-
-  // ==========================================================================
-  // 8. SEARCH & FILTER INTERACTION IN CHAPTER 2
-  // ==========================================================================
-  const searchInput = document.getElementById('snipeSearchInput');
-  const snipeBtn = document.getElementById('snipeSimulateBtn');
-  const filterPills = document.querySelectorAll('.filter-pill');
-  const vaultCards = document.querySelectorAll('.vault-card-mini');
-
-  function filterMiniVault(query) {
-    const q = query.trim().toLowerCase();
-    vaultCards.forEach(card => {
-      const tags = (card.getAttribute('data-tags') || '').toLowerCase();
-      const title = (card.querySelector('strong')?.textContent || '').toLowerCase();
-      if (q === '' || q === 'all' || tags.includes(q) || title.includes(q)) {
-        card.style.display = 'flex';
-        card.style.opacity = '1';
-      } else {
-        card.style.opacity = '0.2';
-        setTimeout(() => {
-          if (card.style.opacity === '0.2') card.style.display = 'none';
-        }, 200);
-      }
-    });
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      filterMiniVault(e.target.value);
-      filterPills.forEach(p => p.classList.remove('active'));
-    });
-  }
-
-  if (snipeBtn) {
-    snipeBtn.addEventListener('click', () => {
-      snipeBtn.innerHTML = '<span>⚡ Scanning...</span>';
-      setTimeout(() => {
-        snipeBtn.innerHTML = '<span>Snyped!</span><kbd>0.018s</kbd>';
-        setTimeout(() => {
-          snipeBtn.innerHTML = '<span>Snype Scan</span><kbd>⚡ 18ms</kbd>';
-        }, 2000);
-      }, 300);
-    });
-  }
-
-  filterPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      filterPills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      const query = pill.getAttribute('data-query') || '';
-      if (searchInput) {
-        searchInput.value = query === 'all' ? '' : query;
-      }
-      filterMiniVault(query);
-    });
-  });
 
   // ==========================================================================
   // 9. GSAP SCROLL REVEALS FOR POST-HERO SECTIONS -- REMOVED 2026-08-24
