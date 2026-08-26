@@ -1,4 +1,4 @@
-<!DOCTYPE html><html     lang="en"><head><meta charset="utf-8"/><title>Snypd - Deal Alerts for Resellers on Vinted| Snipe Deals First</title><meta content="Stop refreshing Vinted manually. Get alerts pushed to your dashboard as soon as a match is found. Join free." name="description"/><meta content="Snypd - Deal Alerts for Resellers on Vinted| Snipe Deals First" property="og:title"/><meta content="Stop refreshing Vinted manually. Get alerts pushed to your dashboard as soon as a match is found. Join free." property="og:description"/><meta content="Snypd - Deal Alerts for Resellers on Vinted| Snipe Deals First" name="twitter:title"/><meta content="Stop refreshing Vinted manually. Get alerts pushed to your dashboard as soon as a match is found. Join free." name="twitter:description"/><meta property="og:type" content="website"/><meta content="summary_large_image" name="twitter:card"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}</style>
+<!DOCTYPE html><html     lang="en"><head><meta charset="utf-8"/><title>SNYPD - Vinted Monitor & Deal Alerts for Resellers | Find Vinted Steals First</title><meta content="SNYPD is a Vinted monitor built for resellers. It watches your saved searches and alerts you as soon as a match appears - so you see Vinted steals before anyone else does. Free to start, no time limit." name="description"/><meta content="SNYPD - Vinted Monitor & Deal Alerts for Resellers | Find Vinted Steals First" property="og:title"/><meta content="SNYPD is a Vinted monitor built for resellers. It watches your saved searches and alerts you as soon as a match appears - so you see Vinted steals before anyone else does. Free to start, no time limit." property="og:description"/><meta content="SNYPD - Vinted Monitor & Deal Alerts for Resellers | Find Vinted Steals First" name="twitter:title"/><meta content="SNYPD is a Vinted monitor built for resellers. It watches your saved searches and alerts you as soon as a match appears - so you see Vinted steals before anyone else does. Free to start, no time limit." name="twitter:description"/><meta property="og:type" content="website"/><meta content="summary_large_image" name="twitter:card"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}</style>
 <link rel="stylesheet" href="/style.css"/>
 <!-- 1) Load Supabase UMD + init global client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -299,7 +299,7 @@
       margin: 4px 0;
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 991px) {
       .snypd-island__links {
         display: none;
       }
@@ -1057,7 +1057,7 @@
     </h1>
 
     <p class="hero-sub">
-      Get lightning-fast alerts and automated checkouts. Secure the best pairs on Vinted before anyone else even sees them live.
+      Get lightning-fast alerts and full control over every purchase. Secure the best pairs on Vinted before anyone else even sees them live.
     </p>
 
     <div class="hero-actions">
@@ -1956,6 +1956,15 @@
       font-size: clamp(36px, 10vw, 48px);
     }
   }
+
+  @media (max-width: 640px) {
+    /* Two 3-card rows plus the timeline made this section ~4 phone-screens
+       tall. Trim each side to its 2 clearest cards so pricing/FAQ are
+       reachable sooner; unchanged above 640px. */
+    .board-side .action-card:nth-child(3) {
+      display: none;
+    }
+  }
 </style>
 
 
@@ -1978,9 +1987,9 @@
         <div class="dot"></div>
         The Refresh Loop
       </div>
-      <h1 class="super-headline">Stop looping through<br><span>the same Vinted searches.</span></h1>
+      <h2 class="super-headline">Stop refreshing Vinted.<br><span>Start catching the steals first.</span></h2>
       <p class="sub-headline">
-        Manual refreshing keeps you checking the same filters again and again. SNYPD watches while you’re active and brings fresh matches directly into your dashboard.
+        SNYPD is a Vinted monitor built for resellers. It watches your saved searches and alerts you as soon as a match shows up - free to start, no time limit. Upgrade for 24/7 monitoring that keeps working after you close your laptop.
       </p>
     </div>
 
