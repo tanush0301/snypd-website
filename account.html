@@ -37,71 +37,7 @@
   gtag('js', new Date());
 
   gtag('config', 'G-VBC0SXPR6F');
-</script><style>
-/* --- SNYPD Account v2: Contrast Fix (paste LAST) --- */
-.snypd-account-v2{
-  /* Stronger readable defaults */
-  --acc-text: rgba(255,255,255,.92);
-  --acc-muted: rgba(255,255,255,.70);
-  --acc-dim: rgba(255,255,255,.55);
-}
-
-/* Make ALL text readable by default inside the module */
-.snypd-account-v2,
-.snypd-account-v2 *{
-  color: var(--acc-text);
-}
-
-/* Section/card titles ("Account", "Overview", etc.) */
-.snypd-account-v2 .acc-card-title,
-.snypd-account-v2 .acc-title,
-.snypd-account-v2 [data-acc-title],
-.snypd-account-v2 h1,
-.snypd-account-v2 h2,
-.snypd-account-v2 h3{
-  color: rgba(255,255,255,.96) !important;
-  font-weight: 900 !important;
-  letter-spacing: .2px;
-  text-shadow:
-    0 1px 0 rgba(0,0,0,.35),
-    0 10px 30px rgba(124,58,237,.20);
-}
-
-/* Small labels on rows ("Email", "Plan", "Billing status", etc.) */
-.snypd-account-v2 .acc-k,
-.snypd-account-v2 .acc-label,
-.snypd-account-v2 [data-acc-label]{
-  color: var(--acc-dim) !important;
-  font-weight: 800;
-}
-
-/* Values on rows (the important part) */
-.snypd-account-v2 .acc-v,
-.snypd-account-v2 .acc-value,
-.snypd-account-v2 [data-acc-value]{
-  color: rgba(255,255,255,.92) !important;
-  font-weight: 800;
-}
-
-/* Links (Manage billing / support email) */
-.snypd-account-v2 a{
-  color: rgba(167,139,250,.95) !important;
-  text-decoration: none;
-}
-.snypd-account-v2 a:hover{
-  text-decoration: underline;
-}
-
-/* Optional: make header strip slightly clearer if you still feel it blends */
-.snypd-account-v2 .acc-card-hd,
-.snypd-account-v2 [data-acc-hd]{
-  background: linear-gradient(180deg,
-    rgba(255,255,255,.06),
-    rgba(255,255,255,.02)) !important;
-  border-bottom: 1px solid rgba(140,98,255,.18) !important;
-}
-</style>
-
+</script>
 <style>
           body {
             display: flex;
@@ -498,15 +434,15 @@
     --panel:rgba(18,12,28,.76);
     --panel2:rgba(11,8,18,.68);
     --glass:rgba(25,18,39,.74);
-    --stroke:rgba(140,98,255,.22);
-    --stroke-strong:rgba(140,98,255,.34);
+    --stroke:rgba(162,0,255,.22);
+    --stroke-strong:rgba(162,0,255,.34);
     --text:#f5f1ff;
     --text-strong:#ffffff;
     --muted:rgba(245,241,255,.82);
     --muted2:rgba(245,241,255,.66);
     --muted3:rgba(245,241,255,.52);
-    --accent1:#7c3aed;
-    --accent2:#a78bfa;
+    --accent1:#A200FF;
+    --accent2:#C455FF;
     --ok:#22c55e;
     --warn:#f59e0b;
     --danger:#ef4444;
@@ -550,7 +486,7 @@
   .snypd-account-final .backbtn:hover{
     transform:translateY(-1px);
     border-color:var(--stroke-strong);
-    box-shadow:0 16px 44px rgba(124,58,237,.22);
+    box-shadow:0 16px 44px rgba(162,0,255,.22);
   }
   .snypd-account-final .backbtn:active{ transform:translateY(0); }
   .snypd-account-final .backbtn svg{ opacity:.92; }
@@ -567,7 +503,7 @@
     height:10px;
     border-radius:50%;
     background:var(--accent2);
-    box-shadow:0 0 18px rgba(167,139,250,.7);
+    box-shadow:0 0 18px rgba(196,85,255,.7);
     flex:0 0 auto;
   }
   .snypd-account-final h1{
@@ -595,8 +531,8 @@
     border-radius:var(--radius);
     border:1px solid var(--stroke);
     background:
-      radial-gradient(900px 420px at 20% -10%, rgba(124,58,237,.18), transparent 55%),
-      radial-gradient(900px 420px at 110% 20%, rgba(167,139,250,.12), transparent 55%),
+      radial-gradient(900px 420px at 20% -10%, rgba(162,0,255,.18), transparent 55%),
+      radial-gradient(900px 420px at 110% 20%, rgba(196,85,255,.12), transparent 55%),
       linear-gradient(180deg, var(--panel), var(--panel2));
     box-shadow:var(--shadow);
     overflow:hidden;
@@ -621,7 +557,7 @@
     justify-content:space-between;
     gap:12px;
     padding:14px 16px;
-    border-bottom:1px solid rgba(140,98,255,.16);
+    border-bottom:1px solid rgba(162,0,255,.16);
     z-index:1;
   }
 
@@ -638,8 +574,8 @@
     gap:8px;
     padding:6px 10px;
     border-radius:999px;
-    border:1px solid rgba(140,98,255,.24);
-    background:rgba(140,98,255,.12);
+    border:1px solid rgba(162,0,255,.24);
+    background:rgba(162,0,255,.12);
     font-size:12px;
     font-weight:900;
     color:rgba(245,241,255,.96);
@@ -649,8 +585,8 @@
     width:7px;
     height:7px;
     border-radius:50%;
-    background:rgba(167,139,250,.98);
-    box-shadow:0 0 12px rgba(167,139,250,.58);
+    background:rgba(196,85,255,.98);
+    box-shadow:0 0 12px rgba(196,85,255,.58);
   }
   .snypd-account-final .pill.ok{
     background:rgba(34,197,94,.10);
@@ -688,7 +624,7 @@
     gap:12px;
     padding:12px;
     border-radius:14px;
-    border:1px solid rgba(140,98,255,.14);
+    border:1px solid rgba(162,0,255,.14);
     background:rgba(255,255,255,.045);
   }
 
@@ -745,7 +681,7 @@
   .snypd-account-final .btn-primary{
     color:#fff;
     background:linear-gradient(135deg, var(--accent1), var(--accent2));
-    box-shadow:0 16px 40px rgba(124,58,237,.32);
+    box-shadow:0 16px 40px rgba(162,0,255,.32);
     min-width:220px;
   }
   .snypd-account-final .btn-primary::after{
@@ -765,7 +701,7 @@
   .snypd-account-final .btn-secondary{
     color:rgba(245,241,255,.98);
     background:rgba(255,255,255,.06);
-    border:1px solid rgba(140,98,255,.24);
+    border:1px solid rgba(162,0,255,.24);
     padding:11px 14px;
   }
 
@@ -782,7 +718,7 @@
 
   .snypd-account-final .mini{
     border-radius:16px;
-    border:1px solid rgba(140,98,255,.16);
+    border:1px solid rgba(162,0,255,.16);
     background:rgba(255,255,255,.04);
     padding:14px;
   }
@@ -804,9 +740,9 @@
   .snypd-account-final .mini-link{
     font-size:12px;
     font-weight:900;
-    color:rgba(167,139,250,.98);
+    color:rgba(196,85,255,.98);
     text-decoration:none;
-    border-bottom:1px dashed rgba(167,139,250,.36);
+    border-bottom:1px dashed rgba(196,85,255,.36);
   }
 
   .snypd-account-final .mini-p{
@@ -823,7 +759,7 @@
     gap:10px;
     margin-top:12px;
     padding-top:12px;
-    border-top:1px solid rgba(140,98,255,.16);
+    border-top:1px solid rgba(162,0,255,.16);
   }
 
   .snypd-account-final .limit strong{
