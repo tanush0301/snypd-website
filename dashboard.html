@@ -554,7 +554,8 @@ body {
 
 .meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; }
 .t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.p { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.p { font-weight: 700; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
+.p.p-unknown { font-weight: 500; font-size: 12px; color: var(--text-muted); font-style: italic; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .tiny { display: none; }
 
@@ -896,10 +897,17 @@ const HEARTBEAT_URL = (() => {
       { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
     ));
 
-  const fmtPrice = (amt, curr = 'EUR') =>
-    amt == null ? '' :
-      new Intl.NumberFormat('nl-BE', { style: 'currency', currency: curr })
-        .format(Number(amt));
+  const fmtPrice = (amt, curr = 'EUR') => {
+    if (amt == null || amt === '') return '';
+    const n = Number(amt);
+    if (!Number.isFinite(n)) return '';
+    try {
+      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: curr || 'EUR' }).format(n);
+    } catch (e) {
+      // an unrecognised currency code should never take down the whole card
+      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n);
+    }
+  };
 
   if (!sb) {
     msg('Supabase client missing');
@@ -1119,10 +1127,12 @@ const HEARTBEAT_URL = (() => {
   }
 
   function derivePrice(row) {
-    const p  = row?.price || {};
-    const tp = row?.total_item_price || {};
+    const p  = (row?.price && typeof row.price === 'object') ? row.price : {};
+    const tp = (row?.total_item_price && typeof row.total_item_price === 'object') ? row.total_item_price : {};
+    // Vinted's real shape is {amount, currency_code} - "currency" was never
+    // the right key, it just happened to silently default to EUR either way.
     const amt = (p?.amount ?? tp?.amount ?? null);
-    const cur = (p?.currency ?? tp?.currency ?? 'EUR');
+    const cur = (p?.currency_code ?? p?.currency ?? tp?.currency_code ?? tp?.currency ?? 'EUR');
     return { amount: amt, currency: cur };
   }
 
@@ -1138,6 +1148,10 @@ const HEARTBEAT_URL = (() => {
 
   const cardHTML = (r) => {
     const { amount, currency } = derivePrice(r);
+    const priceLabel = fmtPrice(amount, currency);
+    if (!priceLabel) {
+      console.warn('SNYPD: listing has no usable price', { id: r.listing_id, price: r.price, total_item_price: r.total_item_price });
+    }
     const img = getImageUrl(r);
     const cls = img ? 'thumb' : 'thumb fallback';
 
@@ -1178,7 +1192,7 @@ const HEARTBEAT_URL = (() => {
         <div>
           <div class="meta-top">
             <div class="t">${esc(r.title) || 'View listing'}</div>
-            <div class="p">${fmtPrice(amount, currency)}</div>
+            <div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div>
           </div>
           <div class="muted" title="${esc(fullLabel)}">
             ${[brand, size, status, src, relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
