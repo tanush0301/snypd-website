@@ -483,6 +483,22 @@ body {
   border-color: var(--border-hover);
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cta-instruct {
+  opacity: 1 !important;
+  cursor: default !important;
+  background: rgba(162,0,255,0.14) !important;
+  color: var(--brand) !important;
+  border: 1px solid rgba(162,0,255,0.4) !important;
+  font-weight: 700;
+}
+#notify-note.cta-note {
+  background: rgba(162,0,255,0.06);
+  border: 1px solid rgba(162,0,255,0.18);
+  border-radius: 8px;
+  padding: 12px 14px !important;
+  color: var(--text-primary) !important;
+  margin-top: 10px !important;
+}
 
 /* List */
 .panel .bd { padding: 24px; }
@@ -554,10 +570,88 @@ body {
   100% { background-position: -200% 0; } 
 }
 </style><style>
+    #mobile-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(10,10,10,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    #mobile-header .hamburger {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 22px;
+      line-height: 1;
+      padding: 4px;
+      cursor: pointer;
+    }
+    #mobile-header .mh-word {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+    }
+    #mobile-header .mh-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      margin-left: auto;
+      transition: background 0.3s var(--smooth), box-shadow 0.3s var(--smooth);
+    }
+    #mobile-header .mh-dot.live {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(16,185,129,0.55);
+    }
+
+    /* "N new" pill - buffers new listings instead of yanking the list
+       under a user who is scrolled away from the top. */
+    .new-pill {
+      position: fixed;
+      top: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--brand);
+      color: var(--brand-fg);
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(162,0,255,0.4);
+    }
+    .new-pill.show { display: inline-flex; animation: pillIn 0.2s var(--smooth); }
+    @keyframes pillIn { from { opacity: 0; transform: translate(-50%, -6px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+    /* New-card entrance: restrained, no bounce - then a brief teal highlight that fades. */
+    .card.is-new {
+      animation: cardIn 0.15s var(--smooth);
+      border-color: rgba(53,231,220,0.55) !important;
+      box-shadow: 0 0 0 1px rgba(53,231,220,0.35), 0 8px 24px rgba(0,0,0,0.4);
+      transition: border-color 1.4s ease, box-shadow 1.4s ease;
+    }
+    @keyframes cardIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
     @media (max-width: 991px) {
-      #mobile-header { display: block !important; }
+      #mobile-header { display: flex !important; }
       .hdr { display: none !important; }
-      .dash-wrap { padding-top: 16px; margin-top: 0; }
+      .dash-wrap { padding-top: 0; margin-top: 0; }
+      .panel .hd { flex-wrap: wrap; gap: 10px 16px; padding: 14px 16px; }
+      .status-bar { gap: 8px; }
+      .chip { padding: 5px 10px; font-size: 11px; }
+      .controls { gap: 8px; }
+      .btn { height: 34px; padding: 0 14px; font-size: 12px; }
     }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -637,8 +731,11 @@ body {
 </div><div class="main-content">
 <!-- HAMBURGER FOR MOBILE -->
 <div id="mobile-header" style="display:none;">
-<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px;">&#9776;</button>
+<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" aria-label="Menu">&#9776;</button>
+<span class="mh-word">SNYPD</span>
+<span class="mh-dot" id="mh-status-dot"></span>
 </div>
+<button class="new-pill" id="new-pill" type="button"></button>
 <div class="dash-wrap">
 <div class="hdr">
 <div class="brand">
@@ -891,8 +988,48 @@ const HEARTBEAT_URL = (() => {
   const empty   = document.getElementById('empty');
   const btnStart = document.getElementById('btn-start');
   const btnStop  = document.getElementById('btn-stop');
+  const pageScrollTop = () => window.scrollY || document.documentElement.scrollTop || 0;
+  const newPill = document.getElementById('new-pill');
+  const statusDot = document.getElementById('mh-status-dot');
 
   let running = false;
+  let hasRenderedOnce = false;
+  let pendingNew = [];
+
+  function updatePill() {
+    if (!newPill) return;
+    if (pendingNew.length > 0) {
+      newPill.textContent = pendingNew.length === 1 ? '1 new match' : `${pendingNew.length} new matches`;
+      newPill.classList.add('show');
+    } else {
+      newPill.classList.remove('show');
+    }
+  }
+
+  function insertCards(rows, mode) {
+    const temp = document.createElement('div');
+    temp.innerHTML = rows.map(r => cardHTML(r)).join('');
+    const frag = document.createDocumentFragment();
+    Array.from(temp.children).forEach((node, i) => {
+      if (mode === 'enter' && i < 8) node.classList.add('enter');
+      if (mode === 'new') {
+        node.classList.add('is-new');
+        setTimeout(() => node.classList.remove('is-new'), 1600);
+      }
+      frag.appendChild(node);
+    });
+    return frag;
+  }
+
+  if (newPill) {
+    newPill.onclick = () => {
+      if (!pendingNew.length) return;
+      list.insertBefore(insertCards(pendingNew, 'new'), list.firstChild);
+      pendingNew = [];
+      updatePill();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
 
   function updateEmptyUI(hasRows) {
     if (hasRows) {
@@ -975,6 +1112,16 @@ const HEARTBEAT_URL = (() => {
     return { amount: amt, currency: cur };
   }
 
+  function relativeTime(ms) {
+    const diff = Date.now() - ms;
+    if (diff < 45000) return 'just now';
+    const mins = Math.round(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.round(hours / 24)}d ago`;
+  }
+
   const cardHTML = (r) => {
     const { amount, currency } = derivePrice(r);
     const img = getImageUrl(r);
@@ -985,8 +1132,9 @@ const HEARTBEAT_URL = (() => {
     const status = r.status;
     const src   = r.content_source;
 
-    const dt = new Date(uploadedTimeMs(r) || Date.now());
-    const fetchedLabel =
+    const uploadedMs = uploadedTimeMs(r) || Date.now();
+    const dt = new Date(uploadedMs);
+    const fullLabel =
       `Uploaded on Vinted at ${new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Europe/Berlin',
         year: 'numeric',
@@ -1010,6 +1158,7 @@ const HEARTBEAT_URL = (() => {
          rel="noopener"
          class="card"
          data-id="${r.listing_id}"
+         data-uploaded-ms="${uploadedMs}"
          style="text-decoration:none;color:inherit">
         ${imgHtml}
         <div>
@@ -1017,8 +1166,8 @@ const HEARTBEAT_URL = (() => {
             <div class="t">${esc(r.title) || 'View listing'}</div>
             <div class="p">${fmtPrice(amount, currency)}</div>
           </div>
-          <div class="muted">
-            ${[brand, size, status, src, fetchedLabel].filter(Boolean).map(esc).join(' • ')}
+          <div class="muted" title="${esc(fullLabel)}">
+            ${[brand, size, status, src, relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
           <div class="tiny"></div>
         </div>
@@ -1028,13 +1177,48 @@ const HEARTBEAT_URL = (() => {
   function renderRows(rows) {
     if (!rows.length) {
       list.innerHTML = '';
+      pendingNew = [];
+      updatePill();
       updateEmptyUI(false);
+      hasRenderedOnce = true;
       return;
     }
     updateEmptyUI(true);
-    list.innerHTML = rows.map(r => cardHTML(r)).join('');
-    list.querySelectorAll('.card').forEach((c, i) => { if (i < 8) c.classList.add('enter'); });
-    list.querySelectorAll('.skeleton').forEach(s => s.remove());
+
+    // First real render (replacing the loading skeletons): show everything
+    // with the staggered load-in, nothing to diff against yet.
+    if (!hasRenderedOnce) {
+      list.innerHTML = '';
+      list.appendChild(insertCards(rows, 'enter'));
+      hasRenderedOnce = true;
+      return;
+    }
+
+    const incomingIds = new Set(rows.map(r => String(r.listing_id)));
+    const existingCards = Array.from(list.querySelectorAll('.card'));
+    const existingIds = new Set(existingCards.map(c => c.dataset.id));
+
+    // Listings that aged out of the freshness window - always the oldest
+    // (bottom-most, given newest-first order), so removing them doesn't
+    // shift anything the user is currently looking at.
+    existingCards.forEach(c => { if (!incomingIds.has(c.dataset.id)) c.remove(); });
+
+    const newRows = rows.filter(r => !existingIds.has(String(r.listing_id)));
+    if (!newRows.length) return;
+
+    const nearTop = pageScrollTop() <= 32;
+    if (nearTop) {
+      list.insertBefore(insertCards(newRows, 'new'), list.firstChild);
+    } else {
+      // Buffer instead of yanking the list under a user scrolled into it -
+      // show the "N new" pill, insert only when they tap it.
+      const seen = new Set(pendingNew.map(r => String(r.listing_id)));
+      newRows.forEach(r => {
+        const id = String(r.listing_id);
+        if (!seen.has(id)) { pendingNew.push(r); seen.add(id); }
+      });
+      updatePill();
+    }
   }
 
   function setLoading(flag) {
@@ -1119,6 +1303,7 @@ const HEARTBEAT_URL = (() => {
     const chip = document.getElementById('status-chip');
     const cls  = next === 'running' ? 'ok' : (next === 'stopped' ? '' : 'warn');
     chip.className = 'chip ' + cls;
+    if (statusDot) statusDot.classList.toggle('live', next === 'running');
   }
 
   const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
@@ -1415,11 +1600,13 @@ const HEARTBEAT_URL = (() => {
       if (isIOS() && !isStandalone()) {
         btn.style.display = '';
         btn.disabled = true;
-        btn.textContent = 'Alerts: add to Home Screen first';
+        btn.classList.add('btn-cta-instruct');
+        btn.textContent = '📲 Add to Home Screen for alerts';
         say('On iPhone and iPad, alerts only work once SNYPD is on your Home '
           + 'Screen. Tap the Share button, then "Add to Home Screen", and open '
           + 'SNYPD from that icon. Apple does not allow websites to do this step '
           + 'for you.');
+        note.classList.add('cta-note');
       }
       return;   // desktop browsers without push: leave the button hidden
     }
