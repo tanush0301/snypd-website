@@ -445,7 +445,7 @@ body {
 .chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .chip.err { color: var(--danger); background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
 .chip.err::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
-.controls { display: flex; gap: 12px; }
+.controls { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Buttons */
 .btn { 
@@ -485,12 +485,15 @@ body {
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-cta-instruct {
   opacity: 1 !important;
-  cursor: default !important;
+  cursor: pointer !important;
   background: rgba(162,0,255,0.14) !important;
   color: var(--brand) !important;
   border: 1px solid rgba(162,0,255,0.4) !important;
   font-weight: 700;
+  flex-basis: 100%;
+  order: 3;
 }
+.btn-cta-instruct:active { transform: scale(0.98); }
 #notify-note.cta-note {
   background: rgba(162,0,255,0.06);
   border: 1px solid rgba(162,0,255,0.18);
@@ -532,12 +535,13 @@ body {
 .card.enter:nth-child(7) { animation-delay: 0.28s; }
 .card.enter:nth-child(8) { animation-delay: 0.32s; }
 
-.card:hover { 
-  transform: translateY(-2px); 
-  border-color: var(--border-hover); 
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
   background: rgba(255,255,255,0.05);
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
+.card:active { transform: translateY(0) scale(0.99); background: rgba(255,255,255,0.06); }
 
 .thumb { 
   width: 88px; 
@@ -608,6 +612,14 @@ body {
     #mobile-header .mh-dot.live {
       background: var(--success);
       box-shadow: 0 0 8px rgba(16,185,129,0.55);
+      animation: mhDotPulse 2s ease-in-out infinite;
+    }
+    @keyframes mhDotPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(16,185,129,0.55); }
+      50% { box-shadow: 0 0 14px rgba(16,185,129,0.9); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #mobile-header .mh-dot.live { animation: none; }
     }
 
     /* "N new" pill - buffers new listings instead of yanking the list
@@ -1031,14 +1043,16 @@ const HEARTBEAT_URL = (() => {
     };
   }
 
+  const EMPTY_ICON = '<svg width="28" height="28" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:0.6"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>';
+
   function updateEmptyUI(hasRows) {
     if (hasRows) {
       empty.style.display = 'none';
       return;
     }
-    empty.textContent = running
+    empty.innerHTML = EMPTY_ICON + (running
       ? 'No results yet. Sniping is running…'
-      : 'No results yet. Press “Start Sniping Now”.';
+      : 'No results yet. Press “Start Sniping Now”.');
     empty.style.display = 'block';
   }
 
@@ -1308,6 +1322,8 @@ const HEARTBEAT_URL = (() => {
 
   const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
 
+  let heartbeatMisses = 0;
+
   async function sendHeartbeat() {
     try {
       await fetch(HEARTBEAT_URL, {
@@ -1315,8 +1331,14 @@ const HEARTBEAT_URL = (() => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: uid })
       });
+      heartbeatMisses = 0;
     } catch (e) {
       console.error(e);
+      heartbeatMisses++;
+      // One missed beat is often just a phone switching networks - only
+      // surface it as an error once it's happened twice in a row, so a
+      // single blip doesn't read as the product being broken.
+      if (heartbeatMisses < 2) return;
       set('err-chip', 'Heartbeat failed');
       show('err-chip', true);
     }
@@ -1599,9 +1621,9 @@ const HEARTBEAT_URL = (() => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       if (isIOS() && !isStandalone()) {
         btn.style.display = '';
-        btn.disabled = true;
+        btn.disabled = false;
         btn.classList.add('btn-cta-instruct');
-        btn.textContent = '📲 Add to Home Screen for alerts';
+        btn.innerHTML = '<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><rect height="8" rx="2" width="14" x="5" y="13"></rect></svg>Add to Home Screen for alerts';
         say('On iPhone and iPad, alerts only work once SNYPD is on your Home '
           + 'Screen. Tap the Share button, then "Add to Home Screen", and open '
           + 'SNYPD from that icon. Apple does not allow websites to do this step '
@@ -1650,6 +1672,18 @@ const HEARTBEAT_URL = (() => {
   }
 
   btn.addEventListener('click', async function () {
+    if (btn.classList.contains('btn-cta-instruct')) {
+      // Apple exposes no API to trigger "Add to Home Screen" directly, but
+      // the native share sheet this opens includes it as an option on iOS -
+      // this gets the user most of the way there instead of leaving the tap
+      // do nothing.
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'SNYPD', text: 'Add SNYPD to your Home Screen to get alerts.', url: location.href });
+        } catch (e) { /* cancelled or unsupported - the note below still explains the steps */ }
+      }
+      return;
+    }
     var sub = await currentSub();
     if (sub) { disable(); } else { enable(); }
   });
