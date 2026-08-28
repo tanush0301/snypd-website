@@ -245,6 +245,27 @@
     return wrap;
   }
 
+  function makeText(s, onChange) {
+    var wrap = document.createElement('div');
+    wrap.className = 'num'; // same layout as makeNumber - just a bare input, no bounds
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = s.value;
+    wrap.appendChild(input);
+
+    // Same commit-on-blur/Enter pattern as makeNumber: typing "zara,h&m"
+    // character by character must not fire a save on every keystroke.
+    var last = String(s.value);
+    function commit() {
+      if (input.value === last) { return; }
+      last = input.value;
+      onChange(input.value, input);
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { input.blur(); } });
+    return wrap;
+  }
+
   function render(snapshot) {
     var list = el('settingList');
     list.textContent = '';
@@ -328,7 +349,10 @@
           });
       }
 
-      ctl.appendChild(s.type === 'bool' ? makeToggle(s, save) : makeNumber(s, save));
+      var control = s.type === 'bool' ? makeToggle(s, save)
+                  : s.type === 'string' ? makeText(s, save)
+                  : makeNumber(s, save);
+      ctl.appendChild(control);
       row.appendChild(info);
       row.appendChild(ctl);
       card.appendChild(row);
