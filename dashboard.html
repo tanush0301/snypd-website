@@ -10,6 +10,9 @@
 <meta content="#0A0A0A" name="theme-color"/>
 <link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon"/>
 <meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="SNYPD" name="apple-mobile-web-app-title"/>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -509,9 +512,9 @@ body {
 .list.loading { opacity: 0.6; pointer-events: none; transition: opacity 0.3s ease; }
 
 /* Horizontal Card */
-.card { 
-  display: grid; 
-  grid-template-columns: 88px 1fr; 
+.card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
   gap: 16px; 
   background: rgba(255,255,255,0.02); 
   border: 1px solid var(--border); 
@@ -552,8 +555,8 @@ body {
 }
 .thumb.fallback { border: 1px solid var(--border); }
 
-.meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; }
-.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; min-width: 0; }
+.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
 .p { font-weight: 700; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
 .p.p-unknown { font-weight: 500; font-size: 12px; color: var(--text-muted); font-style: italic; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
