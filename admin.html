@@ -115,6 +115,36 @@
     .toast.ok { border-color: rgba(16, 185, 129, 0.45); }
     .toast.err { border-color: rgba(239, 68, 68, 0.5); }
 
+    .mr-section { border: 1px solid var(--border); background: var(--panel);
+                  border-radius: var(--radius); padding: 32px; margin-top: 30px; }
+    .mr-section h2 { margin: 0 0 6px; font-size: 19px; font-weight: 700;
+                      display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+    .mr-row { display: flex; gap: 10px; margin: 18px 0 6px; }
+    .mr-row input { flex: 1; background: var(--panel-2); border: 1px solid var(--border);
+                     border-radius: 9px; color: var(--text); font-family: inherit;
+                     font-size: 14px; padding: 11px 14px; }
+    .mr-row input:focus { outline: none; border-color: var(--brand); }
+    .mr-card { border: 1px solid var(--border); background: var(--panel-2);
+               border-radius: 10px; padding: 18px 20px; margin-top: 14px; }
+    .mr-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+                text-transform: uppercase; padding: 3px 9px; border-radius: 999px; margin-bottom: 12px; }
+    .mr-badge.ok { background: rgba(16,185,129,0.15); color: var(--success); }
+    .mr-badge.warn { background: rgba(245,158,11,0.15); color: var(--warn); }
+    .mr-badge.bad { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .mr-headline { font-size: 14.5px; line-height: 1.6; margin: 0; color: var(--text); }
+    .mr-headline b { color: #fff; }
+    .mr-cond-row { display: flex; justify-content: space-between; align-items: baseline;
+                   gap: 16px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+    .mr-cond-row:first-child { border-top: none; padding-top: 0; }
+    .mr-cond-name { font-weight: 650; white-space: nowrap; }
+    .mr-cond-detail { color: var(--muted); text-align: right; }
+    .mr-cond-detail b { color: var(--text); }
+    .mr-track { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+                font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+    .mr-track.tracked { color: var(--success); }
+    .mr-loading, .mr-error { color: var(--muted); font-size: 14px; padding: 8px 0; }
+    .mr-error { color: var(--danger); }
+
     .foot { color: var(--muted); font-size: 13px; margin-top: 26px; line-height: 1.7; }
     .skeleton { background: linear-gradient(90deg,#141414 25%,#1c1c1c 50%,#141414 75%);
                 background-size: 200% 100%; animation: sk 1.3s ease-in-out infinite;
@@ -160,6 +190,17 @@
 <div class="hidden" id="stateOk">
 <div id="settingList"></div>
 <p class="foot" id="footNote"></p>
+
+<div class="mr-section">
+<h2>Market Research AI <span class="tag fallback">preview</span></h2>
+<p class="sdesc">Internal only &mdash; not linked from the real site, no customer sees this. Price lookup by condition, plus the automatic new-search tracking.</p>
+<div class="mr-row">
+<input id="mrQuery" placeholder="e.g. jordan 1 reverse mocha" type="text"/>
+<button class="btn" id="mrGo" type="button">Search</button>
+</div>
+<div id="mrResult"></div>
+</div>
+
 </div>
 
 </div>
@@ -409,6 +450,136 @@
     render(res.body);
     show('stateOk');
   }
+
+  // ---- Market Research AI preview ---------------------------------------
+  // Query text is user-typed and gets echoed back into the page, so it is
+  // escaped before ever going into innerHTML -- same discipline as the
+  // settings labels above, which are treated as untrusted text for the
+  // same reason (there they come from a database row; here from whatever
+  // is typed into the box).
+  function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = String(s == null ? '' : s);
+    return d.innerHTML;
+  }
+
+  function mrEur(cents) {
+    if (cents === null || cents === undefined) { return '--'; }
+    return '€' + (cents / 100).toFixed(0);
+  }
+
+  function mrVerdictBadge(r) {
+    var n = r.sample_size || 0;
+    if (n === 0) { return { cls: 'bad', text: 'No data yet' }; }
+    if (r.verdict === 'too_thin') { return { cls: 'warn', text: 'Not enough data' }; }
+    if (r.verdict === 'too_broad') { return { cls: 'bad', text: 'Too inconsistent to trust' }; }
+    if (r.verdict === 'one_seller_dominates') { return { cls: 'warn', text: 'Not a real market' }; }
+    return { cls: 'ok', text: 'Trusted price' };
+  }
+
+  function mrOverallHeadline(q, r, hasConditions) {
+    var n = r.sample_size || 0;
+    var qSafe = escapeHtml(q);
+    var prefix = hasConditions ? 'across all conditions' : '';
+    if (n === 0) {
+      return 'We haven\'t seen any listings matching <b>"' + qSafe + '"</b> yet. No price shown — nothing invented.';
+    }
+    if (r.verdict === 'too_thin') {
+      return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' found ' + prefix + ' — too few to trust a price yet.';
+    }
+    if (r.verdict === 'too_broad') {
+      return 'Found <b>' + n + '</b> listings from <b>' + r.distinct_sellers + '</b> sellers, but prices range from <b>'
+        + mrEur(r.min_cents) + '</b> to <b>' + mrEur(r.max_cents) + '</b> — too spread out for one number to mean anything '
+        + '(likely mixed real/fake, or several different products sharing this search).';
+    }
+    if (r.verdict === 'one_seller_dominates') {
+      return 'Found ' + n + ' listings, but one seller owns <b>' + Math.round((r.top_seller_share || 0) * 100)
+        + '%</b> of them — that\'s one person\'s pricing, not a market.';
+    }
+    return 'Typical price ' + prefix + ': <b>' + mrEur(r.median_cents) + '</b>, based on ' + n + ' listings from '
+      + r.distinct_sellers + ' sellers.';
+  }
+
+  function mrConditionRow(c, overall) {
+    var n = c.sample_size || 0;
+    var detail;
+    if (c.verdict === 'ok') {
+      detail = '<b>' + mrEur(c.median_cents) + '</b> typical (' + mrEur(c.p25_cents) + '–' + mrEur(c.p75_cents)
+        + ' middle range) · ' + n + ' listings';
+    } else {
+      var fallback = (overall.verdict === 'ok')
+        ? 'overall range instead: <b>' + mrEur(overall.median_cents) + '</b> typical'
+        : 'overall number isn\'t trustworthy either — see below';
+      detail = 'Only ' + n + ' listing' + (n === 1 ? '' : 's') + ' in this exact condition, not enough on its own — showing the ' + fallback;
+    }
+    // condition_label always comes from the server's own fixed known-conditions
+    // list (MARKET_RESEARCH_KNOWN_CONDITIONS in main.py), never user input.
+    return '<div class="mr-cond-row"><div class="mr-cond-name">' + c.condition_label
+      + '</div><div class="mr-cond-detail">' + detail + '</div></div>';
+  }
+
+  function mrTrackNote(track) {
+    if (!track) { return ''; }
+    if (track.tracked) {
+      return '<div class="mr-track tracked">&check; No data existed for this search, so it is now being tracked going '
+        + 'forward — real coverage should build up over time (' + (track.rows_written || 0) + ' listings added just now).</div>';
+    }
+    var reasons = {
+      already_tracked: 'Already being tracked from an earlier search — more data should accumulate over time.',
+      cap_reached: 'Not tracked: the tracking list is full right now.',
+      not_relevant: 'Not tracked: what Vinted actually returned for this search did not look related to it ('
+        + (track.matched || 0) + '/' + (track.sample_size || 0) + ' results matched) — likely a typo or not a real product search.',
+      no_token: 'Could not check for tracking right now (no live session token available).'
+    };
+    var msg = reasons[track.reason];
+    return msg ? '<div class="mr-track">' + msg + '</div>' : '';
+  }
+
+  function mrRender(q, data) {
+    var overall = data.overall || { sample_size: 0 };
+    var byCondition = data.by_condition || [];
+    var hasConditions = byCondition.length > 0;
+    var html = '';
+
+    if (hasConditions) {
+      html += '<div class="mr-card"><div class="slabel" style="margin-bottom:10px;">Price by condition</div>'
+        + byCondition.map(function (c) { return mrConditionRow(c, overall); }).join('') + '</div>';
+    }
+
+    var badge = mrVerdictBadge(overall);
+    html += '<div class="mr-card">'
+      + '<span class="mr-badge ' + badge.cls + '">' + (hasConditions ? 'All conditions combined' : badge.text) + '</span>'
+      + '<p class="mr-headline">' + mrOverallHeadline(q, overall, hasConditions) + '</p>'
+      + mrTrackNote(data.track)
+      + '</div>';
+
+    el('mrResult').innerHTML = html;
+  }
+
+  async function runMarketResearch() {
+    var input = el('mrQuery');
+    var q = input.value.trim();
+    if (!q) { return; }
+    var btn = el('mrGo');
+    btn.disabled = true;
+    el('mrResult').innerHTML = '<div class="mr-loading">Querying real listing data across every condition...</div>';
+    try {
+      var res = await api('/api/v1/admin/market-research', 'POST', { q: q });
+      if (res.status !== 200 || !res.body) {
+        el('mrResult').innerHTML = '<div class="mr-error">Could not complete the search (status '
+          + res.status + '). Nothing changed.</div>';
+        return;
+      }
+      mrRender(q, res.body);
+    } catch (e) {
+      el('mrResult').innerHTML = '<div class="mr-error">Could not reach the server.</div>';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  el('mrGo').addEventListener('click', runMarketResearch);
+  el('mrQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { runMarketResearch(); } });
 
   el('retryBtn').addEventListener('click', load);
   load();
