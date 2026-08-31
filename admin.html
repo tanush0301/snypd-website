@@ -145,6 +145,18 @@
     .mr-loading, .mr-error { color: var(--muted); font-size: 14px; padding: 8px 0; }
     .mr-error { color: var(--danger); }
 
+    .sm-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .sm-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11.5px;
+                   text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 10px;
+                   border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .sm-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .sm-table tr:last-child td { border-bottom: none; }
+    .sm-url { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+              display: inline-block; vertical-align: middle; color: var(--muted); }
+    .sm-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; }
+    .sm-dot.ok { background: var(--success); }
+    .sm-dot.bad { background: var(--danger); }
+
     .foot { color: var(--muted); font-size: 13px; margin-top: 26px; line-height: 1.7; }
     .skeleton { background: linear-gradient(90deg,#141414 25%,#1c1c1c 50%,#141414 75%);
                 background-size: 200% 100%; animation: sk 1.3s ease-in-out infinite;
@@ -190,6 +202,22 @@
 <div class="hidden" id="stateOk">
 <div id="settingList"></div>
 <p class="foot" id="footNote"></p>
+
+<div class="mr-section" id="searchMonitorSection">
+<h2>Search Monitor <button class="btn ghost" id="smRefresh" style="margin-left:auto;font-size:12px;padding:6px 12px;" type="button">Refresh</button></h2>
+<p class="sdesc">Live per-search state &mdash; the dials above are global and won&rsquo;t show if one specific search has quietly stopped being polled.</p>
+<p class="sdesc" id="smStats" style="margin-top:10px;"></p>
+<div id="smAlert"></div>
+<div style="overflow-x:auto;margin-top:14px;">
+<table class="sm-table" id="smTable"></table>
+</div>
+
+<div class="mr-row" style="margin-top:22px;">
+<input id="entUserId" placeholder="user_id (uuid) — check anyone's always-on entitlement" type="text"/>
+<button class="btn ghost" id="entGo" type="button">Check</button>
+</div>
+<div id="entResult"></div>
+</div>
 
 <div class="mr-section">
 <h2>Market Research AI <span class="tag fallback">preview</span></h2>
@@ -449,6 +477,121 @@
 
     render(res.body);
     show('stateOk');
+    loadSearchMonitor();
+  }
+
+  // ---- Search Monitor -----------------------------------------------------
+  // Per-search live state -- the settings above are global dials and give no
+  // visibility into whether one specific search has quietly stopped being
+  // polled (e.g. after a crashed poller, before the backend's own 5-minute
+  // reconcile sweep catches it). is_polling here is the exact same check the
+  // backend's self-heal loop uses.
+
+  function smFormatIdle(sec) {
+    if (sec === null || sec === undefined) { return '—'; }
+    if (sec < 60) { return Math.round(sec) + 's'; }
+    if (sec < 3600) { return Math.round(sec / 60) + 'm'; }
+    return (sec / 3600).toFixed(1) + 'h';
+  }
+
+  function smRenderTable(data) {
+    var stats = data.stats || {};
+    el('smStats').textContent = (stats.polled_searches || 0) + ' searches polled, '
+      + (stats.user_searches || 0) + ' user-searches, ' + (stats.dedup_factor || 0)
+      + 'x dedup, ' + (stats.shards || 0) + ' shards.';
+
+    var rows = data.searches || [];
+    var broken = rows.filter(function (r) { return !r.is_polling; });
+    el('smAlert').innerHTML = broken.length
+      ? '<div class="mr-badge bad" style="margin-bottom:14px;">' + broken.length
+        + ' search(es) NOT being polled right now</div>'
+      : '';
+
+    if (!rows.length) {
+      el('smTable').innerHTML = '<tr><td class="sdesc" style="padding:10px 0;border:0;">'
+        + 'No active searches right now.</td></tr>';
+      return;
+    }
+
+    var head = '<tr><th>Status</th><th>Search</th><th>Users</th><th>Shard</th>'
+      + '<th>Idle</th><th>Always-on</th></tr>';
+    var body = rows.map(function (r) {
+      var dot = '<span class="sm-dot ' + (r.is_polling ? 'ok' : 'bad') + '"></span>'
+        + (r.is_polling ? 'Polling' : 'NOT polling');
+      var urlSafe = escapeHtml(r.url || r.search_key);
+      return '<tr>'
+        + '<td>' + dot + '</td>'
+        + '<td><span class="sm-url" title="' + urlSafe + '">' + urlSafe + '</span></td>'
+        + '<td>' + (r.subscriber_count || 0) + '</td>'
+        + '<td>' + r.shard + '</td>'
+        + '<td>' + smFormatIdle(r.idle_seconds) + (r.saturated ? ' (saturated)' : '') + '</td>'
+        + '<td>' + (r.has_always_on_subscriber ? 'Yes' : '—') + '</td>'
+        + '</tr>';
+    }).join('');
+    el('smTable').innerHTML = head + body;
+  }
+
+  async function loadSearchMonitor() {
+    el('smStats').textContent = 'Loading...';
+    try {
+      var res = await api('/api/v1/admin/searches');
+      if (res.status !== 200 || !res.body) {
+        el('smStats').textContent = 'Could not load search state (status ' + res.status + ').';
+        return;
+      }
+      smRenderTable(res.body);
+    } catch (e) {
+      el('smStats').textContent = 'Could not reach the server.';
+    }
+  }
+
+  function entRenderVerdict(data) {
+    if (!data.found) {
+      el('entResult').innerHTML = '<div class="mr-card"><span class="mr-badge bad">Not found</span>'
+        + '<p class="mr-headline">No account with that user_id.</p></div>';
+      return;
+    }
+    var badge = data.entitled ? { cls: 'ok', text: 'Entitled' } : { cls: 'bad', text: 'Not entitled' };
+    var searches = data.searches || [];
+    var brokenCount = searches.filter(function (s) { return !s.is_polling; }).length;
+    var f = data.fields || {};
+    var html = '<div class="mr-card">'
+      + '<span class="mr-badge ' + badge.cls + '">' + badge.text + '</span>'
+      + '<p class="mr-headline">' + escapeHtml(data.verdict_reason) + '</p>'
+      + '<p class="sdesc" style="margin-top:10px;">plan: <b>' + escapeHtml(f.subscription_plan || '(empty)')
+      + '</b> &middot; status: <b>' + escapeHtml(f.sub_status || '(empty)')
+      + '</b> &middot; whop_product_id: <b>' + (f.whop_product_id ? 'set' : 'missing') + '</b></p>'
+      + '<p class="sdesc">currently always-on: <b>' + (data.currently_always_on ? 'yes' : 'no')
+      + '</b> &middot; always-on globally enabled: <b>'
+      + (data.always_on_globally_enabled ? 'yes' : 'no') + '</b></p>'
+      + (searches.length
+          ? '<p class="sdesc">' + searches.length + ' search(es) on file, ' + brokenCount
+            + ' not currently polling.</p>'
+          : '<p class="sdesc">No saved searches on file.</p>')
+      + '</div>';
+    el('entResult').innerHTML = html;
+  }
+
+  async function runEntitlementCheck() {
+    var input = el('entUserId');
+    var uid = input.value.trim();
+    if (!uid) { return; }
+    var btn = el('entGo');
+    btn.disabled = true;
+    el('entResult').innerHTML = '<div class="mr-loading">Checking...</div>';
+    try {
+      var res = await api('/api/v1/admin/entitlement?user_id=' + encodeURIComponent(uid));
+      if (res.status !== 200 || !res.body) {
+        el('entResult').innerHTML = '<div class="mr-error">Could not check (status '
+          + res.status + ').</div>';
+        return;
+      }
+      entRenderVerdict(res.body);
+    } catch (e) {
+      el('entResult').innerHTML = '<div class="mr-error">Could not reach the server.</div>';
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   // ---- Market Research AI preview ---------------------------------------
@@ -580,6 +723,10 @@
 
   el('mrGo').addEventListener('click', runMarketResearch);
   el('mrQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { runMarketResearch(); } });
+
+  el('smRefresh').addEventListener('click', loadSearchMonitor);
+  el('entGo').addEventListener('click', runEntitlementCheck);
+  el('entUserId').addEventListener('keydown', function (e) { if (e.key === 'Enter') { runEntitlementCheck(); } });
 
   el('retryBtn').addEventListener('click', load);
   load();

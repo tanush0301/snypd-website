@@ -894,15 +894,33 @@ const HEARTBEAT_URL = (() => {
 
   let running = false;
 
-  function updateEmptyUI(hasRows) {
+  function updateEmptyUI(hasRows, lastMatchTs) {
     if (hasRows) {
       empty.style.display = 'none';
       return;
     }
-    empty.textContent = running
-      ? 'No results yet. Sniping is running…'
-      : 'No results yet. Press “Start Sniping Now”.';
+    if (!running) {
+      empty.textContent = 'No results yet. Press “Start Sniping Now”.';
+    } else if (lastMatchTs) {
+      // A genuinely quiet stretch (nothing new in the freshness window) reads
+      // as identical to a broken pipeline without this -- last match still
+      // exists, it's just older than DASHBOARD_MAX_AGE_MIN.
+      empty.textContent = `Quiet right now — last match ${relativeMinutesAgo(lastMatchTs)} ago.`;
+    } else {
+      empty.textContent = 'No results yet. Sniping is running…';
+    }
     empty.style.display = 'block';
+  }
+
+  function relativeMinutesAgo(iso) {
+    const t = Date.parse(iso);
+    if (!Number.isFinite(t)) return 'a while';
+    const mins = Math.max(0, Math.round((Date.now() - t) / 60000));
+    if (mins < 1) return 'under a minute';
+    if (mins === 1) return '1 minute';
+    if (mins < 60) return `${mins} minutes`;
+    const hrs = Math.round(mins / 60);
+    return hrs === 1 ? '1 hour' : `${hrs} hours`;
   }
 
     // -------- freshness + ordering helpers ----------
@@ -1025,10 +1043,10 @@ const HEARTBEAT_URL = (() => {
       </a>`;
   };
 
-  function renderRows(rows) {
+  function renderRows(rows, lastMatchTs) {
     if (!rows.length) {
       list.innerHTML = '';
-      updateEmptyUI(false);
+      updateEmptyUI(false, lastMatchTs);
       return;
     }
     updateEmptyUI(true);
@@ -1099,7 +1117,29 @@ const HEARTBEAT_URL = (() => {
         promoted: r.promoted
       })));
 
-      renderRows(rows);
+      let lastMatchTs = null;
+      if (!rows.length) {
+        // The main query above already filters uploaded_at_ts >= cutoffIso,
+        // so an empty result tells us nothing about WHY -- this second,
+        // unfiltered query exists only to answer "was there ever a match,
+        // and how long ago", so the empty state can say something more
+        // honest than a blank screen.
+        try {
+          const { data: last } = await sb
+            .from('current_ads')
+            .select('uploaded_at_ts')
+            .eq('user_id', uid)
+            .eq('is_visible', true)
+            .not('uploaded_at_ts', 'is', null)
+            .order('uploaded_at_ts', { ascending: false })
+            .limit(1);
+          lastMatchTs = last && last[0] ? last[0].uploaded_at_ts : null;
+        } catch (e) {
+          console.warn('Could not fetch last-match time', e);
+        }
+      }
+
+      renderRows(rows, lastMatchTs);
       set('tick-chip', `Last check: ${new Date().toLocaleString()}`);
       show('err-chip', false);
     } catch (e) {
