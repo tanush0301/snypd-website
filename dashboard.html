@@ -1646,6 +1646,20 @@ const HEARTBEAT_URL = (() => {
           + 'SNYPD from that icon. Apple does not allow websites to do this step '
           + 'for you.');
         note.classList.add('cta-note');
+      } else if (isIOS()) {
+        // Standalone per our own check, yet iOS is not exposing the push APIs -
+        // unexpected on 16.4+. Most likely cause: this icon was added to the
+        // Home Screen before it could read a standalone-capable manifest.
+        console.error('SNYPD push: standalone but PushManager/serviceWorker missing', {
+          isStandalone: isStandalone(),
+          navigatorStandalone: window.navigator.standalone,
+          userAgent: navigator.userAgent,
+        });
+        btn.style.display = '';
+        btn.disabled = true;
+        btn.textContent = 'Alerts unavailable';
+        say('Alerts are not available in this app right now. Try removing SNYPD '
+          + 'from your Home Screen and adding it again.');
       }
       return;   // desktop browsers without push: leave the button hidden
     }
@@ -1654,7 +1668,10 @@ const HEARTBEAT_URL = (() => {
       reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       await navigator.serviceWorker.ready;
     } catch (e) {
-      return;   // no worker, no push; nothing useful to offer
+      console.error('SNYPD push: service worker registration failed', e);
+      show('Alerts unavailable', true);
+      say('Could not set up alerts: ' + (e && e.message ? e.message : 'service worker failed to register') + '.');
+      return;
     }
 
     // Only offer the control once the server can actually store a
@@ -1663,8 +1680,18 @@ const HEARTBEAT_URL = (() => {
     // than no button.
     try {
       var st = await api('/api/v1/push/status');
-      if (st.status !== 200 || !st.body || !st.body.ready) { return; }
-    } catch (e) { return; }
+      if (st.status !== 200 || !st.body || !st.body.ready) {
+        console.error('SNYPD push: /push/status not ready', st);
+        show('Alerts unavailable', true);
+        say('Alerts are not ready on this account yet (status ' + st.status + '). Try again shortly.');
+        return;
+      }
+    } catch (e) {
+      console.error('SNYPD push: /push/status request failed', e);
+      show('Alerts unavailable', true);
+      say('Could not check alert status: ' + (e && e.message ? e.message : 'unknown error') + '.');
+      return;
+    }
 
     if (Notification.permission === 'denied') {
       show('Alerts blocked', true);
