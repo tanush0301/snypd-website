@@ -1007,6 +1007,12 @@
     }
 
     if (action === "billing" || action === "billingLink"){
+      if (!window.__snypdAccountState) {
+        const original = btn.textContent;
+        btn.textContent = "Loading, try again in a moment...";
+        setTimeout(() => { btn.textContent = original; }, 2000);
+        return;
+      }
       openBilling(window.__snypdAccountState);
     }
   });
@@ -1204,9 +1210,9 @@
       </div>
     </div>
     <div class="snypd-footer__bottom">
-      <p>&copy; 2024 Snypd. All rights reserved.</p>
+      <p>&copy; <span id="copyYear">2026</span> Snypd. All rights reserved.</p>
     </div>
   </div>
 </footer>
-
+<script>(function(){var y=document.getElementById('copyYear');if(y)y.textContent=new Date().getFullYear();})();</script>
 </body></html>

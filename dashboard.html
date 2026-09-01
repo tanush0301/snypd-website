@@ -534,9 +534,15 @@ body {
 
 .meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; }
 .t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.price-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
 .p { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.p-total { font-size: 11px; font-weight: 500; color: var(--text-muted); white-space: nowrap; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .tiny { display: none; }
+
+.card.is-gone { opacity: 0.55; }
+.card.is-gone:hover { transform: none; box-shadow: none; }
+.card.is-gone .tiny { display: block; margin-top: 4px; font-size: 11px; font-weight: 600; color: var(--danger); }
 
 .empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
 
@@ -650,7 +656,7 @@ body {
 <h2>Unlock Your Arsenal</h2>
 <p>Your SNYPD account is primed. Start the free plan on Whop to unlock your first search lane and dominate the market.</p>
 <div class="activation-actions">
-<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Start Free Trial</a>
+<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Activate Free Plan</a>
 <a class="btn btn-ghost" href="/#pricing">View Plans</a>
 </div>
 <p class="activation-note">Use the same email as your SNYPD account for instant access.</p>
@@ -761,6 +767,7 @@ body {
 })();
 </script><script>
 const SUPABASE_ADS_FETCH_INTERVALL = 20;
+const IDLE_VISIBLE_POLL_SECONDS = 75; // read cadence once visible-but-idle, instead of stopping outright
 const DASHBOARD_MAX_AGE_MIN = 30; // only show ads fetched in last 30 minutes
 
 // heartbeat endpoint (prod vs VPS)
@@ -894,6 +901,11 @@ const HEARTBEAT_URL = (() => {
 
   let running = false;
 
+  // Listings confirmed gone via click-time revalidation (see revalidateListing
+  // below). Kept across poll ticks so a card re-rendered from a fresh
+  // loadAds() still shows as gone until it naturally ages out of the query.
+  const knownDeadIds = new Set();
+
   function updateEmptyUI(hasRows, lastMatchTs) {
     if (hasRows) {
       empty.style.display = 'none';
@@ -988,13 +1000,16 @@ const HEARTBEAT_URL = (() => {
   function derivePrice(row) {
     const p  = row?.price || {};
     const tp = row?.total_item_price || {};
-    const amt = (p?.amount ?? tp?.amount ?? null);
-    const cur = (p?.currency ?? tp?.currency ?? 'EUR');
-    return { amount: amt, currency: cur };
+    const cur = (p?.currency_code ?? tp?.currency_code ?? p?.currency ?? tp?.currency ?? 'EUR');
+    const amount = (p?.amount ?? tp?.amount ?? null);
+    const totalAmount = (tp?.amount ?? null);
+    const showTotal = amount != null && totalAmount != null && Number(totalAmount) !== Number(amount);
+    return { amount, currency: cur, totalAmount, showTotal };
   }
 
   const cardHTML = (r) => {
-    const { amount, currency } = derivePrice(r);
+    const { amount, currency, totalAmount, showTotal } = derivePrice(r);
+    const isDead = knownDeadIds.has(String(r.listing_id));
     const img = getImageUrl(r);
     const cls = img ? 'thumb' : 'thumb fallback';
 
@@ -1023,22 +1038,25 @@ const HEARTBEAT_URL = (() => {
       : `<div class="thumb fallback"></div>`;
 
     return `
-      <a href="${r.url || '#'}"
+      <a href="${esc(r.url) || '#'}"
          target="_blank"
          rel="noopener"
-         class="card"
+         class="card${isDead ? ' is-gone' : ''}"
          data-id="${r.listing_id}"
          style="text-decoration:none;color:inherit">
         ${imgHtml}
         <div>
           <div class="meta-top">
             <div class="t">${esc(r.title) || 'View listing'}</div>
-            <div class="p">${fmtPrice(amount, currency)}</div>
+            <div class="price-wrap">
+              <div class="p">${fmtPrice(amount, currency)}</div>
+              ${showTotal ? `<div class="p-total">${fmtPrice(totalAmount, currency)} incl. Buyer Protection</div>` : ''}
+            </div>
           </div>
           <div class="muted">
             ${[brand, size, status, src, fetchedLabel].filter(Boolean).map(esc).join(' • ')}
           </div>
-          <div class="tiny"></div>
+          <div class="tiny">${isDead ? 'No longer available on Vinted — may have sold' : ''}</div>
         </div>
       </a>`;
   };
@@ -1058,6 +1076,76 @@ const HEARTBEAT_URL = (() => {
   function setLoading(flag) {
     list.classList.toggle('loading', !!flag);
   }
+
+  // ----------------- CLICK-TIME REVALIDATION -----------------
+  //
+  // The Vinted link is a plain <a target="_blank">, navigated by the browser
+  // directly from the click -- that's deliberate and must stay that way.
+  // Calling preventDefault()/window.open() after an await breaks the
+  // "direct result of a user gesture" chain most browsers require, which
+  // means it gets treated as a popup and blocked. So: never intercept the
+  // first click. Instead, race a fast PK-indexed re-check in parallel and
+  // use it only to correct the card for next time -- graying it out and
+  // swapping in an honest message so a second click doesn't repeat the trip.
+
+  function markCardDead(card) {
+    card.classList.add('is-gone');
+    const tiny = card.querySelector('.tiny');
+    if (tiny) tiny.textContent = 'No longer available on Vinted — may have sold';
+  }
+
+  async function revalidateListing(id, card) {
+    try {
+      const { data, error } = await sb
+        .from('current_ads')
+        .select('is_visible, price, total_item_price')
+        .eq('listing_id', Number(id))
+        .eq('user_id', uid)
+        .maybeSingle();
+
+      if (error) return; // fail open -- same convention as the backend's own filters
+
+      const gone = !data || data.is_visible === false;
+      if (gone) {
+        knownDeadIds.add(id);
+        markCardDead(card);
+        return;
+      }
+
+      const { amount, currency, totalAmount, showTotal } = derivePrice(data);
+      const pEl = card.querySelector('.p');
+      if (pEl) pEl.textContent = fmtPrice(amount, currency);
+      const wrap = card.querySelector('.price-wrap');
+      if (wrap) {
+        let totalEl = wrap.querySelector('.p-total');
+        if (showTotal) {
+          if (!totalEl) {
+            totalEl = document.createElement('div');
+            totalEl.className = 'p-total';
+            wrap.appendChild(totalEl);
+          }
+          totalEl.textContent = `${fmtPrice(totalAmount, currency)} incl. Buyer Protection`;
+        } else if (totalEl) {
+          totalEl.remove();
+        }
+      }
+    } catch (e) {
+      // fail open
+    }
+  }
+
+  list.addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    const id = card.dataset.id;
+    if (!id) return;
+
+    if (knownDeadIds.has(id)) {
+      e.preventDefault(); // already confirmed gone -- don't send them there again
+      return;
+    }
+    revalidateListing(id, card); // fires in parallel; native navigation is untouched
+  });
 
   // ----------------- LOAD ADS (main logic) -----------------
 
@@ -1159,6 +1247,9 @@ const HEARTBEAT_URL = (() => {
     const chip = document.getElementById('status-chip');
     const cls  = next === 'running' ? 'ok' : (next === 'stopped' ? '' : 'warn');
     chip.className = 'chip ' + cls;
+    if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
+      window.SNYPD.setSidebarState(next);
+    }
   }
 
   const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
@@ -1191,9 +1282,15 @@ const HEARTBEAT_URL = (() => {
 
   let adsTimer = null;
   let hbTimer  = null;
+  let watchingSlow = false; // visible-but-idle: still reading current_ads, just less often
 
   // If user clicks Stop, we respect it and won’t auto-start until Start is clicked again.
   let manualPaused = (localStorage.getItem('snypd_manual_paused') === 'true');
+
+  function setAdsCadence(seconds) {
+    if (adsTimer) clearInterval(adsTimer);
+    adsTimer = setInterval(loadAds, Math.max(5, seconds) * 1000);
+  }
 
   async function start() {
     if (running) return;
@@ -1208,7 +1305,7 @@ const HEARTBEAT_URL = (() => {
     hbTimer = setInterval(sendHeartbeat, 30000);
 
     await loadAds();
-    adsTimer = setInterval(loadAds, Math.max(5, SUPABASE_ADS_FETCH_INTERVALL) * 1000);
+    setAdsCadence(SUPABASE_ADS_FETCH_INTERVALL);
   }
 
   async function stop(statusLabel = 'stopped') {
@@ -1220,6 +1317,7 @@ const HEARTBEAT_URL = (() => {
     }
 
     running = false;
+    watchingSlow = false;
     setStatus(statusLabel);
 
     if (hbTimer)  clearInterval(hbTimer);
@@ -1231,6 +1329,27 @@ const HEARTBEAT_URL = (() => {
 
     // IMPORTANT: stop backend immediately so proxies stop burning
     await sendStop();
+  }
+
+  // A user reading a card to decide whether to buy is normal use of a
+  // "steals" feed, not idleness -- so 5 minutes of no mouse movement slows
+  // the dashboard's own read cadence rather than stopping it outright. The
+  // backend heartbeat/scraping is untouched by this; only how often THIS TAB
+  // re-reads current_ads changes.
+  function enterSlowWatch() {
+    if (!running || watchingSlow) return;
+    watchingSlow = true;
+    setAdsCadence(IDLE_VISIBLE_POLL_SECONDS);
+    setStatus('watching');
+  }
+
+  function exitSlowWatch() {
+    if (!watchingSlow) return;
+    watchingSlow = false;
+    if (running) {
+      setAdsCadence(SUPABASE_ADS_FETCH_INTERVALL);
+      setStatus('running');
+    }
   }
 
   btnStart.onclick = async () => {
@@ -1256,6 +1375,7 @@ const HEARTBEAT_URL = (() => {
 
   function touchActivity() {
     lastActivity = Date.now();
+    exitSlowWatch(); // real activity always restores full read cadence
 
     // If we're visible again and not manually paused, resume instantly (spontaneous)
     if (!manualPaused && document.visibilityState === 'visible' && !running) {
@@ -1293,9 +1413,10 @@ const HEARTBEAT_URL = (() => {
         return;
       }
 
-      // If visible but user inactive: stop after 5 minutes idle
+      // If visible but user inactive: slow the read cadence after 5 minutes,
+      // rather than stopping outright -- see enterSlowWatch().
       if (running && (now - lastActivity) >= IDLE_MS) {
-        await stop('idle');
+        enterSlowWatch();
       }
     }, CHECK_EVERY_MS);
   }

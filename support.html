@@ -1369,6 +1369,8 @@
 
         </form>
 
+        <p style="text-align:center;font-size:13px;color:var(--muted);margin:12px 0 0">Prefer email? Write to <a href="mailto:support@snypd.store" style="color:var(--brand)">support@snypd.store</a> directly.</p>
+
         <!-- Discord Widget -->
         <div class="discord-widget">
           <div class="dw-info">
@@ -1855,7 +1857,20 @@
 
       try {
         if (!SUPPORT_TICKET_URL) {
-          throw new Error('SUPPORT_TICKET_ROUTE is not configured');
+          // No backend route yet (see the comment above SUPPORT_TICKET_ROUTE) --
+          // fall back to a real mailto instead of reporting a failure for
+          // something the user can actually still do.
+          const subject = encodeURIComponent(`Support: ${payload.topic}`);
+          const body = encodeURIComponent(`Name: ${payload.name}\nEmail: ${payload.email}\n\n${payload.message}`);
+          window.location.href = `mailto:support@snypd.store?subject=${subject}&body=${body}`;
+          setButtonState('is-success');
+          announce('Opening your email app to send this.');
+          resetTimer = setTimeout(() => {
+            resetTimer = null;
+            form.reset();
+            setButtonState(null);
+          }, 3000);
+          return;
         }
 
         // Without an abort the button can stay disabled forever on a hung request.
@@ -2257,7 +2272,7 @@
           <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.7 1.6 6.8L12 16.9 5.8 20.4 7.4 13 2.2 8.9l6.9-.6L12 2z"/></svg>
           <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.7 1.6 6.8L12 16.9 5.8 20.4 7.4 13 2.2 8.9l6.9-.6L12 2z"/></svg>
         </div>
-        <div class="score"><strong>4.9</strong>/5 <span>• Verified resellers</span></div>
+        <div class="score"><strong>4.5</strong>/5 <span>• Verified resellers</span></div>
       </div>
     </div>
 

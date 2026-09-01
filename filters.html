@@ -451,7 +451,7 @@
       </div>
     </div>
     <div class="snypd-footer__bottom">
-      <p>&copy; 2024 Snypd. All rights reserved.</p>
+      <p>&copy; <span id="copyYear">2026</span> Snypd. All rights reserved.</p>
     </div>
   </div>
 </footer>
@@ -535,5 +535,7 @@
   window.SNYPD = window.SNYPD || {};
   window.SNYPD.setSidebarState = (s) => setState(s);
 })();
-</script></body></html>
+</script>
+<script>(function(){var y=document.getElementById('copyYear');if(y)y.textContent=new Date().getFullYear();})();</script>
+</body></html>
 
