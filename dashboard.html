@@ -763,7 +763,7 @@ body {
 <h2>Unlock Your Arsenal</h2>
 <p>Your SNYPD account is primed. Start the free plan on Whop to unlock your first search lane and dominate the market.</p>
 <div class="activation-actions">
-<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Start Free Trial</a>
+<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Activate Free Plan</a>
 <a class="btn btn-ghost" href="/#pricing">View Plans</a>
 </div>
 <p class="activation-note">Use the same email as your SNYPD account for instant access.</p>
@@ -1335,6 +1335,9 @@ const HEARTBEAT_URL = (() => {
     const cls  = next === 'running' ? 'ok' : (next === 'stopped' ? '' : 'warn');
     chip.className = 'chip ' + cls;
     if (statusDot) statusDot.classList.toggle('live', next === 'running');
+    if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
+      window.SNYPD.setSidebarState(next);
+    }
   }
 
   const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
