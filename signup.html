@@ -1055,8 +1055,24 @@
 </div>
 <div class="snypd-proof__text">
 <span class="snypd-proof__pulse"></span>
-<strong>Founding member access</strong> — first 100 keep Pro pricing for life
+<strong>Founding member access</strong> — <span id="foundingCount">first 100</span> keep Pro pricing for life
       </div>
+<script>
+(async () => {
+  const el = document.getElementById('foundingCount');
+  if (!el) return;
+  try {
+    const isProd = /(^|\.)snypd\.store$/i.test(location.hostname);
+    const base = isProd ? 'https://api.snypd.store' : `${location.protocol === 'https:' ? 'https' : 'http'}://82.165.195.178`;
+    const res = await fetch(`${base}/api/v1/founding-members`);
+    if (!res.ok) return; // keep the static "first 100" fallback already in the markup
+    const data = await res.json();
+    if (typeof data.remaining === 'number') {
+      el.textContent = data.remaining > 0 ? `${data.remaining} of the first 100 spots left` : 'all 100 founding spots claimed';
+    }
+  } catch (e) { /* keep the static fallback */ }
+})();
+</script>
 </div>
 <!-- Card (outer = perspective + entrance, inner = tilt + shake) -->
 <div class="snypd-card-outer snypd-reveal snypd-reveal--card" data-delay="550">
