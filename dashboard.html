@@ -14,26 +14,26 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="SNYPD" name="apple-mobile-web-app-title"/>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
   /* Scope everything */
   .snypd-sidebar {
-    --bg: #0A0A0A; 
+    --bg: #0A0A0A;
     --panel: #111111;
     --border: #262626;
     --border-hover: #404040;
     --text-primary: #F5F5F5;
     --text-muted: #8A8A8A;
-    --brand: #A200FF; /* Matches logo exact purple */
+    --brand: #A200FF; /* Matches logo exact purple - action color only */
     --brand-hover: #B533FF;
-    --success: #10B981;
-    
-    --w: 260px;          
-    --wFocus: 260px;     
-    --radius: 10px;
+    --success: #35e7dc; /* mint - status color only, never action */
+
+    --w: 260px;
+    --wFocus: 260px;
+    --radius: 0px;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   /* Support for Obsidian translucent background if placed on absolute black */
@@ -129,7 +129,7 @@
   }
   .snypd-sidebar[data-state="live"] .snypd-orb {
     background: var(--success);
-    box-shadow: 0 0 8px rgba(16,185,129,0.4);
+    box-shadow: 0 0 8px rgba(53,231,220,0.4);
   }
   .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
     color: var(--success);
@@ -139,7 +139,7 @@
   .snypd-sidebar__toggle {
     border: 1px solid var(--border);
     background: transparent;
-    border-radius: 6px;
+    border-radius: 0;
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -175,7 +175,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
-    border-radius: 6px;
+    border-radius: 0;
     text-decoration: none;
     color: var(--text-muted);
     transition: all 0.2s var(--ease);
@@ -233,12 +233,13 @@
   }
   .snypd-pill {
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 0;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.02);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
   .snypd-link {
@@ -247,15 +248,17 @@
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.15s var(--ease);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .snypd-link:hover { color: var(--text-primary); }
 
   .snypd-cta {
     width: 100%;
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 10px 14px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 13px;
     font-family: var(--font);
     color: var(--brand-fg);
@@ -265,6 +268,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   .snypd-cta:hover { 
     background: var(--brand-hover);
@@ -319,7 +324,7 @@
   .snypd-sidebar[data-focus="true"] .snypd-icon { margin-right: 0; }
   .snypd-sidebar[data-focus="true"] .snypd-sidebar__header { padding: 24px 16px; }
 </style><style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 :root {
   --bg: #000000;
@@ -329,13 +334,13 @@
   --border-hover: rgba(255, 255, 255, 0.2);
   --text-primary: #FFFFFF;
   --text-muted: #888888;
-  --brand: #A200FF; 
+  --brand: #A200FF; /* action color only - buttons */
   --brand-hover: #C54BFF;
   --brand-fg: #FFFFFF;
-  --success: #10B981;
+  --success: #35e7dc; /* mint - status color only, never action */
   --warning: #F59E0B;
   --danger: #EF4444;
-  --font: 'Inter', -apple-system, sans-serif;
+  --font: 'JetBrains Mono', monospace;
   --smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -387,16 +392,16 @@ body {
   pointer-events: none;
 }
 
-.sub { font-size: 13px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; }
+.sub { font-size: 13px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 0; }
 
 /* Gate */
-.activation-gate { 
-  background: var(--panel); 
+.activation-gate {
+  background: var(--panel);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border); 
-  border-radius: 12px; 
-  padding: 48px; 
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 48px;
   text-align: center; 
   margin-bottom: 32px; 
   box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
@@ -416,7 +421,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0,0,0,0.8);
 }
@@ -436,20 +441,20 @@ body {
 .mr-input {
   flex: 1 1 260px; min-width: 0; padding: 11px 14px;
   background: rgba(0,0,0,0.35); color: var(--text-primary);
-  border: 1px solid var(--border); border-radius: 10px;
+  border: 1px solid var(--border); border-radius: 0;
   font-family: var(--font); font-size: 14px;
 }
 .mr-input:focus { outline: none; border-color: var(--brand); }
 .mr-card {
   background: var(--panel-header); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px 16px; margin-top: 12px;
+  border-radius: 0; padding: 14px 16px; margin-top: 12px;
 }
 .mr-badge {
   display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
-  text-transform: uppercase; padding: 4px 9px; border-radius: 999px;
+  text-transform: uppercase; padding: 4px 9px; border-radius: 0;
   border: 1px solid var(--border); color: var(--text-muted);
 }
-.mr-badge.ok   { color: var(--success); border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.06); }
+.mr-badge.ok   { color: var(--success); border-color: rgba(53,231,220,0.35); background: rgba(53,231,220,0.06); }
 .mr-badge.warn { color: var(--warning); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); }
 .mr-badge.bad  { color: var(--danger);  border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.06); }
 .mr-headline { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--text-primary); }
@@ -465,12 +470,12 @@ body {
 .mr-cond-detail { font-size: 13px; color: var(--text-primary); text-align: right; }
 .mr-cond-detail b { color: var(--text-primary); }
 .mr-flag {
-  margin-top: 10px; padding: 9px 12px; border-radius: 8px; font-size: 13px; line-height: 1.5;
+  margin-top: 10px; padding: 9px 12px; border-radius: 0; font-size: 13px; line-height: 1.5;
   background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25); color: var(--warning);
 }
 .mr-note { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .mr-error {
-  margin-top: 12px; padding: 11px 14px; border-radius: 8px; font-size: 13px; line-height: 1.5;
+  margin-top: 12px; padding: 11px 14px; border-radius: 0; font-size: 13px; line-height: 1.5;
   background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); color: var(--danger);
 }
 .mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
@@ -490,20 +495,22 @@ body {
   background: var(--panel-header); 
 }
 .status-bar { display: flex; gap: 12px; flex-wrap: wrap; }
-.chip { 
-  padding: 6px 12px; 
-  border-radius: 6px; 
-  font-size: 12px; 
-  font-weight: 600; 
-  background: rgba(255,255,255,0.05); 
-  color: var(--text-muted); 
-  border: 1px solid var(--border); 
-  display:flex; 
-  align-items:center; 
+.chip {
+  padding: 6px 12px;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  display:flex;
+  align-items:center;
   gap:8px;
 }
 .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #666; }
-.chip.ok { color: var(--success); background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); }
+.chip.ok { color: var(--success); background: rgba(53,231,220,0.05); border-color: rgba(53,231,220,0.2); }
 .chip.ok::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
 .chip.warn { color: var(--warning); background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
 .chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
@@ -512,20 +519,22 @@ body {
 .controls { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Buttons */
-.btn { 
-  border: none; 
-  border-radius: 8px; 
-  padding: 0 20px; 
-  height: 38px; 
-  font-size: 13px; 
-  font-weight: 600; 
-  cursor: pointer; 
-  transition: all 0.2s var(--smooth); 
-  font-family: var(--font); 
-  text-decoration: none; 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
+.btn {
+  border: none;
+  border-radius: 0;
+  padding: 0 20px;
+  height: 38px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s var(--smooth);
+  font-family: var(--font);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn:active:not(:disabled) { transform: scale(0.97); }
 .btn-prim { 
@@ -561,7 +570,7 @@ body {
 #notify-note.cta-note {
   background: rgba(162,0,255,0.06);
   border: 1px solid rgba(162,0,255,0.18);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 12px 14px !important;
   color: var(--text-primary) !important;
   margin-top: 10px !important;
@@ -576,13 +585,13 @@ body {
 .card {
   display: grid;
   grid-template-columns: 88px minmax(0, 1fr);
-  gap: 16px; 
-  background: rgba(255,255,255,0.02); 
-  border: 1px solid var(--border); 
-  border-radius: 10px; 
-  padding: 12px; 
-  transition: all 0.3s var(--smooth); 
-  align-items: center; 
+  gap: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px;
+  transition: all 0.3s var(--smooth);
+  align-items: center;
 }
 .card.enter { animation: slideUp 0.5s var(--smooth) both; }
 @keyframes slideUp { 
@@ -607,12 +616,12 @@ body {
 }
 .card:active { transform: translateY(0) scale(0.99); background: rgba(255,255,255,0.06); }
 
-.thumb { 
-  width: 88px; 
-  height: 88px; 
-  border-radius: 6px; 
-  object-fit: cover; 
-  background: rgba(255,255,255,0.05); 
+.thumb {
+  width: 88px;
+  height: 88px;
+  border-radius: 0;
+  object-fit: cover;
+  background: rgba(255,255,255,0.05);
 }
 .thumb.fallback { border: 1px solid var(--border); }
 
@@ -623,16 +632,16 @@ body {
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .tiny { display: none; }
 
-.empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
+.empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 0; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
 
 /* Skeleton animation */
-.skeleton { 
-  height: 114px; 
-  border-radius: 10px; 
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02)); 
-  background-size: 200% 100%; 
-  animation: shimmer 1.5s infinite linear; 
-  border: 1px solid var(--border); 
+.skeleton {
+  height: 114px;
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border: 1px solid var(--border);
 }
 @keyframes shimmer { 
   0% { background-position: 200% 0; } 
@@ -676,12 +685,12 @@ body {
     }
     #mobile-header .mh-dot.live {
       background: var(--success);
-      box-shadow: 0 0 8px rgba(16,185,129,0.55);
+      box-shadow: 0 0 8px rgba(53,231,220,0.55);
       animation: mhDotPulse 2s ease-in-out infinite;
     }
     @keyframes mhDotPulse {
-      0%, 100% { box-shadow: 0 0 8px rgba(16,185,129,0.55); }
-      50% { box-shadow: 0 0 14px rgba(16,185,129,0.9); }
+      0%, 100% { box-shadow: 0 0 8px rgba(53,231,220,0.55); }
+      50% { box-shadow: 0 0 14px rgba(53,231,220,0.9); }
     }
     @media (prefers-reduced-motion: reduce) {
       #mobile-header .mh-dot.live { animation: none; }
@@ -699,11 +708,13 @@ body {
       align-items: center;
       gap: 6px;
       padding: 8px 16px;
-      border-radius: 999px;
+      border-radius: 0;
       background: var(--brand);
       color: var(--brand-fg);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
       border: none;
       cursor: pointer;
       box-shadow: 0 8px 24px rgba(162,0,255,0.4);
@@ -730,6 +741,40 @@ body {
       .controls { gap: 8px; }
       .btn { height: 34px; padding: 0 14px; font-size: 12px; }
     }
+
+    /* First-run wizard. Shown only when a real query confirms this user has
+       zero saved searches - never a nag, never shown to a returning user. */
+    .wiz-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .wiz-modal {
+      width: 100%; max-width: 520px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+    }
+    .wiz-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--brand); text-transform: uppercase; margin-bottom: 12px; }
+    .wiz-title { font-size: 22px; font-weight: 700; margin: 0 0 8px; color: var(--text-primary); }
+    .wiz-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; line-height: 1.5; }
+    .wiz-presets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .wiz-preset {
+      display: flex; flex-direction: column; gap: 4px;
+      text-align: left; width: 100%; padding: 14px 16px;
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: 0; cursor: pointer; transition: all 0.2s var(--smooth);
+      font-family: var(--font);
+    }
+    .wiz-preset:hover { border-color: var(--brand); background: rgba(162,0,255,0.05); }
+    .wiz-preset.is-picked { border-color: var(--success); background: rgba(53,231,220,0.06); opacity: 0.6; pointer-events: none; }
+    .wiz-preset__name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .wiz-preset__meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .wiz-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -813,6 +858,46 @@ body {
 <span class="mh-dot" id="mh-status-dot"></span>
 </div>
 <button class="new-pill" id="new-pill" type="button"></button>
+
+<!-- First-run wizard: hidden by default, shown only if a real DB check finds
+     zero saved searches for this user (see the script block near loadAds). -->
+<div class="wiz-overlay" id="wiz-overlay">
+  <div class="wiz-modal">
+    <div class="wiz-step" id="wiz-step-1">
+      <div class="wiz-eyebrow">Step 1 of 2</div>
+      <h2 class="wiz-title">What are you hunting?</h2>
+      <p class="wiz-sub">Pick one to start. You can add more from Filters anytime.</p>
+      <div class="wiz-presets" id="wiz-presets">
+        <button class="wiz-preset" type="button" data-name="Jordan 1 Travis Scott" data-url="https://www.vinted.be/catalog?search_text=jordan%20travis%20scott&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=782&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=791&amp;size_ids[]=792&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
+          <span class="wiz-preset__name">Jordan 1 Travis Scott</span>
+          <span class="wiz-preset__meta">Sneakers &middot; from &euro;150</span>
+        </button>
+        <button class="wiz-preset" type="button" data-name="Off-White" data-url="https://www.vinted.be/catalog?search_text=off%20white&amp;catalog[]=1231&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=791&amp;size_ids[]=792&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
+          <span class="wiz-preset__name">Off-White</span>
+          <span class="wiz-preset__meta">Streetwear &middot; from &euro;150</span>
+        </button>
+        <button class="wiz-preset" type="button" data-name="Jordan (all)" data-url="https://www.vinted.be/catalog?search_text=jordan&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=782&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=792&amp;size_ids[]=791&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
+          <span class="wiz-preset__name">Jordan (all)</span>
+          <span class="wiz-preset__meta">Sneakers &middot; broadest &middot; from &euro;150</span>
+        </button>
+      </div>
+      <div class="wiz-actions">
+        <a class="btn btn-ghost" href="/filters">+ Build my own</a>
+        <button class="btn btn-ghost" id="wiz-skip" type="button">Skip &mdash; start me broad</button>
+      </div>
+    </div>
+    <div class="wiz-step" id="wiz-step-2" style="display:none">
+      <div class="wiz-eyebrow">Step 2 of 2</div>
+      <h2 class="wiz-title">Turn on alerts?</h2>
+      <p class="wiz-sub">Get notified the moment a match appears. On paid plans this keeps working even with this tab closed.</p>
+      <div class="wiz-actions">
+        <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Enable alerts</button>
+        <button class="btn btn-ghost" id="wiz-finish" type="button">Set this up later</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="dash-wrap">
 <div class="hdr">
 <div class="brand">
@@ -1095,6 +1180,82 @@ const HEARTBEAT_URL = (() => {
   if (dashboardPanel) dashboardPanel.classList.remove('is-hidden');
   
   set('plan-banner', `Plan: ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`);
+
+  // Sidebar plan pill - was hardcoded "PLAN - ELITE" for every user regardless
+  // of real plan. Wire it to the same effectivePlan already resolved above.
+  const sidebarPlanPill = document.querySelector('[data-snypd-plan]');
+  if (sidebarPlanPill) {
+    sidebarPlanPill.textContent = `PLAN — ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`;
+  }
+
+  // ----------------- FIRST-RUN WIZARD -----------------
+  // Shown only when a real query confirms zero saved searches for this user -
+  // a returning user with at least one search never sees this, no flag needed.
+  (async () => {
+    try {
+      const { count, error: cErr } = await sb
+        .from('user_searches')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', uid);
+      if (cErr) { console.error('SNYPD wizard: could not check searches', cErr); return; }
+      if ((count || 0) > 0) return;
+
+      const overlay = document.getElementById('wiz-overlay');
+      const step1 = document.getElementById('wiz-step-1');
+      const step2 = document.getElementById('wiz-step-2');
+      if (!overlay) return;
+      overlay.style.display = 'flex';
+
+      async function saveSearch(name, url) {
+        const { error } = await sb.from('user_searches').insert({
+          user_id: uid, search_name: name, vinted_url: url, is_active: true
+        });
+        if (error) console.error('SNYPD wizard: could not save search', error);
+        // Move to step 2 regardless - a failed save here shouldn't trap a new
+        // user on step 1; they can add a real search from /filters after.
+        step1.style.display = 'none';
+        step2.style.display = '';
+      }
+
+      document.querySelectorAll('.wiz-preset').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          document.querySelectorAll('.wiz-preset').forEach(b => b.classList.remove('is-picked'));
+          btn.classList.add('is-picked');
+          await saveSearch(btn.dataset.name, btn.dataset.url);
+        });
+      });
+
+      const skipBtn = document.getElementById('wiz-skip');
+      if (skipBtn) {
+        skipBtn.addEventListener('click', async () => {
+          // The broadest of the three real presets - proves the mechanic works
+          // fast, with zero forced steps for someone who just wants in.
+          await saveSearch(
+            'Jordan (all)',
+            'https://www.vinted.be/catalog?search_text=jordan&price_from=150.0&currency=EUR&size_ids[]=782&size_ids[]=784&size_ids[]=785&size_ids[]=786&size_ids[]=788&size_ids[]=789&size_ids[]=790&size_ids[]=792&size_ids[]=791&status_ids[]=2&status_ids[]=3&status_ids[]=4&order=newest_first'
+          );
+        });
+      }
+
+      const enableBtn = document.getElementById('wiz-enable-alerts');
+      if (enableBtn) {
+        enableBtn.addEventListener('click', () => {
+          // Reuses the real, already-working notification button rather than
+          // reimplementing push logic here.
+          const realNotifyBtn = document.getElementById('btn-notify');
+          if (realNotifyBtn) realNotifyBtn.click();
+          overlay.style.display = 'none';
+        });
+      }
+
+      const finishBtn = document.getElementById('wiz-finish');
+      if (finishBtn) {
+        finishBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
+      }
+    } catch (e) {
+      console.error('SNYPD wizard error', e);
+    }
+  })();
 
   const list    = document.getElementById('list');
   const empty   = document.getElementById('empty');
@@ -1915,6 +2076,7 @@ const HEARTBEAT_URL = (() => {
    * present an unrecognised state as a trustworthy price. */
   function badgeFor(v) {
     if (v === 'ok') { return { cls: 'ok', text: 'Trusted price' }; }
+    if (v === 'too_thin_shown') { return { cls: 'warn', text: 'Rough guide only' }; }
     if (v === 'too_thin') { return { cls: 'warn', text: 'Not enough data' }; }
     if (v === 'too_broad') { return { cls: 'bad', text: 'Too mixed to trust' }; }
     if (v === 'one_seller_dominates') { return { cls: 'warn', text: 'Not a real market' }; }
@@ -1929,6 +2091,16 @@ const HEARTBEAT_URL = (() => {
            + '-- if this is a real item, we have started watching it and data should build up.';
     }
     if (d.display_verdict === 'too_thin') {
+      /* Two different situations share this verdict. If a price is being shown
+       * alongside it, saying "too few to call a price" contradicts the number
+       * directly above it. */
+      if (d.provisional) {
+        var ob = d.observed_cents || {};
+        return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' to go on'
+             + (ob.low != null ? ', running from <b>' + eur(ob.low) + '</b> to <b>' + eur(ob.high) + '</b>' : '')
+             + '. Rare items are thin here because they are rare on Vinted, so this is a '
+             + 'starting point rather than a settled price.';
+      }
       return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' found so far '
            + '-- too few to call a price honestly.';
     }
@@ -1949,11 +2121,18 @@ const HEARTBEAT_URL = (() => {
     if (!list || !list.length) { return ''; }
     var rows = list.map(function (c) {
       var detail;
+      var r = c.range_cents || {};
       if (c.verdict === 'ok' && c.typical_cents != null) {
-        var r = c.range_cents || {};
         detail = '<b>' + eur(c.typical_cents) + '</b> typical '
                + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ')</span> '
                + MIDDOT + ' ' + (c.sample_size || 0) + ' listings';
+      } else if (c.provisional && c.typical_cents != null) {
+        /* Thin but real. Shown deliberately: for a rare colourway every rung is
+         * thin by definition, and a rough number that admits it is rough beats
+         * an empty row. The tilde and the lighter weight carry that. */
+        detail = '<b style="opacity:.85">~' + eur(c.typical_cents) + '</b> '
+               + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ') '
+               + MIDDOT + ' only ' + (c.sample_size || 0) + ' listings</span>';
       } else {
         detail = '<span style="opacity:.7">' + (c.sample_size || 0) + ' listing'
                + ((c.sample_size === 1) ? '' : 's') + ', not enough on its own</span>';
@@ -1966,13 +2145,18 @@ const HEARTBEAT_URL = (() => {
   }
 
   function render(d) {
-    var b = badgeFor(d.display_verdict);
+    /* A thin result that still carries a price is its own state: the badge must
+     * not say "not enough data" directly above a euro figure. */
+    var b = badgeFor(d.provisional ? 'too_thin_shown' : d.display_verdict);
     var html = '<div class="mr-card"><span class="mr-badge ' + b.cls + '">' + b.text + '</span>';
 
     if (d.show_headline && d.typical_cents != null) {
       var r = d.range_cents || {};
-      html += '<div style="margin-top:10px"><div class="mr-price">' + eur(d.typical_cents) + '</div>'
-            + '<div class="mr-sub">Most sit between ' + eur(r.low) + ' and ' + eur(r.high) + '</div></div>';
+      html += '<div style="margin-top:10px"><div class="mr-price">'
+            + (d.provisional ? '~' : '') + eur(d.typical_cents) + '</div>'
+            + '<div class="mr-sub">'
+            + (d.provisional ? 'Midpoint of what few listings exist' : 'Most sit between ' + eur(r.low) + ' and ' + eur(r.high))
+            + '</div></div>';
     }
 
     html += '<p class="mr-headline">' + headline(d) + '</p>';
