@@ -411,14 +411,75 @@ body {
 .is-hidden { display: none !important; opacity: 0; pointer-events: none; }
 
 /* Panel */
-.panel { 
-  background: var(--panel); 
+.panel {
+  background: var(--panel);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border); 
-  border-radius: 12px; 
-  overflow: hidden; 
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+}
+
+/* Market Report (Elite).
+   Ported from admin.html's validated .mr-* rules, but the token names are NOT
+   the same on this page and pasting them across would have silently produced
+   uncoloured, transparent elements:
+     admin --panel-2 -> --panel-header here
+     admin --text    -> --text-primary
+     admin --muted   -> --text-muted
+     admin --warn    -> --warning        (this one is the easiest to miss: a
+                                          missing token is not an error, it just
+                                          renders as if it were a design choice)
+   Every token below is defined in this file's own :root block. */
+.mr-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.mr-input {
+  flex: 1 1 260px; min-width: 0; padding: 11px 14px;
+  background: rgba(0,0,0,0.35); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 10px;
+  font-family: var(--font); font-size: 14px;
+}
+.mr-input:focus { outline: none; border-color: var(--brand); }
+.mr-card {
+  background: var(--panel-header); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; margin-top: 12px;
+}
+.mr-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; padding: 4px 9px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-muted);
+}
+.mr-badge.ok   { color: var(--success); border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.06); }
+.mr-badge.warn { color: var(--warning); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); }
+.mr-badge.bad  { color: var(--danger);  border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.06); }
+.mr-headline { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--text-primary); }
+.mr-headline b { color: var(--brand-hover); }
+.mr-price { font-size: 30px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+.mr-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+.mr-cond-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.mr-cond-row:last-child { border-bottom: none; }
+.mr-cond-name { font-size: 13px; color: var(--text-muted); flex: 0 0 auto; }
+.mr-cond-detail { font-size: 13px; color: var(--text-primary); text-align: right; }
+.mr-cond-detail b { color: var(--text-primary); }
+.mr-flag {
+  margin-top: 10px; padding: 9px 12px; border-radius: 8px; font-size: 13px; line-height: 1.5;
+  background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25); color: var(--warning);
+}
+.mr-note { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.mr-error {
+  margin-top: 12px; padding: 11px 14px; border-radius: 8px; font-size: 13px; line-height: 1.5;
+  background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); color: var(--danger);
+}
+.mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.mr-locked { padding: 6px 0 2px; }
+.mr-locked h3 { margin: 0 0 6px; font-size: 15px; color: var(--text-primary); }
+.mr-locked p  { margin: 0 0 12px; font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 60ch; }
+@media (max-width: 560px) {
+  .mr-cond-row { flex-direction: column; gap: 2px; }
+  .mr-cond-detail { text-align: left; }
 }
 .panel .hd { 
   padding: 20px 24px; 
@@ -793,6 +854,26 @@ body {
 <div class="tiny" id="msg" style="margin-top:10px; display:none;"></div>
 </div>
 </div>
+<div class="panel" id="market-panel" style="margin-bottom:16px; display:none">
+<div class="hd">
+<div class="status-bar">
+<div class="chip plan">Market Report</div>
+<div class="chip neutral" id="mr-tier-chip">Elite</div>
+</div>
+<div class="mr-row" id="mr-controls" style="margin-top:10px">
+<input class="mr-input" id="mr-query" type="text" autocomplete="off" spellcheck="false" placeholder="Search an item, e.g. jordan 1 mid" />
+<button class="btn btn-prim" id="mr-go" type="button">Check price</button>
+</div>
+<div class="mr-locked" id="mr-locked" style="display:none">
+<h3>Market Report is part of Elite</h3>
+<p>See what an item actually sells for across Vinted right now, broken down by condition, with a warning when the listings are too mixed to trust a single price.</p>
+<a class="btn btn-prim" href="/plans">View plans</a>
+</div>
+</div>
+<div class="bd">
+<div id="mr-result"></div>
+</div>
+</div>
 </div>
 </div><script>
 (() => {
@@ -975,7 +1056,15 @@ const HEARTBEAT_URL = (() => {
     !!whopProductId;
 
   const effectivePlan = isActivePaidPlan ? rawPlan : 'free';
-  
+
+  // Published for the Market Report panel further down the page, which shows
+  // itself only to Elite. This is presentation only -- the real gate is the
+  // backend, which returns 403 elite_required regardless of what this says.
+  // effectivePlan already degrades a lapsed paid plan to 'free', which is the
+  // behaviour wanted here too.
+  document.body.dataset.plan = effectivePlan;
+  document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
+
   console.log('SNYPD activation check', {
     plan: rawPlan,
     status: rawStatus,
@@ -1744,6 +1833,230 @@ const HEARTBEAT_URL = (() => {
   }
 
   init();
+})();
+</script>
+<script>
+/* Market Report (Elite).
+ *
+ * Renderers ported from admin.html, where they have been validated against real
+ * production data -- but rewritten against the CUSTOMER response shape
+ * (display_verdict / typical_cents / range_cents / flags[]), not the raw
+ * market_snapshot row the admin page reads. The backend deliberately does not
+ * send this page the smoothed means, the raw outlier counts, or any
+ * days-listed figure; see market_report.py's customer_view allowlist for why.
+ *
+ * This file is written byte-for-byte as Latin-1 to preserve its BOM, so every
+ * string here is pure ASCII: the euro sign, en dash and middot are \u escapes.
+ *
+ * token()/api() are duplicated from the push-notification block above rather
+ * than exported from it. That block has been debugged twice recently and a new
+ * screen must not be able to break alerts.
+ */
+(function () {
+  var API = 'https://api.snypd.store';
+
+  var panel   = document.getElementById('market-panel');
+  var input   = document.getElementById('mr-query');
+  var goBtn   = document.getElementById('mr-go');
+  var result  = document.getElementById('mr-result');
+  var locked  = document.getElementById('mr-locked');
+  var controls= document.getElementById('mr-controls');
+  var tierChip= document.getElementById('mr-tier-chip');
+  if (!panel || !input || !goBtn || !result) { return; }
+
+  var EUR = '\u20AC';
+  var NDASH = '\u2013';
+  var MIDDOT = '\u00B7';
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function eur(cents) {
+    if (cents == null || isNaN(cents)) { return '?'; }
+    var v = cents / 100;
+    return EUR + (v >= 100 ? Math.round(v).toString() : v.toFixed(2).replace(/\.00$/, ''));
+  }
+
+  async function token() {
+    try {
+      /* window.SNYPD.supabase is where this page actually puts its client (see
+       * the createClient call in <head>). An earlier draft of this block read
+       * window.supabaseClient, which does not exist here -- token() returned
+       * null every time, so every request went out with no Authorization header
+       * and the endpoint answered 401. Caught by driving the real page rather
+       * than by reading the code. */
+      var sb = (window.SNYPD && window.SNYPD.supabase) || window.supabaseClient || window.sb;
+      if (!sb) { return null; }
+      var s = await sb.auth.getSession();
+      return (s && s.data && s.data.session && s.data.session.access_token) || null;
+    } catch (e) { return null; }
+  }
+
+  async function api(path, method, body) {
+    var t = await token();
+    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    if (t) { headers['Authorization'] = 'Bearer ' + t; }
+    var res = await fetch(API + path, {
+      method: method || 'GET',
+      headers: headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    var parsed = null;
+    try { parsed = await res.json(); } catch (e) { parsed = null; }
+    return { status: res.status, body: parsed };
+  }
+
+  /* Badge vocabulary. Unknown verdicts fall through to a neutral "check the
+   * detail below" rather than being treated as OK -- the backend can grow a new
+   * verdict (a bimodality flag is planned) and a stale page must not silently
+   * present an unrecognised state as a trustworthy price. */
+  function badgeFor(v) {
+    if (v === 'ok') { return { cls: 'ok', text: 'Trusted price' }; }
+    if (v === 'too_thin') { return { cls: 'warn', text: 'Not enough data' }; }
+    if (v === 'too_broad') { return { cls: 'bad', text: 'Too mixed to trust' }; }
+    if (v === 'one_seller_dominates') { return { cls: 'warn', text: 'Not a real market' }; }
+    return { cls: 'warn', text: 'See detail' };
+  }
+
+  function headline(d) {
+    var n = d.sample_size || 0;
+    var q = escapeHtml(d.query || '');
+    if (n === 0) {
+      return 'No listings matching <b>"' + q + '"</b> yet. We are not going to invent a price '
+           + '-- if this is a real item, we have started watching it and data should build up.';
+    }
+    if (d.display_verdict === 'too_thin') {
+      return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' found so far '
+           + '-- too few to call a price honestly.';
+    }
+    if (d.display_verdict === 'too_broad') {
+      var o = d.observed_cents || {};
+      return 'Found <b>' + n + '</b> listings from <b>' + (d.distinct_sellers || 0) + '</b> sellers, but they run from <b>'
+           + eur(o.low) + '</b> to <b>' + eur(o.high) + '</b>. That spread usually means fakes mixed in with real ones, '
+           + 'or several different products sharing the same words. No single price would be honest here.';
+    }
+    if (d.display_verdict === 'one_seller_dominates') {
+      return 'Found ' + n + ' listings, but <b>' + (d.top_seller_pct || 0) + '%</b> of them belong to one seller. '
+           + 'That is one seller setting the price, not a market.';
+    }
+    return 'Based on <b>' + n + '</b> listings from <b>' + (d.distinct_sellers || 0) + '</b> sellers.';
+  }
+
+  function conditionRows(list) {
+    if (!list || !list.length) { return ''; }
+    var rows = list.map(function (c) {
+      var detail;
+      if (c.verdict === 'ok' && c.typical_cents != null) {
+        var r = c.range_cents || {};
+        detail = '<b>' + eur(c.typical_cents) + '</b> typical '
+               + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ')</span> '
+               + MIDDOT + ' ' + (c.sample_size || 0) + ' listings';
+      } else {
+        detail = '<span style="opacity:.7">' + (c.sample_size || 0) + ' listing'
+               + ((c.sample_size === 1) ? '' : 's') + ', not enough on its own</span>';
+      }
+      return '<div class="mr-cond-row"><div class="mr-cond-name">' + escapeHtml(c.condition_label || '')
+           + '</div><div class="mr-cond-detail">' + detail + '</div></div>';
+    }).join('');
+    return '<div class="mr-card"><div class="slabel" style="margin-bottom:6px;font-size:12px;color:#8A8A8A;'
+         + 'text-transform:uppercase;letter-spacing:.05em">Price by condition</div>' + rows + '</div>';
+  }
+
+  function render(d) {
+    var b = badgeFor(d.display_verdict);
+    var html = '<div class="mr-card"><span class="mr-badge ' + b.cls + '">' + b.text + '</span>';
+
+    if (d.show_headline && d.typical_cents != null) {
+      var r = d.range_cents || {};
+      html += '<div style="margin-top:10px"><div class="mr-price">' + eur(d.typical_cents) + '</div>'
+            + '<div class="mr-sub">Most sit between ' + eur(r.low) + ' and ' + eur(r.high) + '</div></div>';
+    }
+
+    html += '<p class="mr-headline">' + headline(d) + '</p>';
+
+    (d.flags || []).forEach(function (f) {
+      html += '<div class="mr-flag">' + escapeHtml(f.message || '') + '</div>';
+    });
+
+    if (d.coverage_note) {
+      html += '<div class="mr-note">' + escapeHtml(d.coverage_note) + '</div>';
+    }
+    html += '</div>';
+
+    html += conditionRows(d.by_condition);
+    result.innerHTML = html;
+  }
+
+  var busy = false;
+  async function run() {
+    if (busy) { return; }
+    var q = (input.value || '').trim();
+    if (!q) { return; }
+    busy = true;
+    goBtn.disabled = true;
+    result.innerHTML = '<div class="mr-loading">Checking real listings across every condition...</div>';
+    try {
+      var res = await api('/api/v1/market/snapshot', 'POST', { q: q });
+      if (res.status === 200 && res.body) {
+        render(res.body);
+      } else if (res.status === 403) {
+        /* Mirrors the locked state, so a stale body[data-plan] cannot dead-end
+         * a non-Elite user on a spinner. */
+        showLocked();
+        result.innerHTML = '';
+      } else if (res.status === 429) {
+        result.innerHTML = '<div class="mr-error">' + escapeHtml(detailOf(res)
+          || 'You have used your searches for now. Try again a bit later.') + '</div>';
+      } else if (res.status === 503) {
+        result.innerHTML = '<div class="mr-error">' + escapeHtml(detailOf(res)
+          || 'That search is too broad. Add a model name or colourway.') + '</div>';
+      } else if (res.status === 401) {
+        result.innerHTML = '<div class="mr-error">Your session expired. Refresh the page and sign in again.</div>';
+      } else {
+        result.innerHTML = '<div class="mr-error">Could not complete that search. Nothing changed.</div>';
+      }
+    } catch (e) {
+      result.innerHTML = '<div class="mr-error">Could not reach the server.</div>';
+    } finally {
+      busy = false;
+      goBtn.disabled = false;
+    }
+  }
+
+  function detailOf(res) {
+    var d = res && res.body && res.body.detail;
+    if (typeof d === 'string') { return d; }
+    if (d && typeof d.message === 'string') { return d.message; }
+    return null;
+  }
+
+  function showLocked() {
+    if (controls) { controls.style.display = 'none'; }
+    if (locked) { locked.style.display = 'block'; }
+    if (tierChip) { tierChip.textContent = 'Elite only'; }
+    panel.style.display = '';
+  }
+
+  function showUnlocked() {
+    if (controls) { controls.style.display = ''; }
+    if (locked) { locked.style.display = 'none'; }
+    panel.style.display = '';
+  }
+
+  function applyPlan(plan) {
+    if (plan === 'elite') { showUnlocked(); } else { showLocked(); }
+  }
+
+  goBtn.addEventListener('click', run);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { run(); } });
+
+  /* The plan is resolved asynchronously by the block above, so take it from
+   * whichever arrives first: the event, or an already-set attribute. */
+  document.addEventListener('snypd:plan', function (e) { applyPlan(e.detail); });
+  if (document.body.dataset.plan) { applyPlan(document.body.dataset.plan); }
 })();
 </script>
 </body>
