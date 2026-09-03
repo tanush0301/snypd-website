@@ -53,6 +53,14 @@ self.addEventListener('push', (event) => {
     timestamp: data.ts ? data.ts * 1000 : Date.now(),
     data: { url: data.url || DEFAULT_URL },
   };
+  // Android Chrome and Windows Chrome/Edge render this as the big preview
+  // photo. iOS Safari and any macOS browser (via the OS's own Notification
+  // Center) silently ignore it and always show the app icon instead -- a
+  // platform limit, not a bug, so the price/condition text in `body` above is
+  // what actually has to carry that information everywhere.
+  if (data.image) {
+    options.image = data.image;
+  }
 
   event.waitUntil(self.registration.showNotification(title, options));
 });

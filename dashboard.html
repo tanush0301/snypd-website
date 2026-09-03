@@ -10,27 +10,30 @@
 <meta content="#0A0A0A" name="theme-color"/>
 <link href="/assets/icons/apple-touch-icon.png" rel="apple-touch-icon"/>
 <meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="SNYPD" name="apple-mobile-web-app-title"/>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
   /* Scope everything */
   .snypd-sidebar {
-    --bg: #0A0A0A; 
+    --bg: #0A0A0A;
     --panel: #111111;
     --border: #262626;
     --border-hover: #404040;
     --text-primary: #F5F5F5;
     --text-muted: #8A8A8A;
-    --brand: #A200FF; /* Matches logo exact purple */
+    --brand: #A200FF; /* Matches logo exact purple - action color only */
     --brand-hover: #B533FF;
-    --success: #10B981;
-    
-    --w: 260px;          
-    --wFocus: 260px;     
-    --radius: 10px;
+    --success: #35e7dc; /* mint - status color only, never action */
+
+    --w: 260px;
+    --wFocus: 260px;
+    --radius: 0px;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   /* Support for Obsidian translucent background if placed on absolute black */
@@ -126,7 +129,7 @@
   }
   .snypd-sidebar[data-state="live"] .snypd-orb {
     background: var(--success);
-    box-shadow: 0 0 8px rgba(16,185,129,0.4);
+    box-shadow: 0 0 8px rgba(53,231,220,0.4);
   }
   .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
     color: var(--success);
@@ -136,7 +139,7 @@
   .snypd-sidebar__toggle {
     border: 1px solid var(--border);
     background: transparent;
-    border-radius: 6px;
+    border-radius: 0;
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -172,7 +175,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
-    border-radius: 6px;
+    border-radius: 0;
     text-decoration: none;
     color: var(--text-muted);
     transition: all 0.2s var(--ease);
@@ -230,12 +233,13 @@
   }
   .snypd-pill {
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 0;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.02);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
   .snypd-link {
@@ -244,15 +248,17 @@
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.15s var(--ease);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .snypd-link:hover { color: var(--text-primary); }
 
   .snypd-cta {
     width: 100%;
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 10px 14px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 13px;
     font-family: var(--font);
     color: var(--brand-fg);
@@ -262,6 +268,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   .snypd-cta:hover { 
     background: var(--brand-hover);
@@ -316,7 +324,7 @@
   .snypd-sidebar[data-focus="true"] .snypd-icon { margin-right: 0; }
   .snypd-sidebar[data-focus="true"] .snypd-sidebar__header { padding: 24px 16px; }
 </style><style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 :root {
   --bg: #000000;
@@ -326,13 +334,13 @@
   --border-hover: rgba(255, 255, 255, 0.2);
   --text-primary: #FFFFFF;
   --text-muted: #888888;
-  --brand: #A200FF; 
+  --brand: #A200FF; /* action color only - buttons */
   --brand-hover: #C54BFF;
   --brand-fg: #FFFFFF;
-  --success: #10B981;
+  --success: #35e7dc; /* mint - status color only, never action */
   --warning: #F59E0B;
   --danger: #EF4444;
-  --font: 'Inter', -apple-system, sans-serif;
+  --font: 'JetBrains Mono', monospace;
   --smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -384,16 +392,16 @@ body {
   pointer-events: none;
 }
 
-.sub { font-size: 13px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; }
+.sub { font-size: 13px; font-weight: 500; color: var(--text-muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 12px; border-radius: 0; }
 
 /* Gate */
-.activation-gate { 
-  background: var(--panel); 
+.activation-gate {
+  background: var(--panel);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border); 
-  border-radius: 12px; 
-  padding: 48px; 
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 48px;
   text-align: center; 
   margin-bottom: 32px; 
   box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
@@ -408,14 +416,75 @@ body {
 .is-hidden { display: none !important; opacity: 0; pointer-events: none; }
 
 /* Panel */
-.panel { 
-  background: var(--panel); 
+.panel {
+  background: var(--panel);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border); 
-  border-radius: 12px; 
-  overflow: hidden; 
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
+  border: 1px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+}
+
+/* Market Report (Elite).
+   Ported from admin.html's validated .mr-* rules, but the token names are NOT
+   the same on this page and pasting them across would have silently produced
+   uncoloured, transparent elements:
+     admin --panel-2 -> --panel-header here
+     admin --text    -> --text-primary
+     admin --muted   -> --text-muted
+     admin --warn    -> --warning        (this one is the easiest to miss: a
+                                          missing token is not an error, it just
+                                          renders as if it were a design choice)
+   Every token below is defined in this file's own :root block. */
+.mr-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.mr-input {
+  flex: 1 1 260px; min-width: 0; padding: 11px 14px;
+  background: rgba(0,0,0,0.35); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 0;
+  font-family: var(--font); font-size: 14px;
+}
+.mr-input:focus { outline: none; border-color: var(--brand); }
+.mr-card {
+  background: var(--panel-header); border: 1px solid var(--border);
+  border-radius: 0; padding: 14px 16px; margin-top: 12px;
+}
+.mr-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; padding: 4px 9px; border-radius: 0;
+  border: 1px solid var(--border); color: var(--text-muted);
+}
+.mr-badge.ok   { color: var(--success); border-color: rgba(53,231,220,0.35); background: rgba(53,231,220,0.06); }
+.mr-badge.warn { color: var(--warning); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); }
+.mr-badge.bad  { color: var(--danger);  border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.06); }
+.mr-headline { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--text-primary); }
+.mr-headline b { color: var(--brand-hover); }
+.mr-price { font-size: 30px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+.mr-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+.mr-cond-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.mr-cond-row:last-child { border-bottom: none; }
+.mr-cond-name { font-size: 13px; color: var(--text-muted); flex: 0 0 auto; }
+.mr-cond-detail { font-size: 13px; color: var(--text-primary); text-align: right; }
+.mr-cond-detail b { color: var(--text-primary); }
+.mr-flag {
+  margin-top: 10px; padding: 9px 12px; border-radius: 0; font-size: 13px; line-height: 1.5;
+  background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25); color: var(--warning);
+}
+.mr-note { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.mr-error {
+  margin-top: 12px; padding: 11px 14px; border-radius: 0; font-size: 13px; line-height: 1.5;
+  background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); color: var(--danger);
+}
+.mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.mr-locked { padding: 6px 0 2px; }
+.mr-locked h3 { margin: 0 0 6px; font-size: 15px; color: var(--text-primary); }
+.mr-locked p  { margin: 0 0 12px; font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 60ch; }
+@media (max-width: 560px) {
+  .mr-cond-row { flex-direction: column; gap: 2px; }
+  .mr-cond-detail { text-align: left; }
 }
 .panel .hd { 
   padding: 20px 24px; 
@@ -426,42 +495,46 @@ body {
   background: var(--panel-header); 
 }
 .status-bar { display: flex; gap: 12px; flex-wrap: wrap; }
-.chip { 
-  padding: 6px 12px; 
-  border-radius: 6px; 
-  font-size: 12px; 
-  font-weight: 600; 
-  background: rgba(255,255,255,0.05); 
-  color: var(--text-muted); 
-  border: 1px solid var(--border); 
-  display:flex; 
-  align-items:center; 
+.chip {
+  padding: 6px 12px;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  display:flex;
+  align-items:center;
   gap:8px;
 }
 .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #666; }
-.chip.ok { color: var(--success); background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); }
+.chip.ok { color: var(--success); background: rgba(53,231,220,0.05); border-color: rgba(53,231,220,0.2); }
 .chip.ok::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
 .chip.warn { color: var(--warning); background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
 .chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .chip.err { color: var(--danger); background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
 .chip.err::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
-.controls { display: flex; gap: 12px; }
+.controls { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Buttons */
-.btn { 
-  border: none; 
-  border-radius: 8px; 
-  padding: 0 20px; 
-  height: 38px; 
-  font-size: 13px; 
-  font-weight: 600; 
-  cursor: pointer; 
-  transition: all 0.2s var(--smooth); 
-  font-family: var(--font); 
-  text-decoration: none; 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
+.btn {
+  border: none;
+  border-radius: 0;
+  padding: 0 20px;
+  height: 38px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s var(--smooth);
+  font-family: var(--font);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn:active:not(:disabled) { transform: scale(0.97); }
 .btn-prim { 
@@ -483,6 +556,25 @@ body {
   border-color: var(--border-hover);
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cta-instruct {
+  opacity: 1 !important;
+  cursor: pointer !important;
+  background: rgba(162,0,255,0.14) !important;
+  color: var(--brand) !important;
+  border: 1px solid rgba(162,0,255,0.4) !important;
+  font-weight: 700;
+  flex-basis: 100%;
+  order: 3;
+}
+.btn-cta-instruct:active { transform: scale(0.98); }
+#notify-note.cta-note {
+  background: rgba(162,0,255,0.06);
+  border: 1px solid rgba(162,0,255,0.18);
+  border-radius: 0;
+  padding: 12px 14px !important;
+  color: var(--text-primary) !important;
+  margin-top: 10px !important;
+}
 
 /* List */
 .panel .bd { padding: 24px; }
@@ -490,16 +582,16 @@ body {
 .list.loading { opacity: 0.6; pointer-events: none; transition: opacity 0.3s ease; }
 
 /* Horizontal Card */
-.card { 
-  display: grid; 
-  grid-template-columns: 88px 1fr; 
-  gap: 16px; 
-  background: rgba(255,255,255,0.02); 
-  border: 1px solid var(--border); 
-  border-radius: 10px; 
-  padding: 12px; 
-  transition: all 0.3s var(--smooth); 
-  align-items: center; 
+.card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px;
+  transition: all 0.3s var(--smooth);
+  align-items: center;
 }
 .card.enter { animation: slideUp 0.5s var(--smooth) both; }
 @keyframes slideUp { 
@@ -516,49 +608,173 @@ body {
 .card.enter:nth-child(7) { animation-delay: 0.28s; }
 .card.enter:nth-child(8) { animation-delay: 0.32s; }
 
-.card:hover { 
-  transform: translateY(-2px); 
-  border-color: var(--border-hover); 
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
   background: rgba(255,255,255,0.05);
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
+.card:active { transform: translateY(0) scale(0.99); background: rgba(255,255,255,0.06); }
 
-.thumb { 
-  width: 88px; 
-  height: 88px; 
-  border-radius: 6px; 
-  object-fit: cover; 
-  background: rgba(255,255,255,0.05); 
+.thumb {
+  width: 88px;
+  height: 88px;
+  border-radius: 0;
+  object-fit: cover;
+  background: rgba(255,255,255,0.05);
 }
 .thumb.fallback { border: 1px solid var(--border); }
 
-.meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; }
-.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.p { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; min-width: 0; }
+.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
+.p { font-weight: 700; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
+.p.p-unknown { font-weight: 500; font-size: 12px; color: var(--text-muted); font-style: italic; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .tiny { display: none; }
 
-.empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
+.empty { text-align: center; padding: 48px; border: 1px dashed var(--border); border-radius: 0; color: var(--text-muted); font-size: 14px; background: rgba(255,255,255,0.02); }
 
 /* Skeleton animation */
-.skeleton { 
-  height: 114px; 
-  border-radius: 10px; 
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02)); 
-  background-size: 200% 100%; 
-  animation: shimmer 1.5s infinite linear; 
-  border: 1px solid var(--border); 
+.skeleton {
+  height: 114px;
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border: 1px solid var(--border);
 }
 @keyframes shimmer { 
   0% { background-position: 200% 0; } 
   100% { background-position: -200% 0; } 
 }
 </style><style>
-    @media (max-width: 991px) {
-      #mobile-header { display: block !important; }
-      .hdr { display: none !important; }
-      .dash-wrap { padding-top: 16px; margin-top: 0; }
+    #mobile-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(10,10,10,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
+    #mobile-header .hamburger {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 22px;
+      line-height: 1;
+      padding: 4px;
+      cursor: pointer;
+    }
+    #mobile-header .mh-word {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+    }
+    #mobile-header .mh-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      margin-left: auto;
+      transition: background 0.3s var(--smooth), box-shadow 0.3s var(--smooth);
+    }
+    #mobile-header .mh-dot.live {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(53,231,220,0.55);
+      animation: mhDotPulse 2s ease-in-out infinite;
+    }
+    @keyframes mhDotPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(53,231,220,0.55); }
+      50% { box-shadow: 0 0 14px rgba(53,231,220,0.9); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #mobile-header .mh-dot.live { animation: none; }
+    }
+
+    /* "N new" pill - buffers new listings instead of yanking the list
+       under a user who is scrolled away from the top. */
+    .new-pill {
+      position: fixed;
+      top: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 0;
+      background: var(--brand);
+      color: var(--brand-fg);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(162,0,255,0.4);
+    }
+    .new-pill.show { display: inline-flex; animation: pillIn 0.2s var(--smooth); }
+    @keyframes pillIn { from { opacity: 0; transform: translate(-50%, -6px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+    /* New-card entrance: restrained, no bounce - then a brief teal highlight that fades. */
+    .card.is-new {
+      animation: cardIn 0.15s var(--smooth);
+      border-color: rgba(53,231,220,0.55) !important;
+      box-shadow: 0 0 0 1px rgba(53,231,220,0.35), 0 8px 24px rgba(0,0,0,0.4);
+      transition: border-color 1.4s ease, box-shadow 1.4s ease;
+    }
+    @keyframes cardIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+    @media (max-width: 991px) {
+      #mobile-header { display: flex !important; }
+      .hdr { display: none !important; }
+      .dash-wrap { padding-top: 0; margin-top: 0; }
+      .panel .hd { flex-wrap: wrap; gap: 10px 16px; padding: 14px 16px; }
+      .status-bar { gap: 8px; }
+      .chip { padding: 5px 10px; font-size: 11px; }
+      .controls { gap: 8px; }
+      .btn { height: 34px; padding: 0 14px; font-size: 12px; }
+    }
+
+    /* First-run wizard. Shown only when a real query confirms this user has
+       zero saved searches - never a nag, never shown to a returning user. */
+    .wiz-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .wiz-modal {
+      width: 100%; max-width: 520px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+    }
+    .wiz-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--brand); text-transform: uppercase; margin-bottom: 12px; }
+    .wiz-title { font-size: 22px; font-weight: 700; margin: 0 0 8px; color: var(--text-primary); }
+    .wiz-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; line-height: 1.5; }
+    .wiz-presets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .wiz-preset {
+      display: flex; flex-direction: column; gap: 4px;
+      text-align: left; width: 100%; padding: 14px 16px;
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: 0; cursor: pointer; transition: all 0.2s var(--smooth);
+      font-family: var(--font);
+    }
+    .wiz-preset:hover { border-color: var(--brand); background: rgba(162,0,255,0.05); }
+    .wiz-preset.is-picked { border-color: var(--success); background: rgba(53,231,220,0.06); opacity: 0.6; pointer-events: none; }
+    .wiz-preset__name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .wiz-preset__meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .wiz-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -637,8 +853,51 @@ body {
 </div><div class="main-content">
 <!-- HAMBURGER FOR MOBILE -->
 <div id="mobile-header" style="display:none;">
-<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px;">&#9776;</button>
+<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" aria-label="Menu">&#9776;</button>
+<span class="mh-word">SNYPD</span>
+<span class="mh-dot" id="mh-status-dot"></span>
 </div>
+<button class="new-pill" id="new-pill" type="button"></button>
+
+<!-- First-run wizard: hidden by default, shown only if a real DB check finds
+     zero saved searches for this user (see the script block near loadAds). -->
+<div class="wiz-overlay" id="wiz-overlay">
+  <div class="wiz-modal">
+    <div class="wiz-step" id="wiz-step-1">
+      <div class="wiz-eyebrow">Step 1 of 2</div>
+      <h2 class="wiz-title">What are you hunting?</h2>
+      <p class="wiz-sub">Pick one to start. You can add more from Filters anytime.</p>
+      <div class="wiz-presets" id="wiz-presets">
+        <button class="wiz-preset" type="button" data-name="Jordan 1 Travis Scott" data-url="https://www.vinted.be/catalog?search_text=jordan%20travis%20scott&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=782&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=791&amp;size_ids[]=792&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
+          <span class="wiz-preset__name">Jordan 1 Travis Scott</span>
+          <span class="wiz-preset__meta">Sneakers &middot; from &euro;150</span>
+        </button>
+        <button class="wiz-preset" type="button" data-name="Off-White" data-url="https://www.vinted.be/catalog?search_text=off%20white&amp;catalog[]=1231&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=791&amp;size_ids[]=792&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
+          <span class="wiz-preset__name">Off-White</span>
+          <span class="wiz-preset__meta">Streetwear &middot; from &euro;150</span>
+        </button>
+        <button class="wiz-preset" type="button" data-name="Jordan (all)" data-url="https://www.vinted.be/catalog?search_text=jordan&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=782&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=792&amp;size_ids[]=791&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
+          <span class="wiz-preset__name">Jordan (all)</span>
+          <span class="wiz-preset__meta">Sneakers &middot; broadest &middot; from &euro;150</span>
+        </button>
+      </div>
+      <div class="wiz-actions">
+        <a class="btn btn-ghost" href="/filters">+ Build my own</a>
+        <button class="btn btn-ghost" id="wiz-skip" type="button">Skip &mdash; start me broad</button>
+      </div>
+    </div>
+    <div class="wiz-step" id="wiz-step-2" style="display:none">
+      <div class="wiz-eyebrow">Step 2 of 2</div>
+      <h2 class="wiz-title">Turn on alerts?</h2>
+      <p class="wiz-sub">Get notified the moment a match appears. On paid plans this keeps working even with this tab closed.</p>
+      <div class="wiz-actions">
+        <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Enable alerts</button>
+        <button class="btn btn-ghost" id="wiz-finish" type="button">Set this up later</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="dash-wrap">
 <div class="hdr">
 <div class="brand">
@@ -650,7 +909,7 @@ body {
 <h2>Unlock Your Arsenal</h2>
 <p>Your SNYPD account is primed. Start the free plan on Whop to unlock your first search lane and dominate the market.</p>
 <div class="activation-actions">
-<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Start Free Trial</a>
+<a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Activate Free Plan</a>
 <a class="btn btn-ghost" href="/#pricing">View Plans</a>
 </div>
 <p class="activation-note">Use the same email as your SNYPD account for instant access.</p>
@@ -678,6 +937,26 @@ body {
 <div class="skeleton"></div>
 </div>
 <div class="tiny" id="msg" style="margin-top:10px; display:none;"></div>
+</div>
+</div>
+<div class="panel" id="market-panel" style="margin-bottom:16px; display:none">
+<div class="hd">
+<div class="status-bar">
+<div class="chip plan">Market Report</div>
+<div class="chip neutral" id="mr-tier-chip">Elite</div>
+</div>
+<div class="mr-row" id="mr-controls" style="margin-top:10px">
+<input class="mr-input" id="mr-query" type="text" autocomplete="off" spellcheck="false" placeholder="Search an item, e.g. jordan 1 mid" />
+<button class="btn btn-prim" id="mr-go" type="button">Check price</button>
+</div>
+<div class="mr-locked" id="mr-locked" style="display:none">
+<h3>Market Report is part of Elite</h3>
+<p>See what an item actually sells for across Vinted right now, broken down by condition, with a warning when the listings are too mixed to trust a single price.</p>
+<a class="btn btn-prim" href="/plans">View plans</a>
+</div>
+</div>
+<div class="bd">
+<div id="mr-result"></div>
 </div>
 </div>
 </div>
@@ -787,10 +1066,17 @@ const HEARTBEAT_URL = (() => {
       { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
     ));
 
-  const fmtPrice = (amt, curr = 'EUR') =>
-    amt == null ? '' :
-      new Intl.NumberFormat('nl-BE', { style: 'currency', currency: curr })
-        .format(Number(amt));
+  const fmtPrice = (amt, curr = 'EUR') => {
+    if (amt == null || amt === '') return '';
+    const n = Number(amt);
+    if (!Number.isFinite(n)) return '';
+    try {
+      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: curr || 'EUR' }).format(n);
+    } catch (e) {
+      // an unrecognised currency code should never take down the whole card
+      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n);
+    }
+  };
 
   if (!sb) {
     msg('Supabase client missing');
@@ -855,7 +1141,15 @@ const HEARTBEAT_URL = (() => {
     !!whopProductId;
 
   const effectivePlan = isActivePaidPlan ? rawPlan : 'free';
-  
+
+  // Published for the Market Report panel further down the page, which shows
+  // itself only to Elite. This is presentation only -- the real gate is the
+  // backend, which returns 403 elite_required regardless of what this says.
+  // effectivePlan already degrades a lapsed paid plan to 'free', which is the
+  // behaviour wanted here too.
+  document.body.dataset.plan = effectivePlan;
+  document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
+
   console.log('SNYPD activation check', {
     plan: rawPlan,
     status: rawStatus,
@@ -887,28 +1181,148 @@ const HEARTBEAT_URL = (() => {
   
   set('plan-banner', `Plan: ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`);
 
+  // Sidebar plan pill - was hardcoded "PLAN - ELITE" for every user regardless
+  // of real plan. Wire it to the same effectivePlan already resolved above.
+  const sidebarPlanPill = document.querySelector('[data-snypd-plan]');
+  if (sidebarPlanPill) {
+    sidebarPlanPill.textContent = `PLAN — ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`;
+  }
+
+  // ----------------- FIRST-RUN WIZARD -----------------
+  // Shown only when a real query confirms zero saved searches for this user -
+  // a returning user with at least one search never sees this, no flag needed.
+  (async () => {
+    try {
+      const { count, error: cErr } = await sb
+        .from('user_searches')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', uid);
+      if (cErr) { console.error('SNYPD wizard: could not check searches', cErr); return; }
+      if ((count || 0) > 0) return;
+
+      const overlay = document.getElementById('wiz-overlay');
+      const step1 = document.getElementById('wiz-step-1');
+      const step2 = document.getElementById('wiz-step-2');
+      if (!overlay) return;
+      overlay.style.display = 'flex';
+
+      async function saveSearch(name, url) {
+        const { error } = await sb.from('user_searches').insert({
+          user_id: uid, search_name: name, vinted_url: url, is_active: true
+        });
+        if (error) console.error('SNYPD wizard: could not save search', error);
+        // Move to step 2 regardless - a failed save here shouldn't trap a new
+        // user on step 1; they can add a real search from /filters after.
+        step1.style.display = 'none';
+        step2.style.display = '';
+      }
+
+      document.querySelectorAll('.wiz-preset').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          document.querySelectorAll('.wiz-preset').forEach(b => b.classList.remove('is-picked'));
+          btn.classList.add('is-picked');
+          await saveSearch(btn.dataset.name, btn.dataset.url);
+        });
+      });
+
+      const skipBtn = document.getElementById('wiz-skip');
+      if (skipBtn) {
+        skipBtn.addEventListener('click', async () => {
+          // The broadest of the three real presets - proves the mechanic works
+          // fast, with zero forced steps for someone who just wants in.
+          await saveSearch(
+            'Jordan (all)',
+            'https://www.vinted.be/catalog?search_text=jordan&price_from=150.0&currency=EUR&size_ids[]=782&size_ids[]=784&size_ids[]=785&size_ids[]=786&size_ids[]=788&size_ids[]=789&size_ids[]=790&size_ids[]=792&size_ids[]=791&status_ids[]=2&status_ids[]=3&status_ids[]=4&order=newest_first'
+          );
+        });
+      }
+
+      const enableBtn = document.getElementById('wiz-enable-alerts');
+      if (enableBtn) {
+        enableBtn.addEventListener('click', () => {
+          // Reuses the real, already-working notification button rather than
+          // reimplementing push logic here.
+          const realNotifyBtn = document.getElementById('btn-notify');
+          if (realNotifyBtn) realNotifyBtn.click();
+          overlay.style.display = 'none';
+        });
+      }
+
+      const finishBtn = document.getElementById('wiz-finish');
+      if (finishBtn) {
+        finishBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
+      }
+    } catch (e) {
+      console.error('SNYPD wizard error', e);
+    }
+  })();
+
   const list    = document.getElementById('list');
   const empty   = document.getElementById('empty');
   const btnStart = document.getElementById('btn-start');
   const btnStop  = document.getElementById('btn-stop');
+  const pageScrollTop = () => window.scrollY || document.documentElement.scrollTop || 0;
+  const newPill = document.getElementById('new-pill');
+  const statusDot = document.getElementById('mh-status-dot');
 
   let running = false;
+  let hasRenderedOnce = false;
+  let pendingNew = [];
+
+  function updatePill() {
+    if (!newPill) return;
+    if (pendingNew.length > 0) {
+      newPill.textContent = pendingNew.length === 1 ? '1 new match' : `${pendingNew.length} new matches`;
+      newPill.classList.add('show');
+    } else {
+      newPill.classList.remove('show');
+    }
+  }
+
+  function insertCards(rows, mode) {
+    const temp = document.createElement('div');
+    temp.innerHTML = rows.map(r => cardHTML(r)).join('');
+    const frag = document.createDocumentFragment();
+    Array.from(temp.children).forEach((node, i) => {
+      if (mode === 'enter' && i < 8) node.classList.add('enter');
+      if (mode === 'new') {
+        node.classList.add('is-new');
+        setTimeout(() => node.classList.remove('is-new'), 1600);
+      }
+      frag.appendChild(node);
+    });
+    return frag;
+  }
+
+  if (newPill) {
+    newPill.onclick = () => {
+      if (!pendingNew.length) return;
+      list.insertBefore(insertCards(pendingNew, 'new'), list.firstChild);
+      pendingNew = [];
+      updatePill();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
+
+  const EMPTY_ICON = '<svg width="28" height="28" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:0.6"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>';
 
   function updateEmptyUI(hasRows, lastMatchTs) {
     if (hasRows) {
       empty.style.display = 'none';
       return;
     }
+    let msg;
     if (!running) {
-      empty.textContent = 'No results yet. Press “Start Sniping Now”.';
+      msg = 'No results yet. Press “Start Sniping Now”.';
     } else if (lastMatchTs) {
       // A genuinely quiet stretch (nothing new in the freshness window) reads
       // as identical to a broken pipeline without this -- last match still
       // exists, it's just older than DASHBOARD_MAX_AGE_MIN.
-      empty.textContent = `Quiet right now — last match ${relativeMinutesAgo(lastMatchTs)} ago.`;
+      msg = `Quiet right now — last match ${relativeMinutesAgo(lastMatchTs)} ago.`;
     } else {
-      empty.textContent = 'No results yet. Sniping is running…';
+      msg = 'No results yet. Sniping is running…';
     }
+    empty.innerHTML = EMPTY_ICON + msg;
     empty.style.display = 'block';
   }
 
@@ -986,15 +1400,31 @@ const HEARTBEAT_URL = (() => {
   }
 
   function derivePrice(row) {
-    const p  = row?.price || {};
-    const tp = row?.total_item_price || {};
+    const p  = (row?.price && typeof row.price === 'object') ? row.price : {};
+    const tp = (row?.total_item_price && typeof row.total_item_price === 'object') ? row.total_item_price : {};
+    // Vinted's real shape is {amount, currency_code} - "currency" was never
+    // the right key, it just happened to silently default to EUR either way.
     const amt = (p?.amount ?? tp?.amount ?? null);
-    const cur = (p?.currency ?? tp?.currency ?? 'EUR');
+    const cur = (p?.currency_code ?? p?.currency ?? tp?.currency_code ?? tp?.currency ?? 'EUR');
     return { amount: amt, currency: cur };
+  }
+
+  function relativeTime(ms) {
+    const diff = Date.now() - ms;
+    if (diff < 45000) return 'just now';
+    const mins = Math.round(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.round(hours / 24)}d ago`;
   }
 
   const cardHTML = (r) => {
     const { amount, currency } = derivePrice(r);
+    const priceLabel = fmtPrice(amount, currency);
+    if (!priceLabel) {
+      console.warn('SNYPD: listing has no usable price', { id: r.listing_id, price: r.price, total_item_price: r.total_item_price });
+    }
     const img = getImageUrl(r);
     const cls = img ? 'thumb' : 'thumb fallback';
 
@@ -1003,8 +1433,9 @@ const HEARTBEAT_URL = (() => {
     const status = r.status;
     const src   = r.content_source;
 
-    const dt = new Date(uploadedTimeMs(r) || Date.now());
-    const fetchedLabel =
+    const uploadedMs = uploadedTimeMs(r) || Date.now();
+    const dt = new Date(uploadedMs);
+    const fullLabel =
       `Uploaded on Vinted at ${new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Europe/Berlin',
         year: 'numeric',
@@ -1028,15 +1459,16 @@ const HEARTBEAT_URL = (() => {
          rel="noopener"
          class="card"
          data-id="${r.listing_id}"
+         data-uploaded-ms="${uploadedMs}"
          style="text-decoration:none;color:inherit">
         ${imgHtml}
         <div>
           <div class="meta-top">
             <div class="t">${esc(r.title) || 'View listing'}</div>
-            <div class="p">${fmtPrice(amount, currency)}</div>
+            <div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div>
           </div>
-          <div class="muted">
-            ${[brand, size, status, src, fetchedLabel].filter(Boolean).map(esc).join(' • ')}
+          <div class="muted" title="${esc(fullLabel)}">
+            ${[brand, size, status, src, relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
           <div class="tiny"></div>
         </div>
@@ -1046,13 +1478,48 @@ const HEARTBEAT_URL = (() => {
   function renderRows(rows, lastMatchTs) {
     if (!rows.length) {
       list.innerHTML = '';
+      pendingNew = [];
+      updatePill();
       updateEmptyUI(false, lastMatchTs);
+      hasRenderedOnce = true;
       return;
     }
     updateEmptyUI(true);
-    list.innerHTML = rows.map(r => cardHTML(r)).join('');
-    list.querySelectorAll('.card').forEach((c, i) => { if (i < 8) c.classList.add('enter'); });
-    list.querySelectorAll('.skeleton').forEach(s => s.remove());
+
+    // First real render (replacing the loading skeletons): show everything
+    // with the staggered load-in, nothing to diff against yet.
+    if (!hasRenderedOnce) {
+      list.innerHTML = '';
+      list.appendChild(insertCards(rows, 'enter'));
+      hasRenderedOnce = true;
+      return;
+    }
+
+    const incomingIds = new Set(rows.map(r => String(r.listing_id)));
+    const existingCards = Array.from(list.querySelectorAll('.card'));
+    const existingIds = new Set(existingCards.map(c => c.dataset.id));
+
+    // Listings that aged out of the freshness window - always the oldest
+    // (bottom-most, given newest-first order), so removing them doesn't
+    // shift anything the user is currently looking at.
+    existingCards.forEach(c => { if (!incomingIds.has(c.dataset.id)) c.remove(); });
+
+    const newRows = rows.filter(r => !existingIds.has(String(r.listing_id)));
+    if (!newRows.length) return;
+
+    const nearTop = pageScrollTop() <= 32;
+    if (nearTop) {
+      list.insertBefore(insertCards(newRows, 'new'), list.firstChild);
+    } else {
+      // Buffer instead of yanking the list under a user scrolled into it -
+      // show the "N new" pill, insert only when they tap it.
+      const seen = new Set(pendingNew.map(r => String(r.listing_id)));
+      newRows.forEach(r => {
+        const id = String(r.listing_id);
+        if (!seen.has(id)) { pendingNew.push(r); seen.add(id); }
+      });
+      updatePill();
+    }
   }
 
   function setLoading(flag) {
@@ -1159,9 +1626,15 @@ const HEARTBEAT_URL = (() => {
     const chip = document.getElementById('status-chip');
     const cls  = next === 'running' ? 'ok' : (next === 'stopped' ? '' : 'warn');
     chip.className = 'chip ' + cls;
+    if (statusDot) statusDot.classList.toggle('live', next === 'running');
+    if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
+      window.SNYPD.setSidebarState(next);
+    }
   }
 
   const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
+
+  let heartbeatMisses = 0;
 
   async function sendHeartbeat() {
     try {
@@ -1170,8 +1643,14 @@ const HEARTBEAT_URL = (() => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: uid })
       });
+      heartbeatMisses = 0;
     } catch (e) {
       console.error(e);
+      heartbeatMisses++;
+      // One missed beat is often just a phone switching networks - only
+      // surface it as an error once it's happened twice in a row, so a
+      // single blip doesn't read as the product being broken.
+      if (heartbeatMisses < 2) return;
       set('err-chip', 'Heartbeat failed');
       show('err-chip', true);
     }
@@ -1454,12 +1933,28 @@ const HEARTBEAT_URL = (() => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       if (isIOS() && !isStandalone()) {
         btn.style.display = '';
-        btn.disabled = true;
-        btn.textContent = 'Alerts: add to Home Screen first';
+        btn.disabled = false;
+        btn.classList.add('btn-cta-instruct');
+        btn.innerHTML = '<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><rect height="8" rx="2" width="14" x="5" y="13"></rect></svg>Add to Home Screen for alerts';
         say('On iPhone and iPad, alerts only work once SNYPD is on your Home '
           + 'Screen. Tap the Share button, then "Add to Home Screen", and open '
           + 'SNYPD from that icon. Apple does not allow websites to do this step '
           + 'for you.');
+        note.classList.add('cta-note');
+      } else if (isIOS()) {
+        // Standalone per our own check, yet iOS is not exposing the push APIs -
+        // unexpected on 16.4+. Most likely cause: this icon was added to the
+        // Home Screen before it could read a standalone-capable manifest.
+        console.error('SNYPD push: standalone but PushManager/serviceWorker missing', {
+          isStandalone: isStandalone(),
+          navigatorStandalone: window.navigator.standalone,
+          userAgent: navigator.userAgent,
+        });
+        btn.style.display = '';
+        btn.disabled = true;
+        btn.textContent = 'Alerts unavailable';
+        say('Alerts are not available in this app right now. Try removing SNYPD '
+          + 'from your Home Screen and adding it again.');
       }
       return;   // desktop browsers without push: leave the button hidden
     }
@@ -1468,7 +1963,10 @@ const HEARTBEAT_URL = (() => {
       reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       await navigator.serviceWorker.ready;
     } catch (e) {
-      return;   // no worker, no push; nothing useful to offer
+      console.error('SNYPD push: service worker registration failed', e);
+      show('Alerts unavailable', true);
+      say('Could not set up alerts: ' + (e && e.message ? e.message : 'service worker failed to register') + '.');
+      return;
     }
 
     // Only offer the control once the server can actually store a
@@ -1477,8 +1975,18 @@ const HEARTBEAT_URL = (() => {
     // than no button.
     try {
       var st = await api('/api/v1/push/status');
-      if (st.status !== 200 || !st.body || !st.body.ready) { return; }
-    } catch (e) { return; }
+      if (st.status !== 200 || !st.body || !st.body.ready) {
+        console.error('SNYPD push: /push/status not ready', st);
+        show('Alerts unavailable', true);
+        say('Alerts are not ready on this account yet (status ' + st.status + '). Try again shortly.');
+        return;
+      }
+    } catch (e) {
+      console.error('SNYPD push: /push/status request failed', e);
+      show('Alerts unavailable', true);
+      say('Could not check alert status: ' + (e && e.message ? e.message : 'unknown error') + '.');
+      return;
+    }
 
     if (Notification.permission === 'denied') {
       show('Alerts blocked', true);
@@ -1503,6 +2011,18 @@ const HEARTBEAT_URL = (() => {
   }
 
   btn.addEventListener('click', async function () {
+    if (btn.classList.contains('btn-cta-instruct')) {
+      // Apple exposes no API to trigger "Add to Home Screen" directly, but
+      // the native share sheet this opens includes it as an option on iOS -
+      // this gets the user most of the way there instead of leaving the tap
+      // do nothing.
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'SNYPD', text: 'Add SNYPD to your Home Screen to get alerts.', url: location.href });
+        } catch (e) { /* cancelled or unsupported - the note below still explains the steps */ }
+      }
+      return;
+    }
     var sub = await currentSub();
     if (sub) { disable(); } else { enable(); }
   });
@@ -1516,6 +2036,253 @@ const HEARTBEAT_URL = (() => {
   }
 
   init();
+})();
+</script>
+<script>
+/* Market Report (Elite).
+ *
+ * Renderers ported from admin.html, where they have been validated against real
+ * production data -- but rewritten against the CUSTOMER response shape
+ * (display_verdict / typical_cents / range_cents / flags[]), not the raw
+ * market_snapshot row the admin page reads. The backend deliberately does not
+ * send this page the smoothed means, the raw outlier counts, or any
+ * days-listed figure; see market_report.py's customer_view allowlist for why.
+ *
+ * This file is written byte-for-byte as Latin-1 to preserve its BOM, so every
+ * string here is pure ASCII: the euro sign, en dash and middot are \u escapes.
+ *
+ * token()/api() are duplicated from the push-notification block above rather
+ * than exported from it. That block has been debugged twice recently and a new
+ * screen must not be able to break alerts.
+ */
+(function () {
+  var API = 'https://api.snypd.store';
+
+  var panel   = document.getElementById('market-panel');
+  var input   = document.getElementById('mr-query');
+  var goBtn   = document.getElementById('mr-go');
+  var result  = document.getElementById('mr-result');
+  var locked  = document.getElementById('mr-locked');
+  var controls= document.getElementById('mr-controls');
+  var tierChip= document.getElementById('mr-tier-chip');
+  if (!panel || !input || !goBtn || !result) { return; }
+
+  var EUR = '\u20AC';
+  var NDASH = '\u2013';
+  var MIDDOT = '\u00B7';
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function eur(cents) {
+    if (cents == null || isNaN(cents)) { return '?'; }
+    var v = cents / 100;
+    return EUR + (v >= 100 ? Math.round(v).toString() : v.toFixed(2).replace(/\.00$/, ''));
+  }
+
+  async function token() {
+    try {
+      /* window.SNYPD.supabase is where this page actually puts its client (see
+       * the createClient call in <head>). An earlier draft of this block read
+       * window.supabaseClient, which does not exist here -- token() returned
+       * null every time, so every request went out with no Authorization header
+       * and the endpoint answered 401. Caught by driving the real page rather
+       * than by reading the code. */
+      var sb = (window.SNYPD && window.SNYPD.supabase) || window.supabaseClient || window.sb;
+      if (!sb) { return null; }
+      var s = await sb.auth.getSession();
+      return (s && s.data && s.data.session && s.data.session.access_token) || null;
+    } catch (e) { return null; }
+  }
+
+  async function api(path, method, body) {
+    var t = await token();
+    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    if (t) { headers['Authorization'] = 'Bearer ' + t; }
+    var res = await fetch(API + path, {
+      method: method || 'GET',
+      headers: headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    var parsed = null;
+    try { parsed = await res.json(); } catch (e) { parsed = null; }
+    return { status: res.status, body: parsed };
+  }
+
+  /* Badge vocabulary. Unknown verdicts fall through to a neutral "check the
+   * detail below" rather than being treated as OK -- the backend can grow a new
+   * verdict (a bimodality flag is planned) and a stale page must not silently
+   * present an unrecognised state as a trustworthy price. */
+  function badgeFor(v) {
+    if (v === 'ok') { return { cls: 'ok', text: 'Trusted price' }; }
+    if (v === 'too_thin_shown') { return { cls: 'warn', text: 'Rough guide only' }; }
+    if (v === 'too_thin') { return { cls: 'warn', text: 'Not enough data' }; }
+    if (v === 'too_broad') { return { cls: 'bad', text: 'Too mixed to trust' }; }
+    if (v === 'one_seller_dominates') { return { cls: 'warn', text: 'Not a real market' }; }
+    return { cls: 'warn', text: 'See detail' };
+  }
+
+  function headline(d) {
+    var n = d.sample_size || 0;
+    var q = escapeHtml(d.query || '');
+    if (n === 0) {
+      return 'No listings matching <b>"' + q + '"</b> yet. We are not going to invent a price '
+           + '-- if this is a real item, we have started watching it and data should build up.';
+    }
+    if (d.display_verdict === 'too_thin') {
+      /* Two different situations share this verdict. If a price is being shown
+       * alongside it, saying "too few to call a price" contradicts the number
+       * directly above it. */
+      if (d.provisional) {
+        var ob = d.observed_cents || {};
+        return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' to go on'
+             + (ob.low != null ? ', running from <b>' + eur(ob.low) + '</b> to <b>' + eur(ob.high) + '</b>' : '')
+             + '. Rare items are thin here because they are rare on Vinted, so this is a '
+             + 'starting point rather than a settled price.';
+      }
+      return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' found so far '
+           + '-- too few to call a price honestly.';
+    }
+    if (d.display_verdict === 'too_broad') {
+      var o = d.observed_cents || {};
+      return 'Found <b>' + n + '</b> listings from <b>' + (d.distinct_sellers || 0) + '</b> sellers, but they run from <b>'
+           + eur(o.low) + '</b> to <b>' + eur(o.high) + '</b>. That spread usually means fakes mixed in with real ones, '
+           + 'or several different products sharing the same words. No single price would be honest here.';
+    }
+    if (d.display_verdict === 'one_seller_dominates') {
+      return 'Found ' + n + ' listings, but <b>' + (d.top_seller_pct || 0) + '%</b> of them belong to one seller. '
+           + 'That is one seller setting the price, not a market.';
+    }
+    return 'Based on <b>' + n + '</b> listings from <b>' + (d.distinct_sellers || 0) + '</b> sellers.';
+  }
+
+  function conditionRows(list) {
+    if (!list || !list.length) { return ''; }
+    var rows = list.map(function (c) {
+      var detail;
+      var r = c.range_cents || {};
+      if (c.verdict === 'ok' && c.typical_cents != null) {
+        detail = '<b>' + eur(c.typical_cents) + '</b> typical '
+               + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ')</span> '
+               + MIDDOT + ' ' + (c.sample_size || 0) + ' listings';
+      } else if (c.provisional && c.typical_cents != null) {
+        /* Thin but real. Shown deliberately: for a rare colourway every rung is
+         * thin by definition, and a rough number that admits it is rough beats
+         * an empty row. The tilde and the lighter weight carry that. */
+        detail = '<b style="opacity:.85">~' + eur(c.typical_cents) + '</b> '
+               + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ') '
+               + MIDDOT + ' only ' + (c.sample_size || 0) + ' listings</span>';
+      } else {
+        detail = '<span style="opacity:.7">' + (c.sample_size || 0) + ' listing'
+               + ((c.sample_size === 1) ? '' : 's') + ', not enough on its own</span>';
+      }
+      return '<div class="mr-cond-row"><div class="mr-cond-name">' + escapeHtml(c.condition_label || '')
+           + '</div><div class="mr-cond-detail">' + detail + '</div></div>';
+    }).join('');
+    return '<div class="mr-card"><div class="slabel" style="margin-bottom:6px;font-size:12px;color:#8A8A8A;'
+         + 'text-transform:uppercase;letter-spacing:.05em">Price by condition</div>' + rows + '</div>';
+  }
+
+  function render(d) {
+    /* A thin result that still carries a price is its own state: the badge must
+     * not say "not enough data" directly above a euro figure. */
+    var b = badgeFor(d.provisional ? 'too_thin_shown' : d.display_verdict);
+    var html = '<div class="mr-card"><span class="mr-badge ' + b.cls + '">' + b.text + '</span>';
+
+    if (d.show_headline && d.typical_cents != null) {
+      var r = d.range_cents || {};
+      html += '<div style="margin-top:10px"><div class="mr-price">'
+            + (d.provisional ? '~' : '') + eur(d.typical_cents) + '</div>'
+            + '<div class="mr-sub">'
+            + (d.provisional ? 'Midpoint of what few listings exist' : 'Most sit between ' + eur(r.low) + ' and ' + eur(r.high))
+            + '</div></div>';
+    }
+
+    html += '<p class="mr-headline">' + headline(d) + '</p>';
+
+    (d.flags || []).forEach(function (f) {
+      html += '<div class="mr-flag">' + escapeHtml(f.message || '') + '</div>';
+    });
+
+    if (d.coverage_note) {
+      html += '<div class="mr-note">' + escapeHtml(d.coverage_note) + '</div>';
+    }
+    html += '</div>';
+
+    html += conditionRows(d.by_condition);
+    result.innerHTML = html;
+  }
+
+  var busy = false;
+  async function run() {
+    if (busy) { return; }
+    var q = (input.value || '').trim();
+    if (!q) { return; }
+    busy = true;
+    goBtn.disabled = true;
+    result.innerHTML = '<div class="mr-loading">Checking real listings across every condition...</div>';
+    try {
+      var res = await api('/api/v1/market/snapshot', 'POST', { q: q });
+      if (res.status === 200 && res.body) {
+        render(res.body);
+      } else if (res.status === 403) {
+        /* Mirrors the locked state, so a stale body[data-plan] cannot dead-end
+         * a non-Elite user on a spinner. */
+        showLocked();
+        result.innerHTML = '';
+      } else if (res.status === 429) {
+        result.innerHTML = '<div class="mr-error">' + escapeHtml(detailOf(res)
+          || 'You have used your searches for now. Try again a bit later.') + '</div>';
+      } else if (res.status === 503) {
+        result.innerHTML = '<div class="mr-error">' + escapeHtml(detailOf(res)
+          || 'That search is too broad. Add a model name or colourway.') + '</div>';
+      } else if (res.status === 401) {
+        result.innerHTML = '<div class="mr-error">Your session expired. Refresh the page and sign in again.</div>';
+      } else {
+        result.innerHTML = '<div class="mr-error">Could not complete that search. Nothing changed.</div>';
+      }
+    } catch (e) {
+      result.innerHTML = '<div class="mr-error">Could not reach the server.</div>';
+    } finally {
+      busy = false;
+      goBtn.disabled = false;
+    }
+  }
+
+  function detailOf(res) {
+    var d = res && res.body && res.body.detail;
+    if (typeof d === 'string') { return d; }
+    if (d && typeof d.message === 'string') { return d.message; }
+    return null;
+  }
+
+  function showLocked() {
+    if (controls) { controls.style.display = 'none'; }
+    if (locked) { locked.style.display = 'block'; }
+    if (tierChip) { tierChip.textContent = 'Elite only'; }
+    panel.style.display = '';
+  }
+
+  function showUnlocked() {
+    if (controls) { controls.style.display = ''; }
+    if (locked) { locked.style.display = 'none'; }
+    panel.style.display = '';
+  }
+
+  function applyPlan(plan) {
+    if (plan === 'elite') { showUnlocked(); } else { showLocked(); }
+  }
+
+  goBtn.addEventListener('click', run);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { run(); } });
+
+  /* The plan is resolved asynchronously by the block above, so take it from
+   * whichever arrives first: the event, or an already-set attribute. */
+  document.addEventListener('snypd:plan', function (e) { applyPlan(e.detail); });
+  if (document.body.dataset.plan) { applyPlan(document.body.dataset.plan); }
 })();
 </script>
 </body>
