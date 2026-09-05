@@ -4262,13 +4262,11 @@ const HEARTBEAT_URL = (() => {
     if (controls) { controls.style.display = 'none'; }
     if (locked) { locked.style.display = 'block'; }
     if (tierChip) { tierChip.textContent = 'Elite only'; }
-    panel.style.display = '';
   }
 
   function showUnlocked() {
     if (controls) { controls.style.display = ''; }
     if (locked) { locked.style.display = 'none'; }
-    panel.style.display = '';
   }
 
   function applyPlan(plan) {
