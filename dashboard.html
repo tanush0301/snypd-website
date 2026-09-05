@@ -409,8 +409,16 @@ body {
 .snypd-topbar__right:hover { border-color: var(--border); }
 .snypd-topbar__status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
 .snypd-topbar .snypd-orb { width: 6px; height: 6px; background: var(--text-muted); flex: 0 0 auto; }
-.snypd-topbar[data-state="running"] .snypd-orb { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.snypd-topbar[data-state="running"] .snypd-orb { background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulseDot 2.2s ease infinite; }
 .snypd-topbar[data-state="running"] .snypd-topbar__status { color: var(--success); }
+/* Ledger's own "LIVE"/"WATCHING 24/7" dot breathes via opacity - this was
+   a real, confirmed gap: the topbar dot only changed color/glow on state,
+   it never actually animated. Only the running/active state pulses,
+   matching the mockup (its offline/error dots are static). */
+@keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) {
+  .snypd-topbar .snypd-orb { animation: none !important; }
+}
 .snypd-topbar[data-state="offline"] .snypd-orb { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 .snypd-topbar[data-state="offline"] .snypd-topbar__status { color: var(--warning); }
 .snypd-topbar[data-state="backend-down"] .snypd-orb { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
@@ -891,6 +899,20 @@ body {
   border: 1px solid rgba(255,176,32,0.4);
 }
 .offline-banner__title { font-size: 13px; font-weight: 700; color: var(--warning); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+/* Same box treatment as .offline-banner, recolored to status-mint - no new
+   visual language, just this design system's existing warning-banner shape
+   reused for a status message instead of invented from scratch. */
+.rankup-banner {
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: rgba(0,229,160,0.06);
+  border: 1px solid rgba(0,229,160,0.4);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--success);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
 .offline-banner__text { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 10px; }
 .offline-banner__row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .offline-banner__row span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
@@ -1295,6 +1317,9 @@ body {
     <span id="offline-last-sync"></span>
     <button class="btn btn-prim" type="button" id="offline-retry">Retry</button>
   </div>
+</div>
+<div class="rankup-banner" id="rankup-banner" style="display:none">
+  <span id="rankup-banner-text"></span>
 </div>
 <div class="claim-hint" id="claim-hint" style="display:none">
   Tapping <strong>Claim</strong> marks an item as bought and tracks it in your <a href="#" data-view-link="history">History</a> tab, where you can later mark it sold, mark it still listed, or remove it if you claimed it by mistake.
@@ -2331,6 +2356,41 @@ const HEARTBEAT_URL = (() => {
       return { name: tier.name, next, pct };
     }
 
+    // xp-spec.md section 5: "Tier-up is detected by comparing tier(xp_before)
+    // vs tier(xp_after) on insert; that transition is what fires the notif."
+    // Done here (on every recompute) rather than only inside awardXP so a
+    // tier-up credited server-side (E1, streak_tracker.py) is caught too, not
+    // just client-inserted events. localStorage remembers the last tier seen
+    // on this device so it fires once, not on every reload - and a brand new
+    // account's very first tier is stored silently, never announced as a
+    // "rank up" with nothing to compare against.
+    const RANKUP_KEY = 'snypd_last_tier_seen';
+    let rankupDismissTimer = null;
+    function maybeShowRankUp(currentTierName) {
+      const banner = document.getElementById('rankup-banner');
+      const bannerText = document.getElementById('rankup-banner-text');
+      if (!banner || !bannerText) return;
+      let lastTier;
+      try { lastTier = localStorage.getItem(RANKUP_KEY); } catch (e) { return; }
+      if (lastTier && lastTier !== currentTierName) {
+        const lastIdx = XP_TIERS.findIndex(x => x.name === lastTier);
+        const curIdx = XP_TIERS.findIndex(x => x.name === currentTierName);
+        if (curIdx > lastIdx) {
+          bannerText.textContent = `Rank up — ${lastTier} → ${currentTierName}`;
+          banner.style.display = '';
+          clearTimeout(rankupDismissTimer);
+          rankupDismissTimer = setTimeout(() => { banner.style.display = 'none'; }, 6000);
+        }
+      }
+      try { localStorage.setItem(RANKUP_KEY, currentTierName); } catch (e) { /* ignore */ }
+    }
+    document.addEventListener('click', (e) => {
+      const banner = document.getElementById('rankup-banner');
+      if (banner && banner.style.display !== 'none' && !banner.contains(e.target)) {
+        banner.style.display = 'none';
+      }
+    });
+
     async function loadStreakAndXP() {
       const fill = document.getElementById('prof-xp-fill');
       const tierText = document.getElementById('prof-tier-text');
@@ -2354,6 +2414,8 @@ const HEARTBEAT_URL = (() => {
         nextText.textContent = t.next
           ? `${(t.next.floor - xpTotal).toLocaleString()} XP to ${t.next.name}`
           : 'Top tier reached';
+
+        maybeShowRankUp(t.name);
       } catch (e) {
         console.error('SNYPD profile: could not load XP total', e);
         tierText.textContent = '—';
