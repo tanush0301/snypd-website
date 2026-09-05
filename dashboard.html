@@ -14,7 +14,6 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="SNYPD" name="apple-mobile-web-app-title"/>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
   /* Scope everything */
   .snypd-sidebar {
@@ -117,15 +116,14 @@
     display: flex; align-items: center; gap: 8px;
     margin-top: 4px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
   .snypd-orb {
-    width: 8px; height: 8px; border-radius: 50%;
+    width: 8px; height: 8px; border-radius: 0;
     background: #555;
-    transition: all 0.3s var(--ease);
   }
   .snypd-sidebar[data-state="live"] .snypd-orb {
     background: var(--success);
@@ -237,7 +235,7 @@
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.02);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--text-muted);
@@ -258,7 +256,7 @@
     border: none;
     border-radius: 0;
     padding: 10px 14px;
-    font-weight: 700;
+    font-weight: 400;
     font-size: 13px;
     font-family: var(--font);
     color: var(--brand-fg);
@@ -415,9 +413,9 @@ body {
   transition: border-color 0.2s var(--smooth);
 }
 .snypd-topbar__right:hover { border-color: var(--border); }
-.snypd-topbar__status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+.snypd-topbar__status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
 .snypd-topbar .snypd-orb { width: 6px; height: 6px; background: var(--text-muted); flex: 0 0 auto; }
-.snypd-topbar[data-state="running"] .snypd-orb { background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulseDot 2.2s ease infinite; }
+.snypd-topbar[data-state="running"] .snypd-orb { background: var(--success); animation: pulseDot 2.2s ease infinite; }
 .snypd-topbar[data-state="running"] .snypd-topbar__status { color: var(--success); }
 /* Ledger's own "LIVE"/"WATCHING 24/7" dot breathes via opacity - this was
    a real, confirmed gap: the topbar dot only changed color/glow on state,
@@ -427,12 +425,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .snypd-topbar .snypd-orb { animation: none !important; }
 }
-.snypd-topbar[data-state="offline"] .snypd-orb { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.snypd-topbar[data-state="offline"] .snypd-orb { background: var(--warning); }
 .snypd-topbar[data-state="offline"] .snypd-topbar__status { color: var(--warning); }
-.snypd-topbar[data-state="backend-down"] .snypd-orb { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.snypd-topbar[data-state="backend-down"] .snypd-orb { background: var(--danger); }
 .snypd-topbar[data-state="backend-down"] .snypd-topbar__status { color: var(--danger); }
-.snypd-topbar__plan { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: var(--text-muted); text-transform: uppercase; }
-.snypd-topbar__streak { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; font-family: var(--font); }
+.snypd-topbar__plan { font-size: 11px; font-weight: 400; letter-spacing: 0.03em; color: var(--text-muted); text-transform: uppercase; }
+.snypd-topbar__streak { font-size: 10.5px; font-weight: 400; letter-spacing: 0.06em; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; font-family: var(--font); }
 
 .snypd-bottombar {
   display: none;
@@ -449,7 +447,7 @@ body {
   text-align: center;
   padding: 18px 0 26px;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -528,7 +526,7 @@ body {
   transition: transform 0.4s var(--smooth);
 }
 .activation-gate:hover { transform: translateY(-2px); }
-.activation-gate h2 { font-size: 28px; font-weight: 700; margin: 0 0 12px; letter-spacing:-0.02em; color: var(--text-primary); }
+.activation-gate h2 { font-size: 28px; font-weight: 500; margin: 0 0 12px; letter-spacing:-0.02em; color: var(--text-primary); }
 .activation-gate p { color: var(--text-muted); max-width: 500px; margin: 0 auto 24px; line-height: 1.6; font-size: 15px; }
 .activation-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
 .activation-note { font-size: 13px !important; color: #555 !important; margin-bottom: 0 !important; }
@@ -569,7 +567,7 @@ body {
   border-radius: 0; padding: 14px 16px; margin-top: 12px;
 }
 .mr-badge {
-  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  display: inline-block; font-size: 11px; font-weight: 400; letter-spacing: .04em;
   text-transform: uppercase; padding: 4px 9px; border-radius: 0;
   border: 1px solid var(--border); color: var(--text-muted);
 }
@@ -605,7 +603,7 @@ body {
 .mr-pos-scale { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted); }
 .mr-pos-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(126px, 1fr)); gap: 6px 12px; margin-top: 10px; }
 .mr-pos-item { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-.mr-pos-item b { color: var(--text-primary); display: block; font-weight: 600; }
+.mr-pos-item b { color: var(--text-primary); display: block; font-weight: 400; }
 .mr-drift {
   margin-top: 10px; padding: 9px 12px; border-radius: 0; font-size: 13px; line-height: 1.5;
   background: rgba(162,0,255,0.07); border: 1px solid rgba(162,0,255,0.25); color: var(--text-primary);
@@ -643,7 +641,7 @@ body {
   padding: 6px 12px;
   border-radius: 0;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   background: rgba(255,255,255,0.05);
@@ -653,13 +651,13 @@ body {
   align-items:center;
   gap:8px;
 }
-.chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #666; }
+.chip::before { content: ''; width: 6px; height: 6px; border-radius: 0; background: #666; }
 .chip.ok { color: var(--success); background: rgba(0,229,160,0.05); border-color: rgba(0,229,160,0.2); }
-.chip.ok::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.chip.ok::before { background: var(--success); }
 .chip.warn { color: var(--warning); background: rgba(255,176,32,0.06); border-color: rgba(255,176,32,0.4); }
-.chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.chip.warn::before { background: var(--warning); }
 .chip.err { color: var(--danger); background: rgba(255,92,92,0.06); border-color: rgba(255,92,92,0.4); }
-.chip.err::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.chip.err::before { background: var(--danger); }
 /* Grey/paused state - secondary text only, per the Ledger status system (2h):
    no state is distinguishable by hue alone without a word alongside it. */
 .chip.muted { color: var(--text-muted); background: rgba(255,255,255,0.02); border-color: var(--border); }
@@ -672,7 +670,7 @@ body {
    deliberate rather than as one radius among several. */
 .plan-badge {
   font-size: 9.5px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 6px 11px;
@@ -721,7 +719,7 @@ body {
   padding: 0 20px;
   height: 38px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -764,7 +762,7 @@ body {
   background: rgba(162,0,255,0.14) !important;
   color: var(--brand) !important;
   border: 1px solid rgba(162,0,255,0.4) !important;
-  font-weight: 700;
+  font-weight: 400;
   flex-basis: 100%;
   order: 3;
 }
@@ -844,7 +842,7 @@ body {
   padding: 0 16px;
   font-family: var(--font);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -907,7 +905,7 @@ body {
   font-size: 13px;
 }
 .prof-row span:first-child { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.03em; }
-.prof-row span:last-child { color: var(--text-primary); font-weight: 600; }
+.prof-row span:last-child { color: var(--text-primary); font-weight: 400; }
 .tiny-note { margin-top: 14px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
 .xp-bar-track { height: 4px; background: var(--panel-header); margin-top: 6px; position: relative; }
 .xp-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--success); }
@@ -954,7 +952,7 @@ body {
   background: rgba(255,176,32,0.06);
   border: 1px solid rgba(255,176,32,0.4);
 }
-.offline-banner__title { font-size: 13px; font-weight: 700; color: var(--warning); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+.offline-banner__title { font-size: 13px; font-weight: 400; color: var(--warning); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
 /* Same box treatment as .offline-banner, recolored to status-mint - no new
    visual language, just this design system's existing warning-banner shape
    reused for a status message instead of invented from scratch. */
@@ -964,7 +962,7 @@ body {
   background: rgba(0,229,160,0.06);
   border: 1px solid rgba(0,229,160,0.4);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--success);
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -999,7 +997,7 @@ body {
   position: absolute;
   top: 8px;
   font-size: 8.5px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 3px 7px;
@@ -1040,8 +1038,8 @@ body {
 }
 
 .meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; min-width: 0; }
-.t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
-.p { font-weight: 700; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
+.t { font-weight: 400; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
+.p { font-weight: 400; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
 .p.p-unknown { font-weight: 500; font-size: 12px; color: var(--text-muted); font-style: italic; }
 .p-total { font-size: 9px; color: var(--text-muted); white-space: nowrap; text-align: right; margin-top: 1px; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
@@ -1085,7 +1083,7 @@ body {
       cursor: pointer;
     }
     #mobile-header .mh-word {
-      font-weight: 700;
+      font-weight: 400;
       font-size: 13px;
       letter-spacing: 0.08em;
       color: var(--text-primary);
@@ -1127,7 +1125,7 @@ body {
       background: var(--brand);
       color: var(--brand-fg);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.03em;
       border: none;
@@ -1174,8 +1172,8 @@ body {
       padding: 32px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.9);
     }
-    .wiz-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--brand); text-transform: uppercase; margin-bottom: 12px; }
-    .wiz-title { font-size: 22px; font-weight: 700; margin: 0 0 8px; color: var(--text-primary); }
+    .wiz-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.1em; color: var(--brand); text-transform: uppercase; margin-bottom: 12px; }
+    .wiz-title { font-size: 22px; font-weight: 500; margin: 0 0 8px; color: var(--text-primary); }
     .wiz-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; line-height: 1.5; }
     .wiz-presets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
     .wiz-preset {
@@ -1208,7 +1206,7 @@ body {
     .rec-sheet-count { font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
     .rec-sheet-btns { display: flex; gap: 6px; }
     .rec-sheet-btns .btn { flex: 1; padding: 0 8px; font-size: 10.5px; }
-    .wiz-preset__name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .wiz-preset__name { font-size: 14px; font-weight: 400; color: var(--text-primary); }
     .wiz-preset__meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
     .wiz-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   </style>
