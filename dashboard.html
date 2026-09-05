@@ -352,6 +352,12 @@
    .claim-hint a keep their own color regardless, since they're more specific
    than this. */
 a { color: var(--success); text-decoration: none; }
+/* Design handoff RISK 4: h1-h6/strong/b/th default to 600-700 in every
+   browser and were never explicitly reset - confirmed live via the spec's
+   own verification snippet (document.querySelectorAll('*') flagged real
+   <strong>/<h3> elements at weight 700). "Never bold" is an absolute rule;
+   hierarchy comes from size/color/letter-spacing, not weight. */
+h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 400; }
 a:hover { color: #57FFC8; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-thumb { background: var(--border-hover); }
@@ -386,9 +392,7 @@ body {
   align-items: center;
   gap: 24px;
   padding: 16px 24px;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--panel-header);
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
@@ -438,9 +442,7 @@ body {
   left: 0; right: 0; bottom: 0;
   z-index: 100;
   border-top: 1px solid var(--border);
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--panel-header);
 }
 .bottombar-tab {
   flex: 1;
@@ -475,9 +477,15 @@ body {
   /* Ledger 2a-2e's bottom bar, built for real at this breakpoint - see the
      nav markup right after </header> for why Market Insights isn't a 4th
      tab here. dash-wrap gets bottom padding so the bar never covers the
-     last card/button on a long page. */
+     last card/button on a long page. 148px, not 72px: the floating
+     .filter-pill sits fixed at bottom:84px with its own ~43px height, so
+     its top edge lands ~127px above the viewport bottom - well above the
+     bottombar's own 60px. Padding has to clear the pill, not just the bar,
+     or the last stat/card on any tab sits permanently under it. Measured
+     live at 375x812: pill top was at 127px from viewport bottom while this
+     padding was still 72px, confirmed overlapping real content. */
   .snypd-bottombar { display: flex; }
-  .dash-wrap { padding-bottom: 72px; }
+  .dash-wrap { padding-bottom: 148px; }
 }
 
 /* Header (legacy, unused now that the topbar replaces it - left in place,
@@ -514,33 +522,25 @@ body {
 /* Gate */
 .activation-gate {
   background: var(--panel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: 0;
   padding: 48px;
-  text-align: center; 
-  margin-bottom: 32px; 
-  box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
-  transform: translateY(0);
-  transition: transform 0.4s var(--smooth);
+  text-align: center;
+  margin-bottom: 32px;
 }
-.activation-gate:hover { transform: translateY(-2px); }
 .activation-gate h2 { font-size: 28px; font-weight: 500; margin: 0 0 12px; letter-spacing:-0.02em; color: var(--text-primary); }
 .activation-gate p { color: var(--text-muted); max-width: 500px; margin: 0 auto 24px; line-height: 1.6; font-size: 15px; }
 .activation-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
 .activation-note { font-size: 13px !important; color: #555 !important; margin-bottom: 0 !important; }
 .is-hidden { display: none !important; opacity: 0; pointer-events: none; }
 
-/* Panel */
+/* Panel - flat per the design handoff's absolute rules: no shadow, no
+   glass/backdrop-blur, no elevation anywhere except the one sheet shadow. */
 .panel {
   background: var(--panel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
 }
 
 /* Market Report (Elite).
@@ -731,10 +731,10 @@ body {
   justify-content: center;
 }
 .btn:active:not(:disabled) { transform: scale(0.97); }
-.btn-prim { 
-  background: var(--brand); 
-  color: var(--brand-fg); 
-  border: 1px solid var(--brand);
+.btn-prim {
+  background: var(--brand);
+  color: var(--brand-fg);
+  border: 1px solid transparent; /* purple is fill-only per the spec - never a border, even one matching the fill */
 }
 .btn-prim:hover:not(:disabled) { 
   background: var(--brand-hover);
@@ -893,7 +893,6 @@ body {
   margin-top: 8px;
   line-height: 1.4;
 }
-.claim-hint a { color: var(--brand); text-decoration: none; }
 .claim-hint a:hover { text-decoration: underline; }
 
 .rows-simple { display: flex; flex-direction: column; gap: 1px; }
@@ -1130,19 +1129,21 @@ body {
       letter-spacing: 0.03em;
       border: none;
       cursor: pointer;
-      box-shadow: 0 8px 24px rgba(162,0,255,0.4);
     }
     .new-pill.show { display: inline-flex; animation: pillIn 0.2s var(--smooth); }
     @keyframes pillIn { from { opacity: 0; transform: translate(-50%, -6px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-    /* New-card entrance: restrained, no bounce - then a brief teal highlight that fades. */
+    /* New-card entrance: the spec's own riseIn (README §2.5) - only three
+       animations exist in the whole system and this is one of them. The
+       previous version used an unauthorised scale animation plus a glow
+       shadow and a color transition, none of which are in that list. The
+       border-color highlight now just holds steady while .is-new is set,
+       no fade transition (also banned: "no colour transition on anything"). */
     .card.is-new {
-      animation: cardIn 0.15s var(--smooth);
+      animation: riseIn 0.3s ease;
       border-color: rgba(0,229,160,0.55) !important;
-      box-shadow: 0 0 0 1px rgba(0,229,160,0.35), 0 8px 24px rgba(0,0,0,0.4);
-      transition: border-color 1.4s ease, box-shadow 1.4s ease;
     }
-    @keyframes cardIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+    @keyframes riseIn { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
 
     @media (max-width: 991px) {
       #mobile-header { display: flex !important; }
@@ -1172,7 +1173,7 @@ body {
       padding: 32px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.9);
     }
-    .wiz-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.1em; color: var(--brand); text-transform: uppercase; margin-bottom: 12px; }
+    .wiz-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
     .wiz-title { font-size: 22px; font-weight: 500; margin: 0 0 8px; color: var(--text-primary); }
     .wiz-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; line-height: 1.5; }
 
@@ -1315,7 +1316,7 @@ body {
      URL (matching the exact helper filters.html already used). -->
 <button class="filter-pill" id="filter-pill" type="button">Filters · <span id="filter-pill-count">0</span></button>
 <div class="wiz-overlay" id="filter-sheet-overlay">
-  <div class="filter-sheet">
+  <div class="filter-sheet" data-sheet>
     <div class="filter-sheet__handle"></div>
     <div class="filter-sheet__header">
       <span class="filter-sheet__title">Your hunts</span>
