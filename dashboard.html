@@ -1175,6 +1175,56 @@ body {
     .wiz-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.1em; color: var(--brand); text-transform: uppercase; margin-bottom: 12px; }
     .wiz-title { font-size: 22px; font-weight: 500; margin: 0 0 8px; color: var(--text-primary); }
     .wiz-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; line-height: 1.5; }
+
+    /* Ledger 2a: filter bottom sheet - real bottom-pinned sheet chrome per
+       README §5.2/§2.4, distinct from .wiz-overlay/.wiz-modal's centered-
+       modal-with-elevation pattern (that pattern predates this spec and is
+       its own separate cleanup, not bundled into this one). */
+    .filter-pill {
+      position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
+      z-index: 90;
+      font-size: 13px; color: var(--text-primary); background: var(--field, #191C1E);
+      border: 1px solid var(--border-hover); padding: 12px 24px;
+      font-family: var(--font); cursor: pointer;
+    }
+    #filter-sheet-overlay { align-items: flex-end; justify-content: stretch; padding: 0; background: rgba(8,9,10,0.62); }
+    .filter-sheet {
+      width: 100%; max-width: 520px; margin: 0 auto;
+      background: #101214; border: 1px solid var(--border); border-top: 1px solid var(--border);
+      border-radius: 0; padding: 20px 20px 26px; box-sizing: border-box;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 -18px 50px rgba(0,0,0,0.65);
+      max-height: 85vh; overflow-y: auto;
+    }
+    .filter-sheet__handle { width: 36px; height: 3px; background: var(--border-hover); margin: 0 auto; }
+    .filter-sheet__header { display: flex; justify-content: space-between; align-items: baseline; }
+    .filter-sheet__title { font-size: 16px; color: var(--text-primary); letter-spacing: 0.02em; }
+    .filter-sheet__meta { font-size: 10.5px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .filter-sheet__list { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+    .fs-row { background: var(--panel); padding: 14px; display: flex; flex-direction: column; gap: 8px; border-left: 2px solid var(--border3, #3A4147); }
+    .fs-row.is-live { border-left-color: var(--success); }
+    .fs-row.is-paused { opacity: 0.72; }
+    .fs-row__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .fs-row__name { font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .fs-row__status { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .fs-row__dot { width: 6px; height: 6px; background: var(--border3, #3A4147); }
+    .fs-row.is-live .fs-row__dot { background: var(--success); animation: pulseDot 2.2s ease infinite; }
+    .fs-row__status-text { font-size: 9.5px; letter-spacing: 0.1em; color: var(--text-muted); }
+    .fs-row.is-live .fs-row__status-text { color: var(--success); }
+    .fs-row__url { font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fs-row__actions { display: flex; gap: 16px; padding-top: 4px; }
+    .fs-row__actions button { background: none; border: none; padding: 0; font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted); font-family: var(--font); cursor: pointer; }
+    .fs-row__actions button.fs-danger { color: var(--danger); }
+    .filter-sheet__new { border: 1px dashed var(--border-hover); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .filter-sheet__new-title { font-size: 12.5px; color: var(--text-muted); }
+    .filter-sheet__new-hint { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+    .filter-sheet__new-form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .filter-sheet__new-form input {
+      background: var(--field, #191C1E); border: 1px solid var(--border); color: var(--text-primary);
+      padding: 10px 12px; font-family: var(--font); font-size: 12.5px;
+    }
+    .filter-sheet__limit-note { font-size: 10.5px; color: var(--warning); line-height: 1.5; }
+    .filter-sheet__footer { display: flex; gap: 9px; }
     .wiz-presets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
     .wiz-preset {
       display: flex; flex-direction: column; gap: 4px;
@@ -1253,6 +1303,40 @@ body {
   <button class="bottombar-tab" type="button" data-view="profile">Profile</button>
 </nav>
 <button class="new-pill" id="new-pill" type="button"></button>
+
+<!-- Ledger 2a: the filter bottom sheet. Per the design handoff (README §5.2,
+     CLAUDE_CODE_PROMPT.md §1/§6), this is now the ONLY place to add, pause,
+     or delete a hunt - filters.html redirects here instead of existing as a
+     second surface. Real data note: the mockup's per-hunt chip row (size,
+     price cap, condition) assumes structured filter fields that were never
+     actually captured - user_searches only ever stored a display name and
+     the raw pasted Vinted URL. Rather than invent chips from data that
+     doesn't exist, this shows the real name + a short derived form of the
+     URL (matching the exact helper filters.html already used). -->
+<button class="filter-pill" id="filter-pill" type="button">Filters · <span id="filter-pill-count">0</span></button>
+<div class="wiz-overlay" id="filter-sheet-overlay">
+  <div class="filter-sheet">
+    <div class="filter-sheet__handle"></div>
+    <div class="filter-sheet__header">
+      <span class="filter-sheet__title">Your hunts</span>
+      <span class="filter-sheet__meta" id="filter-sheet-meta">— OF — · —</span>
+    </div>
+    <div class="filter-sheet__list" id="filter-sheet-list"></div>
+    <div class="filter-sheet__new" id="filter-sheet-new">
+      <div class="filter-sheet__new-title">+ New hunt — brand, size, price cap</div>
+      <div class="filter-sheet__new-hint">Built here. No Vinted link to copy — the app can't read one from the Vinted app anyway.</div>
+      <div class="filter-sheet__new-form">
+        <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
+        <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
+        <button class="btn btn-prim" id="filter-new-save" type="button" disabled>Save search</button>
+      </div>
+      <p class="filter-sheet__limit-note" id="filter-sheet-limit-note" style="display:none"></p>
+    </div>
+    <div class="filter-sheet__footer">
+      <button class="btn btn-prim" id="filter-sheet-done" type="button" style="flex:1">Done</button>
+    </div>
+  </div>
+</div>
 
 <!-- First-run wizard: hidden by default, shown only if a real DB check finds
      zero saved searches for this user (see the script block near loadAds). -->
@@ -1769,6 +1853,167 @@ const HEARTBEAT_URL = (() => {
     if (window.SNYPD && window.SNYPD.loadStreakAndXP) { window.SNYPD.loadStreakAndXP(); return; }
     if (attemptsLeft > 0) setTimeout(() => pollForTopbarStreakRefresh(attemptsLeft - 1), 150);
   })(20);
+
+  // ----------------- FILTER SHEET (Ledger 2a) -----------------
+  // Ported from the old filters.html, which is now a redirect (see its own
+  // file) - this is the single real place to add/pause/delete a hunt.
+  // Real data note: user_searches only ever stored a name + raw pasted
+  // Vinted URL, never structured brand/size/price fields, so the per-hunt
+  // chip row the mockup shows (size, price cap, condition) isn't rendered -
+  // there's nothing real to put in it. Showing the name + a short derived
+  // form of the URL instead, using the exact same derivation filters.html
+  // already used, rather than inventing fields that were never captured.
+  (function filterSheet() {
+    const FS_LIMIT = { free: 1, kickstart: 2, pro: 5, elite: 7 };
+    const pill = document.getElementById('filter-pill');
+    const pillCount = document.getElementById('filter-pill-count');
+    const overlay = document.getElementById('filter-sheet-overlay');
+    const listEl = document.getElementById('filter-sheet-list');
+    const metaEl = document.getElementById('filter-sheet-meta');
+    const nameInput = document.getElementById('filter-new-name');
+    const urlInput = document.getElementById('filter-new-url');
+    const saveBtn = document.getElementById('filter-new-save');
+    const limitNote = document.getElementById('filter-sheet-limit-note');
+    const doneBtn = document.getElementById('filter-sheet-done');
+    if (!pill || !overlay) return;
+
+    let rows = [];
+    let quota = { used: 0, limit: FS_LIMIT[effectivePlan] || 1, remaining: 1 };
+
+    const escFs = v => String(v ?? '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    function validVintedUrl(u) {
+      try {
+        const x = new URL(String(u || '').trim());
+        return /(^|\.)vinted\./i.test(x.hostname) && x.pathname.replace(/\/+$/, '') === '/catalog' && x.search.length > 1;
+      } catch (e) { return false; }
+    }
+    function shortUrl(u) {
+      try {
+        const x = new URL(u);
+        const q = x.searchParams.get('search_text');
+        return x.hostname.replace(/^www\./, '') + (q ? ' · ' + q : x.pathname);
+      } catch (e) { return u || ''; }
+    }
+    function nameFromUrl(u) {
+      try { return new URL(u).searchParams.get('search_text') || 'Vinted search'; } catch (e) { return 'Vinted search'; }
+    }
+
+    async function computeQuota() {
+      let rpcUsed = null, rpcLimit = null;
+      try {
+        const r = await sb.rpc('filter_quota');
+        if (!r.error && r.data) {
+          const d = Array.isArray(r.data) ? r.data[0] : r.data;
+          rpcLimit = Number(d.quota_limit ?? d.plan_limit ?? d.filter_limit ?? d.max_filters ?? d.limit ?? d.max_active_filters);
+        }
+      } catch (e) { /* fall through to the plan table below */ }
+      const used = rows.filter(r => r.is_active === true).length;
+      const limit = Number.isFinite(rpcLimit) && rpcLimit >= 0 ? rpcLimit : (FS_LIMIT[effectivePlan] ?? 1);
+      quota = { used, limit, remaining: Math.max(0, limit - used) };
+    }
+
+    function paintMeta() {
+      metaEl.textContent = `${quota.used} OF ${quota.limit} · ${effectivePlan.toUpperCase()}`;
+      const full = quota.remaining <= 0;
+      saveBtn.disabled = full;
+      limitNote.style.display = full ? '' : 'none';
+      if (full) limitNote.textContent = `You're using all your active searches. Pause one, or upgrade for more.`;
+      if (pillCount) pillCount.textContent = String(quota.used);
+    }
+
+    function renderList() {
+      if (!rows.length) {
+        listEl.innerHTML = '<div class="fs-row" style="border-left-color:transparent"><span class="fs-row__name" style="color:var(--text-muted)">No hunts yet. Add one below.</span></div>';
+        return;
+      }
+      listEl.innerHTML = rows.map(r => {
+        const live = r.is_active === true;
+        return `
+          <div class="fs-row ${live ? 'is-live' : 'is-paused'}" data-id="${escFs(r.id)}">
+            <div class="fs-row__top">
+              <span class="fs-row__name">${escFs(r.search_name || nameFromUrl(r.vinted_url))}</span>
+              <span class="fs-row__status">
+                <span class="fs-row__dot"></span>
+                <span class="fs-row__status-text">${live ? 'LIVE' : 'PAUSED'}</span>
+              </span>
+            </div>
+            <div class="fs-row__url">${escFs(shortUrl(r.vinted_url))}</div>
+            <div class="fs-row__actions">
+              <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
+              <a href="${escFs(r.vinted_url)}" target="_blank" rel="noopener" style="font-size:11px;letter-spacing:.08em;color:var(--text-muted)">OPEN ON VINTED</a>
+              <button type="button" class="fs-danger" data-fs-delete>DELETE</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function reloadHunts() {
+      const { data, error } = await sb.from('user_searches').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+      if (error) { console.error('SNYPD filter sheet: could not load hunts', error); return; }
+      rows = data || [];
+      await computeQuota();
+      paintMeta();
+      renderList();
+    }
+
+    async function addHunt() {
+      const url = urlInput.value.trim();
+      const name = nameInput.value.trim();
+      if (quota.remaining <= 0) return;
+      if (!validVintedUrl(url)) { urlInput.style.borderColor = 'var(--danger)'; return; }
+      urlInput.style.borderColor = '';
+      saveBtn.disabled = true;
+      try {
+        const { data: inserted, error } = await sb.from('user_searches')
+          .insert({ user_id: uid, search_name: name || nameFromUrl(url), vinted_url: url, is_active: true })
+          .select('id').single();
+        if (error) throw error;
+        // Same E6 event the wizard's skip path already awards - first hunt
+        // created, ever, regardless of which entry point did it.
+        const hadHuntBefore = await xpEventExistsEver('first_hunt', null);
+        if (!hadHuntBefore) await awardXP('first_hunt', 20, inserted ? inserted.id : null, {});
+        nameInput.value = ''; urlInput.value = '';
+        await reloadHunts();
+      } catch (e) {
+        console.error('SNYPD filter sheet: could not save hunt', e);
+        saveBtn.disabled = false;
+      }
+    }
+
+    function openSheet() { overlay.style.display = 'flex'; reloadHunts(); }
+    function closeSheet() { overlay.style.display = 'none'; }
+
+    pill.addEventListener('click', openSheet);
+    doneBtn.addEventListener('click', closeSheet);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSheet(); });
+    saveBtn.addEventListener('click', addHunt);
+
+    listEl.addEventListener('click', async (e) => {
+      const row = e.target.closest('.fs-row');
+      if (!row || !row.dataset.id) return;
+      const id = row.dataset.id;
+      const item = rows.find(r => String(r.id) === String(id));
+      if (!item) return;
+      if (e.target.closest('[data-fs-toggle]')) {
+        const next = !item.is_active;
+        if (next && quota.remaining <= 0) return;
+        const { error } = await sb.from('user_searches').update({ is_active: next }).eq('id', id).eq('user_id', uid);
+        if (error) console.error('SNYPD filter sheet: could not toggle hunt', error);
+        await reloadHunts();
+        return;
+      }
+      if (e.target.closest('[data-fs-delete]')) {
+        if (!confirm('Delete this hunt?')) return;
+        const { error } = await sb.from('user_searches').delete().eq('id', id).eq('user_id', uid);
+        if (error) console.error('SNYPD filter sheet: could not delete hunt', error);
+        await reloadHunts();
+      }
+    });
+
+    // Populate the pill's own count on load, not just when the sheet opens -
+    // same "don't hide state behind a click" reasoning as the topbar streak.
+    reloadHunts();
+  })();
 
   console.log('SNYPD activation check', {
     plan: rawPlan,

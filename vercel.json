@@ -5,6 +5,7 @@
   "redirects": [
     { "source": "/sign-in", "destination": "/login", "permanent": false },
     { "source": "/sign-up", "destination": "/signup", "permanent": false },
-    { "source": "/pricing", "destination": "/plans", "permanent": false }
+    { "source": "/pricing", "destination": "/plans", "permanent": false },
+    { "source": "/filters", "destination": "/dashboard", "permanent": false }
   ]
 }
