@@ -41,6 +41,7 @@
 <style>
           body {
             display: flex;
+            flex-direction: column;
             background: #0B0C0D;
             margin: 0;
             min-height: 100vh;
@@ -73,8 +74,7 @@
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; gap: 24px;
     padding: 16px 24px;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    background: #101214;
     border-bottom: 1px solid #1E2225;
     flex-wrap: wrap;
   }
@@ -96,16 +96,15 @@
   .snypd-topbar__link:hover { color: #EDEFF0; }
   .snypd-topbar__plan { font-size: 11px; font-weight: 400; letter-spacing: 0.03em; color: #7C8489; text-transform: uppercase; }
   @media (max-width: 767px) {
-    /* Real bug, confirmed live on a real phone: body is display:flex with no
-       flex-direction set (row, the default), a leftover from this page's
-       original sidebar layout. .snypd-topbar and .main-content were sitting
-       SIDE BY SIDE as flex items instead of stacked - the topbar's own
-       content pushed its width to fill the viewport, so .main-content's
-       flex:1 had zero space left and rendered at width:0. The whole page
-       (all real content, confirmed present in the DOM) was there but
-       invisible at zero width. Stacking them fixes the actual cause;
-       dashboard.html never had this bug because its body was never flex. */
-    body { flex-direction: column; }
+    /* body's flex-direction:column now lives on the base rule above - it was
+       mobile-only here at first (a real bug, confirmed on a real phone: with
+       no flex-direction, .snypd-topbar and .main-content sat SIDE BY SIDE as
+       row flex items, the topbar's own content pushing .main-content's
+       flex:1 to zero width - all real content, confirmed present in the DOM,
+       rendered invisible). Testing at desktop width later found the same
+       row-direction default was ALSO squashing the topbar into a tall
+       596px-wide sliver above 767px, just never checked until then - moved
+       to the base rule so both are fixed the same way. */
     .snypd-topbar { padding: 12px 16px; gap: 12px; }
     .snypd-topbar__brand { font-size: 15px; letter-spacing: 0.04em; }
     .snypd-topbar__nav { order: 3; flex-basis: 100%; overflow-x: auto; }
@@ -422,30 +421,37 @@
 </header><div class="main-content">
 <section class="section-signup account"><div class="padding-global"><div class="container-large"></div></div><div><!-- SNYPD Account Page — FINAL Whop-only -->
 <style>
+  /* Ledger tokens, matching dashboard.html's :root exactly (this page can't
+     share that file's stylesheet - see the project-wide "filters.html,
+     account.html, and dashboard.html do not link style.css" rule - so the
+     values are duplicated here on purpose, not approximated). Rebuilt
+     2026-09-05: this card previously ran an entirely separate, older visual
+     system (system-ui font, 14-18px radius, weight 850-950, gradient/glow
+     backgrounds) that was never part of the Ledger handoff - confirmed by
+     checking the spec's own §5.1-5.10 screen list, which has no Account/
+     Billing screen at all. Rebuilt against the same tokens as everything
+     else on the site rather than left to drift further. */
   .snypd-account-final{
-    --bg:#0f0b16;
-    --panel:rgba(18,12,28,.76);
-    --panel2:rgba(11,8,18,.68);
-    --glass:rgba(25,18,39,.74);
-    --stroke:rgba(162,0,255,.22);
-    --stroke-strong:rgba(162,0,255,.34);
-    --text:#f5f1ff;
-    --text-strong:#ffffff;
-    --muted:rgba(245,241,255,.82);
-    --muted2:rgba(245,241,255,.66);
-    --muted3:rgba(245,241,255,.52);
+    --bg:#0B0C0D;
+    --panel:#0F1113;
+    --stroke:#1E2225;
+    --stroke-strong:#262B2F;
+    --text:#EDEFF0;
+    --text-strong:#EDEFF0;
+    --muted:#A6ADB1;
+    --muted2:#7C8489;
+    --muted3:#5C6469;
     --accent1:#A200FF;
-    --accent2:#C455FF;
-    --ok:#22c55e;
-    --warn:#f59e0b;
-    --danger:#ef4444;
-    --shadow:0 18px 60px rgba(0,0,0,.55);
-    --shadow-soft:0 10px 30px rgba(0,0,0,.42);
-    --radius:18px;
-    --radius-sm:14px;
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    --accent2:#C54BFF;
+    --ok:#00E5A0;
+    --warn:#FFB020;
+    --danger:#FF5C5C;
+    --radius:0;
+    --radius-sm:0;
+    font-family:'DM Mono', ui-monospace, monospace;
     color:var(--text);
   }
+  .snypd-account-final strong, .snypd-account-final b { font-weight:400; }
 
   .snypd-account-final .wrap{
     max-width:1080px;
@@ -466,22 +472,17 @@
     align-items:center;
     gap:10px;
     padding:10px 12px;
-    border-radius:14px;
+    border-radius:0;
     border:1px solid var(--stroke);
-    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    background:transparent;
     color:var(--text);
     cursor:pointer;
-    box-shadow:var(--shadow-soft);
-    transition:transform .14s ease, box-shadow .2s ease, border-color .2s ease;
     user-select:none;
     white-space:nowrap;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-size:12px;
   }
-  .snypd-account-final .backbtn:hover{
-    transform:translateY(-1px);
-    border-color:var(--stroke-strong);
-    box-shadow:0 16px 44px rgba(162,0,255,.22);
-  }
-  .snypd-account-final .backbtn:active{ transform:translateY(0); }
   .snypd-account-final .backbtn svg{ opacity:.92; }
 
   .snypd-account-final .title{
@@ -492,17 +493,16 @@
     line-height:1.1;
   }
   .snypd-account-final .dot{
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:var(--accent2);
-    box-shadow:0 0 18px rgba(196,85,255,.7);
+    width:8px;
+    height:8px;
+    border-radius:0;
+    background:var(--ok);
     flex:0 0 auto;
   }
   .snypd-account-final h1{
     margin:0;
     font-size:22px;
-    font-weight:900;
+    font-weight:400;
     letter-spacing:.2px;
     color:var(--text-strong);
   }
@@ -521,26 +521,10 @@
 
   .snypd-account-final .card{
     position:relative;
-    border-radius:var(--radius);
+    border-radius:0;
     border:1px solid var(--stroke);
-    background:
-      radial-gradient(900px 420px at 20% -10%, rgba(162,0,255,.18), transparent 55%),
-      radial-gradient(900px 420px at 110% 20%, rgba(196,85,255,.12), transparent 55%),
-      linear-gradient(180deg, var(--panel), var(--panel2));
-    box-shadow:var(--shadow);
+    background:var(--panel);
     overflow:hidden;
-    backdrop-filter:blur(8px);
-  }
-
-  .snypd-account-final .card::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
-    background-size:18px 18px;
-    opacity:.10;
-    mix-blend-mode:overlay;
   }
 
   .snypd-account-final .card-hd{
@@ -550,15 +534,14 @@
     justify-content:space-between;
     gap:12px;
     padding:14px 16px;
-    border-bottom:1px solid rgba(162,0,255,.16);
+    border-bottom:1px solid var(--stroke);
     z-index:1;
   }
 
   .snypd-account-final .card-title{
-    font-weight:950;
+    font-weight:400;
     letter-spacing:.2px;
-    color:rgba(245,241,255,.98);
-    opacity:1;
+    color:var(--text);
   }
 
   .snypd-account-final .pill{
@@ -566,38 +549,38 @@
     align-items:center;
     gap:8px;
     padding:6px 10px;
-    border-radius:999px;
-    border:1px solid rgba(162,0,255,.24);
-    background:rgba(162,0,255,.12);
+    border-radius:0;
+    border:1px solid var(--stroke);
+    background:rgba(255,255,255,.02);
     font-size:12px;
-    font-weight:900;
-    color:rgba(245,241,255,.96);
-    opacity:1;
+    font-weight:400;
+    color:var(--muted2);
+    text-transform:uppercase;
+    letter-spacing:.03em;
   }
   .snypd-account-final .pill .p-dot{
     width:7px;
     height:7px;
-    border-radius:50%;
-    background:rgba(196,85,255,.98);
-    box-shadow:0 0 12px rgba(196,85,255,.58);
+    border-radius:0;
+    background:var(--muted2);
   }
+  /* .ok/.warn are toggled by this file's own JS (setStatusPill) - class
+     names are load-bearing, only the visual treatment changes here. */
   .snypd-account-final .pill.ok{
-    background:rgba(34,197,94,.10);
-    border-color:rgba(34,197,94,.28);
-    color:rgba(245,241,255,.98);
+    border-color:var(--ok);
+    color:var(--ok);
+    background:transparent;
   }
   .snypd-account-final .pill.ok .p-dot{
-    background:rgba(34,197,94,.98);
-    box-shadow:0 0 12px rgba(34,197,94,.52);
+    background:var(--ok);
   }
   .snypd-account-final .pill.warn{
-    background:rgba(245,158,11,.10);
-    border-color:rgba(245,158,11,.30);
-    color:rgba(245,241,255,.98);
+    border-color:var(--warn);
+    color:var(--warn);
+    background:transparent;
   }
   .snypd-account-final .pill.warn .p-dot{
-    background:rgba(245,158,11,.98);
-    box-shadow:0 0 12px rgba(245,158,11,.50);
+    background:var(--warn);
   }
 
   .snypd-account-final .card-bd{
@@ -616,21 +599,22 @@
     grid-template-columns:140px 1fr;
     gap:12px;
     padding:12px;
-    border-radius:14px;
-    border:1px solid rgba(162,0,255,.14);
-    background:rgba(255,255,255,.045);
+    border-radius:0;
+    border:1px solid var(--stroke);
+    background:rgba(255,255,255,.02);
   }
 
   .snypd-account-final .k{
-    color:rgba(245,241,255,.86);
+    color:var(--muted2);
     font-size:12px;
-    font-weight:850;
-    letter-spacing:.2px;
+    font-weight:400;
+    letter-spacing:.03em;
+    text-transform:uppercase;
   }
 
   .snypd-account-final .v{
-    font-weight:900;
-    color:rgba(255,255,255,.98);
+    font-weight:400;
+    color:var(--text);
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
@@ -640,10 +624,10 @@
     display:none;
     margin-top:10px;
     padding:10px 12px;
-    border-radius:14px;
-    border:1px solid rgba(245,158,11,.26);
-    background:rgba(245,158,11,.08);
-    color:rgba(245,241,255,.90);
+    border-radius:0;
+    border:1px solid var(--warn);
+    background:rgba(255,176,32,.08);
+    color:var(--text);
     font-size:13px;
     line-height:1.45;
   }
@@ -657,51 +641,34 @@
 
   .snypd-account-final .btn{
     position:relative;
-    border:none;
-    border-radius:14px;
+    border:1px solid transparent;
+    border-radius:0;
     padding:12px 14px;
-    font-weight:950;
+    font-weight:400;
     cursor:pointer;
-    transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
     user-select:none;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-family:inherit;
   }
-  .snypd-account-final .btn:hover{
-    transform:translateY(-1px);
-    box-shadow:0 18px 48px rgba(0,0,0,.45);
-  }
-  .snypd-account-final .btn:active{ transform:translateY(0); }
 
   .snypd-account-final .btn-primary{
     color:#fff;
-    background:linear-gradient(135deg, var(--accent1), var(--accent2));
-    box-shadow:0 16px 40px rgba(162,0,255,.32);
+    background:var(--accent1);
     min-width:220px;
-  }
-  .snypd-account-final .btn-primary::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:14px;
-    background:linear-gradient(120deg, transparent, rgba(255,255,255,.15), transparent);
-    transform:translateX(-120%);
-    transition:transform .7s ease;
-    pointer-events:none;
-  }
-  .snypd-account-final .btn-primary:hover::after{
-    transform:translateX(120%);
   }
 
   .snypd-account-final .btn-secondary{
-    color:rgba(245,241,255,.98);
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(162,0,255,.24);
+    color:var(--text);
+    background:transparent;
+    border:1px solid var(--stroke-strong);
     padding:11px 14px;
   }
 
   .snypd-account-final .subtle{
     margin-top:10px;
     font-size:12px;
-    color:rgba(245,241,255,.70);
+    color:var(--muted3);
   }
 
   .snypd-account-final .sideStack{
@@ -710,9 +677,9 @@
   }
 
   .snypd-account-final .mini{
-    border-radius:16px;
-    border:1px solid rgba(162,0,255,.16);
-    background:rgba(255,255,255,.04);
+    border-radius:0;
+    border:1px solid var(--stroke);
+    background:rgba(255,255,255,.02);
     padding:14px;
   }
 
@@ -725,22 +692,24 @@
   }
 
   .snypd-account-final .mini-title{
-    font-weight:950;
-    color:rgba(245,241,255,.98);
-    opacity:1;
+    font-weight:400;
+    color:var(--text);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-size:12px;
   }
 
   .snypd-account-final .mini-link{
     font-size:12px;
-    font-weight:900;
-    color:rgba(196,85,255,.98);
+    font-weight:400;
+    color:var(--ok);
     text-decoration:none;
-    border-bottom:1px dashed rgba(196,85,255,.36);
   }
+  .snypd-account-final .mini-link:hover{ color:#57FFC8; }
 
   .snypd-account-final .mini-p{
     font-size:13px;
-    color:rgba(245,241,255,.84);
+    color:var(--muted);
     line-height:1.45;
     margin:0;
   }
@@ -752,19 +721,22 @@
     gap:10px;
     margin-top:12px;
     padding-top:12px;
-    border-top:1px solid rgba(162,0,255,.16);
+    border-top:1px solid var(--stroke);
   }
 
   .snypd-account-final .limit strong{
     font-size:22px;
-    color:rgba(255,255,255,.98);
+    font-weight:400;
+    color:var(--text);
     letter-spacing:.2px;
   }
 
   .snypd-account-final .limit span{
     font-size:12px;
-    color:rgba(245,241,255,.72);
-    font-weight:850;
+    color:var(--muted2);
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:.03em;
   }
 
   @media (max-width:920px){
@@ -774,28 +746,6 @@
       flex-direction:column;
     }
     .snypd-account-final .title{ text-align:left; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .snypd-account-final *{
-      transition:none !important;
-      animation:none !important;
-    }
-  }
-</style>
-<style>
-  /* Consistency pass: applies the mono/square/mint-status-purple-action system
-     already shipped on dashboard.html to this page's content area, without
-     restructuring its layout. */
-  .snypd-account-final, .snypd-account-final * { font-family: 'DM Mono', ui-monospace, monospace !important; }
-  .snypd-account-final .backbtn, .snypd-account-final .card, .snypd-account-final .pill,
-  .snypd-account-final .row, .snypd-account-final .notice, .snypd-account-final .btn,
-  .snypd-account-final .mini {
-    border-radius: 0 !important;
-  }
-  .snypd-account-final .btn, .snypd-account-final .pill, .snypd-account-final .k {
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
   }
 </style>
 <div class="snypd-account-final">
