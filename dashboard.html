@@ -620,14 +620,23 @@ body {
   .mr-cond-row { flex-direction: column; gap: 2px; }
   .mr-cond-detail { text-align: left; }
 }
-.panel .hd { 
-  padding: 20px 24px; 
-  border-bottom: 1px solid var(--border); 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  background: var(--panel-header); 
+.panel .hd {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--panel-header);
 }
+/* #dashboard-panel's own .hd (Plan/Status/Last-check chips, Start/Stop,
+   alerts messaging) has no equivalent anywhere in the Ledger mockup - it's
+   real, necessary scraper controls the mockup's screens just never had to
+   show. Quieted down rather than boxed as its own card-header bar, so it
+   reads as a utility strip above the real content instead of competing
+   with it for attention: no dividing border, background matches the
+   panel's own surface instead of the slightly-lighter --panel-header tone
+   every other panel heading uses. */
+#dashboard-panel .hd { background: transparent; border-bottom: none; padding-bottom: 8px; }
 /* Feed 4-stat row (Ledger 2j) */
 .feed-stats { display: flex; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .feed-stat { flex: 1 1 140px; padding: 16px 24px; display: flex; flex-direction: column; gap: 4px; border-left: 1px solid var(--border); }
@@ -835,8 +844,9 @@ body {
 /* Feed / History tabs */
 .view-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
 .view-tab {
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
   color: var(--text-muted);
   height: 34px;
   padding: 0 16px;
@@ -851,8 +861,11 @@ body {
 /* Mint is the status/selection color in this design system; purple is
    reserved for primary action buttons only (Claim, Start Hunting, etc.) -
    this used to fill active nav tabs with purple, which is a real deviation
-   from the locked Ledger direction. */
-.view-tab.active { background: rgba(255,255,255,0.02); color: var(--text-primary); border-color: var(--success); }
+   from the locked Ledger direction. A later pass boxed the active tab in a
+   full mint border instead - confirmed against the actual 2j mockup image
+   that it's a plain-text tab with just a thin mint underline, no border
+   box on either state. */
+.view-tab.active { color: var(--text-primary); border-bottom-color: var(--success); }
 
 /* History cards */
 .hist-card {
@@ -1004,9 +1017,15 @@ body {
 }
 .card-badge--new { left: 8px; color: var(--bg); background: var(--success); }
 .card-badge--drop { left: 8px; color: #FFFFFF; background: var(--brand); }
+/* Icon-only, not a "Check seller" text banner - confirmed against the
+   actual 2j mockup image, which shows a small square glyph badge here, the
+   same footprint as NEW/DROP, not a wide label. The reason ("Vinted
+   flagged this listing's photo for review") lives in the title tooltip. */
 .card-badge--suspicious {
-  right: 8px; left: auto;
-  display: flex; align-items: center; gap: 4px;
+  right: 8px; left: auto; top: 8px;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
   color: var(--warning); background: rgba(11,12,13,0.85);
   border: 1px solid rgba(255,176,32,0.4);
 }
@@ -1508,15 +1527,19 @@ body {
 </div>
 
 <div class="panel" id="history-panel" style="margin-bottom:16px; display:none">
-<div class="hd">
-<div class="status-bar">
-<div class="chip plan" id="hist-holding-count">Holding: —</div>
-<div class="chip plan" id="hist-sold-count">Sold: —</div>
-<div class="chip ok" id="hist-profit">Realised profit: —</div>
+<!-- Ledger 2c: headline stat bar (Saved vs median / Realised profit), same
+     shape as Feed's .feed-stats - confirmed against the actual mockup image
+     that History shows both, not just profit alone. "Saved vs median" has
+     no real computation behind it yet anywhere in the product, Feed's own
+     copy included - this is the same honest placeholder, not new data. -->
+<div class="feed-stats" id="hist-stats">
+  <div class="feed-stat"><span class="feed-stat__val mint" id="hist-saved">&mdash;</span><span class="feed-stat__lbl">Saved vs median</span></div>
+  <div class="feed-stat"><span class="feed-stat__val" id="hist-profit">&mdash;</span><span class="feed-stat__lbl">Realised profit</span></div>
 </div>
+<div class="hd">
 <div class="controls">
-<button class="btn hist-subtab active" type="button" data-sub="holding">Holding</button>
-<button class="btn hist-subtab" type="button" data-sub="sold">Sold</button>
+<button class="btn hist-subtab active" type="button" data-sub="holding">Holding<span id="hist-holding-count"></span></button>
+<button class="btn hist-subtab" type="button" data-sub="sold">Sold<span id="hist-sold-count"></span></button>
 </div>
 </div>
 <div class="bd">
@@ -1524,7 +1547,6 @@ body {
   <span id="reconcile-text"></span>
   <span class="reconcile-actions">
     <button class="btn btn-prim" type="button" id="reconcile-review">Review</button>
-    <button class="btn btn-ghost" type="button" id="reconcile-snooze">Ask me again in 30 days</button>
   </span>
 </div>
 <div class="empty" id="hist-empty" style="display:none"></div>
@@ -1537,6 +1559,10 @@ body {
 <div class="status-bar">
 <div class="chip plan" id="prof-plan">Plan: —</div>
 <div class="plan-badge plan-badge--founding" id="prof-founding" style="display:none">Founding member</div>
+<!-- No real computation behind this anywhere yet, Feed's own copy included -
+     same honest placeholder, confirmed against the 2d mockup which shows it
+     as Profile's own headline stat alongside profit. -->
+<div class="chip ok" id="prof-saved">Saved vs median: —</div>
 <div class="chip ok" id="prof-profit">Realised profit: —</div>
 </div>
 </div>
@@ -2359,8 +2385,8 @@ const HEARTBEAT_URL = (() => {
           }
         }
 
-        holdingCount.textContent = `Holding: ${holding.length}`;
-        soldCount.textContent = `Sold: ${sold.length}`;
+        holdingCount.textContent = ` · ${holding.length}`;
+        soldCount.textContent = ` · ${sold.length}`;
         const historyCountEl = document.getElementById('view-tab-history-count');
         if (historyCountEl) historyCountEl.textContent = rows.length ? ` · ${rows.length}` : '';
 
@@ -2368,7 +2394,7 @@ const HEARTBEAT_URL = (() => {
           if (r.sold_price_cents == null || r.bought_price_cents == null) return sum;
           return sum + (r.sold_price_cents - r.bought_price_cents);
         }, 0);
-        profitChip.textContent = `Realised profit: ${eur(totalProfit)}`;
+        profitChip.textContent = eur(totalProfit);
 
         const fsProfit = document.getElementById('fs-profit');
         const fsProfitLbl = document.getElementById('fs-profit-lbl');
@@ -3201,7 +3227,7 @@ const HEARTBEAT_URL = (() => {
     // map_vinted_item_to_current_ad, migration 029) - independent of the
     // corner badge above, so both can show at once.
     const suspicionBadge = r.is_suspicious === true
-      ? `<span class="card-badge card-badge--suspicious" title="Vinted flagged this listing's photo for review">&#9888; Check seller</span>`
+      ? `<span class="card-badge card-badge--suspicious" title="Vinted flagged this listing's photo for review">&#9888;</span>`
       : '';
     const badge = cornerBadge + suspicionBadge;
 
