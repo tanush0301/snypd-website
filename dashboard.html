@@ -2864,6 +2864,54 @@ const HEARTBEAT_URL = (() => {
       </div>`;
   };
 
+  // E3: deal-quality bonus (spec section 2). Elite-only, not by choice made
+  // here but because there is no other way to get a real median price - the
+  // only market-data endpoint in this codebase (POST /api/v1/market/snapshot)
+  // is already gated Elite-only (main.py's _require_elite_or_403), same
+  // paywall the Market Insights tab already respects. A Free account simply
+  // has no real number to compute this bonus from, so it never fires there,
+  // not a new restriction being introduced for XP specifically.
+  //
+  // Runs AFTER the claim and its E2/E6 XP already saved - never blocks the
+  // claim button, and a slow/failed lookup just means no bonus this time,
+  // not a broken claim. Reuses the exact eligibility rule market_snapshot()
+  // itself already enforces (sample_size, and 'one_seller_dominates' fires
+  // at precisely max-seller-share > 0.4, confirmed by reading
+  // ops/migrations/023_market_snapshot_fix_numeric_cast.sql - the same
+  // >0.4 boundary the spec's own max_single_seller_share<=0.40 gate means),
+  // so this can't disagree with what the Market Insights tab itself would
+  // show for the same query.
+  async function awardDealQualityBonus(itemId, itemTitle, boughtCents) {
+    if (effectivePlan !== 'elite') return;
+    if (!itemTitle || boughtCents == null) return;
+    try {
+      const t = session && session.access_token;
+      if (!t) return;
+      const res = await fetch('https://api.snypd.store/api/v1/market/snapshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
+        body: JSON.stringify({ q: itemTitle }),
+      });
+      if (!res.ok) return; // 403/429/503 etc - no bonus this time, not an error to surface
+      const report = await res.json();
+
+      const sampleOk = Number(report.sample_size) >= 30;
+      const sellerOk = report.display_verdict !== 'one_seller_dominates';
+      const medianCents = report.show_headline ? Number(report.typical_cents) : null;
+      if (!sampleOk || !sellerOk || !medianCents) return; // "pending market data", not 0 XP
+
+      const d = (medianCents - boughtCents) / medianCents;
+      const bonus = Math.max(0, Math.min(50, Math.floor(d * 100)));
+      if (bonus > 0) {
+        await awardXP('deal_quality', bonus, itemId, {
+          median_cents: medianCents, bought_cents: boughtCents, sample_size: report.sample_size,
+        });
+      }
+    } catch (e) {
+      console.error('SNYPD XP: deal-quality bonus lookup failed (no bonus awarded)', e);
+    }
+  }
+
   // ----------------- CLAIM -----------------
   // Delegated on #list rather than per-button, since cards are inserted and
   // removed dynamically by renderRows(). Real DB write, real error handling -
@@ -2923,6 +2971,11 @@ const HEARTBEAT_URL = (() => {
       const claimsToday = await xpEventCountToday('claim');
       if (claimsToday < 4) {
         await awardXP('claim', 25, claimRowId, { listing_id: listingId });
+        // E3 rides on the same cap as E2 - a claim that earned no XP because
+        // today's 4 are already used earns no deal-quality bonus either, so
+        // farming claims never multiplies XP by adding a second uncapped
+        // event on top of the one that's already capped.
+        awardDealQualityBonus(claimRowId, row.title, boughtCents);
       }
       if (!hadClaimedBefore) {
         await awardXP('first_claim', 25, claimRowId, {});
