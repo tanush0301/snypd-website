@@ -349,6 +349,14 @@
   --font: 'DM Mono', ui-monospace, monospace;
   --smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
+/* Ledger's own base rules (its <helmet> style block) - a bare, unstyled link
+   was falling back to browser-default blue; explicit per-context rules like
+   .claim-hint a keep their own color regardless, since they're more specific
+   than this. */
+a { color: var(--success); text-decoration: none; }
+a:hover { color: #57FFC8; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: var(--border-hover); }
 
 body {
   background: var(--bg);
@@ -429,7 +437,15 @@ body {
 @media (max-width: 767px) {
   .snypd-topbar { padding: 12px 16px; gap: 12px; }
   .snypd-topbar__brand { font-size: 15px; letter-spacing: 0.04em; }
-  .snypd-topbar__tabs { order: 3; flex-basis: 100%; }
+  /* Real bug, found on an actual mobile-width check: "Market Insights" and
+     "History · N" wrapped to two lines inside their own tab, since .view-tab
+     has no white-space rule and shrinks under its flex parent by default.
+     nowrap + horizontal scroll (rather than wrapping) keeps every label
+     readable on one line - this does not attempt the mockup's separate
+     bottom-tab-bar mobile pattern (Ledger 2a-2e), which is a bigger, still-
+     unbuilt redesign of its own, not a one-line fix. */
+  .snypd-topbar__tabs { order: 3; flex-basis: 100%; overflow-x: auto; }
+  .view-tab { white-space: nowrap; flex: 0 0 auto; font-size: 11px; padding: 0 12px; }
   .snypd-topbar__plan { display: none; }
   .snypd-topbar__streak { display: none !important; }
   #topbar-founding { display: none !important; }
@@ -695,7 +711,13 @@ body {
   background: var(--brand-hover);
   border-color: var(--brand-hover);
 }
-.btn-ghost { 
+/* Ledger 2c: a segmented status toggle (which state am I viewing), not an
+   action button - mint fill for the selected side, matching how the
+   HOLDING/SOLD control looks in the mockup. Kept separate from .btn-prim so
+   real action buttons (Claim, Mark Sold) never accidentally pick this up. */
+.hist-subtab { background: var(--panel); color: var(--text-muted); border: 1px solid var(--border); }
+.hist-subtab.active { background: var(--success); color: var(--bg); border-color: var(--success); }
+.btn-ghost {
   background: rgba(255,255,255,0.02); 
   color: var(--text-primary); 
   border: 1px solid var(--border); 
@@ -816,6 +838,9 @@ body {
   margin-bottom: 12px;
 }
 .hist-held { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.hist-dq { font-size: 11px; margin-top: 4px; }
+.hist-dq--awarded { color: var(--success); }
+.hist-dq--pending { color: var(--text-muted); }
 .p.hist-profit-pos { color: var(--success) !important; }
 .p.hist-profit-neg { color: var(--danger) !important; }
 .hist-sale-form { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
@@ -1173,7 +1198,7 @@ body {
   <div class="snypd-topbar__brand">SNYPD<span class="snypd-topbar__brand-underscore">_</span></div>
   <nav class="snypd-topbar__tabs" id="view-tabs">
     <button class="view-tab active" type="button" data-view="feed">Feed</button>
-    <button class="view-tab" type="button" data-view="history">History</button>
+    <button class="view-tab" type="button" data-view="history">History<span id="view-tab-history-count"></span></button>
     <button class="view-tab" type="button" data-view="market">Market Insights</button>
   </nav>
   <div class="snypd-topbar__right" id="topbar-profile-trigger" role="button" tabindex="0" aria-label="Open profile">
@@ -1364,8 +1389,8 @@ body {
 <div class="chip ok" id="hist-profit">Realised profit: —</div>
 </div>
 <div class="controls">
-<button class="btn btn-prim hist-subtab active" type="button" data-sub="holding">Holding</button>
-<button class="btn btn-ghost hist-subtab" type="button" data-sub="sold">Sold</button>
+<button class="btn hist-subtab active" type="button" data-sub="holding">Holding</button>
+<button class="btn hist-subtab" type="button" data-sub="sold">Sold</button>
 </div>
 </div>
 <div class="bd">
@@ -1942,10 +1967,26 @@ const HEARTBEAT_URL = (() => {
       }
     }
 
-    function histCardHTML(row) {
+    // E3 (spec section 2): "If not eligible: bonus = 0, and the UI reads
+    // 'quality bonus pending market data' (never '0 XP')." awardDealQualityBonus
+    // never writes a row when ineligible, so there is no separate "ineligible"
+    // state to render - only "awarded" (a real deal_quality row exists) or
+    // "pending" (it doesn't, yet - or won't, which reads the same by design).
+    // Elite-only (see awardDealQualityBonus's own comment for why): a Free
+    // account shows neither line, since "pending market data" would be a lie -
+    // it will never resolve for them under a plan that has no market data.
+    function dealQualityLineHTML(row, dealQualityByItem) {
+      const dq = dealQualityByItem.get(String(row.id));
+      if (dq != null) return `<div class="hist-dq hist-dq--awarded">+${dq} XP quality bonus</div>`;
+      if (effectivePlan === 'elite') return `<div class="hist-dq hist-dq--pending">Quality bonus pending market data</div>`;
+      return '';
+    }
+
+    function histCardHTML(row, dealQualityByItem) {
       const img = row.image_url
         ? `<img class="thumb" loading="lazy" src="${esc(row.image_url)}" alt="${esc(row.title || '')}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb fallback'}))" />`
         : `<div class="thumb fallback"></div>`;
+      const dqLine = dealQualityLineHTML(row, dealQualityByItem);
 
       if (row.status === 'sold') {
         const profit = (row.sold_price_cents != null && row.bought_price_cents != null)
@@ -1963,6 +2004,7 @@ const HEARTBEAT_URL = (() => {
                 <div class="p ${profitCls}">${profitLabel}</div>
               </div>
               <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')} · bought ${eur(row.bought_price_cents)}${soldPart}</div>
+              ${dqLine}
               <div class="hist-sale-form">
                 <button class="btn btn-ghost hist-remove" type="button" data-remove-claim="${row.id}">Remove from history</button>
               </div>
@@ -1982,6 +2024,7 @@ const HEARTBEAT_URL = (() => {
             </div>
             <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')}</div>
             <div class="hist-held">${stale ? '⚠ ' : ''}Held ${held}d${stale ? ' — still yours?' : ''}</div>
+            ${dqLine}
             <div class="hist-sale-form" data-sale-form>
               <input type="number" step="0.01" min="0" placeholder="Sold for" data-sale-input />
               <button class="btn btn-prim" type="button" data-mark-sold="${row.id}">Mark sold</button>
@@ -2009,8 +2052,30 @@ const HEARTBEAT_URL = (() => {
         const stale = holding.filter(r => daysHeld(r.claimed_at) >= STALE_DAYS);
         lastStaleItems = stale;
 
+        // Elite only - see dealQualityLineHTML/awardDealQualityBonus. Best-
+        // effort: a failed lookup here just means every card shows "pending"
+        // a little longer, never blocks history from loading.
+        const dealQualityByItem = new Map();
+        if (effectivePlan === 'elite' && rows.length) {
+          try {
+            const ids = rows.map(r => r.id).filter(Boolean);
+            const { data: dqRows, error: dqErr } = await sb
+              .from('xp_events')
+              .select('item_id, xp')
+              .eq('user_id', uid)
+              .eq('event_type', 'deal_quality')
+              .in('item_id', ids);
+            if (dqErr) throw dqErr;
+            for (const r of (dqRows || [])) dealQualityByItem.set(String(r.item_id), Number(r.xp) || 0);
+          } catch (e) {
+            console.error('SNYPD history: could not load deal-quality bonuses', e);
+          }
+        }
+
         holdingCount.textContent = `Holding: ${holding.length}`;
         soldCount.textContent = `Sold: ${sold.length}`;
+        const historyCountEl = document.getElementById('view-tab-history-count');
+        if (historyCountEl) historyCountEl.textContent = rows.length ? ` · ${rows.length}` : '';
 
         const totalProfit = sold.reduce((sum, r) => {
           if (r.sold_price_cents == null || r.bought_price_cents == null) return sum;
@@ -2052,7 +2117,7 @@ const HEARTBEAT_URL = (() => {
           histEmpty.style.display = 'block';
           return;
         }
-        histList.innerHTML = shown.map(histCardHTML).join('');
+        histList.innerHTML = shown.map(row => histCardHTML(row, dealQualityByItem)).join('');
       } catch (e) {
         console.error('SNYPD history: could not load claims', e);
         histList.innerHTML = '';
@@ -2145,16 +2210,19 @@ const HEARTBEAT_URL = (() => {
 
     document.querySelectorAll('.hist-subtab').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.hist-subtab').forEach(b => {
-          b.classList.remove('active', 'btn-prim');
-          b.classList.add('btn-ghost');
-        });
-        btn.classList.add('active', 'btn-prim');
-        btn.classList.remove('btn-ghost');
+        document.querySelectorAll('.hist-subtab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
         currentSub = btn.dataset.sub;
         loadClaims();
       });
     });
+
+    // Ledger 2j: the History nav tab shows a live count ("HISTORY · 12")
+    // permanently, not only once the tab is opened - same reasoning as the
+    // topbar's streak/XP text. loadClaims() already sets it as a side effect,
+    // so just run it once on load; it populates the (hidden) History panel
+    // too, harmlessly, same as it already does after every claim/sale.
+    loadClaims();
 
     function snoozeReconcile() {
       const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
@@ -2906,6 +2974,12 @@ const HEARTBEAT_URL = (() => {
         await awardXP('deal_quality', bonus, itemId, {
           median_cents: medianCents, bought_cents: boughtCents, sample_size: report.sample_size,
         });
+        // The claim already rendered its History card showing "pending" (no
+        // deal_quality row existed yet at that point, win or lose) - refresh
+        // so it flips to the real amount without the user needing to leave
+        // and reopen the History tab. Safe to call even if History was never
+        // opened this session; it just populates it invisibly.
+        loadClaims();
       }
     } catch (e) {
       console.error('SNYPD XP: deal-quality bonus lookup failed (no bonus awarded)', e);
@@ -3706,7 +3780,7 @@ const HEARTBEAT_URL = (() => {
   function badgeFor(v) {
     if (v === 'ok') { return { cls: 'ok', text: 'Trusted price' }; }
     if (v === 'too_thin_shown') { return { cls: 'warn', text: 'Rough guide only' }; }
-    if (v === 'too_thin') { return { cls: 'warn', text: 'Not enough data' }; }
+    if (v === 'too_thin') { return { cls: 'warn', text: 'Not enough data yet' }; }
     if (v === 'too_broad') { return { cls: 'bad', text: 'Too mixed to trust' }; }
     if (v === 'one_seller_dominates') { return { cls: 'warn', text: 'Not a real market' }; }
     return { cls: 'warn', text: 'See detail' };
