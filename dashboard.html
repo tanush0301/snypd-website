@@ -129,7 +129,7 @@
   }
   .snypd-sidebar[data-state="live"] .snypd-orb {
     background: var(--success);
-    box-shadow: 0 0 8px rgba(53,231,220,0.4);
+    box-shadow: 0 0 8px rgba(0,229,160,0.4);
   }
   .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
     color: var(--success);
@@ -324,29 +324,34 @@
   .snypd-sidebar[data-focus="true"] .snypd-icon { margin-right: 0; }
   .snypd-sidebar[data-focus="true"] .snypd-sidebar__header { padding: 24px 16px; }
 </style><style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 
+/* Locked direction, "SNYPD Ledger" (Claude Design, Round 2) - exact values,
+   not approximations. Mint is status-only text/dots, never a fill; purple is
+   action-fill-only, never text (it measures 3.65:1 as text on this bg). */
 :root {
-  --bg: #000000;
-  --panel: rgba(20, 20, 20, 0.7);
-  --panel-header: rgba(30, 30, 30, 0.4);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.2);
-  --text-primary: #FFFFFF;
-  --text-muted: #888888;
+  --bg: #0B0C0D;
+  --panel: #0F1113;
+  --panel-header: #101214;
+  --surface3: #191C1E;
+  --border: #1E2225;
+  --border-hover: #262B2F;
+  --text-primary: #EDEFF0;
+  --text-secondary: #A6ADB1;
+  --text-muted: #7C8489;
+  --text-caption: #5C6469;
   --brand: #A200FF; /* action color only - buttons */
   --brand-hover: #C54BFF;
   --brand-fg: #FFFFFF;
-  --success: #35e7dc; /* mint - status color only, never action */
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --font: 'JetBrains Mono', monospace;
+  --success: #00E5A0; /* mint - status color only, never action */
+  --warning: #FFB020;
+  --danger: #FF5C5C;
+  --font: 'DM Mono', ui-monospace, monospace;
   --smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body {
   background: var(--bg);
-  background-image: radial-gradient(circle at 50% -20%, rgba(162, 0, 255, 0.1), transparent 60%);
   color: var(--text-primary);
   font-family: var(--font);
   margin: 0;
@@ -362,9 +367,68 @@ body {
   min-width: 0;
 }
 
-.dash-wrap { max-width: 1080px; margin: 40px auto; padding: 0 24px; }
+.dash-wrap { max-width: 1080px; margin: 24px auto 40px; padding: 0 24px; }
 
-/* Header */
+/* Unified top bar - replaces the old left sidebar entirely, per the final
+   desktop mockup (2j): logo, Feed/History/Market Insights tabs, and a
+   status+plan cluster on the right that opens Profile. */
+.snypd-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.snypd-topbar__brand {
+  font-family: var(--font);
+  font-size: 16px;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+.snypd-topbar__brand-underscore { color: var(--success); }
+.snypd-topbar__tabs { display: flex; gap: 4px; flex: 1 1 auto; }
+.snypd-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s var(--smooth);
+}
+.snypd-topbar__right:hover { border-color: var(--border); }
+.snypd-topbar__status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+.snypd-topbar .snypd-orb { width: 6px; height: 6px; background: var(--text-muted); flex: 0 0 auto; }
+.snypd-topbar[data-state="running"] .snypd-orb { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.snypd-topbar[data-state="running"] .snypd-topbar__status { color: var(--success); }
+.snypd-topbar[data-state="offline"] .snypd-orb { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+.snypd-topbar[data-state="offline"] .snypd-topbar__status { color: var(--warning); }
+.snypd-topbar[data-state="backend-down"] .snypd-orb { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.snypd-topbar[data-state="backend-down"] .snypd-topbar__status { color: var(--danger); }
+.snypd-topbar__plan { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: var(--text-muted); text-transform: uppercase; }
+.snypd-topbar__streak { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; font-family: var(--font); }
+
+@media (max-width: 767px) {
+  .snypd-topbar { padding: 12px 16px; gap: 12px; }
+  .snypd-topbar__brand { font-size: 15px; letter-spacing: 0.04em; }
+  .snypd-topbar__tabs { order: 3; flex-basis: 100%; }
+  .snypd-topbar__plan { display: none; }
+  .snypd-topbar__streak { display: none !important; }
+  #topbar-founding { display: none !important; }
+}
+
+/* Header (legacy, unused now that the topbar replaces it - left in place,
+   harmless, not worth the risk of deleting rules something else might share) */
 .hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
 .brand { display: flex; align-items: center; }
 
@@ -454,7 +518,7 @@ body {
   text-transform: uppercase; padding: 4px 9px; border-radius: 0;
   border: 1px solid var(--border); color: var(--text-muted);
 }
-.mr-badge.ok   { color: var(--success); border-color: rgba(53,231,220,0.35); background: rgba(53,231,220,0.06); }
+.mr-badge.ok   { color: var(--success); border-color: rgba(0,229,160,0.35); background: rgba(0,229,160,0.06); }
 .mr-badge.warn { color: var(--warning); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); }
 .mr-badge.bad  { color: var(--danger);  border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.06); }
 .mr-headline { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--text-primary); }
@@ -474,6 +538,23 @@ body {
   background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25); color: var(--warning);
 }
 .mr-note { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+/* Price positioning: where an asking price sits against this market. Derived
+   from p25/median/p75, which were already being returned. */
+.mr-pos { margin-top: 14px; }
+.mr-pos-bar { display: flex; height: 8px; overflow: hidden; background: rgba(255,255,255,0.06); }
+.mr-pos-seg { flex: 1 1 25%; }
+.mr-pos-seg.s1 { background: var(--success); opacity: .85; }
+.mr-pos-seg.s2 { background: var(--success); opacity: .45; }
+.mr-pos-seg.s3 { background: var(--warning); opacity: .55; }
+.mr-pos-seg.s4 { background: var(--danger);  opacity: .6; }
+.mr-pos-scale { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted); }
+.mr-pos-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(126px, 1fr)); gap: 6px 12px; margin-top: 10px; }
+.mr-pos-item { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.mr-pos-item b { color: var(--text-primary); display: block; font-weight: 600; }
+.mr-drift {
+  margin-top: 10px; padding: 9px 12px; border-radius: 0; font-size: 13px; line-height: 1.5;
+  background: rgba(162,0,255,0.07); border: 1px solid rgba(162,0,255,0.25); color: var(--text-primary);
+}
 .mr-error {
   margin-top: 12px; padding: 11px 14px; border-radius: 0; font-size: 13px; line-height: 1.5;
   background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); color: var(--danger);
@@ -494,6 +575,14 @@ body {
   align-items: center; 
   background: var(--panel-header); 
 }
+/* Feed 4-stat row (Ledger 2j) */
+.feed-stats { display: flex; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.feed-stat { flex: 1 1 140px; padding: 16px 24px; display: flex; flex-direction: column; gap: 4px; border-left: 1px solid var(--border); }
+.feed-stat:first-child { border-left: none; }
+.feed-stat__val { font-size: 24px; color: var(--text-primary); }
+.feed-stat__val.mint { color: var(--success); }
+.feed-stat__lbl { font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
 .status-bar { display: flex; gap: 12px; flex-wrap: wrap; }
 .chip {
   padding: 6px 12px;
@@ -510,12 +599,64 @@ body {
   gap:8px;
 }
 .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #666; }
-.chip.ok { color: var(--success); background: rgba(53,231,220,0.05); border-color: rgba(53,231,220,0.2); }
+.chip.ok { color: var(--success); background: rgba(0,229,160,0.05); border-color: rgba(0,229,160,0.2); }
 .chip.ok::before { background: var(--success); box-shadow: 0 0 6px var(--success); }
-.chip.warn { color: var(--warning); background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
+.chip.warn { color: var(--warning); background: rgba(255,176,32,0.06); border-color: rgba(255,176,32,0.4); }
 .chip.warn::before { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
-.chip.err { color: var(--danger); background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+.chip.err { color: var(--danger); background: rgba(255,92,92,0.06); border-color: rgba(255,92,92,0.4); }
 .chip.err::before { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+/* Grey/paused state - secondary text only, per the Ledger status system (2h):
+   no state is distinguishable by hue alone without a word alongside it. */
+.chip.muted { color: var(--text-muted); background: rgba(255,255,255,0.02); border-color: var(--border); }
+.chip.muted::before { background: var(--text-muted); box-shadow: none; }
+
+/* Plan badges (Ledger 2h "side by side") - three different shapes on purpose,
+   not just three colors: FREE is outline-only, ELITE is a solid mint fill
+   with dark text, FOUNDING is a mint tinted-outline fill with the chamfered
+   corner - the only cut corner anywhere in the system, so it reads as
+   deliberate rather than as one radius among several. */
+.plan-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 11px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: var(--font);
+}
+.plan-badge--free { color: var(--text-muted); border: 1px solid var(--border-hover); background: transparent; }
+.plan-badge--elite { color: var(--bg); background: var(--success); }
+.plan-badge--founding {
+  color: var(--success);
+  background: rgba(0,229,160,0.08);
+  border: 1px solid rgba(0,229,160,0.4);
+  clip-path: polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);
+}
+
+/* Toggle switch - squared knob and track, no radius, matching every other
+   control in this system. Not a native checkbox so the knob shape stays
+   square (an appearance:none checkbox still gets platform rounding). */
+.toggle-switch {
+  width: 40px; height: 22px;
+  background: var(--border-hover);
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.toggle-switch__knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: var(--bg);
+  transition: left 0.15s var(--smooth);
+}
+.toggle-switch.is-on { background: var(--success); }
+.toggle-switch.is-on .toggle-switch__knob { left: 21px; }
+.toggle-switch:disabled, .toggle-switch.is-disabled { cursor: not-allowed; opacity: 0.45; }
 .controls { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* Buttons */
@@ -616,6 +757,155 @@ body {
 }
 .card:active { transform: translateY(0) scale(0.99); background: rgba(255,255,255,0.06); }
 
+.card-actions { display: flex; gap: 8px; margin-top: 10px; }
+.card-actions .btn {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 11px;
+  flex: 0 0 auto;
+}
+.card-link { text-decoration: none; }
+.btn-claimed {
+  background: rgba(0,229,160,0.1);
+  color: var(--success);
+  border: 1px solid rgba(0,229,160,0.4);
+  cursor: default;
+}
+.claim-btn:disabled { opacity: 1; }
+
+/* Feed / History tabs */
+.view-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.view-tab {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--text-muted);
+  height: 34px;
+  padding: 0 16px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 0;
+}
+/* Mint is the status/selection color in this design system; purple is
+   reserved for primary action buttons only (Claim, Start Hunting, etc.) -
+   this used to fill active nav tabs with purple, which is a real deviation
+   from the locked Ledger direction. */
+.view-tab.active { background: rgba(255,255,255,0.02); color: var(--text-primary); border-color: var(--success); }
+
+/* History cards */
+.hist-card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.hist-held { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.p.hist-profit-pos { color: var(--success) !important; }
+.p.hist-profit-neg { color: var(--danger) !important; }
+.hist-sale-form { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.hist-sale-form input {
+  height: 30px;
+  width: 100px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 0 10px;
+  border-radius: 0;
+}
+.hist-remove { margin-left: auto; opacity: 0.6; }
+.hist-remove:hover { opacity: 1; color: var(--danger); border-color: var(--danger); }
+
+.claim-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+.claim-hint a { color: var(--brand); text-decoration: none; }
+.claim-hint a:hover { text-decoration: underline; }
+
+.rows-simple { display: flex; flex-direction: column; gap: 1px; }
+.prof-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.prof-row span:first-child { color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.03em; }
+.prof-row span:last-child { color: var(--text-primary); font-weight: 600; }
+.tiny-note { margin-top: 14px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+.xp-bar-track { height: 4px; background: var(--panel-header); margin-top: 6px; position: relative; }
+.xp-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--success); }
+
+.reconcile-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: rgba(245,158,11,0.06);
+  border: 1px solid rgba(245,158,11,0.3);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.reconcile-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.reconcile-actions .btn { height: 30px; padding: 0 12px; font-size: 11px; }
+.hist-card.is-stale { border-color: rgba(245,158,11,0.4); }
+
+/* Elite upsell (Ledger 2j) - real copy, no invented "N found overnight"
+   count. Free/Kickstart/Pro only; never shown to an already-Elite account. */
+.elite-banner {
+  padding: 17px 20px;
+  margin-bottom: 16px;
+  background: rgba(0,229,160,0.05);
+  border: 1px solid rgba(0,229,160,0.28);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.elite-banner__title { font-size: 15px; color: var(--text-primary); margin-bottom: 4px; }
+.elite-banner__text { font-size: 11.5px; color: var(--text-muted); }
+
+/* Offline / can't-reach-backend state - amber per Ledger 2e: this is a
+   "cached, still recoverable" state (Vinted unreachable, hunts still saved),
+   not the more severe "backend down" red state. */
+.offline-banner {
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: rgba(255,176,32,0.06);
+  border: 1px solid rgba(255,176,32,0.4);
+}
+.offline-banner__title { font-size: 13px; font-weight: 700; color: var(--warning); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+.offline-banner__text { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 10px; }
+.offline-banner__row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.offline-banner__row span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.offline-banner__row .btn { height: 30px; padding: 0 14px; font-size: 11px; }
+
+.list.stale-data .card { opacity: 0.7; }
+.stale-flag {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--warning);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-left: 8px;
+}
+
 .thumb {
   width: 88px;
   height: 88px;
@@ -625,10 +915,57 @@ body {
 }
 .thumb.fallback { border: 1px solid var(--border); }
 
+.thumb-wrap { position: relative; flex: 0 0 auto; }
+.thumb-wrap .thumb { display: block; }
+.card-badge {
+  position: absolute;
+  top: 8px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  font-family: var(--font);
+}
+.card-badge--new { left: 8px; color: var(--bg); background: var(--success); }
+.card-badge--drop { left: 8px; color: #FFFFFF; background: var(--brand); }
+.card-badge--suspicious {
+  right: 8px; left: auto;
+  display: flex; align-items: center; gap: 4px;
+  color: var(--warning); background: rgba(11,12,13,0.85);
+  border: 1px solid rgba(255,176,32,0.4);
+}
+
+/* Desktop grid layout (Ledger 2j) - the row layout above stays the mobile
+   default; the Ledger has no mobile feed screen of its own, so this is the
+   only place the grid applies. Scoped to #list specifically, NOT the shared
+   .list class - #hist-list uses that same class for the History view, which
+   keeps .hist-card's row layout (88px thumb + wide content) at every width.
+   A real bug found live: .list here briefly broke History's layout by
+   squeezing .hist-card's row-sized content into ~195px grid cells. */
+@media (min-width: 900px) {
+  #list { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+  .card {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+  }
+  .card > .thumb-wrap { width: 100%; }
+  .card .thumb { width: 100%; height: auto; aspect-ratio: 1; }
+  .card > div:last-child { padding: 11px; display: flex; flex-direction: column; gap: 6px; }
+  .card .meta-top { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .card .t { white-space: normal; font-size: 11.5px; }
+  .card .p { font-size: 15px; }
+  .card .muted { font-size: 9px; white-space: normal; }
+  .card-actions { flex-direction: column; }
+}
+
 .meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; min-width: 0; }
 .t { font-weight: 600; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
 .p { font-weight: 700; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
 .p.p-unknown { font-weight: 500; font-size: 12px; color: var(--text-muted); font-style: italic; }
+.p-total { font-size: 9px; color: var(--text-muted); white-space: nowrap; text-align: right; margin-top: 1px; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .tiny { display: none; }
 
@@ -685,12 +1022,12 @@ body {
     }
     #mobile-header .mh-dot.live {
       background: var(--success);
-      box-shadow: 0 0 8px rgba(53,231,220,0.55);
+      box-shadow: 0 0 8px rgba(0,229,160,0.55);
       animation: mhDotPulse 2s ease-in-out infinite;
     }
     @keyframes mhDotPulse {
-      0%, 100% { box-shadow: 0 0 8px rgba(53,231,220,0.55); }
-      50% { box-shadow: 0 0 14px rgba(53,231,220,0.9); }
+      0%, 100% { box-shadow: 0 0 8px rgba(0,229,160,0.55); }
+      50% { box-shadow: 0 0 14px rgba(0,229,160,0.9); }
     }
     @media (prefers-reduced-motion: reduce) {
       #mobile-header .mh-dot.live { animation: none; }
@@ -725,8 +1062,8 @@ body {
     /* New-card entrance: restrained, no bounce - then a brief teal highlight that fades. */
     .card.is-new {
       animation: cardIn 0.15s var(--smooth);
-      border-color: rgba(53,231,220,0.55) !important;
-      box-shadow: 0 0 0 1px rgba(53,231,220,0.35), 0 8px 24px rgba(0,0,0,0.4);
+      border-color: rgba(0,229,160,0.55) !important;
+      box-shadow: 0 0 0 1px rgba(0,229,160,0.35), 0 8px 24px rgba(0,0,0,0.4);
       transition: border-color 1.4s ease, box-shadow 1.4s ease;
     }
     @keyframes cardIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
@@ -771,7 +1108,28 @@ body {
       font-family: var(--font);
     }
     .wiz-preset:hover { border-color: var(--brand); background: rgba(162,0,255,0.05); }
-    .wiz-preset.is-picked { border-color: var(--success); background: rgba(53,231,220,0.06); opacity: 0.6; pointer-events: none; }
+    .wiz-preset.is-picked { border-color: var(--success); background: rgba(0,229,160,0.06); opacity: 0.6; pointer-events: none; }
+
+    /* Wizard step 2 alert rows (Ledger 2b) */
+    .wiz-alert-rows { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+    .wiz-alert-row { background: var(--panel); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .wiz-alert-row__title { font-size: 13px; color: var(--text-primary); }
+    .wiz-alert-row__note { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+    /* Reconcile bulk sheet (Ledger 2i) */
+    .rec-sheet-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); max-height: 340px; overflow-y: auto; margin-bottom: 16px; }
+    .rec-sheet-item { background: var(--panel); padding: 13px; display: flex; gap: 11px; align-items: center; cursor: pointer; }
+    .rec-sheet-item__check {
+      width: 16px; height: 16px; border: 1px solid var(--border-hover); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--bg);
+    }
+    .rec-sheet-item.is-checked .rec-sheet-item__check { border-color: var(--success); background: var(--success); }
+    .rec-sheet-item__title { font-size: 12.5px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-sheet-item__meta { font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.03em; margin-top: 3px; }
+    .rec-sheet-actions { display: flex; flex-direction: column; gap: 8px; }
+    .rec-sheet-count { font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
+    .rec-sheet-btns { display: flex; gap: 6px; }
+    .rec-sheet-btns .btn { flex: 1; padding: 0 8px; font-size: 10.5px; }
     .wiz-preset__name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
     .wiz-preset__meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
     .wiz-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -788,75 +1146,24 @@ body {
   </script>
 </head>
 <body>
-<div class="snypd-sidebar obsidian-mode" data-focus="false" data-open="false" data-snypd-sidebar="" data-state="idle">
-<div class="snypd-dim" data-snypd-action="close"></div>
-<aside aria-label="SNYPD navigation" class="snypd-sidebar__shell">
-<div class="snypd-sidebar__top">
-<div class="snypd-sidebar__brand">
-<div class="snypd-sidebar__logoRow">
-<!-- Logo replicated exactly -->
-<div class="snypd-sidebar__wordmark">SNYPD</div>
-</div>
-<div class="snypd-sidebar__tagline">Be first. Stay ahead.</div>
-<div class="snypd-sidebar__status">
-<span class="snypd-orb"></span>
-<span data-snypd-status-label="">IDLE</span>
-</div>
-</div>
-<button aria-label="Toggle sidebar" class="snypd-sidebar__toggle" data-snypd-action="toggle" type="button">
-<svg class="snypd-ico" fill="none" viewbox="0 0 24 24">
-<path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-</button>
-</div>
-<div class="snypd-sidebar__navWrap">
-<nav class="snypd-sidebar__nav" data-snypd-nav="">
-<a class="snypd-navItem" data-active="true" data-key="dashboard" data-snypd-navitem="" href="/dashboard">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M4 4h7v7H4V4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M13 4h7v7h-7V4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M4 13h7v7H4v-7Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M13 13h7v7h-7v-7Z" stroke="currentColor" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Dashboard</span>
-</a>
-<a class="snypd-navItem" data-key="filters" data-snypd-navitem="" href="/filters">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Filters</span>
-</a>
-<a class="snypd-navItem" data-key="stockx" data-snypd-navitem="" href="https://stockx.com/" target="_blank">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M7 7h10v10H7V7Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M9 9h6v6H9V9Z" opacity=".7" stroke="currentColor" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">StockX</span>
-</a>
-<a class="snypd-navItem" data-key="account" data-snypd-navitem="" href="/account">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Account</span>
-</a>
-</nav>
-</div>
-<div class="snypd-sidebar__bottom">
-<div class="snypd-bottomRow">
-<div class="snypd-pill" data-snypd-plan="">PLAN — ELITE</div>
-<a class="snypd-link" data-snypd-support="" href="/support">Support</a>
-</div>
-<button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
-</div>
-</aside>
-</div><div class="main-content">
-<!-- HAMBURGER FOR MOBILE -->
-<div id="mobile-header" style="display:none;">
-<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" aria-label="Menu">&#9776;</button>
-<span class="mh-word">SNYPD</span>
-<span class="mh-dot" id="mh-status-dot"></span>
-</div>
+<div class="main-content" style="width:100%">
+<header class="snypd-topbar" data-snypd-status="idle">
+  <div class="snypd-topbar__brand">SNYPD<span class="snypd-topbar__brand-underscore">_</span></div>
+  <nav class="snypd-topbar__tabs" id="view-tabs">
+    <button class="view-tab active" type="button" data-view="feed">Feed</button>
+    <button class="view-tab" type="button" data-view="history">History</button>
+    <button class="view-tab" type="button" data-view="market">Market Insights</button>
+  </nav>
+  <div class="snypd-topbar__right" id="topbar-profile-trigger" role="button" tabindex="0" aria-label="Open profile">
+    <span class="snypd-topbar__status">
+      <span class="snypd-orb" data-snypd-status-label=""></span>
+      <span id="topbar-status-text">Idle</span>
+    </span>
+    <span class="snypd-topbar__streak" id="topbar-streak" style="display:none"></span>
+    <span class="plan-badge plan-badge--founding" id="topbar-founding" style="display:none"></span>
+    <span class="snypd-topbar__plan" data-snypd-plan="">PLAN — ELITE</span>
+  </div>
+</header>
 <button class="new-pill" id="new-pill" type="button"></button>
 
 <!-- First-run wizard: hidden by default, shown only if a real DB check finds
@@ -888,23 +1195,61 @@ body {
     </div>
     <div class="wiz-step" id="wiz-step-2" style="display:none">
       <div class="wiz-eyebrow">Step 2 of 2</div>
-      <h2 class="wiz-title">Turn on alerts?</h2>
-      <p class="wiz-sub">Get notified the moment a match appears. On paid plans this keeps working even with this tab closed.</p>
+      <h2 class="wiz-title">How should we tell you?</h2>
+      <p class="wiz-sub">Under-market listings go fast. We alert you the moment one matches.</p>
+      <div class="wiz-alert-rows">
+        <div class="wiz-alert-row">
+          <div>
+            <div class="wiz-alert-row__title">Push notification</div>
+            <div class="wiz-alert-row__note">the fast one</div>
+          </div>
+          <button type="button" class="toggle-switch is-on" id="wiz-toggle-push" role="switch" aria-checked="true"><span class="toggle-switch__knob"></span></button>
+        </div>
+        <div class="wiz-alert-row">
+          <div>
+            <div class="wiz-alert-row__title">Email digest</div>
+            <div class="wiz-alert-row__note">not built yet</div>
+          </div>
+          <button type="button" class="toggle-switch is-disabled" disabled title="Coming soon"><span class="toggle-switch__knob"></span></button>
+        </div>
+        <div class="wiz-alert-row">
+          <div>
+            <div class="wiz-alert-row__title">Quiet hours</div>
+            <div class="wiz-alert-row__note">23:00 &ndash; 08:00 UTC</div>
+          </div>
+          <button type="button" class="toggle-switch is-on" id="wiz-toggle-quiet" role="switch" aria-checked="true"><span class="toggle-switch__knob"></span></button>
+        </div>
+      </div>
+      <p class="wiz-sub" style="margin:16px 0 0;font-size:11.5px;">Threshold-based filtering ("only ping me under X% below market") isn't built yet - every match on an enabled push alerts you today.</p>
       <div class="wiz-actions">
-        <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Enable alerts</button>
+        <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Start hunting</button>
         <button class="btn btn-ghost" id="wiz-finish" type="button">Set this up later</button>
       </div>
     </div>
   </div>
 </div>
 
+<div class="wiz-overlay" id="reconcile-sheet">
+  <div class="wiz-modal">
+    <div class="wiz-eyebrow" id="reconcile-sheet-eyebrow">Still holding these?</div>
+    <p class="wiz-sub" style="margin-bottom:16px">These have sat in Holding for 45 days or more. Clearing them keeps your profit number honest - it doesn't affect your saved total or streak.</p>
+    <div class="rec-sheet-list" id="reconcile-sheet-list"></div>
+    <div class="rec-sheet-actions">
+      <span class="rec-sheet-count" id="reconcile-sheet-count">0 selected</span>
+      <div class="rec-sheet-btns">
+        <button class="btn btn-ghost" type="button" id="reconcile-bulk-listed">Still listed</button>
+        <button class="btn btn-ghost" type="button" id="reconcile-bulk-price">Add price</button>
+        <button class="btn btn-prim" type="button" id="reconcile-bulk-sold">Sold elsewhere</button>
+      </div>
+    </div>
+    <div class="wiz-actions" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+      <button class="btn btn-ghost" type="button" id="reconcile-sheet-all-listed">Everything's still listed</button>
+      <button class="btn btn-ghost" type="button" id="reconcile-sheet-snooze-30">Ask me again in 30 days</button>
+    </div>
+  </div>
+</div>
+
 <div class="dash-wrap">
-<div class="hdr">
-<div class="brand">
-<div class="brand-logo">SNYPD</div>
-</div>
-<div class="sub" id="user-bar"></div>
-</div>
 <div class="activation-gate is-hidden" id="activation-gate">
 <h2>Unlock Your Arsenal</h2>
 <p>Your SNYPD account is primed. Start the free plan on Whop to unlock your first search lane and dominate the market.</p>
@@ -929,7 +1274,32 @@ body {
 </div>
 <p id="notify-note" style="display:none;margin:8px 0 0;font-size:13px;color:#8A8A8A;line-height:1.5;max-width:56ch"></p>
 </div>
+<div class="feed-stats" id="feed-stats">
+  <div class="feed-stat"><span class="feed-stat__val" id="fs-saved">&mdash;</span><span class="feed-stat__lbl" id="fs-saved-lbl">Saved vs median</span></div>
+  <div class="feed-stat"><span class="feed-stat__val" id="fs-profit">&mdash;</span><span class="feed-stat__lbl" id="fs-profit-lbl">Realised profit</span></div>
+  <div class="feed-stat"><span class="feed-stat__val" id="fs-hunts">&mdash;</span><span class="feed-stat__lbl">Hunts running</span></div>
+  <div class="feed-stat"><span class="feed-stat__val" id="fs-holding">&mdash;</span><span class="feed-stat__lbl">Holding</span></div>
+</div>
 <div class="bd">
+<div class="elite-banner" id="elite-banner" style="display:none">
+  <div>
+    <div class="elite-banner__title">Elite watches while you're away</div>
+    <div class="elite-banner__text">Your plan only checks while this tab is open. Elite keeps hunting 24/7, tab closed or not.</div>
+  </div>
+  <a class="btn btn-prim" href="/plans">Go Elite</a>
+</div>
+<div class="offline-banner" id="offline-banner" style="display:none">
+  <div class="offline-banner__title">&#9888; Can't reach Vinted right now</div>
+  <p class="offline-banner__text">Your hunts are still saved. We'll pick up automatically - nothing found in the meantime is lost, it just isn't shown yet.</p>
+  <div class="offline-banner__row">
+    <span id="offline-last-sync"></span>
+    <button class="btn btn-prim" type="button" id="offline-retry">Retry</button>
+  </div>
+</div>
+<div class="claim-hint" id="claim-hint" style="display:none">
+  Tapping <strong>Claim</strong> marks an item as bought and tracks it in your <a href="#" data-view-link="history">History</a> tab, where you can later mark it sold, mark it still listed, or remove it if you claimed it by mistake.
+  <a href="#" data-dismiss-hint style="margin-left:8px">Got it</a>
+</div>
 <div class="empty" id="empty" style="display:none">No results yet. Press “Start Sniping Now”.</div>
 <div class="list" id="list">
 <div class="skeleton"></div>
@@ -942,9 +1312,10 @@ body {
 <div class="panel" id="market-panel" style="margin-bottom:16px; display:none">
 <div class="hd">
 <div class="status-bar">
-<div class="chip plan">Market Report</div>
+<div class="chip plan">Market Insights</div>
 <div class="chip neutral" id="mr-tier-chip">Elite</div>
 </div>
+<p class="tiny-note" style="margin-top:10px">Median asking price and sample size for any item, computed live across current Vinted listings, broken down by condition.</p>
 <div class="mr-row" id="mr-controls" style="margin-top:10px">
 <input class="mr-input" id="mr-query" type="text" autocomplete="off" spellcheck="false" placeholder="Search an item, e.g. jordan 1 mid" />
 <button class="btn btn-prim" id="mr-go" type="button">Check price</button>
@@ -959,81 +1330,97 @@ body {
 <div id="mr-result"></div>
 </div>
 </div>
+
+<div class="panel" id="history-panel" style="margin-bottom:16px; display:none">
+<div class="hd">
+<div class="status-bar">
+<div class="chip plan" id="hist-holding-count">Holding: —</div>
+<div class="chip plan" id="hist-sold-count">Sold: —</div>
+<div class="chip ok" id="hist-profit">Realised profit: —</div>
+</div>
+<div class="controls">
+<button class="btn btn-prim hist-subtab active" type="button" data-sub="holding">Holding</button>
+<button class="btn btn-ghost hist-subtab" type="button" data-sub="sold">Sold</button>
+</div>
+</div>
+<div class="bd">
+<div class="reconcile-strip" id="reconcile-strip" style="display:none">
+  <span id="reconcile-text"></span>
+  <span class="reconcile-actions">
+    <button class="btn btn-prim" type="button" id="reconcile-review">Review</button>
+    <button class="btn btn-ghost" type="button" id="reconcile-snooze">Ask me again in 30 days</button>
+  </span>
+</div>
+<div class="empty" id="hist-empty" style="display:none"></div>
+<div class="list" id="hist-list"></div>
+</div>
+</div>
+
+<div class="panel" id="profile-panel" style="margin-bottom:16px; display:none">
+<div class="hd">
+<div class="status-bar">
+<div class="chip plan" id="prof-plan">Plan: —</div>
+<div class="plan-badge plan-badge--founding" id="prof-founding" style="display:none">Founding member</div>
+<div class="chip ok" id="prof-profit">Realised profit: —</div>
+</div>
+</div>
+<div class="bd">
+<div class="rows-simple" id="prof-rows">
+  <div class="prof-row"><span>Email</span><span id="prof-email">—</span></div>
+  <div class="prof-row"><span>Joined</span><span id="prof-joined">—</span></div>
+  <div class="prof-row"><span>Plan</span><span id="prof-plan-detail">—</span></div>
+  <div class="prof-row"><span>Founding member</span><span id="prof-founding-detail">—</span></div>
+  <div class="prof-row"><span>Holding</span><span id="prof-holding-detail">—</span></div>
+  <div class="prof-row"><span>Sold</span><span id="prof-sold-detail">—</span></div>
+  <div class="prof-row"><span>Realised profit</span><span id="prof-profit-detail">—</span></div>
+</div>
+<div id="prof-xp-block" style="margin-top:16px">
+  <div id="prof-streak-row" style="display:none;font-size:13px;color:var(--text-primary);margin-bottom:8px">&#128293; <span id="prof-streak-text"></span></div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline">
+    <span id="prof-tier-text" style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em">&mdash;</span>
+  </div>
+  <div class="xp-bar-track"><div class="xp-bar-fill" id="prof-xp-fill" style="width:0%"></div></div>
+  <div id="prof-xp-next" style="font-size:11px;color:var(--text-muted);margin-top:4px"></div>
+</div>
+<p class="tiny-note" id="prof-elite-streak-note" style="display:none">Elite's own streak condition (always-on monitoring, no tab-open requirement) isn't wired up yet - streak tracking above is currently Free-tier only.</p>
+<p class="tiny-note">Per-category alert settings shown in early mockups aren't wired to real data yet - not shown here rather than shown with invented numbers.</p>
+<div class="controls" style="margin-top:16px">
+<a class="btn btn-prim" href="/plans" id="prof-go-elite">Go Elite</a>
+<button class="btn btn-ghost" id="prof-export" type="button">Export history as CSV</button>
+<a class="btn btn-ghost" href="/account">Account settings</a>
+<a class="btn btn-ghost" href="/support">Support</a>
+<button class="btn btn-ghost" id="prof-signout" type="button">Sign out</button>
+</div>
+</div>
+</div>
+
 </div>
 </div><script>
 (() => {
-  const root = document.querySelector('[data-snypd-sidebar]');
+  // Replaces the old removed left-sidebar's status/toggle logic. Kept as the
+  // same window.SNYPD.setSidebarState(s) entry point so setStatus() in the
+  // main script below doesn't need to change at all.
+  const root = document.querySelector('.snypd-topbar');
   if (!root) return;
 
-  const statusLabel = root.querySelector('[data-snypd-status-label]');
+  const statusText = document.getElementById('topbar-status-text');
 
-  const isMobile = () => window.matchMedia('(max-width: 991px)').matches;
-
-  // Persist focus mode (desktop only)
-  const savedFocus = localStorage.getItem('snypd_sidebar_focus');
-  if (savedFocus === '1') root.dataset.focus = 'true';
+  // Ledger 2e: offline/backend-down are their own status words, not a
+  // capitalized version of the internal state key.
+  const STATE_LABELS = {
+    idle: 'Idle',
+    running: 'Running',
+    stopped: 'Stopped',
+    offline: 'Not watching',
+    'backend-down': 'SNYPD offline',
+  };
 
   const setState = (state) => {
-    root.dataset.state = state;
-    if (statusLabel) statusLabel.textContent = (state || 'idle').toUpperCase();
+    const s = state || 'idle';
+    root.dataset.state = s;
+    if (statusText) statusText.textContent = STATE_LABELS[s] || (s.charAt(0).toUpperCase() + s.slice(1));
   };
-  setState(root.dataset.state || 'idle');
-
-  // We set active purely by path to ensure robustness
-  const path = window.location.pathname;
-  const setActive = () => {
-    root.querySelectorAll('[data-snypd-navitem]').forEach(a => {
-      a.dataset.active = (path.includes(a.dataset.key)) ? 'true' : 'false';
-    });
-  };
-  setActive();
-
-  const openMobile = (flag) => {
-    root.dataset.open = flag ? 'true' : 'false';
-  };
-
-  // Event delegation
-  root.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-snypd-action]');
-    const nav = e.target.closest('[data-snypd-navitem]');
-    if (btn) {
-      const action = btn.getAttribute('data-snypd-action');
-
-      if (action === 'toggle') {
-        if (isMobile()) {
-          openMobile(root.dataset.open !== 'true');
-        } else {
-          // Desktop: Focus mode (NOT collapse)
-          const next = root.dataset.focus !== 'true';
-          root.dataset.focus = next ? 'true' : 'false';
-          localStorage.setItem('snypd_sidebar_focus', next ? '1' : '0');
-        }
-        return;
-      }
-
-      if (action === 'close') {
-        openMobile(false);
-        return;
-      }
-
-      if (action === 'upgrade') {
-        window.location.href = '/plans';
-        return;
-      }
-    }
-
-    if (nav) {
-      if (isMobile()) openMobile(false);
-    }
-  });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isMobile()) openMobile(false);
-  });
-
-  window.addEventListener('resize', () => {
-    if (!isMobile()) openMobile(false);
-  });
+  setState('idle');
 
   window.SNYPD = window.SNYPD || {};
   window.SNYPD.setSidebarState = (s) => setState(s);
@@ -1095,7 +1482,104 @@ const HEARTBEAT_URL = (() => {
   }
   const uid   = session.user.id;
   const email = session.user.email || '';
+  // Real, not fabricated - Supabase Auth stamps every user row with this on
+  // signup, no separate tracking needed for a real "joined" date.
+  const joinedAt = session.user.created_at || null;
   set('user-bar', `Logged in as ${email}`);
+
+  // ----------------- XP (Streak/XP/Tier Specification v1, sections 2 & 5) -----------------
+  // Client-inserted, same trust model migration 024 already accepts for every
+  // event except E1 (server-authoritative - see backend/src/streak_tracker.py):
+  // RLS lets a signed-in user insert their own xp_events rows, so these caps
+  // are enforced here at write time, not cryptographically guaranteed. That's
+  // an existing, already-accepted property of this ledger design, not a new
+  // gap introduced by wiring these events up.
+  const XP_DAILY_CEILING = 200;
+
+  function utcMidnightIso() {
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  async function xpEarnedToday() {
+    try {
+      const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).gte('created_at', utcMidnightIso());
+      if (error) throw error;
+      return (data || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+    } catch (e) {
+      console.error('SNYPD XP: could not read today total', e);
+      return XP_DAILY_CEILING; // fail toward awarding nothing, not toward an uncapped write
+    }
+  }
+
+  async function xpEventCountToday(eventType) {
+    try {
+      const { data, error } = await sb.from('xp_events').select('id').eq('user_id', uid).eq('event_type', eventType).gte('created_at', utcMidnightIso());
+      if (error) throw error;
+      return (data || []).length;
+    } catch (e) {
+      console.error('SNYPD XP: could not count today', eventType, e);
+      return Infinity; // fail toward the per-event cap already being hit
+    }
+  }
+
+  async function xpEventSumToday(eventType) {
+    try {
+      const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).eq('event_type', eventType).gte('created_at', utcMidnightIso());
+      if (error) throw error;
+      return (data || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+    } catch (e) {
+      console.error('SNYPD XP: could not sum today', eventType, e);
+      return Infinity;
+    }
+  }
+
+  async function xpEventExistsEver(eventType, itemId) {
+    try {
+      let q = sb.from('xp_events').select('id').eq('user_id', uid).eq('event_type', eventType).limit(1);
+      if (itemId) q = q.eq('item_id', itemId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data || []).length > 0;
+    } catch (e) {
+      console.error('SNYPD XP: could not check prior', eventType, e);
+      return true; // fail toward not double-crediting, not toward a duplicate award
+    }
+  }
+
+  // Writes one XP event, clamped to the shared 200 XP/day ceiling (spec
+  // section 2, "Daily ceiling"). Returns the amount actually awarded - may be
+  // less than requested, or 0, if the ceiling was already close.
+  async function awardXP(eventType, xpAmount, itemId, meta) {
+    if (!(xpAmount > 0)) return 0;
+    const earnedToday = await xpEarnedToday();
+    const awarded = Math.max(0, Math.min(xpAmount, XP_DAILY_CEILING - earnedToday));
+    if (awarded <= 0) return 0;
+    try {
+      const { error } = await sb.from('xp_events').insert({
+        user_id: uid,
+        event_type: eventType,
+        xp: awarded,
+        item_id: itemId || null,
+        meta: meta || null,
+      });
+      if (error) throw error;
+      // Fire-and-forget: keeps the topbar's XP/tier text live right after an
+      // award (claim, mark-sold, reconcile) without a full page reload. Not
+      // awaited - a slow refresh here must never block the action that
+      // earned the XP from completing.
+      if (window.SNYPD && window.SNYPD.loadStreakAndXP) window.SNYPD.loadStreakAndXP();
+      return awarded;
+    } catch (e) {
+      console.error('SNYPD XP: could not record', eventType, e);
+      return 0;
+    }
+  }
+
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.awardXP = awardXP;
+  window.SNYPD.xpEventExistsEver = xpEventExistsEver;
 
   // plan + Whop activation check
   const ACTIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid']);
@@ -1108,11 +1592,29 @@ const HEARTBEAT_URL = (() => {
     elite: 'ELITE'
   };
   
-  const me = await sb.from('users')
-    .select('subscription_plan, sub_status, billing_provider, whop_product_id, whop_manage_url')
+  // founding_number (migration 027) is requested alongside fields that
+  // already worked before it existed - subscription_plan/sub_status decide
+  // this account's ENTIRE plan gating below. PostgREST fails the whole
+  // query if any one selected column is missing, so a pending migration
+  // must never be allowed to silently zero out plan detection for
+  // everyone. Try the full select first; fall back to the core fields
+  // alone (and log loudly) if that's specifically what's failing.
+  const CORE_USER_COLUMNS = 'subscription_plan, sub_status, billing_provider, whop_product_id, whop_manage_url, is_founding_member';
+  let me = await sb.from('users')
+    .select(CORE_USER_COLUMNS + ', founding_number')
     .eq('id', uid)
     .maybeSingle();
-  
+  if (me.error) {
+    console.error('SNYPD: users query with founding_number failed, retrying without it', me.error);
+    me = await sb.from('users')
+      .select(CORE_USER_COLUMNS)
+      .eq('id', uid)
+      .maybeSingle();
+  }
+  if (me.error) {
+    console.error('SNYPD: could not load user profile at all', me.error);
+  }
+
   const profile = me.data || {};
   const rawPlan = String(profile.subscription_plan || '').toLowerCase().trim();
   const rawStatus = String(profile.sub_status || '').toLowerCase().trim();
@@ -1149,6 +1651,33 @@ const HEARTBEAT_URL = (() => {
   // behaviour wanted here too.
   document.body.dataset.plan = effectivePlan;
   document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
+
+  const eliteBanner = document.getElementById('elite-banner');
+  if (eliteBanner) eliteBanner.style.display = (effectivePlan === 'elite') ? 'none' : '';
+
+  // Topbar founding badge: mirrors the Profile panel's own badge (below),
+  // but populated here unconditionally on load rather than only when the
+  // user opens Profile - the Ledger desktop mockup keeps this permanently
+  // visible in the header, not tucked behind a click.
+  const topbarFounding = document.getElementById('topbar-founding');
+  if (topbarFounding) {
+    const isFoundingTopbar = profile.is_founding_member === true;
+    topbarFounding.style.display = isFoundingTopbar ? '' : 'none';
+    topbarFounding.textContent = (isFoundingTopbar && profile.founding_number != null)
+      ? `Founding #${String(profile.founding_number).padStart(3, '0')}`
+      : 'Founding member';
+  }
+  // Same reasoning for streak/tier/XP - fire-and-forget, not awaited, so it
+  // never delays the feed's own first render. loadStreakAndXP lives in a
+  // different closure (defined further down the page) exposed the same way
+  // awardXP is reached from elsewhere: via window.SNYPD. That closure hasn't
+  // necessarily finished setting up yet at this exact point in execution
+  // (both closures are async and interleave), so poll briefly rather than
+  // fire once and silently give up if it's a beat too early.
+  (function pollForTopbarStreakRefresh(attemptsLeft) {
+    if (window.SNYPD && window.SNYPD.loadStreakAndXP) { window.SNYPD.loadStreakAndXP(); return; }
+    if (attemptsLeft > 0) setTimeout(() => pollForTopbarStreakRefresh(attemptsLeft - 1), 150);
+  })(20);
 
   console.log('SNYPD activation check', {
     plan: rawPlan,
@@ -1210,7 +1739,15 @@ const HEARTBEAT_URL = (() => {
         const { error } = await sb.from('user_searches').insert({
           user_id: uid, search_name: name, vinted_url: url, is_active: true
         });
-        if (error) console.error('SNYPD wizard: could not save search', error);
+        if (error) {
+          console.error('SNYPD wizard: could not save search', error);
+        } else {
+          // E6 onboarding: first hunt created, +20 XP, once per account ever -
+          // this wizard isn't the only place a hunt can be created (/filters
+          // is another), so this checks history rather than assuming.
+          const already = await xpEventExistsEver('first_hunt', null);
+          if (!already) await awardXP('first_hunt', 20, null, {});
+        }
         // Move to step 2 regardless - a failed save here shouldn't trap a new
         // user on step 1; they can add a real search from /filters after.
         step1.style.display = 'none';
@@ -1237,13 +1774,45 @@ const HEARTBEAT_URL = (() => {
         });
       }
 
+      const pushToggle = document.getElementById('wiz-toggle-push');
+      if (pushToggle) {
+        pushToggle.addEventListener('click', () => {
+          pushToggle.classList.toggle('is-on');
+          pushToggle.setAttribute('aria-checked', pushToggle.classList.contains('is-on') ? 'true' : 'false');
+        });
+      }
+
+      const quietToggle = document.getElementById('wiz-toggle-quiet');
+      if (quietToggle) {
+        quietToggle.addEventListener('click', () => {
+          quietToggle.classList.toggle('is-on');
+          quietToggle.setAttribute('aria-checked', quietToggle.classList.contains('is-on') ? 'true' : 'false');
+        });
+      }
+
       const enableBtn = document.getElementById('wiz-enable-alerts');
       if (enableBtn) {
-        enableBtn.addEventListener('click', () => {
+        enableBtn.addEventListener('click', async () => {
           // Reuses the real, already-working notification button rather than
-          // reimplementing push logic here.
-          const realNotifyBtn = document.getElementById('btn-notify');
-          if (realNotifyBtn) realNotifyBtn.click();
+          // reimplementing push logic here. Only fires if the push toggle
+          // above is actually on.
+          if (pushToggle && pushToggle.classList.contains('is-on')) {
+            const realNotifyBtn = document.getElementById('btn-notify');
+            if (realNotifyBtn) realNotifyBtn.click();
+          }
+          // Quiet hours (migration 028, backend/src/push.py) - real, unlike
+          // email digest and the threshold selector below, which are
+          // genuinely not built yet. 23:00-08:00 UTC matches the mockup's
+          // shown default; not user-adjustable yet, just on/off.
+          const quietOn = quietToggle && quietToggle.classList.contains('is-on');
+          try {
+            await sb.from('users').update({
+              push_quiet_hours_start: quietOn ? 23 : null,
+              push_quiet_hours_end: quietOn ? 8 : null,
+            }).eq('id', uid);
+          } catch (e) {
+            console.error('SNYPD wizard: could not save quiet hours', e);
+          }
           overlay.style.display = 'none';
         });
       }
@@ -1255,6 +1824,726 @@ const HEARTBEAT_URL = (() => {
     } catch (e) {
       console.error('SNYPD wizard error', e);
     }
+  })();
+
+  // ----------------- HISTORY (Holding / Sold) + PROFILE -----------------
+  (function () {
+    const viewTabs = document.getElementById('view-tabs');
+    const feedPanels = [document.getElementById('dashboard-panel')];
+    const marketPanel = document.getElementById('market-panel');
+    const historyPanel = document.getElementById('history-panel');
+    const profilePanel = document.getElementById('profile-panel');
+    const histList = document.getElementById('hist-list');
+    const histEmpty = document.getElementById('hist-empty');
+    const holdingCount = document.getElementById('hist-holding-count');
+    const soldCount = document.getElementById('hist-sold-count');
+    const profitChip = document.getElementById('hist-profit');
+    if (!viewTabs || !historyPanel) return;
+
+    const esc = t =>
+      String(t || '').replace(/[&<>"']/g, m => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
+      ));
+
+    let currentSub = 'holding';
+    let showStaleOnly = false;
+    let lastStaleItems = [];
+    const STALE_DAYS = 45;
+    const SNOOZE_KEY = 'snypd_reconcile_snooze_until';
+
+    const reconcileStrip = document.getElementById('reconcile-strip');
+    const reconcileText = document.getElementById('reconcile-text');
+    const reconcileReview = document.getElementById('reconcile-review');
+    const reconcileSnooze = document.getElementById('reconcile-snooze');
+
+    function eur(cents) {
+      if (cents == null) return '—';
+      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+    }
+
+    function daysHeld(claimedAt) {
+      const ms = Date.now() - new Date(claimedAt).getTime();
+      return Math.max(0, Math.floor(ms / (24 * 60 * 60 * 1000)));
+    }
+
+    // E5: 5 XP per item resolved as "still listed" through the tidy-Holding
+    // flow, max 25 XP/day from this event (spec section 2), once per item
+    // lifetime - re-confirming the same still-stale item on a later day
+    // earns nothing the second time. Shared by the per-item stale "Still
+    // listed" button and the bulk reconcile sheet, since both are the same
+    // underlying action through two entry points.
+    async function awardReconcileXP(itemId) {
+      if (!itemId) return;
+      const already = await xpEventExistsEver('reconcile', itemId);
+      if (already) return;
+      const earnedTodayForEvent = await xpEventSumToday('reconcile');
+      if (earnedTodayForEvent >= 25) return;
+      await awardXP('reconcile', 5, itemId, {});
+    }
+
+    // E4: 15 XP for logging any terminal outcome, once per item (spec section
+    // 2) - "sold elsewhere" with no price counts same as a priced sale.
+    async function awardMarkSoldXP(itemId) {
+      if (!itemId) return;
+      const already = await xpEventExistsEver('mark_sold', itemId);
+      if (already) return;
+      await awardXP('mark_sold', 15, itemId, {});
+    }
+
+    // Spec section 2, E2: "Un-claiming within 24h reverses the 25 XP and any
+    // E3 bonus." E3 is never awarded here (blocked on market data - see
+    // dashboard.html's Market Insights notes), so this only ever has E2's
+    // claim award to undo. A negative ledger row, not a delete or an update -
+    // same append-only reasoning as everywhere else in this ledger. Goes
+    // straight to xp_events rather than through awardXP(), since a debit must
+    // never be clamped by the daily-earning ceiling that exists to stop
+    // over-awarding.
+    async function reverseClaimXPIfWithin24h(itemId, claimedAtIso) {
+      if (!itemId || !claimedAtIso) return;
+      const ageMs = Date.now() - new Date(claimedAtIso).getTime();
+      if (!(ageMs >= 0) || ageMs > 24 * 60 * 60 * 1000) return;
+      try {
+        const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).eq('event_type', 'claim').eq('item_id', itemId);
+        if (error) throw error;
+        const claimXp = (data || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+        if (claimXp > 0) {
+          const { error: revError } = await sb.from('xp_events').insert({
+            user_id: uid, event_type: 'unclaim_reversal', xp: -claimXp, item_id: itemId, meta: null,
+          });
+          if (revError) throw revError;
+        }
+      } catch (e) {
+        console.error('SNYPD XP: could not reverse claim award', e);
+      }
+    }
+
+    function histCardHTML(row) {
+      const img = row.image_url
+        ? `<img class="thumb" loading="lazy" src="${esc(row.image_url)}" alt="${esc(row.title || '')}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb fallback'}))" />`
+        : `<div class="thumb fallback"></div>`;
+
+      if (row.status === 'sold') {
+        const profit = (row.sold_price_cents != null && row.bought_price_cents != null)
+          ? row.sold_price_cents - row.bought_price_cents
+          : null;
+        const profitCls = profit == null ? '' : (profit >= 0 ? 'hist-profit-pos' : 'hist-profit-neg');
+        const profitLabel = profit == null ? 'Sold elsewhere' : `${profit >= 0 ? '+' : ''}${eur(profit)}`;
+        const soldPart = row.sold_price_cents != null ? (' → sold ' + eur(row.sold_price_cents)) : '';
+        return `
+          <div class="hist-card" data-id="${row.id}">
+            ${img}
+            <div>
+              <div class="meta-top">
+                <div class="t">${esc(row.title) || 'Claimed item'}</div>
+                <div class="p ${profitCls}">${profitLabel}</div>
+              </div>
+              <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')} · bought ${eur(row.bought_price_cents)}${soldPart}</div>
+              <div class="hist-sale-form">
+                <button class="btn btn-ghost hist-remove" type="button" data-remove-claim="${row.id}">Remove from history</button>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      const held = daysHeld(row.claimed_at);
+      const stale = held >= STALE_DAYS;
+      return `
+        <div class="hist-card${stale ? ' is-stale' : ''}" data-id="${row.id}">
+          ${img}
+          <div>
+            <div class="meta-top">
+              <div class="t">${esc(row.title) || 'Claimed item'}</div>
+              <div class="p">${eur(row.bought_price_cents)}</div>
+            </div>
+            <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')}</div>
+            <div class="hist-held">${stale ? '⚠ ' : ''}Held ${held}d${stale ? ' — still yours?' : ''}</div>
+            <div class="hist-sale-form" data-sale-form>
+              <input type="number" step="0.01" min="0" placeholder="Sold for" data-sale-input />
+              <button class="btn btn-prim" type="button" data-mark-sold="${row.id}">Mark sold</button>
+              ${stale ? `<button class="btn btn-ghost" type="button" data-still-listed="${row.id}">Still listed</button>` : ''}
+              <button class="btn btn-ghost hist-remove" type="button" data-remove-claim="${row.id}" data-claimed-at="${esc(row.claimed_at || '')}" title="Claimed by mistake? Remove it.">Remove</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function loadClaims() {
+      histList.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+      histEmpty.style.display = 'none';
+      try {
+        const { data, error } = await sb
+          .from('user_claims')
+          .select('*')
+          .eq('user_id', uid)
+          .order('claimed_at', { ascending: false });
+        if (error) throw error;
+
+        const rows = data || [];
+        const holding = rows.filter(r => r.status === 'holding');
+        const sold = rows.filter(r => r.status === 'sold');
+        const stale = holding.filter(r => daysHeld(r.claimed_at) >= STALE_DAYS);
+        lastStaleItems = stale;
+
+        holdingCount.textContent = `Holding: ${holding.length}`;
+        soldCount.textContent = `Sold: ${sold.length}`;
+
+        const totalProfit = sold.reduce((sum, r) => {
+          if (r.sold_price_cents == null || r.bought_price_cents == null) return sum;
+          return sum + (r.sold_price_cents - r.bought_price_cents);
+        }, 0);
+        profitChip.textContent = `Realised profit: ${eur(totalProfit)}`;
+
+        const fsProfit = document.getElementById('fs-profit');
+        const fsProfitLbl = document.getElementById('fs-profit-lbl');
+        const fsSavedLbl = document.getElementById('fs-saved-lbl');
+        const fsHolding = document.getElementById('fs-holding');
+        if (fsProfit) fsProfit.textContent = eur(totalProfit);
+        if (fsProfitLbl) fsProfitLbl.textContent = `Realised profit · ${sold.length} sold`;
+        if (fsSavedLbl) fsSavedLbl.textContent = `Saved vs median · ${rows.length} claim${rows.length === 1 ? '' : 's'}`;
+        if (fsHolding) fsHolding.textContent = stale.length > 0 ? `${holding.length} · ${stale.length} stale` : String(holding.length);
+
+        // Reconciliation strip - only on the Holding sub-tab, only if there are
+        // stale items, and not if the user asked to be reminded later.
+        const snoozeUntil = Number(localStorage.getItem(SNOOZE_KEY) || 0);
+        const snoozed = Date.now() < snoozeUntil;
+        if (reconcileStrip) {
+          if (currentSub === 'holding' && stale.length > 0 && !snoozed) {
+            reconcileStrip.style.display = 'flex';
+            reconcileText.textContent = stale.length === 1
+              ? '1 item held 45 days or more — still yours?'
+              : `${stale.length} items held 45 days or more — still yours?`;
+          } else {
+            reconcileStrip.style.display = 'none';
+          }
+        }
+
+        let shown = currentSub === 'holding' ? holding : sold;
+
+        if (!shown.length) {
+          histList.innerHTML = '';
+          histEmpty.textContent = currentSub === 'holding'
+            ? 'Nothing in Holding yet. Claim a catch from the Feed to start tracking it here.'
+            : 'Nothing marked sold yet.';
+          histEmpty.style.display = 'block';
+          return;
+        }
+        histList.innerHTML = shown.map(histCardHTML).join('');
+      } catch (e) {
+        console.error('SNYPD history: could not load claims', e);
+        histList.innerHTML = '';
+        histEmpty.textContent = 'Could not load your history. Try switching tabs again.';
+        histEmpty.style.display = 'block';
+      }
+    }
+
+    histList.addEventListener('click', async (e) => {
+      const soldBtn = e.target.closest('[data-mark-sold]');
+      const listedBtn = e.target.closest('[data-still-listed]');
+      const removeBtn = e.target.closest('[data-remove-claim]');
+      if (!soldBtn && !listedBtn && !removeBtn) return;
+
+      if (removeBtn) {
+        // Real undo path for a mis-click or a mistake, found necessary the
+        // first time this was actually used - see migration 023. Confirmed
+        // first, same pattern filters.html already uses for its own delete.
+        if (!confirm('Remove this from your history? This cannot be undone.')) return;
+        removeBtn.disabled = true;
+        removeBtn.textContent = 'Removing...';
+        try {
+          const claimId = removeBtn.dataset.removeClaim;
+          const claimedAt = removeBtn.dataset.claimedAt;
+          const { error } = await sb
+            .from('user_claims')
+            .delete()
+            .eq('id', claimId)
+            .eq('user_id', uid);
+          if (error) throw error;
+          await reverseClaimXPIfWithin24h(claimId, claimedAt);
+          await loadClaims();
+        } catch (err) {
+          console.error('SNYPD history: could not remove claim', err);
+          removeBtn.disabled = false;
+          removeBtn.textContent = 'Remove';
+        }
+        return;
+      }
+
+      if (listedBtn) {
+        // No status change - a lightweight acknowledgement, matching the
+        // reconcile sheet's "still listed" action: confirms freshness
+        // without requiring a price. Only shown on stale items (see
+        // histCardHTML), so this IS the per-item tidy-Holding action the
+        // spec's E5 describes, same as the bulk sheet's version of it.
+        listedBtn.textContent = 'Confirmed';
+        listedBtn.disabled = true;
+        const itemId = listedBtn.dataset.stillListed;
+        awardReconcileXP(itemId).catch((e) => console.error('SNYPD XP: reconcile award failed', e));
+        return;
+      }
+
+      const id = soldBtn.dataset.markSold;
+      const card = soldBtn.closest('.hist-card');
+      const input = card ? card.querySelector('[data-sale-input]') : null;
+      const raw = input ? input.value.trim() : '';
+      let soldCents = null;
+      if (raw) {
+        const parsed = parseFloat(raw);
+        if (isNaN(parsed) || parsed < 0) {
+          if (input) input.style.borderColor = 'var(--danger)';
+          return;
+        }
+        soldCents = Math.round(parsed * 100);
+      }
+      // Empty input intentionally allowed through as null - "sold elsewhere,
+      // no price logged" is a real, honest state (see the migration comment),
+      // not a validation failure.
+
+      const originalLabel = soldBtn.textContent;
+      soldBtn.disabled = true;
+      soldBtn.textContent = 'Saving...';
+
+      try {
+        const { error } = await sb
+          .from('user_claims')
+          .update({ status: 'sold', sold_price_cents: soldCents, sold_at: new Date().toISOString() })
+          .eq('id', id)
+          .eq('user_id', uid);
+        if (error) throw error;
+        await awardMarkSoldXP(id);
+        await loadClaims();
+      } catch (err) {
+        console.error('SNYPD history: could not mark sold', err);
+        soldBtn.disabled = false;
+        soldBtn.textContent = originalLabel;
+      }
+    });
+
+    document.querySelectorAll('.hist-subtab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.hist-subtab').forEach(b => {
+          b.classList.remove('active', 'btn-prim');
+          b.classList.add('btn-ghost');
+        });
+        btn.classList.add('active', 'btn-prim');
+        btn.classList.remove('btn-ghost');
+        currentSub = btn.dataset.sub;
+        loadClaims();
+      });
+    });
+
+    function snoozeReconcile() {
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      localStorage.setItem(SNOOZE_KEY, String(Date.now() + thirtyDaysMs));
+    }
+
+    if (reconcileSnooze) {
+      reconcileSnooze.addEventListener('click', () => {
+        snoozeReconcile();
+        loadClaims();
+      });
+    }
+
+    // ----------------- BULK RECONCILE SHEET (Ledger 2i) -----------------
+
+    const reconcileSheet = document.getElementById('reconcile-sheet');
+    const reconcileSheetList = document.getElementById('reconcile-sheet-list');
+    const reconcileSheetCount = document.getElementById('reconcile-sheet-count');
+    let reconcileSelected = new Set();
+
+    function renderReconcileSheet() {
+      if (!reconcileSheetList) return;
+      reconcileSheetList.innerHTML = lastStaleItems.map(r => `
+        <div class="rec-sheet-item${reconcileSelected.has(r.id) ? ' is-checked' : ''}" data-rec-item="${r.id}">
+          <span class="rec-sheet-item__check">${reconcileSelected.has(r.id) ? String.fromCharCode(0x2713) : ''}</span>
+          <div style="flex:1;min-width:0">
+            <div class="rec-sheet-item__title">${esc(r.title) || 'Claimed item'}</div>
+            <div class="rec-sheet-item__meta">${eur(r.bought_price_cents)} · HELD ${daysHeld(r.claimed_at)}D</div>
+          </div>
+        </div>
+      `).join('');
+      reconcileSheetCount.textContent = `${reconcileSelected.size} selected`;
+    }
+
+    function openReconcileSheet() {
+      reconcileSelected = new Set(lastStaleItems.map(r => r.id));
+      renderReconcileSheet();
+      if (reconcileSheet) reconcileSheet.style.display = 'flex';
+    }
+
+    function closeReconcileSheet() {
+      if (reconcileSheet) reconcileSheet.style.display = 'none';
+    }
+
+    if (reconcileReview) reconcileReview.addEventListener('click', openReconcileSheet);
+
+    if (reconcileSheetList) {
+      reconcileSheetList.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-rec-item]');
+        if (!item) return;
+        const id = item.dataset.recItem;
+        if (reconcileSelected.has(id)) reconcileSelected.delete(id); else reconcileSelected.add(id);
+        renderReconcileSheet();
+      });
+    }
+
+    async function bulkMarkSoldElsewhere(ids) {
+      if (!ids.length) return;
+      const { error } = await sb
+        .from('user_claims')
+        .update({ status: 'sold', sold_price_cents: null, sold_at: new Date().toISOString() })
+        .in('id', ids)
+        .eq('user_id', uid);
+      if (error) console.error('SNYPD reconcile: bulk mark-sold failed', error);
+    }
+
+    const bulkListedBtn = document.getElementById('reconcile-bulk-listed');
+    const bulkPriceBtn = document.getElementById('reconcile-bulk-price');
+    const bulkSoldBtn = document.getElementById('reconcile-bulk-sold');
+    const allListedBtn = document.getElementById('reconcile-sheet-all-listed');
+    const sheetSnoozeBtn = document.getElementById('reconcile-sheet-snooze-30');
+
+    if (bulkListedBtn) {
+      // Same lightweight, no-write acknowledgement as the single-item "Still
+      // listed" button - confirms freshness without a status change. These
+      // items will read as stale again on the next load; that's the existing
+      // behaviour for the single-item action too, not a new limitation.
+      bulkListedBtn.addEventListener('click', async () => {
+        const ids = Array.from(reconcileSelected);
+        closeReconcileSheet();
+        for (const id of ids) await awardReconcileXP(id);
+      });
+    }
+    if (bulkPriceBtn) {
+      // Pricing a sale is inherently per-item - closes the sheet back to the
+      // normal Holding list, where each item's own Mark Sold field is right there.
+      bulkPriceBtn.addEventListener('click', () => { closeReconcileSheet(); });
+    }
+    if (bulkSoldBtn) {
+      bulkSoldBtn.addEventListener('click', async () => {
+        const ids = Array.from(reconcileSelected);
+        bulkSoldBtn.disabled = true;
+        bulkSoldBtn.textContent = 'Saving...';
+        await bulkMarkSoldElsewhere(ids);
+        for (const id of ids) await awardMarkSoldXP(id);
+        bulkSoldBtn.disabled = false;
+        bulkSoldBtn.textContent = 'Sold elsewhere';
+        closeReconcileSheet();
+        await loadClaims();
+      });
+    }
+    if (allListedBtn) {
+      allListedBtn.addEventListener('click', async () => {
+        const ids = lastStaleItems.map(r => r.id);
+        closeReconcileSheet();
+        for (const id of ids) await awardReconcileXP(id);
+      });
+    }
+    if (sheetSnoozeBtn) {
+      sheetSnoozeBtn.addEventListener('click', () => {
+        snoozeReconcile();
+        closeReconcileSheet();
+        loadClaims();
+      });
+    }
+
+    async function loadProfile() {
+      set('prof-email', email);
+      if (joinedAt) {
+        const d = new Date(joinedAt);
+        set('prof-joined', d.toLocaleDateString(undefined, { year: 'numeric', month: 'long' }));
+      }
+      const planLabel = PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase();
+      set('prof-plan', `Plan: ${planLabel}`);
+      set('prof-plan-detail', planLabel);
+
+      const isFounding = profile.is_founding_member === true;
+      const foundingBadge = document.getElementById('prof-founding');
+      foundingBadge.style.display = isFounding ? '' : 'none';
+      // Real number (migration 027) when it exists; older founding accounts
+      // predating that migration's backfill window edge case aside, this
+      // should always be set for anyone with is_founding_member=true - but
+      // fall back to the plain label rather than show a blank badge if not.
+      foundingBadge.textContent = (isFounding && profile.founding_number != null)
+        ? `Founding member #${String(profile.founding_number).padStart(3, '0')}`
+        : 'Founding member';
+      set('prof-founding-detail', isFounding
+        ? (profile.founding_number != null ? `Yes · #${profile.founding_number}` : 'Yes')
+        : 'No');
+
+      // Bug fix: this used to show unconditionally, so an Elite customer's
+      // own Profile page told them to upgrade to the plan they already pay
+      // for. Matches the same effectivePlan check the Feed tab's elite-banner
+      // already uses.
+      const goEliteBtn = document.getElementById('prof-go-elite');
+      if (goEliteBtn) goEliteBtn.style.display = (effectivePlan === 'elite') ? 'none' : '';
+
+      await loadStreakAndXP();
+
+      try {
+        const { data, error } = await sb
+          .from('user_claims')
+          .select('status, bought_price_cents, sold_price_cents')
+          .eq('user_id', uid);
+        if (error) throw error;
+        const rows = data || [];
+        const holding = rows.filter(r => r.status === 'holding').length;
+        const sold = rows.filter(r => r.status === 'sold');
+        const totalProfit = sold.reduce((sum, r) => {
+          if (r.sold_price_cents == null || r.bought_price_cents == null) return sum;
+          return sum + (r.sold_price_cents - r.bought_price_cents);
+        }, 0);
+        set('prof-holding-detail', String(holding));
+        set('prof-sold-detail', String(sold.length));
+        set('prof-profit-detail', eurCents(totalProfit));
+        set('prof-profit', `Realised profit: ${eurCents(totalProfit)}`);
+      } catch (e) {
+        console.error('SNYPD profile: could not load claim stats', e);
+        set('prof-holding-detail', '—');
+        set('prof-sold-detail', '—');
+        set('prof-profit-detail', '—');
+      }
+    }
+
+    function eurCents(cents) {
+      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format((cents || 0) / 100);
+    }
+
+    // Tier table, spec section 1. tier = highest row where xp_total >= floor.
+    const XP_TIERS = [
+      { name: 'Rookie', floor: 0 },
+      { name: 'Bronze Hunter', floor: 250 },
+      { name: 'Silver Hunter', floor: 600 },
+      { name: 'Gold Hunter', floor: 1100 },
+      { name: 'Platinum Hunter', floor: 1860 },
+      { name: 'Obsidian Hunter', floor: 3000 },
+      { name: 'Apex Hunter', floor: 4700 },
+      { name: 'Legend', floor: 7200 },
+    ];
+
+    function tierFor(xpTotal) {
+      let idx = 0;
+      for (let i = 0; i < XP_TIERS.length; i++) {
+        if (xpTotal >= XP_TIERS[i].floor) idx = i;
+      }
+      const tier = XP_TIERS[idx];
+      const next = XP_TIERS[idx + 1] || null;
+      const pct = next ? Math.max(0, Math.min(1, (xpTotal - tier.floor) / (next.floor - tier.floor))) : 1;
+      return { name: tier.name, next, pct };
+    }
+
+    async function loadStreakAndXP() {
+      const fill = document.getElementById('prof-xp-fill');
+      const tierText = document.getElementById('prof-tier-text');
+      const nextText = document.getElementById('prof-xp-next');
+      const streakRow = document.getElementById('prof-streak-row');
+      const streakText = document.getElementById('prof-streak-text');
+      const eliteNote = document.getElementById('prof-elite-streak-note');
+      const topbarStreak = document.getElementById('topbar-streak');
+
+      let tierLabel = null;
+      let xpTotal = 0;
+      try {
+        const { data: xpRows, error: xpErr } = await sb.from('xp_events').select('xp').eq('user_id', uid);
+        if (xpErr) throw xpErr;
+        xpTotal = (xpRows || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+        const t = tierFor(xpTotal);
+        tierLabel = `${t.name.toUpperCase()} · ${xpTotal.toLocaleString()} XP`;
+
+        tierText.textContent = tierLabel;
+        fill.style.width = `${Math.round(t.pct * 100)}%`;
+        nextText.textContent = t.next
+          ? `${(t.next.floor - xpTotal).toLocaleString()} XP to ${t.next.name}`
+          : 'Top tier reached';
+      } catch (e) {
+        console.error('SNYPD profile: could not load XP total', e);
+        tierText.textContent = '—';
+        fill.style.width = '0%';
+        nextText.textContent = '';
+      }
+
+      // Streak: server-authoritative (backend/src/streak_tracker.py), Free-
+      // tier only right now - Elite's own condition (always-on monitoring,
+      // no tab-open requirement) is a separate mechanism that isn't built
+      // yet, so an Elite account correctly has no row here until it is.
+      if (effectivePlan === 'elite') {
+        streakRow.style.display = 'none';
+        eliteNote.style.display = '';
+        if (topbarStreak) {
+          topbarStreak.style.display = tierLabel ? '' : 'none';
+          topbarStreak.textContent = tierLabel || '';
+        }
+        return;
+      }
+      eliteNote.style.display = 'none';
+      try {
+        const { data, error } = await sb.from('user_streak_state').select('current_streak').eq('user_id', uid).maybeSingle();
+        if (error) throw error;
+        const streak = data ? Number(data.current_streak) || 0 : 0;
+        if (streak > 0) {
+          streakText.textContent = `Day ${streak} of the hunt`;
+          streakRow.style.display = '';
+          if (topbarStreak) {
+            topbarStreak.style.display = tierLabel ? '' : 'none';
+            topbarStreak.textContent = tierLabel ? `\u{1F525} Day ${streak} · ${tierLabel}` : '';
+          }
+        } else {
+          streakRow.style.display = 'none';
+          if (topbarStreak) {
+            topbarStreak.style.display = tierLabel ? '' : 'none';
+            topbarStreak.textContent = tierLabel || '';
+          }
+        }
+      } catch (e) {
+        console.error('SNYPD profile: could not load streak', e);
+        streakRow.style.display = 'none';
+        if (topbarStreak) topbarStreak.style.display = 'none';
+      }
+    }
+
+    // This IIFE and the earlier one that computes `profile`/`effectivePlan`
+    // and defines awardXP are separate closures (same pattern as the
+    // existing window.SNYPD.awardXP bridge below) - bare `loadStreakAndXP()`
+    // is out of scope from over there, hence the window.SNYPD hand-off.
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.loadStreakAndXP = loadStreakAndXP;
+
+    function switchView(view) {
+      // 'profile' is reachable (via the topbar's right-side cluster) but is
+      // deliberately not one of the three tab buttons - matches the final
+      // desktop mockup, which shows Feed/History/Market Insights as tabs
+      // and plan/streak/founding info always-visible instead.
+      document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+      feedPanels.forEach(p => { if (p) p.style.display = view === 'feed' ? '' : 'none'; });
+      historyPanel.style.display = view === 'history' ? '' : 'none';
+      if (marketPanel) marketPanel.style.display = view === 'market' ? '' : 'none';
+      if (profilePanel) profilePanel.style.display = view === 'profile' ? '' : 'none';
+
+      if (view === 'history') {
+        loadClaims();
+      } else if (view === 'profile') {
+        loadProfile();
+      } else if (view === 'market') {
+        // market-panel's locked/unlocked inner state is controlled by its own
+        // script reacting to snypd:plan - re-firing it here just re-applies
+        // whatever that already correctly resolved, it doesn't override it.
+        // Moved here from the 'feed' branch now that the real Market Report
+        // lives under its own Market Insights tab, not squeezed under Feed.
+        if (document.body.dataset.plan) {
+          document.dispatchEvent(new CustomEvent('snypd:plan', { detail: document.body.dataset.plan }));
+        }
+      }
+    }
+
+    viewTabs.addEventListener('click', (e) => {
+      const tab = e.target.closest('.view-tab');
+      if (!tab) return;
+      switchView(tab.dataset.view);
+    });
+
+    const profileTrigger = document.getElementById('topbar-profile-trigger');
+    if (profileTrigger) {
+      profileTrigger.addEventListener('click', () => switchView('profile'));
+      profileTrigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchView('profile'); }
+      });
+    }
+
+    // First-time explanation of what Claim does, shown above the feed until
+    // dismissed once - found necessary from real usage, not designed in
+    // upfront. Its "History" link reuses the same switchView() the tabs use.
+    const hint = document.getElementById('claim-hint');
+    if (hint) {
+      if (!localStorage.getItem('snypd_claim_hint_dismissed')) {
+        hint.style.display = 'block';
+      }
+      hint.addEventListener('click', (e) => {
+        const dismiss = e.target.closest('[data-dismiss-hint]');
+        const link = e.target.closest('[data-view-link]');
+        if (dismiss) {
+          e.preventDefault();
+          hint.style.display = 'none';
+          localStorage.setItem('snypd_claim_hint_dismissed', '1');
+        } else if (link) {
+          e.preventDefault();
+          switchView(link.dataset.viewLink);
+        }
+      });
+    }
+
+    const exportBtn = document.getElementById('prof-export');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', async () => {
+        exportBtn.disabled = true;
+        exportBtn.textContent = 'Preparing...';
+        try {
+          const { data, error } = await sb
+            .from('user_claims')
+            .select('*')
+            .eq('user_id', uid)
+            .order('claimed_at', { ascending: false });
+          if (error) throw error;
+
+          const rows = data || [];
+          const cols = ['title', 'brand_title', 'size_title', 'bought_price_cents', 'status', 'claimed_at', 'sold_price_cents', 'sold_at', 'vinted_url'];
+          const csvEsc = v => {
+            const s = v == null ? '' : String(v);
+            return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+          };
+          const lines = [cols.join(',')];
+          rows.forEach(r => lines.push(cols.map(c => csvEsc(r[c])).join(',')));
+
+          const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `snypd-history-${new Date().toISOString().slice(0, 10)}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          console.error('SNYPD profile: export failed', e);
+        } finally {
+          exportBtn.disabled = false;
+          exportBtn.textContent = 'Export history as CSV';
+        }
+      });
+    }
+
+    const signoutBtn = document.getElementById('prof-signout');
+    if (signoutBtn) {
+      signoutBtn.addEventListener('click', async () => {
+        signoutBtn.disabled = true;
+        try {
+          await sb.auth.signOut();
+        } catch (e) {
+          console.error('SNYPD profile: sign out error', e);
+        }
+        location.href = '/login';
+      });
+    }
+
+    // Feed 4-stat row (Ledger 2j) - populated on load regardless of which
+    // tab is active, not only when the user visits History. "Saved vs
+    // median" is left at its default dash - there is no per-catch market
+    // comparison built yet, so it stays honestly blank rather than guessed.
+    async function loadHuntsRunningCount() {
+      const fsHunts = document.getElementById('fs-hunts');
+      if (!fsHunts) return;
+      try {
+        const { count, error } = await sb
+          .from('user_searches')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', uid)
+          .eq('is_active', true);
+        if (error) throw error;
+        fsHunts.textContent = String(count ?? 0);
+      } catch (e) {
+        console.error('SNYPD feed stats: could not load hunts count', e);
+      }
+    }
+    loadClaims();
+    loadHuntsRunningCount();
   })();
 
   const list    = document.getElementById('list');
@@ -1389,6 +2678,18 @@ const HEARTBEAT_URL = (() => {
     return { amount: amt, currency: cur };
   }
 
+  // total_item_price (base + Vinted's Buyer Protection fee) can arrive either
+  // as the same {amount, currency_code} shape as `price`, or as a plain
+  // number - both have been observed on this table. Never guess a shape that
+  // isn't there: return null rather than render a wrong number.
+  function deriveTotalPrice(row) {
+    const tp = row?.total_item_price;
+    if (tp == null) return null;
+    if (typeof tp === 'object') return (tp.amount != null) ? Number(tp.amount) : null;
+    const n = Number(tp);
+    return Number.isFinite(n) ? n : null;
+  }
+
   function relativeTime(ms) {
     const diff = Date.now() - ms;
     if (diff < 45000) return 'just now';
@@ -1399,12 +2700,31 @@ const HEARTBEAT_URL = (() => {
     return `${Math.round(hours / 24)}d ago`;
   }
 
+  // Full row data, keyed by listing id as a string - the Claim handler needs
+  // fields (brand, size, image, real price) that aren't on the card's own
+  // data-attributes, and current_ads rows can age out of the DOM before a
+  // slow click resolves, so this is looked up rather than re-queried.
+  const rowById = new Map();
+  const claimedIds = new Set();
+  // listing_id -> first_seen_price amount (number), for the DROP badge.
+  // Populated per loadAds() call from migration 029's listing_first_seen -
+  // an insert-only table the scraper writes once per (listing,user), never
+  // current_ads itself (see that migration's comment for why).
+  const firstSeenPriceByListing = new Map();
+
   const cardHTML = (r) => {
     const { amount, currency } = derivePrice(r);
     const priceLabel = fmtPrice(amount, currency);
     if (!priceLabel) {
       console.warn('SNYPD: listing has no usable price', { id: r.listing_id, price: r.price, total_item_price: r.total_item_price });
     }
+    // Only shown when it's genuinely a different number from the headline
+    // price - a listing with no separate buyer-protection fee should not
+    // show a redundant second line repeating the same figure.
+    const totalAmount = deriveTotalPrice(r);
+    const totalLabel = (totalAmount != null && amount != null && Math.abs(totalAmount - Number(amount)) >= 0.01)
+      ? fmtPrice(totalAmount, currency)
+      : null;
     const img = getImageUrl(r);
     const cls = img ? 'thumb' : 'thumb fallback';
 
@@ -1433,29 +2753,129 @@ const HEARTBEAT_URL = (() => {
                onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb fallback'}))" />`
       : `<div class="thumb fallback"></div>`;
 
+    const idStr = String(r.listing_id);
+    const alreadyClaimed = claimedIds.has(idStr);
+
+    // "New" is an honest signal (genuinely just uploaded to Vinted), not a
+    // per-viewer "have you seen this" flag - there's no per-user seen-state
+    // tracked anywhere to base that on. 15 min matches this dashboard's own
+    // freshness window elsewhere on the page.
+    const isNew = (Date.now() - uploadedMs) < 15 * 60 * 1000;
+    // DROP: a real, measured decrease against the price this exact listing
+    // first showed at for this user (migration 029) - never shown alongside
+    // NEW, since a listing only ever earns a first-seen record after its
+    // first poll, by which point it's no longer "new" by the definition above.
+    const firstSeen = firstSeenPriceByListing.get(String(r.listing_id));
+    const hasDropped = !isNew && firstSeen != null && amount != null && Number(amount) < firstSeen - 0.01;
+    const cornerBadge = isNew
+      ? `<span class="card-badge card-badge--new">New</span>`
+      : (hasDropped ? `<span class="card-badge card-badge--drop">Drop</span>` : '');
+    // CHECK SELLER: Vinted's own image-moderation flag (scraper-worker's
+    // map_vinted_item_to_current_ad, migration 029) - independent of the
+    // corner badge above, so both can show at once.
+    const suspicionBadge = r.is_suspicious === true
+      ? `<span class="card-badge card-badge--suspicious" title="Vinted flagged this listing's photo for review">&#9888; Check seller</span>`
+      : '';
+    const badge = cornerBadge + suspicionBadge;
+
     return `
-      <a href="${r.url || '#'}"
-         target="_blank"
-         rel="noopener"
-         class="card"
+      <div class="card"
          data-id="${r.listing_id}"
-         data-uploaded-ms="${uploadedMs}"
-         style="text-decoration:none;color:inherit">
-        ${imgHtml}
+         data-uploaded-ms="${uploadedMs}">
+        <div class="thumb-wrap">${imgHtml}${badge}</div>
         <div>
           <div class="meta-top">
             <div class="t">${esc(r.title) || 'View listing'}</div>
-            <div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div>
+            <div>
+              <div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div>
+              ${totalLabel ? `<div class="p-total">${totalLabel} incl. protection</div>` : ''}
+            </div>
           </div>
           <div class="muted" title="${esc(fullLabel)}">
             ${[brand, size, status, src, relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
-          <div class="tiny"></div>
+          <div class="card-actions">
+            <a class="btn btn-ghost card-link" href="${esc(r.url || '#')}" target="_blank" rel="noopener">Open on Vinted</a>
+            <button class="btn ${alreadyClaimed ? 'btn-claimed' : 'btn-prim'} claim-btn" type="button" data-listing="${r.listing_id}" ${alreadyClaimed ? 'disabled' : ''}>${alreadyClaimed ? (String.fromCharCode(0x2713) + ' Claimed') : 'Claim'}</button>
+          </div>
         </div>
-      </a>`;
+      </div>`;
   };
 
+  // ----------------- CLAIM -----------------
+  // Delegated on #list rather than per-button, since cards are inserted and
+  // removed dynamically by renderRows(). Real DB write, real error handling -
+  // a failed insert leaves the button re-clickable, not silently "succeeded."
+  list.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.claim-btn');
+    if (!btn || btn.disabled) return;
+
+    const listingId = btn.dataset.listing;
+    if (!listingId || claimedIds.has(listingId)) return;
+
+    const row = rowById.get(String(listingId));
+    if (!row) {
+      console.error('SNYPD: claim clicked but no row data cached for', listingId);
+      return;
+    }
+
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Claiming...';
+
+    const { amount } = derivePrice(row);
+    const boughtCents = (amount != null && Number.isFinite(Number(amount)))
+      ? Math.round(Number(amount) * 100)
+      : null;
+
+    try {
+      const { data: inserted, error } = await sb.from('user_claims').insert({
+        user_id: uid,
+        listing_id: Number(listingId) || null,
+        title: row.title || null,
+        brand_title: row.brand_title || null,
+        size_title: row.size_title || null,
+        image_url: getImageUrl(row) || null,
+        vinted_url: row.url || null,
+        bought_price_cents: boughtCents,
+        status: 'holding'
+      }).select('id').single();
+
+      if (error) throw error;
+
+      claimedIds.add(String(listingId));
+      btn.textContent = String.fromCharCode(0x2713) + ' Claimed';
+      btn.classList.remove('btn-prim');
+      btn.classList.add('btn-claimed');
+      // Stays disabled - a claim is a one-way action, not a toggle.
+
+      // E2: 25 XP per claim, self-reported so capped at 4 claims/day earning
+      // XP (spec section 2) - claims past the 4th still record for History,
+      // they just earn nothing. Linked to the new claim row (item_id) so an
+      // un-claim within 24h (see the Remove handler) can find and reverse
+      // this exact award rather than guessing. E6: first claim ever, +25 XP
+      // on top of E2 - checked BEFORE today's claim is recorded, or it would
+      // always find the row it just inserted and never fire.
+      const claimRowId = inserted && inserted.id ? inserted.id : null;
+      const hadClaimedBefore = await xpEventExistsEver('claim', null);
+      const claimsToday = await xpEventCountToday('claim');
+      if (claimsToday < 4) {
+        await awardXP('claim', 25, claimRowId, { listing_id: listingId });
+      }
+      if (!hadClaimedBefore) {
+        await awardXP('first_claim', 25, claimRowId, {});
+      }
+    } catch (err) {
+      console.error('SNYPD: could not save claim', err);
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+      btn.title = 'Could not save - try again';
+    }
+  });
+
   function renderRows(rows) {
+    rows.forEach(r => rowById.set(String(r.listing_id), r));
+
     if (!rows.length) {
       list.innerHTML = '';
       pendingNew = [];
@@ -1515,9 +2935,7 @@ const HEARTBEAT_URL = (() => {
 
       const cutoffIso = new Date(Date.now() - DASHBOARD_MAX_AGE_MIN * 60 * 1000).toISOString();
 
-      const { data, error } = await sb
-        .from('current_ads')
-        .select(`
+      const CORE_AD_COLUMNS = `
           listing_id,
           user_id,
           title,
@@ -1539,14 +2957,31 @@ const HEARTBEAT_URL = (() => {
           favourite_count,
           view_count,
           total_item_price
-        `)
-        .eq('user_id', uid)
-        .eq('is_visible', true)
-        .gte('uploaded_at_ts', cutoffIso)
-        .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
-        .order('listing_id', { ascending: false })
-        .limit(80);
+        `;
 
+      function adsQuery(columns) {
+        return sb
+          .from('current_ads')
+          .select(columns)
+          .eq('user_id', uid)
+          .eq('is_visible', true)
+          .gte('uploaded_at_ts', cutoffIso)
+          .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
+          .order('listing_id', { ascending: false })
+          .limit(80);
+      }
+
+      // is_suspicious (migration 029) is requested alongside columns that
+      // already worked before it existed. PostgREST fails the WHOLE query if
+      // any one selected column is missing - a pending migration must never
+      // take the entire feed offline over one optional field. Try the full
+      // select first; if it's specifically that column causing the failure,
+      // retry without it rather than throwing.
+      let { data, error } = await adsQuery(CORE_AD_COLUMNS + ', is_suspicious');
+      if (error) {
+        console.error('SNYPD: ads query with is_suspicious failed, retrying without it', error);
+        ({ data, error } = await adsQuery(CORE_AD_COLUMNS));
+      }
       if (error) throw error;
 
       const rows = (data || [])
@@ -1564,17 +2999,89 @@ const HEARTBEAT_URL = (() => {
         promoted: r.promoted
       })));
 
+      // DROP badge support - best-effort, never lets a lookup failure block
+      // the feed itself from rendering.
+      try {
+        const ids = rows.map(r => r.listing_id).filter(Boolean);
+        if (ids.length) {
+          const { data: fsRows, error: fsErr } = await sb
+            .from('listing_first_seen')
+            .select('listing_id, first_seen_price')
+            .eq('user_id', uid)
+            .in('listing_id', ids);
+          if (fsErr) throw fsErr;
+          firstSeenPriceByListing.clear();
+          for (const fr of (fsRows || [])) {
+            const { amount } = derivePrice({ price: fr.first_seen_price });
+            if (amount != null) firstSeenPriceByListing.set(String(fr.listing_id), Number(amount));
+          }
+        }
+      } catch (e) {
+        console.error('SNYPD: could not load first-seen prices', e);
+      }
+
       renderRows(rows);
-      set('tick-chip', `Last check: ${new Date().toLocaleString()}`);
+      lastSuccessfulSync = new Date();
+      set('tick-chip', `Last check: ${lastSuccessfulSync.toLocaleString()}`);
       show('err-chip', false);
+      setOfflineState(false);
     } catch (e) {
       console.error(e);
       set('err-chip', e?.message || 'Fetch error');
       show('err-chip', true);
+      // Real network/backend failure - the existing feed is not wrong, it's
+      // just unconfirmed since lastSuccessfulSync. Say that plainly rather
+      // than a bare error chip nobody reads.
+      setOfflineState(true);
     } finally {
       setLoading(false);
       msg('');
     }
+  }
+
+  let lastSuccessfulSync = null;
+  const offlineBanner = document.getElementById('offline-banner');
+  const offlineLastSync = document.getElementById('offline-last-sync');
+  const offlineRetry = document.getElementById('offline-retry');
+
+  function relativeAgo(date) {
+    const mins = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000));
+    if (mins < 1) return 'just now';
+    if (mins === 1) return '1 min ago';
+    if (mins < 60) return `${mins} min ago`;
+    const hrs = Math.round(mins / 60);
+    return hrs === 1 ? '1 hour ago' : `${hrs} hours ago`;
+  }
+
+  function setOfflineState(isOffline) {
+    if (!offlineBanner) return;
+    if (isOffline) {
+      offlineBanner.style.display = 'block';
+      offlineLastSync.textContent = lastSuccessfulSync
+        ? `Last sync ${lastSuccessfulSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · ${relativeAgo(lastSuccessfulSync)}`
+        : 'No successful sync yet this session';
+      list.classList.add('stale-data');
+      if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
+        window.SNYPD.setSidebarState('offline');
+      }
+    } else {
+      offlineBanner.style.display = 'none';
+      list.classList.remove('stale-data');
+      if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
+        window.SNYPD.setSidebarState(running ? 'running' : 'stopped');
+      }
+    }
+  }
+
+  if (offlineRetry) {
+    offlineRetry.addEventListener('click', () => {
+      offlineRetry.disabled = true;
+      offlineRetry.textContent = 'Retrying...';
+      loadAds().finally(() => {
+        offlineRetry.disabled = false;
+        offlineRetry.textContent = 'Retry';
+      });
+    });
   }
   
   // ----------------- STATUS + HEARTBEAT (VISIBLE=ON, HIDDEN=OFF) -----------------
@@ -1865,6 +3372,13 @@ const HEARTBEAT_URL = (() => {
       show('Alerts on - turn off', false);
       say('This device will be alerted when a listing matches, even with the '
         + 'browser closed.');
+
+      // E6 onboarding: alerts enabled, +10 XP, once per account ever.
+      if (window.SNYPD && window.SNYPD.xpEventExistsEver && window.SNYPD.awardXP) {
+        window.SNYPD.xpEventExistsEver('alerts_enabled', null).then((already) => {
+          if (!already) window.SNYPD.awardXP('alerts_enabled', 10, null, {});
+        }).catch((e) => console.error('SNYPD XP: alerts_enabled check failed', e));
+      }
     } catch (e) {
       show('Enable alerts', false);
       say('Could not turn alerts on: ' + (e && e.message ? e.message : 'unknown error'));
@@ -2144,6 +3658,44 @@ const HEARTBEAT_URL = (() => {
          + 'text-transform:uppercase;letter-spacing:.05em">Price by condition</div>' + rows + '</div>';
   }
 
+  /* Where would MY price sit? The single most useful thing this data can say,
+   * because mispricing is the most documented reason a Vinted listing does not
+   * sell, and "EUR 45 typical" does not tell a seller whether their EUR 62 will
+   * move. Built from p25/median/p75, which the report already returned. */
+  function positioning(d) {
+    var p = d.positioning;
+    if (!p || !p.bands || !p.bands.length) { return ''; }
+    var segs = '';
+    for (var i = 0; i < 4; i++) { segs += '<div class="mr-pos-seg s' + (i + 1) + '"></div>'; }
+    var b = p.bands;
+    var scale = '<div class="mr-pos-scale">'
+      + '<span>' + eur(b[0].upto_cents) + '</span>'
+      + '<span>' + eur(b[1].upto_cents) + '</span>'
+      + '<span>' + eur(b[2].upto_cents) + '</span>'
+      + '</div>';
+    var legend = b.map(function (x) {
+      var range = (x.key === 'cheap') ? 'under ' + eur(x.upto_cents)
+                : (x.key === 'top')   ? 'over ' + eur(b[2].upto_cents)
+                : 'to ' + eur(x.upto_cents);
+      return '<div class="mr-pos-item"><b>' + escapeHtml(x.label) + '</b>'
+           + escapeHtml(range) + ' ' + MIDDOT + ' ' + escapeHtml(x.note) + '</div>';
+    }).join('');
+    return '<div class="mr-pos"><div class="slabel" style="margin-bottom:8px;font-size:12px;'
+         + 'color:#8A8A8A;text-transform:uppercase;letter-spacing:.05em">Where your price would sit</div>'
+         + '<div class="mr-pos-bar">' + segs + '</div>' + scale
+         + '<div class="mr-pos-legend">' + legend + '</div></div>';
+  }
+
+  /* Do sellers of this item cut their price? Nobody else can answer this --
+   * Vinted shows no price history at all. The copy says "have already dropped"
+   * rather than "discount", because we only see cuts made after we first
+   * observed a listing, so the figure is a floor and not a rate. */
+  function drift(d) {
+    var x = d.price_drift;
+    if (!x || !x.message) { return ''; }
+    return '<div class="mr-drift">' + escapeHtml(x.message) + '</div>';
+  }
+
   function render(d) {
     /* A thin result that still carries a price is its own state: the badge must
      * not say "not enough data" directly above a euro figure. */
@@ -2160,6 +3712,9 @@ const HEARTBEAT_URL = (() => {
     }
 
     html += '<p class="mr-headline">' + headline(d) + '</p>';
+
+    html += positioning(d);
+    html += drift(d);
 
     (d.flags || []).forEach(function (f) {
       html += '<div class="mr-flag">' + escapeHtml(f.message || '') + '</div>';

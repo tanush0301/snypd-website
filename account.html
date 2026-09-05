@@ -41,13 +41,12 @@
 <style>
           body {
             display: flex;
-            background: #000; /* Fallback */
-            background-image: radial-gradient(circle at 50% -20%, rgba(162, 0, 255, 0.1), transparent 60%);
+            background: #0B0C0D;
             margin: 0;
             min-height: 100vh;
             overflow-x: hidden;
-            color: #fff;
-            font-family: 'Inter', -apple-system, sans-serif;
+            color: #EDEFF0;
+            font-family: 'DM Mono', ui-monospace, monospace;
           }
           .main-content {
             flex: 1;
@@ -61,34 +60,65 @@
           .main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
           .main-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
           
-          /* Mobile hamburger logic */
-          @media (max-width: 991px) {
-            #mobile-header { display: block !important; }
-            .hdr { display: none !important; }
-            .dash-wrap, .account-wrap, .filters-wrap { padding-top: 16px; margin-top: 0; }
-          }
         </style>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 
-  /* Scope everything */
+  /* Unified top bar - replaces the old left sidebar, matching dashboard.html's
+     Ledger-locked direction. Nav here is plain page links, not view tabs -
+     this is its own page, not an in-app view. StockX is dropped from the nav:
+     that integration was scrapped in favour of Vinted-only, so the old
+     sidebar's link to it was already stale. */
+  .snypd-topbar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 24px;
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1E2225;
+    flex-wrap: wrap;
+  }
+  .snypd-topbar__brand { font-size: 16px; color: #EDEFF0; letter-spacing: 0.06em; font-weight: 500; flex: 0 0 auto; }
+  .snypd-topbar__brand-underscore { color: #00E5A0; }
+  .snypd-topbar__nav { display: flex; gap: 4px; flex: 1 1 auto; }
+  .snypd-topbar__navlink {
+    border: 1px solid #1E2225;
+    background: rgba(255,255,255,0.02);
+    color: #7C8489;
+    height: 34px; padding: 0 16px;
+    display: inline-flex; align-items: center;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .snypd-topbar__navlink.active { background: rgba(255,255,255,0.02); color: #EDEFF0; border-color: #00E5A0; }
+  .snypd-topbar__right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  .snypd-topbar__link { color: #7C8489; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-decoration: none; }
+  .snypd-topbar__link:hover { color: #EDEFF0; }
+  .snypd-topbar__plan { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: #7C8489; text-transform: uppercase; }
+  @media (max-width: 767px) {
+    .snypd-topbar { padding: 12px 16px; gap: 12px; }
+    .snypd-topbar__brand { font-size: 15px; letter-spacing: 0.04em; }
+    .snypd-topbar__nav { order: 3; flex-basis: 100%; }
+  }
+
+  /* Scope everything - Ledger locked-direction tokens, matching dashboard.html */
   .snypd-sidebar {
-    --bg: #0A0A0A; 
-    --panel: #111111;
-    --border: #262626;
-    --border-hover: #404040;
-    --text-primary: #F5F5F5;
-    --text-muted: #8A8A8A;
-    --brand: #A200FF; /* Matches logo exact purple */
-    --brand-hover: #B533FF;
-    --success: #10B981;
-    
-    --w: 260px;          
-    --wFocus: 260px;     
-    --radius: 10px;
+    --bg: #0B0C0D;
+    --panel: #0F1113;
+    --border: #1E2225;
+    --border-hover: #262B2F;
+    --text-primary: #EDEFF0;
+    --text-muted: #7C8489;
+    --brand: #A200FF; /* action color only - buttons */
+    --brand-hover: #C54BFF;
+    --success: #00E5A0; /* mint - status color only, never action */
+
+    --w: 260px;
+    --wFocus: 260px;
+    --radius: 0px;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'DM Mono', ui-monospace, monospace;
   }
 
   /* Support for Obsidian translucent background if placed on absolute black */
@@ -184,7 +214,7 @@
   }
   .snypd-sidebar[data-state="live"] .snypd-orb {
     background: var(--success);
-    box-shadow: 0 0 8px rgba(16,185,129,0.4);
+    box-shadow: 0 0 8px rgba(0,229,160,0.4);
   }
   .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
     color: var(--success);
@@ -194,7 +224,7 @@
   .snypd-sidebar__toggle {
     border: 1px solid var(--border);
     background: transparent;
-    border-radius: 6px;
+    border-radius: 0;
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -230,7 +260,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
-    border-radius: 6px;
+    border-radius: 0;
     text-decoration: none;
     color: var(--text-muted);
     transition: all 0.2s var(--ease);
@@ -288,12 +318,13 @@
   }
   .snypd-pill {
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 0;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.02);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
   .snypd-link {
@@ -302,15 +333,17 @@
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.15s var(--ease);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .snypd-link:hover { color: var(--text-primary); }
 
   .snypd-cta {
     width: 100%;
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 10px 14px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 13px;
     font-family: var(--font);
     color: var(--brand-fg);
@@ -320,6 +353,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   .snypd-cta:hover { 
     background: var(--brand-hover);
@@ -362,72 +397,18 @@
   @media (prefers-reduced-motion: reduce) {
     .snypd-sidebar * { animation: none !important; transition: none !important; }
   }
-</style></head><body><div class="snypd-sidebar obsidian-mode" data-focus="false" data-open="false" data-snypd-sidebar="" data-state="idle">
-<div class="snypd-dim" data-snypd-action="close"></div>
-<aside aria-label="SNYPD navigation" class="snypd-sidebar__shell">
-<div class="snypd-sidebar__top">
-<div class="snypd-sidebar__brand">
-<div class="snypd-sidebar__logoRow">
-<!-- Logo replicated exactly -->
-<div class="snypd-sidebar__wordmark">SNYPD</div>
-</div>
-<div class="snypd-sidebar__tagline">Be first. Stay ahead.</div>
-<div class="snypd-sidebar__status">
-<span class="snypd-orb"></span>
-<span data-snypd-status-label="">IDLE</span>
-</div>
-</div>
-<button aria-label="Toggle sidebar" class="snypd-sidebar__toggle" data-snypd-action="toggle" type="button">
-<svg class="snypd-ico" fill="none" viewbox="0 0 24 24">
-<path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-</button>
-</div>
-<div class="snypd-sidebar__navWrap">
-<nav class="snypd-sidebar__nav" data-snypd-nav="">
-<a class="snypd-navItem" data-active="true" data-key="dashboard" data-snypd-navitem="" href="/dashboard">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M4 4h7v7H4V4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M13 4h7v7h-7V4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M4 13h7v7H4v-7Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M13 13h7v7h-7v-7Z" stroke="currentColor" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Dashboard</span>
-</a>
-<a class="snypd-navItem" data-key="filters" data-snypd-navitem="" href="/filters">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Filters</span>
-</a>
-<a class="snypd-navItem" data-key="stockx" data-snypd-navitem="" href="https://stockx.com/" target="_blank">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M7 7h10v10H7V7Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M9 9h6v6H9V9Z" opacity=".7" stroke="currentColor" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">StockX</span>
-</a>
-<a class="snypd-navItem" data-key="account" data-snypd-navitem="" href="/account">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Account</span>
-</a>
+</style></head><body><header class="snypd-topbar">
+<div class="snypd-topbar__brand">SNYPD<span class="snypd-topbar__brand-underscore">_</span></div>
+<nav class="snypd-topbar__nav">
+<a class="snypd-topbar__navlink" href="/dashboard">Dashboard</a>
+<a class="snypd-topbar__navlink" href="/filters">Filters</a>
+<a class="snypd-topbar__navlink active" href="/account">Account</a>
 </nav>
+<div class="snypd-topbar__right">
+<a class="snypd-topbar__link" data-snypd-support="" href="/support">Support</a>
+<span class="snypd-topbar__plan" data-snypd-plan="">PLAN — ELITE</span>
 </div>
-<div class="snypd-sidebar__bottom">
-<div class="snypd-bottomRow">
-<div class="snypd-pill" data-snypd-plan="">PLAN — ELITE</div>
-<a class="snypd-link" data-snypd-support="" href="/support">Support</a>
-</div>
-<button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
-</div>
-</aside>
-</div><div class="main-content">
-<div id="mobile-header" style="display:none;">
-<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px; cursor:pointer;">☰</button>
-</div>
+</header><div class="main-content">
 <section class="section-signup account"><div class="padding-global"><div class="container-large"></div></div><div><!-- SNYPD Account Page — FINAL Whop-only -->
 <style>
   .snypd-account-final{
@@ -791,6 +772,21 @@
     }
   }
 </style>
+<style>
+  /* Consistency pass: applies the mono/square/mint-status-purple-action system
+     already shipped on dashboard.html to this page's content area, without
+     restructuring its layout. */
+  .snypd-account-final, .snypd-account-final * { font-family: 'DM Mono', ui-monospace, monospace !important; }
+  .snypd-account-final .backbtn, .snypd-account-final .card, .snypd-account-final .pill,
+  .snypd-account-final .row, .snypd-account-final .notice, .snypd-account-final .btn,
+  .snypd-account-final .mini {
+    border-radius: 0 !important;
+  }
+  .snypd-account-final .btn, .snypd-account-final .pill, .snypd-account-final .k {
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+</style>
 <div class="snypd-account-final">
 <div class="wrap">
 <div class="topbar">
@@ -951,8 +947,12 @@
 
   function setPlanPill(plan){
     const pill = document.querySelector(`[data-snypd="planPill"]`);
-    if (!pill) return;
-    pill.innerHTML = `<span class="p-dot"></span> PLAN - ${String(plan || "FREE").toUpperCase()}`;
+    if (pill) pill.innerHTML = `<span class="p-dot"></span> PLAN - ${String(plan || "FREE").toUpperCase()}`;
+
+    // Sidebar plan pill - was hardcoded "PLAN - ELITE" for every user regardless
+    // of real plan. Wire it to the same effectivePlan already resolved by the caller.
+    const sidebarPill = document.querySelector('[data-snypd-plan]');
+    if (sidebarPill) sidebarPill.textContent = `PLAN — ${String(plan || "FREE").toUpperCase()}`;
   }
 
   function setBillingButton(subscribed){

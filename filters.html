@@ -39,12 +39,11 @@
 <style>
           body {
             display: flex;
-            background: #000; /* Fallback */
-            background-image: radial-gradient(circle at 50% -20%, rgba(162, 0, 255, 0.1), transparent 60%);
+            background: #0B0C0D;
             margin: 0;
             min-height: 100vh;
-            color: #fff;
-            font-family: 'Inter', -apple-system, sans-serif;
+            color: #EDEFF0;
+            font-family: 'DM Mono', ui-monospace, monospace;
           }
           .main-content {
             flex: 1;
@@ -58,34 +57,65 @@
           .main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
           .main-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
           
-          /* Mobile hamburger logic */
-          @media (max-width: 991px) {
-            #mobile-header { display: block !important; }
-            .hdr { display: none !important; }
-            .dash-wrap, .account-wrap, .filters-wrap { padding-top: 16px; margin-top: 0; }
-          }
         </style>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 
-  /* Scope everything */
+  /* Unified top bar - replaces the old left sidebar, matching dashboard.html's
+     Ledger-locked direction. Nav here is plain page links, not view tabs -
+     this is its own page, not an in-app view. StockX is dropped from the nav:
+     that integration was scrapped in favour of Vinted-only, so the old
+     sidebar's link to it was already stale. */
+  .snypd-topbar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 24px;
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1E2225;
+    flex-wrap: wrap;
+  }
+  .snypd-topbar__brand { font-size: 16px; color: #EDEFF0; letter-spacing: 0.06em; font-weight: 500; flex: 0 0 auto; }
+  .snypd-topbar__brand-underscore { color: #00E5A0; }
+  .snypd-topbar__nav { display: flex; gap: 4px; flex: 1 1 auto; }
+  .snypd-topbar__navlink {
+    border: 1px solid #1E2225;
+    background: rgba(255,255,255,0.02);
+    color: #7C8489;
+    height: 34px; padding: 0 16px;
+    display: inline-flex; align-items: center;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .snypd-topbar__navlink.active { background: rgba(255,255,255,0.02); color: #EDEFF0; border-color: #00E5A0; }
+  .snypd-topbar__right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  .snypd-topbar__link { color: #7C8489; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-decoration: none; }
+  .snypd-topbar__link:hover { color: #EDEFF0; }
+  .snypd-topbar__plan { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: #7C8489; text-transform: uppercase; }
+  @media (max-width: 767px) {
+    .snypd-topbar { padding: 12px 16px; gap: 12px; }
+    .snypd-topbar__brand { font-size: 15px; letter-spacing: 0.04em; }
+    .snypd-topbar__nav { order: 3; flex-basis: 100%; }
+  }
+
+  /* Scope everything - Ledger locked-direction tokens, matching dashboard.html */
   .snypd-sidebar {
-    --bg: #0A0A0A; 
-    --panel: #111111;
-    --border: #262626;
-    --border-hover: #404040;
-    --text-primary: #F5F5F5;
-    --text-muted: #8A8A8A;
-    --brand: #A200FF; /* Matches logo exact purple */
-    --brand-hover: #B533FF;
-    --success: #10B981;
-    
-    --w: 260px;          
-    --wFocus: 260px;     
-    --radius: 10px;
+    --bg: #0B0C0D;
+    --panel: #0F1113;
+    --border: #1E2225;
+    --border-hover: #262B2F;
+    --text-primary: #EDEFF0;
+    --text-muted: #7C8489;
+    --brand: #A200FF; /* action color only - buttons */
+    --brand-hover: #C54BFF;
+    --success: #00E5A0; /* mint - status color only, never action */
+
+    --w: 260px;
+    --wFocus: 260px;
+    --radius: 0px;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'DM Mono', ui-monospace, monospace;
   }
 
   /* Support for Obsidian translucent background if placed on absolute black */
@@ -181,7 +211,7 @@
   }
   .snypd-sidebar[data-state="live"] .snypd-orb {
     background: var(--success);
-    box-shadow: 0 0 8px rgba(16,185,129,0.4);
+    box-shadow: 0 0 8px rgba(0,229,160,0.4);
   }
   .snypd-sidebar[data-state="live"] .snypd-sidebar__status {
     color: var(--success);
@@ -191,7 +221,7 @@
   .snypd-sidebar__toggle {
     border: 1px solid var(--border);
     background: transparent;
-    border-radius: 6px;
+    border-radius: 0;
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -227,7 +257,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
-    border-radius: 6px;
+    border-radius: 0;
     text-decoration: none;
     color: var(--text-muted);
     transition: all 0.2s var(--ease);
@@ -285,12 +315,13 @@
   }
   .snypd-pill {
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 0;
     border: 1px solid var(--border);
     background: rgba(255,255,255,0.02);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
   .snypd-link {
@@ -299,15 +330,17 @@
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.15s var(--ease);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .snypd-link:hover { color: var(--text-primary); }
 
   .snypd-cta {
     width: 100%;
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 10px 14px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 13px;
     font-family: var(--font);
     color: var(--brand-fg);
@@ -317,6 +350,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   .snypd-cta:hover { 
     background: var(--brand-hover);
@@ -359,80 +394,45 @@
   @media (prefers-reduced-motion: reduce) {
     .snypd-sidebar * { animation: none !important; transition: none !important; }
   }
-</style></head><body><div class="snypd-sidebar obsidian-mode" data-focus="false" data-open="false" data-snypd-sidebar="" data-state="idle">
-<div class="snypd-dim" data-snypd-action="close"></div>
-<aside aria-label="SNYPD navigation" class="snypd-sidebar__shell">
-<div class="snypd-sidebar__top">
-<div class="snypd-sidebar__brand">
-<div class="snypd-sidebar__logoRow">
-<!-- Logo replicated exactly -->
-<div class="snypd-sidebar__wordmark">SNYPD</div>
-</div>
-<div class="snypd-sidebar__tagline">Be first. Stay ahead.</div>
-<div class="snypd-sidebar__status">
-<span class="snypd-orb"></span>
-<span data-snypd-status-label="">IDLE</span>
-</div>
-</div>
-<button aria-label="Toggle sidebar" class="snypd-sidebar__toggle" data-snypd-action="toggle" type="button">
-<svg class="snypd-ico" fill="none" viewbox="0 0 24 24">
-<path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-</button>
-</div>
-<div class="snypd-sidebar__navWrap">
-<nav class="snypd-sidebar__nav" data-snypd-nav="">
-<a class="snypd-navItem" data-active="true" data-key="dashboard" data-snypd-navitem="" href="/dashboard">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M4 4h7v7H4V4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M13 4h7v7h-7V4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M4 13h7v7H4v-7Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M13 13h7v7h-7v-7Z" stroke="currentColor" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Dashboard</span>
-</a>
-<a class="snypd-navItem" data-key="filters" data-snypd-navitem="" href="/filters">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Filters</span>
-</a>
-<a class="snypd-navItem" data-key="stockx" data-snypd-navitem="" href="https://stockx.com/" target="_blank">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M7 7h10v10H7V7Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M9 9h6v6H9V9Z" opacity=".7" stroke="currentColor" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">StockX</span>
-</a>
-<a class="snypd-navItem" data-key="account" data-snypd-navitem="" href="/account">
-<svg class="snypd-navIcon" fill="none" viewbox="0 0 24 24">
-<path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="2"></path>
-<path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
-</svg>
-<span class="snypd-navLabel">Account</span>
-</a>
+</style>
+<style>
+  /* Consistency pass: applies the mono/square/mint-status-purple-action system
+     already shipped on dashboard.html to this page's content area, without
+     restructuring its layout - filters.html is slated for eventual
+     deprecation once the dashboard absorbs search management, so a deeper
+     redesign here would be wasted effort. */
+  .x, .x * { font-family: 'DM Mono', ui-monospace, monospace; }
+  .x .btn, .x .tab, .x .ib, .x .ki, .x .p, .x .gate, .x input, .x select,
+  .x .lim, .x .tabs, .x .sort select, .x .r, .x .pill, .x .e, .x .toast div {
+    border-radius: 0 !important;
+  }
+  .x .btn, .x .tab, .x .ib, .x .pill {
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 700;
+  }
+</style>
+</head><body><header class="snypd-topbar">
+<div class="snypd-topbar__brand">SNYPD<span class="snypd-topbar__brand-underscore">_</span></div>
+<nav class="snypd-topbar__nav">
+<a class="snypd-topbar__navlink" href="/dashboard">Dashboard</a>
+<a class="snypd-topbar__navlink active" href="/filters">Filters</a>
+<a class="snypd-topbar__navlink" href="/account">Account</a>
 </nav>
+<div class="snypd-topbar__right">
+<a class="snypd-topbar__link" data-snypd-support="" href="/support">Support</a>
+<span class="snypd-topbar__plan" data-snypd-plan="">PLAN — ELITE</span>
 </div>
-<div class="snypd-sidebar__bottom">
-<div class="snypd-bottomRow">
-<div class="snypd-pill" data-snypd-plan="">PLAN — ELITE</div>
-<a class="snypd-link" data-snypd-support="" href="/support">Support</a>
-</div>
-<button class="snypd-cta" data-snypd-action="upgrade" type="button">Upgrade plan</button>
-</div>
-</aside>
-</div><div class="main-content">
-<div id="mobile-header" style="display:none;">
-<button class="hamburger" onclick="document.querySelector('.snypd-sidebar').dataset.open='true'" style="background:transparent; border:none; color:#fff; font-size:24px; margin: 16px; cursor:pointer;">☰</button>
-</div>
+</header><div class="main-content">
 <div>
 <section class="x">
 <style>
-.x{--l:rgba(162,0,255,.18);--t:#FFFFFF;--m:rgba(156,163,175,.7);--c:#35e7dc;position:relative;width:100%;overflow-x:hidden;overflow-x:clip;overflow-y:visible;color:var(--t);padding:48px 16px;background:#030303}.x,.x *{box-sizing:border-box}.x h1,.x h2,.x h3,.x p{margin:0}.x a{text-decoration:none;color:inherit}.x .w{position:relative;max-width:1180px;margin:auto}.x .h{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:end}.x .ey{color:var(--c);font-size:12px;font-weight:950;text-transform:uppercase;margin-bottom:14px}.x h1{max-width:780px;font-size:clamp(42px,7vw,88px)}.x .sub{max-width:700px;margin-top:18px;color:var(--m);font-size:clamp(16px,1.7vw,19px)}.x .a{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}.x .btn,.x .tab,.x .ib{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--l);border-radius:999px;background:rgba(255,255,255,.06);color:var(--t);font:inherit;font-weight:900;cursor:pointer}.x .btn{min-height:46px;padding:12px 17px}.x .btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none}.x .pri{color:#fff;background:#A200FF;box-shadow:0 0 30px rgba(162,0,255,.35)}.x .k{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:24px 0}.x .ki,.x .p,.x .gate{border:1px solid var(--l);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035)),rgba(18,15,31,.82)}.x .ki{padding:16px}.x .ki span,.x label{display:block;color:rgba(156,163,175,.55);font-size:12px;font-weight:950;text-transform:uppercase}.x .ki b{display:block;margin-top:12px;font-size:clamp(24px,3vw,40px);line-height:1;letter-spacing:-.04em}.x .g{display:grid;grid-template-columns:.9fr 1.45fr;gap:18px;align-items:start}.x .in{padding:22px}.x h2{font-size:23px;letter-spacing:-.03em}.x .txt{color:var(--m);font-size:14px;line-height:1.55}.x .frm{display:grid;gap:14px;margin-top:18px}.x .f{display:grid;gap:8px}.x input,.x select{width:100%;min-height:48px;border:1px solid rgba(162,0,255,.16);border-radius:15px;background:rgba(5,4,12,.54);color:var(--t);padding:12px 14px;font:inherit}.x input:focus,.x select:focus{border-color:rgba(53,231,220,.46)}.x .lim{display:none;margin-top:16px;padding:15px;border-radius:18px;border:1px solid rgba(248,189,79,.28);background:rgba(248,189,79,.1)}.x .lim.on{display:block}.x .lim p{margin:6px 0 12px;color:var(--m);font-size:14px}.x .bar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}.x .tabs{display:inline-flex;padding:5px;border-radius:999px;border:1px solid rgba(162,0,255,.13);background:rgba(0,0,0,.22);gap:4px;margin-bottom:16px}.x .tab{border:0;padding:9px 13px;color:var(--m);background:transparent;font-size:13px}.x .tab.on{color:#fff;background:#A200FF}.x .sort select{min-height:40px;border-radius:999px}.x .list{display:grid;gap:12px;min-height:124px}.x .r{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:16px;border-radius:20px;background:rgba(8,7,18,.62);border:1px solid rgba(162,0,255,.13)}.x .ttl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:17px;font-weight:950;margin-bottom:7px}.x .pill{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase;border:1px solid transparent}.x .act{color:#bfffe8;background:rgba(53,232,137,.105)}.x .pau{color:rgba(156,163,175,.66);background:rgba(255,255,255,.055)}.x .url{display:block;color:rgba(156,163,175,.48);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.x .ra{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.x .ib{min-height:38px;padding:9px 11px;font-size:12px}.x .del{color:#ffd6dc}.x .e{text-align:center;padding:34px 18px;color:var(--m);border:1px dashed var(--l);border-radius:20px}.x .toast{position:fixed;right:18px;bottom:18px;z-index:9999;display:grid;gap:10px;width:min(390px,calc(100% - 36px));pointer-events:none}.x .toast div{padding:14px 16px;border-radius:16px;background:rgba(10,8,18,.96);border:1px solid rgba(162,0,255,.18);font-size:14px}.x .gate{display:none;margin-top:22px;padding:26px}.x .gate.on{display:block}@media(max-width:920px){.x .h,.x .g{grid-template-columns:1fr}.x .a{justify-content:flex-start}.x .k{grid-template-columns:repeat(2,1fr)}.x .r{grid-template-columns:1fr}.x .ra{justify-content:flex-start}}@media(max-width:540px){.x .k{grid-template-columns:1fr}.x .btn{width:100%}.x .bar,.x .sort,.x .a{display:grid}}
+.x{--l:rgba(162,0,255,.18);--t:#EDEFF0;--m:rgba(156,163,175,.7);--c:#00E5A0;position:relative;width:100%;overflow-x:hidden;overflow-x:clip;overflow-y:visible;color:var(--t);padding:48px 16px;background:#030303}.x,.x *{box-sizing:border-box}.x h1,.x h2,.x h3,.x p{margin:0}.x a{text-decoration:none;color:inherit}.x .w{position:relative;max-width:1180px;margin:auto}.x .h{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:end}.x .ey{color:var(--c);font-size:12px;font-weight:950;text-transform:uppercase;margin-bottom:14px}.x h1{max-width:780px;font-size:clamp(42px,7vw,88px)}.x .sub{max-width:700px;margin-top:18px;color:var(--m);font-size:clamp(16px,1.7vw,19px)}.x .a{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}.x .btn,.x .tab,.x .ib{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--l);border-radius:999px;background:rgba(255,255,255,.06);color:var(--t);font:inherit;font-weight:900;cursor:pointer}.x .btn{min-height:46px;padding:12px 17px}.x .btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none}.x .pri{color:#fff;background:#A200FF;box-shadow:0 0 30px rgba(162,0,255,.35)}.x .k{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:24px 0}.x .ki,.x .p,.x .gate{border:1px solid var(--l);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035)),rgba(18,15,31,.82)}.x .ki{padding:16px}.x .ki span,.x label{display:block;color:rgba(156,163,175,.55);font-size:12px;font-weight:950;text-transform:uppercase}.x .ki b{display:block;margin-top:12px;font-size:clamp(24px,3vw,40px);line-height:1;letter-spacing:-.04em}.x .g{display:grid;grid-template-columns:.9fr 1.45fr;gap:18px;align-items:start}.x .in{padding:22px}.x h2{font-size:23px;letter-spacing:-.03em}.x .txt{color:var(--m);font-size:14px;line-height:1.55}.x .frm{display:grid;gap:14px;margin-top:18px}.x .f{display:grid;gap:8px}.x input,.x select{width:100%;min-height:48px;border:1px solid rgba(162,0,255,.16);border-radius:15px;background:rgba(5,4,12,.54);color:var(--t);padding:12px 14px;font:inherit}.x input:focus,.x select:focus{border-color:rgba(0,229,160,.46)}.x .lim{display:none;margin-top:16px;padding:15px;border-radius:18px;border:1px solid rgba(248,189,79,.28);background:rgba(248,189,79,.1)}.x .lim.on{display:block}.x .lim p{margin:6px 0 12px;color:var(--m);font-size:14px}.x .bar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}.x .tabs{display:inline-flex;padding:5px;border-radius:999px;border:1px solid rgba(162,0,255,.13);background:rgba(0,0,0,.22);gap:4px;margin-bottom:16px}.x .tab{border:0;padding:9px 13px;color:var(--m);background:transparent;font-size:13px}.x .tab.on{color:#fff;background:#A200FF}.x .sort select{min-height:40px;border-radius:999px}.x .list{display:grid;gap:12px;min-height:124px}.x .r{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:16px;border-radius:20px;background:rgba(8,7,18,.62);border:1px solid rgba(162,0,255,.13)}.x .ttl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:17px;font-weight:950;margin-bottom:7px}.x .pill{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase;border:1px solid transparent}.x .act{color:#bfffe8;background:rgba(53,232,137,.105)}.x .pau{color:rgba(156,163,175,.66);background:rgba(255,255,255,.055)}.x .url{display:block;color:rgba(156,163,175,.48);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.x .ra{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.x .ib{min-height:38px;padding:9px 11px;font-size:12px}.x .del{color:#ffd6dc}.x .e{text-align:center;padding:34px 18px;color:var(--m);border:1px dashed var(--l);border-radius:20px}.x .toast{position:fixed;right:18px;bottom:18px;z-index:9999;display:grid;gap:10px;width:min(390px,calc(100% - 36px));pointer-events:none}.x .toast div{padding:14px 16px;border-radius:16px;background:rgba(10,8,18,.96);border:1px solid rgba(162,0,255,.18);font-size:14px}.x .gate{display:none;margin-top:22px;padding:26px}.x .gate.on{display:block}@media(max-width:920px){.x .h,.x .g{grid-template-columns:1fr}.x .a{justify-content:flex-start}.x .k{grid-template-columns:repeat(2,1fr)}.x .r{grid-template-columns:1fr}.x .ra{justify-content:flex-start}}@media(max-width:540px){.x .k{grid-template-columns:1fr}.x .btn{width:100%}.x .bar,.x .sort,.x .a{display:grid}}
 </style>
 <div class="w"><div class="h"><div><div class="ey">Filters</div><h1>Searches SNYPD watches</h1><p class="sub">Paste Vinted search links. Keep active searches on and check new matches from your dashboard.</p></div><div class="a"><a class="btn pri" href="/dashboard">Open dashboard</a><a class="btn" href="https://www.vinted.be/catalog">Open Vinted</a></div></div><section class="gate" data-gate=""><h2>Almost there.</h2><p class="txt">Start the free plan to add your first Vinted search.</p><div class="a" style="justify-content:flex-start;margin-top:16px"><a class="btn pri" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Start free</a><a class="btn" href="/#pricing">Back to plans</a></div></section><div data-app=""><div class="k"><div class="ki"><span>Active</span><b data-active="">...</b></div><div class="ki"><span>Limit</span><b data-limit="">...</b></div><div class="ki"><span>Left</span><b data-left="">...</b></div><div class="ki"><span>Plan</span><b data-plan="">...</b></div><div class="ki"><span>Monitoring</span><b data-speed="">...</b></div></div><div class="g"><aside class="p"><div class="in"><h2>Add a search</h2><p class="txt">Set filters on Vinted first, then paste the search URL here.</p><div class="frm" data-form=""><div class="f"><label>Name</label><input data-name="" placeholder="Ralph Lauren shirts"/></div><div class="f"><label>Vinted search URL</label><input data-url="" placeholder="Paste /catalog?... link"/></div><button class="btn pri" data-add="" disabled="" type="button">Save search</button></div><div class="lim" data-limit-box=""><strong>You’re using all your active searches.</strong><p data-limit-copy=""></p><a class="btn" href="/#pricing">See plans</a></div><p class="txt" style="margin-top:16px">SNYPD checks active searches while your dashboard is open.</p></div></aside><main class="p"><div class="in"><div class="bar"><div><h2>Your searches</h2><p class="txt">Active searches are checked while dashboard is open.</p></div><label class="sort">Sort<select data-sort=""><option value="newest">Newest added</option><option value="active">Active first</option><option value="name">Name A-Z</option></select></label></div><div class="tabs"><button class="tab on" data-tab="all">All</button><button class="tab" data-tab="active">Active</button><button class="tab" data-tab="paused">Paused</button></div><div class="list" data-list=""></div></div></main></div></div><div class="toast" data-toast=""></div>
 <script>
-(()=>{const root=document.currentScript.closest('.x'),$=s=>root.querySelector(s),$$=s=>Array.from(root.querySelectorAll(s)),ACT=new Set(['active','trialing','past_due','unpaid']),PLANS=new Set(['free','kickstart','pro','elite']),LIMIT={free:1,kickstart:2,pro:5,elite:7},btnAdd=$('[data-add]'),box=$('[data-limit-box]');let sb,st={user:null,profile:{},rows:[],tab:'all',sort:'newest',q:{used:0,limit:1,remaining:1,plan:'free'},dbg:{}};const esc=v=>String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])),toast=m=>{let w=$('[data-toast]'),d=document.createElement('div');d.textContent=m;w.appendChild(d);setTimeout(()=>d.remove(),3600)},pl=v=>PLANS.has(String(v||'').toLowerCase())?String(v||'').toLowerCase():'free',num=v=>{let n=Number(v);return Number.isFinite(n)?n:null},spd=p=>p==='free'?'While tab is open':'24/7',whop=p=>String(p.billing_provider||'').toLowerCase()==='whop'||!!String(p.whop_manage_url||'').trim()||!!String(p.whop_plan_id||'').trim()||!!String(p.whop_product_id||'').trim(),ok=p=>true/*free tier needs no Whop membership; Whop only decides the LIMIT below*/,valid=u=>{try{let x=new URL(String(u||'').trim());return /(^|\.)vinted\./i.test(x.hostname)&&x.pathname.replace(/\/+$/,'')==='/catalog'&&x.search.length>1}catch(e){return false}},short=u=>{try{let x=new URL(u),q=x.searchParams.get('search_text');return x.hostname.replace(/^www\./,'')+(q?' · '+q:x.pathname)}catch(e){return u||''}},nm=u=>{try{return new URL(u).searchParams.get('search_text')||'Vinted search'}catch(e){return'Vinted search'}};async function getSB(){for(let i=0;i<100&&!window.SNYPD?.supabase;i++)await new Promise(r=>setTimeout(r,30));return window.SNYPD?.supabase}async function quota(){let _rp=pl(st.profile.subscription_plan),p=(_rp!=='free'&&PLANS.has(_rp)&&ACT.has(String(st.profile.sub_status||'').toLowerCase())&&whop(st.profile))?_rp:'free',status=String(st.profile.sub_status||'').toLowerCase(),billingProvider=String(st.profile.billing_provider||'').toLowerCase(),whopPlanId=String(st.profile.whop_plan_id||''),whopProductId=String(st.profile.whop_product_id||''),whopManageUrl=String(st.profile.whop_manage_url||''),rpcUsed=null,rpcLimit=null,rp=p;try{let r=await sb.rpc('filter_quota');if(!r.error&&r.data){let d=Array.isArray(r.data)?r.data[0]:r.data;rpcUsed=num(d.used??d.active_count??d.active_filters??d.used_filters??d.active);rpcLimit=num(d.quota_limit??d.plan_limit??d.filter_limit??d.max_filters??d.limit??d.max_active_filters);rp=pl(d.plan??d.subscription_plan??p)}}catch(e){}let computedActiveUsed=st.rows.filter(r=>r.is_active===true).length,finalLimit=rpcLimit!=null&&rpcLimit>=0?Number(rpcLimit):Number(LIMIT[p]??1),finalUsed=Number(computedActiveUsed),remaining=Math.max(0,finalLimit-finalUsed);st.q={used:finalUsed,limit:finalLimit,remaining,plan:rp||p};st.dbg={plan:p,status,billingProvider,whopPlanId,whopProductId,whopManageUrl,rpcUsed,rpcLimit,computedActiveUsed,finalUsed,finalLimit,remaining};paint()}function paint(){let q=st.q,used=Number(q.used)||0,limit=Number(q.limit)||0,remaining=Math.max(0,limit-used),full=remaining<=0;$('[data-active]').textContent=used;$('[data-limit]').textContent=limit;$('[data-left]').textContent=remaining;$('[data-plan]').textContent=q.plan.toUpperCase();$('[data-speed]').textContent=spd(q.plan);box.classList.toggle('on',full);full?btnAdd.setAttribute('disabled','disabled'):btnAdd.removeAttribute('disabled');$('[data-limit-copy]').textContent=q.plan==='free'?'Free includes 1 active search. Pro gives you 5, running 24/7.':q.plan==='kickstart'?'Kickstart includes 2 active searches. Pro gives you 5.':'Pause one search or upgrade to watch more.';console.log('SNYPD filters quota',{...st.dbg,saveDisabled:btnAdd.disabled})}function render(){let rows=st.rows.slice();if(st.tab==='active')rows=rows.filter(x=>x.is_active);if(st.tab==='paused')rows=rows.filter(x=>!x.is_active);if(st.sort==='active')rows.sort((a,b)=>Number(b.is_active)-Number(a.is_active)||new Date(b.created_at||0)-new Date(a.created_at||0));else if(st.sort==='name')rows.sort((a,b)=>String(a.search_name||'').localeCompare(String(b.search_name||'')));else rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));if(!rows.length){$('[data-list]').innerHTML='<div class="e"><b>No searches yet.</b><p>Paste your first Vinted search link.</p></div>';return}$('[data-list]').innerHTML=rows.map(x=>{let a=!!x.is_active;return `<article class="r" data-id="${esc(x.id)}"><div><div class="ttl"><span>${esc(x.search_name||nm(x.vinted_url))}</span><span class="pill ${a?'act':'pau'}">${a?'Active':'Paused'}</span></div><span class="url">${esc(short(x.vinted_url))}</span></div><div class="ra"><button class="ib" data-toggle>${a?'Pause':'Activate'}</button><a class="ib" href="${esc(x.vinted_url)}">Open on Vinted</a><button class="ib" data-copy>Copy link</button><button class="ib del" data-del>Delete</button></div></article>`}).join('')}async function reload(){let r=await sb.from('user_searches').select('*').eq('user_id',st.user.id).order('created_at',{ascending:false});if(r.error){toast('Could not load searches.');return}st.rows=r.data||[];await quota();render()}function hit(){toast('You’re at your plan limit. Pause one search or upgrade.');box.classList.add('on')}async function add(){let url=$('[data-url]').value.trim(),name=$('[data-name]').value.trim();console.log('SNYPD save search clicked',{url,name,finalUsed:st.q.used,finalLimit:st.q.limit,remaining:st.q.remaining});await reload();let finalUsed=Number(st.q.used)||0,finalLimit=Number(st.q.limit)||0,remaining=Math.max(0,finalLimit-finalUsed);console.log('SNYPD save search clicked',{url,name,finalUsed,finalLimit,remaining});if(finalUsed>=finalLimit){hit();return}if(!valid(url)){toast('Paste a Vinted /catalog link.');return}btnAdd.setAttribute('disabled','disabled');let r=await sb.from('user_searches').insert({user_id:st.user.id,search_name:name||nm(url),vinted_url:url,is_active:true});if(r.error){await reload();/limit|quota|active/i.test(String(r.error.message||''))?hit():toast('Could not save this search.');return}$('[data-name]').value='';$('[data-url]').value='';toast('Search saved.');await reload()}async function init(){sb=await getSB();if(!sb){toast('Refresh the page.');return}let ses=await sb.auth.getSession(),u=ses?.data?.session?.user;if(!u){location.href='/login';return}st.user=u;let pr=await sb.from('users').select('*').eq('id',u.id).maybeSingle();st.profile=pr.data||{};if(!ok(st.profile)){$('[data-gate]').classList.add('on');$('[data-app]').style.display='none';return}$('[data-app]').style.display='';await reload();btnAdd.addEventListener('click',add);root.addEventListener('click',async e=>{let tab=e.target.closest('[data-tab]');if(tab){st.tab=tab.dataset.tab||'all';$$('[data-tab]').forEach(b=>b.classList.toggle('on',b===tab));render();return}let row=e.target.closest('.r');if(!row)return;let id=row.dataset.id,item=st.rows.find(x=>String(x.id)===String(id));if(!item)return;if(e.target.closest('[data-copy]')){try{await navigator.clipboard.writeText(item.vinted_url);toast('Link copied.')}catch(_){toast('Could not copy the link.')}return}if(e.target.closest('[data-del]')){if(!confirm('Delete this search?'))return;let r=await sb.from('user_searches').delete().eq('id',id).eq('user_id',st.user.id);if(r.error)toast('Could not delete search.');else{toast('Search deleted.');await reload()}return}if(e.target.closest('[data-toggle]')){await reload();let fresh=st.rows.find(x=>String(x.id)===String(id));if(!fresh)return;let next=!fresh.is_active;if(next&&st.q.used>=st.q.limit){hit();return}let r=await sb.from('user_searches').update({is_active:next}).eq('id',id).eq('user_id',st.user.id);if(r.error){await reload();/limit|quota|active/i.test(String(r.error.message||''))?hit():toast('Could not update search.');return}toast(next?'Search is active.':'Search paused.');await reload()}});$('[data-sort]').onchange=e=>{st.sort=e.target.value||'newest';render()}}init().catch(e=>{toast('Refresh and try again.')})})();
+(()=>{const root=document.currentScript.closest('.x'),$=s=>root.querySelector(s),$$=s=>Array.from(root.querySelectorAll(s)),ACT=new Set(['active','trialing','past_due','unpaid']),PLANS=new Set(['free','kickstart','pro','elite']),LIMIT={free:1,kickstart:2,pro:5,elite:7},btnAdd=$('[data-add]'),box=$('[data-limit-box]');let sb,st={user:null,profile:{},rows:[],tab:'all',sort:'newest',q:{used:0,limit:1,remaining:1,plan:'free'},dbg:{}};const esc=v=>String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])),toast=m=>{let w=$('[data-toast]'),d=document.createElement('div');d.textContent=m;w.appendChild(d);setTimeout(()=>d.remove(),3600)},pl=v=>PLANS.has(String(v||'').toLowerCase())?String(v||'').toLowerCase():'free',num=v=>{let n=Number(v);return Number.isFinite(n)?n:null},spd=p=>p==='free'?'While tab is open':'24/7',whop=p=>String(p.billing_provider||'').toLowerCase()==='whop'||!!String(p.whop_manage_url||'').trim()||!!String(p.whop_plan_id||'').trim()||!!String(p.whop_product_id||'').trim(),ok=p=>true/*free tier needs no Whop membership; Whop only decides the LIMIT below*/,valid=u=>{try{let x=new URL(String(u||'').trim());return /(^|\.)vinted\./i.test(x.hostname)&&x.pathname.replace(/\/+$/,'')==='/catalog'&&x.search.length>1}catch(e){return false}},short=u=>{try{let x=new URL(u),q=x.searchParams.get('search_text');return x.hostname.replace(/^www\./,'')+(q?' · '+q:x.pathname)}catch(e){return u||''}},nm=u=>{try{return new URL(u).searchParams.get('search_text')||'Vinted search'}catch(e){return'Vinted search'}};async function getSB(){for(let i=0;i<100&&!window.SNYPD?.supabase;i++)await new Promise(r=>setTimeout(r,30));return window.SNYPD?.supabase}async function quota(){let _rp=pl(st.profile.subscription_plan),p=(_rp!=='free'&&PLANS.has(_rp)&&ACT.has(String(st.profile.sub_status||'').toLowerCase())&&whop(st.profile))?_rp:'free',status=String(st.profile.sub_status||'').toLowerCase(),billingProvider=String(st.profile.billing_provider||'').toLowerCase(),whopPlanId=String(st.profile.whop_plan_id||''),whopProductId=String(st.profile.whop_product_id||''),whopManageUrl=String(st.profile.whop_manage_url||''),rpcUsed=null,rpcLimit=null,rp=p;try{let r=await sb.rpc('filter_quota');if(!r.error&&r.data){let d=Array.isArray(r.data)?r.data[0]:r.data;rpcUsed=num(d.used??d.active_count??d.active_filters??d.used_filters??d.active);rpcLimit=num(d.quota_limit??d.plan_limit??d.filter_limit??d.max_filters??d.limit??d.max_active_filters);rp=pl(d.plan??d.subscription_plan??p)}}catch(e){}let computedActiveUsed=st.rows.filter(r=>r.is_active===true).length,finalLimit=rpcLimit!=null&&rpcLimit>=0?Number(rpcLimit):Number(LIMIT[p]??1),finalUsed=Number(computedActiveUsed),remaining=Math.max(0,finalLimit-finalUsed);st.q={used:finalUsed,limit:finalLimit,remaining,plan:rp||p};st.dbg={plan:p,status,billingProvider,whopPlanId,whopProductId,whopManageUrl,rpcUsed,rpcLimit,computedActiveUsed,finalUsed,finalLimit,remaining};paint()}function paint(){let q=st.q,used=Number(q.used)||0,limit=Number(q.limit)||0,remaining=Math.max(0,limit-used),full=remaining<=0;$('[data-active]').textContent=used;$('[data-limit]').textContent=limit;$('[data-left]').textContent=remaining;$('[data-plan]').textContent=q.plan.toUpperCase();$('[data-speed]').textContent=spd(q.plan);(function(){var sp=document.querySelector('[data-snypd-plan]');if(sp)sp.textContent='PLAN — '+q.plan.toUpperCase()})();box.classList.toggle('on',full);full?btnAdd.setAttribute('disabled','disabled'):btnAdd.removeAttribute('disabled');$('[data-limit-copy]').textContent=q.plan==='free'?'Free includes 1 active search. Pro gives you 5, running 24/7.':q.plan==='kickstart'?'Kickstart includes 2 active searches. Pro gives you 5.':'Pause one search or upgrade to watch more.';console.log('SNYPD filters quota',{...st.dbg,saveDisabled:btnAdd.disabled})}function render(){let rows=st.rows.slice();if(st.tab==='active')rows=rows.filter(x=>x.is_active);if(st.tab==='paused')rows=rows.filter(x=>!x.is_active);if(st.sort==='active')rows.sort((a,b)=>Number(b.is_active)-Number(a.is_active)||new Date(b.created_at||0)-new Date(a.created_at||0));else if(st.sort==='name')rows.sort((a,b)=>String(a.search_name||'').localeCompare(String(b.search_name||'')));else rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));if(!rows.length){$('[data-list]').innerHTML='<div class="e"><b>No searches yet.</b><p>Paste your first Vinted search link.</p></div>';return}$('[data-list]').innerHTML=rows.map(x=>{let a=!!x.is_active;return `<article class="r" data-id="${esc(x.id)}"><div><div class="ttl"><span>${esc(x.search_name||nm(x.vinted_url))}</span><span class="pill ${a?'act':'pau'}">${a?'Active':'Paused'}</span></div><span class="url">${esc(short(x.vinted_url))}</span></div><div class="ra"><button class="ib" data-toggle>${a?'Pause':'Activate'}</button><a class="ib" href="${esc(x.vinted_url)}">Open on Vinted</a><button class="ib" data-copy>Copy link</button><button class="ib del" data-del>Delete</button></div></article>`}).join('')}async function awardFirstHuntXP(){try{let ex=await sb.from('xp_events').select('id').eq('user_id',st.user.id).eq('event_type','first_hunt').limit(1);if(ex.error||(ex.data&&ex.data.length))return;let mid=new Date();mid.setUTCHours(0,0,0,0);let tot=await sb.from('xp_events').select('xp').eq('user_id',st.user.id).gte('created_at',mid.toISOString());let earned=tot.error?200:(tot.data||[]).reduce((s,r)=>s+(Number(r.xp)||0),0);let award=Math.max(0,Math.min(20,200-earned));if(award<=0)return;await sb.from('xp_events').insert({user_id:st.user.id,event_type:'first_hunt',xp:award,item_id:null,meta:null})}catch(e){console.error('SNYPD XP: first_hunt award failed',e)}}
+async function reload(){let r=await sb.from('user_searches').select('*').eq('user_id',st.user.id).order('created_at',{ascending:false});if(r.error){toast('Could not load searches.');return}st.rows=r.data||[];await quota();render()}function hit(){toast('You’re at your plan limit. Pause one search or upgrade.');box.classList.add('on')}async function add(){let url=$('[data-url]').value.trim(),name=$('[data-name]').value.trim();console.log('SNYPD save search clicked',{url,name,finalUsed:st.q.used,finalLimit:st.q.limit,remaining:st.q.remaining});await reload();let finalUsed=Number(st.q.used)||0,finalLimit=Number(st.q.limit)||0,remaining=Math.max(0,finalLimit-finalUsed);console.log('SNYPD save search clicked',{url,name,finalUsed,finalLimit,remaining});if(finalUsed>=finalLimit){hit();return}if(!valid(url)){toast('Paste a Vinted /catalog link.');return}btnAdd.setAttribute('disabled','disabled');let r=await sb.from('user_searches').insert({user_id:st.user.id,search_name:name||nm(url),vinted_url:url,is_active:true});if(r.error){await reload();/limit|quota|active/i.test(String(r.error.message||''))?hit():toast('Could not save this search.');return}awardFirstHuntXP();$('[data-name]').value='';$('[data-url]').value='';toast('Search saved.');await reload()}async function init(){sb=await getSB();if(!sb){toast('Refresh the page.');return}let ses=await sb.auth.getSession(),u=ses?.data?.session?.user;if(!u){location.href='/login';return}st.user=u;let pr=await sb.from('users').select('*').eq('id',u.id).maybeSingle();st.profile=pr.data||{};if(!ok(st.profile)){$('[data-gate]').classList.add('on');$('[data-app]').style.display='none';return}$('[data-app]').style.display='';await reload();btnAdd.addEventListener('click',add);root.addEventListener('click',async e=>{let tab=e.target.closest('[data-tab]');if(tab){st.tab=tab.dataset.tab||'all';$$('[data-tab]').forEach(b=>b.classList.toggle('on',b===tab));render();return}let row=e.target.closest('.r');if(!row)return;let id=row.dataset.id,item=st.rows.find(x=>String(x.id)===String(id));if(!item)return;if(e.target.closest('[data-copy]')){try{await navigator.clipboard.writeText(item.vinted_url);toast('Link copied.')}catch(_){toast('Could not copy the link.')}return}if(e.target.closest('[data-del]')){if(!confirm('Delete this search?'))return;let r=await sb.from('user_searches').delete().eq('id',id).eq('user_id',st.user.id);if(r.error)toast('Could not delete search.');else{toast('Search deleted.');await reload()}return}if(e.target.closest('[data-toggle]')){await reload();let fresh=st.rows.find(x=>String(x.id)===String(id));if(!fresh)return;let next=!fresh.is_active;if(next&&st.q.used>=st.q.limit){hit();return}let r=await sb.from('user_searches').update({is_active:next}).eq('id',id).eq('user_id',st.user.id);if(r.error){await reload();/limit|quota|active/i.test(String(r.error.message||''))?hit():toast('Could not update search.');return}toast(next?'Search is active.':'Search paused.');await reload()}});$('[data-sort]').onchange=e=>{st.sort=e.target.value||'newest';render()}}init().catch(e=>{toast('Refresh and try again.')})})();
 </script>
 </div>
 
