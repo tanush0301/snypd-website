@@ -379,7 +379,14 @@ body {
   min-width: 0;
 }
 
-.dash-wrap { max-width: 1080px; margin: 24px auto 40px; padding: 0 24px; }
+/* 1080px read as a narrow column with big black margins on any screen
+   wider than ~1130px - the actual 2j mockup canvas (2476px) fills the
+   width it was authored at, edge to edge but for its own page padding.
+   Raised so a normal 1440-1920px desktop shows the real design using the
+   page, not a centered island of it. 2200px keeps a ceiling for genuinely
+   ultrawide/4K displays, where an uncapped single dashboard would stretch
+   thin rather than looking intentional. */
+.dash-wrap { max-width: 2200px; margin: 24px auto 40px; padding: 0 24px; }
 
 /* Unified top bar - replaces the old left sidebar entirely, per the final
    desktop mockup (2j): logo, Feed/History/Market Insights tabs, and a
@@ -790,18 +797,27 @@ body {
 .list { display: grid; gap: 12px; }
 .list.loading { opacity: 0.6; pointer-events: none; transition: opacity 0.3s ease; }
 
-/* Horizontal Card */
+/* Ledger 2e: one big image per card, full list width, stacked vertically -
+   confirmed this is the real mobile feed format (not just the offline/
+   cached state's own layout) by the card shape itself: title left/price
+   right on one row directly under a large image, exactly what a normal
+   online card would need too. The offline banner in 2e is prepended
+   above this same list, not a different list shape. Was previously an
+   88px-thumbnail row here; the desktop grid below already used a column
+   layout per card, this makes the base (mobile) case consistent with it. */
 .card {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 0;
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--border);
   border-radius: 0;
-  padding: 12px;
+  padding: 0;
+  overflow: hidden;
   transition: all 0.3s var(--smooth);
-  align-items: center;
 }
+.card > .thumb-wrap { width: 100%; }
+.card > div:last-child { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
 .card.enter { animation: slideUp 0.5s var(--smooth) both; }
 @keyframes slideUp { 
   0% { opacity: 0; transform: translateY(10px); } 
@@ -994,17 +1010,21 @@ body {
   margin-left: 8px;
 }
 
+/* 3:2, not square - matches 2e's own proportions (measured off the actual
+   mockup image: ~700x460), distinct from the desktop grid's 1:1 cells
+   (2j), which get their own aspect-ratio override below. */
 .thumb {
-  width: 88px;
-  height: 88px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
   border-radius: 0;
   object-fit: cover;
   background: rgba(255,255,255,0.05);
+  display: block;
 }
 .thumb.fallback { border: 1px solid var(--border); }
 
-.thumb-wrap { position: relative; flex: 0 0 auto; }
-.thumb-wrap .thumb { display: block; }
+.thumb-wrap { position: relative; }
 .card-badge {
   position: absolute;
   top: 8px;
@@ -1030,24 +1050,28 @@ body {
   border: 1px solid rgba(255,176,32,0.4);
 }
 
-/* Desktop grid layout (Ledger 2j) - the row layout above stays the mobile
-   default; the Ledger has no mobile feed screen of its own, so this is the
-   only place the grid applies. Scoped to #list specifically, NOT the shared
-   .list class - #hist-list uses that same class for the History view, which
-   keeps .hist-card's row layout (88px thumb + wide content) at every width.
-   A real bug found live: .list here briefly broke History's layout by
-   squeezing .hist-card's row-sized content into ~195px grid cells. */
+/* Desktop grid layout (Ledger 2j) - the base .card above (2e) is already a
+   single full-width column with a big image; this only adds the
+   multi-column grid and narrows the per-card sizing to fit it. Scoped to
+   #list specifically, NOT the shared .list class - #hist-list uses that
+   same class for the History view, which keeps .hist-card's row layout
+   (88px thumb + wide content) at every width. A real bug found live: .list
+   here briefly broke History's layout by squeezing .hist-card's row-sized
+   content into ~195px grid cells. */
 @media (min-width: 900px) {
-  #list { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
-  .card {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    padding: 0;
-    overflow: hidden;
-  }
-  .card > .thumb-wrap { width: 100%; }
-  .card .thumb { width: 100%; height: auto; aspect-ratio: 1; }
-  .card > div:last-child { padding: 11px; display: flex; flex-direction: column; gap: 6px; }
+  /* auto-fit, not auto-fill: with fewer real cards than the container is
+     wide enough for, auto-fill still reserves one track per potential
+     170px slot, so the few real cards sit narrow on the left with visible
+     empty black space after them. auto-fit collapses the empty tracks
+     instead and lets the populated ones' 1fr actually claim that space -
+     the fix for "a small design on a blurred/black page" when a hunter
+     just doesn't have many matches yet. Identical result to auto-fill
+     once there are enough cards to fill every column either way. */
+  #list { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  /* 1:1, not 2e's 3:2 - the desktop grid cell (2j) is a narrow square
+     thumbnail, not the mobile single-column feed's wide banner image. */
+  .card .thumb { aspect-ratio: 1; }
+  .card > div:last-child { padding: 11px; }
   .card .meta-top { flex-direction: column; align-items: flex-start; gap: 2px; }
   .card .t { white-space: normal; font-size: 11.5px; }
   .card .p { font-size: 15px; }
