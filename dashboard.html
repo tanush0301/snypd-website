@@ -767,10 +767,22 @@ body {
   color: var(--text-primary); 
   border: 1px solid var(--border); 
 }
-.btn-ghost:hover:not(:disabled) { 
-  background: rgba(255,255,255,0.08); 
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
   border-color: var(--border-hover);
 }
+/* README §3.3's 4th variant - no fill, no border, dimmest legal text
+   color, centred. Didn't exist before; only btn-prim/btn-ghost were built,
+   so every tertiary action (e.g. "Ask me again in 30 days") was wrongly
+   styled as a secondary button instead. */
+.btn-tertiary {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.btn-tertiary:hover:not(:disabled) { color: var(--text-primary); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-cta-instruct {
   opacity: 1 !important;
@@ -818,28 +830,14 @@ body {
 }
 .card > .thumb-wrap { width: 100%; }
 .card > div:last-child { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-.card.enter { animation: slideUp 0.5s var(--smooth) both; }
-@keyframes slideUp { 
-  0% { opacity: 0; transform: translateY(10px); } 
-  100% { opacity: 1; transform: translateY(0); } 
-}
-/* Staggering for list loads */
-.card.enter:nth-child(1) { animation-delay: 0.04s; }
-.card.enter:nth-child(2) { animation-delay: 0.08s; }
-.card.enter:nth-child(3) { animation-delay: 0.12s; }
-.card.enter:nth-child(4) { animation-delay: 0.16s; }
-.card.enter:nth-child(5) { animation-delay: 0.20s; }
-.card.enter:nth-child(6) { animation-delay: 0.24s; }
-.card.enter:nth-child(7) { animation-delay: 0.28s; }
-.card.enter:nth-child(8) { animation-delay: 0.32s; }
-
-.card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-hover);
-  background: rgba(255,255,255,0.05);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-}
-.card:active { transform: translateY(0) scale(0.99); background: rgba(255,255,255,0.06); }
+/* README §2.5: exactly three animations exist (pulseDot, riseIn, spin) and
+   "nothing else moves - no hover lift... no scroll animation." slideUp was
+   a 4th, unsanctioned one (initial-load stagger now reuses is-new/riseIn,
+   see insertCards); .card:hover/:active's transform+shadow+stagger-delay
+   rules below were a real, previously-uncaught violation of the same rule
+   ("cards and panels have no shadow. Do not add any.") - removed rather
+   than softened, not restyled into a smaller version of the same thing. */
+.card:hover { border-color: var(--border-hover); }
 
 .card-actions { display: flex; gap: 8px; margin-top: 10px; }
 .card-actions .btn {
@@ -883,10 +881,12 @@ body {
    box on either state. */
 .view-tab.active { color: var(--text-primary); border-bottom-color: var(--success); }
 
-/* History cards */
+/* History cards. README §5.4: 62x62px thumbnail - was 88px, sharing the
+   feed's own .thumb sizing rule (see the scoped .card .thumb / .hist-card
+   .thumb split below) before this fix, not this card's own intended size. */
 .hist-card {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: 62px minmax(0, 1fr);
   gap: 16px;
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--border);
@@ -1000,7 +1000,7 @@ body {
 .offline-banner__row span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
 .offline-banner__row .btn { height: 30px; padding: 0 14px; font-size: 11px; }
 
-.list.stale-data .card { opacity: 0.7; }
+.list.stale-data .card { opacity: 0.55; }
 .stale-flag {
   display: inline-block;
   font-size: 10px;
@@ -1013,16 +1013,22 @@ body {
 /* 3:2, not square - matches 2e's own proportions (measured off the actual
    mockup image: ~700x460), distinct from the desktop grid's 1:1 cells
    (2j), which get their own aspect-ratio override below. */
+/* Bare, unscoped sizing here was a real regression: .hist-card reuses this
+   same .thumb class (see histCardHTML), so giving .thumb a feed-sized 3:2
+   aspect-ratio here silently squashed every History thumbnail into a
+   62px-wide x ~41px-tall rectangle too. Base rule now carries only what's
+   shared (radius/fit/fallback fill); size is scoped per context below. */
 .thumb {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
   border-radius: 0;
   object-fit: cover;
   background: rgba(255,255,255,0.05);
   display: block;
 }
 .thumb.fallback { border: 1px solid var(--border); }
+/* Feed card (Ledger 2e) - full-width, ~3:2 image. */
+.card .thumb { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+/* History card (Ledger 2c) - fixed 62x62px square. */
+.hist-card .thumb { width: 62px; height: 62px; }
 
 .thumb-wrap { position: relative; }
 .card-badge {
@@ -1439,7 +1445,7 @@ body {
       <p class="wiz-sub" style="margin:16px 0 0;font-size:11.5px;">Threshold-based filtering ("only ping me under X% below market") isn't built yet - every match on an enabled push alerts you today.</p>
       <div class="wiz-actions">
         <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Start hunting</button>
-        <button class="btn btn-ghost" id="wiz-finish" type="button">Set this up later</button>
+        <button class="btn btn-tertiary" id="wiz-finish" type="button">Set this up later</button>
       </div>
     </div>
   </div>
@@ -1453,14 +1459,50 @@ body {
     <div class="rec-sheet-actions">
       <span class="rec-sheet-count" id="reconcile-sheet-count">0 selected</span>
       <div class="rec-sheet-btns">
+        <!-- README §5.7: STILL LISTED (secondary), SOLD ELSEWHERE (secondary),
+             ADD PRICE (primary) - these three were built with sold/price
+             swapped (sold as primary, price as secondary). -->
         <button class="btn btn-ghost" type="button" id="reconcile-bulk-listed">Still listed</button>
-        <button class="btn btn-ghost" type="button" id="reconcile-bulk-price">Add price</button>
-        <button class="btn btn-prim" type="button" id="reconcile-bulk-sold">Sold elsewhere</button>
+        <button class="btn btn-prim" type="button" id="reconcile-bulk-price">Add price</button>
+        <button class="btn btn-ghost" type="button" id="reconcile-bulk-sold">Sold elsewhere</button>
       </div>
     </div>
     <div class="wiz-actions" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
       <button class="btn btn-ghost" type="button" id="reconcile-sheet-all-listed">Everything's still listed</button>
-      <button class="btn btn-ghost" type="button" id="reconcile-sheet-snooze-30">Ask me again in 30 days</button>
+      <button class="btn btn-tertiary" type="button" id="reconcile-sheet-snooze-30">Ask me again in 30 days</button>
+    </div>
+  </div>
+</div>
+
+<!-- Claim receipt (README §6): "item leaves the feed, enters History, claim
+     receipt appears" - the real gap this session's audit found: claiming
+     used to just flip the button to a checkmark in place, no confirmation,
+     item never actually left the feed. Bottom sheet, same chrome as the
+     filter sheet (README's own sheets are bottom-pinned with the one
+     sanctioned shadow, not .wiz-modal's centered/over-shadowed pattern -
+     don't propagate that into new code). SHARE CATCH is deliberately not a
+     button here: the share-card image feature (2f/2g) doesn't exist yet,
+     so a button for it would be fake. MARK SOLD hands off to the exact,
+     already-tested History inline sale-form for this same item rather than
+     duplicating that logic in a second place. -->
+<div class="wiz-overlay" id="claim-receipt-overlay" style="align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)">
+  <div class="filter-sheet" style="max-width:520px">
+    <div class="filter-sheet__handle"></div>
+    <div class="filter-sheet__header">
+      <span class="filter-sheet__title">Claimed</span>
+      <span class="filter-sheet__meta" id="claim-receipt-day"></span>
+    </div>
+    <div style="border:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">
+        <span style="font-size:13px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0" id="claim-receipt-title"></span>
+        <span style="font-size:15px;color:var(--text-primary);flex-shrink:0" id="claim-receipt-price"></span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted)">Profit — not yet</div>
+    </div>
+    <div style="font-size:13px;color:var(--success)" id="claim-receipt-xp"></div>
+    <div class="filter-sheet__footer">
+      <button class="btn btn-ghost" id="claim-receipt-mark-sold" type="button" style="flex:1">Mark sold</button>
+      <button class="btn btn-prim" id="claim-receipt-done" type="button" style="flex:1">Done</button>
     </div>
   </div>
 </div>
@@ -3050,7 +3092,12 @@ const HEARTBEAT_URL = (() => {
     temp.innerHTML = rows.map(r => cardHTML(r)).join('');
     const frag = document.createDocumentFragment();
     Array.from(temp.children).forEach((node, i) => {
-      if (mode === 'enter' && i < 8) node.classList.add('enter');
+      // Both branches use is-new/riseIn now - slideUp was a 4th, unsanctioned
+      // animation (README §2.5 names exactly three: pulseDot, riseIn, spin).
+      if (mode === 'enter' && i < 8) {
+        node.classList.add('is-new');
+        setTimeout(() => node.classList.remove('is-new'), 1600);
+      }
       if (mode === 'new') {
         node.classList.add('is-new');
         setTimeout(() => node.classList.remove('is-new'), 1600);
@@ -3354,7 +3401,7 @@ const HEARTBEAT_URL = (() => {
     btn.disabled = true;
     btn.textContent = 'Claiming...';
 
-    const { amount } = derivePrice(row);
+    const { amount, currency } = derivePrice(row);
     const boughtCents = (amount != null && Number.isFinite(Number(amount)))
       ? Math.round(Number(amount) * 100)
       : null;
@@ -3375,10 +3422,6 @@ const HEARTBEAT_URL = (() => {
       if (error) throw error;
 
       claimedIds.add(String(listingId));
-      btn.textContent = String.fromCharCode(0x2713) + ' Claimed';
-      btn.classList.remove('btn-prim');
-      btn.classList.add('btn-claimed');
-      // Stays disabled - a claim is a one-way action, not a toggle.
 
       // E2: 25 XP per claim, self-reported so capped at 4 claims/day earning
       // XP (spec section 2) - claims past the 4th still record for History,
@@ -3390,8 +3433,10 @@ const HEARTBEAT_URL = (() => {
       const claimRowId = inserted && inserted.id ? inserted.id : null;
       const hadClaimedBefore = await xpEventExistsEver('claim', null);
       const claimsToday = await xpEventCountToday('claim');
+      let xpEarnedThisClaim = 0;
       if (claimsToday < 4) {
         await awardXP('claim', 25, claimRowId, { listing_id: listingId });
+        xpEarnedThisClaim += 25;
         // E3 rides on the same cap as E2 - a claim that earned no XP because
         // today's 4 are already used earns no deal-quality bonus either, so
         // farming claims never multiplies XP by adding a second uncapped
@@ -3400,7 +3445,17 @@ const HEARTBEAT_URL = (() => {
       }
       if (!hadClaimedBefore) {
         await awardXP('first_claim', 25, claimRowId, {});
+        xpEarnedThisClaim += 25;
       }
+
+      // README §6: "item leaves the feed, enters History, claim receipt
+      // appears" - card removed from the live feed immediately (not just
+      // left sitting there with a checkmark), and a real receipt sheet
+      // shown with this claim's actual earned XP and streak day, not
+      // hardcoded mockup numbers.
+      const card = btn.closest('.card');
+      if (card) card.remove();
+      showClaimReceipt({ title: row.title, amount, currency, xpEarnedThisClaim, claimId: claimRowId });
     } catch (err) {
       console.error('SNYPD: could not save claim', err);
       btn.disabled = false;
@@ -3409,8 +3464,52 @@ const HEARTBEAT_URL = (() => {
     }
   });
 
-  function renderRows(rows) {
-    rows.forEach(r => rowById.set(String(r.listing_id), r));
+  async function showClaimReceipt({ title, amount, currency, xpEarnedThisClaim, claimId }) {
+    const overlay = document.getElementById('claim-receipt-overlay');
+    if (!overlay) return;
+    document.getElementById('claim-receipt-title').textContent = title || 'Claimed item';
+    document.getElementById('claim-receipt-price').textContent = fmtPrice(amount, currency);
+    const xpLine = document.getElementById('claim-receipt-xp');
+    xpLine.textContent = xpEarnedThisClaim > 0 ? `+${xpEarnedThisClaim} XP` : '';
+    xpLine.style.display = xpEarnedThisClaim > 0 ? '' : 'none';
+
+    const dayEl = document.getElementById('claim-receipt-day');
+    dayEl.textContent = '';
+    try {
+      const { data } = await sb.from('user_streak_state').select('current_streak').eq('user_id', uid).maybeSingle();
+      const streak = data ? Number(data.current_streak) || 0 : 0;
+      if (streak > 0) dayEl.textContent = `DAY ${streak}`;
+    } catch (e) { /* streak line is a nice-to-have, never blocks the receipt */ }
+
+    overlay.style.display = 'flex';
+    overlay.dataset.claimId = claimId || '';
+  }
+
+  (function claimReceiptButtons() {
+    const overlay = document.getElementById('claim-receipt-overlay');
+    const doneBtn = document.getElementById('claim-receipt-done');
+    const soldBtn = document.getElementById('claim-receipt-mark-sold');
+    if (!overlay || !doneBtn || !soldBtn) return;
+    const close = () => { overlay.style.display = 'none'; };
+    doneBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    soldBtn.addEventListener('click', () => {
+      // Hands off to History's own, already-tested inline sale-form for this
+      // same item rather than duplicating that read/validate/write logic in
+      // a second place - the claimed row is already there the instant
+      // loadClaims() (called by switchView) reads user_claims again.
+      close();
+      const historyTab = document.querySelector('.view-tab[data-view="history"]');
+      if (historyTab) historyTab.click();
+    });
+  })();
+
+  function renderRows(allRows) {
+    allRows.forEach(r => rowById.set(String(r.listing_id), r));
+    // Claimed items leave the feed immediately (see showClaimReceipt's
+    // caller) - filtered here too so a later poll within the same 30-min
+    // freshness window doesn't re-add a card just removed.
+    const rows = allRows.filter(r => !claimedIds.has(String(r.listing_id)));
 
     if (!rows.length) {
       list.innerHTML = '';
