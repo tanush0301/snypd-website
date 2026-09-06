@@ -385,6 +385,11 @@ a:hover { color: #57FFC8; }
    on top of it. Also pins the dark scheme so form controls and scrollbars
    render dark (the design is dark-only by decision, README §8). */
 html { background: var(--canvas); color-scheme: dark; }
+/* The browser's own native pull-to-refresh (Chrome/Android) and rubber-band
+   overscroll would otherwise fight the custom pull-refresh gesture below -
+   both could fire from the same drag. This is the standard, JS-independent
+   fix; the touchmove handler's preventDefault is the second layer. */
+html, body { overscroll-behavior-y: contain; }
 body {
   background: var(--bg);
   color: var(--text-primary);
@@ -674,6 +679,25 @@ body {
   display: inline-block; vertical-align: -1px;
 }
 @media (prefers-reduced-motion: reduce) { .feed-spinner { animation: none; } }
+/* The drag gesture Tanush asked for alongside the FEED-tap refresh - the tap
+   reaches a user who thinks to look at the tab bar, a pull reaches the one who
+   is already at the top of the list and just drags. Height-driven, not
+   transform-driven: a translated overlay would sit on top of the first card
+   instead of pushing it down, which reads as a glitch, not a gesture. No
+   transition while a finger is down (set only when JS adds .settling, on
+   release) - a CSS transition would lag behind the touch and read as broken
+   on a real device, same reasoning as the "no transition on hover-only
+   affordances" rule elsewhere in this file. */
+#pull-refresh {
+  display: flex; align-items: center; justify-content: center;
+  height: 0; overflow: hidden;
+  font-size: 11px; letter-spacing: 0.02em; color: var(--text-muted);
+}
+#pull-refresh.settling { transition: height 0.2s var(--smooth); }
+#pull-refresh[data-armed="true"] { color: var(--success); }
+#pull-refresh .feed-spinner { display: none; }
+#pull-refresh[data-refreshing="true"] .feed-spinner { display: inline-block; }
+
 .mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 9px; }
 .mr-spinner {
   width: 12px; height: 12px; flex: 0 0 auto;
@@ -1775,6 +1799,9 @@ body {
 <p class="activation-note">Use the same email as your SNYPD account for instant access.</p>
 </div>
 <div class="panel" id="dashboard-panel" style="margin-bottom:16px">
+<div id="pull-refresh" data-armed="false" data-refreshing="false" aria-hidden="true">
+  <span class="feed-spinner"></span><span id="pull-refresh-label">Pull to refresh</span>
+</div>
 <div class="hd">
 <div class="status-bar">
 <div class="chip plan" id="plan-banner">Plan: —</div>
@@ -3345,6 +3372,116 @@ const HEARTBEAT_URL = (() => {
         window.SNYPD.refreshFeed();
       }
     }
+
+    /* Pull-to-refresh, offered alongside the tap above rather than instead of
+       it - a tap only reaches someone who thinks to look at the tab bar; a
+       drag is what most people reach for first after scrolling a long feed.
+       Deliberately conventional: track only once the page is already
+       scrolled to its top (window.scrollY <= 0), same as every native app -
+       there is no way to tell "pull past the top" apart from "scroll up
+       toward the top" while still below it, so trying to support that would
+       just make normal scrolling jittery. */
+    (function pullToRefresh() {
+      const indicator = document.getElementById('pull-refresh');
+      const label = document.getElementById('pull-refresh-label');
+      if (!indicator || !label) return;
+
+      const THRESHOLD = 56;   // damped px the indicator must reach to arm
+      const MAX_PULL = 84;    // visual cap regardless of how far the finger travels
+
+      let tracking = false;   // touchstart happened at scrollY<=0, no overlay open
+      let committed = false;  // direction has been decided as a vertical pull
+      let startX = 0, startY = 0;
+      let armed = false;
+
+      function onFeed() {
+        const panel = document.getElementById('dashboard-panel');
+        return !!panel && getComputedStyle(panel).display !== 'none';
+      }
+      // Same signal overlayKeyboardAndScrollLock() already uses to lock body
+      // scroll - reusing it means this gesture is automatically suppressed
+      // under the wizard, the filter sheet, the reconcile sheet and the claim
+      // receipt without re-deriving each overlay's own open/closed state.
+      function overlayOpen() {
+        return document.body.style.overflow === 'hidden';
+      }
+
+      function setHeight(px) {
+        indicator.style.height = Math.max(0, Math.round(px)) + 'px';
+      }
+
+      function reset(withTransition) {
+        indicator.classList.toggle('settling', !!withTransition);
+        indicator.dataset.armed = 'false';
+        indicator.dataset.refreshing = 'false';
+        label.textContent = 'Pull to refresh';
+        armed = false;
+        setHeight(0);
+      }
+
+      document.addEventListener('touchstart', (e) => {
+        if (indicator.dataset.refreshing === 'true') { tracking = false; return; }
+        indicator.classList.remove('settling'); // no transition fighting a live drag
+        tracking = onFeed() && !overlayOpen() && window.scrollY <= 0;
+        committed = false;
+        if (!tracking) return;
+        const t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!tracking) return;
+        const t = e.touches[0];
+        const dy = t.clientY - startY;
+        const dx = t.clientX - startX;
+
+        if (!committed) {
+          // Ignore jitter below 6px in either axis before deciding intent -
+          // a near-vertical tap-drag shouldn't misfire as a scroll-blocking
+          // pull, and a mostly-horizontal move (not currently used anywhere
+          // in this app, but cheap insurance) should never be swallowed.
+          if (Math.abs(dy) < 6 && Math.abs(dx) < 6) return;
+          committed = true;
+          if (dy <= 0 || Math.abs(dy) <= Math.abs(dx) || window.scrollY > 0) {
+            tracking = false; // not a downward pull at the top - let native scroll happen
+            return;
+          }
+        }
+
+        // Committed to a pull: stop the page's own scroll/rubber-band for the
+        // rest of this gesture (overscroll-behavior-y:contain is the primary
+        // defense against the browser's native PTR; this is the second layer).
+        e.preventDefault();
+        const damped = Math.min(MAX_PULL, dy * 0.5);
+        setHeight(damped);
+        const nowArmed = damped >= THRESHOLD;
+        if (nowArmed !== armed) {
+          armed = nowArmed;
+          indicator.dataset.armed = String(armed);
+          label.textContent = armed ? 'Release to refresh' : 'Pull to refresh';
+        }
+      }, { passive: false });
+
+      async function onRelease() {
+        if (!tracking || !committed) { tracking = false; return; }
+        tracking = false;
+        if (!armed) { reset(true); return; }
+        indicator.classList.add('settling');
+        indicator.dataset.refreshing = 'true';
+        label.textContent = 'Refreshing' + '\u2026';
+        setHeight(40);
+        try {
+          if (window.SNYPD && typeof window.SNYPD.refreshFeed === 'function') {
+            await window.SNYPD.refreshFeed();
+          }
+        } finally {
+          reset(true);
+        }
+      }
+      document.addEventListener('touchend', onRelease, { passive: true });
+      document.addEventListener('touchcancel', onRelease, { passive: true });
+    })();
 
     viewTabs.addEventListener('click', (e) => {
       const tab = e.target.closest('.view-tab');
