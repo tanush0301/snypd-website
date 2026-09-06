@@ -1024,6 +1024,10 @@ body {
   border: 1px solid rgba(255,176,32,0.4);
 }
 .offline-banner__title { font-size: 13px; font-weight: 400; color: var(--warning); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+/* README §5.6 backend-down variant: same layout, red instead of amber, and
+   the cached grid is gone rather than dimmed - there is nothing to trust. */
+.offline-banner.is-backend-down { background: rgba(255,92,92,0.06); border-color: rgba(255,92,92,0.4); }
+.offline-banner.is-backend-down .offline-banner__title { color: var(--danger); }
 /* Same box treatment as .offline-banner, recolored to status-mint - no new
    visual language, just this design system's existing warning-banner shape
    reused for a status message instead of invented from scratch. */
@@ -1044,6 +1048,10 @@ body {
 .offline-banner__row .btn { height: 30px; padding: 0 14px; font-size: 11px; }
 
 .list.stale-data .card { opacity: 0.55; }
+/* README §3.4: "Gone - opacity .55 + 'Gone - may have sold'". Same value the
+   spec gives cached/stale cards. */
+.card.is-gone { opacity: 0.55; }
+.card.is-gone .p-gone { color: var(--text-primary); }
 /* RISK 13: opacity composites against the page, so text3 (#7C8489, 5.15:1
    on its own) drops to ~2.33:1 at .55 - under the spec's own 3:1 floor, at
    9-12px. The spec's remedy is to dim selectively rather than drop the
@@ -1090,7 +1098,20 @@ body {
   background-size: 24px 24px;
 }
 /* Feed card (Ledger 2e) - full-width, ~3:2 image. */
-.card .thumb { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+/* 1:1, not the mockup's literal 3:2.
+   The 2e artboard draws this block as height:230px in a 350px-wide column
+   (= 3:2), and RISK 6 says to rebuild those fixed heights as aspect-ratio -
+   which is where the 3:2 came from. But that block only ever contained the
+   placeholder ICON in the design; no real photo was ever put in it. RISK 8
+   is explicit that "real Vinted photos are portrait and inconsistent", and
+   a portrait 2:3 shot cropped to a 3:2 landscape box with object-fit:cover
+   shows only ~44% of the garment - a horizontal slice through the middle,
+   which is what it looked like on a real phone. A square keeps ~67% of the
+   same photo, is the ratio the design itself uses everywhere else (the
+   desktop grid's six cards are all aspect-ratio:1) and is what RISK 8 calls
+   the placeholder ratio. Still a fixed box with object-fit:cover, so the
+   rule that matters is intact. */
+.card .thumb { width: 100%; height: auto; aspect-ratio: 1; }
 /* History card (Ledger 2c) - fixed 62x62px square. */
 .hist-card .thumb { width: 62px; height: 62px; }
 
@@ -1144,8 +1165,9 @@ body {
      fills the width whenever there are enough cards to do so honestly, and
      a near-empty feed shows real-sized cards instead of two giant ones. */
   #list { grid-template-columns: repeat(auto-fit, minmax(170px, 300px)); gap: 14px; justify-content: start; }
-  /* 1:1, not 2e's 3:2 - the desktop grid cell (2j) is a narrow square
-     thumbnail, not the mobile single-column feed's wide banner image. */
+  /* Desktop grid cell (2j) is a square thumbnail. Same value as the base
+     rule now that mobile is square too - kept explicit so the desktop grid
+     is pinned to 1:1 regardless of what the mobile card ever changes to. */
   .card .thumb { aspect-ratio: 1; }
   .card > div:last-child { padding: 11px; }
   .card .meta-top { flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -1664,9 +1686,15 @@ body {
   </div>
   <a class="btn btn-prim" href="/plans">Go Elite</a>
 </div>
+<!-- README §5.6 is explicit that these are two different failures with two
+     different screens: Vinted unreachable (amber, cached feed still shown,
+     dimmed) and the SNYPD backend being down (red, no cached grid at all,
+     just the retry affordance). "Never collapse them into one generic
+     error." One banner element, two states - the copy, colour and whether
+     the feed stays on screen are all driven by setSyncState(). -->
 <div class="offline-banner" id="offline-banner" style="display:none">
-  <div class="offline-banner__title">&#9888; Can't reach Vinted right now</div>
-  <p class="offline-banner__text">Your hunts are still saved. We'll pick up automatically - nothing found in the meantime is lost, it just isn't shown yet.</p>
+  <div class="offline-banner__title" id="offline-title">&#9888; Can't reach Vinted right now</div>
+  <p class="offline-banner__text" id="offline-text">Your hunts are still saved. We'll pick up automatically - nothing found in the meantime is lost, it just isn't shown yet.</p>
   <div class="offline-banner__row">
     <span id="offline-last-sync"></span>
     <button class="btn btn-prim" type="button" id="offline-retry">Retry</button>
@@ -3526,11 +3554,19 @@ const HEARTBEAT_URL = (() => {
       : '';
     const badge = cornerBadge + suspicionBadge;
 
+    // README §3.4/§5.10: a delisted listing stays on screen at opacity .55
+    // reading "Gone - may have sold", with its delta omitted entirely, rather
+    // than disappearing without explanation. is_visible is the scraper's own
+    // "still on Vinted" flag; these rows used to be filtered out server-side
+    // (see adsQuery) so this state was unreachable. Claim is disabled here -
+    // you cannot buy something that is no longer listed.
+    const isGone = r.is_visible === false;
+
     return `
-      <div class="card"
+      <div class="card${isGone ? ' is-gone' : ''}"
          data-id="${r.listing_id}"
          data-uploaded-ms="${uploadedMs}">
-        <div class="thumb-wrap">${imgHtml}${badge}</div>
+        <div class="thumb-wrap">${imgHtml}${isGone ? '' : badge}</div>
         <div>
           <div class="meta-top">
             <div class="t">${esc(r.title) || 'View listing'}</div>
@@ -3539,7 +3575,9 @@ const HEARTBEAT_URL = (() => {
                  inner node and never protected the title's ellipsis. -->
             <div class="p-stack">
               <div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div>
-              ${totalLabel ? `<div class="p-total">${totalLabel} incl. protection</div>` : ''}
+              ${isGone
+                ? `<div class="p-total p-gone">Gone &middot; may have sold</div>`
+                : (totalLabel ? `<div class="p-total">${totalLabel} incl. protection</div>` : '')}
             </div>
           </div>
           <div class="muted" title="${esc(fullLabel)}">
@@ -3547,7 +3585,9 @@ const HEARTBEAT_URL = (() => {
           </div>
           <div class="card-actions">
             <a class="btn btn-ghost card-link" href="${esc(r.url || '#')}" target="_blank" rel="noopener">Open on Vinted</a>
-            <button class="btn ${alreadyClaimed ? 'btn-claimed' : 'btn-prim'} claim-btn" type="button" data-listing="${r.listing_id}" ${alreadyClaimed ? 'disabled' : ''}>${alreadyClaimed ? (String.fromCharCode(0x2713) + ' Claimed') : 'Claim'}</button>
+            ${isGone
+              ? ''
+              : `<button class="btn ${alreadyClaimed ? 'btn-claimed' : 'btn-prim'} claim-btn" type="button" data-listing="${r.listing_id}" ${alreadyClaimed ? 'disabled' : ''}>${alreadyClaimed ? (String.fromCharCode(0x2713) + ' Claimed') : 'Claim'}</button>`}
           </div>
         </div>
       </div>`;
@@ -3830,12 +3870,18 @@ const HEARTBEAT_URL = (() => {
           total_item_price
         `;
 
+      // No is_visible filter. README §3.4/§5.10 want a delisted listing to
+      // stay on screen at opacity .55 reading "Gone - may have sold", not to
+      // silently vanish: a catch disappearing without explanation is exactly
+      // how a hunter loses trust in the feed. Filtering is_visible=true
+      // server-side meant the page never even received those rows, so no
+      // client-side treatment could have shown them. They're fetched now and
+      // rendered dimmed by cardHTML.
       function adsQuery(columns) {
         return sb
           .from('current_ads')
           .select(columns)
           .eq('user_id', uid)
-          .eq('is_visible', true)
           .gte('uploaded_at_ts', cutoffIso)
           .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
           .order('listing_id', { ascending: false })
@@ -3919,15 +3965,39 @@ const HEARTBEAT_URL = (() => {
       lastSuccessfulSync = new Date();
       set('tick-chip', `Last check: ${lastSuccessfulSync.toLocaleString()}`);
       show('err-chip', false);
-      setOfflineState(false);
+
+      // Supabase answered, so our own backend is up. Whether VINTED is
+      // reachable is a separate question, answered by how long ago the
+      // scraper last managed to write anything for this user. Only claimed
+      // when there IS a previous write to compare against - a brand-new
+      // account with no rows yet is "nothing found", never "Vinted is down".
+      let vintedStale = false;
+      if (running) {
+        try {
+          const { data: newest } = await sb
+            .from('current_ads')
+            .select('fetched_at')
+            .eq('user_id', uid)
+            .not('fetched_at', 'is', null)
+            .order('fetched_at', { ascending: false })
+            .limit(1);
+          const lastFetched = newest && newest[0] ? Date.parse(newest[0].fetched_at) : NaN;
+          if (Number.isFinite(lastFetched)) {
+            vintedStale = (Date.now() - lastFetched) > VINTED_STALE_MIN * 60 * 1000;
+          }
+        } catch (e) {
+          // This probe is advisory only - never let it decide "offline".
+          console.warn('SNYPD: could not check scraper freshness', e);
+        }
+      }
+      setSyncState(vintedStale ? 'vinted_unreachable' : 'ok');
     } catch (e) {
       console.error(e);
       set('err-chip', e?.message || 'Fetch error');
       show('err-chip', true);
-      // Real network/backend failure - the existing feed is not wrong, it's
-      // just unconfirmed since lastSuccessfulSync. Say that plainly rather
-      // than a bare error chip nobody reads.
-      setOfflineState(true);
+      // The query to our own backend threw, so this is SNYPD being
+      // unreachable, not Vinted - a distinct screen per README §5.6.
+      setSyncState('backend_down');
     } finally {
       setLoading(false);
       msg('');
@@ -3938,6 +4008,8 @@ const HEARTBEAT_URL = (() => {
   const offlineBanner = document.getElementById('offline-banner');
   const offlineLastSync = document.getElementById('offline-last-sync');
   const offlineRetry = document.getElementById('offline-retry');
+  const offlineTitle = document.getElementById('offline-title');
+  const offlineText = document.getElementById('offline-text');
 
   function relativeAgo(date) {
     const mins = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000));
@@ -3948,23 +4020,56 @@ const HEARTBEAT_URL = (() => {
     return hrs === 1 ? '1 hour ago' : `${hrs} hours ago`;
   }
 
-  function setOfflineState(isOffline) {
+  /* README §5.6 / §7's own syncState model: 'ok' | 'vinted_unreachable' |
+     'backend_down'. These were collapsed into one boolean before, so a real
+     Supabase outage and Vinted merely being slow produced the identical
+     amber "Can't reach Vinted" banner - the exact thing §5.6 forbids
+     ("Never collapse them into one generic error").
+
+     How the two are told apart, which is the part that actually needed
+     building: if the query itself throws we could not reach our OWN backend,
+     so that is backend_down. If it succeeds but the newest row we have was
+     fetched a long time ago, Supabase is fine and the scraper is not getting
+     through to Vinted - that is vinted_unreachable, and the cached rows are
+     still worth showing, dimmed. */
+  const VINTED_STALE_MIN = 15;
+
+  function setSyncState(state) {
     if (!offlineBanner) return;
-    if (isOffline) {
-      offlineBanner.style.display = 'block';
-      offlineLastSync.textContent = lastSuccessfulSync
-        ? `Last sync ${lastSuccessfulSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · ${relativeAgo(lastSuccessfulSync)}`
-        : 'No successful sync yet this session';
-      list.classList.add('stale-data');
-      if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
-        window.SNYPD.setSidebarState('offline');
-      }
-    } else {
+    const isDown = state === 'backend_down';
+    const isStale = state === 'vinted_unreachable';
+
+    if (!isDown && !isStale) {
       offlineBanner.style.display = 'none';
+      offlineBanner.classList.remove('is-backend-down');
       list.classList.remove('stale-data');
+      list.style.display = '';
       if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
         window.SNYPD.setSidebarState(running ? 'running' : 'stopped');
       }
+      return;
+    }
+
+    offlineBanner.style.display = 'block';
+    offlineBanner.classList.toggle('is-backend-down', isDown);
+    offlineTitle.innerHTML = isDown
+      ? '&#10005; SNYPD offline'
+      : '&#9888; Can\'t reach Vinted right now';
+    offlineText.textContent = isDown
+      ? "We can't reach SNYPD's own servers, so nothing is being checked right now. Your hunts and history are safe - this is on our side, not yours."
+      : "Your hunts are still saved. We'll pick up automatically - nothing found in the meantime is lost, it just isn't shown yet.";
+    offlineLastSync.textContent = lastSuccessfulSync
+      ? `Last sync ${lastSuccessfulSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · ${relativeAgo(lastSuccessfulSync)}`
+      : 'No successful sync yet this session';
+
+    // Vinted unreachable: cached catches stay readable, just marked stale.
+    // Backend down: there is no trustworthy cache to show, so the feed area
+    // holds only the retry affordance (§5.6's backend-down variant).
+    list.classList.toggle('stale-data', isStale);
+    list.style.display = isDown ? 'none' : '';
+
+    if (window.SNYPD && typeof window.SNYPD.setSidebarState === 'function') {
+      window.SNYPD.setSidebarState(isDown ? 'backend-down' : 'offline');
     }
   }
 
