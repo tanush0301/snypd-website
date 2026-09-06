@@ -1131,7 +1131,13 @@ body {
      the fix for "a small design on a blurred/black page" when a hunter
      just doesn't have many matches yet. Identical result to auto-fill
      once there are enough cards to fill every column either way. */
-  #list { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  /* README §5.10 specifies repeat(6, 1fr). auto-fit is kept because a fixed
+     6 leaves dead black space on a sparse feed, but it has the opposite
+     failure: with 2 catches those 2 tracks absorb the whole row and each
+     card balloons to ~558px. The 300px ceiling settles it - the grid still
+     fills the width whenever there are enough cards to do so honestly, and
+     a near-empty feed shows real-sized cards instead of two giant ones. */
+  #list { grid-template-columns: repeat(auto-fit, minmax(170px, 300px)); gap: 14px; justify-content: start; }
   /* 1:1, not 2e's 3:2 - the desktop grid cell (2j) is a narrow square
      thumbnail, not the mobile single-column feed's wide banner image. */
   .card .thumb { aspect-ratio: 1; }
