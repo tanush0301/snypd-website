@@ -3967,19 +3967,45 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // which outreach message brought them here.
     try { localStorage.setItem('snypd_ref', code); } catch (e) {}
 
-    // 1. Google Analytics, so it shows up alongside the rest of your traffic.
-    if (typeof gtag === 'function') {
-      gtag('event', 'dm_click', { ref_code: code, source: 'instagram_dm' });
+    // 1. Only count a visit once a human has actually looked at the page.
+    //    Meta fetches every link sent in a DM to build the preview card, and
+    //    that fetch runs this script. It is why 178 of 178 recorded clicks
+    //    landed a median of 4.4s after the message was sent, every one with a
+    //    facebook.com referrer, and not one ever arrived later. Counting them
+    //    made a campaign with zero real visitors read as 99.3% click-through.
+    var counted = false;
+    function countVisit() {
+      if (counted || document.visibilityState !== 'visible') return;
+      counted = true;
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'dm_click', { ref_code: code, source: 'instagram_dm' });
+      }
+      // Fire and forget: a failure here must never affect the page.
+      if (window.SNYPD && window.SNYPD.supabase) {
+        window.SNYPD.supabase
+          .from('ref_clicks')
+          .insert({ code: code, referrer: document.referrer || null })
+          .then(function () {}, function () {});
+      }
     }
 
-    // 2. Record it where the outreach tool can read it back. Fire and forget:
-    //    a failure here must never affect the page the visitor sees.
-    if (window.SNYPD && window.SNYPD.supabase) {
-      window.SNYPD.supabase
-        .from('ref_clicks')
-        .insert({ code: code, referrer: document.referrer || null })
-        .then(function () {}, function () {});
+    // 2. A prerender or a crawler is never 'visible'; a real reader is. Dwell
+    //    catches someone who reads without touching anything, interaction is
+    //    the fast path for someone who does.
+    function armDwell() { setTimeout(countVisit, 4000); }
+    if (document.visibilityState === 'visible') {
+      armDwell();
+    } else {
+      document.addEventListener('visibilitychange', function onVis() {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', onVis);
+        armDwell();
+      });
     }
+    ['pointerdown', 'touchstart', 'keydown', 'scroll'].forEach(function (ev) {
+      window.addEventListener(ev, countVisit, { once: true, passive: true });
+    });
 
     // 3. Tidy the address bar. The visitor arrived on a link with a tracking
     //    code on the end; there is no reason for them to keep looking at it.
