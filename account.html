@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 
-<html     lang="en"><head><meta charset="utf-8"/><title>account</title><meta content="account" property="og:title"/><meta content="account" name="twitter:title"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}
+<html     lang="en"><head><meta charset="utf-8"/><title>account</title><meta content="account" property="og:title"/><meta content="account" name="twitter:title"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}
 *, *::before, *::after { box-sizing: border-box; }
 </style><!-- 1) Load Supabase UMD + init global client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -39,12 +39,16 @@
   gtag('config', 'G-VBC0SXPR6F');
 </script>
 <style>
+          html { background: #08090A; color-scheme: dark; }
           body {
             display: flex;
             flex-direction: column;
             background: #0B0C0D;
             margin: 0;
+            /* dvh, not vh - mobile browser chrome makes 100vh taller than the
+               visible viewport (design handoff RISK 6). */
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
             color: #EDEFF0;
             font-family: 'DM Mono', ui-monospace, monospace;
@@ -52,9 +56,14 @@
           .main-content {
             flex: 1;
             min-width: 0;
+            /* Was height:100vh on a flex child that already sits below the
+               topbar, so the shell measured a full viewport PLUS the header
+               and the last rows fell under the mobile URL bar. flex:1 with
+               min-height:0 sizes it to the space that's actually left. */
+            min-height: 0;
             overflow-y: auto;
-            height: 100vh;
           }
+          :focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
           /* Custom scrollbar for main content to match premium feel */
           .main-content::-webkit-scrollbar { width: 8px; }
           .main-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }

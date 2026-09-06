@@ -4,7 +4,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<!-- viewport-fit=cover is required for env(safe-area-inset-*) to resolve to
+     anything but 0px (RISK 7) - the bottom nav and the sheets both pad
+     against it so they clear the iPhone home indicator. -->
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <title>SNYPD Dashboard</title>
 <link href="/manifest.webmanifest" rel="manifest"/>
 <meta content="#0A0A0A" name="theme-color"/>
@@ -328,15 +331,24 @@
    not approximations. Mint is status-only text/dots, never a fill; purple is
    action-fill-only, never text (it measures 3.65:1 as text on this bg). */
 :root {
+  /* README §2.1 `canvas` - the page background *behind* the app, one step
+     darker than `bg`. Was missing entirely. */
+  --canvas: #08090A;
   --bg: #0B0C0D;
   --panel: #0F1113;
   --panel-header: #101214;
   --surface3: #191C1E;
+  /* README §2.1 `image` - image-placeholder fill. Was missing; thumbnails
+     used a translucent white that composited differently per surface. */
+  --image: #131517;
   --border: #1E2225;
   --border-hover: #262B2F;
+  --border3: #3A4147;
   --text-primary: #EDEFF0;
   --text-secondary: #A6ADB1;
   --text-muted: #7C8489;
+  /* Declared for completeness only. README §2.1 forbids this as product
+     text (3.3:1, fails AA) - do not reference it from any color rule. */
   --text-caption: #5C6469;
   --brand: #A200FF; /* action color only - buttons */
   --brand-hover: #C54BFF;
@@ -359,16 +371,31 @@ a { color: var(--success); text-decoration: none; }
    hierarchy comes from size/color/letter-spacing, not weight. */
 h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 400; }
 a:hover { color: #57FFC8; }
+/* Design handoff RISK 16: the design defines no focus state, and the spec
+   fills that gap with an exact rule rather than leaving it to invention -
+   square, mint, 2px, offset 2px, :focus-visible only (so a mouse click
+   never paints a ring), and never purple. Before this, the file had no
+   :focus-visible rule at all and the only outline declaration in it was an
+   `outline: none` that replaced the ring with a purple border. */
+:focus-visible { outline: 2px solid var(--success); outline-offset: 2px; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-thumb { background: var(--border-hover); }
 
+/* README §2.1: `canvas` sits behind everything; the app shell paints `bg`
+   on top of it. Also pins the dark scheme so form controls and scrollbars
+   render dark (the design is dark-only by decision, README §8). */
+html { background: var(--canvas); color-scheme: dark; }
 body {
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font);
   margin: 0;
   -webkit-font-smoothing: antialiased;
+  /* dvh, not vh - RISK 6: mobile browser chrome makes 100vh taller than the
+     visible viewport, so a vh-sized shell hides its own last rows behind the
+     URL bar. Fallback kept first for browsers without dvh. */
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   /* TO MAKE SIDEBAR WORK, ADD FLEX: */
   display: flex;
@@ -454,7 +481,11 @@ body {
 .bottombar-tab {
   flex: 1;
   text-align: center;
+  /* RISK 7: the trailing 26px is the mockup faking home-indicator
+     clearance. On a real notched device it has to grow to the actual
+     inset, or the labels sit under the indicator. */
   padding: 18px 0 26px;
+  padding-bottom: max(26px, env(safe-area-inset-bottom));
   font-size: 11.5px;
   font-weight: 400;
   letter-spacing: 0.06em;
@@ -568,7 +599,11 @@ body {
   border: 1px solid var(--border); border-radius: 0;
   font-family: var(--font); font-size: 14px;
 }
-.mr-input:focus { outline: none; border-color: var(--brand); }
+/* Was `outline: none; border-color: var(--brand)` - it both suppressed the
+   focus indicator and used purple as the focus affordance, the one color
+   RISK 16 / law 3 says focus must never be. The global :focus-visible rule
+   near :root now covers this input like everything else. */
+.mr-input:focus { border-color: var(--border-hover); }
 .mr-card {
   background: var(--panel-header); border: 1px solid var(--border);
   border-radius: 0; padding: 14px 16px; margin-top: 12px;
@@ -888,7 +923,9 @@ body {
   display: grid;
   grid-template-columns: 62px minmax(0, 1fr);
   gap: 16px;
-  background: rgba(255,255,255,0.02);
+  /* README §5.4: "1px solid #1E2225 on #0F1113" - the panel token, not a
+     translucent white that shifts with whatever it's layered on. */
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 0;
   padding: 12px;
@@ -1001,6 +1038,14 @@ body {
 .offline-banner__row .btn { height: 30px; padding: 0 14px; font-size: 11px; }
 
 .list.stale-data .card { opacity: 0.55; }
+/* RISK 13: opacity composites against the page, so text3 (#7C8489, 5.15:1
+   on its own) drops to ~2.33:1 at .55 - under the spec's own 3:1 floor, at
+   9-12px. The spec's remedy is to dim selectively rather than drop the
+   opacity, so the muted copy inside a dimmed card is promoted to text
+   first; at .55 that composites back to ~5.9:1. */
+.list.stale-data .card .muted,
+.list.stale-data .card .p-total,
+.list.stale-data .card .p-unknown { color: var(--text-primary); }
 .stale-flag {
   display: inline-block;
   font-size: 10px;
@@ -1021,10 +1066,23 @@ body {
 .thumb {
   border-radius: 0;
   object-fit: cover;
-  background: rgba(255,255,255,0.05);
+  /* README §2.1 `image` token. Was rgba(255,255,255,0.05), which composited
+     to ~#1C1D1E over the card and drifted with whatever it sat on instead
+     of being a fixed value. */
+  background: var(--image);
   display: block;
 }
-.thumb.fallback { border: 1px solid var(--border); }
+/* README §4: the placeholder is a centred photo-outline icon on the image
+   fill - it must never read as a file-upload prompt. Drawn as an inline SVG
+   data URI so it needs no extra markup in either card renderer. */
+.thumb.fallback {
+  border: 1px solid var(--border);
+  background-color: var(--image);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23353B40' stroke-width='1.4'%3E%3Crect x='3' y='3' width='18' height='18'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpath d='m21 15-5-5L5 21'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+}
 /* Feed card (Ledger 2e) - full-width, ~3:2 image. */
 .card .thumb { width: 100%; height: auto; aspect-ratio: 3 / 2; }
 /* History card (Ledger 2c) - fixed 62x62px square. */
@@ -1088,6 +1146,9 @@ body {
 .meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; min-width: 0; }
 .t { font-weight: 400; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
 .p { font-weight: 400; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
+/* The price column inside .meta-top - never shrinks, so a long title
+   ellipsises instead of squeezing the price (RISK 9). */
+.p-stack { flex: 0 0 auto; min-width: 0; }
 .p.p-unknown { font-weight: 500; font-size: 12px; color: var(--text-muted); font-style: italic; }
 .p-total { font-size: 9px; color: var(--text-muted); white-space: nowrap; text-align: right; margin-top: 1px; }
 .muted { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
@@ -1220,7 +1281,10 @@ body {
       border: 1px solid var(--border);
       border-radius: 0;
       padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+      /* No shadow. README §2.4 allows exactly one in the whole system -
+         `0 -18px 50px rgba(0,0,0,.65)` on a bottom sheet's top edge - and
+         this centered modal's `0 20px 60px rgba(0,0,0,.9)` was not it.
+         Separation here comes from the scrim behind it, as everywhere else. */
     }
     .wiz-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
     .wiz-title { font-size: 22px; font-weight: 500; margin: 0 0 8px; color: var(--text-primary); }
@@ -1242,9 +1306,13 @@ body {
       width: 100%; max-width: 520px; margin: 0 auto;
       background: #101214; border: 1px solid var(--border); border-top: 1px solid var(--border);
       border-radius: 0; padding: 20px 20px 26px; box-sizing: border-box;
+      /* Same home-indicator clearance as the bottom nav (RISK 7). */
+      padding-bottom: max(26px, env(safe-area-inset-bottom));
       display: flex; flex-direction: column; gap: 16px;
       box-shadow: 0 -18px 50px rgba(0,0,0,0.65);
-      max-height: 85vh; overflow-y: auto;
+      /* dvh so the cap tracks the *visible* viewport, not the taller vh one
+         that ignores mobile browser chrome (RISK 6). */
+      max-height: 85vh; max-height: 85dvh; overflow-y: auto;
     }
     .filter-sheet__handle { width: 36px; height: 3px; background: var(--border-hover); margin: 0 auto; }
     .filter-sheet__header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -1254,6 +1322,12 @@ body {
     .fs-row { background: var(--panel); padding: 14px; display: flex; flex-direction: column; gap: 8px; border-left: 2px solid var(--border3, #3A4147); }
     .fs-row.is-live { border-left-color: var(--success); }
     .fs-row.is-paused { opacity: 0.72; }
+    /* RISK 13, same reasoning as the stale-card rule: text3 at .72
+       composites to ~3.17:1, which fails 4.5:1 at 9.5-11px - and the
+       Pause/Delete controls inherit it. Promote, don't un-dim the row. */
+    .fs-row.is-paused .fs-row__status-text,
+    .fs-row.is-paused .fs-row__url,
+    .fs-row.is-paused .fs-row__actions button { color: var(--text-primary); }
     .fs-row__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .fs-row__name { font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .fs-row__status { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
@@ -1306,9 +1380,25 @@ body {
     .rec-sheet-count { font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
     .rec-sheet-btns { display: flex; gap: 6px; }
     .rec-sheet-btns .btn { flex: 1; padding: 0 8px; font-size: 10.5px; }
-    .wiz-preset__name { font-size: 14px; font-weight: 400; color: var(--text-primary); }
+    /* README §3.3: "Every button label is UPPERCASE... No exceptions." These
+       presets are real buttons, and their names were the only mixed-case
+       button labels left in the file. */
+    .wiz-preset__name { font-size: 14px; font-weight: 400; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; }
     .wiz-preset__meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
     .wiz-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    /* README §5.3.1 progress row: label + 1px rule + a 26x2px mint bar. */
+    .wiz-progress { display: flex; align-items: center; gap: 9px; margin-bottom: 22px; }
+    .wiz-progress__rule { flex: 1; height: 1px; background: var(--border); }
+    .wiz-progress__bar { width: 26px; height: 2px; background: var(--success); }
+    /* README §5.3.6: the footer is pinned, START HUNTING is full-width, and
+       SET THIS UP LATER is a centred tertiary beneath it - not two buttons
+       sharing a row, which is what .wiz-actions gives by default. */
+    #wiz-step-2 .wiz-actions { flex-direction: column; gap: 13px; margin-top: 24px; }
+    #wiz-step-2 .wiz-actions .btn { width: 100%; }
+    /* README §5.7 footer: EVERYTHING'S STILL LISTED is full width, with the
+       tertiary snooze centred beneath it. */
+    #reconcile-sheet .wiz-actions { flex-direction: column; gap: 11px; }
+    #reconcile-sheet .wiz-actions .btn { width: 100%; }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1416,30 +1506,42 @@ body {
       </div>
     </div>
     <div class="wiz-step" id="wiz-step-2" style="display:none">
-      <div class="wiz-eyebrow">Step 2 of 2</div>
+      <!-- README §5.3.1: the step label sits on a progress row - label, a
+           1px rule filling the space, then a short mint bar. Only the label
+           existed before. -->
+      <div class="wiz-progress">
+        <span class="wiz-eyebrow" style="margin:0">Step 2 / 2</span>
+        <span class="wiz-progress__rule"></span>
+        <span class="wiz-progress__bar"></span>
+      </div>
       <h2 class="wiz-title">How should we tell you?</h2>
       <p class="wiz-sub">Under-market listings go fast. We alert you the moment one matches.</p>
+      <!-- RISK 15: each toggle's only content is a decorative knob span, so
+           without an explicit name a screen reader announces "switch, on"
+           with no subject. aria-labelledby points at the visible label that
+           already exists, rather than duplicating the copy in an aria-label
+           that could drift from it. -->
       <div class="wiz-alert-rows">
         <div class="wiz-alert-row">
           <div>
-            <div class="wiz-alert-row__title">Push notification</div>
+            <div class="wiz-alert-row__title" id="wiz-label-push">Push notification</div>
             <div class="wiz-alert-row__note">the fast one</div>
           </div>
-          <button type="button" class="toggle-switch is-on" id="wiz-toggle-push" role="switch" aria-checked="true"><span class="toggle-switch__knob"></span></button>
+          <button type="button" class="toggle-switch is-on" id="wiz-toggle-push" role="switch" aria-checked="true" aria-labelledby="wiz-label-push"><span class="toggle-switch__knob"></span></button>
         </div>
         <div class="wiz-alert-row">
           <div>
-            <div class="wiz-alert-row__title">Email digest</div>
+            <div class="wiz-alert-row__title" id="wiz-label-email">Email digest</div>
             <div class="wiz-alert-row__note">not built yet</div>
           </div>
-          <button type="button" class="toggle-switch is-disabled" disabled title="Coming soon"><span class="toggle-switch__knob"></span></button>
+          <button type="button" class="toggle-switch is-disabled" disabled role="switch" aria-checked="false" aria-labelledby="wiz-label-email" title="Coming soon"><span class="toggle-switch__knob"></span></button>
         </div>
         <div class="wiz-alert-row">
           <div>
-            <div class="wiz-alert-row__title">Quiet hours</div>
+            <div class="wiz-alert-row__title" id="wiz-label-quiet">Quiet hours</div>
             <div class="wiz-alert-row__note">23:00 &ndash; 08:00 UTC</div>
           </div>
-          <button type="button" class="toggle-switch is-on" id="wiz-toggle-quiet" role="switch" aria-checked="true"><span class="toggle-switch__knob"></span></button>
+          <button type="button" class="toggle-switch is-on" id="wiz-toggle-quiet" role="switch" aria-checked="true" aria-labelledby="wiz-label-quiet"><span class="toggle-switch__knob"></span></button>
         </div>
       </div>
       <p class="wiz-sub" style="margin:16px 0 0;font-size:11.5px;">Threshold-based filtering ("only ping me under X% below market") isn't built yet - every match on an enabled push alerts you today.</p>
@@ -1451,21 +1553,25 @@ body {
   </div>
 </div>
 
-<div class="wiz-overlay" id="reconcile-sheet">
-  <div class="wiz-modal">
-    <div class="wiz-eyebrow" id="reconcile-sheet-eyebrow">Still holding these?</div>
-    <p class="wiz-sub" style="margin-bottom:16px">These have sat in Holding for 45 days or more. Clearing them keeps your profit number honest - it doesn't affect your saved total or streak.</p>
+<!-- README §5.7: "Modal sheet over a .62 scrim, same sheet chrome as §5.2" -
+     this was built as a centered .wiz-modal, which is a different pattern
+     with a different (non-sanctioned) shadow. Now the real bottom sheet. -->
+<div class="wiz-overlay" id="reconcile-sheet" style="align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)">
+  <div class="filter-sheet" data-sheet style="max-width:520px">
+    <div class="filter-sheet__handle"></div>
+    <div class="filter-sheet__title" id="reconcile-sheet-eyebrow">Still holding these?</div>
+    <p class="wiz-sub" style="margin:0">These have sat in Holding for 45 days or more. Clearing them keeps your profit number honest - it doesn't affect your saved total or streak.</p>
     <div class="rec-sheet-list" id="reconcile-sheet-list"></div>
     <div class="rec-sheet-actions">
-      <span class="rec-sheet-count" id="reconcile-sheet-count">0 selected</span>
+      <span class="rec-sheet-count" id="reconcile-sheet-count">For the 0 selected</span>
       <div class="rec-sheet-btns">
-        <!-- README §5.7: STILL LISTED (secondary), SOLD ELSEWHERE (secondary),
-             ADD PRICE (primary) - these three were built with sold/price
-             swapped (sold as primary, price as secondary). -->
+        <!-- README §5.7 order and hierarchy: STILL LISTED (secondary),
+             SOLD ELSEWHERE (secondary), ADD PRICE (primary, last). -->
         <button class="btn btn-ghost" type="button" id="reconcile-bulk-listed">Still listed</button>
-        <button class="btn btn-prim" type="button" id="reconcile-bulk-price">Add price</button>
         <button class="btn btn-ghost" type="button" id="reconcile-bulk-sold">Sold elsewhere</button>
+        <button class="btn btn-prim" type="button" id="reconcile-bulk-price">Add price</button>
       </div>
+      <p class="filter-sheet__new-hint" style="margin:0">Sold elsewhere with no price logs the sale and leaves profit blank - you can fill it in later from History.</p>
     </div>
     <div class="wiz-actions" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
       <button class="btn btn-ghost" type="button" id="reconcile-sheet-all-listed">Everything's still listed</button>
@@ -1486,7 +1592,7 @@ body {
      already-tested History inline sale-form for this same item rather than
      duplicating that logic in a second place. -->
 <div class="wiz-overlay" id="claim-receipt-overlay" style="align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)">
-  <div class="filter-sheet" style="max-width:520px">
+  <div class="filter-sheet" data-sheet style="max-width:520px">
     <div class="filter-sheet__handle"></div>
     <div class="filter-sheet__header">
       <span class="filter-sheet__title">Claimed</span>
@@ -1559,7 +1665,9 @@ body {
 </div>
 <div class="claim-hint" id="claim-hint" style="display:none">
   Tapping <strong>Claim</strong> marks an item as bought and tracks it in your <a href="#" data-view-link="history">History</a> tab, where you can later mark it sold, mark it still listed, or remove it if you claimed it by mistake.
-  <a href="#" data-dismiss-hint style="margin-left:8px">Got it</a>
+  <!-- An inline text action, so README §3.3's uppercase rule applies to it
+       the same as to any other button label. -->
+  <a href="#" data-dismiss-hint style="margin-left:8px;text-transform:uppercase;letter-spacing:0.08em;font-size:11px">Got it</a>
 </div>
 <div class="empty" id="empty" style="display:none">No results yet. Press “Start Sniping Now”.</div>
 <div class="list" id="list">
@@ -1721,17 +1829,36 @@ const HEARTBEAT_URL = (() => {
       { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
     ));
 
+  /* RISK 10: the design writes "EUR62" and "EUR273.70" - symbol first,
+     period decimal, no space, and no trailing ".00". Intl.NumberFormat with
+     a locale renders "EUR 260,00" (or "260,00 EUR" elsewhere in the EU),
+     which breaks the visual rhythm of every price column. The format is
+     pinned here instead of letting the browser decide. Non-EUR codes fall
+     back to their ISO code + a space, which is honest rather than wrong. */
+  // \u escapes, not literals - this file is byte-sensitive (see the project's
+  // own "injected HTML/JS must be pure ASCII" rule) and the market-report
+  // block below already uses the same escape convention.
+  const CURRENCY_SYMBOLS = {
+    EUR: '€', USD: '$', GBP: '£', PLN: 'zł',
+    CZK: 'Kč', SEK: 'kr', DKK: 'kr',
+  };
+  const fmtMoney = (n, curr = 'EUR') => {
+    const code = (curr || 'EUR').toUpperCase();
+    const sym = CURRENCY_SYMBOLS[code];
+    const body = n.toFixed(2).replace(/\.00$/, '');
+    return sym ? sym + body : code + ' ' + body;
+  };
   const fmtPrice = (amt, curr = 'EUR') => {
     if (amt == null || amt === '') return '';
     const n = Number(amt);
     if (!Number.isFinite(n)) return '';
-    try {
-      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: curr || 'EUR' }).format(n);
-    } catch (e) {
-      // an unrecognised currency code should never take down the whole card
-      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n);
-    }
+    return fmtMoney(n, curr);
   };
+  // History and Profile live in a separate closure and had their own
+  // locale-formatted copies of this. One pinned formatter, shared - same
+  // window.SNYPD bridge pattern this file already uses for awardXP.
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.fmtMoney = fmtMoney;
 
   if (!sb) {
     msg('Supabase client missing');
@@ -1848,6 +1975,39 @@ const HEARTBEAT_URL = (() => {
   window.SNYPD = window.SNYPD || {};
   window.SNYPD.awardXP = awardXP;
   window.SNYPD.xpEventExistsEver = xpEventExistsEver;
+
+  /* RISK 15: none of the four overlays closed on Esc, and none locked
+     background scroll, so a sheet floated over a page that still scrolled
+     under it. Handled once here for all of them rather than per-sheet, and
+     driven off what is actually on screen so it stays correct as sheets are
+     added. Topmost-first: Esc closes the frontmost sheet only.
+     #wiz-overlay is deliberately excluded - the first-run wizard is the
+     onboarding path, not a dismissible sheet, and it has its own explicit
+     "set this up later" exit. */
+  (function overlayKeyboardAndScrollLock() {
+    const DISMISSIBLE = ['claim-receipt-overlay', 'reconcile-sheet', 'filter-sheet-overlay'];
+    const isOpen = (el) => el && getComputedStyle(el).display !== 'none';
+    const anyOpen = () => ['wiz-overlay', ...DISMISSIBLE]
+      .some(id => isOpen(document.getElementById(id)));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      for (const id of DISMISSIBLE) {
+        const el = document.getElementById(id);
+        if (isOpen(el)) { el.style.display = 'none'; e.preventDefault(); break; }
+      }
+    });
+
+    // Scroll lock, applied by observing the overlays' own display rather
+    // than by patching every open/close call site - a sheet opened by code
+    // that predates this still locks correctly.
+    const sync = () => { document.body.style.overflow = anyOpen() ? 'hidden' : ''; };
+    ['wiz-overlay', ...DISMISSIBLE].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) new MutationObserver(sync).observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+    });
+    sync();
+  })();
 
   // plan + Whop activation check
   const ACTIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid']);
@@ -2287,11 +2447,18 @@ const HEARTBEAT_URL = (() => {
 
     function eur(cents) {
       if (cents == null) return '—';
-      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+      // RISK 10: pinned format, not a locale one - see fmtMoney's own note.
+      return window.SNYPD.fmtMoney(cents / 100, 'EUR');
     }
 
     function daysHeld(claimedAt) {
-      const ms = Date.now() - new Date(claimedAt).getTime();
+      // RISK 9: a missing/unparseable claimed_at gives NaN, and Math.max(0,
+      // NaN) is NaN, which rendered literally as "Held NaNd". The column is
+      // NOT NULL in migration 022 so the DB prevents it today, but the render
+      // path itself was unguarded - a null must degrade, never print NaN.
+      const t = new Date(claimedAt).getTime();
+      if (!Number.isFinite(t)) return 0;
+      const ms = Date.now() - t;
       return Math.max(0, Math.floor(ms / (24 * 60 * 60 * 1000)));
     }
 
@@ -2320,19 +2487,19 @@ const HEARTBEAT_URL = (() => {
     }
 
     // Spec section 2, E2: "Un-claiming within 24h reverses the 25 XP and any
-    // E3 bonus." E3 is never awarded here (blocked on market data - see
-    // dashboard.html's Market Insights notes), so this only ever has E2's
-    // claim award to undo. A negative ledger row, not a delete or an update -
-    // same append-only reasoning as everywhere else in this ledger. Goes
-    // straight to xp_events rather than through awardXP(), since a debit must
-    // never be clamped by the daily-earning ceiling that exists to stop
-    // over-awarding.
+    // E3 bonus." Both are reversed - the comment here used to say E3 was
+    // never awarded, which went stale the moment E3 shipped, leaving a real
+    // gap where a below-market bonus survived its own claim being undone.
+    // A negative ledger row, not a delete or an update - same append-only
+    // reasoning as everywhere else in this ledger. Goes straight to
+    // xp_events rather than through awardXP(), since a debit must never be
+    // clamped by the daily-earning ceiling that exists to stop over-awarding.
     async function reverseClaimXPIfWithin24h(itemId, claimedAtIso) {
       if (!itemId || !claimedAtIso) return;
       const ageMs = Date.now() - new Date(claimedAtIso).getTime();
       if (!(ageMs >= 0) || ageMs > 24 * 60 * 60 * 1000) return;
       try {
-        const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).eq('event_type', 'claim').eq('item_id', itemId);
+        const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).in('event_type', ['claim', 'deal_quality_bonus', 'first_claim']).eq('item_id', itemId);
         if (error) throw error;
         const claimXp = (data || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
         if (claimXp > 0) {
@@ -2442,7 +2609,7 @@ const HEARTBEAT_URL = (() => {
               .from('xp_events')
               .select('item_id, xp')
               .eq('user_id', uid)
-              .eq('event_type', 'deal_quality')
+              .eq('event_type', 'deal_quality_bonus')
               .in('item_id', ids);
             if (dqErr) throw dqErr;
             for (const r of (dqRows || [])) dealQualityByItem.set(String(r.item_id), Number(r.xp) || 0);
@@ -2625,15 +2792,18 @@ const HEARTBEAT_URL = (() => {
     function renderReconcileSheet() {
       if (!reconcileSheetList) return;
       reconcileSheetList.innerHTML = lastStaleItems.map(r => `
-        <div class="rec-sheet-item${reconcileSelected.has(r.id) ? ' is-checked' : ''}" data-rec-item="${r.id}">
-          <span class="rec-sheet-item__check">${reconcileSelected.has(r.id) ? String.fromCharCode(0x2713) : ''}</span>
+        <div class="rec-sheet-item${reconcileSelected.has(r.id) ? ' is-checked' : ''}" data-rec-item="${r.id}"
+             role="checkbox" tabindex="0" aria-checked="${reconcileSelected.has(r.id) ? 'true' : 'false'}"
+             aria-label="${esc(r.title) || 'Claimed item'}">
+          <span class="rec-sheet-item__check" aria-hidden="true">${reconcileSelected.has(r.id) ? String.fromCharCode(0x2713) : ''}</span>
           <div style="flex:1;min-width:0">
             <div class="rec-sheet-item__title">${esc(r.title) || 'Claimed item'}</div>
             <div class="rec-sheet-item__meta">${eur(r.bought_price_cents)} · HELD ${daysHeld(r.claimed_at)}D</div>
           </div>
         </div>
       `).join('');
-      reconcileSheetCount.textContent = `${reconcileSelected.size} selected`;
+      // README §5.7: the eyebrow reads "FOR THE N SELECTED", count is live.
+      reconcileSheetCount.textContent = `For the ${reconcileSelected.size} selected`;
     }
 
     function openReconcileSheet() {
@@ -2649,12 +2819,30 @@ const HEARTBEAT_URL = (() => {
     if (reconcileReview) reconcileReview.addEventListener('click', openReconcileSheet);
 
     if (reconcileSheetList) {
-      reconcileSheetList.addEventListener('click', (e) => {
-        const item = e.target.closest('[data-rec-item]');
-        if (!item) return;
+      const toggleRecItem = (item) => {
         const id = item.dataset.recItem;
         if (reconcileSelected.has(id)) reconcileSelected.delete(id); else reconcileSelected.add(id);
         renderReconcileSheet();
+        // Re-rendering replaces the row, so focus has to be put back on the
+        // equivalent row or a keyboard user is dumped to the top of the sheet.
+        const again = reconcileSheetList.querySelector(`[data-rec-item="${id}"]`);
+        if (again) again.focus();
+      };
+      reconcileSheetList.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-rec-item]');
+        if (!item) return;
+        toggleRecItem(item);
+      });
+      // RISK 15: these rows were plain divs with a click handler and no
+      // tabindex - a keyboard user could not change the selection at all,
+      // so the sheet's three bulk actions operated on a set they couldn't
+      // edit. Space/Enter is the standard activation pair for role=checkbox.
+      reconcileSheetList.addEventListener('keydown', (e) => {
+        if (e.key !== ' ' && e.key !== 'Enter') return;
+        const item = e.target.closest('[data-rec-item]');
+        if (!item) return;
+        e.preventDefault();
+        toggleRecItem(item);
       });
     }
 
@@ -2777,7 +2965,8 @@ const HEARTBEAT_URL = (() => {
     }
 
     function eurCents(cents) {
-      return new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format((cents || 0) / 100);
+      // RISK 10: pinned format, not a locale one - see fmtMoney's own note.
+      return window.SNYPD.fmtMoney((cents || 0) / 100, 'EUR');
     }
 
     // Tier table, spec section 1. tier = highest row where xp_total >= floor.
@@ -2833,7 +3022,10 @@ const HEARTBEAT_URL = (() => {
     }
     document.addEventListener('click', (e) => {
       const banner = document.getElementById('rankup-banner');
-      if (banner && banner.style.display !== 'none' && !banner.contains(e.target)) {
+      // Any click dismisses it, including one on the banner itself - it
+      // carries cursor:pointer, and previously a click *on* it was the one
+      // place that did nothing, which is exactly the affordance it advertises.
+      if (banner && banner.style.display !== 'none') {
         banner.style.display = 'none';
       }
     });
@@ -3310,7 +3502,10 @@ const HEARTBEAT_URL = (() => {
         <div>
           <div class="meta-top">
             <div class="t">${esc(r.title) || 'View listing'}</div>
-            <div>
+            <!-- RISK 9: this wrapper is the actual flex child, so it needs
+                 the shrink guard - .p's own flex:0 0 auto applies to the
+                 inner node and never protected the title's ellipsis. -->
+            <div class="p-stack">
               <div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div>
               ${totalLabel ? `<div class="p-total">${totalLabel} incl. protection</div>` : ''}
             </div>
@@ -3365,7 +3560,13 @@ const HEARTBEAT_URL = (() => {
       const d = (medianCents - boughtCents) / medianCents;
       const bonus = Math.max(0, Math.min(50, Math.floor(d * 100)));
       if (bonus > 0) {
-        await awardXP('deal_quality', bonus, itemId, {
+        // 'deal_quality_bonus', not 'deal_quality' - migration 024's CHECK
+        // constraint only permits the former. Writing the short name raised
+        // 23514, awardXP's catch swallowed it, and E3 silently awarded
+        // nothing in production while every History card stayed on "pending
+        // market data" forever. Invisible to QA-mock testing, because a
+        // mocked client doesn't enforce CHECK constraints.
+        await awardXP('deal_quality_bonus', bonus, itemId, {
           median_cents: medianCents, bought_cents: boughtCents, sample_size: report.sample_size,
         });
         // The claim already rendered its History card showing "pending" (no
@@ -3433,10 +3634,12 @@ const HEARTBEAT_URL = (() => {
       const claimRowId = inserted && inserted.id ? inserted.id : null;
       const hadClaimedBefore = await xpEventExistsEver('claim', null);
       const claimsToday = await xpEventCountToday('claim');
+      // Count what awardXP actually wrote, not what was requested - it
+      // clamps against the 200/day ceiling and returns the real figure, so
+      // near the cap the receipt would otherwise claim XP nobody received.
       let xpEarnedThisClaim = 0;
       if (claimsToday < 4) {
-        await awardXP('claim', 25, claimRowId, { listing_id: listingId });
-        xpEarnedThisClaim += 25;
+        xpEarnedThisClaim += await awardXP('claim', 25, claimRowId, { listing_id: listingId });
         // E3 rides on the same cap as E2 - a claim that earned no XP because
         // today's 4 are already used earns no deal-quality bonus either, so
         // farming claims never multiplies XP by adding a second uncapped
@@ -3444,8 +3647,7 @@ const HEARTBEAT_URL = (() => {
         awardDealQualityBonus(claimRowId, row.title, boughtCents);
       }
       if (!hadClaimedBefore) {
-        await awardXP('first_claim', 25, claimRowId, {});
-        xpEarnedThisClaim += 25;
+        xpEarnedThisClaim += await awardXP('first_claim', 25, claimRowId, {});
       }
 
       // README §6: "item leaves the feed, enters History, claim receipt
