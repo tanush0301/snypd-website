@@ -1177,6 +1177,23 @@ body {
   .card-actions { flex-direction: column; }
 }
 
+/* Phone gutter. Placed HERE, after .panel .bd/.hd's base rules, not up in
+   the earlier max-width:767px block - these selectors have the same
+   specificity as the base ones, so an override written before them loses on
+   source order and silently does nothing. (Same trap the bottom bar hit.)
+
+   The gutter was being paid twice: .dash-wrap's 24px page padding AND the
+   panel's own 24px .bd padding, so 49px per side once the panel border is
+   counted, leaving only 262px of a 360px screen for the card. README §2.3
+   asks for a 20px mobile gutter with 13-16px panel padding. Photos are the
+   visible cost - the square card image grows from 260px to ~290px. */
+@media (max-width: 767px) {
+  .dash-wrap { padding-left: 20px; padding-right: 20px; }
+  .panel .bd { padding: 14px; }
+  .panel .hd { padding: 14px; }
+  .feed-stat { padding: 14px 16px; }
+}
+
 .meta-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; align-items: center; min-width: 0; }
 .t { font-weight: 400; font-size: 14px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 auto; }
 .p { font-weight: 400; font-size: 15px; color: var(--text-primary); white-space: nowrap; flex: 0 0 auto; }
