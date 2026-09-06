@@ -617,8 +617,13 @@ body {
 .mr-badge.warn { color: var(--warning); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.06); }
 .mr-badge.bad  { color: var(--danger);  border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.06); }
 .mr-headline { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--text-primary); }
-.mr-headline b { color: var(--brand-hover); }
-.mr-price { font-size: 30px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+/* Mint, not --brand-hover (#C54BFF). Every number in this sentence was
+   rendered in purple TEXT, which the colour doctrine forbids outright -
+   purple is a fill, never type. Missed by every earlier verification pass
+   because those scanned only for #A200FF/#B933FF, and because this markup is
+   injected by JS so it does not exist until a search actually runs. */
+.mr-headline b { color: var(--success); }
+.mr-price { font-size: 30px; font-weight: 400; color: var(--text-primary); letter-spacing: -0.02em; }
 .mr-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
 .mr-cond-row {
   display: flex; justify-content: space-between; gap: 12px;
@@ -654,13 +659,59 @@ body {
   margin-top: 12px; padding: 11px 14px; border-radius: 0; font-size: 13px; line-height: 1.5;
   background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); color: var(--danger);
 }
-.mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+/* `spin` is one of the three animations README 2.5 sanctions and it was the
+   only one not present in the file. A bare text line was the whole loading
+   state for a lookup that can genuinely take seconds. */
+@keyframes spin { to { transform: rotate(360deg); } }
+.mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 9px; }
+.mr-spinner {
+  width: 12px; height: 12px; flex: 0 0 auto;
+  border: 1.5px solid var(--border3);
+  border-top-color: var(--success);
+  animation: spin 0.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .mr-spinner { animation: none; } }
+.mr-chips-label { margin-top: 12px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.mr-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.mr-chip {
+  background: var(--panel-header);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font); font-size: 11px; letter-spacing: 0.04em;
+  padding: 6px 10px; border-radius: 0; cursor: pointer;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mr-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+/* The server already knew how many lookups were left and discarded it, so a
+   429 used to arrive with no warning. This renders the real number the route
+   returns, never a client-side guess. */
+.mr-quota { margin-top: 9px; font-size: 11px; color: var(--text-muted); }
+.mr-quota.low { color: var(--warning); }
+/* README 2j/5.4.5 reserve a per-item market slot next to the price
+   (`-13% vs median`). Computing that for every card was ruled out - titles are
+   near-unique so the report cache would miss on nearly all of them. This is
+   the same slot, filled on demand by the reader instead. */
+.mkt-check {
+  background: none; border: 0; padding: 0; margin-top: 3px;
+  font-family: var(--font); font-size: 10px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--success); cursor: pointer;
+  text-align: right; display: block; width: 100%;
+}
+.hist-card .mkt-check { text-align: right; }
+.mkt-check:hover { text-decoration: underline; }
 .mr-locked { padding: 6px 0 2px; }
 .mr-locked h3 { margin: 0 0 6px; font-size: 15px; color: var(--text-primary); }
 .mr-locked p  { margin: 0 0 12px; font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 60ch; }
 @media (max-width: 560px) {
   .mr-cond-row { flex-direction: column; gap: 2px; }
   .mr-cond-detail { text-align: left; }
+  /* The auto-fit grid gives two 129px tracks on a 375px phone, which wraps
+     "Most expensive quarter" onto two lines and its note onto three, so the
+     four bands read as one ragged block (measured: every item 67px tall).
+     One column per row is legible at that width. */
+  .mr-pos-legend { grid-template-columns: 1fr; gap: 8px; }
+  .mr-input { width: 100%; box-sizing: border-box; }
+  #mr-controls .btn { width: 100%; }
 }
 .panel .hd {
   padding: 20px 24px;
@@ -1765,6 +1816,9 @@ body {
 <input class="mr-input" id="mr-query" type="text" autocomplete="off" spellcheck="false" placeholder="Search an item, e.g. jordan 1 mid" />
 <button class="btn btn-prim" id="mr-go" type="button">Check price</button>
 </div>
+<div class="mr-chips-label" id="mr-chips-label" style="display:none"></div>
+<div class="mr-chips" id="mr-chips" style="display:none"></div>
+<div class="mr-quota" id="mr-quota" style="display:none"></div>
 <div class="mr-locked" id="mr-locked" style="display:none">
 <h3>Market Report is part of Elite</h3>
 <p>See what an item actually sells for across Vinted right now, broken down by condition, with a warning when the listings are too mixed to trust a single price.</p>
@@ -2646,6 +2700,7 @@ const HEARTBEAT_URL = (() => {
             </div>
             <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')}</div>
             <div class="hist-held">${stale ? '⚠ ' : ''}Held ${held}d${stale ? ' — still yours?' : ''}</div>
+            ${row.title ? `<button class="mkt-check" type="button" data-market-check="${esc(row.title)}">Check price</button>` : ''}
             ${dqLine}
             <div class="hist-sale-form" data-sale-form>
               <input type="number" step="0.01" min="0" placeholder="Sold for" data-sale-input />
@@ -3217,6 +3272,24 @@ const HEARTBEAT_URL = (() => {
       }
     }
 
+    /* The per-item market slot README 2j/5.4.5 reserves. Delegated at document
+       level because it appears on two independently-rendered card types (the
+       feed and History's holding cards) and both re-render from scratch.
+       A non-Elite tap still switches tabs - the panel's own locked state then
+       explains why, which is a real path rather than a dead control - but no
+       lookup is attempted, since /market/snapshot would only 403. */
+    document.addEventListener('click', (e) => {
+      const slot = e.target.closest('[data-market-check]');
+      if (!slot) return;
+      e.preventDefault();
+      switchView('market');
+      if (document.body.dataset.plan === 'elite' && window.SNYPD && window.SNYPD.marketCheck) {
+        window.SNYPD.marketCheck(slot.dataset.marketCheck);
+      }
+      const panel = document.getElementById('market-panel');
+      if (panel) panel.scrollIntoView({ block: 'start' });
+    });
+
     viewTabs.addEventListener('click', (e) => {
       const tab = e.target.closest('.view-tab');
       if (!tab) return;
@@ -3619,6 +3692,7 @@ const HEARTBEAT_URL = (() => {
               ${isGone
                 ? `<div class="p-total p-gone">Gone &middot; may have sold</div>`
                 : (totalLabel ? `<div class="p-total">${totalLabel} incl. protection</div>` : '')}
+              ${isGone || !r.title ? '' : `<button class="mkt-check" type="button" data-market-check="${esc(r.title)}">Check price</button>`}
             </div>
           </div>
           <div class="muted" title="${esc(fullLabel)}">
@@ -4572,6 +4646,9 @@ const HEARTBEAT_URL = (() => {
   var API = 'https://api.snypd.store';
 
   var panel   = document.getElementById('market-panel');
+  var chipsBox= document.getElementById('mr-chips');
+  var chipsLbl= document.getElementById('mr-chips-label');
+  var quotaEl = document.getElementById('mr-quota');
   var input   = document.getElementById('mr-query');
   var goBtn   = document.getElementById('mr-go');
   var result  = document.getElementById('mr-result');
@@ -4583,11 +4660,20 @@ const HEARTBEAT_URL = (() => {
   var EUR = '\u20AC';
   var NDASH = '\u2013';
   var MIDDOT = '\u00B7';
+  var HELLIP = '\u2026';
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* 5911 -> 5,911. The design groups thousands ("1,240 XP"), and a raw
+     four-digit count in the middle of a sentence reads as a typo. */
+  function num(v) {
+    var n = Number(v || 0);
+    if (!isFinite(n)) { return '0'; }
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   function eur(cents) {
@@ -4651,25 +4737,25 @@ const HEARTBEAT_URL = (() => {
        * directly above it. */
       if (d.provisional) {
         var ob = d.observed_cents || {};
-        return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' to go on'
+        return 'Only <b>' + num(n) + '</b> listing' + (n === 1 ? '' : 's') + ' to go on'
              + (ob.low != null ? ', running from <b>' + eur(ob.low) + '</b> to <b>' + eur(ob.high) + '</b>' : '')
              + '. Rare items are thin here because they are rare on Vinted, so this is a '
              + 'starting point rather than a settled price.';
       }
-      return 'Only <b>' + n + '</b> listing' + (n === 1 ? '' : 's') + ' found so far '
+      return 'Only <b>' + num(n) + '</b> listing' + (n === 1 ? '' : 's') + ' found so far '
            + '-- too few to call a price honestly.';
     }
     if (d.display_verdict === 'too_broad') {
       var o = d.observed_cents || {};
-      return 'Found <b>' + n + '</b> listings from <b>' + (d.distinct_sellers || 0) + '</b> sellers, but they run from <b>'
+      return 'Found <b>' + num(n) + '</b> listings from <b>' + num(d.distinct_sellers) + '</b> sellers, but they run from <b>'
            + eur(o.low) + '</b> to <b>' + eur(o.high) + '</b>. That spread usually means fakes mixed in with real ones, '
            + 'or several different products sharing the same words. No single price would be honest here.';
     }
     if (d.display_verdict === 'one_seller_dominates') {
-      return 'Found ' + n + ' listings, but <b>' + (d.top_seller_pct || 0) + '%</b> of them belong to one seller. '
+      return 'Found ' + num(n) + ' listings, but <b>' + (d.top_seller_pct || 0) + '%</b> of them belong to one seller. '
            + 'That is one seller setting the price, not a market.';
     }
-    return 'Based on <b>' + n + '</b> listings from <b>' + (d.distinct_sellers || 0) + '</b> sellers.';
+    return 'Based on <b>' + num(n) + '</b> listings from <b>' + num(d.distinct_sellers) + '</b> sellers.';
   }
 
   function conditionRows(list) {
@@ -4680,16 +4766,16 @@ const HEARTBEAT_URL = (() => {
       if (c.verdict === 'ok' && c.typical_cents != null) {
         detail = '<b>' + eur(c.typical_cents) + '</b> typical '
                + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ')</span> '
-               + MIDDOT + ' ' + (c.sample_size || 0) + ' listings';
+               + MIDDOT + ' ' + num(c.sample_size) + ' listings';
       } else if (c.provisional && c.typical_cents != null) {
         /* Thin but real. Shown deliberately: for a rare colourway every rung is
          * thin by definition, and a rough number that admits it is rough beats
          * an empty row. The tilde and the lighter weight carry that. */
         detail = '<b style="opacity:.85">~' + eur(c.typical_cents) + '</b> '
                + '<span style="opacity:.7">(' + eur(r.low) + ' ' + NDASH + ' ' + eur(r.high) + ') '
-               + MIDDOT + ' only ' + (c.sample_size || 0) + ' listings</span>';
+               + MIDDOT + ' only ' + num(c.sample_size) + ' listings</span>';
       } else {
-        detail = '<span style="opacity:.7">' + (c.sample_size || 0) + ' listing'
+        detail = '<span style="opacity:.7">' + num(c.sample_size) + ' listing'
                + ((c.sample_size === 1) ? '' : 's') + ', not enough on its own</span>';
       }
       return '<div class="mr-cond-row"><div class="mr-cond-name">' + escapeHtml(c.condition_label || '')
@@ -4754,9 +4840,6 @@ const HEARTBEAT_URL = (() => {
 
     html += '<p class="mr-headline">' + headline(d) + '</p>';
 
-    html += positioning(d);
-    html += drift(d);
-
     (d.flags || []).forEach(function (f) {
       html += '<div class="mr-flag">' + escapeHtml(f.message || '') + '</div>';
     });
@@ -4766,8 +4849,77 @@ const HEARTBEAT_URL = (() => {
     }
     html += '</div>';
 
+    /* The condition ladder comes before positioning and drift: it is the most
+       decision-relevant thing this report produces (a shoe's grade moves the
+       price more than anything else here), and it used to sit last, below the
+       fold on a phone. */
     html += conditionRows(d.by_condition);
+    html += positioning(d);
+    html += drift(d);
     result.innerHTML = html;
+  }
+
+  /* Recent lookups, per device. Pricing several items in a row meant retyping
+     each title in full; the chips make the second one a tap. The starters are
+     queries measured to actually return data (Session 8's seed run) - a
+     starter that comes back empty would teach a new user the tool is broken. */
+  var RECENT_KEY = 'snypd_mr_recent';
+  var RECENT_MAX = 6;
+  var STARTERS = ['jordan 1 mid', 'nike air max 90', 'stone island sweater',
+                  'carhartt detroit jacket', "arc'teryx beta"];
+
+  function readRecent() {
+    try {
+      var raw = localStorage.getItem(RECENT_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(arr)) { return []; }
+      /* Capped on READ as well as on write. The cap used to live only in
+         pushRecent, so any stored value that was already longer - a leftover
+         from a different cap, or hand-edited storage - rendered in full.
+         Confirmed live: a seeded 8-entry value drew 8 chips. */
+      return arr.filter(function (x) { return typeof x === 'string' && x; }).slice(0, RECENT_MAX);
+    } catch (e) { return []; }
+  }
+
+  function pushRecent(q) {
+    var k = q.toLowerCase();
+    var list = readRecent().filter(function (x) { return x.toLowerCase() !== k; });
+    list.unshift(q);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, RECENT_MAX))); } catch (e) {}
+    renderChips();
+  }
+
+  function renderChips() {
+    if (!chipsBox || !chipsLbl) { return; }
+    var recent = readRecent();
+    var list = recent.length ? recent : STARTERS;
+    chipsLbl.textContent = recent.length ? 'Recent' : 'Try one of these';
+    chipsBox.innerHTML = list.map(function (q) {
+      return '<button class="mr-chip" type="button" data-mr-chip="' + escapeHtml(q) + '">'
+           + escapeHtml(q) + '</button>';
+    }).join('');
+    chipsLbl.style.display = '';
+    chipsBox.style.display = '';
+  }
+
+  function renderQuota(q) {
+    if (!quotaEl) { return; }
+    if (!q || typeof q.hour_remaining !== 'number') { quotaEl.style.display = 'none'; return; }
+    var left = q.hour_remaining;
+    var lim = (typeof q.hour_limit === 'number') ? q.hour_limit : null;
+    quotaEl.textContent = left + (lim ? ' of ' + lim : '') + ' price check'
+      + (left === 1 ? '' : 's') + ' left this hour';
+    quotaEl.className = 'mr-quota' + (left <= 3 ? ' low' : '');
+    quotaEl.style.display = '';
+  }
+
+  if (chipsBox) {
+    chipsBox.addEventListener('click', function (e) {
+      var chip = e.target.closest('[data-mr-chip]');
+      if (!chip) { return; }
+      input.value = chip.dataset.mrChip;
+      run();
+    });
   }
 
   var busy = false;
@@ -4777,17 +4929,21 @@ const HEARTBEAT_URL = (() => {
     if (!q) { return; }
     busy = true;
     goBtn.disabled = true;
-    result.innerHTML = '<div class="mr-loading">Checking real listings across every condition...</div>';
+    result.innerHTML = '<div class="mr-loading"><span class="mr-spinner"></span>'
+      + '<span>Checking real listings across every condition' + HELLIP + '</span></div>';
     try {
       var res = await api('/api/v1/market/snapshot', 'POST', { q: q });
       if (res.status === 200 && res.body) {
         render(res.body);
+        pushRecent(q);
+        renderQuota(res.body.quota);
       } else if (res.status === 403) {
         /* Mirrors the locked state, so a stale body[data-plan] cannot dead-end
          * a non-Elite user on a spinner. */
         showLocked();
         result.innerHTML = '';
       } else if (res.status === 429) {
+        renderQuota({ hour_remaining: 0, hour_limit: null });
         result.innerHTML = '<div class="mr-error">' + escapeHtml(detailOf(res)
           || 'You have used your searches for now. Try again a bit later.') + '</div>';
       } else if (res.status === 503) {
@@ -4817,11 +4973,17 @@ const HEARTBEAT_URL = (() => {
     if (controls) { controls.style.display = 'none'; }
     if (locked) { locked.style.display = 'block'; }
     if (tierChip) { tierChip.textContent = 'Elite only'; }
+    /* A locked panel has no search box, so tappable queries under it would be
+       dead controls. Same for the quota line - there is nothing to spend. */
+    if (chipsBox) { chipsBox.style.display = 'none'; }
+    if (chipsLbl) { chipsLbl.style.display = 'none'; }
+    if (quotaEl) { quotaEl.style.display = 'none'; }
   }
 
   function showUnlocked() {
     if (controls) { controls.style.display = ''; }
     if (locked) { locked.style.display = 'none'; }
+    renderChips();
   }
 
   function applyPlan(plan) {
@@ -4830,6 +4992,17 @@ const HEARTBEAT_URL = (() => {
 
   goBtn.addEventListener('click', run);
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { run(); } });
+
+  /* Cross-closure bridge, same pattern as window.SNYPD.awardXP - the card
+     renderers live in a different IIFE and cannot see run() directly. This
+     only fills and runs; the caller switches to the tab itself. */
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.marketCheck = function (q) {
+    var t = (q || '').trim();
+    if (!t) { return; }
+    input.value = t;
+    run();
+  };
 
   /* The plan is resolved asynchronously by the block above, so take it from
    * whichever arrives first: the event, or an already-set attribute. */
