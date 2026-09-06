@@ -7,6 +7,7 @@
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
 <script>
     window.SNYPD = window.SNYPD || {};
     if (!SNYPD.supabase) {
@@ -826,6 +827,40 @@
       Free monitors while your dashboard is open. Paid plans keep running 24/7, even after you close it.
     </p>
 </div>
+
+<!-- Embedded Whop checkout - keeps the buyer on snypd.store instead of a
+     full-page redirect to whop.com. One static div per paid plan, matching
+     the plan IDs already used for the plain-link checkout above. Free never
+     goes through Whop checkout (see the click handler below), so it has no
+     embed. docs.whop.com/payments/checkout-embed only documents a static
+     data-whop-checkout-plan-id per div, not a documented way to swap the
+     plan on one shared div after mount - three real divs is the safe way
+     to do this rather than assuming undocumented dynamic-remount behavior. -->
+<div class="whop-embed-overlay" data-whop-embed-overlay="kickstart" hidden="">
+  <div class="whop-embed-box">
+    <button class="whop-embed-close" data-whop-embed-close="" type="button" aria-label="Close checkout">&times;</button>
+    <div data-whop-checkout-plan-id="plan_LThAkWvHKdWHd" data-whop-checkout-theme="dark" data-whop-checkout-theme-accent-color="#A200FF" data-whop-checkout-on-complete="snypdCheckoutComplete"></div>
+  </div>
+</div>
+<div class="whop-embed-overlay" data-whop-embed-overlay="pro" hidden="">
+  <div class="whop-embed-box">
+    <button class="whop-embed-close" data-whop-embed-close="" type="button" aria-label="Close checkout">&times;</button>
+    <div data-whop-checkout-plan-id="plan_AMgmgP4AEPcOB" data-whop-checkout-theme="dark" data-whop-checkout-theme-accent-color="#A200FF" data-whop-checkout-on-complete="snypdCheckoutComplete"></div>
+  </div>
+</div>
+<div class="whop-embed-overlay" data-whop-embed-overlay="elite" hidden="">
+  <div class="whop-embed-box">
+    <button class="whop-embed-close" data-whop-embed-close="" type="button" aria-label="Close checkout">&times;</button>
+    <div data-whop-checkout-plan-id="plan_NyA2CkiHNzymG" data-whop-checkout-theme="dark" data-whop-checkout-theme-accent-color="#A200FF" data-whop-checkout-on-complete="snypdCheckoutComplete"></div>
+  </div>
+</div>
+<style>
+  .whop-embed-overlay{position:fixed;inset:0;z-index:9999;background:rgba(3,3,3,.78);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px}
+  .whop-embed-overlay[hidden]{display:none}
+  .whop-embed-box{position:relative;width:100%;max-width:480px;max-height:90vh;overflow:auto;background:#0f0f11;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px}
+  .whop-embed-close{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:20px;line-height:1;cursor:pointer}
+  .whop-embed-close:hover{background:rgba(255,255,255,.12)}
+</style>
 <script>
     (function () {
       var root = document.currentScript.closest(".snypd-pricing");
@@ -985,9 +1020,46 @@
           if (!href || href === "https://whop.com/checkout/plan_jPBUwsY7FaO3w") {
             event.preventDefault();
             window.location.href = signupUrl;
+            return;
+          }
+
+          var ctaPlan = normalizePlan(cta.getAttribute("data-plan"));
+
+          // Own current paid plan's button reads "Manage subscription" here -
+          // send that to Whop's real account page. No documented embedded
+          // billing-portal exists, only checkout for a NEW plan.
+          if (ctaPlan === authState.currentPlan) return;
+
+          var overlay = root.querySelector('[data-whop-embed-overlay="' + ctaPlan + '"]');
+          if (overlay) {
+            event.preventDefault();
+            overlay.hidden = false;
           }
         });
       });
+
+      document.querySelectorAll("[data-whop-embed-close]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          btn.closest("[data-whop-embed-overlay]").hidden = true;
+        });
+      });
+
+      document.querySelectorAll("[data-whop-embed-overlay]").forEach(function (overlay) {
+        overlay.addEventListener("click", function (event) {
+          if (event.target === overlay) overlay.hidden = true;
+        });
+      });
+
+      // Fires when the embedded checkout completes (data-whop-checkout-on-complete).
+      // The webhook that updates Supabase runs async on Whop's side, so this
+      // sends the buyer to the dashboard rather than trying to re-render the
+      // plan state immediately - the dashboard's own load already re-checks it.
+      window.snypdCheckoutComplete = function () {
+        document.querySelectorAll("[data-whop-embed-overlay]").forEach(function (overlay) {
+          overlay.hidden = true;
+        });
+        window.location.href = "/dashboard";
+      };
 
       loadUserPlan();
     })();

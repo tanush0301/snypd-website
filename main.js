@@ -332,9 +332,46 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!href || href === "https://whop.com/checkout/plan_jPBUwsY7FaO3w") {
           event.preventDefault();
           window.location.href = signupUrl;
+          return;
+        }
+
+        const ctaPlan = normalizePlan(cta.getAttribute("data-plan"));
+
+        // Own current paid plan's button reads "Manage subscription" here -
+        // send that to Whop's real account page. No documented embedded
+        // billing-portal exists, only checkout for a NEW plan.
+        if (ctaPlan === authState.currentPlan) return;
+
+        const overlay = pricingRoot.querySelector(`[data-whop-embed-overlay="${ctaPlan}"]`);
+        if (overlay) {
+          event.preventDefault();
+          overlay.hidden = false;
         }
       });
     });
+
+    document.querySelectorAll("[data-whop-embed-close]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        btn.closest("[data-whop-embed-overlay]").hidden = true;
+      });
+    });
+
+    document.querySelectorAll("[data-whop-embed-overlay]").forEach(overlay => {
+      overlay.addEventListener("click", event => {
+        if (event.target === overlay) overlay.hidden = true;
+      });
+    });
+
+    // Fires when the embedded checkout completes (data-whop-checkout-on-complete).
+    // The webhook that updates Supabase runs async on Whop's side, so this
+    // sends the buyer to the dashboard rather than trying to re-render the
+    // plan state immediately - the dashboard's own load already re-checks it.
+    window.snypdCheckoutComplete = function () {
+      document.querySelectorAll("[data-whop-embed-overlay]").forEach(overlay => {
+        overlay.hidden = true;
+      });
+      window.location.href = "/dashboard";
+    };
 
     loadUserPlan();
   }
