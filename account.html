@@ -64,6 +64,11 @@
             overflow-y: auto;
           }
           :focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+          /* README RISK 4 / "never bold": h1-h6, strong, b and th default to
+             600-700 in every browser. dashboard.html has had this reset for a
+             while; account.html never did, so its footer <h3> was rendering
+             at 700. */
+          h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 400; }
           /* Custom scrollbar for main content to match premium feel */
           .main-content::-webkit-scrollbar { width: 8px; }
           .main-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
@@ -788,7 +793,12 @@
 </div>
 <div class="row" id="foundingRow" style="display:none">
 <div class="k">Founding member</div>
-<div class="v" style="color:#A200FF;font-weight:700">Pro pricing locked for life</div>
+<!-- Mint, not purple, and weight 400. This row arrived with main's
+     founding-member work and used #A200FF as text at weight 700 - purple as
+     text measures 3.65:1 and fails AA, which is why README law 3 makes it
+     fill-only, and "never bold" is its own absolute rule. Mint is the
+     correct colour here: this is a status, not an action. -->
+<div class="v" style="color:#00E5A0">Pro pricing locked for life</div>
 </div>
 <div class="row">
 <div class="k">Billing status</div>

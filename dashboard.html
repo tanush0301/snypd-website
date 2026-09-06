@@ -864,7 +864,13 @@ body {
   transition: all 0.3s var(--smooth);
 }
 .card > .thumb-wrap { width: 100%; }
-.card > div:last-child { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+/* min-width:0 is load-bearing (RISK 9): as a grid item this column defaults
+   to min-width:auto, so it refuses to shrink below its longest line. With a
+   real 90-character Vinted title it measured 854px inside a 262px card at
+   360px wide - .card's overflow:hidden and body's overflow-x:hidden were
+   the only things hiding it, which meant the title was hard-cut mid-word
+   instead of ellipsising, and .t's text-overflow never got to apply. */
+.card > div:last-child { padding: 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 /* README §2.5: exactly three animations exist (pulseDot, riseIn, spin) and
    "nothing else moves - no hover lift... no scroll animation." slideUp was
    a 4th, unsanctioned one (initial-load stagger now reuses is-new/riseIn,
