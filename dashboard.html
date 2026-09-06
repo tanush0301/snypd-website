@@ -663,6 +663,17 @@ body {
    only one not present in the file. A bare text line was the whole loading
    state for a lookup that can genuinely take seconds. */
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Tapping FEED while already on the feed re-fetches, so the tap needs to say
+   something happened even when the same ads come back. Reuses `spin`, one of
+   README 2.5's three sanctioned animations. */
+.feed-spinner {
+  width: 9px; height: 9px; flex: 0 0 auto; margin-right: 7px;
+  border: 1.5px solid var(--border3);
+  border-top-color: var(--success);
+  animation: spin 0.8s linear infinite;
+  display: inline-block; vertical-align: -1px;
+}
+@media (prefers-reduced-motion: reduce) { .feed-spinner { animation: none; } }
 .mr-loading { margin-top: 12px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 9px; }
 .mr-spinner {
   width: 12px; height: 12px; flex: 0 0 auto;
@@ -1026,8 +1037,27 @@ body {
 /* Remove has no equivalent in the mockup at all, so it sits below the
    prescribed pair as a quiet tertiary affordance rather than competing with
    them as a third button. */
-.hist-remove { align-self: flex-end; opacity: 0.6; padding: 2px 0; }
-.hist-remove:hover { opacity: 1; color: var(--danger); }
+/* opacity:.6 over --text-muted composited to rgb(80,86,90) = 2.54:1 against
+   --panel, under even the 3:1 UI minimum. The ONLY rule that raised it was
+   :hover, which never fires on a touch device - so on a desktop it looked
+   fine the instant the mouse went near it, and on a real phone it was
+   permanently unreadable. Tanush reported it as "not fully visible ... which
+   makes it broken"; the click itself was working the whole time (verified:
+   Holding 2 -> 1). Full --text-muted is 4.97:1 and passes AA. The underline
+   makes it read as an action without a fill or a border, so it stays a
+   tertiary control per README 3.3, and min-height gives it a real 44px
+   touch target instead of the 34px it had. */
+.hist-remove {
+  align-self: flex-end;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  padding: 0 2px;
+}
+/* :active matters as much as :hover here - a touch device only ever gets the
+   former, which is how this became invisible in the first place. */
+.hist-remove:hover, .hist-remove:active, .hist-remove:focus-visible { color: var(--danger); }
 
 .claim-hint {
   font-size: 11px;
@@ -1751,6 +1781,7 @@ body {
 <div class="chip warn" id="status-chip">Status: Idle</div>
 <div class="chip neutral" id="tick-chip">Last check: —</div>
 <div class="chip err" id="err-chip" style="display:none"></div>
+<div class="chip neutral" id="feed-refreshing" style="display:none"><span class="feed-spinner"></span>Refreshing</div>
 </div>
 <div class="controls">
 <button class="btn btn-prim" id="btn-start">Start Sniping</button>
@@ -3290,10 +3321,36 @@ const HEARTBEAT_URL = (() => {
       if (panel) panel.scrollIntoView({ block: 'start' });
     });
 
+    /* A tap on FEED means "give me what's new". Scrolling back to the top is
+       half the ask - the other half of Tanush's complaint was having to scroll
+       up after reading down a long list.
+       Refetches on EVERY feed tap, whether or not the feed was already open:
+       switchView deliberately has no 'feed' branch (it loads for history,
+       profile and market only), so arriving from another tab does NOT refetch
+       on its own and there is no double request to avoid. Checked, rather than
+       assumed - the first version of this guarded on "already on feed" for a
+       double-load that does not exist. */
+    function feedTapped() {
+      /* window.scrollTo(0,0), not panel.scrollIntoView(): the feed panel starts
+         99px down the page (measured), so scrolling IT to block:'start' lands
+         at scrollY 99 and tucks the panel's own header under the sticky topbar.
+         And 'auto', not 'smooth': smooth scrolling is an animation, and this
+         tooling's tab reports document.hidden === true, which suspends
+         animations - verified here, smooth left scrollY at 1200 while auto
+         reached the target. Smooth would work on a real phone, but an instant
+         jump is the one this environment can actually prove, per this repo's
+         own rule about not shipping visual behaviour it cannot confirm. */
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      if (window.SNYPD && typeof window.SNYPD.refreshFeed === 'function') {
+        window.SNYPD.refreshFeed();
+      }
+    }
+
     viewTabs.addEventListener('click', (e) => {
       const tab = e.target.closest('.view-tab');
       if (!tab) return;
       switchView(tab.dataset.view);
+      if (tab.dataset.view === 'feed') feedTapped();
     });
 
     const bottombar = document.getElementById('bottombar');
@@ -3301,7 +3358,10 @@ const HEARTBEAT_URL = (() => {
       bottombar.addEventListener('click', (e) => {
         const tab = e.target.closest('.bottombar-tab');
         if (!tab) return;
+        // The phone nav gets the same refresh-on-FEED-tap as the top row; this
+        // is the one Tanush is actually tapping on a mobile device.
         switchView(tab.dataset.view);
+        if (tab.dataset.view === 'feed') feedTapped();
       });
     }
 
@@ -3951,6 +4011,39 @@ const HEARTBEAT_URL = (() => {
   function setLoading(flag) {
     list.classList.toggle('loading', !!flag);
   }
+
+  /* Tapping FEED refreshes the feed. Tanush's own words: with a lot of ads you
+     scroll down, and then you want new ones without hunting for a control.
+     Bridged onto window.SNYPD because switchView and the tab handlers live in
+     a different closure - same pattern as awardXP/marketCheck. No first-paint
+     race to guard here (unlike loadStreakAndXP, see its own note): this only
+     ever runs from a real tap, long after both closures have set up.
+
+     `manual` drives the "Refreshing" chip. It is deliberately shown for a
+     minimum ~450ms even when the fetch returns instantly - a spinner that
+     vanishes in 40ms reads as nothing having happened, which is the exact
+     complaint this is fixing. */
+  let refreshBusy = false;
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.refreshFeed = async function () {
+    if (refreshBusy) return;
+    refreshBusy = true;
+    const chip = document.getElementById('feed-refreshing');
+    if (chip) chip.style.display = '';
+    const started = Date.now();
+    try {
+      await loadAds();
+    } catch (e) {
+      // loadAds owns its own error surface (the offline/backend-down banner);
+      // swallowing here only stops one bad tap from wedging refreshBusy.
+      console.error('SNYPD feed: manual refresh failed', e);
+    } finally {
+      const held = Date.now() - started;
+      if (held < 450) { await new Promise(r => setTimeout(r, 450 - held)); }
+      if (chip) chip.style.display = 'none';
+      refreshBusy = false;
+    }
+  };
 
   // ----------------- LOAD ADS (main logic) -----------------
 
