@@ -786,6 +786,10 @@
 <div class="k">Plan</div>
 <div class="v" data-snypd="plan">—</div>
 </div>
+<div class="row" id="foundingRow" style="display:none">
+<div class="k">Founding member</div>
+<div class="v" style="color:#A200FF;font-weight:700">Pro pricing locked for life</div>
+</div>
 <div class="row">
 <div class="k">Billing status</div>
 <div class="v" data-snypd="status">—</div>
@@ -1056,6 +1060,18 @@
       ? `Need to change your plan or payment method? <a class="mini-link" href="#" data-snypd-action="billingLink">Manage billing</a>.`
       : `You do not have an active membership. <a class="mini-link" href="#" data-snypd-action="billingLink">Choose a plan</a> to start tracking filters.`;
     setHTML("billingCopy", billingCopy);
+
+    // Isolated on purpose: is_founding_member (migration 019) may not exist
+    // yet on every deploy, and this badge is cosmetic -- a missing column
+    // here must never break the billing info above, which is why this is
+    // its own try/catch instead of a field in the main select().
+    try {
+      const { data: fmRow } = await sb.from("users").select("is_founding_member").eq("id", uid).maybeSingle();
+      const foundingRow = document.getElementById("foundingRow");
+      if (foundingRow && fmRow && fmRow.is_founding_member) {
+        foundingRow.style.display = "";
+      }
+    } catch (e) { /* badge just stays hidden */ }
 
     const notice = document.querySelector(`[data-snypd="notice"]`);
     if (notice){

@@ -3317,15 +3317,35 @@ const HEARTBEAT_URL = (() => {
 
   const EMPTY_ICON = '<svg width="28" height="28" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:0.6"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>';
 
-  function updateEmptyUI(hasRows) {
+  function updateEmptyUI(hasRows, lastMatchTs) {
     if (hasRows) {
       empty.style.display = 'none';
       return;
     }
-    empty.innerHTML = EMPTY_ICON + (running
-      ? 'No results yet. Sniping is running…'
-      : 'No results yet. Press “Start Sniping Now”.');
+    let msg;
+    if (!running) {
+      msg = 'No results yet. Press “Start Sniping Now”.';
+    } else if (lastMatchTs) {
+      // A genuinely quiet stretch (nothing new in the freshness window) reads
+      // as identical to a broken pipeline without this -- last match still
+      // exists, it's just older than DASHBOARD_MAX_AGE_MIN.
+      msg = `Quiet right now — last match ${relativeMinutesAgo(lastMatchTs)} ago.`;
+    } else {
+      msg = 'No results yet. Sniping is running…';
+    }
+    empty.innerHTML = EMPTY_ICON + msg;
     empty.style.display = 'block';
+  }
+
+  function relativeMinutesAgo(iso) {
+    const t = Date.parse(iso);
+    if (!Number.isFinite(t)) return 'a while';
+    const mins = Math.max(0, Math.round((Date.now() - t) / 60000));
+    if (mins < 1) return 'under a minute';
+    if (mins === 1) return '1 minute';
+    if (mins < 60) return `${mins} minutes`;
+    const hrs = Math.round(mins / 60);
+    return hrs === 1 ? '1 hour' : `${hrs} hours`;
   }
 
     // -------- freshness + ordering helpers ----------
@@ -3712,7 +3732,9 @@ const HEARTBEAT_URL = (() => {
     });
   })();
 
-  function renderRows(allRows) {
+  // lastMatchTs comes from main's empty-state work (see loadAds) - kept
+  // alongside this branch's claimed-item filter, both are needed.
+  function renderRows(allRows, lastMatchTs) {
     allRows.forEach(r => rowById.set(String(r.listing_id), r));
     // Claimed items leave the feed immediately (see showClaimReceipt's
     // caller) - filtered here too so a later poll within the same 30-min
@@ -3723,7 +3745,7 @@ const HEARTBEAT_URL = (() => {
       list.innerHTML = '';
       pendingNew = [];
       updatePill();
-      updateEmptyUI(false);
+      updateEmptyUI(false, lastMatchTs);
       hasRenderedOnce = true;
       return;
     }
@@ -3863,7 +3885,31 @@ const HEARTBEAT_URL = (() => {
         console.error('SNYPD: could not load first-seen prices', e);
       }
 
-      renderRows(rows);
+      let lastMatchTs = null;
+      if (!rows.length) {
+        // The main query above already filters uploaded_at_ts >= cutoffIso,
+        // so an empty result tells us nothing about WHY -- this second,
+        // unfiltered query exists only to answer "was there ever a match,
+        // and how long ago", so the empty state can say something more
+        // honest than a blank screen.
+        try {
+          const { data: last } = await sb
+            .from('current_ads')
+            .select('uploaded_at_ts')
+            .eq('user_id', uid)
+            .eq('is_visible', true)
+            .not('uploaded_at_ts', 'is', null)
+            .order('uploaded_at_ts', { ascending: false })
+            .limit(1);
+          lastMatchTs = last && last[0] ? last[0].uploaded_at_ts : null;
+        } catch (e) {
+          console.warn('Could not fetch last-match time', e);
+        }
+      }
+
+      renderRows(rows, lastMatchTs);
+      // lastSuccessfulSync is this branch's - the offline banner's "Last
+      // sync HH:MM - N min ago" line reads it, so it must keep being set.
       lastSuccessfulSync = new Date();
       set('tick-chip', `Last check: ${lastSuccessfulSync.toLocaleString()}`);
       show('err-chip', false);
