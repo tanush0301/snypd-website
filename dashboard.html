@@ -944,10 +944,24 @@ body {
 .hist-dq--pending { color: var(--text-muted); }
 .p.hist-profit-pos { color: var(--success) !important; }
 .p.hist-profit-neg { color: var(--danger) !important; }
-.hist-sale-form { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+/* README 5.4.5: the action is one full-width MARK SOLD under 45 days, and at
+   45 days or over it splits into two flex:1 buttons (STILL LISTED secondary +
+   SOLD primary). So this stacks vertically - the price input on its own line,
+   the prescribed button pair below it. It used to be a single nowrap row
+   holding the input plus up to three buttons in a content column that is only
+   201px wide on a 375px phone: it needed 276px, so "Remove" ran 75px past the
+   card and was clipped by .card's overflow:hidden (measured live). */
+/* The 250px cap is the design's own intended button width: the 2c artboard is
+   350px wide, and the content column is 350 - 13*2 card padding - 62 thumb -
+   12 gap = 250px. Without it a desktop History card is ~1200px wide and the
+   spec's "full-width MARK SOLD" became a 1198px button (measured live). A
+   phone's column is 201px, so mobile is unchanged by the cap. */
+.hist-sale-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-width: 250px; }
 .hist-sale-form input {
   height: 30px;
-  width: 100px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: rgba(0,0,0,0.35);
   border: 1px solid var(--border);
   color: var(--text-primary);
@@ -956,8 +970,13 @@ body {
   padding: 0 10px;
   border-radius: 0;
 }
-.hist-remove { margin-left: auto; opacity: 0.6; }
-.hist-remove:hover { opacity: 1; color: var(--danger); border-color: var(--danger); }
+.hist-actions { display: flex; gap: 6px; }
+.hist-actions .btn { flex: 1; min-width: 0; padding: 8px; font-size: 10.5px; letter-spacing: 0.06em; }
+/* Remove has no equivalent in the mockup at all, so it sits below the
+   prescribed pair as a quiet tertiary affordance rather than competing with
+   them as a third button. */
+.hist-remove { align-self: flex-end; opacity: 0.6; padding: 2px 0; }
+.hist-remove:hover { opacity: 1; color: var(--danger); }
 
 .claim-hint {
   font-size: 11px;
@@ -2609,7 +2628,7 @@ const HEARTBEAT_URL = (() => {
               <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')} · bought ${eur(row.bought_price_cents)}${soldPart}</div>
               ${dqLine}
               <div class="hist-sale-form">
-                <button class="btn btn-ghost hist-remove" type="button" data-remove-claim="${row.id}">Remove from history</button>
+                <button class="btn btn-tertiary hist-remove" type="button" data-remove-claim="${row.id}">Remove from history</button>
               </div>
             </div>
           </div>`;
@@ -2630,9 +2649,11 @@ const HEARTBEAT_URL = (() => {
             ${dqLine}
             <div class="hist-sale-form" data-sale-form>
               <input type="number" step="0.01" min="0" placeholder="Sold for" data-sale-input />
-              <button class="btn btn-prim" type="button" data-mark-sold="${row.id}">Mark sold</button>
-              ${stale ? `<button class="btn btn-ghost" type="button" data-still-listed="${row.id}">Still listed</button>` : ''}
-              <button class="btn btn-ghost hist-remove" type="button" data-remove-claim="${row.id}" data-claimed-at="${esc(row.claimed_at || '')}" title="Claimed by mistake? Remove it.">Remove</button>
+              <div class="hist-actions">
+                ${stale ? `<button class="btn btn-ghost" type="button" data-still-listed="${row.id}">Still listed</button>` : ''}
+                <button class="btn btn-prim" type="button" data-mark-sold="${row.id}">${stale ? 'Sold' : 'Mark sold'}</button>
+              </div>
+              <button class="btn btn-tertiary hist-remove" type="button" data-remove-claim="${row.id}" data-claimed-at="${esc(row.claimed_at || '')}" title="Claimed by mistake? Remove it.">Remove</button>
             </div>
           </div>
         </div>`;
@@ -2740,6 +2761,9 @@ const HEARTBEAT_URL = (() => {
         // first time this was actually used - see migration 023. Confirmed
         // first, same pattern filters.html already uses for its own delete.
         if (!confirm('Remove this from your history? This cannot be undone.')) return;
+        // Keep the original label: the Sold card's button reads "Remove from
+        // history", so restoring a hardcoded 'Remove' on failure relabelled it.
+        const removeLabel = removeBtn.textContent;
         removeBtn.disabled = true;
         removeBtn.textContent = 'Removing...';
         try {
@@ -2756,7 +2780,7 @@ const HEARTBEAT_URL = (() => {
         } catch (err) {
           console.error('SNYPD history: could not remove claim', err);
           removeBtn.disabled = false;
-          removeBtn.textContent = 'Remove';
+          removeBtn.textContent = removeLabel;
         }
         return;
       }
