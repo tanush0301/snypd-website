@@ -2925,12 +2925,25 @@ const HEARTBEAT_URL = (() => {
         try {
           const claimId = removeBtn.dataset.removeClaim;
           const claimedAt = removeBtn.dataset.claimedAt;
-          const { error } = await sb
+          // .select('id') matters here, not just for logging: a delete RLS
+          // blocks still comes back with error === null (PostgREST answers
+          // 204 whether it deleted one row or filtered the request down to
+          // zero), so an unconditional "no error -> reverse the XP" is not
+          // safe - confirmed live 2026-09-14 that this exact silent-zero-row
+          // delete currently happens in production (migration 023's delete
+          // policy was found not applied). Without this check, a user could
+          // click Remove, see the item stay in Holding, and still lose the
+          // claim's XP as if the undo had actually happened.
+          const { data: removed, error } = await sb
             .from('user_claims')
             .delete()
             .eq('id', claimId)
-            .eq('user_id', uid);
+            .eq('user_id', uid)
+            .select('id');
           if (error) throw error;
+          if (!removed || !removed.length) {
+            throw new Error('Remove did not affect any row - refusing to reverse XP for a claim that is still there');
+          }
           await reverseClaimXPIfWithin24h(claimId, claimedAt);
           await loadClaims();
         } catch (err) {
