@@ -1,0 +1,4 @@
+# This repo has no build step, so Vercel serves every committed file at its
+# own path by default, same as any real page. ops/ holds dev/QA tooling
+# (see ops/qa_mock.js) that should stay in git history but never deploy.
+ops/
