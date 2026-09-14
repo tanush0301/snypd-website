@@ -2044,8 +2044,14 @@ const HEARTBEAT_URL = (() => {
   const fmtMoney = (n, curr = 'EUR') => {
     const code = (curr || 'EUR').toUpperCase();
     const sym = CURRENCY_SYMBOLS[code];
-    const body = n.toFixed(2).replace(/\.00$/, '');
-    return sym ? sym + body : code + ' ' + body;
+    // Sign goes on the outside. A bare `n.toFixed(2)` on a negative number
+    // (a sale at a loss - see History's own hist-profit-neg) keeps the "-"
+    // inside the body, putting the sign after the currency symbol instead
+    // of before it.
+    const neg = n < 0;
+    const body = Math.abs(n).toFixed(2).replace(/\.00$/, '');
+    const signed = sym ? sym + body : code + ' ' + body;
+    return neg ? '-' + signed : signed;
   };
   const fmtPrice = (amt, curr = 'EUR') => {
     if (amt == null || amt === '') return '';
@@ -2139,6 +2145,22 @@ const HEARTBEAT_URL = (() => {
     } catch (e) {
       console.error('SNYPD XP: could not check prior', eventType, e);
       return true; // fail toward not double-crediting, not toward a duplicate award
+    }
+  }
+
+  // Belt-and-suspenders alongside seedClaimedIds() (below, near claimedIds
+  // itself): that seed only runs once per page load, so it can't see a
+  // claim made a moment ago from a second open tab. A live check right
+  // before the insert closes that gap without adding a real cost - this
+  // only runs once per click, not per poll.
+  async function claimExistsForListing(listingId) {
+    try {
+      const { data, error } = await sb.from('user_claims').select('id').eq('user_id', uid).eq('listing_id', Number(listingId) || -1).limit(1);
+      if (error) throw error;
+      return (data || []).length > 0;
+    } catch (e) {
+      console.error('SNYPD: could not check prior claim for listing', listingId, e);
+      return true; // fail toward not double-claiming/double-XP
     }
   }
 
@@ -2647,7 +2669,12 @@ const HEARTBEAT_URL = (() => {
     function eur(cents) {
       if (cents == null) return '—';
       // RISK 10: pinned format, not a locale one - see fmtMoney's own note.
-      return window.SNYPD.fmtMoney(cents / 100, 'EUR');
+      // Same "Held NaNd" bug class as daysHeld below guards against - a
+      // non-finite value must degrade to the dash, never print a currency
+      // symbol next to "NaN".
+      const n = Number(cents) / 100;
+      if (!Number.isFinite(n)) return '—';
+      return window.SNYPD.fmtMoney(n, 'EUR');
     }
 
     function daysHeld(claimedAt) {
@@ -2673,7 +2700,12 @@ const HEARTBEAT_URL = (() => {
       if (already) return;
       const earnedTodayForEvent = await xpEventSumToday('reconcile');
       if (earnedTodayForEvent >= 25) return;
-      await awardXP('reconcile', 5, itemId, {});
+      // Clamped to the remaining headroom under this event's own 25/day
+      // ceiling, not a flat 5 - awardXP already clamps the GLOBAL 200/day
+      // ceiling to whatever's left, which can leave earnedTodayForEvent at
+      // a non-multiple-of-5 (e.g. 23); a flat +5 there would land at 28,
+      // a few XP past this event's own documented cap.
+      await awardXP('reconcile', Math.min(5, 25 - earnedTodayForEvent), itemId, {});
     }
 
     // E4: 15 XP for logging any terminal outcome, once per item (spec section
@@ -3197,6 +3229,15 @@ const HEARTBEAT_URL = (() => {
       return { name: tier.name, next, pct };
     }
 
+    // RISK 10 applied to XP, not just money: `.toLocaleString()` uses the
+    // visitor's own browser/OS locale, which for any EU locale that groups
+    // thousands with a period renders "7.200 XP" instead of "7,200 XP" -
+    // same bug class already fixed once for prices, unaddressed here until
+    // now. Fixed-format, same regex the Market Report's own num() uses.
+    function fmtCount(n) {
+      return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
     // xp-spec.md section 5: "Tier-up is detected by comparing tier(xp_before)
     // vs tier(xp_after) on insert; that transition is what fires the notif."
     // Done here (on every recompute) rather than only inside awardXP so a
@@ -3251,12 +3292,12 @@ const HEARTBEAT_URL = (() => {
         if (xpErr) throw xpErr;
         xpTotal = (xpRows || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
         const t = tierFor(xpTotal);
-        tierLabel = `${t.name.toUpperCase()} · ${xpTotal.toLocaleString()} XP`;
+        tierLabel = `${t.name.toUpperCase()} · ${fmtCount(xpTotal)} XP`;
 
         tierText.textContent = tierLabel;
         fill.style.width = `${Math.round(t.pct * 100)}%`;
         nextText.textContent = t.next
-          ? `${(t.next.floor - xpTotal).toLocaleString()} XP to ${t.next.name}`
+          ? `${fmtCount(t.next.floor - xpTotal)} XP to ${t.next.name}`
           : 'Top tier reached';
 
         maybeShowRankUp(t.name);
@@ -3312,6 +3353,14 @@ const HEARTBEAT_URL = (() => {
     // is out of scope from over there, hence the window.SNYPD hand-off.
     window.SNYPD = window.SNYPD || {};
     window.SNYPD.loadStreakAndXP = loadStreakAndXP;
+    // Same reason: awardDealQualityBonus (a sibling of the claim handler,
+    // outside this closure) used to call the bare `loadClaims()` name to
+    // refresh History right after a claim's deal-quality lookup resolves -
+    // that threw a silent ReferenceError caught by its own try/catch, so
+    // the bonus was written to the DB but the "pending" card never flipped
+    // to the real amount until the user happened to leave and reopen
+    // History. Bridged the same way as loadStreakAndXP above.
+    window.SNYPD.loadClaims = loadClaims;
 
     function switchView(view) {
       // 'profile' is reachable (via the topbar's right-side cluster) but is
@@ -3810,6 +3859,28 @@ const HEARTBEAT_URL = (() => {
   // current_ads itself (see that migration's comment for why).
   const firstSeenPriceByListing = new Map();
 
+  // claimedIds only ever grew in-memory (added by the Claim click handler
+  // below), so a page reload forgot every earlier claim in this same
+  // session: a still-listed, already-claimed item reappeared with a live
+  // "Claim" button, and clicking it inserted a second user_claims row for
+  // the same listing plus a second E2 award (capped at 4/day, so not
+  // unlimited, but still a real duplicate History entry and double XP).
+  // Seeded once from the real table so a reload restores the same
+  // disabled "Claimed" state cardHTML() already knows how to render.
+  let claimedIdsSeeded = false;
+  async function seedClaimedIds() {
+    if (claimedIdsSeeded) return;
+    claimedIdsSeeded = true;
+    try {
+      const { data, error } = await sb.from('user_claims').select('listing_id').eq('user_id', uid).not('listing_id', 'is', null);
+      if (error) throw error;
+      for (const r of (data || [])) claimedIds.add(String(r.listing_id));
+    } catch (e) {
+      console.error('SNYPD: could not preload already-claimed listing ids', e);
+      claimedIdsSeeded = false; // retry on the next loadAds() rather than silently under-protecting forever
+    }
+  }
+
   const cardHTML = (r) => {
     const { amount, currency } = derivePrice(r);
     const priceLabel = fmtPrice(amount, currency);
@@ -3969,7 +4040,12 @@ const HEARTBEAT_URL = (() => {
         // so it flips to the real amount without the user needing to leave
         // and reopen the History tab. Safe to call even if History was never
         // opened this session; it just populates it invisibly.
-        loadClaims();
+        // loadClaims() lives in a different closure (the History/Profile
+        // IIFE) - bare `loadClaims()` here threw a silent ReferenceError,
+        // swallowed by this function's own catch below, so the bonus was
+        // written to the DB but the card never actually flipped out of
+        // "pending" until the user happened to leave and reopen History.
+        if (window.SNYPD && typeof window.SNYPD.loadClaims === 'function') window.SNYPD.loadClaims();
       }
     } catch (e) {
       console.error('SNYPD XP: deal-quality bonus lookup failed (no bonus awarded)', e);
@@ -3996,6 +4072,14 @@ const HEARTBEAT_URL = (() => {
     const originalLabel = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Claiming...';
+
+    if (await claimExistsForListing(listingId)) {
+      claimedIds.add(String(listingId));
+      btn.textContent = String.fromCharCode(0x2713) + ' Claimed';
+      btn.classList.remove('btn-prim');
+      btn.classList.add('btn-claimed');
+      return;
+    }
 
     const { amount, currency } = derivePrice(row);
     const boughtCents = (amount != null && Number.isFinite(Number(amount)))
@@ -4199,6 +4283,8 @@ const HEARTBEAT_URL = (() => {
     setLoading(true);
     try {
       console.log('Dashboard user_id:', uid);
+
+      await seedClaimedIds();
 
       const cutoffIso = new Date(Date.now() - DASHBOARD_MAX_AGE_MIN * 60 * 1000).toISOString();
 
@@ -4920,7 +5006,11 @@ const HEARTBEAT_URL = (() => {
   function eur(cents) {
     if (cents == null || isNaN(cents)) { return '?'; }
     var v = cents / 100;
-    return EUR + (v >= 100 ? Math.round(v).toString() : v.toFixed(2).replace(/\.00$/, ''));
+    // Used to round to a whole number at v >= 100, silently dropping real
+    // cents (EUR273.70 -> "EUR274") on exactly the price range (sneakers,
+    // streetwear) this feature exists for - contradicts the pinned format
+    // fmtMoney already gets right elsewhere on the same page.
+    return EUR + v.toFixed(2).replace(/\.00$/, '');
   }
 
   async function token() {
