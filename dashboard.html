@@ -1517,6 +1517,16 @@ body {
     .filter-sheet__new { border: 1px dashed var(--border-hover); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
     .filter-sheet__new-title { font-size: 12.5px; color: var(--text-muted); }
     .filter-sheet__new-hint { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+    /* Building a filtered Vinted catalog URL is realistically a desktop-web
+       action - Vinted's native mobile app doesn't expose a copyable filtered
+       search link the way a browser address bar does. Disclosed, not
+       enforced: some users can still copy a link from mobile web Vinted, so
+       the field stays enabled - this just sets expectations honestly, same
+       doctrine as the free-tier/Vinted-unreachable disclosures elsewhere. */
+    .filter-sheet__mobile-notice { display: none; }
+    @media (max-width: 767px) {
+      .filter-sheet__mobile-notice { display: block; font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+    }
     .filter-sheet__new-form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
     .filter-sheet__new-form input {
       background: var(--field, #191C1E); border: 1px solid var(--border); color: var(--text-primary);
@@ -1640,6 +1650,7 @@ body {
     <div class="filter-sheet__new" id="filter-sheet-new">
       <div class="filter-sheet__new-title">+ New hunt — brand, size, price cap</div>
       <div class="filter-sheet__new-hint">Built here. No Vinted link to copy — the app can't read one from the Vinted app anyway.</div>
+      <div class="filter-sheet__mobile-notice">Building a filtered Vinted search works best from a computer - come back here once you've got the link.</div>
       <div class="filter-sheet__new-form">
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
         <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
