@@ -866,6 +866,29 @@
       var root = document.currentScript.closest(".snypd-pricing");
       if (!root) return;
 
+      // Prefill the buyer's email on the embedded checkout (closes the
+      // Whop-linking-by-email gap - a checkout under a different address
+      // never links back to the account). Must happen before the Whop
+      // loader script (in <head>, async defer) scans the DOM and creates
+      // its iframes - verified live that setting this attribute AFTER an
+      // iframe already exists does nothing, the loader only reads it once
+      // at mount. Read synchronously from Supabase's own persisted session
+      // in localStorage (same default key format supabase-js itself uses:
+      // sb-<project-ref>-auth-token) rather than the async getSession()
+      // used below for the plan lookup - by the time that resolves, the
+      // loader has already mounted the iframes with no email. Verified end
+      // to end against the real Whop loader with a seeded session: the
+      // resulting checkout iframe's own src includes the email parameter.
+      try {
+        var storedRaw = window.localStorage.getItem("sb-igbuqanjocfmahlzzupc-auth-token");
+        var storedEmail = storedRaw && JSON.parse(storedRaw).user && JSON.parse(storedRaw).user.email;
+        if (storedEmail) {
+          root.querySelectorAll("[data-whop-checkout-plan-id]").forEach(function (el) {
+            el.setAttribute("data-whop-checkout-prefill-email", storedEmail);
+          });
+        }
+      } catch (e) { /* no stored session, or unreadable - checkout still works, just unprefilled */ }
+
       var signupUrl = "/signup";
       var fallbackManageUrl = "https://whop.com/@me/settings/orders/";
       var activeStatuses = ["active", "trialing", "past_due", "unpaid"];
