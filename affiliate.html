@@ -91,6 +91,82 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     .sub { color: var(--muted); font-size: 15px; margin: 0 0 36px; max-width: 60ch; }
 
+
+    /* ---- public partner pitch ----------------------------------------
+       Renders for everyone, signed in or not. The recruitment copy used to
+       live only inside #stateNotPartner, which a signed-OUT visitor never
+       reaches - so anyone arriving from Whop's affiliate marketplace or a
+       cold pitch hit a sign-in wall instead of the offer. */
+    .pitch { margin: 0 0 40px; }
+    .pitch-lead {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .pitch-lead .pitch-rate {
+      font-size: clamp(34px, 7vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin: 0 0 8px;
+      color: var(--brand);
+    }
+    .pitch-lead p:not(.pitch-rate) { color: var(--muted); font-size: 15px; margin: 0; max-width: 62ch; }
+    .pitch h3 {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+    .pitch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .pitch-card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .earn-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+    .earn-row:last-child { border-bottom: 0; }
+    .earn-row b { font-weight: 700; color: var(--success); white-space: nowrap; }
+    .earn-note { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+    .steps { margin: 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
+    .steps li { margin-bottom: 10px; }
+    .steps li:last-child { margin-bottom: 0; }
+    .steps b { color: var(--text); font-weight: 600; }
+    .terms { list-style: none; margin: 0; padding: 0; }
+    .terms li {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .terms li:last-child { border-bottom: 0; }
+    .terms span { color: var(--text); text-align: right; }
+    .faq-q { font-weight: 600; margin: 16px 0 4px; font-size: 15px; }
+    .faq-a { color: var(--muted); font-size: 14px; margin: 0; }
+    .pitch-cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+    .pitch-cta .fineprint { color: var(--muted); font-size: 13px; }
+
     /* ---- states ---- */
     .state {
       border: 1px solid var(--border);
@@ -250,10 +326,98 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <a class="backlink" href="/dashboard">&larr; Back to dashboard</a>
 </div>
 
-<h1>Partner earnings</h1>
-<p class="sub">Your referrals and commission, live from Whop. You are already signed in &mdash; there is nothing else to log into.</p>
+<h1>Partner with SNYPD</h1>
+<p class="sub">Earn 30% of every subscription you refer &mdash; every month, for as long as they stay. Free to join, and you do not need to be a customer.</p>
 
 <!-- Loading -->
+<!-- Public partner pitch. Not a .state element, so show() never hides it. -->
+<section class="pitch" id="partnerPitch">
+
+  <div class="pitch-lead">
+    <p class="pitch-rate">30% recurring</p>
+    <p>You earn 30% of what every subscriber you refer pays SNYPD - not once, but
+       every month, for as long as they stay subscribed. If they stay a year, one
+       referral pays you twelve times.</p>
+  </div>
+
+  <div class="pitch-grid">
+    <div class="pitch-card">
+      <h3>What you earn</h3>
+      <div class="earn-row"><span>Kickstart &mdash; &euro;14.99/mo</span> <b>&euro;4.50 /mo</b></div>
+      <div class="earn-row"><span>Pro &mdash; &euro;24.99/mo</span> <b>&euro;7.50 /mo</b></div>
+      <div class="earn-row"><span>Elite &mdash; &euro;39.99/mo</span> <b>&euro;12.00 /mo</b></div>
+      <p class="earn-note">Per referral, every month. Ten Elite subscribers who stay
+         is &euro;120 a month, recurring, without referring anyone new.</p>
+    </div>
+
+    <div class="pitch-card">
+      <h3>How it works</h3>
+      <ol class="steps">
+        <li><b>Get your link.</b> Whop generates a personal referral link the moment
+            you join. Nothing to install.</li>
+        <li><b>Share it</b> where resellers already are - your bio, a story, a
+            Discord, a video description.</li>
+        <li><b>Get paid every month.</b> Whop tracks the referral and pays your
+            commission for as long as that person stays subscribed.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="pitch-grid">
+    <div class="pitch-card">
+      <h3>The terms, in full</h3>
+      <ul class="terms">
+        <li>Commission <span>30% recurring, all paid plans</span></li>
+        <li>How long it pays <span>As long as they stay subscribed</span></li>
+        <li>Attribution window <span>30 days from the click</span></li>
+        <li>Free signups <span>Pay nothing - paid plans only</span></li>
+        <li>Payouts <span>Handled by Whop, not by us</span></li>
+        <li>Cost to join <span>Nothing</span></li>
+      </ul>
+    </div>
+
+    <div class="pitch-card">
+      <h3>Who this actually works for</h3>
+      <p class="faq-a">People who already have the ear of resellers: Vinted and
+         sneaker accounts, reselling Discords, YouTube or TikTok channels about
+         flipping, and anyone running a community where people hunt underpriced
+         stock. SNYPD is a tool for EU Vinted resellers. If that is not your
+         audience this will not convert for you, and we would rather say so now
+         than waste your posts.</p>
+    </div>
+  </div>
+
+  <div class="pitch-card">
+    <h3>Questions people actually ask</h3>
+
+    <p class="faq-q" style="margin-top:0">Do I need to be a SNYPD customer to promote it?</p>
+    <p class="faq-a">No. Anyone can join. If you are a paying member you earn the
+       same 30%.</p>
+
+    <p class="faq-q">What if someone signs up free and upgrades later?</p>
+    <p class="faq-a">You still get paid, as long as they upgrade within the 30-day
+       attribution window from their click.</p>
+
+    <p class="faq-q">How established is this program?</p>
+    <p class="faq-a">Early, and you should hear that from us rather than find out.
+       SNYPD is a small, live product with real paying users, not a large program
+       with hundreds of partners. That is exactly why the rate is what it is: we
+       would rather pay the people who show up first properly than advertise a
+       number nobody actually earns.</p>
+
+    <p class="faq-q">Can I run paid ads on the SNYPD brand name?</p>
+    <p class="faq-a">No. Bidding on our own brand terms means we pay commission on
+       customers who were already looking for us. Everything else is fair game.</p>
+
+    <div class="pitch-cta" id="joinCta">
+      <a class="btn" href="/support">Become a partner</a>
+      <span class="fineprint">Free to join. Tell us where your audience is and we
+        will set you up.</span>
+    </div>
+  </div>
+
+</section>
+
 <div class="state" id="stateLoading">
 <h2 class="skeleton" style="width:200px">Loading</h2>
 <p class="skeleton" style="width:320px">Loading your partner data</p>
@@ -282,6 +446,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <!-- The dashboard -->
 <div class="hidden" id="stateOk">
+
+<h2 style="margin:0 0 6px">Your earnings</h2>
+<p class="sub" style="margin:0 0 24px">Your referrals and commission, live from Whop. You are already signed in &mdash; there is nothing else to log into.</p>
 
 <div class="grid">
 <div class="card accent">
@@ -337,6 +504,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   function show(id) {
     ['stateLoading', 'stateSignedOut', 'stateNotPartner', 'stateUnavailable', 'stateOk']
       .forEach(function (s) { el(s).classList.toggle('hidden', s !== id); });
+    // Already a partner: the pitch stays (it is their terms of record),
+    // but do not invite them to join something they are already in.
+    var cta = el('joinCta');
+    if (cta) { cta.classList.toggle('hidden', id === 'stateOk'); }
   }
   function text(id, v) {
     var n = el(id);
