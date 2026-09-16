@@ -1878,7 +1878,7 @@ body {
 <div class="hd">
 <div class="status-bar">
 <div class="chip plan">Market Insights</div>
-<div class="chip neutral" id="mr-tier-chip">Elite</div>
+<div class="chip neutral" id="mr-tier-chip">Pro &amp; Elite</div>
 </div>
 <p class="tiny-note" style="margin-top:10px">Median asking price and sample size for any item, computed live across current Vinted listings, broken down by condition.</p>
 <div class="mr-row" id="mr-controls" style="margin-top:10px">
@@ -1889,7 +1889,7 @@ body {
 <div class="mr-chips" id="mr-chips" style="display:none"></div>
 <div class="mr-quota" id="mr-quota" style="display:none"></div>
 <div class="mr-locked" id="mr-locked" style="display:none">
-<h3>Market Report is part of Elite</h3>
+<h3>Market Report is part of Pro and Elite</h3>
 <p>See what an item actually sells for across Vinted right now, broken down by condition, with a warning when the listings are too mixed to trust a single price.</p>
 <a class="btn btn-prim" href="/plans">View plans</a>
 </div>
@@ -2338,7 +2338,7 @@ const HEARTBEAT_URL = (() => {
   // form of the URL instead, using the exact same derivation filters.html
   // already used, rather than inventing fields that were never captured.
   (function filterSheet() {
-    const FS_LIMIT = { free: 1, kickstart: 2, pro: 5, elite: 7 };
+    const FS_LIMIT = { free: 1, kickstart: 2, pro: 5, elite: 10 };
     const pill = document.getElementById('filter-pill');
     const pillCount = document.getElementById('filter-pill-count');
     const overlay = document.getElementById('filter-sheet-overlay');
@@ -2749,13 +2749,14 @@ const HEARTBEAT_URL = (() => {
     // never writes a row when ineligible, so there is no separate "ineligible"
     // state to render - only "awarded" (a real deal_quality row exists) or
     // "pending" (it doesn't, yet - or won't, which reads the same by design).
-    // Elite-only (see awardDealQualityBonus's own comment for why): a Free
-    // account shows neither line, since "pending market data" would be a lie -
-    // it will never resolve for them under a plan that has no market data.
+    // Pro and Elite only (see awardDealQualityBonus's own comment for why):
+    // Free and Kickstart show neither line, since "pending market data" would
+    // be a lie - it will never resolve for them under a plan with no Price
+    // Intelligence access.
     function dealQualityLineHTML(row, dealQualityByItem) {
       const dq = dealQualityByItem.get(String(row.id));
       if (dq != null) return `<div class="hist-dq hist-dq--awarded">+${dq} XP quality bonus</div>`;
-      if (effectivePlan === 'elite') return `<div class="hist-dq hist-dq--pending">Quality bonus pending market data</div>`;
+      if (effectivePlan === 'elite' || effectivePlan === 'pro') return `<div class="hist-dq hist-dq--pending">Quality bonus pending market data</div>`;
       return '';
     }
 
@@ -2832,11 +2833,11 @@ const HEARTBEAT_URL = (() => {
         const stale = holding.filter(r => daysHeld(r.claimed_at) >= STALE_DAYS);
         lastStaleItems = stale;
 
-        // Elite only - see dealQualityLineHTML/awardDealQualityBonus. Best-
-        // effort: a failed lookup here just means every card shows "pending"
-        // a little longer, never blocks history from loading.
+        // Pro and Elite only - see dealQualityLineHTML/awardDealQualityBonus.
+        // Best-effort: a failed lookup here just means every card shows
+        // "pending" a little longer, never blocks history from loading.
         const dealQualityByItem = new Map();
-        if (effectivePlan === 'elite' && rows.length) {
+        if ((effectivePlan === 'elite' || effectivePlan === 'pro') && rows.length) {
           try {
             const ids = rows.map(r => r.id).filter(Boolean);
             const { data: dqRows, error: dqErr } = await sb
@@ -3414,7 +3415,8 @@ const HEARTBEAT_URL = (() => {
       if (!slot) return;
       e.preventDefault();
       switchView('market');
-      if (document.body.dataset.plan === 'elite' && window.SNYPD && window.SNYPD.marketCheck) {
+      const _mcPlan = document.body.dataset.plan;
+      if ((_mcPlan === 'elite' || _mcPlan === 'pro') && window.SNYPD && window.SNYPD.marketCheck) {
         window.SNYPD.marketCheck(slot.dataset.marketCheck);
       }
       const panel = document.getElementById('market-panel');
@@ -4018,7 +4020,7 @@ const HEARTBEAT_URL = (() => {
   // so this can't disagree with what the Market Insights tab itself would
   // show for the same query.
   async function awardDealQualityBonus(itemId, itemTitle, boughtCents) {
-    if (effectivePlan !== 'elite') return;
+    if (effectivePlan !== 'elite' && effectivePlan !== 'pro') return;
     if (!itemTitle || boughtCents == null) return;
     try {
       const t = session && session.access_token;
@@ -5316,7 +5318,7 @@ const HEARTBEAT_URL = (() => {
   function showLocked() {
     if (controls) { controls.style.display = 'none'; }
     if (locked) { locked.style.display = 'block'; }
-    if (tierChip) { tierChip.textContent = 'Elite only'; }
+    if (tierChip) { tierChip.textContent = 'Pro & Elite only'; }
     /* A locked panel has no search box, so tappable queries under it would be
        dead controls. Same for the quota line - there is nothing to spend. */
     if (chipsBox) { chipsBox.style.display = 'none'; }
@@ -5331,7 +5333,7 @@ const HEARTBEAT_URL = (() => {
   }
 
   function applyPlan(plan) {
-    if (plan === 'elite') { showUnlocked(); } else { showLocked(); }
+    if (plan === 'elite' || plan === 'pro') { showUnlocked(); } else { showLocked(); }
   }
 
   goBtn.addEventListener('click', run);
