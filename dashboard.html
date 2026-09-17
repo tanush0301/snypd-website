@@ -3770,7 +3770,7 @@ const HEARTBEAT_URL = (() => {
 
     // -------- freshness + ordering helpers ----------
 
-  function uploadedTimeMs(row) {
+  function knownUploadTimeMs(row) {
     if (row?.uploaded_at_ts) {
       const t = Date.parse(row.uploaded_at_ts);
       if (Number.isFinite(t)) return t;
@@ -3781,11 +3781,14 @@ const HEARTBEAT_URL = (() => {
       if (Number.isFinite(n) && n > 0) return n * 1000;
     }
 
-    if (row?.fetched_at) {
-      const t = Date.parse(row.fetched_at);
-      if (Number.isFinite(t)) return t;
-    }
+    return 0;
+  }
 
+  function uploadedTimeMs(row) {
+    const uploaded = knownUploadTimeMs(row);
+    if (uploaded) return uploaded;
+
+    // Repeated fetches must not make an old match look newly discovered.
     if (row?.created_at) {
       const t = Date.parse(row.created_at);
       if (Number.isFinite(t)) return t;
@@ -3917,10 +3920,11 @@ const HEARTBEAT_URL = (() => {
     const status = r.status;
     const src   = r.content_source;
 
+    const knownUploadMs = knownUploadTimeMs(r);
     const uploadedMs = uploadedTimeMs(r) || Date.now();
     const dt = new Date(uploadedMs);
     const fullLabel =
-      `Uploaded on Vinted at ${new Intl.DateTimeFormat('en-GB', {
+      `${knownUploadMs ? 'Uploaded on Vinted' : 'First seen by SNYPD'} at ${new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Europe/Berlin',
         year: 'numeric',
         month: 'long',
@@ -3944,7 +3948,7 @@ const HEARTBEAT_URL = (() => {
     // per-viewer "have you seen this" flag - there's no per-user seen-state
     // tracked anywhere to base that on. 15 min matches this dashboard's own
     // freshness window elsewhere on the page.
-    const isNew = (Date.now() - uploadedMs) < 15 * 60 * 1000;
+    const isNew = knownUploadMs > 0 && (Date.now() - knownUploadMs) < 15 * 60 * 1000;
     // DROP: a real, measured decrease against the price this exact listing
     // first showed at for this user (migration 029) - never shown alongside
     // NEW, since a listing only ever earns a first-seen record after its
@@ -3990,7 +3994,7 @@ const HEARTBEAT_URL = (() => {
             </div>
           </div>
           <div class="muted" title="${esc(fullLabel)}">
-            ${[brand, size, status, src, relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
+            ${[brand, size, status, src, (knownUploadMs ? '' : 'Seen ') + relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
           <div class="card-actions">
             <a class="btn btn-ghost card-link" href="${esc(r.url || '#')}" target="_blank" rel="noopener">Open on Vinted</a>
@@ -4339,8 +4343,10 @@ const HEARTBEAT_URL = (() => {
           .from('current_ads')
           .select(columns)
           .eq('user_id', uid)
-          .gte('uploaded_at_ts', cutoffIso)
-          .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
+          // The catalogue API no longer supplies upload times. Keep known
+          // upload ages authoritative; otherwise use the first database insert.
+          .or(`uploaded_at_ts.gte.${cutoffIso},and(uploaded_at_ts.is.null,created_at.gte.${cutoffIso})`)
+          .order('created_at', { ascending: false, nullsFirst: false })
           .order('listing_id', { ascending: false })
           .limit(80);
       }
@@ -4396,7 +4402,7 @@ const HEARTBEAT_URL = (() => {
 
       let lastMatchTs = null;
       if (!rows.length) {
-        // The main query above already filters uploaded_at_ts >= cutoffIso,
+        // The main query above already filters to the freshness window,
         // so an empty result tells us nothing about WHY -- this second,
         // unfiltered query exists only to answer "was there ever a match,
         // and how long ago", so the empty state can say something more
@@ -4404,13 +4410,13 @@ const HEARTBEAT_URL = (() => {
         try {
           const { data: last } = await sb
             .from('current_ads')
-            .select('uploaded_at_ts')
+            .select('uploaded_at_ts,uploaded_ts,created_at')
             .eq('user_id', uid)
             .eq('is_visible', true)
-            .not('uploaded_at_ts', 'is', null)
-            .order('uploaded_at_ts', { ascending: false })
+            .order('created_at', { ascending: false })
             .limit(1);
-          lastMatchTs = last && last[0] ? last[0].uploaded_at_ts : null;
+          const lastMs = last && last[0] ? uploadedTimeMs(last[0]) : 0;
+          lastMatchTs = lastMs ? new Date(lastMs).toISOString() : null;
         } catch (e) {
           console.warn('Could not fetch last-match time', e);
         }
