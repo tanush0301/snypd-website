@@ -22,7 +22,7 @@ function section(start, end) {
 const now = Date.now();
 const minutesAgo = n => new Date(now - n * 60000).toISOString();
 const context = vm.createContext({
-  Date, Intl, console,
+  Date, Intl, URL, console,
   DASHBOARD_MAX_AGE_MIN: 30,
   claimedIds: new Set(),
   firstSeenPriceByListing: new Map(),
@@ -34,7 +34,7 @@ const context = vm.createContext({
   relativeTime: () => '2m ago',
 });
 vm.runInContext(section('  function knownUploadTimeMs(', '  // -------- helpers for mapping'), context);
-vm.runInContext(section('  const cardHTML =', '  // E3:'), context);
+vm.runInContext(section('  function vintedListingUrl(', '  // E3:'), context);
 
 const recent = { listing_id: 1, title: 'Jordan 4', created_at: minutesAgo(2),
   fetched_at: minutesAgo(0), uploaded_at_ts: null, uploaded_ts: null };
@@ -53,6 +53,15 @@ let card = vm.runInContext('cardHTML(row)', context);
 assert(card.includes('First seen by SNYPD at '));
 assert(card.includes('Seen 2m ago'));
 assert(!card.includes('card-badge--new'));
+assert(card.includes('href="https://www.vinted.be/items/1"'));
+assert.equal(context.vintedListingUrl({ listing_id: 1, url: '/items/1-jordan' }),
+  'https://www.vinted.be/items/1-jordan');
+assert.equal(context.vintedListingUrl({ listing_id: 1, url: 'https://www.vinted.fr/items/1' }),
+  'https://www.vinted.fr/items/1');
+assert.equal(context.vintedListingUrl({ listing_id: 1, url: 'javascript:alert(1)' }),
+  'https://www.vinted.be/items/1');
+assert.equal(context.vintedListingUrl({ listing_id: 1, url: '//example.com/items/1' }),
+  'https://www.vinted.be/items/1');
 context.row = known;
 card = vm.runInContext('cardHTML(row)', context);
 assert(card.includes('Uploaded on Vinted at '));

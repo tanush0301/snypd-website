@@ -3899,6 +3899,16 @@ const HEARTBEAT_URL = (() => {
     }
   }
 
+  function vintedListingUrl(row) {
+    try {
+      const url = new URL(row.url || `/items/${row.listing_id}`, 'https://www.vinted.be');
+      if (url.protocol === 'https:' && /^(www\.)?vinted\.[a-z.]+$/.test(url.hostname)) {
+        return url.href;
+      }
+    } catch (_) {}
+    return `https://www.vinted.be/items/${encodeURIComponent(row.listing_id)}`;
+  }
+
   const cardHTML = (r) => {
     const { amount, currency } = derivePrice(r);
     const priceLabel = fmtPrice(amount, currency);
@@ -3997,7 +4007,7 @@ const HEARTBEAT_URL = (() => {
             ${[brand, size, status, src, (knownUploadMs ? '' : 'Seen ') + relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
           <div class="card-actions">
-            <a class="btn btn-ghost card-link" href="${esc(r.url || '#')}" target="_blank" rel="noopener">Open on Vinted</a>
+            <a class="btn btn-ghost card-link" href="${esc(vintedListingUrl(r))}" target="_blank" rel="noopener">Open on Vinted</a>
             ${isGone
               ? ''
               : `<button class="btn ${alreadyClaimed ? 'btn-claimed' : 'btn-prim'} claim-btn" type="button" data-listing="${r.listing_id}" ${alreadyClaimed ? 'disabled' : ''}>${alreadyClaimed ? (String.fromCharCode(0x2713) + ' Claimed') : 'Claim'}</button>`}
@@ -4113,7 +4123,7 @@ const HEARTBEAT_URL = (() => {
         brand_title: row.brand_title || null,
         size_title: row.size_title || null,
         image_url: getImageUrl(row) || null,
-        vinted_url: row.url || null,
+        vinted_url: vintedListingUrl(row),
         bought_price_cents: boughtCents,
         status: 'holding'
       }).select('id').single();
