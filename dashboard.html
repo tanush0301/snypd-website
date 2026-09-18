@@ -2474,6 +2474,7 @@ const HEARTBEAT_URL = (() => {
         const { error } = await sb.from('user_searches').update({ is_active: next }).eq('id', id).eq('user_id', uid);
         if (error) console.error('SNYPD filter sheet: could not toggle hunt', error);
         await reloadHunts();
+        await loadAds();
         return;
       }
       if (e.target.closest('[data-fs-delete]')) {
@@ -2481,6 +2482,7 @@ const HEARTBEAT_URL = (() => {
         const { error } = await sb.from('user_searches').delete().eq('id', id).eq('user_id', uid);
         if (error) console.error('SNYPD filter sheet: could not delete hunt', error);
         await reloadHunts();
+        await loadAds();
       }
     });
 
@@ -3902,11 +3904,35 @@ const HEARTBEAT_URL = (() => {
   function vintedListingUrl(row) {
     try {
       const url = new URL(row.url || `/items/${row.listing_id}`, 'https://www.vinted.be');
-      if (url.protocol === 'https:' && /^(www\.)?vinted\.[a-z.]+$/.test(url.hostname)) {
+      if (url.protocol === 'https:' && !url.username && !url.password && !url.port &&
+          /^(www\.)?vinted\.(be|fr|nl|de|it|es|pt|at|lu|ie|co\.uk|com|pl|cz|sk|lt|lv|ee|fi|se|dk|hu|ro|hr|si|gr)$/.test(url.hostname) &&
+          /^\/items\/[0-9]+(?:-|$)/.test(url.pathname)) {
         return url.href;
       }
     } catch (_) {}
     return `https://www.vinted.be/items/${encodeURIComponent(row.listing_id)}`;
+  }
+
+  function vintedLinkTarget() {
+    // Keep a direct user-initiated universal link on iOS home-screen installs.
+    // Opening a new window there was verified to open an embedded browser.
+    return typeof navigator !== 'undefined' && navigator.standalone === true
+      ? '_self' : '_blank';
+  }
+
+  function savedSearchSignature(value) {
+    try {
+      const url = new URL(value);
+      const volatile = new Set(['page', 'per_page', 'order', 'time', 'search_id']);
+      const pairs = [...url.searchParams].filter(([key, val]) => !volatile.has(key) && val)
+        .sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0);
+      return JSON.stringify([url.hostname.toLowerCase(), url.pathname.replace(/\/+$/, '') || '/', pairs]);
+    } catch (_) { return null; }
+  }
+
+  function matchesActiveSearch(row, activeSearches) {
+    const proof = row.item_box && row.item_box.snypd_filter_contract;
+    return proof?.version === 1 && activeSearches.has(proof.search);
   }
 
   const cardHTML = (r) => {
@@ -4007,7 +4033,7 @@ const HEARTBEAT_URL = (() => {
             ${[brand, size, status, src, (knownUploadMs ? '' : 'Seen ') + relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
           <div class="card-actions">
-            <a class="btn btn-ghost card-link" href="${esc(vintedListingUrl(r))}" target="_blank" rel="noopener">Open on Vinted</a>
+            <a class="btn btn-ghost card-link" href="${esc(vintedListingUrl(r))}" target="${vintedLinkTarget()}" rel="noopener external">Open on Vinted</a>
             ${isGone
               ? ''
               : `<button class="btn ${alreadyClaimed ? 'btn-claimed' : 'btn-prim'} claim-btn" type="button" data-listing="${r.listing_id}" ${alreadyClaimed ? 'disabled' : ''}>${alreadyClaimed ? (String.fromCharCode(0x2713) + ' Claimed') : 'Claim'}</button>`}
@@ -4316,6 +4342,13 @@ const HEARTBEAT_URL = (() => {
       await seedClaimedIds();
 
       const cutoffIso = new Date(Date.now() - DASHBOARD_MAX_AGE_MIN * 60 * 1000).toISOString();
+      const { data: activeHunts, error: huntsError } = await sb.from('user_searches')
+        .select('vinted_url').eq('user_id', uid).eq('is_active', true);
+      if (huntsError) {
+        renderRows([], null);
+        throw huntsError;
+      }
+      const activeSearches = new Set((activeHunts || []).map(h => savedSearchSignature(h.vinted_url)).filter(Boolean));
 
       const CORE_AD_COLUMNS = `
           listing_id,
@@ -4353,6 +4386,7 @@ const HEARTBEAT_URL = (() => {
           .from('current_ads')
           .select(columns)
           .eq('user_id', uid)
+          .eq('item_box->snypd_filter_contract->>version', '1')
           // The catalogue API no longer supplies upload times. Keep known
           // upload ages authoritative; otherwise use the first database insert.
           .or(`uploaded_at_ts.gte.${cutoffIso},and(uploaded_at_ts.is.null,created_at.gte.${cutoffIso})`)
@@ -4375,6 +4409,7 @@ const HEARTBEAT_URL = (() => {
       if (error) throw error;
 
       const rows = (data || [])
+        .filter(r => matchesActiveSearch(r, activeSearches))
         .filter(r => !(r.promoted || r.content_source === 'search_promoted_items'))
         .filter(isFreshListing)
         .sort(sortNewestUploadedFirst)
@@ -4420,12 +4455,14 @@ const HEARTBEAT_URL = (() => {
         try {
           const { data: last } = await sb
             .from('current_ads')
-            .select('uploaded_at_ts,uploaded_ts,created_at')
+            .select('uploaded_at_ts,uploaded_ts,created_at,item_box')
             .eq('user_id', uid)
+            .eq('item_box->snypd_filter_contract->>version', '1')
             .eq('is_visible', true)
             .order('created_at', { ascending: false })
-            .limit(1);
-          const lastMs = last && last[0] ? uploadedTimeMs(last[0]) : 0;
+            .limit(80);
+          const lastMatching = (last || []).find(row => matchesActiveSearch(row, activeSearches));
+          const lastMs = lastMatching ? uploadedTimeMs(lastMatching) : 0;
           lastMatchTs = lastMs ? new Date(lastMs).toISOString() : null;
         } catch (e) {
           console.warn('Could not fetch last-match time', e);
@@ -4451,6 +4488,7 @@ const HEARTBEAT_URL = (() => {
             .from('current_ads')
             .select('fetched_at')
             .eq('user_id', uid)
+            .eq('item_box->snypd_filter_contract->>version', '1')
             .not('fetched_at', 'is', null)
             .order('fetched_at', { ascending: false })
             .limit(1);

@@ -22,7 +22,7 @@ function section(start, end) {
 const now = Date.now();
 const minutesAgo = n => new Date(now - n * 60000).toISOString();
 const context = vm.createContext({
-  Date, Intl, URL, console,
+  Date, Intl, URL, console, Set, navigator: { standalone: false },
   DASHBOARD_MAX_AGE_MIN: 30,
   claimedIds: new Set(),
   firstSeenPriceByListing: new Map(),
@@ -62,6 +62,24 @@ assert.equal(context.vintedListingUrl({ listing_id: 1, url: 'javascript:alert(1)
   'https://www.vinted.be/items/1');
 assert.equal(context.vintedListingUrl({ listing_id: 1, url: '//example.com/items/1' }),
   'https://www.vinted.be/items/1');
+for (const url of ['https://vinted.evil.tld/items/1', 'https://www.vinted.be.evil.tld/items/1',
+  'https://user:password@www.vinted.be/items/1', 'https://www.vinted.be/member/signup']) {
+  assert.equal(context.vintedListingUrl({ listing_id: 1, url }), 'https://www.vinted.be/items/1');
+}
+assert.equal(context.vintedLinkTarget(), '_blank');
+context.navigator.standalone = true;
+assert.equal(context.vintedLinkTarget(), '_self');
+assert(vm.runInContext('cardHTML(row)', context).includes('target="_self"'));
+context.navigator.standalone = false;
+const hunt = 'https://www.vinted.be/catalog?search_text=jordan&price_from=150&currency=EUR&size_ids[]=784';
+const signature = context.savedSearchSignature(hunt);
+assert.equal(signature, context.savedSearchSignature(hunt + '&time=123&search_id=5&order=newest_first'));
+const active = new Set([signature]);
+assert.equal(context.matchesActiveSearch({}, active), false, 'Legacy rows must not reach the feed');
+assert.equal(context.matchesActiveSearch({ item_box: { snypd_filter_contract: {
+  version: 1, search: signature } } }, active), true);
+assert.equal(context.matchesActiveSearch({ item_box: { snypd_filter_contract: {
+  version: 1, search: signature } } }, new Set()), false, 'Paused/deleted searches must not match');
 context.row = known;
 card = vm.runInContext('cardHTML(row)', context);
 assert(card.includes('Uploaded on Vinted at '));
@@ -76,6 +94,7 @@ context.cutoffIso = minutesAgo(30);
 vm.runInContext(section('      function adsQuery(', '      // is_suspicious'), context);
 context.adsQuery('listing_id');
 assert(calls.some(c => c[0] === 'eq' && c[1] === 'user_id' && c[2] === 'test-user'));
+assert(calls.some(c => c[0] === 'eq' && c[1] === 'item_box->snypd_filter_contract->>version' && c[2] === '1'));
 assert(calls.some(c => c[0] === 'or' && c[1] ===
   `uploaded_at_ts.gte.${context.cutoffIso},and(uploaded_at_ts.is.null,created_at.gte.${context.cutoffIso})`));
 assert(calls.some(c => c[0] === 'limit' && c[1] === 80));
