@@ -4614,11 +4614,12 @@ const HEARTBEAT_URL = (() => {
 
   async function sendHeartbeat() {
     try {
-      await fetch(HEARTBEAT_URL, {
+      const response = await fetch(HEARTBEAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: uid })
       });
+      if (!response.ok) throw new Error(`Heartbeat HTTP ${response.status}`);
       heartbeatMisses = 0;
     } catch (e) {
       console.error(e);
@@ -4728,8 +4729,15 @@ const HEARTBEAT_URL = (() => {
     if (document.visibilityState === 'visible') {
       hiddenSince = null;
       touchActivity(); // coming back counts as activity â†’ resumes immediately
+      if (!manualPaused) loadAds().catch(console.error);
     } else {
       hiddenSince = Date.now(); // start grace timer
+    }
+  });
+  window.addEventListener('pageshow', () => {
+    if (!manualPaused && document.visibilityState === 'visible') {
+      touchActivity();
+      loadAds().catch(console.error);
     }
   });
 
