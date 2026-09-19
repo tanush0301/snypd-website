@@ -4464,10 +4464,19 @@ const HEARTBEAT_URL = (() => {
           .select(columns)
           .eq('user_id', uid)
           .eq('item_box->snypd_filter_contract->>version', '1')
-          // The catalogue API no longer supplies upload times. Keep known
-          // upload ages authoritative; otherwise use the first database insert.
-          .or(`uploaded_at_ts.gte.${cutoffIso},and(uploaded_at_ts.is.null,created_at.gte.${cutoffIso})`)
-          .order('created_at', { ascending: false, nullsFirst: false })
+          // Hard 30-minute gate, fail-closed. Vinted's 2026-09-15 API
+          // migration stopped sending upload times; the scraper now restores
+          // them from the listing id (scraper-worker/src/id_clock.py), so a
+          // row WITHOUT one is a row whose real age we cannot prove, and it
+          // is not shown. The fallback that used to live here read created_at
+          // -- when WE first inserted the row -- which let a listing uploaded
+          // days ago pass as fresh simply because we first noticed it a
+          // minute ago. Measured live 2026-09-18 before the fix: 13% of the
+          // feed was stale that way, including listings 4 and 5 days old
+          // rendered as "Seen 11m ago". Sorting is by real upload time too,
+          // not by insert order, so the newest upload is genuinely on top.
+          .gte('uploaded_at_ts', cutoffIso)
+          .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
           .order('listing_id', { ascending: false })
           .limit(80);
       }
