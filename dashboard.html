@@ -1533,6 +1533,12 @@ body {
       padding: 10px 12px; font-family: var(--font); font-size: 12.5px;
     }
     .filter-sheet__limit-note { font-size: 10.5px; color: var(--warning); line-height: 1.5; }
+    .fs-floor { display: flex; align-items: center; gap: 8px; }
+    .fs-floor label { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
+    .fs-floor__cur { font-size: 10.5px; color: var(--text-muted); }
+    .filter-sheet__new-form .fs-floor input { width: 88px; }
+    .fs-floor__note { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+    .fs-floor__note.is-warn { color: var(--warning); }
     .filter-sheet__footer { display: flex; gap: 9px; }
     .wiz-presets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
     .wiz-preset {
@@ -1654,6 +1660,12 @@ body {
       <div class="filter-sheet__new-form">
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
         <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
+        <div class="fs-floor">
+          <label for="filter-new-minprice">Minimum price</label>
+          <span class="fs-floor__cur">EUR</span>
+          <input type="number" id="filter-new-minprice" min="0" step="1" value="30" inputmode="numeric" />
+        </div>
+        <p class="fs-floor__note" id="filter-new-floor-note"></p>
         <button class="btn btn-prim" id="filter-new-save" type="button" disabled>Save search</button>
       </div>
       <p class="filter-sheet__limit-note" id="filter-sheet-limit-note" style="display:none"></p>
@@ -2294,8 +2306,9 @@ const HEARTBEAT_URL = (() => {
   const effectivePlan = isActivePaidPlan ? rawPlan : 'free';
 
   // Published for the Market Report panel further down the page, which shows
-  // itself only to Elite. This is presentation only -- the real gate is the
-  // backend, which returns 403 elite_required regardless of what this says.
+  // itself to Pro and Elite. This is presentation only -- the real gate is
+  // the backend, which returns 403 elite_required regardless of what this
+  // says.
   // effectivePlan already degrades a lapsed paid plan to 'free', which is the
   // behaviour wanted here too.
   document.body.dataset.plan = effectivePlan;
@@ -2348,6 +2361,8 @@ const HEARTBEAT_URL = (() => {
     const urlInput = document.getElementById('filter-new-url');
     const saveBtn = document.getElementById('filter-new-save');
     const limitNote = document.getElementById('filter-sheet-limit-note');
+    const minPriceInput = document.getElementById('filter-new-minprice');
+    const floorNote = document.getElementById('filter-new-floor-note');
     const doneBtn = document.getElementById('filter-sheet-done');
     if (!pill || !overlay) return;
 
@@ -2361,6 +2376,60 @@ const HEARTBEAT_URL = (() => {
         return /(^|\.)vinted\./i.test(x.hostname) && x.pathname.replace(/\/+$/, '') === '/catalog' && x.search.length > 1;
       } catch (e) { return false; }
     }
+    // WHY NEW HUNTS GET A DEFAULT MINIMUM PRICE
+    // Measured live 2026-09-18 against the real Vinted catalogue gateway: the
+    // SAME search with and without a floor returns a different market entirely.
+    //   "zara"                  -> median EUR10   (fast fashion, never a flip)
+    //   "zara" + price_from=150 -> median EUR190  (vintage/collab, real stock)
+    //   "jordan"                -> median EUR20
+    //   "jordan travis scott" + price_from=150 -> median EUR299
+    // In production every clean saved search carries a price_from and every junk
+    // one is a hand-typed search_text with no filters at all. The floor, not the
+    // brand, is what separates them - so the paste path now gets the discipline
+    // the wizard presets already had (all of them ship price_from=150.0).
+    // Pre-filled and visible rather than injected silently: this is a nudge, not
+    // a rewrite of what the user asked for. Clearing the box is a real choice.
+    const DEFAULT_MIN_PRICE = 30;
+
+    function floorValue() {
+      const raw = String(minPriceInput ? minPriceInput.value : '').trim();
+      if (!raw) return null;
+      const n = Number(raw);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    }
+
+    function applyPriceFloor(u) {
+      const floor = floorValue();
+      if (floor === null) return u;
+      try {
+        const x = new URL(u);
+        // A floor the user already built on Vinted itself always wins. Never
+        // override it, and never add a currency param - the backend contract
+        // (catalogue_contract.build_catalogue_request) sets currency from the
+        // marketplace and REJECTS a search whose currency disagrees with it.
+        if (x.searchParams.has('price_from')) return u;
+        x.searchParams.set('price_from', String(floor));
+        return x.toString();
+      } catch (e) { return u; }
+    }
+
+    function paintFloorNote() {
+      if (!floorNote) return;
+      const u = urlInput.value.trim();
+      const floor = floorValue();
+      let own = false;
+      try { own = new URL(u).searchParams.has('price_from'); } catch (e) { own = false; }
+      floorNote.classList.remove('is-warn');
+      if (u && own) {
+        floorNote.textContent = 'This link sets its own minimum price, so yours is kept as-is.';
+      } else if (floor === null) {
+        floorNote.textContent = 'No minimum set. Most Vinted items under EUR30 are fast fashion, not resale stock.';
+        floorNote.classList.add('is-warn');
+      } else {
+        floorNote.textContent = 'Will watch items from EUR' + floor + ' up. Clear the box to watch everything.';
+      }
+    }
+
     function shortUrl(u) {
       try {
         const x = new URL(u);
@@ -2439,7 +2508,7 @@ const HEARTBEAT_URL = (() => {
       saveBtn.disabled = true;
       try {
         const { data: inserted, error } = await sb.from('user_searches')
-          .insert({ user_id: uid, search_name: name || nameFromUrl(url), vinted_url: url, is_active: true })
+          .insert({ user_id: uid, search_name: name || nameFromUrl(url), vinted_url: applyPriceFloor(url), is_active: true })
           .select('id').single();
         if (error) throw error;
         // Same E6 event the wizard's skip path already awards - first hunt
@@ -2447,6 +2516,8 @@ const HEARTBEAT_URL = (() => {
         const hadHuntBefore = await xpEventExistsEver('first_hunt', null);
         if (!hadHuntBefore) await awardXP('first_hunt', 20, inserted ? inserted.id : null, {});
         nameInput.value = ''; urlInput.value = '';
+        if (minPriceInput) minPriceInput.value = String(DEFAULT_MIN_PRICE);
+        paintFloorNote();
         await reloadHunts();
       } catch (e) {
         console.error('SNYPD filter sheet: could not save hunt', e);
@@ -2461,6 +2532,12 @@ const HEARTBEAT_URL = (() => {
     doneBtn.addEventListener('click', closeSheet);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSheet(); });
     saveBtn.addEventListener('click', addHunt);
+    if (minPriceInput) {
+      minPriceInput.value = String(DEFAULT_MIN_PRICE);
+      minPriceInput.addEventListener('input', paintFloorNote);
+    }
+    urlInput.addEventListener('input', paintFloorNote);
+    paintFloorNote();
 
     listEl.addEventListener('click', async (e) => {
       const row = e.target.closest('.fs-row');
