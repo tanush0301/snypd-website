@@ -399,7 +399,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
   
   <style>
     /* ==========================================================================
@@ -624,394 +624,262 @@
     }
 
     /* ==========================================================================
-       5. APP REVEAL (The Dashboard Mockup based on actual SNYPD UI)
+       5. THE INTERCEPT - hero product cinematic
+       --------------------------------------------------------------------------
+       Replaces the pre-2026-09 .app-window mockup, which still rendered a left
+       sidebar, a "PLAN - ELITE" chip and a StockX nav item. The real dashboard
+       has been topbar-based ("Ledger") since 2026-09-03 and StockX was dropped
+       months before that, so the old block advertised a UI that no longer
+       exists. Every token below was read out of the live dashboard.html :root
+       on 2026-09-20 (--success is #00E5A0; the #35e7dc in that same file is
+       scoped to .snypd-sidebar, which no longer exists), not from a design doc.
+
+       SAFETY CONTRACT - see CLAUDE.md READ FIRST #4 (feat/higgsfield-design).
+       Nothing here may hide content if the script does not run:
+         * no CSS rule anywhere in this component sets a card to opacity 0.
+           The arriving catch is dimmed only by an inline style written from
+           inside a real animation frame, so every path that ends in "the loop
+           never ran" - no JS, thrown JS, throttled rAF, reduced motion -
+           leaves all six catches visible;
+         * there is no scroll listener, no ScrollTrigger, no scroll-linked
+           anything. The shot list is a time-based loop over one transform.
        ========================================================================== */
-    .app-reveal-wrapper {
+    .ic {
       position: relative;
       width: 100%;
       max-width: 1280px;
-      margin: 80px auto 0;
+      margin: 72px auto 0;
       padding: 0 24px;
-      opacity: 0;
-      transform: translateY(100px) scale(0.95);
-      animation: appReveal 1.2s var(--ease) 0.5s forwards;
-      perspective: 1000px;
+      /* Deliberately no entrance animation on this wrapper. The block it
+         replaced used opacity:0 + a forwards keyframe; that is the shape of
+         the bug that left pricing and the FAQ invisible in August, and the
+         hero copy above already carries the page's entrance. */
     }
 
-    @keyframes appReveal {
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .app-window {
+    /* The lens. Clips the camera and defines the 16:9 shot. */
+    .ic-frame {
+      position: relative;
       width: 100%;
-      height: 700px;
-      background: var(--dash-bg);
-      border-radius: var(--radius-sm); /* smaller radius like screenshot */
-      box-shadow: 
-        0 40px 100px rgba(0, 0, 0, 0.9),
-        0 0 0 1px #444,
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      aspect-ratio: 16 / 9;
       overflow: hidden;
-      display: flex;
-      position: relative;
+      background: #08090A;
+      border: 1px solid #2A2F33;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+      container-type: inline-size;
     }
-    
-    /* SNYPD Logo Styling (Strikethrough) */
-    .snypd-logo {
-      position: relative;
-      font-family: var(--font-mono);
-      color: var(--purple);
-      font-weight: 700;
-      letter-spacing: 6px;
-      display: inline-block;
+    .ic-fit { position: absolute; inset: 0; }
+    .ic-cam {
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 50%;
+      transform: scale(1);   /* the wide shot, and the static fallback */
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
+    /* ---- the Ledger render ------------------------------------------------ */
+    /* The dashboard is authored against a 1200x675 design space so the camera
+       keyframes are deterministic, but it is sized in em off a container-query
+       font-size rather than in px: 1em is exactly 16 design pixels at any
+       frame width, so the layout never reflows and needs no JS, no resize
+       listener and no scale() wrapper.
+       (An earlier revision tried transform: scale(calc(100cqw / 1200)) and it
+       silently did nothing - that calc yields a length, and scale() takes a
+       unitless number. Caught by reading the computed transform, not by
+       looking at the page.)
+       Without container-query units the fallback font-size leaves the render
+       at its native design size, cropped to the frame - still a legible
+       dashboard, which is the bar the fallback has to clear. */
+    .ic-app {
+      --ic-bg: #0B0C0D;
+      --ic-panel-header: #101214;
+      --ic-image: #131517;
+      --ic-border: #1E2225;
+      --ic-text: #EDEFF0;
+      --ic-text2: #A6ADB1;
+      --ic-muted: #7C8489;
+      --ic-mint: #00E5A0;
+      --ic-mono: 'DM Mono', ui-monospace, 'JetBrains Mono', monospace;
+
+      width: 100%;
+      height: 100%;
       font-size: 16px;
+      background: var(--ic-bg);
+      color: var(--ic-text);
+      font-family: var(--ic-mono);
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: 0;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
     }
-    .snypd-logo::after {
-      content: '';
+    @supports (width: 1cqw) {
+      .ic-app { font-size: calc(100cqw / 75); }   /* 1200 design px / 16 */
+    }
+    /* Ledger law: no radius, no shadow, no glow, no bold anywhere inside the
+       app render. The frame around it may have a shadow - that is the
+       marketing page presenting a screenshot, not the app. */
+    .ic-app * { font-weight: 400; border-radius: 0; box-shadow: none; }
+
+    .ic-topbar {
+      flex: 0 0 3em;
+      display: flex;
+      align-items: center;
+      gap: 1.75em;
+      /* 2em, not the app's own 1.5em: the camera overscans slightly on the
+         drift, and 1.5em let it clip the leading characters of "Plan:" at
+         the resting frame. Caught by screenshotting the wide shot. */
+      padding: 0 2em;
+      background: var(--ic-panel-header);
+      border-bottom: 1px solid var(--ic-border);
+    }
+    .ic-wordmark { color: var(--ic-text); font-size: 0.9375em; letter-spacing: 0.22em; }
+    .ic-wordmark i { font-style: normal; color: var(--ic-mint); }
+    .ic-tabs { display: flex; gap: 1.375em; }
+    .ic-tab {
+      font-size: 0.71875em;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--ic-muted);
+      padding: 0.25em 0;
+      border-bottom: 0.17em solid transparent;
+    }
+    /* Ledger: the active nav tab is white text + a mint underline, never a
+       purple fill - purple is action-fill-only and measures 3.65:1 as text. */
+    .ic-tab.is-active { color: var(--ic-text); border-bottom-color: var(--ic-mint); }
+    .ic-topright { margin-left: auto; display: flex; align-items: center; gap: 0.875em; }
+    .ic-status { display: flex; align-items: center; gap: 0.4375em; font-size: 0.6875em; letter-spacing: 0.09em; color: var(--ic-mint); text-transform: uppercase; }
+    /* Square, not a circle - Ledger status marks are squares. */
+    .ic-orb { width: 0.6em; height: 0.6em; background: var(--ic-mint); }
+    .ic-chip { font-size: 0.625em; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.3em 0.8em; border: 1px solid var(--ic-border); color: var(--ic-text2); }
+
+    .ic-strip {
+      flex: 0 0 3.25em;
+      display: flex;
+      align-items: center;
+      gap: 1.625em;
+      padding: 0 2em;
+      font-size: 0.6875em;
+      letter-spacing: 0.05em;
+      color: var(--ic-muted);
+      border-bottom: 1px solid var(--ic-border);
+    }
+    .ic-strip b { color: var(--ic-text2); }
+    .ic-strip .ic-mint { color: var(--ic-mint); }
+    .ic-stop { margin-left: auto; border: 1px solid var(--ic-border); color: var(--ic-text2); padding: 0.55em 1.3em; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    .ic-body { flex: 1 1 auto; padding: 2em; overflow: hidden; }
+    /* The shipped rule is repeat(auto-fit, minmax(170px, 300px)); at this
+       container width it resolves to exactly four 264px tracks, so this is
+       what the real dashboard renders, not a simplification of it. */
+    .ic-grid { display: grid; grid-template-columns: repeat(4, 16.5em); gap: 1em; }
+
+    .ic-card { background: rgba(255,255,255,0.02); border: 1px solid var(--ic-border); overflow: hidden; }
+    .ic-thumbwrap { position: relative; }
+    .ic-thumb { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--ic-image); }
+    .ic-badge {
+      position: absolute; top: 0.5em; left: 0.5em;
+      font-size: 0.53125em; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.35em 0.8em; color: var(--ic-bg); background: var(--ic-mint);
+    }
+    .ic-info { padding: 0.75em; display: flex; flex-direction: column; gap: 0.375em; min-width: 0; }
+    .ic-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75em; min-width: 0; }
+    /* The shipped card keeps the title on one line and ellipsises it. At
+       hero scale that cut "Off-White x Nike Air Jordan 1 Chicago The Ten"
+       down to "Off-White ...", which defeats the point of showing it, so
+       this render allows two lines - the same relaxation dashboard.html
+       already makes for itself at narrow widths (.card .t { white-space:
+       normal }). Disclosed deviation, not an accident. */
+    .ic-t {
+      font-size: 0.75em; color: var(--ic-text); min-width: 0; flex: 1 1 auto;
+      white-space: normal; overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    }
+    .ic-pricecol { flex: 0 0 auto; text-align: right; }
+    .ic-p { font-size: 0.9375em; color: var(--ic-text); white-space: nowrap; }
+    .ic-ptotal { font-size: 0.5625em; color: var(--ic-muted); white-space: nowrap; margin-top: 0.1em; }
+    .ic-meta { font-size: 0.65625em; color: var(--ic-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Scan-line that sweeps the arriving catch. Decorative; invisible until
+       the script arms it. */
+    .ic-scan { position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; opacity: 0; }
+
+    .ic-vignette {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(125% 95% at 50% 42%, transparent 52%, rgba(0,0,0,0.6) 100%),
+        linear-gradient(to bottom, transparent 58%, rgba(3,4,9,0.97) 92%);
+    }
+
+    .ic-caption {
       position: absolute;
-      left: -5px;
-      right: 0px;
-      top: 50%;
-      height: 2px;
-      background: var(--purple);
-      transform: translateY(-50%);
-    }
-
-    /* --- Sidebar --- */
-    .dash-sidebar {
-      width: 260px;
-      background: var(--dash-sidebar);
-      border-right: 1px solid var(--dash-border);
-      display: flex;
-      flex-direction: column;
-      padding: 24px 20px;
-    }
-
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    
-    .hamburger {
-      width: 24px;
-      height: 24px;
-      background: #2a2a2a;
-      border: 1px solid #333;
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 3px;
-    }
-    .hamburger div {
-      width: 12px;
-      height: 1px;
-      background: #888;
-    }
-
-    .sidebar-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--dash-text-muted);
-      margin-bottom: 24px;
-      font-family: var(--font-mono);
-    }
-    .status-dot-grey {
-      width: 6px;
-      height: 6px;
-      background: #555;
-      border-radius: 50%;
-    }
-
-    .sidebar-sep {
-      height: 1px;
-      background: var(--dash-border);
-      margin-bottom: 24px;
-    }
-
-    .nav-items {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex: 1;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--dash-text-muted);
-      cursor: default;
-    }
-    
-    .nav-item.active {
-      background: #2a2a2a;
-      color: var(--dash-text);
-      position: relative;
-    }
-    
-    .nav-item.active::before {
-      content: '';
-      position: absolute;
-      left: -20px;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--purple);
-    }
-
-    .nav-icon {
-      width: 16px;
-      height: 16px;
-      opacity: 0.7;
-    }
-
-    .sidebar-bottom {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: auto;
-    }
-
-    .plan-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--dash-text-muted);
-    }
-    .plan-badge {
-      border: 1px solid var(--dash-border);
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
-
-    .btn-upgrade {
-      background: var(--purple);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 12px;
-      font-size: 13px;
-      font-weight: 600;
+      left: 0; right: 0; bottom: 3.2%;
       text-align: center;
-      cursor: default;
+      font-family: var(--font-mono);
+      font-size: clamp(9px, 1.05cqw, 13px);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.78);
+      padding: 0 24px;
+      pointer-events: none;
     }
 
-    /* --- Main Content --- */
-    .dash-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    .dash-header {
-      padding: 32px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .login-box {
-      border: 1px solid var(--dash-border);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      color: #777;
-    }
-
-    .dash-content {
-      padding: 0 40px;
-      flex: 1;
-    }
-
-    .engine-card {
-      background: var(--dash-card);
-      border: 1px solid #1a1a1a;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .engine-controls {
-      display: flex;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid #1a1a1a;
-      gap: 12px;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      background: #2a2a2a;
-      border-radius: 4px;
-      font-size: 11px;
-      color: #bbb;
-    }
-    
-    .status-badge.active {
-      color: var(--green);
-    }
-    .status-dot-green {
-      width: 6px;
-      height: 6px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--green);
-    }
-
-    .engine-actions {
-      margin-left: auto;
-      display: flex;
-      gap: 8px;
-    }
-    .btn-running {
-      background: var(--purple);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
+    .ic-note {
+      margin: 14px auto 0;
+      max-width: 780px;
+      text-align: center;
       font-size: 12px;
-      font-weight: 600;
-    }
-    .btn-stop {
-      background: #2a2a2a;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
+      line-height: 1.6;
+      color: var(--ink-tertiary);
     }
 
-    /* Feed Items */
-    .feed-container {
-      display: flex;
-      flex-direction: column;
-      padding: 8px;
-      background: #1e1e1e;
-      min-height: 200px;
-      position: relative;
-    }
-
-    .feed-item {
-      position: relative;
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      border-radius: 8px;
-      background: transparent;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      gap: 16px;
-      border: 1px solid transparent;
-      border-bottom: 1px solid #2a2a2a;
-      cursor: pointer;
-    }
-    .feed-item:last-child {
-      border-bottom: 1px solid transparent;
-    }
-    .feed-item:hover {
-      background: #252525;
-      transform: scale(1.02);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-      border: 1px solid rgba(191, 0, 255, 0.3);
-      z-index: 10;
-    }
-    
-    .feed-action {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%) translateX(10px);
-      opacity: 0;
-      background: var(--purple);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 100px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 15px rgba(191, 0, 255, 0.4);
-      pointer-events: auto;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .feed-item:hover .feed-action {
+    /* ---- the only states the SCRIPT unlocks ------------------------------- */
+    /* Neither of these can hide content: one paints a gradient, one blinks a
+       status dot. The attribute is set as the script's last init step. */
+    .ic[data-ic-ready="1"] .ic-scan.is-sweeping {
       opacity: 1;
-      transform: translateY(-50%) translateX(0);
+      background: linear-gradient(to bottom, transparent 0%, rgba(0,229,160,0.30) 46%, rgba(0,229,160,0.85) 50%, rgba(0,229,160,0.30) 54%, transparent 100%);
+    }
+    .ic[data-ic-ready="1"] .ic-orb { animation: icPulse 2.2s ease infinite; }
+    @keyframes icPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    /* Reduced motion: the script returns before setting data-ic-ready, so the
+       camera never moves and no card is ever dimmed. These are belt and
+       braces for anything CSS-driven. */
+    @media (prefers-reduced-motion: reduce) {
+      .ic-cam { transform: scale(1) !important; }
+      .ic-orb { animation: none !important; }
+      .ic-card { opacity: 1 !important; }
     }
 
-    .feed-img {
-      width: 60px;
-      height: 60px;
-      border-radius: 6px;
-      background-size: cover;
-      background-position: center;
-      background-color: #111;
-      flex-shrink: 0;
+    /* Phones get a coarser design space, not a shrunk desktop one.
+       Measured at 375px before this existed: the frame was 295px wide, so
+       1em came out at 3.9px and the entire dashboard was an illegible smudge.
+       Halving the design space to 576 px (36em) and dropping to two columns
+       doubles every glyph; the camera then works from its own keyframes,
+       below. This is the one place the render deliberately stops matching the
+       desktop app - a product shot nobody can read is worse than one that
+       shows fewer cards. */
+    @media (max-width: 768px) {
+      .ic { margin-top: 48px; padding: 0 16px; }
+      .ic-frame { aspect-ratio: 3 / 4; }
+      .ic-caption { padding: 0 12px; letter-spacing: 0.06em; }
+      .ic-note { font-size: 11px; }
+      .ic-grid { grid-template-columns: repeat(2, 16.5em); }
+      /* Measured at 375px: the four tabs wrapped onto two lines. Tighten
+         the gaps, keep each tab on one line, and drop the ELITE chip -
+         the strip underneath already says "Plan: ELITE", so nothing is
+         lost and the row fits in one line again. */
+      .ic-tab { white-space: nowrap; }
+      .ic-topbar { gap: 1.1em; }
+      .ic-tabs { gap: 1em; }
+      .ic-chip { display: none; }
     }
-
-    .feed-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .feed-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .feed-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .feed-price {
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .feed-meta {
-      font-size: 11px;
-      color: #888;
-    }
-
-    /* The Fade Out Gradient at the bottom */
-    .fade-out-bottom {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 300px;
-      background: linear-gradient(to bottom, transparent, var(--bg) 80%);
-      z-index: 50;
-      pointer-events: auto;
-      text-decoration: none;
+    @supports (width: 1cqw) {
+      @media (max-width: 768px) {
+        .ic-app { font-size: calc(100cqw / 36); }
+      }
     }
 
     /* ==========================================================================
@@ -1026,14 +894,9 @@
     }
 
     @media (max-width: 768px) {
-      .dash-sidebar { display: none; }
       .hero-title { font-size: 48px; }
       .btn-group { flex-direction: column; width: 100%; }
       .btn { width: 100%; }
-      .engine-controls { flex-wrap: wrap; }
-      .status-badge { flex: 1 1 100%; justify-content: center;}
-      .engine-actions { width: 100%; margin-left: 0; justify-content: space-between;}
-      .btn-running, .btn-stop { flex: 1;}
     }
 
 
@@ -1095,106 +958,374 @@
   
 
   <!-- The App Reveal -->
-  <div class="app-reveal-wrapper">
-    <div class="app-window">
-      
-      <!-- Sidebar -->
-      <div class="dash-sidebar">
-        <div class="sidebar-header">
-          <div class="snypd-logo">S N Y P D</div>
-          <div class="hamburger">
-            <div></div><div></div><div></div>
-          </div>
+  <!-- ==========================================================================
+       THE INTERCEPT - hero product cinematic
+       A camera move across a faithful render of the CURRENT dashboard ("Ledger",
+       topbar-based since 2026-09-03), holding six real catches pulled from
+       public.current_ads on 2026-09-20. Titles, brands, sizes, conditions,
+       prices, buyer-protection totals and upload times are the stored values -
+       nothing here is invented. Photos are Vinted's own, vendored into
+       /assets/hero/ rather than hotlinked, so a delisted item cannot blank the
+       hero. Scene clock is 06:08 UTC, which is why every card is inside the
+       30-minute freshness window the feed itself enforces.
+
+       If the script below never runs, this renders as a finished still: wide
+       shot, all six cards visible, caption in place. See the SAFETY CONTRACT
+       note in the stylesheet.
+       ========================================================================== -->
+  <div class="ic" id="intercept">
+    <div class="ic-frame">
+      <div class="ic-fit">
+        <div class="ic-cam" id="ic-cam">
+          <div class="ic-app">
+
+      <div class="ic-topbar">
+        <div class="ic-wordmark">SNYPD<i>_</i></div>
+        <div class="ic-tabs">
+          <div class="ic-tab is-active">Feed</div>
+          <div class="ic-tab">History &middot; 12</div>
+          <div class="ic-tab">Market Insights</div>
         </div>
-        
-        <div class="sidebar-status">
-          <div class="status-dot-grey"></div> IDLE
-        </div>
-        
-        <div class="sidebar-sep"></div>
-        
-        <div class="nav-items">
-          <div class="nav-item active">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            Dashboard
-          </div>
-          <div class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            Filters
-          </div>
-          <div class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-            StockX
-          </div>
-          <div class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            Account
-          </div>
-        </div>
-        
-        <div class="sidebar-bottom">
-          <div class="plan-info">
-            <div class="plan-badge">PLAN — ELITE</div>
-            <div>Support</div>
-          </div>
-          <button class="btn-upgrade">Upgrade plan</button>
+        <div class="ic-topright">
+          <div class="ic-status"><span class="ic-orb" id="ic-orb"></span>Running</div>
+          <div class="ic-chip">Plan &mdash; Elite</div>
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div class="dash-main">
-        <div class="dash-header">
-          <div class="snypd-logo" style="font-size:24px;">S N Y P D</div>
-        </div>
-
-        <div class="dash-content">
-          <div class="engine-card">
-            
-            <div class="engine-controls">
-              <div class="status-badge">
-                <div class="status-dot-grey"></div>
-                Plan: ELITE
-              </div>
-              <div class="status-badge active">
-                <div class="status-dot-green"></div>
-                Status: running
-              </div>
-              <div class="status-badge">
-                <div class="status-dot-grey"></div>
-                Last check: <span id="clock-display" style="color:var(--green)">Live feed</span>
-              </div>
-              
-              <div class="engine-actions">
-                <button class="btn-running">Running...</button>
-                <button class="btn-stop">Stop</button>
-              </div>
+            <div class="ic-strip">
+              <span>Plan: <b>ELITE</b></span>
+              <span>Status: <b class="ic-mint">running</b></span>
+              <span>Last check: <b>06:08:02</b></span>
+              <span class="ic-stop">Stop</span>
             </div>
 
-            <div class="feed-container" id="feed-container">
-              <!-- Initial static row from screenshot -->
-              <div class="feed-item">
-                <div class="feed-img" style="background-image:url('/assets/img/6a49f591f2b3031b92a87da3_1783074655.webp')"></div>
-                <div class="feed-info">
-                  <div class="feed-title-row">
-                    <div class="feed-title">Supreme 99 Football Top Black</div>
-                    <div class="feed-price">€ 120,00</div>
+            <div class="ic-body">
+              <div class="ic-grid">
+
+                <div class="ic-card" id="ic-catch">
+                  <div class="ic-thumbwrap">
+                    <img class="ic-thumb" src="/assets/hero/catch-offwhite-jordan1-chicago.webp" width="760" height="571" alt="Off-White x Nike Air Jordan 1 Chicago The Ten, size 44, caught on Vinted" loading="lazy" decoding="async">
+                    <span class="ic-badge">New</span>
+                    <span class="ic-scan" id="ic-scan"></span>
                   </div>
-                  <div class="feed-meta">Supreme • L • Very Good • search • Uploaded on Vinted at 04 July 2026 at 08:30:05</div>
+                  <div class="ic-info">
+                    <div class="ic-row">
+                      <div class="ic-t">Off-White x Nike Air Jordan 1 Chicago The Ten</div>
+                      <div class="ic-pricecol">
+                        <div class="ic-p">&euro;1200</div>
+                        <div class="ic-ptotal">&euro;1260.70 incl. protection</div>
+                      </div>
+                    </div>
+                    <div class="ic-meta">Jordan &bull; 44 &bull; Tr&egrave;s bon &eacute;tat &bull; just now</div>
+                  </div>
                 </div>
+
+                <div class="ic-card">
+                  <div class="ic-thumbwrap">
+                    <img class="ic-thumb" src="/assets/hero/catch-zanotti.webp" width="186" height="420" alt="Giuseppe Zanotti shoes, size 42, caught on Vinted" loading="lazy" decoding="async">
+                    <span class="ic-badge">New</span>
+                  </div>
+                  <div class="ic-info">
+                    <div class="ic-row">
+                      <div class="ic-t">Scarpe Giuseppe Zanotti</div>
+                      <div class="ic-pricecol">
+                        <div class="ic-p">&euro;300</div>
+                        <div class="ic-ptotal">&euro;315.70 incl. protection</div>
+                      </div>
+                    </div>
+                    <div class="ic-meta">Giuseppe Zanotti &bull; 42 &bull; Neuf avec &eacute;tiquette &bull; 2m ago</div>
+                  </div>
+                </div>
+
+                <div class="ic-card">
+                  <div class="ic-thumbwrap">
+                    <img class="ic-thumb" src="/assets/hero/catch-supreme-jordan-hoodie.webp" width="315" height="420" alt="Supreme x Jordan hoodie, size M, caught on Vinted" loading="lazy" decoding="async">
+                  </div>
+                  <div class="ic-info">
+                    <div class="ic-row">
+                      <div class="ic-t">Hoodie supreme x Jordan 2024</div>
+                      <div class="ic-pricecol">
+                        <div class="ic-p">&euro;100</div>
+                        <div class="ic-ptotal">&euro;105.70 incl. protection</div>
+                      </div>
+                    </div>
+                    <div class="ic-meta">Supreme x Jordan &bull; M &bull; Tr&egrave;s bon &eacute;tat &bull; 15m ago</div>
+                  </div>
+                </div>
+
+                <div class="ic-card">
+                  <div class="ic-thumbwrap">
+                    <img class="ic-thumb" src="/assets/hero/catch-dunk-laser-orange.webp" width="315" height="420" alt="Nike Dunk Low Pro Laser Orange, size 44, caught on Vinted" loading="lazy" decoding="async">
+                  </div>
+                  <div class="ic-info">
+                    <div class="ic-row">
+                      <div class="ic-t">Nike Dunk Low Pro ( Laser Orange)</div>
+                      <div class="ic-pricecol">
+                        <div class="ic-p">&euro;100</div>
+                        <div class="ic-ptotal">&euro;105.70 incl. protection</div>
+                      </div>
+                    </div>
+                    <div class="ic-meta">Nike &bull; 44 &bull; Bon &eacute;tat &bull; 20m ago</div>
+                  </div>
+                </div>
+
+                <div class="ic-card">
+                  <div class="ic-thumbwrap">
+                    <img class="ic-thumb" src="/assets/hero/catch-dunk-militaire.webp" width="315" height="420" alt="Nike Dunk militaire, size 39, caught on Vinted" loading="lazy" decoding="async">
+                  </div>
+                  <div class="ic-info">
+                    <div class="ic-row">
+                      <div class="ic-t">Dunk militaire</div>
+                      <div class="ic-pricecol">
+                        <div class="ic-p">&euro;50</div>
+                        <div class="ic-ptotal">&euro;53.20 incl. protection</div>
+                      </div>
+                    </div>
+                    <div class="ic-meta">Nike &bull; 39 &bull; Tr&egrave;s bon &eacute;tat &bull; 24m ago</div>
+                  </div>
+                </div>
+
+                <div class="ic-card">
+                  <div class="ic-thumbwrap">
+                    <img class="ic-thumb" src="/assets/hero/catch-supreme-sudadera.webp" width="315" height="420" alt="Supreme red hoodie, size S, caught on Vinted" loading="lazy" decoding="async">
+                  </div>
+                  <div class="ic-info">
+                    <div class="ic-row">
+                      <div class="ic-t">Sudadera Supreme roja</div>
+                      <div class="ic-pricecol">
+                        <div class="ic-p">&euro;79.99</div>
+                        <div class="ic-ptotal">&euro;84.69 incl. protection</div>
+                      </div>
+                    </div>
+                    <div class="ic-meta">Supreme &bull; S &bull; Neuf sans &eacute;tiquette &bull; 29m ago</div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
           </div>
         </div>
       </div>
-      
+      <div class="ic-vignette"></div>
+      <!-- Static fallback caption. The script replaces the text per shot; if it
+           never runs, this one stays, and it describes the still correctly. -->
+      <div class="ic-caption" id="ic-caption">Live feed &mdash; your saved hunts</div>
     </div>
-    
-    <!-- Fade Out to blend with rest of site -->
-    <div class="fade-out-bottom"></div>
+    <p class="ic-note">
+      Real listings caught on vinted.be, 20 September 2026. Titles, prices, sizes,
+      conditions and buyer-protection totals are exactly as captured.
+    </p>
   </div>
 
-  <!-- Live feed simulation lives in main.js (Section 2) -->
+  <script>
+  /* ==========================================================================
+     THE INTERCEPT - camera engine
+     --------------------------------------------------------------------------
+     Self-contained. Touches nothing outside #intercept. Reads no scroll
+     position and registers no scroll listener: the shot list is a time-based
+     loop, and IntersectionObserver is used only to stop burning frames when
+     the component is off screen - pausing leaves the camera where it is and
+     can never hide anything.
+
+     Everything is computed from a single timeline position t, written straight
+     to style properties on each frame. Nothing depends on a CSS transition
+     completing, because a background tab suspends those (a limitation this
+     project has been bitten by three times - see CLAUDE.md section 4).
+
+     window.__IC.seek(t) is a deliberate debug hook: it positions the timeline
+     exactly so a shot can be inspected without waiting for rAF.
+     ========================================================================== */
+  (function () {
+    'use strict';
+    try {
+      var root = document.getElementById('intercept');
+      var cam = document.getElementById('ic-cam');
+      var card = document.getElementById('ic-catch');
+      var scan = document.getElementById('ic-scan');
+      var cap = document.getElementById('ic-caption');
+      if (!root || !cam || !card || !scan || !cap) return;
+
+      // Respect the user first. Returning here means data-ic-ready is never
+      // set, so the card is never hidden and the camera stays at its CSS wide
+      // shot - the same finished still a no-JS visitor gets.
+      var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (mq && mq.matches) return;
+
+      // --- the shot list ---------------------------------------------------
+      // Camera keys are {s: scale, x: translateX %, y: translateY %}. With
+      // transform-origin at 50% 50% and translate applied before scale, the
+      // percentages that bring a point at fraction (u,v) of the render to the
+      // centre of frame are x = s*(0.5-u)*100, y = s*(0.5-v)*100. The values
+      // below are that formula evaluated for the first card's thumbnail
+      // centre (u 0.137, v 0.391) and its price block (u 0.137, v 0.619).
+      // Scale ceilings are set by raster cost and source resolution, not by
+      // how dramatic they look: the camera scales a live DOM subtree, so a
+      // 2.9x push made the compositor rasterise ~7 MPix and upscaled a
+      // 760px photo past its own resolution. 2.5x is the ceiling that keeps
+      // the money shot sharp AND the layer cheap.
+      var DESKTOP_KEYS = {
+        WIDE:  { s: 1.00, x: 0,     y: 0 },
+        DRIFT: { s: 1.06, x: -1.5,  y: -1.0 },
+        FRAME: { s: 1.45, x: 42.8,  y: 10.2 },
+        PUSH:  { s: 1.95, x: 70.8,  y: 21.3 },
+        PRICE: { s: 2.50, x: 90.8,  y: -29.8 }
+      };
+      // Phones render a 36em x 48em design space with two columns (see the
+      // stylesheet), so the first card sits at u 0.285, v 0.344 and its price
+      // at v 0.543 - different geometry, same formula. The scales are capped
+      // by geometry, not taste: a card is 16.5em of a 36em frame, so
+      // anything past ~2.0x is wider than the frame and starts slicing the
+      // price off the edge. Measured at 375px - 2.7x cut "EUR1200" in half.
+      var MOBILE_KEYS = {
+        WIDE:  { s: 1.00, x: 0,    y: 0 },
+        DRIFT: { s: 1.08, x: -1.2, y: -0.8 },
+        FRAME: { s: 1.35, x: 21.6, y: 13.5 },
+        PUSH:  { s: 1.70, x: 36.6, y: 26.5 },
+        PRICE: { s: 1.95, x: 41.9, y: -8.4 }
+      };
+
+      var narrow = window.matchMedia && window.matchMedia('(max-width: 768px)');
+      var K = (narrow && narrow.matches) ? MOBILE_KEYS : DESKTOP_KEYS;
+      var WIDE = K.WIDE, DRIFT = K.DRIFT, FRAME = K.FRAME, PUSH = K.PUSH, PRICE = K.PRICE;
+
+      var SHOTS = [
+        { at: 0.0,  to: 3.4,  from: WIDE,  end: DRIFT, cap: 'Live feed — your saved hunts' },
+        { at: 3.4,  to: 6.2,  from: DRIFT, end: FRAME, cap: '06:07:34 UTC — posted on vinted.be' },
+        { at: 6.2,  to: 9.6,  from: FRAME, end: PUSH,  cap: 'Off-White x Air Jordan 1 “Chicago” — size 44' },
+        { at: 9.6,  to: 13.0, from: PUSH,  end: PRICE, cap: '€1200 — €1260.70 incl. Buyer Protection' },
+        { at: 13.0, to: 17.4, from: PRICE, end: WIDE,  cap: 'Real catches. Real prices. Your feed.' }
+      ];
+      var LOOP = 17.4;
+
+      // Not a resize listener on the window - a media-query change event, and
+      // it only swaps five numbers. Rotating a phone re-frames the shots
+      // instead of leaving the camera pointed at empty canvas.
+      function useKeys(k) {
+        SHOTS[0].from = k.WIDE;  SHOTS[0].end = k.DRIFT;
+        SHOTS[1].from = k.DRIFT; SHOTS[1].end = k.FRAME;
+        SHOTS[2].from = k.FRAME; SHOTS[2].end = k.PUSH;
+        SHOTS[3].from = k.PUSH;  SHOTS[3].end = k.PRICE;
+        SHOTS[4].from = k.PRICE; SHOTS[4].end = k.WIDE;
+      }
+      if (narrow && narrow.addEventListener) {
+        narrow.addEventListener('change', function (e) {
+          useKeys(e.matches ? MOBILE_KEYS : DESKTOP_KEYS);
+        });
+      }
+
+      // The arriving card and its scan-line, as absolute timeline positions.
+      var CARD_IN = 3.55, CARD_DUR = 0.45;
+      var SCAN_IN = 3.60, SCAN_DUR = 0.95;
+
+      function easeInOut(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+      function lerp(a, b, p) { return a + (b - a) * p; }
+
+      var lastCap = null;
+
+      function render(t) {
+        t = ((t % LOOP) + LOOP) % LOOP;
+
+        var shot = SHOTS[0], i;
+        for (i = 0; i < SHOTS.length; i++) { if (t >= SHOTS[i].at) shot = SHOTS[i]; }
+
+        var p = easeInOut(Math.min(1, Math.max(0, (t - shot.at) / (shot.to - shot.at))));
+        var s = lerp(shot.from.s, shot.end.s, p);
+        var x = lerp(shot.from.x, shot.end.x, p);
+        var y = lerp(shot.from.y, shot.end.y, p);
+        cam.style.transform = 'translate(' + x.toFixed(3) + '%, ' + y.toFixed(3) + '%) scale(' + s.toFixed(4) + ')';
+
+        if (shot.cap !== lastCap) { cap.textContent = shot.cap; lastCap = shot.cap; }
+
+        // The catch is absent before its post time and present after it. This
+        // inline opacity is the ONLY thing on the page that can hide a card,
+        // and it is written exclusively from inside a real animation frame -
+        // so "the loop never ran", for any reason at all, means "all six
+        // catches are visible", not "a card is stuck at zero".
+        var cp = Math.min(1, Math.max(0, (t - CARD_IN) / CARD_DUR));
+        cp = easeInOut(cp);
+        // setProperty(..., 'important') is not cargo cult. style.css still
+        // carries a Webflow-era rule that force-unhides anything whose
+        // inline style contains the substring "opacity: 0":
+        //   [style*="opacity: 0"] { opacity: 1 !important }
+        // It is dead code (Webflow was removed 2026-08-23, html has no
+        // .w-mod-js) but it is still served on every marketing page, and
+        // being a substring match it also swallows 0.25, 0.5, 0.55 and so
+        // on. A plain inline opacity here computed to 1 in real Chrome.
+        // An inline !important outranks a stylesheet !important, so this
+        // works without touching a stylesheet shared by seven pages -
+        // that rule should be removed on its own, deliberately.
+        card.style.setProperty('opacity', String(cp), 'important');
+        card.style.transform = 'translateY(' + (6 * (1 - cp)).toFixed(2) + 'px)';
+
+        var sp = (t - SCAN_IN) / SCAN_DUR;
+        if (sp >= 0 && sp <= 1) {
+          scan.classList.add('is-sweeping');
+          scan.style.transform = 'translateY(' + lerp(-120, 320, sp).toFixed(1) + '%)';
+        } else {
+          scan.classList.remove('is-sweeping');
+        }
+      }
+
+      var running = false, rafId = 0, base = 0, held = 0;
+
+      function tick(now) {
+        if (!running) return;
+        render(held + (now - base) / 1000);
+        rafId = window.requestAnimationFrame(tick);
+      }
+      function start() {
+        if (running) return;
+        running = true;
+        base = (window.performance && performance.now) ? performance.now() : Date.now();
+        rafId = window.requestAnimationFrame(tick);
+      }
+      function stop() {
+        if (!running) return;
+        var now = (window.performance && performance.now) ? performance.now() : Date.now();
+        held = (held + (now - base) / 1000) % LOOP;
+        running = false;
+        if (rafId) window.cancelAnimationFrame(rafId);
+      }
+
+      // Debug/verification hook. seek() renders one exact frame with the loop
+      // stopped, which is the only way to inspect a given shot in a tab where
+      // rAF is throttled.
+      window.__IC = {
+        duration: LOOP,
+        shots: SHOTS,
+        seek: function (t) { stop(); held = ((t % LOOP) + LOOP) % LOOP; render(held); },
+        play: start,
+        pause: stop
+      };
+
+      // Deliberately NOT calling render() here. The first frame is drawn from
+      // inside tick(), so the page keeps its server-rendered still until the
+      // loop is genuinely running. data-ic-ready only unlocks the orb pulse
+      // and the scan-line gradient, neither of which can hide content.
+      root.setAttribute('data-ic-ready', '1');
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          for (var j = 0; j < entries.length; j++) {
+            if (entries[j].isIntersecting) { start(); } else { stop(); }
+          }
+        }, { threshold: 0.15 }).observe(root);
+      } else {
+        start();
+      }
+    } catch (e) {
+      // Leave the page exactly as the server sent it: wide shot, all six
+      // catches visible, fallback caption. Never rethrow from a decorative
+      // component on the highest-traffic page on the site.
+      try {
+        var el = document.getElementById('intercept');
+        if (el) el.removeAttribute('data-ic-ready');
+        console.error('[intercept] disabled, showing static frame:', e);
+      } catch (_) {}
+    }
+  })();
+  </script>
 
 
 

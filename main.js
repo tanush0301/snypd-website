@@ -19,65 +19,20 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // ==========================================================================
-  // 2. HERO DASHBOARD MOCKUP LIVE FEED SIMULATION
+  // 2. HERO DASHBOARD MOCKUP LIVE FEED SIMULATION -- REMOVED 2026-09-20
+  // --------------------------------------------------------------------------
+  // This drove #feed-container inside index.html's .app-window, a mockup of a
+  // dashboard SNYPD no longer has (left sidebar, a StockX nav item). Both the
+  // mockup and this simulation are gone; the hero now renders the real
+  // topbar-based dashboard in "The Intercept" component, whose own camera
+  // engine is self-contained in index.html next to its markup.
+  //
+  // Worth recording why this had to go rather than be repointed: the five
+  // listings here were invented, and every row it inserted carried the
+  // hardcoded date literal "04 July 2026" with a live clock time appended --
+  // a fabricated timestamp on the highest-traffic page on the site. The
+  // replacement uses six real catches read out of public.current_ads.
   // ==========================================================================
-  const feedContainer = document.getElementById('feed-container');
-  if (feedContainer) {
-    const sampleData = [
-      { img: '/assets/img/6a49f591f2b3031b92a87da3_1783074655.webp', name: 'Supreme 99 Football Top Black', meta: 'Supreme • L • Very Good • search', price: '€ 120,00' },
-      { img: '/assets/img/6a49f4c0a4873ec61828a489_1783146176.jpeg', name: 'Jordan 4 Bred OG', meta: 'Jordan • 42 • Very Good • catalog', price: '€ 140,00' },
-      { img: '/assets/img/6a4e03733184f099d185451d_jordan-1-travis-scott-velvet.jpg', name: 'Air Jordan 1 Low Travis Scott Velvet Brown', meta: 'Jordan • 42.5 • Very Good • catalog', price: '€ 225,00' },
-      { img: '/assets/img/6a49f4c0088ffb1e4478ccba_1772617611.png', name: 'Jordan 1 High "Mocha"', meta: 'Jordan • 43 • Good • catalog', price: '€ 84,00' },
-      { img: '/assets/img/6a49f4c0e0c8a747768678bb_1783110478.jpg', name: 'Yeezy Slide Onyx', meta: 'Yeezy • 42 • Brand New • catalog', price: '€ 23,00' }
-    ];
-
-    let dataIndex = 1;
-
-    function createFeedRow(item) {
-      const div = document.createElement('div');
-      div.className = 'feed-item';
-      div.style.opacity = '0';
-      div.style.transform = 'translateY(-10px)';
-      
-      const uploadTime = new Date().toLocaleTimeString('en-US', { hour12: false });
-
-      div.innerHTML = `
-        <div class="feed-img" style="background-image:url('${item.img}')"></div>
-        <div class="feed-info">
-          <div class="feed-title-row">
-            <div class="feed-title">${item.name}</div>
-            <div class="feed-price">${item.price}</div>
-          </div>
-          <div class="feed-meta">${item.meta} • Uploaded on Vinted at 04 July 2026 at ${uploadTime}</div>
-        </div>
-        <a href="/signup" class="feed-action">
-          Snype
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </a>
-      `;
-      return div;
-    }
-
-    setInterval(() => {
-      const item = sampleData[dataIndex % sampleData.length];
-      const newRow = createFeedRow(item);
-      
-      feedContainer.insertBefore(newRow, feedContainer.firstChild);
-      
-      setTimeout(() => {
-        newRow.style.transition = 'all 0.4s var(--ease-fluid)';
-        newRow.style.opacity = '1';
-        newRow.style.transform = 'translateY(0)';
-      }, 50);
-
-      const rows = feedContainer.querySelectorAll('.feed-item');
-      if (rows.length > 3) {
-        rows[rows.length - 1].remove();
-      }
-
-      dataIndex++;
-    }, 3500);
-  }
 
   // ==========================================================================
   // 3. THE ENGINE 3D BOARD TILT PHYSICS
