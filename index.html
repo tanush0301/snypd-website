@@ -630,86 +630,148 @@
        sidebar, a "PLAN - ELITE" chip and a StockX nav item. The real dashboard
        has been topbar-based ("Ledger") since 2026-09-03 and StockX was dropped
        months before that, so the old block advertised a UI that no longer
-       exists. Every token below was read out of the live dashboard.html :root
-       on 2026-09-20 (--success is #00E5A0; the #35e7dc in that same file is
-       scoped to .snypd-sidebar, which no longer exists), not from a design doc.
+       exists.
+
+       ON FIDELITY, and why this is NOT a pixel copy of dashboard.html.
+       The first pass matched the app exactly - flat panels, no glow, no
+       shadow, muted greys, one accent. That is correct inside the product and
+       wrong on this page: dropped between a gradient headline and a glowing
+       CTA it read as a dead grey slab. So the DATA is exact and the CHROME is
+       staged: the screen sits in 3D space over an ambient bloom, the greys are
+       lifted for contrast against a marketing background, and the cards are
+       bigger and fewer. Layout, copy, mint (#00E5A0) and the purple-is-fill-
+       only rule still come from the real app.
 
        SAFETY CONTRACT - see CLAUDE.md READ FIRST #4 (feat/higgsfield-design).
        Nothing here may hide content if the script does not run:
-         * no CSS rule anywhere in this component sets a card to opacity 0.
-           The arriving catch is dimmed only by an inline style written from
-           inside a real animation frame, so every path that ends in "the loop
-           never ran" - no JS, thrown JS, throttled rAF, reduced motion -
-           leaves all six catches visible;
-         * there is no scroll listener, no ScrollTrigger, no scroll-linked
-           anything. The shot list is a time-based loop over one transform.
+         * no CSS rule in this component sets a card to opacity 0. The arriving
+           catch is dimmed only by an inline style written from inside a real
+           animation frame, so no JS, thrown JS, throttled rAF or reduced
+           motion all resolve to "all catches visible";
+         * there is no scroll listener and no scroll-linked animation. The shot
+           list is a time-based loop over one transform.
        ========================================================================== */
     .ic {
       position: relative;
       width: 100%;
-      max-width: 1280px;
-      margin: 72px auto 0;
+      max-width: 1320px;
+      margin: 64px auto 0;
       padding: 0 24px;
-      /* Deliberately no entrance animation on this wrapper. The block it
-         replaced used opacity:0 + a forwards keyframe; that is the shape of
-         the bug that left pricing and the FAQ invisible in August, and the
-         hero copy above already carries the page's entrance. */
+      /* No entrance animation on this wrapper. The block it replaced used
+         opacity:0 + a forwards keyframe - the shape of the bug that left
+         pricing and the FAQ invisible in August. */
     }
 
-    /* The lens. Clips the camera and defines the 16:9 shot. */
+    /* Ambient bloom behind the screen. This is what stops the render reading
+       as a grey slab: the page's own purple, thrown on the backdrop rather
+       than painted onto the app. */
+    .ic-bloom {
+      position: absolute;
+      left: 6%; right: 6%; top: -6%; bottom: 8%;
+      pointer-events: none;
+      background:
+        radial-gradient(60% 55% at 28% 30%, rgba(191, 0, 255, 0.34) 0%, transparent 70%),
+        radial-gradient(55% 50% at 78% 70%, rgba(0, 229, 160, 0.16) 0%, transparent 72%);
+      filter: blur(72px);
+      opacity: 0.85;
+    }
+
+    /* The lens. No border and no background of its own - a visible rectangle
+       around the shot was half of why the first pass looked like a paused
+       video player. It only clips, and it carries the perspective. */
     .ic-frame {
       position: relative;
       width: 100%;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 10;
       overflow: hidden;
-      background: #08090A;
-      border: 1px solid #2A2F33;
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
       container-type: inline-size;
     }
-    .ic-fit { position: absolute; inset: 0; }
+    /* Perspective lives on .ic-fit, not on .ic-frame, and that is load-bearing:
+       an element cannot query its OWN container, so 100cqw written on the
+       container itself silently resolved against the viewport instead - at a
+       1236px frame in a 1280px window it computed 1280px, and on a phone it
+       was wrong by 4x. Measured, not assumed.
+       Depth has to track the frame's own width. A fixed 1500px was ~2x the
+       rendered width, which flattens rotation into a shear: the screen looked
+       skewed rather than placed in space. One frame-width away is the usual
+       range for a product shot that reads dimensional without fisheyeing. */
+    .ic-fit {
+      position: absolute;
+      inset: 0;
+      perspective: 1200px;
+      perspective-origin: 50% 46%;
+    }
+    @supports (width: 1cqw) {
+      .ic-fit { perspective: 100cqw; }
+    }
+
+    /* THE CAMERA. One element, one transform. Its resting value is the wide
+       establishing frame, and that is also the static fallback. It moves
+       through Z against the perspective above rather than through scale(),
+       so near cards sweep past faster than far ones - the difference between
+       a camera travelling and a page being zoomed. */
     .ic-cam {
       width: 100%;
       height: 100%;
-      transform-origin: 50% 50%;
-      transform: scale(1);   /* the wide shot, and the static fallback */
+      font-size: 16px;
+      transform-style: preserve-3d;
+      /* 1em is 16 design px here, same basis as .ic-app, so the script can
+         write Z in design pixels and have it stay proportional at every
+         width. Perspective above is 75em, so magnification is 75/(75 - z). */
+      transform: translate3d(0, 0, -13em) rotateX(4.4deg) rotateY(-10deg);
       will-change: transform;
-      backface-visibility: hidden;
+    }
+    @supports (width: 1cqw) {
+      .ic-cam { font-size: calc(100cqw / 75); }
     }
 
-    /* ---- the Ledger render ------------------------------------------------ */
-    /* The dashboard is authored against a 1200x675 design space so the camera
-       keyframes are deterministic, but it is sized in em off a container-query
-       font-size rather than in px: 1em is exactly 16 design pixels at any
-       frame width, so the layout never reflows and needs no JS, no resize
-       listener and no scale() wrapper.
+    /* The screen itself: bezel, drop shadow, coloured spill. */
+    .ic-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0B0C0D;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.09),
+        0 50px 110px -25px rgba(0, 0, 0, 0.95),
+        0 0 140px -40px rgba(191, 0, 255, 0.55);
+    }
+    /* Specular sheen - a screen catches light; a flat fill does not. */
+    .ic-sheen {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(112deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.02) 26%, transparent 46%);
+    }
+
+    /* ---- the dashboard render --------------------------------------------- */
+    /* Authored against a 1200 x 750 design space, sized in em off a
+       container-query font-size: 1em is exactly 16 design pixels at any frame
+       width, so the layout never reflows and needs no JS, no resize listener
+       and no scale() wrapper.
        (An earlier revision tried transform: scale(calc(100cqw / 1200)) and it
-       silently did nothing - that calc yields a length, and scale() takes a
-       unitless number. Caught by reading the computed transform, not by
-       looking at the page.)
-       Without container-query units the fallback font-size leaves the render
-       at its native design size, cropped to the frame - still a legible
-       dashboard, which is the bar the fallback has to clear. */
+       silently did nothing - that calc yields a length and scale() takes a
+       number. Caught by reading the computed transform, not by looking.) */
     .ic-app {
-      --ic-bg: #0B0C0D;
-      --ic-panel-header: #101214;
-      --ic-image: #131517;
-      --ic-border: #1E2225;
-      --ic-text: #EDEFF0;
-      --ic-text2: #A6ADB1;
-      --ic-muted: #7C8489;
+      /* Lifted off the app's own tokens for contrast on a lit background.
+         Real values in dashboard.html are bg #0B0C0D, text-secondary #A6ADB1,
+         muted #7C8489 - correct in a dark product, washed out here. */
+      --ic-text: #F4F6F7;
+      --ic-text2: #C2C9CE;
+      --ic-muted: #949CA3;
+      --ic-border: #272C31;
+      --ic-image: #15181B;
       --ic-mint: #00E5A0;
       --ic-mono: 'DM Mono', ui-monospace, 'JetBrains Mono', monospace;
 
       width: 100%;
       height: 100%;
       font-size: 16px;
-      background: var(--ic-bg);
+      background:
+        linear-gradient(180deg, #14171C 0%, #0B0C0D 38%, #08090A 100%);
       color: var(--ic-text);
       font-family: var(--ic-mono);
       font-weight: 400;
       line-height: 1.3;
-      letter-spacing: 0;
       text-align: left;
       display: flex;
       flex-direction: column;
@@ -717,168 +779,177 @@
     @supports (width: 1cqw) {
       .ic-app { font-size: calc(100cqw / 75); }   /* 1200 design px / 16 */
     }
-    /* Ledger law: no radius, no shadow, no glow, no bold anywhere inside the
-       app render. The frame around it may have a shadow - that is the
-       marketing page presenting a screenshot, not the app. */
-    .ic-app * { font-weight: 400; border-radius: 0; box-shadow: none; }
+    /* Ledger law, still enforced inside the render: no radius, no bold. */
+    .ic-app * { font-weight: 400; border-radius: 0; }
 
     .ic-topbar {
-      flex: 0 0 3em;
+      flex: 0 0 3.1em;
       display: flex;
       align-items: center;
-      gap: 1.75em;
-      /* 2em, not the app's own 1.5em: the camera overscans slightly on the
-         drift, and 1.5em let it clip the leading characters of "Plan:" at
-         the resting frame. Caught by screenshotting the wide shot. */
+      gap: 1.9em;
       padding: 0 2em;
-      background: var(--ic-panel-header);
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.012));
       border-bottom: 1px solid var(--ic-border);
     }
-    .ic-wordmark { color: var(--ic-text); font-size: 0.9375em; letter-spacing: 0.22em; }
+    .ic-wordmark { color: var(--ic-text); font-size: 1em; letter-spacing: 0.24em; }
     .ic-wordmark i { font-style: normal; color: var(--ic-mint); }
-    .ic-tabs { display: flex; gap: 1.375em; }
+    .ic-tabs { display: flex; gap: 1.5em; }
     .ic-tab {
-      font-size: 0.71875em;
-      letter-spacing: 0.09em;
+      font-size: 0.75em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--ic-muted);
-      padding: 0.25em 0;
-      border-bottom: 0.17em solid transparent;
+      padding: 0.3em 0;
+      border-bottom: 0.16em solid transparent;
+      white-space: nowrap;
     }
-    /* Ledger: the active nav tab is white text + a mint underline, never a
-       purple fill - purple is action-fill-only and measures 3.65:1 as text. */
+    /* Ledger: the active tab is white text + a mint underline, never a purple
+       fill - purple is action-fill-only and measures 3.65:1 as text. */
     .ic-tab.is-active { color: var(--ic-text); border-bottom-color: var(--ic-mint); }
-    .ic-topright { margin-left: auto; display: flex; align-items: center; gap: 0.875em; }
-    .ic-status { display: flex; align-items: center; gap: 0.4375em; font-size: 0.6875em; letter-spacing: 0.09em; color: var(--ic-mint); text-transform: uppercase; }
+    .ic-topright { margin-left: auto; display: flex; align-items: center; gap: 1em; }
+    .ic-status { display: flex; align-items: center; gap: 0.5em; font-size: 0.72em; letter-spacing: 0.1em; color: var(--ic-mint); text-transform: uppercase; white-space: nowrap; }
     /* Square, not a circle - Ledger status marks are squares. */
-    .ic-orb { width: 0.6em; height: 0.6em; background: var(--ic-mint); }
-    .ic-chip { font-size: 0.625em; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.3em 0.8em; border: 1px solid var(--ic-border); color: var(--ic-text2); }
+    .ic-orb { width: 0.6em; height: 0.6em; background: var(--ic-mint); box-shadow: 0 0 0.7em rgba(0,229,160,0.85); }
+    .ic-chip { font-size: 0.65em; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.35em 0.9em; border: 1px solid var(--ic-border); color: var(--ic-text2); white-space: nowrap; }
 
     .ic-strip {
-      flex: 0 0 3.25em;
+      flex: 0 0 3.3em;
       display: flex;
       align-items: center;
-      gap: 1.625em;
+      gap: 1.8em;
       padding: 0 2em;
-      font-size: 0.6875em;
-      letter-spacing: 0.05em;
+      font-size: 0.72em;
+      letter-spacing: 0.06em;
       color: var(--ic-muted);
       border-bottom: 1px solid var(--ic-border);
+      white-space: nowrap;
     }
     .ic-strip b { color: var(--ic-text2); }
     .ic-strip .ic-mint { color: var(--ic-mint); }
-    .ic-stop { margin-left: auto; border: 1px solid var(--ic-border); color: var(--ic-text2); padding: 0.55em 1.3em; letter-spacing: 0.12em; text-transform: uppercase; }
+    .ic-stop { margin-left: auto; border: 1px solid var(--ic-border); color: var(--ic-text2); padding: 0.6em 1.4em; letter-spacing: 0.14em; text-transform: uppercase; }
 
     .ic-body { flex: 1 1 auto; padding: 2em; overflow: hidden; }
-    /* The shipped rule is repeat(auto-fit, minmax(170px, 300px)); at this
-       container width it resolves to exactly four 264px tracks, so this is
-       what the real dashboard renders, not a simplification of it. */
-    .ic-grid { display: grid; grid-template-columns: repeat(4, 16.5em); gap: 1em; }
+    /* Three tracks, not the app's six. The shipped rule is
+       repeat(auto-fit, minmax(170px, 300px)); six 264px cards is what a real
+       1200px viewport gives and it read as a wall of small dark boxes here.
+       Fewer, larger cards is a hero decision, disclosed. */
+    .ic-grid { display: grid; grid-template-columns: repeat(3, 23em); gap: 1em; }
 
-    .ic-card { background: rgba(255,255,255,0.02); border: 1px solid var(--ic-border); overflow: hidden; }
+    .ic-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
+      border: 1px solid rgba(255,255,255,0.085);
+      overflow: hidden;
+    }
     .ic-thumbwrap { position: relative; }
     .ic-thumb { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--ic-image); }
     .ic-badge {
-      position: absolute; top: 0.5em; left: 0.5em;
-      font-size: 0.53125em; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 0.35em 0.8em; color: var(--ic-bg); background: var(--ic-mint);
+      position: absolute; top: 0.6em; left: 0.6em;
+      font-size: 0.56em; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.4em 0.9em; color: #07120D; background: var(--ic-mint);
+      box-shadow: 0 0.2em 1.2em rgba(0,229,160,0.45);
     }
-    .ic-info { padding: 0.75em; display: flex; flex-direction: column; gap: 0.375em; min-width: 0; }
-    .ic-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75em; min-width: 0; }
-    /* The shipped card keeps the title on one line and ellipsises it. At
-       hero scale that cut "Off-White x Nike Air Jordan 1 Chicago The Ten"
-       down to "Off-White ...", which defeats the point of showing it, so
-       this render allows two lines - the same relaxation dashboard.html
-       already makes for itself at narrow widths (.card .t { white-space:
-       normal }). Disclosed deviation, not an accident. */
+    .ic-info { padding: 0.9em 1em 1em; display: flex; flex-direction: column; gap: 0.45em; min-width: 0; }
+    .ic-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.9em; min-width: 0; }
+    /* The shipped card keeps the title on one line and ellipsises it. At hero
+       scale that cut "Off-White x Nike Air Jordan 1 Chicago The Ten" down to
+       "Off-White ...", which defeats showing it, so this render allows two
+       lines - the same relaxation dashboard.html already makes for itself at
+       narrow widths (.card .t { white-space: normal }). */
     .ic-t {
-      font-size: 0.75em; color: var(--ic-text); min-width: 0; flex: 1 1 auto;
+      font-size: 0.86em; color: var(--ic-text); min-width: 0; flex: 1 1 auto;
       white-space: normal; overflow: hidden;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
     .ic-pricecol { flex: 0 0 auto; text-align: right; }
-    .ic-p { font-size: 0.9375em; color: var(--ic-text); white-space: nowrap; }
-    .ic-ptotal { font-size: 0.5625em; color: var(--ic-muted); white-space: nowrap; margin-top: 0.1em; }
-    .ic-meta { font-size: 0.65625em; color: var(--ic-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ic-p { font-size: 1.1em; color: var(--ic-text); white-space: nowrap; }
+    .ic-ptotal { font-size: 0.62em; color: var(--ic-muted); white-space: nowrap; margin-top: 0.25em; }
+    .ic-meta { font-size: 0.7em; color: var(--ic-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Scan-line that sweeps the arriving catch. Decorative; invisible until
-       the script arms it. */
-    .ic-scan { position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; opacity: 0; }
+    /* Border bloom on the arriving catch. Decorative; invisible until the
+       script arms it, and it cannot hide anything. */
+    .ic-scan { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
 
-    .ic-vignette {
-      position: absolute; inset: 0; pointer-events: none;
-      background:
-        radial-gradient(125% 95% at 50% 42%, transparent 52%, rgba(0,0,0,0.6) 100%),
-        linear-gradient(to bottom, transparent 58%, rgba(3,4,9,0.97) 92%);
-    }
-
-    .ic-caption {
-      position: absolute;
-      left: 0; right: 0; bottom: 3.2%;
-      text-align: center;
+    /* The beat line lives OUTSIDE the frame. In the first pass it sat over the
+       cards like a video subtitle, which is most of why the whole thing read
+       as a paused player. */
+    .ic-beat {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 22px auto 0;
       font-family: var(--font-mono);
-      font-size: clamp(9px, 1.05cqw, 13px);
-      letter-spacing: 0.1em;
+      font-size: 12px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.78);
-      padding: 0 24px;
-      pointer-events: none;
+      color: rgba(255, 255, 255, 0.5);
+      min-height: 18px;
+    }
+    .ic-beat::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: #00E5A0;
+      box-shadow: 0 0 10px rgba(0, 229, 160, 0.9);
+      flex: 0 0 auto;
     }
 
     .ic-note {
-      margin: 14px auto 0;
+      margin: 10px auto 0;
       max-width: 780px;
       text-align: center;
-      font-size: 12px;
+      font-size: 11.5px;
       line-height: 1.6;
       color: var(--ink-tertiary);
     }
 
     /* ---- the only states the SCRIPT unlocks ------------------------------- */
-    /* Neither of these can hide content: one paints a gradient, one blinks a
-       status dot. The attribute is set as the script's last init step. */
+    /* One paints a border bloom, one blinks a status dot. Neither can hide
+       content. The attribute is set as the script's last init step. */
     .ic[data-ic-ready="1"] .ic-scan.is-sweeping {
       opacity: 1;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0,229,160,0.30) 46%, rgba(0,229,160,0.85) 50%, rgba(0,229,160,0.30) 54%, transparent 100%);
+      box-shadow: inset 0 0 0 2px rgba(0, 229, 160, 0.9), inset 0 0 3em rgba(0, 229, 160, 0.3);
     }
     .ic[data-ic-ready="1"] .ic-orb { animation: icPulse 2.2s ease infinite; }
-    @keyframes icPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+    @keyframes icPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
     /* Reduced motion: the script returns before setting data-ic-ready, so the
-       camera never moves and no card is ever dimmed. These are belt and
-       braces for anything CSS-driven. */
+       camera never moves and no card is ever dimmed. Belt and braces for
+       anything CSS-driven. */
     @media (prefers-reduced-motion: reduce) {
-      .ic-cam { transform: scale(1) !important; }
+      .ic-cam { transform: translate3d(0, 0, -13em) rotateX(4.4deg) rotateY(-10deg) !important; }
       .ic-orb { animation: none !important; }
       .ic-card { opacity: 1 !important; }
     }
 
-    /* Phones get a coarser design space, not a shrunk desktop one.
-       Measured at 375px before this existed: the frame was 295px wide, so
-       1em came out at 3.9px and the entire dashboard was an illegible smudge.
-       Halving the design space to 576 px (36em) and dropping to two columns
-       doubles every glyph; the camera then works from its own keyframes,
-       below. This is the one place the render deliberately stops matching the
-       desktop app - a product shot nobody can read is worse than one that
-       shows fewer cards. */
+    /* Phones get a coarser design space, not a shrunk desktop one. Measured at
+       375px before this existed: the frame was 295px wide, 1em came out at
+       3.9px and the whole dashboard was an illegible smudge. Halving the
+       design space to 576px (36em) and dropping to two columns doubles every
+       glyph; the camera then works from its own keyframes. */
     @media (max-width: 768px) {
-      .ic { margin-top: 48px; padding: 0 16px; }
+      .ic { margin-top: 44px; padding: 0 16px; }
       .ic-frame { aspect-ratio: 3 / 4; }
-      .ic-caption { padding: 0 12px; letter-spacing: 0.06em; }
-      .ic-note { font-size: 11px; }
-      .ic-grid { grid-template-columns: repeat(2, 16.5em); }
-      /* Measured at 375px: the four tabs wrapped onto two lines. Tighten
-         the gaps, keep each tab on one line, and drop the ELITE chip -
-         the strip underneath already says "Plan: ELITE", so nothing is
-         lost and the row fits in one line again. */
-      .ic-tab { white-space: nowrap; }
-      .ic-topbar { gap: 1.1em; }
-      .ic-tabs { gap: 1em; }
+      /* Gentler on a phone: the frame is narrow, so one frame-width of depth
+         over-rotates the near edge. */
+      .ic-fit { perspective: 420px; }
+      .ic-grid { grid-template-columns: repeat(2, 15.5em); }
       .ic-chip { display: none; }
+      /* Measured at 375px: the topbar row overflowed the render and cut
+         "Watching 24/7" in half. The ELITE chip goes (the strip below
+         already says Plan: ELITE) and the row is tightened to fit. */
+      .ic-topbar { gap: 1em; }
+      .ic-tabs { gap: 0.9em; }
+      .ic-wordmark { font-size: 0.85em; letter-spacing: 0.18em; }
+      .ic-tab { font-size: 0.66em; letter-spacing: 0.07em; }
+      .ic-status { font-size: 0.62em; letter-spacing: 0.06em; }
+      .ic-beat { font-size: 10px; letter-spacing: 0.08em; margin-top: 16px; }
+      .ic-note { font-size: 11px; }
+      .ic-bloom { filter: blur(48px); }
     }
     @supports (width: 1cqw) {
       @media (max-width: 768px) {
-        .ic-app { font-size: calc(100cqw / 36); }
+        .ic-app, .ic-cam { font-size: calc(100cqw / 36); }
+        .ic-fit { perspective: 150cqw; }
       }
     }
 
@@ -960,158 +1031,161 @@
   <!-- The App Reveal -->
   <!-- ==========================================================================
        THE INTERCEPT - hero product cinematic
-       A camera move across a faithful render of the CURRENT dashboard ("Ledger",
-       topbar-based since 2026-09-03), holding six real catches pulled from
-       public.current_ads on 2026-09-20. Titles, brands, sizes, conditions,
-       prices, buyer-protection totals and upload times are the stored values -
-       nothing here is invented. Photos are Vinted's own, vendored into
-       /assets/hero/ rather than hotlinked, so a delisted item cannot blank the
-       hero. Scene clock is 06:08 UTC, which is why every card is inside the
-       30-minute freshness window the feed itself enforces.
+       A camera travelling in 3D over a staged render of the CURRENT dashboard
+       ("Ledger", topbar-based since 2026-09-03), holding six real catches read
+       out of public.current_ads on 2026-09-20. Titles, brands, sizes,
+       conditions, prices, buyer-protection totals and upload times are the
+       stored values - nothing here is invented. Photos are Vinted's own,
+       vendored into /assets/hero/ rather than hotlinked, so a delisted item
+       cannot blank the hero. Scene clock is 06:08 UTC, which is why every card
+       is inside the 30-minute freshness window the feed itself enforces.
 
-       If the script below never runs, this renders as a finished still: wide
-       shot, all six cards visible, caption in place. See the SAFETY CONTRACT
-       note in the stylesheet.
+       If the script below never runs, this renders as a finished still: the
+       establishing frame, all six catches visible, first beat line in place.
        ========================================================================== -->
   <div class="ic" id="intercept">
+    <div class="ic-bloom"></div>
     <div class="ic-frame">
       <div class="ic-fit">
         <div class="ic-cam" id="ic-cam">
-          <div class="ic-app">
+          <div class="ic-screen">
+            <div class="ic-app">
 
-      <div class="ic-topbar">
-        <div class="ic-wordmark">SNYPD<i>_</i></div>
-        <div class="ic-tabs">
-          <div class="ic-tab is-active">Feed</div>
-          <div class="ic-tab">History &middot; 12</div>
-          <div class="ic-tab">Market Insights</div>
-        </div>
-        <div class="ic-topright">
-          <div class="ic-status"><span class="ic-orb" id="ic-orb"></span>Running</div>
-          <div class="ic-chip">Plan &mdash; Elite</div>
-        </div>
-      </div>
-
-            <div class="ic-strip">
-              <span>Plan: <b>ELITE</b></span>
-              <span>Status: <b class="ic-mint">running</b></span>
-              <span>Last check: <b>06:08:02</b></span>
-              <span class="ic-stop">Stop</span>
-            </div>
-
-            <div class="ic-body">
-              <div class="ic-grid">
-
-                <div class="ic-card" id="ic-catch">
-                  <div class="ic-thumbwrap">
-                    <img class="ic-thumb" src="/assets/hero/catch-offwhite-jordan1-chicago.webp" width="760" height="571" alt="Off-White x Nike Air Jordan 1 Chicago The Ten, size 44, caught on Vinted" loading="lazy" decoding="async">
-                    <span class="ic-badge">New</span>
-                    <span class="ic-scan" id="ic-scan"></span>
-                  </div>
-                  <div class="ic-info">
-                    <div class="ic-row">
-                      <div class="ic-t">Off-White x Nike Air Jordan 1 Chicago The Ten</div>
-                      <div class="ic-pricecol">
-                        <div class="ic-p">&euro;1200</div>
-                        <div class="ic-ptotal">&euro;1260.70 incl. protection</div>
-                      </div>
-                    </div>
-                    <div class="ic-meta">Jordan &bull; 44 &bull; Tr&egrave;s bon &eacute;tat &bull; just now</div>
-                  </div>
+              <div class="ic-topbar">
+                <div class="ic-wordmark">SNYPD<i>_</i></div>
+                <div class="ic-tabs">
+                  <div class="ic-tab is-active">Feed</div>
+                  <div class="ic-tab">Market Insights</div>
+                  <div class="ic-tab">History &middot; 12</div>
+                  <div class="ic-tab">Profile</div>
                 </div>
-
-                <div class="ic-card">
-                  <div class="ic-thumbwrap">
-                    <img class="ic-thumb" src="/assets/hero/catch-zanotti.webp" width="186" height="420" alt="Giuseppe Zanotti shoes, size 42, caught on Vinted" loading="lazy" decoding="async">
-                    <span class="ic-badge">New</span>
-                  </div>
-                  <div class="ic-info">
-                    <div class="ic-row">
-                      <div class="ic-t">Scarpe Giuseppe Zanotti</div>
-                      <div class="ic-pricecol">
-                        <div class="ic-p">&euro;300</div>
-                        <div class="ic-ptotal">&euro;315.70 incl. protection</div>
-                      </div>
-                    </div>
-                    <div class="ic-meta">Giuseppe Zanotti &bull; 42 &bull; Neuf avec &eacute;tiquette &bull; 2m ago</div>
-                  </div>
+                <div class="ic-topright">
+                  <div class="ic-status"><span class="ic-orb" id="ic-orb"></span>Watching 24/7</div>
+                  <div class="ic-chip">Elite</div>
                 </div>
-
-                <div class="ic-card">
-                  <div class="ic-thumbwrap">
-                    <img class="ic-thumb" src="/assets/hero/catch-supreme-jordan-hoodie.webp" width="315" height="420" alt="Supreme x Jordan hoodie, size M, caught on Vinted" loading="lazy" decoding="async">
-                  </div>
-                  <div class="ic-info">
-                    <div class="ic-row">
-                      <div class="ic-t">Hoodie supreme x Jordan 2024</div>
-                      <div class="ic-pricecol">
-                        <div class="ic-p">&euro;100</div>
-                        <div class="ic-ptotal">&euro;105.70 incl. protection</div>
-                      </div>
-                    </div>
-                    <div class="ic-meta">Supreme x Jordan &bull; M &bull; Tr&egrave;s bon &eacute;tat &bull; 15m ago</div>
-                  </div>
-                </div>
-
-                <div class="ic-card">
-                  <div class="ic-thumbwrap">
-                    <img class="ic-thumb" src="/assets/hero/catch-dunk-laser-orange.webp" width="315" height="420" alt="Nike Dunk Low Pro Laser Orange, size 44, caught on Vinted" loading="lazy" decoding="async">
-                  </div>
-                  <div class="ic-info">
-                    <div class="ic-row">
-                      <div class="ic-t">Nike Dunk Low Pro ( Laser Orange)</div>
-                      <div class="ic-pricecol">
-                        <div class="ic-p">&euro;100</div>
-                        <div class="ic-ptotal">&euro;105.70 incl. protection</div>
-                      </div>
-                    </div>
-                    <div class="ic-meta">Nike &bull; 44 &bull; Bon &eacute;tat &bull; 20m ago</div>
-                  </div>
-                </div>
-
-                <div class="ic-card">
-                  <div class="ic-thumbwrap">
-                    <img class="ic-thumb" src="/assets/hero/catch-dunk-militaire.webp" width="315" height="420" alt="Nike Dunk militaire, size 39, caught on Vinted" loading="lazy" decoding="async">
-                  </div>
-                  <div class="ic-info">
-                    <div class="ic-row">
-                      <div class="ic-t">Dunk militaire</div>
-                      <div class="ic-pricecol">
-                        <div class="ic-p">&euro;50</div>
-                        <div class="ic-ptotal">&euro;53.20 incl. protection</div>
-                      </div>
-                    </div>
-                    <div class="ic-meta">Nike &bull; 39 &bull; Tr&egrave;s bon &eacute;tat &bull; 24m ago</div>
-                  </div>
-                </div>
-
-                <div class="ic-card">
-                  <div class="ic-thumbwrap">
-                    <img class="ic-thumb" src="/assets/hero/catch-supreme-sudadera.webp" width="315" height="420" alt="Supreme red hoodie, size S, caught on Vinted" loading="lazy" decoding="async">
-                  </div>
-                  <div class="ic-info">
-                    <div class="ic-row">
-                      <div class="ic-t">Sudadera Supreme roja</div>
-                      <div class="ic-pricecol">
-                        <div class="ic-p">&euro;79.99</div>
-                        <div class="ic-ptotal">&euro;84.69 incl. protection</div>
-                      </div>
-                    </div>
-                    <div class="ic-meta">Supreme &bull; S &bull; Neuf sans &eacute;tiquette &bull; 29m ago</div>
-                  </div>
-                </div>
-
               </div>
-            </div>
 
+              <div class="ic-strip">
+                <span>Plan: <b>ELITE</b></span>
+                <span>Status: <b class="ic-mint">running</b></span>
+                <span>Last check: <b>06:08:02</b></span>
+                <span class="ic-stop">Stop</span>
+              </div>
+
+              <div class="ic-body">
+                <div class="ic-grid">
+
+                  <div class="ic-card" id="ic-catch">
+                    <div class="ic-thumbwrap">
+                      <img class="ic-thumb" src="/assets/hero/catch-offwhite-jordan1-chicago.webp" width="760" height="571" alt="Off-White x Nike Air Jordan 1 Chicago The Ten, size 44, caught on Vinted" loading="lazy" decoding="async">
+                      <span class="ic-badge">New</span>
+                      <span class="ic-scan" id="ic-scan"></span>
+                    </div>
+                    <div class="ic-info">
+                      <div class="ic-row">
+                        <div class="ic-t">Off-White x Nike Air Jordan 1 Chicago The Ten</div>
+                        <div class="ic-pricecol">
+                          <div class="ic-p">&euro;1200</div>
+                          <div class="ic-ptotal">&euro;1260.70 incl. protection</div>
+                        </div>
+                      </div>
+                      <div class="ic-meta">Jordan &bull; 44 &bull; Tr&egrave;s bon &eacute;tat &bull; just now</div>
+                    </div>
+                  </div>
+
+                  <div class="ic-card">
+                    <div class="ic-thumbwrap">
+                      <img class="ic-thumb" src="/assets/hero/catch-zanotti.webp" width="186" height="420" alt="Giuseppe Zanotti shoes, size 42, caught on Vinted" loading="lazy" decoding="async">
+                      <span class="ic-badge">New</span>
+                    </div>
+                    <div class="ic-info">
+                      <div class="ic-row">
+                        <div class="ic-t">Scarpe Giuseppe Zanotti</div>
+                        <div class="ic-pricecol">
+                          <div class="ic-p">&euro;300</div>
+                          <div class="ic-ptotal">&euro;315.70 incl. protection</div>
+                        </div>
+                      </div>
+                      <div class="ic-meta">Giuseppe Zanotti &bull; 42 &bull; Neuf avec &eacute;tiquette &bull; 2m ago</div>
+                    </div>
+                  </div>
+
+                  <div class="ic-card">
+                    <div class="ic-thumbwrap">
+                      <img class="ic-thumb" src="/assets/hero/catch-supreme-jordan-hoodie.webp" width="315" height="420" alt="Supreme x Jordan hoodie, size M, caught on Vinted" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ic-info">
+                      <div class="ic-row">
+                        <div class="ic-t">Hoodie supreme x Jordan 2024</div>
+                        <div class="ic-pricecol">
+                          <div class="ic-p">&euro;100</div>
+                          <div class="ic-ptotal">&euro;105.70 incl. protection</div>
+                        </div>
+                      </div>
+                      <div class="ic-meta">Supreme x Jordan &bull; M &bull; Tr&egrave;s bon &eacute;tat &bull; 15m ago</div>
+                    </div>
+                  </div>
+
+                  <div class="ic-card">
+                    <div class="ic-thumbwrap">
+                      <img class="ic-thumb" src="/assets/hero/catch-dunk-laser-orange.webp" width="315" height="420" alt="Nike Dunk Low Pro Laser Orange, size 44, caught on Vinted" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ic-info">
+                      <div class="ic-row">
+                        <div class="ic-t">Nike Dunk Low Pro ( Laser Orange)</div>
+                        <div class="ic-pricecol">
+                          <div class="ic-p">&euro;100</div>
+                          <div class="ic-ptotal">&euro;105.70 incl. protection</div>
+                        </div>
+                      </div>
+                      <div class="ic-meta">Nike &bull; 44 &bull; Bon &eacute;tat &bull; 20m ago</div>
+                    </div>
+                  </div>
+
+                  <div class="ic-card">
+                    <div class="ic-thumbwrap">
+                      <img class="ic-thumb" src="/assets/hero/catch-dunk-militaire.webp" width="315" height="420" alt="Nike Dunk militaire, size 39, caught on Vinted" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ic-info">
+                      <div class="ic-row">
+                        <div class="ic-t">Dunk militaire</div>
+                        <div class="ic-pricecol">
+                          <div class="ic-p">&euro;50</div>
+                          <div class="ic-ptotal">&euro;53.20 incl. protection</div>
+                        </div>
+                      </div>
+                      <div class="ic-meta">Nike &bull; 39 &bull; Tr&egrave;s bon &eacute;tat &bull; 24m ago</div>
+                    </div>
+                  </div>
+
+                  <div class="ic-card">
+                    <div class="ic-thumbwrap">
+                      <img class="ic-thumb" src="/assets/hero/catch-supreme-sudadera.webp" width="315" height="420" alt="Supreme red hoodie, size S, caught on Vinted" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ic-info">
+                      <div class="ic-row">
+                        <div class="ic-t">Sudadera Supreme roja</div>
+                        <div class="ic-pricecol">
+                          <div class="ic-p">&euro;79.99</div>
+                          <div class="ic-ptotal">&euro;84.69 incl. protection</div>
+                        </div>
+                      </div>
+                      <div class="ic-meta">Supreme &bull; S &bull; Neuf sans &eacute;tiquette &bull; 29m ago</div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <div class="ic-sheen"></div>
           </div>
         </div>
       </div>
-      <div class="ic-vignette"></div>
-      <!-- Static fallback caption. The script replaces the text per shot; if it
-           never runs, this one stays, and it describes the still correctly. -->
-      <div class="ic-caption" id="ic-caption">Live feed &mdash; your saved hunts</div>
     </div>
+    <!-- Static fallback beat line. The script replaces the text per shot; if
+         it never runs this one stays, and it describes the still correctly. -->
+    <p class="ic-beat" id="ic-beat">Your saved hunts, watched around the clock</p>
     <p class="ic-note">
       Real listings caught on vinted.be, 20 September 2026. Titles, prices, sizes,
       conditions and buyer-protection totals are exactly as captured.
@@ -1128,13 +1202,22 @@
      the component is off screen - pausing leaves the camera where it is and
      can never hide anything.
 
-     Everything is computed from a single timeline position t, written straight
-     to style properties on each frame. Nothing depends on a CSS transition
-     completing, because a background tab suspends those (a limitation this
-     project has been bitten by three times - see CLAUDE.md section 4).
+     WHY Z AND NOT scale(). The first pass animated scale() on a flat plane,
+     which magnifies everything at the same rate - it reads as a page being
+     zoomed, not a camera travelling. The camera now moves through Z against
+     the perspective on .ic-frame, so the near edge of the screen sweeps past
+     faster than the far edge and the rotation unwinds as it closes in. Same
+     single transform, real parallax.
 
-     window.__IC.seek(t) is a deliberate debug hook: it positions the timeline
-     exactly so a shot can be inspected without waiting for rAF.
+     Pacing is deliberately uneven and the curves differ per beat: a slow dolly
+     in, a snap to the catch that overshoots and settles, a short drop to the
+     price, a long release. One symmetric easeInOut on five equal beats was
+     the other half of why the first pass felt mechanical.
+
+     Nothing depends on a CSS transition completing, because a background tab
+     suspends those (this project has been bitten three times - CLAUDE.md §4).
+     window.__IC.seek(t) positions the timeline exactly so a shot can be
+     inspected without waiting for rAF.
      ========================================================================== */
   (function () {
     'use strict';
@@ -1143,85 +1226,80 @@
       var cam = document.getElementById('ic-cam');
       var card = document.getElementById('ic-catch');
       var scan = document.getElementById('ic-scan');
-      var cap = document.getElementById('ic-caption');
-      if (!root || !cam || !card || !scan || !cap) return;
+      var beat = document.getElementById('ic-beat');
+      if (!root || !cam || !card || !scan || !beat) return;
 
       // Respect the user first. Returning here means data-ic-ready is never
-      // set, so the card is never hidden and the camera stays at its CSS wide
-      // shot - the same finished still a no-JS visitor gets.
+      // set, so no card is ever dimmed and the camera stays at its CSS
+      // establishing frame - the same finished still a no-JS visitor gets.
       var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
       if (mq && mq.matches) return;
 
-      // --- the shot list ---------------------------------------------------
-      // Camera keys are {s: scale, x: translateX %, y: translateY %}. With
-      // transform-origin at 50% 50% and translate applied before scale, the
-      // percentages that bring a point at fraction (u,v) of the render to the
-      // centre of frame are x = s*(0.5-u)*100, y = s*(0.5-v)*100. The values
-      // below are that formula evaluated for the first card's thumbnail
-      // centre (u 0.137, v 0.391) and its price block (u 0.137, v 0.619).
-      // Scale ceilings are set by raster cost and source resolution, not by
-      // how dramatic they look: the camera scales a live DOM subtree, so a
-      // 2.9x push made the compositor rasterise ~7 MPix and upscaled a
-      // 760px photo past its own resolution. 2.5x is the ceiling that keeps
-      // the money shot sharp AND the layer cheap.
-      var DESKTOP_KEYS = {
-        WIDE:  { s: 1.00, x: 0,     y: 0 },
-        DRIFT: { s: 1.06, x: -1.5,  y: -1.0 },
-        FRAME: { s: 1.45, x: 42.8,  y: 10.2 },
-        PUSH:  { s: 1.95, x: 70.8,  y: 21.3 },
-        PRICE: { s: 2.50, x: 90.8,  y: -29.8 }
+      // --- camera keys -----------------------------------------------------
+      // {z: em along the view axis, rx/ry: degrees, x/y: % of the render}.
+      // With perspective P on the parent, magnification is P/(P-z), and the
+      // translate needed to centre a point at fraction u is simply
+      // (0.5 - u) * 100 - independent of z, because the projection scales the
+      // offset and the translate by the same factor. Values below are that,
+      // evaluated for the first card's thumbnail centre (u 0.180, v 0.425)
+      // and its price row (v 0.705) in the 75em x 46.875em desktop space.
+      // z is in em, where 1em is 16 design px and the perspective is 75em,
+      // so magnification is 75/(75 - z): -9.4em reads 0.89x, 26.6em 1.55x,
+      // 34.4em 1.85x. Writing it this way keeps the shot identical at every
+      // viewport width instead of drifting with an absolute px perspective.
+      var DESKTOP = {
+        WIDE:  { z: -13.00, rx: 4.4, ry: -10.0, x: 0,    y: 0 },
+        IN:    { z:  0.000, rx: 2.4, ry:  -5.0, x: 0,    y: 0 },
+        CATCH: { z: 26.600, rx: 1.0, ry:  -2.0, x: 30.0, y: 7.5 },
+        PRICE: { z: 34.400, rx: 0.0, ry:   0.0, x: 32.0, y: -20.5 }
       };
-      // Phones render a 36em x 48em design space with two columns (see the
-      // stylesheet), so the first card sits at u 0.285, v 0.344 and its price
-      // at v 0.543 - different geometry, same formula. The scales are capped
-      // by geometry, not taste: a card is 16.5em of a 36em frame, so
-      // anything past ~2.0x is wider than the frame and starts slicing the
-      // price off the edge. Measured at 375px - 2.7x cut "EUR1200" in half.
-      var MOBILE_KEYS = {
-        WIDE:  { s: 1.00, x: 0,    y: 0 },
-        DRIFT: { s: 1.08, x: -1.2, y: -0.8 },
-        FRAME: { s: 1.35, x: 21.6, y: 13.5 },
-        PUSH:  { s: 1.70, x: 36.6, y: 26.5 },
-        PRICE: { s: 1.95, x: 41.9, y: -8.4 }
+      // Phones render a 36em x 48em space with two columns and a shallower
+      // perspective (900px), so the first card sits at u 0.271, v 0.337 and
+      // its price row at v 0.532. The z ceiling is geometry, not taste: a card
+      // is 15.5em of a 36em frame, so past ~2.1x magnification it is wider
+      // than the frame and the price gets sliced off the edge.
+      var MOBILE = {
+        WIDE:  { z: -6.200, rx: 3.6, ry: -8.0, x: 0,    y: 0 },
+        IN:    { z:  0.000, rx: 2.0, ry: -4.0, x: 0,    y: 0 },
+        CATCH: { z: 12.800, rx: 0.8, ry: -1.5, x: 21.0, y: 15.0 },
+        PRICE: { z: 16.500, rx: 0.0, ry:  0.0, x: 22.9, y: -3.2 }
       };
+
+      // --- easing ----------------------------------------------------------
+      function easeInOutCubic(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+      function easeOutCubic(p) { return 1 - Math.pow(1 - p, 3); }
+      // Overshoot and settle. This is the beat where the feed catches
+      // something; it should arrive with weight, not glide.
+      function easeOutBack(p) { var c1 = 1.34, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); }
+      var EASES = { io: easeInOutCubic, out: easeOutCubic, back: easeOutBack };
 
       var narrow = window.matchMedia && window.matchMedia('(max-width: 768px)');
-      var K = (narrow && narrow.matches) ? MOBILE_KEYS : DESKTOP_KEYS;
-      var WIDE = K.WIDE, DRIFT = K.DRIFT, FRAME = K.FRAME, PUSH = K.PUSH, PRICE = K.PRICE;
+      var K = (narrow && narrow.matches) ? MOBILE : DESKTOP;
 
       var SHOTS = [
-        { at: 0.0,  to: 3.4,  from: WIDE,  end: DRIFT, cap: 'Live feed — your saved hunts' },
-        { at: 3.4,  to: 6.2,  from: DRIFT, end: FRAME, cap: '06:07:34 UTC — posted on vinted.be' },
-        { at: 6.2,  to: 9.6,  from: FRAME, end: PUSH,  cap: 'Off-White x Air Jordan 1 “Chicago” — size 44' },
-        { at: 9.6,  to: 13.0, from: PUSH,  end: PRICE, cap: '€1200 — €1260.70 incl. Buyer Protection' },
-        { at: 13.0, to: 17.4, from: PRICE, end: WIDE,  cap: 'Real catches. Real prices. Your feed.' }
+        { at: 0.0,  to: 3.0,  from: 'WIDE',  end: 'IN',    ease: 'io',   beat: 'Your saved hunts, watched around the clock' },
+        { at: 3.0,  to: 7.0,  from: 'IN',    end: 'CATCH', ease: 'back', beat: '06:07:34 UTC — a seller posts on vinted.be' },
+        { at: 7.0,  to: 10.6, from: 'CATCH', end: 'PRICE', ease: 'out',  beat: '€1200 — €1260.70 incl. Buyer Protection' },
+        { at: 10.6, to: 15.0, from: 'PRICE', end: 'WIDE',  ease: 'io',   beat: 'Off-White x Air Jordan 1 “Chicago” — size 44' }
       ];
-      var LOOP = 17.4;
+      var LOOP = 15.0;
 
-      // Not a resize listener on the window - a media-query change event, and
-      // it only swaps five numbers. Rotating a phone re-frames the shots
+      // Not a resize listener on the window - a media-query change event that
+      // swaps which key table is in use. Rotating a phone re-frames the shots
       // instead of leaving the camera pointed at empty canvas.
-      function useKeys(k) {
-        SHOTS[0].from = k.WIDE;  SHOTS[0].end = k.DRIFT;
-        SHOTS[1].from = k.DRIFT; SHOTS[1].end = k.FRAME;
-        SHOTS[2].from = k.FRAME; SHOTS[2].end = k.PUSH;
-        SHOTS[3].from = k.PUSH;  SHOTS[3].end = k.PRICE;
-        SHOTS[4].from = k.PRICE; SHOTS[4].end = k.WIDE;
-      }
       if (narrow && narrow.addEventListener) {
-        narrow.addEventListener('change', function (e) {
-          useKeys(e.matches ? MOBILE_KEYS : DESKTOP_KEYS);
-        });
+        narrow.addEventListener('change', function (e) { K = e.matches ? MOBILE : DESKTOP; });
       }
 
-      // The arriving card and its scan-line, as absolute timeline positions.
-      var CARD_IN = 3.55, CARD_DUR = 0.45;
-      var SCAN_IN = 3.60, SCAN_DUR = 0.95;
+      // The arriving catch and its border bloom, as absolute timeline points.
+      // Early on purpose. At 5.4s the first grid slot sat empty for a third
+      // of the loop, which left a hole in the establishing shot; the arrival
+      // is the payoff, so it lands as soon as the dolly settles.
+      var CARD_IN = 3.15, CARD_DUR = 0.42;
+      var SCAN_IN = 3.18, SCAN_DUR = 1.00;
 
-      function easeInOut(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
       function lerp(a, b, p) { return a + (b - a) * p; }
-
-      var lastCap = null;
+      var lastBeat = null;
 
       function render(t) {
         t = ((t % LOOP) + LOOP) % LOOP;
@@ -1229,68 +1307,73 @@
         var shot = SHOTS[0], i;
         for (i = 0; i < SHOTS.length; i++) { if (t >= SHOTS[i].at) shot = SHOTS[i]; }
 
-        var p = easeInOut(Math.min(1, Math.max(0, (t - shot.at) / (shot.to - shot.at))));
-        var s = lerp(shot.from.s, shot.end.s, p);
-        var x = lerp(shot.from.x, shot.end.x, p);
-        var y = lerp(shot.from.y, shot.end.y, p);
-        cam.style.transform = 'translate(' + x.toFixed(3) + '%, ' + y.toFixed(3) + '%) scale(' + s.toFixed(4) + ')';
+        var raw = Math.min(1, Math.max(0, (t - shot.at) / (shot.to - shot.at)));
+        var p = EASES[shot.ease](raw);
+        var a = K[shot.from], b = K[shot.end];
 
-        if (shot.cap !== lastCap) { cap.textContent = shot.cap; lastCap = shot.cap; }
+        cam.style.transform =
+          'translate3d(' + lerp(a.x, b.x, p).toFixed(3) + '%, ' + lerp(a.y, b.y, p).toFixed(3) + '%, ' +
+          lerp(a.z, b.z, p).toFixed(3) + 'em) rotateX(' + lerp(a.rx, b.rx, p).toFixed(2) +
+          'deg) rotateY(' + lerp(a.ry, b.ry, p).toFixed(2) + 'deg)';
 
-        // The catch is absent before its post time and present after it. This
-        // inline opacity is the ONLY thing on the page that can hide a card,
-        // and it is written exclusively from inside a real animation frame -
-        // so "the loop never ran", for any reason at all, means "all six
-        // catches are visible", not "a card is stuck at zero".
-        var cp = Math.min(1, Math.max(0, (t - CARD_IN) / CARD_DUR));
-        cp = easeInOut(cp);
-        // setProperty(..., 'important') is not cargo cult. style.css still
-        // carries a Webflow-era rule that force-unhides anything whose
+        if (shot.beat !== lastBeat) { beat.textContent = shot.beat; lastBeat = shot.beat; }
+
+        // The catch is absent before its post time and present after it.
+        //
+        // setProperty(..., 'important') is not cargo cult, and this inline
+        // write is the ONLY thing on the page that can hide a card. style.css
+        // still carries a Webflow-era rule that force-unhides anything whose
         // inline style contains the substring "opacity: 0":
         //   [style*="opacity: 0"] { opacity: 1 !important }
         // It is dead code (Webflow was removed 2026-08-23, html has no
-        // .w-mod-js) but it is still served on every marketing page, and
-        // being a substring match it also swallows 0.25, 0.5, 0.55 and so
-        // on. A plain inline opacity here computed to 1 in real Chrome.
-        // An inline !important outranks a stylesheet !important, so this
-        // works without touching a stylesheet shared by seven pages -
-        // that rule should be removed on its own, deliberately.
+        // .w-mod-js) but it is still served on every marketing page, and being
+        // a substring match it also swallows 0.25, 0.5 and so on. A plain
+        // inline opacity here computed to 1 in real Chrome. An inline
+        // !important outranks a stylesheet !important, so this works without
+        // editing a stylesheet shared by seven pages - that rule should be
+        // removed on its own, deliberately.
+        //
+        // Because it is written only from inside a real animation frame,
+        // every path that ends in "the loop never ran" - no JS, thrown JS,
+        // throttled rAF, reduced motion - leaves all six catches visible.
+        var cp = easeOutCubic(Math.min(1, Math.max(0, (t - CARD_IN) / CARD_DUR)));
         card.style.setProperty('opacity', String(cp), 'important');
-        card.style.transform = 'translateY(' + (6 * (1 - cp)).toFixed(2) + 'px)';
+        card.style.transform = 'translateY(' + (7 * (1 - cp)).toFixed(2) + 'px)';
 
         var sp = (t - SCAN_IN) / SCAN_DUR;
         if (sp >= 0 && sp <= 1) {
           scan.classList.add('is-sweeping');
-          scan.style.transform = 'translateY(' + lerp(-120, 320, sp).toFixed(1) + '%)';
-        } else {
+          scan.style.setProperty('opacity', String(1 - easeOutCubic(sp)), 'important');
+        } else if (scan.classList.contains('is-sweeping')) {
           scan.classList.remove('is-sweeping');
+          scan.style.removeProperty('opacity');
         }
       }
 
       var running = false, rafId = 0, base = 0, held = 0;
+      function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
 
-      function tick(now) {
+      function tick(ts) {
         if (!running) return;
-        render(held + (now - base) / 1000);
+        render(held + (ts - base) / 1000);
         rafId = window.requestAnimationFrame(tick);
       }
       function start() {
         if (running) return;
         running = true;
-        base = (window.performance && performance.now) ? performance.now() : Date.now();
+        base = now();
         rafId = window.requestAnimationFrame(tick);
       }
       function stop() {
         if (!running) return;
-        var now = (window.performance && performance.now) ? performance.now() : Date.now();
-        held = (held + (now - base) / 1000) % LOOP;
+        held = (held + (now() - base) / 1000) % LOOP;
         running = false;
         if (rafId) window.cancelAnimationFrame(rafId);
       }
 
       // Debug/verification hook. seek() renders one exact frame with the loop
-      // stopped, which is the only way to inspect a given shot in a tab where
-      // rAF is throttled.
+      // stopped - the only way to inspect a given shot in a tab where rAF is
+      // throttled.
       window.__IC = {
         duration: LOOP,
         shots: SHOTS,
@@ -1301,8 +1384,8 @@
 
       // Deliberately NOT calling render() here. The first frame is drawn from
       // inside tick(), so the page keeps its server-rendered still until the
-      // loop is genuinely running. data-ic-ready only unlocks the orb pulse
-      // and the scan-line gradient, neither of which can hide content.
+      // loop is genuinely running. data-ic-ready only unlocks the border bloom
+      // and the status-dot pulse, neither of which can hide content.
       root.setAttribute('data-ic-ready', '1');
 
       if ('IntersectionObserver' in window) {
@@ -1315,9 +1398,9 @@
         start();
       }
     } catch (e) {
-      // Leave the page exactly as the server sent it: wide shot, all six
-      // catches visible, fallback caption. Never rethrow from a decorative
-      // component on the highest-traffic page on the site.
+      // Leave the page exactly as the server sent it: establishing frame, all
+      // six catches visible, fallback beat line. Never rethrow from a
+      // decorative component on the highest-traffic page on the site.
       try {
         var el = document.getElementById('intercept');
         if (el) el.removeAttribute('data-ic-ready');
