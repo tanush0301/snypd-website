@@ -95,6 +95,10 @@
   // ---- toggle plan via ?plan=free|elite in the test URL ----
   var params = new URLSearchParams(location.search);
   var PLAN = params.get('plan') || 'elite';
+  // ?hunts=0 seeds an account with no saved searches - the brand-new-user
+  // path (first-run wizard, first-hunt empty state). Without this there was
+  // no way to exercise either from QA at all.
+  var NO_HUNTS = params.get('hunts') === '0';
 
   var UID = 'qa-user-0000-0000-0000-000000000001';
 
@@ -250,6 +254,8 @@
       { user_id: UID, current_streak: 9 },
     ],
   };
+
+  if (NO_HUNTS) { DB.user_searches = []; DB.user_claims = []; DB.xp_events = []; }
 
   function matchRow(row, filters) {
     return filters.every(function (f) {

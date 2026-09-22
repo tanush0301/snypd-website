@@ -1584,6 +1584,18 @@ body {
     /* README §5.3.6: the footer is pinned, START HUNTING is full-width, and
        SET THIS UP LATER is a centred tertiary beneath it - not two buttons
        sharing a row, which is what .wiz-actions gives by default. */
+    /* The wizard has to be able to say "that did not work, and here is why".
+       Amber, not red: failing to turn on alerts is a thing to fix, not an
+       error the user caused. */
+    .wiz-alert-result {
+      margin: 16px 0 0;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,176,32,0.35);
+      background: rgba(255,176,32,0.07);
+      color: var(--warning);
+      font-size: 12px;
+      line-height: 1.55;
+    }
     #wiz-step-2 .wiz-actions { flex-direction: column; gap: 13px; margin-top: 24px; }
     #wiz-step-2 .wiz-actions .btn { width: 100%; }
     /* README §5.7 footer: EVERYTHING'S STILL LISTED is full width, with the
@@ -1743,8 +1755,9 @@ body {
         </div>
       </div>
       <p class="wiz-sub" style="margin:16px 0 0;font-size:11.5px;">Threshold-based filtering ("only ping me under X% below market") isn't built yet - every match on an enabled push alerts you today.</p>
+      <p class="wiz-alert-result" id="wiz-alert-result" style="display:none"></p>
       <div class="wiz-actions">
-        <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Start hunting</button>
+        <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Turn on alerts &amp; start hunting</button>
         <button class="btn btn-tertiary" id="wiz-finish" type="button">Set this up later</button>
       </div>
     </div>
@@ -2681,14 +2694,14 @@ const HEARTBEAT_URL = (() => {
 
       const enableBtn = document.getElementById('wiz-enable-alerts');
       if (enableBtn) {
+        // Set once the user has been shown a real failure reason, so the
+        // second press means "I have read that, let me in" rather than
+        // retrying the same thing.
+        let alertFailureShown = false;
+
         enableBtn.addEventListener('click', async () => {
-          // Reuses the real, already-working notification button rather than
-          // reimplementing push logic here. Only fires if the push toggle
-          // above is actually on.
-          if (pushToggle && pushToggle.classList.contains('is-on')) {
-            const realNotifyBtn = document.getElementById('btn-notify');
-            if (realNotifyBtn) realNotifyBtn.click();
-          }
+          const resultEl = document.getElementById('wiz-alert-result');
+
           // Quiet hours (migration 028, backend/src/push.py) - real, unlike
           // email digest and the threshold selector below, which are
           // genuinely not built yet. 23:00-08:00 UTC matches the mockup's
@@ -2702,7 +2715,41 @@ const HEARTBEAT_URL = (() => {
           } catch (e) {
             console.error('SNYPD wizard: could not save quiet hours', e);
           }
-          overlay.style.display = 'none';
+
+          const wantsPush = pushToggle && pushToggle.classList.contains('is-on');
+          if (!wantsPush || alertFailureShown) { overlay.style.display = 'none'; return; }
+
+          // This used to fire a synthetic click at #btn-notify and close the
+          // overlay in the same tick, which meant every failure path - push
+          // not yet initialised, iOS Safari without a Home Screen install,
+          // permission refused, /push/status not ready - looked identical to
+          // success. window.SNYPD.enableAlerts() awaits the real subsystem
+          // and always resolves with the actual outcome.
+          enableBtn.disabled = true;
+          enableBtn.textContent = 'Turning alerts on...';
+          let res = { ok: false, state: 'unavailable', message: 'Alerts are not available in this browser.' };
+          try {
+            if (window.SNYPD && typeof window.SNYPD.enableAlerts === 'function') {
+              res = await window.SNYPD.enableAlerts();
+            }
+          } catch (e) {
+            console.error('SNYPD wizard: enableAlerts threw', e);
+            res = { ok: false, state: 'error', message: 'Could not turn alerts on: ' + (e && e.message ? e.message : 'unknown error') + '.' };
+          }
+          enableBtn.disabled = false;
+
+          if (res && res.ok) { overlay.style.display = 'none'; return; }
+
+          // Stay open. Closing here is what told 48 of 49 accounts that
+          // alerts were on when they were not.
+          if (resultEl) {
+            resultEl.textContent = (res && res.message)
+              ? res.message
+              : 'Alerts could not be turned on on this device.';
+            resultEl.style.display = 'block';
+          }
+          enableBtn.textContent = 'Continue without alerts';
+          alertFailureShown = true;
         });
       }
 
@@ -3771,6 +3818,10 @@ const HEARTBEAT_URL = (() => {
   const statusDot = document.getElementById('mh-status-dot');
 
   let running = false;
+  // null until loadAds has actually asked. Only false - a confirmed zero -
+  // switches the empty state to the first-hunt screen, so a failed query
+  // never shows a brand-new-user screen to someone with saved hunts.
+  let hasActiveHunts = null;
   let hasRenderedOnce = false;
   let pendingNew = [];
 
@@ -3817,8 +3868,36 @@ const HEARTBEAT_URL = (() => {
   const EMPTY_ICON = '<svg width="28" height="28" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:0.6"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>';
 
   function updateEmptyUI(hasRows, lastMatchTs) {
+    // Undo the first-hunt screen's pill suppression on every other path, so
+    // saving a hunt brings the control straight back without a reload.
+    if (hasRows || hasActiveHunts !== false) {
+      const pill = document.getElementById('filter-pill');
+      if (pill && pill.style.display === 'none') pill.style.display = '';
+    }
     if (hasRows) {
       empty.style.display = 'none';
+      return;
+    }
+    // A brand-new account has nothing to start. Telling it to press Start
+    // Sniping Now is the wrong instruction: with no saved hunt there is
+    // nothing to snipe, so the feed would stay empty forever and look broken.
+    if (hasActiveHunts === false) {
+      empty.innerHTML = EMPTY_ICON
+        + '<div style="font-size:15px;color:var(--text-primary);margin-bottom:8px">No hunts yet</div>'
+        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD watches it around the clock and every new match lands here, newest first.</div>'
+        + '<div style="margin-top:18px"><button class="btn btn-prim" type="button" id="empty-add-hunt">Add your first hunt</button></div>';
+      empty.style.display = 'block';
+      const zeroPill = document.getElementById('filter-pill');
+      if (zeroPill) zeroPill.style.display = 'none';
+      const addBtn = document.getElementById('empty-add-hunt');
+      if (addBtn) {
+        // Reuse the filter sheet's own tested opener rather than a second
+        // path into the same UI.
+        addBtn.addEventListener('click', () => {
+          const pill = document.getElementById('filter-pill');
+          if (pill) pill.click();
+        });
+      }
       return;
     }
     let msg;
@@ -4426,6 +4505,7 @@ const HEARTBEAT_URL = (() => {
         throw huntsError;
       }
       const activeSearches = new Set((activeHunts || []).map(h => savedSearchSignature(h.vinted_url)).filter(Boolean));
+      hasActiveHunts = (activeHunts || []).length > 0;
 
       const CORE_AD_COLUMNS = `
           listing_id,
@@ -4887,6 +4967,18 @@ const HEARTBEAT_URL = (() => {
   var sb = (window.SNYPD && window.SNYPD.supabase) || null;
   var reg = null;
 
+  // Why the alert control ended up in the state it did. The first-run wizard
+  // used to "enable alerts" by firing a synthetic click at #btn-notify, which
+  // starts display:none and only becomes real after init() has registered a
+  // service worker AND completed a network round trip to /push/status. On
+  // every path where that had not finished, or had bailed (iOS Safari not
+  // installed to the Home Screen, push unsupported, status not ready), the
+  // click did nothing at all - and the wizard closed anyway, so the user was
+  // told alerts were on when no subscription existed. Measured 2026-09-22:
+  // 1 of 49 accounts had a push device. This object is what lets the wizard
+  // report the real outcome instead of assuming one.
+  var pushState = { ready: false, state: 'pending', message: 'Still setting up alerts.' };
+
   function say(msg) {
     if (!note) { return; }
     note.textContent = msg || '';
@@ -4954,7 +5046,8 @@ const HEARTBEAT_URL = (() => {
         show('Enable alerts', false);
         say('Notifications are blocked for this site. Turn them back on in your '
           + 'browser settings for snypd.store, then press the button again.');
-        return;
+        pushState = { ready: true, state: 'denied', message: '' };
+        return { ok: false, state: 'denied', message: 'Your browser did not allow notifications. Allow them for snypd.store, then press Enable alerts on the dashboard.' };
       }
 
       var keyRes = await fetch(API + '/api/v1/push/key');
@@ -4977,6 +5070,7 @@ const HEARTBEAT_URL = (() => {
       show('Alerts on - turn off', false);
       say('This device will be alerted when a listing matches, even with the '
         + 'browser closed.');
+      pushState = { ready: true, state: 'on', message: '' };
 
       // E6 onboarding: alerts enabled, +10 XP, once per account ever.
       if (window.SNYPD && window.SNYPD.xpEventExistsEver && window.SNYPD.awardXP) {
@@ -4987,7 +5081,9 @@ const HEARTBEAT_URL = (() => {
     } catch (e) {
       show('Enable alerts', false);
       say('Could not turn alerts on: ' + (e && e.message ? e.message : 'unknown error'));
+      return { ok: false, state: 'error', message: 'Could not turn alerts on: ' + (e && e.message ? e.message : 'unknown error') + '.' };
     }
+    return { ok: true, state: 'on', message: 'Alerts are on for this device.' };
   }
 
   async function disable() {
@@ -5032,6 +5128,12 @@ const HEARTBEAT_URL = (() => {
         btn.textContent = 'Alerts unavailable';
         say('Alerts are not available in this app right now. Try removing SNYPD '
           + 'from your Home Screen and adding it again.');
+        pushState = { ready: false, state: 'unavailable', message: 'Alerts are not available in this app. Remove SNYPD from your Home Screen and add it again.' };
+      } else {
+        pushState = { ready: false, state: 'unsupported', message: 'This browser cannot deliver alerts. Chrome or Edge on desktop can, and so can SNYPD installed to a phone home screen.' };
+      }
+      if (isIOS() && !isStandalone()) {
+        pushState = { ready: false, state: 'ios-install', message: 'On iPhone and iPad, alerts only work once SNYPD is on your Home Screen. Tap Share, then Add to Home Screen, and open SNYPD from that icon. Apple does not let a website do this step for you.' };
       }
       return;   // desktop browsers without push: leave the button hidden
     }
@@ -5043,6 +5145,7 @@ const HEARTBEAT_URL = (() => {
       console.error('SNYPD push: service worker registration failed', e);
       show('Alerts unavailable', true);
       say('Could not set up alerts: ' + (e && e.message ? e.message : 'service worker failed to register') + '.');
+      pushState = { ready: false, state: 'unavailable', message: 'Could not set up alerts on this device: ' + (e && e.message ? e.message : 'the service worker failed to register') + '.' };
       return;
     }
 
@@ -5056,12 +5159,14 @@ const HEARTBEAT_URL = (() => {
         console.error('SNYPD push: /push/status not ready', st);
         show('Alerts unavailable', true);
         say('Alerts are not ready on this account yet (status ' + st.status + '). Try again shortly.');
+        pushState = { ready: false, state: 'unavailable', message: 'Alerts are not ready on this account yet. Try again shortly.' };
         return;
       }
     } catch (e) {
       console.error('SNYPD push: /push/status request failed', e);
       show('Alerts unavailable', true);
       say('Could not check alert status: ' + (e && e.message ? e.message : 'unknown error') + '.');
+      pushState = { ready: false, state: 'unavailable', message: 'Could not reach the alert service. Try again shortly.' };
       return;
     }
 
@@ -5069,10 +5174,12 @@ const HEARTBEAT_URL = (() => {
       show('Alerts blocked', true);
       say('Notifications are blocked for snypd.store in this browser. Re-allow '
         + 'them in your browser settings to use alerts.');
+      pushState = { ready: false, state: 'denied', message: 'Your browser has blocked notifications for snypd.store. Re-allow them in browser settings, then try again.' };
       return;
     }
 
     var sub = await currentSub();
+    pushState = { ready: true, state: sub ? 'on' : 'off', message: '' };
     show(sub ? 'Alerts on - turn off' : 'Enable alerts', false);
     if (sub) {
       // Re-register on every load: subscriptions expire and the server may have
@@ -5112,7 +5219,28 @@ const HEARTBEAT_URL = (() => {
     });
   }
 
-  init();
+  // init() is async and slow: a service worker registration plus a round trip
+  // to /push/status. Anything that wants to turn alerts on has to wait for it,
+  // which is exactly what the synthetic-click approach could not do.
+  var initPromise = init().catch(function (e) {
+    console.error('SNYPD push: init failed', e);
+    pushState = { ready: false, state: 'error', message: 'Alerts could not be set up on this device.' };
+  });
+
+  // Same cross-closure bridge pattern the file already uses for awardXP,
+  // refreshFeed, marketCheck and loadClaims. Always resolves, never throws,
+  // and always reports which real state we ended in.
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.enableAlerts = async function () {
+    try { await initPromise; } catch (e) { /* already recorded in pushState */ }
+    if (pushState.state === 'on') {
+      return { ok: true, state: 'on', message: 'Alerts are already on for this device.' };
+    }
+    if (!pushState.ready) {
+      return { ok: false, state: pushState.state, message: pushState.message };
+    }
+    return await enable();
+  };
 })();
 </script>
 <script>
