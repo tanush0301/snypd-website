@@ -12,6 +12,13 @@
  * covers the actual edge cases, and actually clicking through it, is what
  * has caught bugs static reading alone did not (see CLAUDE.md Session 17).
  *
+ * GOTCHA: select() hands back the LIVE row objects, not copies. Two reads
+ * taken either side of a write therefore point at the same object and both
+ * show the final value, which can make a write that did work look like it
+ * did nothing. Snapshot the field you care about (or JSON.parse(JSON.
+ * stringify(...))) rather than holding two result references. Cost me a
+ * wrong "quiet hours does not persist" conclusion on 2026-09-22.
+ *
  * HOW TO USE
  * 1. Copy dashboard.html next to this file (or vice versa) and swap its
  *    Supabase CDN <script> tag for this one:

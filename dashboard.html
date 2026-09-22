@@ -1596,6 +1596,11 @@ body {
       font-size: 12px;
       line-height: 1.55;
     }
+    .prof-notify-block { margin-top: 20px; }
+    .prof-notify-head {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
     #wiz-step-2 .wiz-actions { flex-direction: column; gap: 13px; margin-top: 24px; }
     #wiz-step-2 .wiz-actions .btn { width: 100%; }
     /* README §5.7 footer: EVERYTHING'S STILL LISTED is full width, with the
@@ -1711,7 +1716,7 @@ body {
         </button>
       </div>
       <div class="wiz-actions">
-        <a class="btn btn-ghost" href="/filters">+ Build my own</a>
+        <button class="btn btn-ghost" id="wiz-build-own" type="button">+ Build my own</button>
         <button class="btn btn-ghost" id="wiz-skip" type="button">Skip &mdash; start me broad</button>
       </div>
     </div>
@@ -1981,6 +1986,33 @@ body {
   </div>
   <div class="xp-bar-track"><div class="xp-bar-fill" id="prof-xp-fill" style="width:0%"></div></div>
   <div id="prof-xp-next" style="font-size:11px;color:var(--text-muted);margin-top:4px"></div>
+</div>
+<!-- Notifications, changeable at any time. Until now the ONLY place the
+     quiet-hours columns (migration 028) could be written was the first-run
+     wizard, and that opens only when an account has zero saved hunts - so
+     the moment you had a hunt, you could never change them again, and if
+     you reached /filters without finishing the wizard they were never set
+     at all. Push on/off was reachable (the header button) but nowhere near
+     anything labelled "notifications". -->
+<div class="prof-notify-block">
+  <div class="prof-notify-head">Notifications</div>
+  <div class="wiz-alert-rows">
+    <div class="wiz-alert-row">
+      <div>
+        <div class="wiz-alert-row__title" id="prof-label-push">Push alerts</div>
+        <div class="wiz-alert-row__note" id="prof-push-note">Checking this device...</div>
+      </div>
+      <button type="button" class="toggle-switch is-disabled" id="prof-toggle-push" disabled role="switch" aria-checked="false" aria-labelledby="prof-label-push"><span class="toggle-switch__knob"></span></button>
+    </div>
+    <div class="wiz-alert-row">
+      <div>
+        <div class="wiz-alert-row__title" id="prof-label-quiet">Quiet hours</div>
+        <div class="wiz-alert-row__note">Hold alerts 23:00 - 08:00 UTC</div>
+      </div>
+      <button type="button" class="toggle-switch" id="prof-toggle-quiet" role="switch" aria-checked="false" aria-labelledby="prof-label-quiet"><span class="toggle-switch__knob"></span></button>
+    </div>
+  </div>
+  <p class="wiz-alert-result" id="prof-notify-result" style="display:none"></p>
 </div>
 <p class="tiny-note" id="prof-elite-streak-note" style="display:none">Elite's own streak condition (always-on monitoring, no tab-open requirement) isn't wired up yet - streak tracking above is currently Free-tier only.</p>
 <p class="tiny-note">Per-category alert settings shown in early mockups aren't wired to real data yet - not shown here rather than shown with invented numbers.</p>
@@ -2664,6 +2696,19 @@ const HEARTBEAT_URL = (() => {
         });
       });
 
+      const buildOwnBtn = document.getElementById('wiz-build-own');
+      if (buildOwnBtn) {
+        buildOwnBtn.addEventListener('click', () => {
+          overlay.style.display = 'none';
+          const pill = document.getElementById('filter-pill');
+          if (pill) { pill.click(); return; }
+          // The pill is hidden on the first-hunt empty state, so fall back to
+          // the empty state's own button, which opens the same sheet.
+          const addBtn = document.getElementById('empty-add-hunt');
+          if (addBtn) addBtn.click();
+        });
+      }
+
       const skipBtn = document.getElementById('wiz-skip');
       if (skipBtn) {
         skipBtn.addEventListener('click', async () => {
@@ -3283,7 +3328,113 @@ const HEARTBEAT_URL = (() => {
       });
     }
 
+    // Reflects the REAL device subscription and the REAL stored quiet hours,
+    // never an assumed state. Both controls stay usable for the life of the
+    // account, which is the whole point of moving them out of the wizard.
+    //
+    // loadProfile() can run more than once (tab switches, XP refreshes), so
+    // the listeners are bound exactly once. This file has already shipped a
+    // bug where two identical handlers cancelled each other out.
+    let notifyPrefsWired = false;
+    async function loadNotificationPrefs() {
+      const pushToggle = document.getElementById('prof-toggle-push');
+      const quietToggle = document.getElementById('prof-toggle-quiet');
+      const pushNote = document.getElementById('prof-push-note');
+      const resultEl = document.getElementById('prof-notify-result');
+      if (!pushToggle || !quietToggle) return;
+
+      function showResult(msg) {
+        if (!resultEl) return;
+        resultEl.textContent = msg || '';
+        resultEl.style.display = msg ? 'block' : 'none';
+      }
+
+      // --- push, read from the actual subscription ---
+      let st = { ready: false, state: 'unavailable', message: 'Alerts are not available in this browser.' };
+      try {
+        if (window.SNYPD && typeof window.SNYPD.alertsStatus === 'function') {
+          st = await window.SNYPD.alertsStatus();
+        }
+      } catch (e) { console.error('SNYPD profile: alertsStatus failed', e); }
+
+      function paintPush(state, message) {
+        const on = state === 'on';
+        pushToggle.classList.toggle('is-on', on);
+        pushToggle.setAttribute('aria-checked', on ? 'true' : 'false');
+        const usable = state === 'on' || state === 'off';
+        pushToggle.disabled = !usable;
+        pushToggle.classList.toggle('is-disabled', !usable);
+        if (pushNote) {
+          pushNote.textContent = on
+            ? 'On for this device'
+            : (usable ? 'Off for this device' : 'Not available on this device');
+        }
+        showResult(usable ? '' : (message || ''));
+      }
+      paintPush(st.state, st.message);
+
+      if (!notifyPrefsWired) pushToggle.addEventListener('click', async () => {
+        if (pushToggle.disabled) return;
+        const turningOn = !pushToggle.classList.contains('is-on');
+        pushToggle.disabled = true;
+        let res;
+        try {
+          res = turningOn
+            ? await window.SNYPD.enableAlerts()
+            : await window.SNYPD.disableAlerts();
+        } catch (e) {
+          console.error('SNYPD profile: push toggle failed', e);
+          res = { ok: false, state: turningOn ? 'error' : 'on', message: 'Could not change alerts. Try again.' };
+        }
+        pushToggle.disabled = false;
+        // Repaint from what actually happened, not from what was clicked.
+        const after = (window.SNYPD && window.SNYPD.alertsStatus)
+          ? await window.SNYPD.alertsStatus()
+          : { state: res && res.state, message: res && res.message };
+        paintPush(after.state, (res && !res.ok) ? res.message : after.message);
+      });
+
+      // --- quiet hours, read from the real columns (migration 028) ---
+      let quietOn = false;
+      try {
+        const { data, error } = await sb
+          .from('users')
+          .select('push_quiet_hours_start,push_quiet_hours_end')
+          .eq('id', uid)
+          .maybeSingle();
+        if (error) throw error;
+        quietOn = !!(data && data.push_quiet_hours_start !== null && data.push_quiet_hours_start !== undefined);
+      } catch (e) {
+        console.error('SNYPD profile: could not read quiet hours', e);
+      }
+      quietToggle.classList.toggle('is-on', quietOn);
+      quietToggle.setAttribute('aria-checked', quietOn ? 'true' : 'false');
+
+      if (!notifyPrefsWired) quietToggle.addEventListener('click', async () => {
+        const next = !quietToggle.classList.contains('is-on');
+        quietToggle.classList.toggle('is-on', next);
+        quietToggle.setAttribute('aria-checked', next ? 'true' : 'false');
+        try {
+          const { error } = await sb.from('users').update({
+            push_quiet_hours_start: next ? 23 : null,
+            push_quiet_hours_end: next ? 8 : null,
+          }).eq('id', uid);
+          if (error) throw error;
+        } catch (e) {
+          // Put the switch back: a toggle that stays flipped after a failed
+          // write is the same lie the wizard was telling.
+          console.error('SNYPD profile: could not save quiet hours', e);
+          quietToggle.classList.toggle('is-on', !next);
+          quietToggle.setAttribute('aria-checked', !next ? 'true' : 'false');
+          showResult('Could not save quiet hours. Try again.');
+        }
+      });
+
+      notifyPrefsWired = true;
+    }
+
     async function loadProfile() {
+      loadNotificationPrefs();
       set('prof-email', email);
       if (joinedAt) {
         const d = new Date(joinedAt);
@@ -5094,11 +5245,14 @@ const HEARTBEAT_URL = (() => {
         await api('/api/v1/push/unsubscribe', 'POST', { endpoint: sub.endpoint });
         await sub.unsubscribe();
       }
+      pushState = { ready: true, state: 'off', message: '' };
       show('Enable alerts', false);
       say('Alerts are off for this device.');
+      return { ok: true, state: 'off', message: 'Alerts are off for this device.' };
     } catch (e) {
       show('Alerts on - turn off', false);
       say('Could not turn alerts off. Try again.');
+      return { ok: false, state: 'on', message: 'Could not turn alerts off. Try again.' };
     }
   }
 
@@ -5231,6 +5385,22 @@ const HEARTBEAT_URL = (() => {
   // refreshFeed, marketCheck and loadClaims. Always resolves, never throws,
   // and always reports which real state we ended in.
   window.SNYPD = window.SNYPD || {};
+  // Read-only: what is actually true for this device right now. Used by the
+  // Profile screen so it can never show a toggle that disagrees with the
+  // real subscription.
+  window.SNYPD.alertsStatus = async function () {
+    try { await initPromise; } catch (e) { /* already recorded in pushState */ }
+    return { ready: pushState.ready, state: pushState.state, message: pushState.message };
+  };
+
+  window.SNYPD.disableAlerts = async function () {
+    try { await initPromise; } catch (e) { /* already recorded in pushState */ }
+    if (pushState.state !== 'on') {
+      return { ok: true, state: pushState.state, message: 'Alerts are already off for this device.' };
+    }
+    return await disable();
+  };
+
   window.SNYPD.enableAlerts = async function () {
     try { await initPromise; } catch (e) { /* already recorded in pushState */ }
     if (pushState.state === 'on') {
