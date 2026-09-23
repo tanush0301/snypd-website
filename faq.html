@@ -1,4 +1,4 @@
-<!DOCTYPE html><html     lang="en"><head><meta charset="utf-8"/><title>Snypd - Deal Alerts for Resellers on Vinted| Snipe Deals First</title><meta content="Stop refreshing Vinted manually. Get alerts pushed to your dashboard as soon as a match is found. Join free." name="description"/><meta content="Snypd - Deal Alerts for Resellers on Vinted| Snipe Deals First" property="og:title"/><meta content="Stop refreshing Vinted manually. Get alerts pushed to your dashboard as soon as a match is found. Join free." property="og:description"/><meta content="Snypd - Deal Alerts for Resellers on Vinted| Snipe Deals First" name="twitter:title"/><meta content="Stop refreshing Vinted manually. Get alerts pushed to your dashboard as soon as a match is found. Join free." name="twitter:description"/><meta property="og:type" content="website"/><meta content="summary_large_image" name="twitter:card"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}</style><!-- 1) Load Supabase UMD + init global client -->
+<!DOCTYPE html><html     lang="en"><head><meta charset="utf-8"/><title>SNYPD FAQ - Vinted Alerts, Plans, Push Notifications &amp; Markets</title><meta content="Answers about SNYPD, the Vinted monitor for resellers: how fast alerts are, whether you need your Vinted login, plan limits, push notifications on iPhone and Android, and cancelling." name="description"/><meta content="SNYPD FAQ - Vinted Alerts, Plans, Push Notifications &amp; Markets" property="og:title"/><meta content="Answers about SNYPD, the Vinted monitor for resellers: how fast alerts are, whether you need your Vinted login, plan limits, push notifications on iPhone and Android, and cancelling." property="og:description"/><meta content="SNYPD FAQ - Vinted Alerts, Plans, Push Notifications &amp; Markets" name="twitter:title"/><meta content="Answers about SNYPD, the Vinted monitor for resellers: how fast alerts are, whether you need your Vinted login, plan limits, push notifications on iPhone and Android, and cancelling." name="twitter:description"/><meta property="og:type" content="website"/><meta content="summary_large_image" name="twitter:card"/><meta content="width=device-width, initial-scale=1" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous"/><style>.anti-flicker, .anti-flicker * {visibility: hidden !important; opacity: 0 !important;}</style><!-- 1) Load Supabase UMD + init global client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
   window.SNYPD = window.SNYPD || {};
@@ -44,7 +44,7 @@
       const session = JSON.parse(localStorage.getItem(sessionKey));
       if (session && session.access_token) {
         // User is logged in! Redirect them immediately without saving the homepage in their back-button history
-        window.location.replace('/dashboard'); 
+        window.location.replace('/dashboard');
       }
     }
   } catch (e) {
@@ -54,15 +54,37 @@
 <link rel="canonical" href="https://www.snypd.store/faq"/>
 <meta property="og:url" content="https://www.snypd.store/faq"/>
 <meta property="og:site_name" content="SNYPD"/>
-<meta property="og:locale" content="en"/>
+<meta property="og:locale" content="en_GB"/>
 <meta property="og:image" content="https://www.snypd.store/assets/og/og-default.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta property="og:image:alt" content="SNYPD - Snype Vinted steals. Before anyone else."/>
 <meta name="twitter:image" content="https://www.snypd.store/assets/og/og-default.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "How do I start with SNYPD?", "acceptedAnswer": {"@type": "Answer", "text": "Create a free account, paste a Vinted search URL (with your brand, size and price filters), give it a short name and switch it on. New matches appear in your dashboard, and SNYPD can send a push notification to your phone or computer as soon as a fresh listing is found."}},
+    {"@type": "Question", "name": "How fast are SNYPD alerts?", "acceptedAnswer": {"@type": "Answer", "text": "SNYPD checks active searches as often as every 30 seconds and speeds up on searches that keep finding matches. You get one alert per item; re-lists and duplicates are filtered out."}},
+    {"@type": "Question", "name": "Do I need my Vinted login?", "acceptedAnswer": {"@type": "Answer", "text": "No. SNYPD never asks for your Vinted account. Our own system does the searching, and each alert opens the listing directly on Vinted so you can buy or make an offer yourself."}},
+    {"@type": "Question", "name": "Is SNYPD affiliated with Vinted?", "acceptedAnswer": {"@type": "Answer", "text": "No. SNYPD is an independent tool for resellers and is not affiliated with, endorsed by or connected to Vinted."}},
+    {"@type": "Question", "name": "Which Vinted countries does SNYPD work with?", "acceptedAnswer": {"@type": "Answer", "text": "Paste a search link from the Vinted country site you shop on, for example vinted.be, vinted.fr, vinted.de, vinted.nl or vinted.co.uk. Prices are shown in that site's own currency."}},
+    {"@type": "Question", "name": "How many searches can I run?", "acceptedAnswer": {"@type": "Answer", "text": "Free includes 1 active search, Kickstart 2, Pro 5 and Elite 10. You can pause a search at any time to free up a slot."}},
+    {"@type": "Question", "name": "Is there a free plan, and how does billing work?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The Free plan has no time limit and includes one search that runs while your dashboard is open. Paid plans (Kickstart EUR 14.99, Pro EUR 24.99, Elite EUR 39.99 per month) keep monitoring 24/7 with your dashboard closed. Billing is monthly through Whop and you can cancel at any time."}},
+    {"@type": "Question", "name": "Do push notifications work on iPhone?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts from the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser."}},
+    {"@type": "Question", "name": "Will I get duplicate alerts?", "acceptedAnswer": {"@type": "Answer", "text": "No. You are alerted once per listing for as long as it stays listed. Obvious re-lists and stale items are filtered out."}},
+    {"@type": "Question", "name": "What is the SNYPD Market Report?", "acceptedAnswer": {"@type": "Answer", "text": "Pro and Elite include a Market Report in the dashboard: type an item and see its typical Vinted asking price, broken down by condition, based on the listings SNYPD has tracked. It refuses to show a price when the data is too thin or too mixed to trust."}},
+    {"@type": "Question", "name": "Is there a SNYPD Discord community?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Every plan can join the free SNYPD Discord for reseller Q&A; paid plans get access to the paid channels. Alerts work without it."}}
+  ]
+}
+</script>
+</head><body style="background:#0B0F14;color:#E8ECF2;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
 
 
-<div><!-- =============== SNYPD FAQ â ICON + CREATIVE LAYOUT (Webflow Embed) ================= -->
+<div><!-- =============== SNYPD FAQ — ICON + CREATIVE LAYOUT (Webflow Embed) ================= -->
 <section id="faq" class="faq faq--cards sn-faq reveal" data-brand="snypd">
   <!-- SVG sprite (icons reused, tiny) -->
   <svg width="0" height="0" style="position:absolute"><defs>
@@ -79,12 +101,12 @@
   </defs></svg>
 
   <header class="faq__head">
-    <h2 class="faq__title">Stay ahead with instant answers</h2>
-    <p class="faq__sub">Crisp, no-fluff info to help you start faster and convert smarter.</p>
+    <h1 class="faq__title">SNYPD FAQ: Vinted alerts, plans and push</h1>
+    <p class="faq__sub">Straight answers on how the Vinted monitor works, what each plan includes and how to get alerts on your phone.</p>
 
     <!-- Search + Category chips -->
     <div class="faq__controls">
-      <input type="search" class="faq__search" placeholder="Search FAQs (speed, login, marketsâ¦)" aria-label="Search FAQs">
+      <input type="search" class="faq__search" placeholder="Search FAQs (speed, login, markets…)" aria-label="Search FAQs">
       <div class="faq__chips" role="tablist" aria-label="FAQ categories">
         <button class="chip is-active" data-cat="all" role="tab" aria-selected="true">All</button>
         <button class="chip" data-cat="start" role="tab">Getting started</button>
@@ -102,7 +124,7 @@
       <div class="help-card">
         <div class="help-card__icon" aria-hidden="true"></div>
         <h3>Need a hand?</h3>
-        <p>We reply fast. Ask anythingâfilters, offers, markets.</p>
+        <p>We reply fast. Ask anything—filters, offers, markets.</p>
         <a class="btn outline" href="mailto:snypd@gmail.com">Email support</a>
       </div>
     </aside>
@@ -116,8 +138,8 @@
           <a class="faq__deeplink" href="#faq-start" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Paste your <b>Vinted search URL</b> (brand, size, price caps), give it a short name, switch it <b>Active</b>.  
-          We’ll send you a <b>push notification</b> when a fresh match hits — open it and make the offer.
+          Create a free account, paste your <b>Vinted search URL</b> (brand, size, price caps), give it a short name and switch it <b>Active</b>.
+          New matches land in your dashboard, and we can send a <b>push notification</b> when a fresh one hits — open it and make the offer.
           <div class="faq__cta">
             <a href="/plans" class="btn gradient-cta" data-ev="faq_cta_click" data-dest="plans-from-start">See plans</a>
           </div>
@@ -131,7 +153,7 @@
           <a class="faq__deeplink" href="#faq-speed" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Near real-time for new listings — our engine checks active searches as often as every 30 seconds and speeds up on ones that keep finding matches. SNYPD is tuned for <b>“be first.”</b>  
+          Near real-time for new listings — our engine checks active searches as often as every 30 seconds and speeds up on ones that keep finding matches. SNYPD is tuned for <b>“be first.”</b>
           Noise control gives you <b>one alert per item</b> — re-lists and obvious duplicates are silenced.
         </div>
       </details>
@@ -147,47 +169,59 @@
         </div>
       </details>
 
+      <details id="faq-affiliation" data-cat="start">
+        <summary>
+          <span class="ico" aria-hidden="true"><svg><use href="#ico-help"/></svg></span>
+          <span>Is SNYPD affiliated with Vinted?</span>
+          <a class="faq__deeplink" href="#faq-affiliation" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
+        </summary>
+        <div class="faq__content">
+          <b>No.</b> SNYPD is an independent tool for resellers. It is not affiliated with, endorsed by or connected to Vinted.
+        </div>
+      </details>
+
       <details id="faq-markets" data-cat="start">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-globe"/></svg></span>
-          <span>Which markets do you cover?</span>
+          <span>Which Vinted countries does SNYPD work with?</span>
           <a class="faq__deeplink" href="#faq-markets" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          EU focus: <b>.be / .fr / .de / .nl / .it</b>, with more coming. Your filters travel with youâsame alert format across markets.
+          Paste a search link from the Vinted site you shop on — for example <b>vinted.be, .fr, .de, .nl or .co.uk</b>. Prices are shown in that site's own currency.
         </div>
       </details>
 
       <details id="faq-pause" data-cat="alerts plans">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-pause"/></svg></span>
-          <span>Can I pause filters or avoid overruns?</span>
+          <span>How many searches can I run, and can I pause them?</span>
           <a class="faq__deeplink" href="#faq-pause" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Yes. Use <b>Safe-pause</b> anytime. A friendly <b>quota guard</b> nudges you near limitsâKickstart <b>2</b>, Pro <b>5</b>, Elite <b>7</b> active filters.
+          Active searches per plan: Free <b>1</b>, Kickstart <b>2</b>, Pro <b>5</b>, Elite <b>10</b>. Pause any search at any time to free up a slot.
         </div>
       </details>
 
       <details id="faq-duplicates" data-cat="alerts">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-bell"/></svg></span>
-          <span>Will I get duplicate pings?</span>
+          <span>Will I get duplicate alerts?</span>
           <a class="faq__deeplink" href="#faq-duplicates" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          We keep the feed clean: <b>one alert per item.</b> Obvious re-lists and stale items are filtered out by design.
+          No: <b>one alert per listing</b>, for as long as it stays listed. Obvious re-lists and stale items are filtered out by design.
         </div>
       </details>
 
       <details id="faq-trial" data-cat="plans">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-card"/></svg></span>
-          <span>How does the free trial & billing work?</span>
+          <span>Is there a free plan, and how does billing work?</span>
           <a class="faq__deeplink" href="#faq-trial" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Free <b>3-day trial</b>. Cancel anytime. Plans include push alerts and smart de-dupe; limits are <b>2/5/7</b> active filters (Kickstart/Pro/Elite).
+          Yes — the <b>Free plan has no time limit</b> and includes one search that runs while your dashboard is open.
+          Paid plans (<b>Kickstart €14.99, Pro €24.99, Elite €39.99</b> a month) keep monitoring <b>24/7</b> with your dashboard closed. Billed monthly through Whop; cancel anytime.
           <div class="faq__cta">
             <a href="/plans" class="btn outline" data-ev="faq_cta_click" data-dest="plans-from-trial">Compare plans</a>
           </div>
@@ -197,44 +231,40 @@
       <details id="faq-discord" data-cat="extras">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-help"/></svg></span>
-          <span>Private Discord community?</span>
+          <span>Is there a SNYPD Discord community?</span>
           <a class="faq__deeplink" href="#faq-discord" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Weâre piloting a private Discord for <b>legit checks</b>, playbooks, and reseller Q&A. Optionalâalerts work without it.  
-          Early users get invite priority. Email us for <b>Discord beta access</b>.
+          Yes. Every plan can join the <b>free SNYPD Discord</b> for reseller Q&amp;A; paid plans get the paid channels. Optional — alerts work without it.
           <div class="faq__cta">
-            <a href="mailto:snypd@gmail.com?subject=Discord%20beta" class="btn outline" data-ev="faq_cta_click" data-dest="email-discord-beta">Request invite</a>
+            <a href="https://discord.gg/4RUtXW78vc" target="_blank" rel="noopener" class="btn outline" data-ev="faq_cta_click" data-dest="discord-invite">Join the Discord</a>
           </div>
         </div>
       </details>
 
-      <details id="faq-tips" data-cat="extras">
+      <details id="faq-iphone" data-cat="alerts">
         <summary>
-          <span class="ico" aria-hidden="true"><svg><use href="#ico-chart"/></svg></span>
-          <span>Weekly tips & tricks?</span>
-          <a class="faq__deeplink" href="#faq-tips" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
+          <span class="ico" aria-hidden="true"><svg><use href="#ico-bell"/></svg></span>
+          <span>Do push notifications work on iPhone?</span>
+          <a class="faq__deeplink" href="#faq-iphone" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          Short, <b>actionable weekly tips</b> (pricing ranges, offer scripts, timing hacks).  
-          Delivered by email; unsubscribe anytime. During beta, included for subscribers.
-          <div class="faq__cta">
-            <a href="mailto:snypd@gmail.com?subject=Subscribe%20to%20weekly%20tips" class="btn outline" data-ev="faq_cta_click" data-dest="email-weekly-tips">Get tips</a>
-          </div>
+          Yes, once SNYPD is on your <b>Home Screen</b>: open snypd.store in Safari, tap Share, then <b>Add to Home Screen</b>, and turn on alerts from the installed app. Apple only allows web push for Home Screen apps.
+          On Android, Windows and Mac, alerts work straight from the browser.
         </div>
       </details>
 
       <details id="faq-insights" data-cat="extras">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-chart"/></svg></span>
-          <span>Market insights (SNKRS & more)?</span>
+          <span>What is the Market Report?</span>
           <a class="faq__deeplink" href="#faq-insights" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          We publish <b>market snapshots</b> (SNKRS heat, size velocity, price floors).  
-          Useful for setting caps on your filters. Join the beta listâemail us to be notified.
+          Included with <b>Pro and Elite</b>: type an item and see its typical Vinted asking price, <b>broken down by condition</b>, based on the listings SNYPD has tracked.
+          Useful for setting price caps on your searches. It refuses to show a price when the data is too thin or too mixed to trust.
           <div class="faq__cta">
-            <a href="mailto:snypd@gmail.com?subject=Market%20insights%20beta" class="btn outline" data-ev="faq_cta_click" data-dest="email-insights">Join insights beta</a>
+            <a href="/plans" class="btn outline" data-ev="faq_cta_click" data-dest="plans-from-insights">See Pro and Elite</a>
           </div>
         </div>
       </details>
@@ -242,11 +272,11 @@
       <details id="faq-support" data-cat="support">
         <summary>
           <span class="ico" aria-hidden="true"><svg><use href="#ico-help"/></svg></span>
-          <span>Didnât find what you need?</span>
+          <span>Didn’t find what you need?</span>
           <a class="faq__deeplink" href="#faq-support" aria-label="Copy link to this question"><svg class="link-ico" aria-hidden="true"><use href="#ico-link"/></svg></a>
         </summary>
         <div class="faq__content">
-          We reply quickly: <a href="mailto:snypd@gmail.com">snypd@gmail.com</a>.  
+          We reply quickly: <a href="mailto:snypd@gmail.com">snypd@gmail.com</a>.
           Or compare plans and limits here.
           <div class="faq__cta">
             <a href="/plans" class="btn gradient-cta" data-ev="faq_cta_click" data-dest="plans-from-support">See pricing</a>
@@ -254,10 +284,10 @@
         </div>
       </details>
     </div>
-  
+
 
 <style>
-/* ====== Tokens (dark glass, lilacâteal) ====== */
+/* ====== Tokens (dark glass, lilac→teal) ====== */
 :root{
   --bg:#0B0F14; --surface:#0F1520; --text:#E8ECF2; --muted:#9AA4B2;
   --brand1:#A855F7; --brand2:#06B6D4; --ring:rgba(168,85,247,.45);
@@ -326,7 +356,7 @@
   const chips=[...document.querySelectorAll('.sn-faq .chip')];
   const items=[...document.querySelectorAll('.sn-faq details')];
   const setCat=(cat)=>{
-    chips.forEach(c=>c.classList.toggle('is-active',c.dataset.cat===cat));
+    chips.forEach(c=>{const on=c.dataset.cat===cat;c.classList.toggle('is-active',on);c.setAttribute('aria-selected',on?'true':'false');});
     items.forEach(d=>{
       if(cat==='all'){ d.hidden=false; return; }
       const cats=(d.dataset.cat||'').split(' ');
@@ -404,7 +434,7 @@
       </div>
     </div>
     <div class="snypd-footer__bottom">
-      <p>&copy; 2024 Snypd. All rights reserved.</p>
+      <p>&copy; 2026 SNYPD. Not affiliated with Vinted.</p>
     </div>
   </div>
 </footer>
