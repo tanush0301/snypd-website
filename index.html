@@ -46,6 +46,9 @@
   [hidden] { display: none !important; }
   @media (max-width: 699.98px) { .dc-desk { display: none !important; } }
   @media (min-width: 700px) { .dc-mob { display: none !important; } }
+  /* Pro price on phones: keep "/ mo incl. VAT" together and, when it has to move
+     under the price, drop it directly below instead of leaving a 64px-tall gap. */
+  @media (max-width: 699.98px) { .dc-price { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .12em; row-gap: 6px; } }
   /* Hover states (not in the design; desktop pointers only, so touch never sticks). */
   @media (hover: hover) and (pointer: fine) {
     a[style*="background:#A200FF"], button[style*="background:#A200FF"] { transition: filter .15s ease; }
@@ -303,7 +306,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span style="font-size:11px;letter-spacing:.14em;color:#FFFFFF;">PRO</span>
             <span style="font-size:11px;letter-spacing:.1em;color:#FFFFFF;background:#A200FF;padding:4px 8px;">BUILT FOR DAILY SOURCING</span>
           </span>
-          <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#FFFFFF;letter-spacing:-.04em;">€24.99<span style="font-family:'DM Mono',monospace;font-weight:400;font-size:13px;color:#8B9094;letter-spacing:0;"> / mo incl. VAT</span></span>
+          <span class="dc-price" style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#FFFFFF;letter-spacing:-.04em;">€24.99<span style="font-family:'DM Mono',monospace;font-weight:400;font-size:13px;color:#8B9094;letter-spacing:0;white-space:nowrap;"> / mo incl. VAT</span></span>
           <span style="font-size:12.5px;color:#8B9094;line-height:1.6;">Five searches, around the clock. For daily sourcing.</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
