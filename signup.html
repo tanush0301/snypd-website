@@ -47,6 +47,19 @@
 <meta name="twitter:image" content="https://www.snypd.store/assets/og/og-default.png"/>
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png"/>
+<script>
+  /* Homepage START KICKSTART / PRO / ELITE link here as /signup?plan=<plan>.
+     Remember the choice so the dashboard can send the buyer to that checkout
+     once they are signed in (see the plan-intent hook in dashboard.html). */
+  (function () {
+    try {
+      var plan = (new URLSearchParams(location.search).get('plan') || '').toLowerCase();
+      if (plan === 'kickstart' || plan === 'pro' || plan === 'elite') {
+        localStorage.setItem('snypd_plan_intent', JSON.stringify({ plan: plan, ts: Date.now() }));
+      }
+    } catch (e) {}
+  })();
+</script>
 </head><body class="body-6"><div><!-- Copy Everything Below This Line -->
 <div class="snypd-island-nav-wrapper">
 <style>
@@ -1380,6 +1393,15 @@
         if (refCode) {
           signUpOptions.data = { ref_code: refCode };
         }
+        /* Carry a chosen paid plan on the account too, so it survives the
+           buyer confirming their email on a different device. */
+        try {
+          var planIntent = JSON.parse(localStorage.getItem('snypd_plan_intent') || 'null');
+          if (planIntent && planIntent.plan) {
+            signUpOptions.data = signUpOptions.data || {};
+            signUpOptions.data.plan_intent = planIntent.plan;
+          }
+        } catch(e) {}
 
         var result = await sb.auth.signUp({
           email: email,

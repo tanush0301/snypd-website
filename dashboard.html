@@ -3,6 +3,51 @@
 
 <html lang="en">
 <head>
+<script>
+  /* Plan intent: a visitor who clicked START KICKSTART / PRO / ELITE on the
+     homepage signed up via /signup?plan=<plan>. Once they are signed in, send
+     them to that plan's checkout on /plans, once. Source of the plan:
+     1. this device (localStorage, set by signup.html), or
+     2. the account itself (user_metadata.plan_intent, set at signup), only
+        within 7 days of account creation and once per device.
+     /plans clears user_metadata.plan_intent when it opens the checkout. */
+  (function () {
+    try {
+      var PLANS = { kickstart: 1, pro: 1, elite: 1 }, WEEK = 7 * 864e5;
+      var local = null;
+      try { local = JSON.parse(localStorage.getItem('snypd_plan_intent') || 'null'); } catch (e) {}
+      var sessionUser = function () {
+        var k = Object.keys(localStorage).filter(function (x) { return x.indexOf('sb-') === 0 && /-auth-token$/.test(x); })[0];
+        if (!k) return null;
+        var s = JSON.parse(localStorage.getItem(k) || 'null');
+        return s && s.access_token && s.user ? s.user : null;
+      };
+      var decide = function () {
+        var u = sessionUser();
+        if (!u) return false;
+        var plan = null;
+        if (local && PLANS[local.plan] && Date.now() - (local.ts || 0) < WEEK) plan = local.plan;
+        if (!plan) {
+          var m = u.user_metadata && u.user_metadata.plan_intent;
+          var fresh = u.created_at && Date.now() - Date.parse(u.created_at) < WEEK;
+          var done = localStorage.getItem('snypd_plan_intent_done') === u.id;
+          if (m && PLANS[m] && fresh && !done) plan = m;
+        }
+        localStorage.removeItem('snypd_plan_intent');
+        if (plan) {
+          localStorage.setItem('snypd_plan_intent_done', u.id);
+          location.replace('/plans?checkout=' + plan);
+        }
+        return true;
+      };
+      /* Right after Google sign-in the session is still in the URL and lands in
+         localStorage a moment later, so keep checking briefly. */
+      if (!decide()) {
+        var n = 0, t = setInterval(function () { if (decide() || ++n > 40) clearInterval(t); }, 150);
+      }
+    } catch (e) {}
+  })();
+</script>
 <meta charset="utf-8"/>
 <!-- viewport-fit=cover is required for env(safe-area-inset-*) to resolve to
      anything but 0px (RISK 7) - the bottom nav and the sheets both pad

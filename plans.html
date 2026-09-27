@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>SNYPD Pricing - Vinted Monitor Plans from Free to &#8364;39.99/month</title><meta content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;39.99 a month. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel anytime." name="description"/><meta content="SNYPD Pricing - Vinted Monitor Plans from Free to &#8364;39.99/month" property="og:title"/><meta content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;39.99 a month. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel anytime." property="og:description"/><meta content="SNYPD Pricing - Vinted Monitor Plans from Free to &#8364;39.99/month" name="twitter:title"/><meta content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;39.99 a month. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel anytime." name="twitter:description"/>
+<title>SNYPD Pricing - Vinted Monitor Plans from Free to &#8364;34.99/month</title><meta content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel anytime." name="description"/><meta content="SNYPD Pricing - Vinted Monitor Plans from Free to &#8364;34.99/month" property="og:title"/><meta content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel anytime." property="og:description"/><meta content="SNYPD Pricing - Vinted Monitor Plans from Free to &#8364;34.99/month" name="twitter:title"/><meta content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel anytime." name="twitter:description"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -324,7 +324,7 @@
     {
       "@type": "Offer",
       "name": "Elite",
-      "price": "39.99",
+      "price": "34.99",
       "priceCurrency": "EUR"
     }
   ]
@@ -852,7 +852,7 @@
 <span class="snypd-pricing__current-badge">Current</span>
 </div>
 <div class="snypd-pricing__price">
-<span class="snypd-pricing__amount">€39.99</span>
+<span class="snypd-pricing__amount">€34.99</span>
 <span class="snypd-pricing__period">/ mo</span>
 </div>
 <p class="snypd-pricing__blurb">Maximum coverage for serious sourcing.</p>
@@ -867,7 +867,7 @@
 </article>
 </div>
 <p class="snypd-pricing__note">
-      Free monitors while your dashboard is open. Paid plans keep running 24/7, even after you close it.
+      Free monitors while your dashboard is open. Paid plans keep running 24/7, even after you close it. Prices per month, VAT included.
     </p>
 </div>
 
@@ -1127,7 +1127,26 @@
         window.location.href = "/dashboard";
       };
 
-      loadUserPlan();
+      // Homepage START KICKSTART / PRO / ELITE -> /signup?plan= -> dashboard
+      // -> here as /plans?checkout=<plan>: open that plan's embedded checkout.
+      // Only for a signed-in account that is free (or whose paid plan lapsed,
+      // which leaves currentPlan null), never over an active paid plan.
+      function openRequestedCheckout() {
+        var want = null;
+        try { want = normalizePlan(new URLSearchParams(window.location.search).get("checkout")); } catch (e) {}
+        if (!want || want === "free") return;
+        try { window.history.replaceState(null, "", window.location.pathname + window.location.hash); } catch (e) {}
+        if (!authState.isLoggedIn) return;
+        var supabase = getSupabaseClient();
+        if (supabase && supabase.auth && supabase.auth.updateUser) {
+          supabase.auth.updateUser({ data: { plan_intent: null } }).catch(function () {});
+        }
+        if (authState.currentPlan && authState.currentPlan !== "free") return;
+        var overlay = root.querySelector('[data-whop-embed-overlay="' + want + '"]');
+        if (overlay) overlay.hidden = false;
+      }
+
+      loadUserPlan().then(openRequestedCheckout, openRequestedCheckout);
     })();
   </script>
 </section>

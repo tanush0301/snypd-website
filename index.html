@@ -46,6 +46,14 @@
   [hidden] { display: none !important; }
   @media (max-width: 699.98px) { .dc-desk { display: none !important; } }
   @media (min-width: 700px) { .dc-mob { display: none !important; } }
+  /* Hover states (not in the design; desktop pointers only, so touch never sticks). */
+  @media (hover: hover) and (pointer: fine) {
+    a[style*="background:#A200FF"], button[style*="background:#A200FF"] { transition: filter .15s ease; }
+    a[style*="background:#A200FF"]:hover, button[style*="background:#A200FF"]:hover { filter: brightness(1.18); }
+    a[style*="background:#141416"], button[style*="background:#141416"] { transition: background-color .15s ease, border-color .15s ease; }
+    a[style*="background:#141416"]:hover, button[style*="background:#141416"]:hover { background-color: #1C1C1F !important; border-color: #3A3A40 !important; }
+  }
+  @media (prefers-reduced-motion: reduce) { a, button { transition: none !important; } }
 </style>
 
 <!-- Supabase client: used by the click-attribution script (ref_clicks) -->
@@ -116,9 +124,9 @@
       "publisher": { "@id": "https://www.snypd.store/#org" },
       "offers": [
         { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR" },
-        { "@type": "Offer", "name": "Kickstart", "price": "18.14", "priceCurrency": "EUR" },
-        { "@type": "Offer", "name": "Pro", "price": "30.24", "priceCurrency": "EUR" },
-        { "@type": "Offer", "name": "Elite", "price": "42.34", "priceCurrency": "EUR" }
+        { "@type": "Offer", "name": "Kickstart", "price": "14.99", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Pro", "price": "24.99", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Elite", "price": "34.99", "priceCurrency": "EUR" }
       ]
     }
   ]
@@ -255,7 +263,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div id="demo-stage" aria-live="polite" style="padding:clamp(18px,4vw,34px);"></div>
     </div>
-    <span style="font-size:12px;color:#8B9094;">Rather skip the walkthrough? <a href="/signup">Start free, no card</a>.</span>
+    <span style="font-size:12px;color:#8B9094;">Rather skip the walkthrough? <a href="/signup">Start free, no card</a> · or ask in the <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</span>
   </div>
 
   <div style="border-top:1px solid #1D1D20;">
@@ -295,7 +303,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span style="font-size:11px;letter-spacing:.14em;color:#FFFFFF;">PRO</span>
             <span style="font-size:11px;letter-spacing:.1em;color:#FFFFFF;background:#A200FF;padding:4px 8px;">BUILT FOR DAILY SOURCING</span>
           </span>
-          <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#FFFFFF;letter-spacing:-.04em;">€30.24<span style="font-family:'DM Mono',monospace;font-weight:400;font-size:13px;color:#8B9094;letter-spacing:0;"> / mo incl. VAT</span></span>
+          <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#FFFFFF;letter-spacing:-.04em;">€24.99<span style="font-family:'DM Mono',monospace;font-weight:400;font-size:13px;color:#8B9094;letter-spacing:0;"> / mo incl. VAT</span></span>
           <span style="font-size:12.5px;color:#8B9094;line-height:1.6;">Five searches, around the clock. For daily sourcing.</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
@@ -327,19 +335,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="/signup" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START FREE</a>
       </div>
       <div style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">KICKSTART</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;">€18.14</span></div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">KICKSTART</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;">€14.99</span></div>
         <span style="font-size:12px;color:#8B9094;line-height:1.6;">2 searches · runs 24/7, even with your dashboard closed</span>
         <a href="/signup?plan=kickstart" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START KICKSTART</a>
       </div>
       <div style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">ELITE</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;">€42.34</span></div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">ELITE</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;">€34.99</span></div>
         <span style="font-size:12px;color:#8B9094;line-height:1.6;">Everything in Pro + 10 searches</span>
         <a href="/signup?plan=elite" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START ELITE</a>
       </div>
     </div>
     <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;">
       <a href="/plans" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Compare all 4 plans side by side →</a>
-      <span style="font-size:12px;color:#8B9094;">Prices per month, incl. 21% Belgian VAT. VAT varies by EU country. Card · Apple Pay · Google Pay.</span>
+      <a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Questions first? Ask in the Discord →</a>
+      <span style="font-size:12px;color:#8B9094;">Prices per month, VAT included. Card · Apple Pay · Google Pay.</span>
     </div>
   </div>
   </div>
@@ -352,6 +361,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Which markets?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Every Vinted country site, vinted.com included. Prices in that site's currency.</span></div>
       <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">How long do matches stay?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">~30 minutes while listed. Push catches what the feed drops.</span></div>
       <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Alerts on iPhone?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Add to home screen from Safari first. iOS requires it.</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Something else?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Ask the community on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</span></div>
     </div>
   </div>
 
@@ -373,6 +383,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div style="display:flex;flex-direction:column;gap:6px;">
         <span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">SNYPD · NOT AFFILIATED WITH VINTED</span>
         <span style="font-size:12px;color:#8B9094;">Reads public listings only.</span>
+        <span style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;"><a href="/faq" style="font-size:12px;">FAQ</a><a href="/support" style="font-size:12px;">Support</a><a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;">Discord</a></span>
       </div>
       <nav id="legal-links" aria-label="Legal" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;min-height:20px;"><span style="font-size:12px;color:#8B9094;">Privacy, Terms and Withdrawal pages coming soon.</span></nav>
     </div>
