@@ -7,7 +7,6 @@
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
 <script>
     window.SNYPD = window.SNYPD || {};
     if (!SNYPD.supabase) {
@@ -332,6 +331,7 @@
 </script>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta property="og:type" content="website"/>
+<script src="/assets/consent.js"></script>
 </head>
 <body>
 <div class="snypd-sidebar" data-focus="false" data-open="false" data-snypd-sidebar="" data-state="idle">
@@ -386,9 +386,7 @@
 </div>
 <div class="dash-wrap">
 <div>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3" style="display:none;visibility:hidden" width="0"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->﻿<section aria-labelledby="snypd-pricing-title" class="snypd-pricing" id="pricing">
+﻿<section aria-labelledby="snypd-pricing-title" class="snypd-pricing" id="pricing">
 <style>
     .snypd-pricing,
     .snypd-pricing * {
@@ -903,6 +901,7 @@
   .whop-embed-box{position:relative;width:100%;max-width:480px;max-height:90vh;overflow:auto;background:#0f0f11;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px}
   .whop-embed-close{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:20px;line-height:1;cursor:pointer}
   .whop-embed-close:hover{background:rgba(255,255,255,.12)}
+  .whop-embed-box [data-whop-checkout-plan-id]:empty:before{content:"Loading secure checkout...";display:block;padding:40px 8px;text-align:center;color:#9CA3AF;font-size:13px}
 </style>
 <script>
     (function () {
@@ -931,6 +930,22 @@
           });
         }
       } catch (e) { /* no stored session, or unreadable - checkout still works, just unprefilled */ }
+
+      // Whop's checkout loader mounts every checkout on the page and also
+      // runs Whop's own tracking script. Loading it only when a buyer opens a
+      // checkout keeps that off plain visits (cookie consent) while the
+      // checkout itself still appears the moment it is asked for. The prefill
+      // attribute above is already set, so the late mount still carries it.
+      var whopLoaderRequested = false;
+      function openCheckoutOverlay(overlay) {
+        overlay.hidden = false;
+        if (whopLoaderRequested) return;
+        whopLoaderRequested = true;
+        var s = document.createElement("script");
+        s.async = true;
+        s.src = "https://js.whop.com/static/checkout/loader.js";
+        document.head.appendChild(s);
+      }
 
       var signupUrl = "/signup";
       var fallbackManageUrl = "https://whop.com/@me/settings/orders/";
@@ -1099,7 +1114,7 @@
           var overlay = root.querySelector('[data-whop-embed-overlay="' + ctaPlan + '"]');
           if (overlay) {
             event.preventDefault();
-            overlay.hidden = false;
+            openCheckoutOverlay(overlay);
           }
         });
       });
@@ -1143,7 +1158,7 @@
         }
         if (authState.currentPlan && authState.currentPlan !== "free") return;
         var overlay = root.querySelector('[data-whop-embed-overlay="' + want + '"]');
-        if (overlay) overlay.hidden = false;
+        if (overlay) openCheckoutOverlay(overlay);
       }
 
       loadUserPlan().then(openRequestedCheckout, openRequestedCheckout);
@@ -1152,9 +1167,6 @@
 </section>
 </div>
 
- Google Tag Manager (noscript) 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3" style="display:none;visibility:hidden" width="0"></iframe></noscript>
- End Google Tag Manager (noscript) 
     </div>
 </div>
 <script>

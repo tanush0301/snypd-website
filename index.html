@@ -71,13 +71,9 @@
   }
 </script>
 
-<!-- Whop pixel -->
-<script>
-!function(w,d,s,u,n,a,b){if(w[n])return;a=w[n]={q:[],t:+new Date,s:[],o:u,track:function(){a.q.push([+new Date].concat([].slice.call(arguments)))},setScope:function(){a.s=[].slice.call(arguments).filter(function(x){return typeof x==="string"});a.q.push([+new Date,"setScope"].concat(a.s))},scope:function(){var c=[].slice.call(arguments);return{track:function(){a.q.push([+new Date].concat([].slice.call(arguments)).concat([{__scope:c}]))}}}};b=d.createElement(s);b.async=1;b.src=u+"/s.js";d.getElementsByTagName(s)[0].parentNode.insertBefore(b,d.getElementsByTagName(s)[0])}(window,document,"script","https://t.whop.tw","whop");whop.setScope("biz_FO7MS9yTf8rm6n");whop.track("page");
-</script>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VBC0SXPR6F"></script>
+<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -137,10 +133,7 @@
 </script>
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N75WVFD3"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+
 <div style="background:#0A0A0B;font-family:'DM Mono',ui-monospace,monospace;color:#E8EAEB;min-height:100vh;">
 
   <div id="site-nav" style="position:sticky;top:0;z-index:30;background:rgba(10,10,11,.82);border-bottom:1px solid #1D1D20;transition:background .25s ease, box-shadow .25s ease;">
@@ -388,7 +381,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span style="font-size:12px;color:#8B9094;">Reads public listings only.</span>
         <span style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;"><a href="/faq" style="font-size:12px;">FAQ</a><a href="/support" style="font-size:12px;">Support</a><a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;">Discord</a></span>
       </div>
-      <nav id="legal-links" aria-label="Legal" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;min-height:20px;"><span style="font-size:12px;color:#8B9094;">Privacy, Terms and Withdrawal pages coming soon.</span></nav>
+      <nav id="legal-links" aria-label="Legal" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;min-height:20px;"><a href="/cookies" style="font-size:12px;">Cookies</a><a href="/cookies" data-cookie-settings style="font-size:12px;">Cookie settings</a><span style="font-size:12px;color:#8B9094;">Privacy and Terms pages coming soon.</span></nav>
     </div>
   </div>
 
@@ -846,8 +839,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (!code || !/^[a-z2-9]{4,8}$/.test(code)) return;
 
     // Remember it. If they sign up later in this browser we can still tell
-    // which outreach message brought them here.
-    try { localStorage.setItem('snypd_ref', code); } catch (e) {}
+    // which outreach message brought them here. Storing it on the device is
+    // marketing, so it waits for that consent (/assets/consent.js); the code
+    // stays in this closure, so saying yes later on this page still keeps it.
+    if (window.SNYPDConsent) {
+      SNYPDConsent.whenGranted('marketing', function () {
+        try { localStorage.setItem('snypd_ref', code); } catch (e) {}
+      });
+    }
 
     // 1. Only count a visit once a human has actually looked at the page.
     //    Meta fetches every link sent in a DM to build the preview card, and
