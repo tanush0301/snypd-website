@@ -12,14 +12,14 @@
 <meta property="og:url" content="https://www.snypd.store/">
 <meta property="og:site_name" content="SNYPD">
 <meta property="og:locale" content="en_GB">
-<meta property="og:image" content="https://www.snypd.store/assets/og/og-default.png">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="SNYPD - Vinted monitor and new listing alerts for resellers">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SNYPD - Vinted Monitor &amp; New Listing Alerts for Resellers">
 <meta name="twitter:description" content="SNYPD is a Vinted monitor for resellers. It watches your saved searches and alerts you the moment a matching listing appears. Free plan, no time limit.">
-<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-default.png">
+<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-v5.png">
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
@@ -192,7 +192,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span style="font-size:12px;color:#8B9094;letter-spacing:.02em;"><span style="color:#00E5A0;">✓</span> Only reads public listings</span>
           <span style="font-size:12px;color:#8B9094;letter-spacing:.02em;"><span style="color:#00E5A0;">✓</span> Cancel any time</span>
         </div>
-        <span id="founding-line" style="font-size:11px;letter-spacing:.06em;color:#8B9094;">Free plan, no card. The first 100 accounts get founding status.</span>
+        <span id="founding-line" style="font-size:11px;letter-spacing:.06em;color:#8B9094;">Free plan, no card. The first 100 accounts keep Pro pricing for life.</span>
       </div>
     </div>
   </div>
@@ -239,9 +239,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div style="max-width:1320px;margin:0 auto;padding:14px 20px 0;">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
       <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
-        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;">178,102</span>
+        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;" id="stat-listings">178,102</span>
         <span style="font-size:12.5px;line-height:1.5;color:#E8EAEB;">unique Vinted listings matched users' searches since 17 Sept 2026</span>
-        <span style="font-size:12px;color:#8B9094;">As of 26 Sept 2026</span>
+        <span style="font-size:12px;color:#8B9094;" id="stat-listings-asof">As of 26 Sept 2026</span>
       </div>
       <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
         <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;">150+ sales</span>
@@ -327,7 +327,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span style="font-size:12px;color:#8B9094;line-height:1.7;">Cancel any time.</span>
         <div style="margin-top:auto;border:1px solid rgba(0,229,160,.38);background:rgba(0,229,160,.06);padding:14px 15px;display:flex;flex-direction:column;gap:6px;">
           <span id="founding-badge" style="font-size:11px;letter-spacing:.12em;color:#00E5A0;">FOUNDING STATUS OPEN</span>
-          <span style="font-size:12px;color:#8B9094;line-height:1.6;">The first 100 accounts get founding status, free accounts included.</span>
+          <span id="founding-detail" style="font-size:12px;color:#8B9094;line-height:1.6;">The first 100 accounts keep Pro pricing for life, free accounts included.</span>
         </div>
       </div>
     </div>
@@ -358,7 +358,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <div style="border-top:1px solid #1D1D20;">
     <div style="max-width:1320px;margin:0 auto;padding:54px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:26px;">
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Is this allowed on Vinted?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Reads public listings only. Never logs in, buys or messages.</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Does SNYPD touch my Vinted account?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">No. Reads public listings only. Never logs in, buys or messages.</span></div>
       <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Do I need my laptop open?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">On Free, yes. Paid runs with it closed.</span></div>
       <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">How fast are alerts?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Every 30s to 5 min, faster for busy searches. Same on every plan. One batched push.</span></div>
       <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Which markets?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Every Vinted country site, vinted.com included. Prices in that site's currency.</span></div>
@@ -723,12 +723,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   }
 
   /* ---------- founding counter ---------- */
+  // Same promise as signup.html and account.html ("keep Pro pricing for
+  // life"). Once all 100 are taken the offer is gone, so stop advertising it.
   function paintFounding() {
-    var c = s.claimed;
-    $('founding-badge').textContent = typeof c === 'number' ? 'FOUNDING · ' + c + ' OF 100 ACCOUNTS' : 'FOUNDING STATUS OPEN';
-    $('founding-line').textContent = typeof c === 'number'
-      ? 'Free plan, no card · ' + c + ' of the first 100 founding accounts taken'
-      : 'Free plan, no card. The first 100 accounts get founding status.';
+    var c = s.claimed, known = typeof c === 'number', full = known && c >= 100;
+    $('founding-badge').textContent = full ? 'FOUNDING · ALL 100 TAKEN' : known ? 'FOUNDING · ' + c + ' OF 100 ACCOUNTS' : 'FOUNDING STATUS OPEN';
+    $('founding-detail').textContent = full
+      ? 'All 100 founding accounts are taken.'
+      : 'The first 100 accounts keep Pro pricing for life, free accounts included.';
+    $('founding-line').textContent = full
+      ? 'Free plan, no card.'
+      : known
+        ? 'Free plan, no card · ' + (100 - c) + ' of the first 100 spots left, Pro pricing for life'
+        : 'Free plan, no card. The first 100 accounts keep Pro pricing for life.';
   }
 
   /* ---------- nav: mobile menu, scroll state, sticky bar ---------- */
@@ -810,6 +817,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) { if (d && typeof d.claimed === 'number') { s.claimed = d.claimed; paintFounding(); } })
     .catch(function () {});
+
+  /* ---------- listings counter ----------
+     public_stats is one cached row per figure, refreshed every 15 min by
+     pg_cron (backend repo, migration 033) - counting live costs ~1.3s, too
+     much for every page view. Any failure keeps the static figure in the
+     markup, which was true on the date it states. */
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+  function groupThousands(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  try {
+    SNYPD.supabase.from('public_stats').select('value, as_of').eq('key', 'listings_matched').maybeSingle()
+      .then(function (res) {
+        var row = res && res.data, when = row && new Date(row.as_of);
+        if (!row || typeof row.value !== 'number' || row.value <= 0 || !when || isNaN(when.getTime())) return;
+        $('stat-listings').textContent = groupThousands(row.value);
+        $('stat-listings-asof').textContent = 'As of ' + when.getUTCDate() + ' ' + MONTHS[when.getUTCMonth()] + ' ' + when.getUTCFullYear();
+      }, function () {});
+  } catch (e) {}
 })();
 </script>
 
