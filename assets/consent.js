@@ -214,11 +214,24 @@
       else if (a === 'settings') openSettings();
     });
     document.body.appendChild(bar);
+    /* The bar is fixed to the bottom, so without room for it the end of the
+       page - including the footer's Privacy/Cookies links - sits under it. */
+    prevPad = document.body.style.paddingBottom;
+    padForBar();
+    window.addEventListener('resize', padForBar);
+  }
+
+  var prevPad = '';
+  function padForBar() {
+    if (bar) document.body.style.paddingBottom = bar.offsetHeight + 'px';
   }
 
   function closeBanner() {
-    if (bar && bar.parentNode) bar.parentNode.removeChild(bar);
+    if (!bar) return;
+    if (bar.parentNode) bar.parentNode.removeChild(bar);
     bar = null;
+    window.removeEventListener('resize', padForBar);
+    document.body.style.paddingBottom = prevPad;
   }
 
   function row(id, title, text, checked, locked) {
