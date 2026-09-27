@@ -381,7 +381,7 @@
         <span style="font-size:12px;color:#8B9094;">Reads public listings only.</span>
         <span style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;"><a href="/faq" style="font-size:12px;">FAQ</a><a href="/support" style="font-size:12px;">Support</a><a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;">Discord</a></span>
       </div>
-      <nav id="legal-links" aria-label="Legal" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;min-height:20px;"><a href="/cookies" style="font-size:12px;">Cookies</a><a href="/cookies" data-cookie-settings style="font-size:12px;">Cookie settings</a><span style="font-size:12px;color:#8B9094;">Privacy and Terms pages coming soon.</span></nav>
+      <nav id="legal-links" aria-label="Legal" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;min-height:20px;"><a href="/privacy" style="font-size:12px;">Privacy</a><a href="/terms" style="font-size:12px;">Terms</a><a href="/cookies" style="font-size:12px;">Cookies</a><a href="/cookies" data-cookie-settings style="font-size:12px;">Cookie settings</a></nav>
     </div>
   </div>
 
@@ -720,7 +720,7 @@
   // life"). Once all 100 are taken the offer is gone, so stop advertising it.
   function paintFounding() {
     var c = s.claimed, known = typeof c === 'number', full = known && c >= 100;
-    $('founding-badge').textContent = full ? 'FOUNDING · ALL 100 TAKEN' : known ? 'FOUNDING · ' + c + ' OF 100 ACCOUNTS' : 'FOUNDING STATUS OPEN';
+    $('founding-badge').textContent = full ? 'FOUNDING · ALL 100 TAKEN' : known ? 'FOUNDING · ' + (100 - c) + ' SPOTS LEFT' : 'FOUNDING STATUS OPEN';
     $('founding-detail').textContent = full
       ? 'All 100 founding accounts are taken.'
       : 'The first 100 accounts keep Pro pricing for life, free accounts included.';
