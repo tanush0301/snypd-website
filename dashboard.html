@@ -2179,11 +2179,16 @@ const HEARTBEAT_URL = (() => {
     return;
   }
   if (!session?.user) {
-    location.href = '/login';
+    // Someone who signed in on this device before gets the 'session expired'
+    // log-in screen with their email filled in; a first visit gets the plain one.
+    let hadSession = false;
+    try { hadSession = !!localStorage.getItem('snypd_last_email'); } catch (e) {}
+    location.href = hadSession ? '/login?reason=expired' : '/login';
     return;
   }
   const uid   = session.user.id;
   const email = session.user.email || '';
+  try { if (email) localStorage.setItem('snypd_last_email', email); } catch (e) {}
   // Real, not fabricated - Supabase Auth stamps every user row with this on
   // signup, no separate tracking needed for a real "joined" date.
   const joinedAt = session.user.created_at || null;
@@ -3975,6 +3980,7 @@ const HEARTBEAT_URL = (() => {
         signoutBtn.disabled = true;
         try {
           await sb.auth.signOut();
+          try { localStorage.removeItem('snypd_last_email'); } catch (e) {}
         } catch (e) {
           console.error('SNYPD profile: sign out error', e);
         }
