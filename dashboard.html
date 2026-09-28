@@ -1912,10 +1912,10 @@ body {
 <div class="bd">
 <div class="elite-banner" id="elite-banner" style="display:none">
   <div>
-    <div class="elite-banner__title">Elite watches while you're away</div>
-    <div class="elite-banner__text">Your plan only checks while this tab is open. Elite keeps hunting 24/7, tab closed or not.</div>
+    <div class="elite-banner__title">Paid plans hunt while you're away</div>
+    <div class="elite-banner__text">Free only checks while this tab is open. Paid plans keep hunting 24/7, tab closed or not.</div>
   </div>
-  <a class="btn btn-prim" href="/plans">Go Elite</a>
+  <a class="btn btn-prim" href="/plans">See plans</a>
 </div>
 <!-- README §5.6 is explicit that these are two different failures with two
      different screens: Vinted unreachable (amber, cached feed still shown,
@@ -2410,7 +2410,8 @@ const HEARTBEAT_URL = (() => {
   document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
 
   const eliteBanner = document.getElementById('elite-banner');
-  if (eliteBanner) eliteBanner.style.display = (effectivePlan === 'elite') ? 'none' : '';
+  // All paid plans run 24/7 (PAID_PLANS-gated), so this is a Free-only nudge.
+  if (eliteBanner) eliteBanner.style.display = (effectivePlan === 'free') ? '' : 'none';
 
   // Topbar founding badge: mirrors the Profile panel's own badge (below),
   // but populated here unconditionally on load rather than only when the

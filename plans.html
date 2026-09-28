@@ -868,12 +868,14 @@
     if (!user) return;
     auth.signedIn = true;
     auth.plan = 'free';
-    var pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url').eq('id', user.id).maybeSingle();
+    var pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id').eq('id', user.id).maybeSingle();
     var row = pr && pr.data;
     if (row) {
       var p = norm(row.subscription_plan) || 'free';
-      // A lapsed paid plan is Free for this page, the same rule as the dashboard.
-      auth.plan = p !== 'free' && ACTIVE.indexOf(String(row.sub_status || '').toLowerCase()) === -1 ? 'free' : p;
+      // Same rule as dashboard.html's isActivePaidPlan: a paid plan counts only
+      // with an active status AND a Whop product id; otherwise this page shows Free.
+      var paidOk = ACTIVE.indexOf(String(row.sub_status || '').toLowerCase()) !== -1 && !!String(row.whop_product_id || '').trim();
+      auth.plan = p !== 'free' && !paidOk ? 'free' : p;
       if (row.whop_manage_url) auth.manageUrl = row.whop_manage_url;
     }
   }
