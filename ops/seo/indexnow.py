@@ -20,7 +20,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 def main():
     if len(sys.argv) > 1:
-        urls = ['https://' + HOST + (p if p.startswith('/') else '/' + p) for p in sys.argv[1:]]
+        # Git Bash rewrites "/faq" into "C:/.../Git/faq" before Python sees it.
+        # Run from PowerShell, or pass paths without the slash ("faq"), or set
+        # MSYS_NO_PATHCONV=1. Refuse anything that is not a plain site path.
+        paths = [p if p.startswith('/') else '/' + p for p in sys.argv[1:]]
+        bad = [p for p in paths if ':' in p or '\\' in p or '/Git/' in p]
+        if bad:
+            sys.exit(f'not site paths (shell rewrote them?): {bad}')
+        urls = ['https://' + HOST + p for p in paths]
     else:
         sm = open(os.path.join(ROOT, 'sitemap.xml'), encoding='utf-8').read()
         urls = re.findall(r'<loc>([^<]+)</loc>', sm)
