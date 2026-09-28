@@ -115,6 +115,22 @@
   .feats li.part::before { content: "\25D0"; color: #FFB020; }
   .feats li.hl { color: #00E5A0; }
   .card .btn { margin-top: auto; }
+  .plus { font-size: 11px; letter-spacing: .06em; color: #8B9094; margin-bottom: -8px; }
+  /* Phones: every plan and price at a glance, so none is missed below the fold. */
+  .jump { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #26262A; margin-bottom: 14px; }
+  .jump a { min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; letter-spacing: .06em; color: #8B9094; background: #141416; border-left: 1px solid #26262A; }
+  .jump a:first-child { border-left: 0; }
+  .jump a b { font-weight: 400; color: #FFFFFF; font-size: 12px; }
+  .jump a.is-pro { background: #1A0F24; color: #FFFFFF; }
+  .card { scroll-margin-top: calc(var(--nav-h) + 12px); }
+  .proof { font-size: 11.5px; color: #8B9094; }
+  .proof b { font-weight: 400; color: #FFFFFF; }
+  /* Phones: the chosen plan and its price stay on screen with the button. */
+  .sbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: #0A0A0B; border-top: 1px solid #26262A; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 12px; box-shadow: 0 -8px 28px rgba(0,0,0,.6); }
+  .sbar__txt { flex: 1; min-width: 0; font-size: 12px; letter-spacing: .04em; color: #8B9094; line-height: 1.4; }
+  .sbar__txt b { font-weight: 400; color: #FFFFFF; }
+  .sbar .btn { min-height: 46px; padding: 0 18px; white-space: nowrap; }
+  .sbar-space { height: 76px; }
   .under { display: flex; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-top: 14px; font-size: 11.5px; line-height: 1.6; }
 
   /* Chooser */
@@ -295,9 +311,15 @@
     </div>
   </section>
 
-  <section class="wrap" style="padding-bottom:40px;" aria-label="Plans" data-section="cards">
+  <section class="wrap" style="padding-bottom:40px;" aria-label="Plans" data-section="cards" id="plans">
+    <nav class="jump mob" aria-label="Jump to a plan">
+      <a href="#card-free">FREE<b>&euro;0</b></a>
+      <a href="#card-kickstart">KICKSTART<b>&euro;14.99</b></a>
+      <a href="#card-pro" class="is-pro">PRO<b>&euro;24.99</b></a>
+      <a href="#card-elite">ELITE<b>&euro;34.99</b></a>
+    </nav>
     <div class="cards">
-      <article class="card" data-plan-card="free" aria-labelledby="n-free">
+      <article class="card" id="card-free" data-plan-card="free" aria-labelledby="n-free">
         <div class="card__top">
           <h2 class="card__name" id="n-free">FREE</h2>
           <span class="tag-cur" data-cur="free"></span>
@@ -306,7 +328,7 @@
           <span class="price__amt">&euro;0</span>
           <span class="price__sub">No card. No time limit.</span>
         </div>
-        <p class="card__for">Try it on one real search.</p>
+        <p class="card__for">Try SNYPD on one real search.</p>
         <ul class="feats">
           <li>1 active Vinted search</li>
           <li class="part">Runs while your dashboard is open</li>
@@ -316,18 +338,19 @@
         <a class="btn" data-cta="free" href="/signup">START FREE</a>
       </article>
 
-      <article class="card" data-plan-card="kickstart" aria-labelledby="n-kickstart">
+      <article class="card" id="card-kickstart" data-plan-card="kickstart" aria-labelledby="n-kickstart">
         <div class="card__top">
           <h2 class="card__name" id="n-kickstart">KICKSTART</h2>
           <span class="tag-cur" data-cur="kickstart"></span>
         </div>
         <div class="price">
           <span class="price__amt">&euro;14.99<span class="price__per"> / mo</span></span>
-          <span class="price__sub">VAT included &middot; renews monthly</span>
+          <span class="price__sub">VAT incl. &middot; monthly &middot; cancel any time</span>
         </div>
-        <p class="card__for">For light hunting.</p>
+        <p class="card__for">For the one or two items you always hunt.</p>
+        <span class="plus">Everything in Free, plus:</span>
         <ul class="feats">
-          <li>2 active Vinted searches</li>
+          <li>2 active Vinted searches, not 1</li>
           <li>Runs 24/7, dashboard closed</li>
           <li>Push alerts around the clock</li>
           <li>Paid Discord channels</li>
@@ -335,7 +358,7 @@
         <a class="btn" data-cta="kickstart" href="/signup?plan=kickstart">START KICKSTART</a>
       </article>
 
-      <article class="card card--pro" data-plan-card="pro" aria-labelledby="n-pro">
+      <article class="card card--pro" id="card-pro" data-plan-card="pro" aria-labelledby="n-pro">
         <div class="card__top">
           <h2 class="card__name" id="n-pro">PRO</h2>
           <span class="card__tags">
@@ -345,35 +368,32 @@
         </div>
         <div class="price">
           <span class="price__amt">&euro;24.99<span class="price__per"> / mo</span></span>
-          <span class="price__sub">VAT included &middot; renews monthly</span>
+          <span class="price__sub">VAT incl. &middot; monthly &middot; cancel any time</span>
         </div>
-        <p class="card__for">For active resellers sourcing every day.</p>
+        <p class="card__for">For resellers sourcing every day.</p>
+        <span class="plus">Everything in Kickstart, plus:</span>
         <ul class="feats">
-          <li>5 active Vinted searches</li>
-          <li>Runs 24/7, dashboard closed</li>
-          <li>Push alerts around the clock</li>
-          <li class="hl">Market Report price checks</li>
-          <li>Paid Discord channels</li>
+          <li>5 active Vinted searches, not 2</li>
+          <li class="hl">Market Report: typical price by condition, before you buy</li>
+          <li>Up to 100 price checks a day</li>
         </ul>
         <a class="btn btn--prim" data-cta="pro" href="/signup?plan=pro">START PRO</a>
       </article>
 
-      <article class="card" data-plan-card="elite" aria-labelledby="n-elite">
+      <article class="card" id="card-elite" data-plan-card="elite" aria-labelledby="n-elite">
         <div class="card__top">
           <h2 class="card__name" id="n-elite">ELITE</h2>
           <span class="tag-cur" data-cur="elite"></span>
         </div>
         <div class="price">
           <span class="price__amt">&euro;34.99<span class="price__per"> / mo</span></span>
-          <span class="price__sub">VAT included &middot; renews monthly</span>
+          <span class="price__sub">VAT incl. &middot; monthly &middot; cancel any time</span>
         </div>
-        <p class="card__for">Maximum coverage for serious sourcing.</p>
+        <p class="card__for">For hunting many brands, sizes or markets at once.</p>
+        <span class="plus">Everything in Pro, plus:</span>
         <ul class="feats">
-          <li>10 active Vinted searches</li>
-          <li>Runs 24/7, dashboard closed</li>
-          <li>Push alerts around the clock</li>
-          <li class="hl">Market Report price checks</li>
-          <li>Paid Discord channels</li>
+          <li>10 active Vinted searches, not 5</li>
+          <li>&euro;3.50 per search a month, the lowest of any plan</li>
         </ul>
         <a class="btn" data-cta="elite" href="/signup?plan=elite">START ELITE</a>
       </article>
@@ -382,6 +402,7 @@
       <span class="muted">Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment.</span>
       <span style="color:#00E5A0;letter-spacing:.06em;" id="founding-line">FIRST 100 ACCOUNTS KEEP PRO PRICING FOR LIFE</span>
     </div>
+    <p class="proof" id="proof" hidden><b id="proof-n"></b> Vinted listings matched for SNYPD hunters so far.</p>
   </section>
 
   <section class="band band--alt" aria-labelledby="chooser-title" data-section="chooser">
@@ -515,6 +536,12 @@
      one, so its tracking script never runs on a plain visit. -->
 <div id="checkouts"></div>
 
+<div class="sbar-space mob"></div>
+<div class="sbar mob" id="sbar" hidden>
+  <span class="sbar__txt" id="sbar-txt"><b>PRO</b> &middot; &euro;24.99 / mo incl. VAT</span>
+  <a class="btn btn--prim" id="sbar-cta" data-cta="pro" data-section="sticky" href="/signup?plan=pro">START PRO</a>
+</div>
+
 <script>
 /* SNYPD /plans. Page layout from the Claude Design file "SNYPD Plans.dc.html";
    facts corrected against the running product (see the comparison rows). */
@@ -525,7 +552,7 @@
   // Prices are VAT-inclusive and must match what Whop charges. A null plan id
   // means there is no live checkout for that plan: the button says so instead
   // of opening a dead checkout.
-  var WHOP_PLANS = { kickstart: null, pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG' };
+  var WHOP_PLANS = { kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG' };
   var PLANS = ['free', 'kickstart', 'pro', 'elite'];
   var NAMES = { free: 'FREE', kickstart: 'KICKSTART', pro: 'PRO', elite: 'ELITE' };
   var PRICE = { free: '€0', kickstart: '€14.99', pro: '€24.99', elite: '€34.99' };
@@ -584,7 +611,7 @@
     ['Do paid plans find listings faster?', 'No. Every plan checks every 30 seconds to 5 minutes, faster on busy searches. Paid plans add searches and keep checking with your dashboard closed.'],
     ['Is there a free trial?', 'There is no trial, because there is no need for one: Free runs on one real search for as long as you like.'],
     ['Does the price include VAT?', 'Yes. €14.99, €24.99 and €34.99 a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.'],
-    ['How do I pay?', 'By card, through Whop’s secure checkout on this page. SNYPD never sees your card details.'],
+    ['How do I pay?', 'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.'],
     ['Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account.'],
     ['What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'],
     ['Can I get a refund?', 'Yes. Email snypd@gmail.com within 14 days of your first payment for a plan and we refund that payment in full.'],
@@ -692,12 +719,22 @@
 
   // ----- Plan chooser -------------------------------------------------------
   var q = { n: 2, closed: true, price: true };
+  var focusPlan = 'pro';
+  function paintBar() {
+    var k = focusPlan;
+    $('sbar-txt').innerHTML = '<b>' + NAMES[k] + '</b> · ' + (k === 'free' ? '€0, no card' : PRICE[k] + ' / mo incl. VAT');
+    var a = $('sbar-cta');
+    a.setAttribute('data-cta', k);
+    a.classList.toggle('btn--prim', true);
+    paintCta(a, k);
+  }
   function paintFit() {
     var rank = Math.max(q.n >= 6 ? 3 : q.n >= 3 ? 2 : q.n >= 2 ? 1 : 0, q.closed ? 1 : 0, q.price ? 2 : 0);
     var k = PLANS[rank];
     var reasons = [SEARCHES[k] + ' active search' + (SEARCHES[k] > 1 ? 'es' : '')];
     reasons.push(k === 'free' ? 'Runs while your dashboard is open' : 'Keeps hunting with the tab closed');
     if (rank >= 2) reasons.push('Market Report price checks');
+    focusPlan = k;
     $('fit-name').textContent = NAMES[k];
     $('fit-price').textContent = k === 'free' ? '€0' : PRICE[k] + ' / mo';
     $('fit-reasons').innerHTML = reasons.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
@@ -707,6 +744,7 @@
     if (ref && fit.getAttribute('href') && fit.getAttribute('href').indexOf('/signup') === 0) {
       var u = new URL(fit.getAttribute('href'), location.origin); u.searchParams.set('r', ref); fit.setAttribute('href', u.pathname + u.search);
     }
+    paintBar();
   }
   $('q-n').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
@@ -731,6 +769,7 @@
     $('cmp').setAttribute('data-show', i);
     this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
     var m = $('cmp-mcta'); m.setAttribute('data-cta', PLANS[+i]); paintCta(m, PLANS[+i]);
+    focusPlan = PLANS[+i]; paintBar();
     if (m.classList.contains('btn--prim') !== (i === '2')) m.classList.toggle('btn--prim', i === '2');
   });
 
@@ -850,6 +889,35 @@
 
   paintAll();
   loadPlan().catch(function () {}).then(function () { paintAll(); openRequested(); });
+
+  // ----- Phone sticky bar -----------------------------------------------------
+  // Shown once the plan cards have scrolled away, hidden again at the final
+  // call to action and footer, which carry their own buttons.
+  var pastCards = false, atEnd = false;
+  function paintSbar() { $('sbar').hidden = !(pastCards && !atEnd); }
+  if (typeof IntersectionObserver === 'function') {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { pastCards = !e.isIntersecting && e.boundingClientRect.top < 0; });
+      paintSbar();
+    }).observe($('plans'));
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { atEnd = e.isIntersecting; });
+      paintSbar();
+    }).observe(document.querySelector('[data-section="end"]'));
+  }
+
+  // ----- Listings figure ------------------------------------------------------
+  // Same cached figure as the homepage (public_stats, refreshed every 15 min by
+  // pg_cron, migration 033). On any failure the line stays hidden.
+  try {
+    SNYPD.supabase.from('public_stats').select('value').eq('key', 'listings_matched').maybeSingle()
+      .then(function (res) {
+        var v = res && res.data && res.data.value;
+        if (typeof v !== 'number' || v <= 0) return;
+        $('proof-n').textContent = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        $('proof').hidden = false;
+      }, function () {});
+  } catch (e) {}
 
   // ----- Founding counter ---------------------------------------------------
   fetch(FOUNDING_ENDPOINT)
