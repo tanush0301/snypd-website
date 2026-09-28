@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SNYPD - Vinted Monitor &amp; New Listing Alerts for Resellers</title>
-<meta name="description" content="SNYPD is a Vinted monitor for resellers. It watches your saved searches and alerts you the moment a matching listing appears. Free plan, no time limit.">
+<title>SNYPD - Vinted Bot &amp; Monitor for New Listing Alerts</title>
+<meta name="description" content="Vinted bot for resellers: SNYPD watches your saved searches and alerts you to new matching listings. No autobuy, no Vinted login needed. Free plan.">
 <link rel="canonical" href="https://www.snypd.store/">
-<meta property="og:title" content="SNYPD - Vinted Monitor &amp; New Listing Alerts for Resellers">
-<meta property="og:description" content="SNYPD is a Vinted monitor for resellers. It watches your saved searches and alerts you the moment a matching listing appears. Free plan, no time limit.">
+<meta property="og:title" content="SNYPD - Vinted Bot &amp; Monitor for New Listing Alerts">
+<meta property="og:description" content="Vinted bot for resellers: SNYPD watches your saved searches and alerts you to new matching listings. No autobuy, no Vinted login needed. Free plan.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.snypd.store/">
 <meta property="og:site_name" content="SNYPD">
@@ -15,10 +15,10 @@
 <meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="SNYPD - Vinted monitor and new listing alerts for resellers">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SNYPD - Vinted Monitor &amp; New Listing Alerts for Resellers">
-<meta name="twitter:description" content="SNYPD is a Vinted monitor for resellers. It watches your saved searches and alerts you the moment a matching listing appears. Free plan, no time limit.">
+<meta name="twitter:title" content="SNYPD - Vinted Bot &amp; Monitor for New Listing Alerts">
+<meta name="twitter:description" content="Vinted bot for resellers: SNYPD watches your saved searches and alerts you to new matching listings. No autobuy, no Vinted login needed. Free plan.">
 <meta name="twitter:image" content="https://www.snypd.store/assets/og/og-v5.png">
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
@@ -59,16 +59,17 @@
   @media (prefers-reduced-motion: reduce) { a, button { transition: none !important; } }
 </style>
 
-<!-- Supabase client: used by the click-attribution script (ref_clicks) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!-- Supabase REST. This page makes two public calls (the listings counter and
+     ref_clicks), so plain fetch instead of the 110 KB supabase-js client, which
+     blocked rendering from the <head>. Same anon key and headers it sent. -->
 <script>
   window.SNYPD = window.SNYPD || {};
-  if (!SNYPD.supabase) {
-    SNYPD.supabase = supabase.createClient(
-      'https://igbuqanjocfmahlzzupc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
-    );
-  }
+  SNYPD.rest = function (path, init) {
+    var key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ';
+    init = init || {};
+    init.headers = Object.assign({ apikey: key, Authorization: 'Bearer ' + key }, init.headers || {});
+    return fetch('https://igbuqanjocfmahlzzupc.supabase.co/rest/v1/' + path, init);
+  };
 </script>
 
 
@@ -119,7 +120,7 @@
       "url": "https://www.snypd.store/",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android, Windows, macOS",
-      "description": "Vinted monitor for resellers: watches your saved Vinted searches and alerts you when a new matching listing appears.",
+      "description": "Vinted alert bot and monitor for resellers: watches your saved Vinted searches and alerts you when a new matching listing appears. It never logs in to your Vinted account and never buys for you.",
       "publisher": { "@id": "https://www.snypd.store/#org" },
       "offers": [
         { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR" },
@@ -232,9 +233,9 @@
   <div style="max-width:1320px;margin:0 auto;padding:14px 20px 0;">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
       <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
-        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;" id="stat-listings">178,102</span>
+        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;" id="stat-listings">233,693</span>
         <span style="font-size:12.5px;line-height:1.5;color:#E8EAEB;">unique Vinted listings matched users' searches since 17 Sept 2026</span>
-        <span style="font-size:12px;color:#8B9094;" id="stat-listings-asof">As of 26 Sept 2026</span>
+        <span style="font-size:12px;color:#8B9094;" id="stat-listings-asof">As of 28 Sept 2026</span>
       </div>
       <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
         <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;">150+ sales</span>
@@ -819,9 +820,10 @@
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
   function groupThousands(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   try {
-    SNYPD.supabase.from('public_stats').select('value, as_of').eq('key', 'listings_matched').maybeSingle()
-      .then(function (res) {
-        var row = res && res.data, when = row && new Date(row.as_of);
+    SNYPD.rest('public_stats?select=value,as_of&key=eq.listings_matched', { headers: { 'Accept-Profile': 'public' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (rows) {
+        var row = rows && rows[0], when = row && new Date(row.as_of);
         if (!row || typeof row.value !== 'number' || row.value <= 0 || !when || isNaN(when.getTime())) return;
         $('stat-listings').textContent = groupThousands(row.value);
         $('stat-listings-asof').textContent = 'As of ' + when.getUTCDate() + ' ' + MONTHS[when.getUTCMonth()] + ' ' + when.getUTCFullYear();
@@ -863,11 +865,12 @@
         gtag('event', 'dm_click', { ref_code: code, source: 'instagram_dm' });
       }
       // Fire and forget: a failure here must never affect the page.
-      if (window.SNYPD && window.SNYPD.supabase) {
-        window.SNYPD.supabase
-          .from('ref_clicks')
-          .insert({ code: code, referrer: document.referrer || null })
-          .then(function () {}, function () {});
+      if (window.SNYPD && window.SNYPD.rest) {
+        window.SNYPD.rest('ref_clicks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Content-Profile': 'public', Prefer: 'return=minimal' },
+          body: JSON.stringify({ code: code, referrer: document.referrer || null })
+        }).then(function () {}, function () {});
       }
     }
 

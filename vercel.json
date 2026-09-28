@@ -3,10 +3,10 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/sign-in", "destination": "/login", "permanent": false },
-    { "source": "/sign-up", "destination": "/signup", "permanent": false },
-    { "source": "/pricing", "destination": "/plans", "permanent": false },
-    { "source": "/filters", "destination": "/dashboard", "permanent": false }
+    { "source": "/sign-in", "destination": "/login", "permanent": true },
+    { "source": "/sign-up", "destination": "/signup", "permanent": true },
+    { "source": "/pricing", "destination": "/plans", "permanent": true },
+    { "source": "/filters", "destination": "/dashboard", "permanent": true }
   ],
   "rewrites": [
     { "source": "/favicon.ico", "destination": "/assets/icons/icon-192.png" }
