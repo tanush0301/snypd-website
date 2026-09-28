@@ -1,0 +1,21 @@
+item,search,group,typical_asking_eur,p25_eur,p75_eur,listings,sellers,confidence,outlier_high_pct
+Air Jordan 1 Mid,jordan 1 mid,sneakers,45.00,28.25,70.00,1078,973,medium,6.7
+Nike Dunk Low,nike dunk low,sneakers,40.00,23.00,65.00,11197,9135,medium,5.9
+Nike Air Force 1,nike air force 1,sneakers,33.00,23.00,60.00,1945,1565,medium,7.1
+Nike Air Max 90,air max 90,sneakers,80.00,49.99,130.00,166,145,medium,15.7
+Nike Air Max 95,air max 95,sneakers,60.00,35.00,95.00,1631,1470,high,4.4
+adidas Samba,adidas samba,sneakers,55.00,36.45,80.00,471,421,high,2.5
+adidas Gazelle,adidas gazelle,sneakers,33.75,20.00,50.00,1454,1344,high,1.0
+adidas Campus,adidas campus,sneakers,30.00,20.00,45.00,1437,1246,high,3.2
+New Balance 550,new balance 550,sneakers,30.00,20.00,45.00,1673,1585,high,3.5
+New Balance 9060,new balance 9060,sneakers,60.00,45.00,95.00,1797,1456,high,4.1
+New Balance 2002R,new balance 2002r,sneakers,55.00,36.00,85.00,1451,1307,high,1.7
+Salomon XT-6,salomon xt-6,sneakers,110.00,93.75,140.00,51,40,high,0.0
+ASICS Gel-Kayano,asics gel kayano,sneakers,50.00,50.00,75.00,2584,1215,high,0.0
+Stone Island jumper,stone island jumper,clothing,75.00,50.00,100.50,1200,948,high,1.4
+Carhartt Detroit jacket,carhartt detroit jacket,clothing,99.99,65.00,140.00,661,485,high,2.6
+Arc’teryx Beta,arcteryx beta,clothing,299.00,212.50,350.00,83,71,high,3.6
+Patagonia fleece,patagonia fleece,clothing,50.00,39.00,70.00,1977,986,high,2.0
+The North Face Nuptse,the north face nuptse,clothing,90.00,65.00,136.50,1153,900,high,3.3
+Ralph Lauren quarter zip,ralph lauren quarter zip,clothing,48.50,40.00,59.00,106,62,high,1.9
+# Source: SNYPD Market Report (median asking price, not sold price), listings seen on vinted.be in the 14 days to 2026-09-28. https://www.snypd.store/vinted-prices

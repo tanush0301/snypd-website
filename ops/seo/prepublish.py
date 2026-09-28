@@ -30,6 +30,14 @@ PAGES = [
     ('/signup',  'signup.html',  None),
     ('/support', 'support.html', None),
     ('/cookies', 'cookies.html', None),
+    ('/vinted-bot',                   'vinted-bot.html',                   {'en': '/vinted-bot', 'fr': '/fr/bot-vinted', 'x-default': '/vinted-bot'}),
+    ('/fr/bot-vinted',                'fr/bot-vinted.html',                {'en': '/vinted-bot', 'fr': '/fr/bot-vinted', 'x-default': '/vinted-bot'}),
+    ('/vinted-saved-search-alerts',   'vinted-saved-search-alerts.html',   {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted', 'x-default': '/vinted-saved-search-alerts'}),
+    ('/fr/alertes-recherche-vinted',  'fr/alertes-recherche-vinted.html',  {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted', 'x-default': '/vinted-saved-search-alerts'}),
+    ('/vinted-bot-comparison',        'vinted-bot-comparison.html',        {'en': '/vinted-bot-comparison', 'fr': '/fr/comparatif-bot-vinted', 'x-default': '/vinted-bot-comparison'}),
+    ('/fr/comparatif-bot-vinted',     'fr/comparatif-bot-vinted.html',     {'en': '/vinted-bot-comparison', 'fr': '/fr/comparatif-bot-vinted', 'x-default': '/vinted-bot-comparison'}),
+    ('/vinted-prices',                'vinted-prices.html',                {'en': '/vinted-prices', 'fr': '/fr/prix-vinted', 'x-default': '/vinted-prices'}),
+    ('/fr/prix-vinted',               'fr/prix-vinted.html',               {'en': '/vinted-prices', 'fr': '/fr/prix-vinted', 'x-default': '/vinted-prices'}),
 ]
 # Pages that carry the static listings figure, with the language of their "As of" line.
 COUNTER_PAGES = [('index.html', 'en')]

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vinted Bot for New Listing Alerts, No Autobuy | SNYPD</title>
+<meta name="description" content="SNYPD is a Vinted bot that watches your searches and sends a push alert when a matching listing appears. It never logs in, buys or messages for you.">
+<link rel="canonical" href="https://www.snypd.store/vinted-bot">
+<link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot">
+<link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted">
+<link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-bot">
+<meta property="og:title" content="Vinted Bot for New Listing Alerts, No Autobuy | SNYPD">
+<meta property="og:description" content="SNYPD is a Vinted bot that watches your searches and sends a push alert when a matching listing appears. It never logs in, buys or messages for you.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.snypd.store/vinted-bot">
+<meta property="og:site_name" content="SNYPD">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap">
+<link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<style>
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+html, body { margin: 0; background: #0A0A0B; }
+body { font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; -webkit-font-smoothing: antialiased; }
+a { color: #00E5A0; text-decoration: none; }
+a:hover { color: #57FFC8; }
+a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+::selection { background: #A200FF; color: #FFFFFF; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor { animation: none !important; } }
+.lg-wrap { max-width: 1320px; margin: 0 auto; padding-left: 20px; padding-right: 20px; box-sizing: border-box; }
+.lg-nav { position: sticky; top: 0; z-index: 30; background: rgba(10,10,11,.92); border-bottom: 1px solid #1D1D20; }
+.lg-nav-in { display: flex; align-items: center; gap: 10px 18px; padding-top: 8px; padding-bottom: 8px; }
+.lg-brand { display: flex; align-items: center; gap: 9px; color: #FFFFFF; min-height: 44px; }
+.lg-brand:hover { color: #FFFFFF; }
+.lg-brand img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.lg-brand span { font-size: 15.5px; font-weight: 700; letter-spacing: .02em; }
+.lg-cursor { animation: blink 1.2s step-end infinite; }
+.lg-links { display: flex; gap: 4px; flex: 1; }
+.lg-navlink { font-size: 12px; letter-spacing: .1em; color: #8B9094; padding: 14px 10px; }
+.lg-navlink:hover { color: #FFFFFF; }
+.lg-navlink[aria-current="page"] { color: #FFFFFF; }
+.lg-cta { font-size: 12px; letter-spacing: .1em; color: #FFFFFF; background: #A200FF; padding: 14px 16px; }
+.lg-cta:hover { color: #FFFFFF; filter: brightness(1.18); }
+@media (max-width: 699.98px) { .lg-links { display: none; } .lg-nav-in { justify-content: space-between; } .lg-login { margin-left: auto; } }
+@media (max-width: 459.98px) { .lg-nav-in { gap: 4px; } .lg-navlink { padding: 14px 6px; letter-spacing: .05em; } .lg-cta { padding: 14px 10px; letter-spacing: .05em; } .lg-brand span { font-size: 14px; } }
+.lg-head { border-bottom: 1px solid #1D1D20; }
+.lg-head-in { padding-top: 56px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 14px; }
+.lg-eyebrow { font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+.lg-h1 { margin: 0; max-width: 20ch; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(36px, 6vw, 60px); line-height: .98; letter-spacing: -.04em; color: #FFFFFF; }
+.lg-meta { font-size: 12px; color: #8B9094; }
+.lg-lead { margin: 6px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.7; color: #B8BCBF; }
+.lg-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding-top: 40px; padding-bottom: 72px; align-items: start; }
+@media (max-width: 899.98px) { .lg-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 28px; } }
+.lg-toc { position: sticky; top: 84px; border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 18px; display: flex; flex-direction: column; gap: 2px; }
+@media (max-width: 899.98px) { .lg-toc { position: static; } }
+.lg-toc span { font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.lg-toc a { font-size: 12px; line-height: 1.5; color: #B8BCBF; padding: 5px 0; }
+.lg-toc a:hover { color: #00E5A0; }
+.lg-doc { max-width: 820px; min-width: 0; }
+.lg-doc section { border-top: 1px solid #1D1D20; padding: 30px 0 6px; scroll-margin-top: 80px; }
+.lg-doc section:first-child { border-top: 0; padding-top: 0; }
+.lg-doc h2 { margin: 0 0 14px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(24px, 3.2vw, 30px); line-height: 1.05; letter-spacing: -.03em; color: #FFFFFF; }
+.lg-doc h3 { margin: 22px 0 8px; font-size: 12.5px; font-weight: 400; letter-spacing: .1em; color: #FFFFFF; }
+.lg-doc p, .lg-doc li { font-size: 13px; line-height: 1.75; color: #B8BCBF; }
+.lg-doc p { margin: 0 0 14px; }
+.lg-doc ul, .lg-doc ol { margin: 0 0 14px; padding-left: 20px; }
+.lg-doc li { margin: 0 0 6px; }
+.lg-doc strong { font-weight: 400; color: #FFFFFF; }
+.lg-doc code { font-family: inherit; font-size: 12px; color: #FFFFFF; background: #141416; border: 1px solid #26262A; padding: 1px 5px; overflow-wrap: anywhere; }
+.lg-doc blockquote { margin: 0 0 14px; padding: 12px 16px; border-left: 2px solid #00E5A0; background: #0C0C0D; font-size: 13px; line-height: 1.7; color: #E8EAEB; }
+.lg-doc blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: 11.5px; color: #8B9094; }
+.lg-box { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 12px; }
+.lg-box.lg-mint { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.06); }
+.lg-box p { margin: 0; }
+.ct-scroll { overflow-x: auto; margin: 0 0 18px; border: 1px solid #1D1D20; -webkit-overflow-scrolling: touch; }
+.ct-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.ct-table th, .ct-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.55; color: #B8BCBF; }
+.ct-table thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .1em; color: #8B9094; }
+.ct-table tbody th { font-weight: 400; color: #FFFFFF; min-width: 150px; }
+.ct-table tbody tr { background: #0C0C0D; }
+.ct-table tbody tr.ct-us { background: rgba(162,0,255,.07); }
+.ct-table .ct-num { white-space: nowrap; color: #FFFFFF; }
+.ct-table small { display: block; color: #8B9094; font-size: 11px; }
+.ct-note { font-size: 11.5px !important; color: #8B9094 !important; }
+.ct-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ct-btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; font-size: 12px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; }
+.ct-btn:hover { color: #FFFFFF; filter: brightness(1.18); }
+.ct-btn.ct-ghost { background: #141416; border: 1px solid #3A3A40; }
+.ct-btn.ct-ghost:hover { filter: none; background: #1C1C1F; border-color: #55555C; }
+.lg-foot { border-top: 1px solid #1D1D20; }
+.lg-foot-in { padding-top: 24px; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lg-foot-a { display: flex; flex-direction: column; gap: 6px; }
+.lg-foot small { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.lg-foot-t { font-size: 12px; color: #8B9094; }
+.lg-foot-l { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-top: 4px; }
+.lg-foot-l a, .lg-foot-l button { font-size: 12px; }
+.lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
+.lg-foot-l button:hover { color: #57FFC8; }
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"A Vinted bot that alerts you and never touches your account.","item":"https://www.snypd.store/vinted-bot"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/vinted-bot#page","url":"https://www.snypd.store/vinted-bot","name":"Vinted Bot for New Listing Alerts, No Autobuy | SNYPD","description":"SNYPD is a Vinted bot that watches your searches and sends a push alert when a matching listing appears. It never logs in, buys or messages for you.","inLanguage":"en","datePublished":"2026-09-28","dateModified":"2026-09-28","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does SNYPD buy items for me?","acceptedAnswer":{"@type":"Answer","text":"No. SNYPD finds new listings and alerts you. You open the listing on Vinted and buy or make an offer yourself, through Vinted’s normal checkout."}},{"@type":"Question","name":"Do I need to give SNYPD my Vinted password?","acceptedAnswer":{"@type":"Answer","text":"No. SNYPD never asks for your Vinted login and never signs in to your account. You only need an email address for your SNYPD account."}},{"@type":"Question","name":"How often does SNYPD check my search?","acceptedAnswer":{"@type":"Answer","text":"Every 30 seconds to 5 minutes. Searches that keep finding new items are checked more often, quiet ones less often. Speed is the same on every plan."}},{"@type":"Question","name":"Does it work on iPhone?","acceptedAnswer":{"@type":"Answer","text":"Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts in the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser."}},{"@type":"Question","name":"Is there a free plan?","acceptedAnswer":{"@type":"Answer","text":"Yes. Free includes one search with no time limit and no card. It checks while your SNYPD dashboard is open; paid plans from €14.99 a month keep checking 24/7 with it closed."}},{"@type":"Question","name":"Which Vinted countries does it work with?","acceptedAnswer":{"@type":"Answer","text":"Any Vinted country site. Paste a search link from vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.co.uk, vinted.com or another, and prices show in that site’s currency."}}]}</script>
+<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VBC0SXPR6F');
+</script>
+</head>
+<body>
+<header class="lg-nav">
+  <div class="lg-wrap lg-nav-in">
+    <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
+    <nav class="lg-links" aria-label="Main"><a class="lg-navlink" href="/vinted-bot" aria-current="page">VINTED BOT</a><a class="lg-navlink" href="/vinted-prices">VINTED PRICES</a><a class="lg-navlink" href="/plans">PRICING</a><a class="lg-navlink" href="https://discord.gg/gjKD4auXhK">DISCORD</a></nav>
+    <a class="lg-navlink" href="/fr/bot-vinted" hreflang="fr" lang="fr" title="Version française">FR</a>
+    <a class="lg-navlink lg-login" href="/login">LOG IN</a>
+    <a class="lg-cta" href="/signup">START FREE</a>
+  </div>
+</header>
+<main>
+  <div class="lg-head">
+    <div class="lg-wrap lg-head-in">
+      <span class="lg-eyebrow">VINTED BOT</span>
+      <h1 class="lg-h1">A Vinted bot that alerts you and never touches your account.</h1>
+      <span class="lg-meta">Updated <time datetime="2026-09-28">28 September 2026</time> &middot; By SNYPD, built by a Belgian sneaker reseller</span>
+      <p class="lg-lead">Most Vinted bots are sold on buying for you, which means acting as you. SNYPD does the other part of the job: it keeps watching your Vinted searches and tells you when something new matches, so you decide and buy on Vinted yourself.</p>
+    </div>
+  </div>
+  <div class="lg-wrap lg-grid">
+    <nav class="lg-toc" aria-label="On This Page"><span>ON THIS PAGE</span><a href="#answer">In one paragraph</a><a href="#kinds">Three kinds of bot</a><a href="#how">How it works</a><a href="#speed">How fast</a><a href="#pricing">What it costs</a><a href="#account">Your Vinted account</a><a href="#faq">Questions</a></nav>
+    <article class="lg-doc">
+
+<section id="answer">
+  <h2>SNYPD in one paragraph</h2>
+  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search every 30 seconds to 5 minutes. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search while your dashboard is open; paid plans from &euro;14.99 a month keep watching 24/7.</p></div>
+</section>
+<section id="kinds">
+  <h2>The three kinds of Vinted bot</h2>
+  <p>&ldquo;Vinted bot&rdquo; covers tools that do very different things. What separates them is whether they act on your Vinted account.</p>
+  <h3>ALERT BOTS</h3>
+  <p>They watch your searches and tell you when something new matches. You buy yourself, so they have no reason to act on your Vinted account. SNYPD, Telvin Bot and Crazed are alert tools.</p>
+  <h3>AUTOBUY AND AUTOCOP BOTS</h3>
+  <p>They buy or check out for you. Buying on Vinted needs a logged-in account, so these tools act through yours; V-Tools, for example, states that you connect your own Vinted accounts. Souk, V-Tools and Resell Reserve sell autobuy features.</p>
+  <h3>DO-IT-YOURSELF SCRIPTS</h3>
+  <p>Open-source projects on GitHub that you host yourself, usually posting to Discord or Telegram. Free, but you run the server and fix it when Vinted changes something.</p>
+  <p>Prices, channels and free plans of each tool are side by side in <a href="/vinted-bot-comparison">Vinted bots compared</a>.</p>
+</section>
+<section id="how">
+  <h2>How SNYPD works</h2>
+  <ol>
+    <li>In a browser, search on your Vinted site and set your filters: brand, size, price, condition.</li>
+    <li>Copy the address from the browser bar. A search address contains <code>/catalog?</code>.</li>
+    <li>Paste it into SNYPD, give it a short name and switch it on.</li>
+    <li>SNYPD checks it every 30 seconds to 5 minutes. New matches go to your dashboard and, if you turned alerts on, to your phone or computer. Several finds close together arrive as one notification.</li>
+    <li>Tap the alert. It opens the listing on Vinted, where you buy or make an offer.</li>
+  </ol>
+</section>
+<section id="speed">
+  <h2>How fast is it?</h2>
+  <p>SNYPD checks each active search as often as every 30 seconds. Searches that keep producing new items stay at that pace; searches that go quiet slow down, up to about 5 minutes between checks, and speed back up as soon as they find something. The speed is the same on every plan: paying buys more searches and 24/7 watching, not faster checks.</p>
+  <p>Some tools advertise alerts in milliseconds. SNYPD does not make that claim. What it does promise is that a paid search keeps running when your laptop is closed and your phone is in your pocket, which is when most finds are missed.</p>
+</section>
+<section id="pricing">
+  <h2>What it costs</h2>
+  <div class="ct-scroll"><table class="ct-table"><thead><tr><th scope="col">PLAN</th><th scope="col">PER MONTH, VAT INCL.</th><th scope="col">ACTIVE SEARCHES</th><th scope="col">WATCHES WITH DASHBOARD CLOSED</th><th scope="col">MARKET REPORT</th></tr></thead><tbody><tr><th scope="row">Free</th><td><span class="ct-num">&euro;0</span></td><td>1</td><td>No, only while your dashboard is open</td><td>No</td></tr><tr><th scope="row">Kickstart</th><td><span class="ct-num">&euro;14.99</span></td><td>2</td><td>Yes, 24/7</td><td>No</td></tr><tr><th scope="row">Pro</th><td><span class="ct-num">&euro;24.99</span></td><td>5</td><td>Yes, 24/7</td><td>Yes</td></tr><tr><th scope="row">Elite</th><td><span class="ct-num">&euro;34.99</span></td><td>10</td><td>Yes, 24/7</td><td>Yes</td></tr></tbody></table></div>
+  <p>Billed monthly, cancel any time. The Market Report shows the typical Vinted asking price of an item by condition; see a sample in <a href="/vinted-prices">Vinted prices</a>. Full details on <a href="/plans">the plans page</a>.</p>
+</section>
+<section id="account">
+  <h2>What SNYPD needs from you</h2>
+  <p>An email address for your SNYPD account. No Vinted password, no Vinted login and no browser extension. SNYPD reads public listings with its own systems: the same search results anyone can open on Vinted without an account.</p>
+  <p>Because SNYPD never signs in as you, nothing it does happens on your Vinted account. When you buy, you buy through Vinted like any other buyer.</p>
+</section>
+<section id="faq">
+  <h2>Questions</h2>
+  <h3>Does SNYPD buy items for me?</h3><p>No. SNYPD finds new listings and alerts you. You open the listing on Vinted and buy or make an offer yourself, through Vinted’s normal checkout.</p><h3>Do I need to give SNYPD my Vinted password?</h3><p>No. SNYPD never asks for your Vinted login and never signs in to your account. You only need an email address for your SNYPD account.</p><h3>How often does SNYPD check my search?</h3><p>Every 30 seconds to 5 minutes. Searches that keep finding new items are checked more often, quiet ones less often. Speed is the same on every plan.</p><h3>Does it work on iPhone?</h3><p>Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts in the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser.</p><h3>Is there a free plan?</h3><p>Yes. Free includes one search with no time limit and no card. It checks while your SNYPD dashboard is open; paid plans from &euro;14.99 a month keep checking 24/7 with it closed.</p><h3>Which Vinted countries does it work with?</h3><p>Any Vinted country site. Paste a search link from vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.co.uk, vinted.com or another, and prices show in that site’s currency.</p>
+</section>
+<section id="start">
+  <h2>Try it on one search</h2>
+  <div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit. Upgrade when you want it to keep watching with your dashboard closed.</p><div class="ct-actions"><a class="ct-btn" href="/signup">START FREE</a><a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>
+</section>
+    </article>
+  </div>
+</main>
+<footer class="lg-foot">
+  <div class="lg-wrap lg-foot-in">
+    <div class="lg-foot-a">
+      <small>SNYPD &middot; NOT AFFILIATED WITH VINTED</small>
+      <span class="lg-foot-t">Reads public listings only.</span>
+      <span class="lg-foot-l"><a href="/vinted-bot">Vinted bot</a><a href="/vinted-saved-search-alerts">Vinted notifications</a><a href="/vinted-bot-comparison">Vinted bots compared</a><a href="/vinted-prices">Vinted prices</a><a href="/faq">FAQ</a><a href="/support">Support</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+    </div>
+    <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a></nav>
+  </div>
+</footer>
+</body>
+</html>
