@@ -1344,27 +1344,28 @@
             <button type="submit" class="btn-submit" id="btnSubmit">
               
               <div class="state-default">
-                TRANSMIT MESSAGE
+                SEND MESSAGE
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </div>
               
               <div class="state-loading">
                 <div class="btn-spinner"></div>
-                ENCRYPTING...
+                OPENING EMAIL...
               </div>
 
               <div class="state-success">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                SECURED.
+                EMAIL APP OPENED
               </div>
 
               <div class="state-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12" y2="16"></line><circle cx="12" cy="12" r="9"></circle></svg>
-                TRANSMISSION FAILED
+                COULD NOT OPEN EMAIL
               </div>
 
             </button>
             <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+            <p style="margin:10px 0 0;font-size:13px;opacity:.75;">Prefer to write directly? <a href="mailto:snypd@gmail.com" style="color:inherit;text-decoration:underline;">snypd@gmail.com</a></p>
           </div>
 
         </form>
@@ -1855,7 +1856,16 @@
 
       try {
         if (!SUPPORT_TICKET_URL) {
-          throw new Error('SUPPORT_TICKET_ROUTE is not configured');
+          // No backend route yet (see SUPPORT_TICKET_ROUTE above), so hand the
+          // message to the visitor's own email app instead of reporting a
+          // failure for something they can still do. Same fallback as the
+          // unmerged 4471962 fix, addressed to the inbox the site publishes.
+          const subject = encodeURIComponent('SNYPD support: ' + payload.topic);
+          const body = encodeURIComponent('Name: ' + payload.name + '\nEmail: ' + payload.email + '\n\n' + payload.message);
+          window.location.href = 'mailto:snypd@gmail.com?subject=' + subject + '&body=' + body;
+          setButtonState('is-success');
+          announce('Your email app should open with this message. Press send there, or write to snypd@gmail.com.');
+          return;
         }
 
         // Without an abort the button can stay disabled forever on a hung request.
