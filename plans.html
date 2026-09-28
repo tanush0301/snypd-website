@@ -711,7 +711,7 @@
       var paid = auth.plan && auth.plan !== 'free';
       $('youplan-manage').hidden = !paid;
       $('youplan-manage').href = auth.manageUrl;
-      document.querySelectorAll('[data-auth-link]').forEach(function (a) { a.textContent = 'DASHBOARD'; a.href = '/dashboard'; });
+      document.querySelectorAll('[data-auth-link]').forEach(function (a) { a.textContent = 'ACCOUNT'; a.href = '/account'; });
       var nc = document.querySelector('[data-nav-cta]'); nc.textContent = 'DASHBOARD'; nc.href = '/dashboard';
       var ec = document.querySelector('[data-end-cta]'); ec.textContent = 'OPEN DASHBOARD'; ec.href = '/dashboard';
     }
