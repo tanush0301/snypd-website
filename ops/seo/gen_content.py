@@ -298,11 +298,11 @@ def faq_html(pairs):
 
 def cta(lang):
     if lang == 'en':
-        return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit. '
+        return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. '
                 'Upgrade when you want it to keep watching with your dashboard closed.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">START FREE</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>')
-    return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée. '
+    return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. '
             'Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p>'
             '<p class="ct-note">L’inscription et le paiement sont pour l’instant en anglais.</p>'
             '<div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a>'
@@ -399,7 +399,7 @@ def page_bot(lang):
         ('À quelle fréquence SNYPD vérifie ma recherche ?', 'Toutes les 30 secondes à 5 minutes. Les recherches qui trouvent souvent de nouveaux articles sont vérifiées plus souvent, les recherches calmes moins souvent. La vitesse est la même pour tous les plans.'),
         ('Est-ce que ça marche sur iPhone ?', 'Oui, une fois SNYPD ajouté à l’écran d’accueil : ouvre snypd.store dans Safari, appuie sur Partager puis Sur l’écran d’accueil, et active les alertes dans l’app installée. Apple n’autorise les notifications web que pour les apps de l’écran d’accueil. Sur Android, Windows et Mac, les alertes marchent directement depuis le navigateur.'),
         ('Y a-t-il un plan gratuit ?', 'Oui. Le plan Free comprend une recherche, sans limite de durée et sans carte. Il vérifie tant que ton tableau de bord SNYPD est ouvert ; les plans payants, à partir de 14,99&nbsp;&euro; par mois, vérifient 24h/24 même fermé.'),
-        ('Avec quels pays Vinted ça fonctionne ?', 'Tous les sites Vinted. Colle un lien de recherche de vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.co.uk, vinted.com ou autre, et les prix s’affichent dans la devise de ce site.'),
+        ('Avec quels pays Vinted ça fonctionne ?', 'Avec ' + MARKETS_TEXT['fr'] + '. Colle un lien de recherche d’un de ces sites ; les prix s’affichent dans la devise de ce site.'),
     ]
     body = f"""
 <section id="resume">
@@ -614,59 +614,65 @@ COMPETITORS = [
     {'name': ('SNYPD', 'SNYPD'), 'url': SITE + '/plans', 'us': True, 'cells': [
         _c('Alerts + price data', 'Alertes + données de prix'),
         _c(YES + 'Market Report on Pro and Elite', YES + 'Market Report sur Pro et Elite'),
-        _c(YES + 'Never: email only', YES + 'Jamais : e-mail seulement'),
+        _c(YES + 'Never: email only', YES + 'Jamais : e-mail seulement'),
         _c(YES + 'Push to phone and computer', YES + 'Push sur téléphone et ordinateur'),
-        _c(YES + '14 days, first payment', YES + '14 jours, premier paiement'),
+        _c(YES + '14 days, full, after use', YES + '14 jours, intégral, même après usage'),
         _c('&euro;14.99&ndash;&euro;34.99 <small>VAT incl.</small>', '14,99&ndash;34,99&nbsp;&euro; <small>TVA incluse</small>'),
-        _c('1 search, no time limit', '1 recherche, sans limite de durée')]},
+        _c(YES + '1 search, no time limit, no notification cap', YES + '1 recherche, sans limite de durée ni de notifications')]},
+    # souk.to/en + souk.to/en/docs/pro-autobuy-billing ("after you link your Vinted account")
     {'name': ('Souk', 'Souk'), 'url': 'https://souk.to/en', 'cells': [
         _c('Alerts + autobuy', 'Alertes + achat automatique'),
         _c('Not on its site', 'Absent de son site'),
-        _c('To buy, yes*', 'Pour acheter, oui*'),
+        _c('Yes, to autobuy: you link your Vinted account', 'Oui, pour l’achat auto : tu lies ton compte Vinted'),
         _c('Push', 'Push'),
         _c('One week', 'Une semaine'),
         _c('&euro;29&ndash;&euro;99', '29&ndash;99&nbsp;&euro;'),
         _c('&ldquo;Start for free&rdquo;, no details', '« Start for free », sans détail')]},
+    # telvin-bot.com/en/ and /en/vinted-alerts/: free = 1 keyword alert, 100 notifications; notification only
     {'name': ('Telvin Bot', 'Telvin Bot'), 'url': 'https://www.telvin-bot.com/en/', 'cells': [
         _c('Alerts', 'Alertes'),
         _c('Not on its site', 'Absent de son site'),
         _c('Not stated', 'Non précisé'),
         _c('Telegram only', 'Telegram uniquement'),
-        _c('Not stated', 'Non précisé'),
+        _c('Not on its homepage', 'Absent de sa page d’accueil'),
         _c('&euro;4.90&ndash;&euro;14.90', '4,90&ndash;14,90&nbsp;&euro;'),
-        _c('1 alert, 100 notifications', '1 alerte, 100 notifications')]},
-    {'name': ('V-Tools', 'V-Tools'), 'url': 'https://v-tools.eu/', 'cells': [
+        _c('1 keyword alert, 100 notifications', '1 alerte mot-clé, 100 notifications')]},
+    # v-tools.com is the vendor; v-tools.eu is an affiliate site ("V-tools Affiliation"), never cite it
+    {'name': ('V-Tools', 'V-Tools'), 'url': 'https://www.v-tools.com/', 'cells': [
         _c('Autobuy, multi-account', 'Achat automatique, multi-comptes'),
-        _c('Not on its site', 'Absent de son site'),
-        _c('Yes: you link your Vinted accounts', 'Oui : tu lies tes comptes Vinted'),
-        _c('Not stated', 'Non précisé'),
-        _c('Not stated', 'Non précisé'),
+        _c('Own sales CRM, no market prices listed', 'CRM de ses ventes, pas de prix du marché indiqués'),
+        _c('Yes: you connect your Vinted accounts', 'Oui : tu connectes tes comptes Vinted'),
+        _c('Its own app feed', 'Le flux de son app'),
+        _c('Not on its homepage', 'Absent de sa page d’accueil'),
         _c('&euro;29.99&ndash;&euro;79.99', '29,99&ndash;79,99&nbsp;&euro;'),
         _c('None stated', 'Aucune indiquée')]},
+    # crazed.fr: Premium 4,99 and Crazy 9,99 both marked "Bientôt disponible" on 1 Oct 2026
     {'name': ('Crazed', 'Crazed'), 'url': 'https://crazed.fr/', 'cells': [
         _c('Alerts', 'Alertes'),
         _c('Not on its site', 'Absent de son site'),
         _c('Not stated', 'Non précisé'),
-        _c('In its platform; push on the &euro;9.99 plan', 'Dans sa plateforme ; push sur le plan à 9,99&nbsp;&euro;'),
-        _c('Not stated', 'Non précisé'),
-        _c('&euro;4.99&ndash;&euro;9.99', '4,99&ndash;9,99&nbsp;&euro;'),
-        _c('3 alerts', '3 alertes')]},
-    {'name': ('Resell Reserve', 'Resell Reserve'), 'url': 'https://legacy.resellreserve.co.uk/', 'cells': [
+        _c('In its platform; push only on a plan marked &ldquo;coming soon&rdquo;', 'Dans sa plateforme ; push seulement sur un plan « bientôt disponible »'),
+        _c('Not on its homepage', 'Absent de sa page d’accueil'),
+        _c('Free only; paid plans &ldquo;coming soon&rdquo;', 'Gratuit seulement ; plans payants « bientôt disponibles »'),
+        _c('3 alerts, 30 items a day', '3 alertes, 30 articles par jour')]},
+    # resellreserve.co.uk (serves legacy.resellreserve.co.uk) + /refund-policy (updated 27 Sept 2026)
+    {'name': ('Resell Reserve', 'Resell Reserve'), 'url': 'https://resellreserve.co.uk/', 'cells': [
         _c('Alerts + autobuy', 'Alertes + achat automatique'),
         _c('AI estimates, &pound;44.99 plan only', 'Estimations IA, plan à 44,99&nbsp;&pound; seulement'),
         _c('To buy, yes*', 'Pour acheter, oui*'),
         _c('Discord', 'Discord'),
-        _c('Not stated', 'Non précisé'),
+        _c('Change of mind: only before you start using it', 'Changement d’avis : seulement avant de commencer à l’utiliser'),
         _c('&pound;19.99&ndash;&pound;44.99', '19,99&ndash;44,99&nbsp;&pound;'),
-        _c('None stated', 'Aucune indiquée')]},
-    {'name': ('MarktAlert', 'MarktAlert'), 'url': 'https://marktalert.nl/', 'cells': [
+        _c('Free preview channels', 'Salons d’aperçu gratuits')]},
+    # marktalert.nl/pricing: its own pages disagree on free alert count/validity, so only the check interval is used
+    {'name': ('MarktAlert', 'MarktAlert'), 'url': 'https://marktalert.nl/pricing', 'cells': [
         _c('Alerts (also Marktplaats, 2dehands)', 'Alertes (aussi Marktplaats, 2dehands)'),
         _c('Price-drop alerts only', 'Alertes de baisse de prix seulement'),
         _c('Not stated', 'Non précisé'),
-        _c('Email, Telegram, app push, webhooks', 'E-mail, Telegram, push dans l’app, webhooks'),
-        _c('Not stated', 'Non précisé'),
+        _c('Telegram, app push, email, webhooks', 'Telegram, push dans l’app, e-mail, webhooks'),
+        _c('Not on its site', 'Absent de son site'),
         _c('&euro;6.95&ndash;&euro;10.95', '6,95&ndash;10,95&nbsp;&euro;'),
-        _c('2 alerts, valid 14 days', '2 alertes, valables 14 jours')]},
+        _c('Free plan, checks every 15 min', 'Plan gratuit, vérification toutes les 15 min')]},
     {'name': ('Vinted saved searches', 'Recherches sauvegardées Vinted'), 'url': None, 'cells': [
         _c('Built into Vinted', 'Intégré à Vinted'),
         _c('No', 'Non'),
@@ -702,7 +708,7 @@ def reasons(lang):
              'Of the six other tools here, only Resell Reserve offers price estimates, and only on its &pound;44.99 Ultimate plan. See a sample: <a href="%s">Vinted prices, September 2026</a>.' % SLUGS['prices']['en']),
             ('Your Vinted account stays yours',
              'SNYPD needs an email address and nothing else: no Vinted password, no login, no browser extension. It never buys and never messages sellers. You buy through Vinted&rsquo;s normal checkout.',
-             'Autobuy tools have to act through a logged-in Vinted account to buy for you. V-Tools&rsquo; own setup step reads &ldquo;Lier vos comptes Vinted &agrave; V-tools&rdquo; (link your Vinted accounts).'),
+             'Autobuy needs your account: Souk&rsquo;s docs say it works &ldquo;after you link your Vinted account&rdquo;, and V-Tools&rsquo; plans come with connected Vinted accounts. V-Tools&rsquo; own FAQ on bans: &ldquo;No tool can guarantee zero risk.&rdquo;'),
             ('Alerts land on your phone',
              'Push notifications go straight to your phone or computer. No Telegram, no Discord server, no extra account. Several finds close together arrive as one notification, not a buzz each.',
              'Telvin alerts only inside Telegram; Resell Reserve alerts in Discord. On iPhone, add SNYPD to your Home Screen once: Apple only allows web push for Home Screen apps.'),
@@ -711,7 +717,7 @@ def reasons(lang):
              'Souk builds alerts from its own form (brand, category, size, keywords, price). SNYPD works with %s today; more Vinted countries are being added.' % MARKETS_TEXT['en']),
             ('14 days to change your mind',
              'Not happy with a paid plan? Email within 14 days of your first payment and you get it back in full. Prices include VAT, plans run month to month, cancel any time.',
-             'Souk&rsquo;s site states one week. Telvin, V-Tools, Crazed, Resell Reserve and MarktAlert don&rsquo;t state a refund window on their homepages.'),
+             'Souk&rsquo;s site states one week. Resell Reserve&rsquo;s refund policy covers a change of mind only before you start using the service.'),
             ('Your finds, tracked to the profit',
              'Claim an item you bought and SNYPD keeps it in History: Holding, then Sold, with your realised profit added up for you. No spreadsheet next to your bot.',
              'Part of the SNYPD dashboard. Matches also carry a NEW badge, a DROP badge when the price fell since SNYPD first saw it, and Vinted&rsquo;s own suspicious-photo warning.'),
@@ -729,7 +735,7 @@ def reasons(lang):
              'Des six autres outils ici, seul Resell Reserve propose des estimations de prix, et seulement sur son plan Ultimate à 44,99&nbsp;&pound;. Un exemple : <a href="%s">Prix Vinted, septembre 2026</a>.' % SLUGS['prices']['fr']),
             ('Ton compte Vinted reste à toi',
              'SNYPD a besoin d’une adresse e-mail, rien d’autre : pas de mot de passe Vinted, pas de connexion, pas d’extension. Il n’achète jamais et n’écrit jamais aux vendeurs. Tu achètes avec le paiement normal de Vinted.',
-             'Les outils d’achat automatique doivent passer par un compte Vinted connecté pour acheter à ta place. L’étape d’installation de V-Tools dit : « Lier vos comptes Vinted à V-tools ».'),
+             'L’achat automatique passe par ton compte : la doc de Souk dit qu’il fonctionne « after you link your Vinted account », et les plans de V-Tools incluent des comptes Vinted connectés. La FAQ de V-Tools sur les bannissements : « No tool can guarantee zero risk ».'),
             ('Les alertes arrivent sur ton téléphone',
              'Les notifications push arrivent directement sur ton téléphone ou ton ordinateur. Pas de Telegram, pas de serveur Discord, pas de compte en plus. Plusieurs trouvailles rapprochées arrivent en une seule notification.',
              'Telvin alerte uniquement dans Telegram ; Resell Reserve dans Discord. Sur iPhone, ajoute SNYPD à ton écran d’accueil une fois : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
@@ -738,9 +744,9 @@ def reasons(lang):
              'Souk crée les alertes depuis son propre formulaire (marque, catégorie, taille, mots-clés, prix). SNYPD fonctionne avec %s.' % MARKETS_TEXT['fr']),
             ('14 jours pour changer d’avis',
              'Pas convaincu par un plan payant ? Écris dans les 14 jours suivant ton premier paiement et tu es remboursé en totalité. Prix TVA incluse, plans au mois, résiliables à tout moment.',
-             'Le site de Souk indique une semaine. Telvin, V-Tools, Crazed, Resell Reserve et MarktAlert n’indiquent pas de délai de remboursement sur leur page d’accueil.'),
+             'Le site de Souk indique une semaine. La politique de Resell Reserve ne rembourse un changement d’avis qu’avant de commencer à utiliser le service.'),
             ('Tes trouvailles, suivies jusqu’au bénéfice',
-             'Marque un article acheté et SNYPD le garde dans l’Historique : En stock, puis Vendu, avec ton bénéfice réalisé calculé pour toi. Plus besoin d’un tableur à côté de ton bot.',
+             'Marque un article acheté et SNYPD le garde dans History : Holding, puis Sold, avec ton bénéfice réalisé calculé pour toi. Plus besoin d’un tableur à côté de ton bot.',
              'Inclus dans le tableau de bord SNYPD. Les annonces portent aussi un badge NEW, un badge DROP quand le prix a baissé depuis que SNYPD l’a vue, et l’avertissement de Vinted sur les photos suspectes.'),
             ('Créé par un revendeur',
              'SNYPD est créé par un revendeur de sneakers belge, avec plus de 150 ventes et 4,5k abonnés, et développé au grand jour avec des revendeurs sur son Discord.',
@@ -768,11 +774,11 @@ def page_compare(lang):
 <section id="table">
   <h2>SNYPD and six other Vinted bots, side by side</h2>
   {tbl}
-  <p class="ct-note">* Buying on Vinted needs a logged-in account, so any autobuy feature acts through yours; the homepages of Souk and Resell Reserve don&rsquo;t say how they connect to it. &ldquo;Not stated&rdquo; and &ldquo;not on its site&rdquo; mean we couldn&rsquo;t find it on that tool&rsquo;s homepage, not proof it doesn&rsquo;t exist.</p>
+  <p class="ct-note">* Buying on Vinted needs a logged-in account, so any autobuy feature acts through yours; Resell Reserve&rsquo;s homepage doesn&rsquo;t say how it connects to it. &ldquo;Not stated&rdquo;, &ldquo;not on its site&rdquo; and &ldquo;not on its homepage&rdquo; mean we couldn&rsquo;t find it on that tool&rsquo;s public pages, not proof it doesn&rsquo;t exist.</p>
 </section>
 <section id="speed">
   <h2>What about speed?</h2>
-  <p>Telvin advertises alerts in 750 ms, Resell Reserve detection in under 0.15 s, V-Tools&rsquo; top-plan autocop under 0.1 s, and Crazed &ldquo;real time&rdquo; on its top plan. Those are each vendor&rsquo;s own figures, measured in their own way, so they can&rsquo;t be compared with each other, or with SNYPD.</p>
+  <p>Telvin advertises alerts in 750 ms, Resell Reserve detection in under 0.15 s, V-Tools detection &ldquo;in a few milliseconds&rdquo;, and Crazed &ldquo;real time&rdquo; on a plan it lists as coming soon. Those are each vendor&rsquo;s own figures, measured in their own way, so they can&rsquo;t be compared with each other, or with SNYPD.</p>
   <p>SNYPD checks each search every 30 seconds to 5 minutes, faster on searches that keep finding things, and the same on every plan. What it adds is reach: paid searches keep running 24/7 with your laptop closed, and the alert finds you on your phone wherever you are.</p>
 </section>
 <section id="fit">
@@ -804,11 +810,11 @@ def page_compare(lang):
 <section id="tableau">
   <h2>SNYPD et six autres bots Vinted, côte à côte</h2>
   {tbl}
-  <p class="ct-note">* Acheter sur Vinted demande un compte connecté, donc toute fonction d’achat automatique passe par le tien ; les pages d’accueil de Souk et de Resell Reserve ne disent pas comment elles s’y connectent. « Non précisé » et « absent de son site » veulent dire que nous ne l’avons pas trouvé sur la page d’accueil de l’outil, pas que cela n’existe pas.</p>
+  <p class="ct-note">* Acheter sur Vinted demande un compte connecté, donc toute fonction d’achat automatique passe par le tien ; la page d’accueil de Resell Reserve ne dit pas comment elle s’y connecte. « Non précisé », « absent de son site » et « absent de sa page d’accueil » veulent dire que nous ne l’avons pas trouvé sur les pages publiques de l’outil, pas que cela n’existe pas.</p>
 </section>
 <section id="vitesse">
   <h2>Et la vitesse ?</h2>
-  <p>Telvin annonce des alertes en 750 ms, Resell Reserve une détection en moins de 0,15 s, l’autocop du plan le plus cher de V-Tools moins de 0,1 s, et Crazed du « temps réel » sur son plan le plus cher. Ce sont les chiffres de chaque éditeur, mesurés à sa façon, donc impossibles à comparer entre eux ou avec SNYPD.</p>
+  <p>Telvin annonce des alertes en 750 ms, Resell Reserve une détection en moins de 0,15 s, V-Tools une détection « in a few milliseconds », et Crazed du « temps réel » sur un plan annoncé comme bientôt disponible. Ce sont les chiffres de chaque éditeur, mesurés à sa façon, donc impossibles à comparer entre eux ou avec SNYPD.</p>
   <p>SNYPD vérifie chaque recherche toutes les 30 secondes à 5 minutes, plus souvent sur les recherches qui trouvent beaucoup, et pareil pour tous les plans. Ce qu’il apporte, c’est la portée : les recherches payantes tournent 24h/24 ordinateur fermé, et l’alerte te trouve sur ton téléphone où que tu sois.</p>
 </section>
 <section id="pour-qui">
