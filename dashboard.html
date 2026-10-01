@@ -1722,6 +1722,7 @@ body {
       <div class="filter-sheet__new-form">
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
         <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
+        <p class="fs-floor__note is-warn" id="filter-new-site-note" role="status" style="display:none"></p>
         <div class="fs-floor">
           <label for="filter-new-minprice">Minimum price</label>
           <span class="fs-floor__cur">EUR</span>
@@ -2455,6 +2456,7 @@ const HEARTBEAT_URL = (() => {
     const metaEl = document.getElementById('filter-sheet-meta');
     const nameInput = document.getElementById('filter-new-name');
     const urlInput = document.getElementById('filter-new-url');
+    const siteNote = document.getElementById('filter-new-site-note');
     const saveBtn = document.getElementById('filter-new-save');
     const limitNote = document.getElementById('filter-sheet-limit-note');
     const minPriceInput = document.getElementById('filter-new-minprice');
@@ -2466,11 +2468,28 @@ const HEARTBEAT_URL = (() => {
     let quota = { used: 0, limit: FS_LIMIT[effectivePlan] || 1, remaining: 1 };
 
     const escFs = v => String(v ?? '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    // The Vinted sites the scraper actually polls. Keep in step with
+    // scraper-worker/src/catalogue_contract.py MARKETS: any other site fails
+    // closed there, so a search saved on it could never find anything.
+    const SUPPORTED_VINTED = ['vinted.be', 'vinted.co.uk', 'vinted.com'];
+    const SUPPORTED_VINTED_TEXT = 'vinted.be, vinted.co.uk and vinted.com';
+    function vintedSite(u) {
+      try { return new URL(String(u || '').trim()).hostname.toLowerCase().replace(/^www\./, ''); }
+      catch (e) { return ''; }
+    }
+    function vintedSiteSupported(u) { return SUPPORTED_VINTED.indexOf(vintedSite(u)) !== -1; }
     function validVintedUrl(u) {
       try {
         const x = new URL(String(u || '').trim());
         return /(^|\.)vinted\./i.test(x.hostname) && x.pathname.replace(/\/+$/, '') === '/catalog' && x.search.length > 1;
       } catch (e) { return false; }
+    }
+    function paintSiteNote() {
+      if (!siteNote) return;
+      const u = urlInput.value.trim();
+      const show = !!u && validVintedUrl(u) && !vintedSiteSupported(u);
+      siteNote.textContent = show ? (vintedSite(u) + ' is not supported yet. SNYPD watches ' + SUPPORTED_VINTED_TEXT + ' for now: search on one of those and paste that link.') : '';
+      siteNote.style.display = show ? '' : 'none';
     }
     // WHY NEW HUNTS GET A DEFAULT MINIMUM PRICE
     // Measured live 2026-09-18 against the real Vinted catalogue gateway: the
@@ -2577,6 +2596,7 @@ const HEARTBEAT_URL = (() => {
               </span>
             </div>
             <div class="fs-row__url">${escFs(shortUrl(r.vinted_url))}</div>
+            ${vintedSiteSupported(r.vinted_url) ? '' : `<p class="fs-floor__note is-warn" role="note">${escFs(vintedSite(r.vinted_url))} is not supported yet, so this hunt cannot find anything. Recreate it with a vinted.be, vinted.co.uk or vinted.com link.</p>`}
             <div class="fs-row__actions">
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
               <a href="${escFs(r.vinted_url)}" target="_blank" rel="noopener" style="font-size:11px;letter-spacing:.08em;color:var(--text-muted)">OPEN ON VINTED</a>
@@ -2600,6 +2620,7 @@ const HEARTBEAT_URL = (() => {
       const name = nameInput.value.trim();
       if (quota.remaining <= 0) return;
       if (!validVintedUrl(url)) { urlInput.style.borderColor = 'var(--danger)'; return; }
+      if (!vintedSiteSupported(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
       urlInput.style.borderColor = '';
       saveBtn.disabled = true;
       try {
@@ -2633,6 +2654,7 @@ const HEARTBEAT_URL = (() => {
       minPriceInput.addEventListener('input', paintFloorNote);
     }
     urlInput.addEventListener('input', paintFloorNote);
+    urlInput.addEventListener('input', paintSiteNote);
     paintFloorNote();
 
     listEl.addEventListener('click', async (e) => {

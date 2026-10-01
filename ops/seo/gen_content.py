@@ -24,8 +24,15 @@ SITE = 'https://www.snypd.store'
 DISCORD = 'https://discord.gg/gjKD4auXhK'
 EMAIL = 'snypd@gmail.com'
 PUBLISHED = '2026-09-28'
-MODIFIED = '2026-09-28'
+MODIFIED = '2026-10-01'
 CHECKED = {'en': '28 September 2026', 'fr': '28 septembre 2026'}
+# French pages stay unpublished until SNYPD really polls vinted.fr (decided 2026-10-01).
+# While False: no French files are written, English pages carry no hreflang or
+# language switch, and prepublish.py leaves French URLs out of the sitemap.
+FR_LIVE = False
+# The Vinted sites the scraper accepts (scraper-worker/src/catalogue_contract.py
+# MARKETS, verified live 2026-10-01). Update together with that list.
+MARKETS_TEXT = {'en': 'vinted.be, vinted.co.uk and vinted.com', 'fr': 'vinted.be, vinted.co.uk et vinted.com'}
 REPORT = os.path.join(ROOT, 'ops', 'seo', 'data', 'price-report-2026-09.json')
 REPORT_CSV = 'vinted-prices-2026-09.csv'
 
@@ -77,6 +84,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-toc a { font-size: 12px; line-height: 1.5; color: #B8BCBF; padding: 5px 0; }
 .lg-toc a:hover { color: #00E5A0; }
 .lg-doc { max-width: 820px; min-width: 0; }
+.lg-wide { grid-template-columns: minmax(0, 1fr); }
+.lg-wide .lg-doc { max-width: 1120px; }
 .lg-doc section { border-top: 1px solid #1D1D20; padding: 30px 0 6px; scroll-margin-top: 80px; }
 .lg-doc section:first-child { border-top: 0; padding-top: 0; }
 .lg-doc h2 { margin: 0 0 14px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(24px, 3.2vw, 30px); line-height: 1.05; letter-spacing: -.03em; color: #FFFFFF; }
@@ -136,7 +145,16 @@ UI = {
                legal='<a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
 }
-DATE_TXT = {'en': '28 September 2026', 'fr': '28 septembre 2026'}
+# Last real content change per page (shown as 'Updated' and used as dateModified).
+PAGE_MODIFIED = {'bot': '2026-10-01', 'notify': '2026-10-01', 'compare': '2026-10-01', 'prices': '2026-10-01'}
+MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+              'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
+
+
+def date_txt(iso, lang):
+    y, m, d = (int(x) for x in iso.split('-'))
+    day = ('1er' if d == 1 else str(d)) if lang == 'fr' else str(d)
+    return '%s %s %d' % (day, MONTHS_TXT[lang][m - 1], y)
 
 
 def esc(s):
@@ -151,22 +169,28 @@ def jsonld(obj):
     return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '</script>'
 
 
-def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=()):
+def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra=''):
     u = UI[lang]
     path = SLUGS[key][lang]
     url = SITE + path
     other = u['switch'][1]
-    alts = ''.join('<link rel="alternate" hreflang="%s" href="%s%s">\n' % (l, SITE, SLUGS[key][l]) for l in ('en', 'fr'))
-    alts += '<link rel="alternate" hreflang="x-default" href="%s%s">\n' % (SITE, SLUGS[key]['en'])
+    alts = ''
+    if FR_LIVE:
+        alts = ''.join('<link rel="alternate" hreflang="%s" href="%s%s">\n' % (l, SITE, SLUGS[key][l]) for l in ('en', 'fr'))
+        alts += '<link rel="alternate" hreflang="x-default" href="%s%s">\n' % (SITE, SLUGS[key]['en'])
+    switch = ('<a class="lg-navlink" href="%s" hreflang="%s" lang="%s" title="%s">%s</a>'
+              % (SLUGS[key][other], other, other, u['switch'][2], u['switch'][0])) if FR_LIVE else ''
     nav = ''.join('<a class="lg-navlink" href="%s"%s>%s</a>' % (href(k, lang), ' aria-current="page"' if k == key else '', t) for k, t in u['nav'])
     foot = ''.join('<a href="%s">%s</a>' % (href(k, lang), t) for k, t in u['foot'])
-    toc_html = ''.join('<a href="#%s">%s</a>' % (a, t) for a, t in toc)
+    toc_html = ''.join('<a href="#%s">%s</a>' % (a, t) for a, t in (toc or []))
+    toc_block = ('<nav class="lg-toc" aria-label="%s"><span>%s</span>%s</nav>' % (u['toc'].title(), u['toc'], toc_html)) if toc else ''
+    grid_cls = 'lg-grid' if toc else 'lg-grid lg-wide'
     ld = [
         {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
             {'@type': 'ListItem', 'position': 1, 'name': u['home'], 'item': SITE + '/'},
             {'@type': 'ListItem', 'position': 2, 'name': h1_plain(h1), 'item': url}]},
         {'@context': 'https://schema.org', '@type': 'WebPage', '@id': url + '#page', 'url': url, 'name': title,
-         'description': desc, 'inLanguage': lang, 'datePublished': PUBLISHED, 'dateModified': MODIFIED,
+         'description': desc, 'inLanguage': lang, 'datePublished': PUBLISHED, 'dateModified': PAGE_MODIFIED[key],
          'isPartOf': {'@id': SITE + '/#website'}, 'publisher': {'@id': SITE + '/#org'}, 'about': {'@id': SITE + '/#app'}},
     ] + list(extra_ld)
     ld_html = '\n'.join(jsonld(o) for o in ld)
@@ -196,7 +220,7 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=()):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap">
 <link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<style>{CSS}</style>
+<style>{CSS}{COMPARE_CSS}</style>
 {ld_html}
 <!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
 <script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
@@ -212,7 +236,7 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=()):
   <div class="lg-wrap lg-nav-in">
     <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
     <nav class="lg-links" aria-label="Main">{nav}</nav>
-    <a class="lg-navlink" href="{SLUGS[key][other]}" hreflang="{other}" lang="{other}" title="{u['switch'][2]}">{u['switch'][0]}</a>
+    {switch}
     <a class="lg-navlink lg-login" href="/login">{u['login']}</a>
     <a class="lg-cta" href="/signup">{u['start']}</a>
   </div>
@@ -222,12 +246,13 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=()):
     <div class="lg-wrap lg-head-in">
       <span class="lg-eyebrow">{eyebrow}</span>
       <h1 class="lg-h1">{h1}</h1>
-      <span class="lg-meta">{u['updated']} <time datetime="{MODIFIED}">{DATE_TXT[lang]}</time> &middot; {u['by']}</span>
+      <span class="lg-meta">{u['updated']} <time datetime="{PAGE_MODIFIED[key]}">{date_txt(PAGE_MODIFIED[key], lang)}</time> &middot; {u['by']}</span>
       <p class="lg-lead">{lead}</p>
+      {head_extra}
     </div>
   </div>
-  <div class="lg-wrap lg-grid">
-    <nav class="lg-toc" aria-label="{u['toc'].title()}"><span>{u['toc']}</span>{toc_html}</nav>
+  <div class="lg-wrap {grid_cls}">
+    {toc_block}
     <article class="lg-doc">
 {body}
     </article>
@@ -311,7 +336,7 @@ def page_bot(lang):
             ('How often does SNYPD check my search?', 'Every 30 seconds to 5 minutes. Searches that keep finding new items are checked more often, quiet ones less often. Speed is the same on every plan.'),
             ('Does it work on iPhone?', 'Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts in the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser.'),
             ('Is there a free plan?', 'Yes. Free includes one search with no time limit and no card. It checks while your SNYPD dashboard is open; paid plans from &euro;14.99 a month keep checking 24/7 with it closed.'),
-            ('Which Vinted countries does it work with?', 'Any Vinted country site. Paste a search link from vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.co.uk, vinted.com or another, and prices show in that site’s currency.'),
+            ('Which Vinted countries does it work with?', 'vinted.be, vinted.co.uk and vinted.com today, with more Vinted countries being added. Paste a search link from one of those sites; prices show in that site’s currency.'),
         ]
         body = f"""
 <section id="answer">
@@ -463,7 +488,7 @@ def page_notify(lang):
 </section>
 <section id="alerts">
   <h2>When you need real alerts</h2>
-  <p>If you resell, the listings worth having are usually gone before your next look at the counter. An alert tool checks the search for you and notifies you when something new matches, so you see it while it is still for sale.</p>
+  <p>If you resell, the listings worth having can be gone before your next look at the counter. An alert tool checks the search for you and notifies you when something new matches, so you see it while it is still for sale.</p>
   <p>With SNYPD, that search is the same one you saved on Vinted:</p>
   <ol>
     <li>Open the search on Vinted in a browser, with your filters (brand, size, price, condition).</li>
@@ -514,7 +539,7 @@ def page_notify(lang):
 </section>
 <section id="alertes">
   <h2>Quand il te faut de vraies alertes</h2>
-  <p>Si tu revends, les annonces intéressantes sont en général parties avant ton prochain coup d’œil au compteur. Un outil d’alertes vérifie la recherche pour toi et te prévient quand un nouvel article correspond, pour que tu le voies tant qu’il est encore en vente.</p>
+  <p>Si tu revends, les annonces intéressantes peuvent être parties avant ton prochain coup d’œil au compteur. Un outil d’alertes vérifie la recherche pour toi et te prévient quand un nouvel article correspond, pour que tu le voies tant qu’il est encore en vente.</p>
   <p>Avec SNYPD, c’est la même recherche que celle que tu as sauvegardée sur Vinted :</p>
   <ol>
     <li>Ouvre la recherche sur Vinted dans un navigateur, avec tes filtres (marque, taille, prix, état).</li>
@@ -541,132 +566,268 @@ def page_notify(lang):
 
 
 # ------------------------------------------------------------------ page: comparison
-# Each row: facts from the vendor's own site on CHECKED. Keep sources.
+# Why SNYPD, then the side-by-side table. Every competitor fact is from that
+# vendor's own homepage on COMPARE_CHECKED and is linked from its row.
+# EU comparative-advertising rules (Directive 2006/114/EC; Belgian Code of
+# Economic Law VI.17) allow naming competitors only when each comparison is
+# objective, verifiable and not misleading: keep every claim checkable, write
+# "not stated" (never "no") when a site is silent, and re-check before changing
+# the date. Tanush chose the eight reasons on 2026-10-01; none use testimonials
+# because none exist yet.
+COMPARE_CHECKED = {'en': '1 October 2026', 'fr': '1er octobre 2026'}
+COMPARE_CHECKED_SHORT = {'en': '1 OCT 2026', 'fr': '1ER OCT. 2026'}
+
+COMPARE_CSS = r"""
+.rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+@media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
+.rs-card { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.rs-card:first-child, .rs-card:nth-child(2) { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.05); }
+.rs-num { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+.lg-doc .rs-title { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.02em; color: #FFFFFF; }
+.lg-doc .rs-card p { margin: 0; font-size: 12.5px; line-height: 1.7; }
+.lg-doc .rs-card p.rs-proof { padding-top: 9px; border-top: 1px dashed #26262A; font-size: 11.5px; color: #8B9094; }
+.rs-proof a { color: #00E5A0; }
+.ct-yes { color: #00E5A0; }
+.ct-table tbody tr.ct-us th, .ct-table tbody tr.ct-us td { color: #FFFFFF; border-top-color: rgba(0,229,160,.45); }
+.ct-table tbody tr.ct-us th { box-shadow: inset 3px 0 0 #00E5A0; }
+.ct-badge { display: inline-block; margin-left: 6px; padding: 2px 6px; font-size: 10px; letter-spacing: .1em; color: #0A0A0B; background: #00E5A0; vertical-align: 1px; }
+.ct-table tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: #0C0C0D; }
+.ct-table thead th:first-child { position: sticky; left: 0; z-index: 2; background: #121214; }
+.ct-table tbody tr.ct-us th[scope="row"] { background: #160C20; }
+@media (max-width: 699.98px) { .ct-table tbody th { min-width: 118px; } }
+.glance { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.glance li { font-size: 12px; letter-spacing: .04em; color: #FFFFFF; border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 8px 11px; }
+.glance li span { color: #00E5A0; margin-right: 6px; }
+.fit-list { list-style: none; padding: 0 !important; margin: 0 0 18px !important; display: flex; flex-direction: column; gap: 10px; }
+.fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.fit-list li strong { display: block; margin-bottom: 3px; }
+.fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+"""
+
+# One row per tool, cells per language: (en, fr). Order: tool, type, price data,
+# account, alerts arrive, refund, per month, free option.
+def _c(en, fr=None):
+    return (en, fr if fr is not None else en)
+
+YES = '<span class="ct-yes">&#10003;</span> '
 COMPETITORS = [
-    # name, url, type_en, type_fr, price_en, price_fr, free_en, free_fr, channels_en, channels_fr, speed_en, speed_fr, account_en, account_fr
-    ('Vinted saved searches', HELP435['en'], 'Built into Vinted', 'Intégré à Vinted', 'Free', 'Gratuit', 'Yes', 'Oui',
-     '&ldquo;+N&rdquo; counter in the search bar', 'Compteur « +N » dans la barre de recherche', 'When you open the search bar', 'Quand tu ouvres la barre de recherche',
-     'Your own account', 'Ton propre compte'),
-    ('SNYPD', SITE + '/plans', 'Alerts', 'Alertes', '&euro;14.99&ndash;&euro;34.99 <small>VAT incl.</small>', '14,99&ndash;34,99&nbsp;&euro; <small>TVA incluse</small>',
-     '1 search, while the dashboard is open', '1 recherche, tableau de bord ouvert', 'Push (phone, computer), dashboard', 'Push (téléphone, ordinateur), tableau de bord',
-     'Every 30 s to 5 min', 'Toutes les 30 s à 5 min', 'No', 'Non'),
-    ('Telvin Bot', 'https://www.telvin-bot.com/en/', 'Alerts', 'Alertes', '&euro;4.90&ndash;&euro;14.90', '4,90&ndash;14,90&nbsp;&euro;',
-     '1 alert, 100 notifications', '1 alerte, 100 notifications', 'Telegram', 'Telegram', '&ldquo;750 ms&rdquo; (paid plans)', '« 750 ms » (plans payants)',
-     'Not stated on its homepage', 'Non précisé sur sa page d’accueil'),
-    ('Crazed', 'https://crazed.fr/', 'Alerts', 'Alertes', '&euro;4.99&ndash;&euro;9.99', '4,99&ndash;9,99&nbsp;&euro;',
-     '3 alerts, 30 items a day', '3 alertes, 30 articles par jour', 'In the Crazed platform; push on the top plan', 'Dans la plateforme Crazed ; push sur le plan le plus cher',
-     'Every 30 s (free), 10 s, &ldquo;real time&rdquo;', 'Toutes les 30 s (gratuit), 10 s, « temps réel »', 'Not stated on its site', 'Non précisé sur son site'),
-    ('MarktAlert', 'https://marktalert.nl/', 'Alerts (also Marktplaats, 2dehands)', 'Alertes (aussi Marktplaats, 2dehands)', '&euro;6.95&ndash;&euro;10.95', '6,95&ndash;10,95&nbsp;&euro;',
-     '2 alerts, valid 14 days', '2 alertes, valables 14 jours', 'Email, Telegram, app push, webhooks', 'E-mail, Telegram, push dans l’app, webhooks',
-     'Every 15, 5 or 3 min by plan', 'Toutes les 15, 5 ou 3 min selon le plan', 'Not stated on its site', 'Non précisé sur son site'),
-    ('Souk', 'https://souk.to/en', 'Alerts + autobuy', 'Alertes + achat automatique', '&euro;29&ndash;&euro;99', '29&ndash;99&nbsp;&euro;',
-     '&ldquo;Start for free&rdquo;, no details on the homepage', '« Start for free », sans détail sur la page d’accueil', 'Push (plus a Discord community)', 'Push (plus une communauté Discord)',
-     'Not stated on the homepage', 'Non précisé sur la page d’accueil', 'To buy, yes*', 'Pour acheter, oui*'),
-    ('V-Tools', 'https://v-tools.eu/', 'Autobuy, multi-account', 'Achat automatique, multi-comptes', '&euro;29.99&ndash;&euro;79.99', '29,99&ndash;79,99&nbsp;&euro;',
-     'None stated', 'Aucun indiqué', 'Not stated on the homepage', 'Non précisé sur la page d’accueil',
-     'Autocop &ldquo;under 0.1 s&rdquo; (top plan)', 'Autocop « inférieur à 0,1 seconde » (plan le plus cher)', 'Yes, you connect your own accounts', 'Oui, tu connectes tes propres comptes'),
-    ('Resell Reserve', 'https://legacy.resellreserve.co.uk/', 'Alerts + autobuy', 'Alertes + achat automatique', '&pound;19.99&ndash;&pound;44.99', '19,99&ndash;44,99&nbsp;&pound;',
-     'None stated', 'Aucun indiqué', 'Discord', 'Discord', 'Detection &ldquo;in under 0.15 s&rdquo;', 'Détection « in under 0.15s »',
-     'To buy, yes*', 'Pour acheter, oui*'),
+    {'name': ('SNYPD', 'SNYPD'), 'url': SITE + '/plans', 'us': True, 'cells': [
+        _c('Alerts + price data', 'Alertes + données de prix'),
+        _c(YES + 'Market Report on Pro and Elite', YES + 'Market Report sur Pro et Elite'),
+        _c(YES + 'Never: email only', YES + 'Jamais : e-mail seulement'),
+        _c(YES + 'Push to phone and computer', YES + 'Push sur téléphone et ordinateur'),
+        _c(YES + '14 days, first payment', YES + '14 jours, premier paiement'),
+        _c('&euro;14.99&ndash;&euro;34.99 <small>VAT incl.</small>', '14,99&ndash;34,99&nbsp;&euro; <small>TVA incluse</small>'),
+        _c('1 search, no time limit', '1 recherche, sans limite de durée')]},
+    {'name': ('Souk', 'Souk'), 'url': 'https://souk.to/en', 'cells': [
+        _c('Alerts + autobuy', 'Alertes + achat automatique'),
+        _c('Not on its site', 'Absent de son site'),
+        _c('To buy, yes*', 'Pour acheter, oui*'),
+        _c('Push', 'Push'),
+        _c('One week', 'Une semaine'),
+        _c('&euro;29&ndash;&euro;99', '29&ndash;99&nbsp;&euro;'),
+        _c('&ldquo;Start for free&rdquo;, no details', '« Start for free », sans détail')]},
+    {'name': ('Telvin Bot', 'Telvin Bot'), 'url': 'https://www.telvin-bot.com/en/', 'cells': [
+        _c('Alerts', 'Alertes'),
+        _c('Not on its site', 'Absent de son site'),
+        _c('Not stated', 'Non précisé'),
+        _c('Telegram only', 'Telegram uniquement'),
+        _c('Not stated', 'Non précisé'),
+        _c('&euro;4.90&ndash;&euro;14.90', '4,90&ndash;14,90&nbsp;&euro;'),
+        _c('1 alert, 100 notifications', '1 alerte, 100 notifications')]},
+    {'name': ('V-Tools', 'V-Tools'), 'url': 'https://v-tools.eu/', 'cells': [
+        _c('Autobuy, multi-account', 'Achat automatique, multi-comptes'),
+        _c('Not on its site', 'Absent de son site'),
+        _c('Yes: you link your Vinted accounts', 'Oui : tu lies tes comptes Vinted'),
+        _c('Not stated', 'Non précisé'),
+        _c('Not stated', 'Non précisé'),
+        _c('&euro;29.99&ndash;&euro;79.99', '29,99&ndash;79,99&nbsp;&euro;'),
+        _c('None stated', 'Aucune indiquée')]},
+    {'name': ('Crazed', 'Crazed'), 'url': 'https://crazed.fr/', 'cells': [
+        _c('Alerts', 'Alertes'),
+        _c('Not on its site', 'Absent de son site'),
+        _c('Not stated', 'Non précisé'),
+        _c('In its platform; push on the &euro;9.99 plan', 'Dans sa plateforme ; push sur le plan à 9,99&nbsp;&euro;'),
+        _c('Not stated', 'Non précisé'),
+        _c('&euro;4.99&ndash;&euro;9.99', '4,99&ndash;9,99&nbsp;&euro;'),
+        _c('3 alerts', '3 alertes')]},
+    {'name': ('Resell Reserve', 'Resell Reserve'), 'url': 'https://legacy.resellreserve.co.uk/', 'cells': [
+        _c('Alerts + autobuy', 'Alertes + achat automatique'),
+        _c('AI estimates, &pound;44.99 plan only', 'Estimations IA, plan à 44,99&nbsp;&pound; seulement'),
+        _c('To buy, yes*', 'Pour acheter, oui*'),
+        _c('Discord', 'Discord'),
+        _c('Not stated', 'Non précisé'),
+        _c('&pound;19.99&ndash;&pound;44.99', '19,99&ndash;44,99&nbsp;&pound;'),
+        _c('None stated', 'Aucune indiquée')]},
+    {'name': ('MarktAlert', 'MarktAlert'), 'url': 'https://marktalert.nl/', 'cells': [
+        _c('Alerts (also Marktplaats, 2dehands)', 'Alertes (aussi Marktplaats, 2dehands)'),
+        _c('Price-drop alerts only', 'Alertes de baisse de prix seulement'),
+        _c('Not stated', 'Non précisé'),
+        _c('Email, Telegram, app push, webhooks', 'E-mail, Telegram, push dans l’app, webhooks'),
+        _c('Not stated', 'Non précisé'),
+        _c('&euro;6.95&ndash;&euro;10.95', '6,95&ndash;10,95&nbsp;&euro;'),
+        _c('2 alerts, valid 14 days', '2 alertes, valables 14 jours')]},
+    {'name': ('Vinted saved searches', 'Recherches sauvegardées Vinted'), 'url': None, 'cells': [
+        _c('Built into Vinted', 'Intégré à Vinted'),
+        _c('No', 'Non'),
+        _c('Your own account', 'Ton propre compte'),
+        _c('&ldquo;+N&rdquo; counter, no alert', 'Compteur « +N », pas d’alerte'),
+        _c('&mdash;', '&mdash;'),
+        _c('Free', 'Gratuit'),
+        _c('Yes', 'Oui')]},
 ]
 
 
-def page_compare(lang):
+def compare_table(lang):
     L = 0 if lang == 'en' else 1
-    head = {'en': ['TOOL', 'TYPE', 'PER MONTH', 'FREE OPTION', 'ALERTS VIA', 'CHECKS OR SPEED (THEIR CLAIM)', 'USES YOUR VINTED ACCOUNT'],
-            'fr': ['OUTIL', 'TYPE', 'PAR MOIS', 'OPTION GRATUITE', 'ALERTES VIA', 'VÉRIFICATIONS OU VITESSE (ANNONCÉE)', 'UTILISE TON COMPTE VINTED']}[lang]
-    rows = []
-    for c in COMPETITORS:
-        name, url = c[0], c[1]
-        if lang == 'fr' and name == 'Vinted saved searches':
-            name, url = 'Recherches sauvegardées Vinted', HELP435['fr']
-        vals = c[2:]
-        cells = [vals[i * 2 + L] for i in range(6)]
-        rows.append(['<a href="%s" rel="nofollow noopener">%s</a>' % (url, name)] + cells)
-    tbl = table(head, rows, us_row=1)
+    head = {'en': ['TOOL', 'WHAT IT DOES', 'PRICE DATA', 'NEEDS YOUR VINTED ACCOUNT', 'ALERTS ARRIVE', 'REFUND', 'PER MONTH', 'FREE OPTION'],
+            'fr': ['OUTIL', 'CE QU’IL FAIT', 'DONNÉES DE PRIX', 'BESOIN DE TON COMPTE VINTED', 'ALERTES VIA', 'REMBOURSEMENT', 'PAR MOIS', 'OPTION GRATUITE']}[lang]
+    rows, us = [], None
+    for i, c in enumerate(COMPETITORS):
+        name = c['name'][L]
+        url = c['url'] or HELP435[lang]
+        label = '<a href="%s"%s>%s</a>' % (url, '' if c.get('us') else ' rel="nofollow noopener"', name)
+        if c.get('us'):
+            label += '<span class="ct-badge">%s</span>' % ('US' if lang == 'en' else 'NOUS')
+            us = i
+        rows.append([label] + [cell[L] for cell in c['cells']])
+    return table(head, rows, us_row=us)
+
+
+def reasons(lang):
+    if lang == 'en':
+        R = [
+            ('Price data is built in',
+             'Pro (&euro;24.99 a month) includes the Market Report: type an item and see its typical Vinted asking price, split by condition. It shows no price at all when the data is too thin or too mixed to trust.',
+             'Of the six other tools here, only Resell Reserve offers price estimates, and only on its &pound;44.99 Ultimate plan. See a sample: <a href="%s">Vinted prices, September 2026</a>.' % SLUGS['prices']['en']),
+            ('Your Vinted account stays yours',
+             'SNYPD needs an email address and nothing else: no Vinted password, no login, no browser extension. It never buys and never messages sellers. You buy through Vinted&rsquo;s normal checkout.',
+             'Autobuy tools have to act through a logged-in Vinted account to buy for you. V-Tools&rsquo; own setup step reads &ldquo;Lier vos comptes Vinted &agrave; V-tools&rdquo; (link your Vinted accounts).'),
+            ('Alerts land on your phone',
+             'Push notifications go straight to your phone or computer. No Telegram, no Discord server, no extra account. Several finds close together arrive as one notification, not a buzz each.',
+             'Telvin alerts only inside Telegram; Resell Reserve alerts in Discord. On iPhone, add SNYPD to your Home Screen once: Apple only allows web push for Home Screen apps.'),
+            ('Every Vinted filter you set',
+             'Paste a Vinted search link and SNYPD keeps every filter in it: brand, size, price, condition, colour, material, category. If you can filter it on Vinted, SNYPD keeps that filter.',
+             'Souk builds alerts from its own form (brand, category, size, keywords, price). SNYPD works with %s today; more Vinted countries are being added.' % MARKETS_TEXT['en']),
+            ('14 days to change your mind',
+             'Not happy with a paid plan? Email within 14 days of your first payment and you get it back in full. Prices include VAT, plans run month to month, cancel any time.',
+             'Souk&rsquo;s site states one week. Telvin, V-Tools, Crazed, Resell Reserve and MarktAlert don&rsquo;t state a refund window on their homepages.'),
+            ('Your finds, tracked to the profit',
+             'Claim an item you bought and SNYPD keeps it in History: Holding, then Sold, with your realised profit added up for you. No spreadsheet next to your bot.',
+             'Part of the SNYPD dashboard. Matches also carry a NEW badge, a DROP badge when the price fell since SNYPD first saw it, and Vinted&rsquo;s own suspicious-photo warning.'),
+            ('Made by a reseller',
+             'SNYPD is built by a Belgian sneaker reseller with 150+ sales and 4.5k followers, and run in the open with resellers in its Discord.',
+             'Questions go to a person: <a href="mailto:%s">%s</a> or the <a href="%s">Discord</a>.' % (EMAIL, EMAIL, DISCORD)),
+            ('A founding price, for life',
+             'The first 100 accounts, free accounts included, keep Pro at &euro;24.99 a month for life.',
+             'The number of places left is counted live on the <a href="/">homepage</a>.'),
+        ]
+    else:
+        R = [
+            ('Les données de prix sont incluses',
+             'Pro (24,99&nbsp;&euro; par mois) inclut le Market Report : tape un article et vois son prix demandé typique sur Vinted, détaillé par état. Il n’affiche aucun prix quand les données sont trop maigres ou trop mélangées pour être fiables.',
+             'Des six autres outils ici, seul Resell Reserve propose des estimations de prix, et seulement sur son plan Ultimate à 44,99&nbsp;&pound;. Un exemple : <a href="%s">Prix Vinted, septembre 2026</a>.' % SLUGS['prices']['fr']),
+            ('Ton compte Vinted reste à toi',
+             'SNYPD a besoin d’une adresse e-mail, rien d’autre : pas de mot de passe Vinted, pas de connexion, pas d’extension. Il n’achète jamais et n’écrit jamais aux vendeurs. Tu achètes avec le paiement normal de Vinted.',
+             'Les outils d’achat automatique doivent passer par un compte Vinted connecté pour acheter à ta place. L’étape d’installation de V-Tools dit : « Lier vos comptes Vinted à V-tools ».'),
+            ('Les alertes arrivent sur ton téléphone',
+             'Les notifications push arrivent directement sur ton téléphone ou ton ordinateur. Pas de Telegram, pas de serveur Discord, pas de compte en plus. Plusieurs trouvailles rapprochées arrivent en une seule notification.',
+             'Telvin alerte uniquement dans Telegram ; Resell Reserve dans Discord. Sur iPhone, ajoute SNYPD à ton écran d’accueil une fois : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
+            ('Chaque filtre Vinted que tu règles',
+             'Colle un lien de recherche Vinted et SNYPD garde tous ses filtres : marque, taille, prix, état, couleur, matière, catégorie. Si tu peux le filtrer sur Vinted, SNYPD garde ce filtre.',
+             'Souk crée les alertes depuis son propre formulaire (marque, catégorie, taille, mots-clés, prix). SNYPD fonctionne avec %s.' % MARKETS_TEXT['fr']),
+            ('14 jours pour changer d’avis',
+             'Pas convaincu par un plan payant ? Écris dans les 14 jours suivant ton premier paiement et tu es remboursé en totalité. Prix TVA incluse, plans au mois, résiliables à tout moment.',
+             'Le site de Souk indique une semaine. Telvin, V-Tools, Crazed, Resell Reserve et MarktAlert n’indiquent pas de délai de remboursement sur leur page d’accueil.'),
+            ('Tes trouvailles, suivies jusqu’au bénéfice',
+             'Marque un article acheté et SNYPD le garde dans l’Historique : En stock, puis Vendu, avec ton bénéfice réalisé calculé pour toi. Plus besoin d’un tableur à côté de ton bot.',
+             'Inclus dans le tableau de bord SNYPD. Les annonces portent aussi un badge NEW, un badge DROP quand le prix a baissé depuis que SNYPD l’a vue, et l’avertissement de Vinted sur les photos suspectes.'),
+            ('Créé par un revendeur',
+             'SNYPD est créé par un revendeur de sneakers belge, avec plus de 150 ventes et 4,5k abonnés, et développé au grand jour avec des revendeurs sur son Discord.',
+             'Tes questions arrivent à une vraie personne : <a href="mailto:%s">%s</a> ou le <a href="%s">Discord</a>.' % (EMAIL, EMAIL, DISCORD)),
+            ('Un prix fondateur, à vie',
+             'Les 100 premiers comptes, gratuits compris, gardent Pro à 24,99&nbsp;&euro; par mois à vie.',
+             'Le nombre de places restantes est affiché en direct sur la <a href="/">page d’accueil</a>.'),
+        ]
+    cards = ''.join('<div class="rs-card"><span class="rs-num">%02d</span><h3 class="rs-title">%s</h3><p>%s</p><p class="rs-proof">%s</p></div>' % (i + 1, t, b, p)
+                    for i, (t, b, p) in enumerate(R))
+    return '<div class="rs-grid">%s</div>' % cards
+
+
+def page_compare(lang):
+    tbl = compare_table(lang)
     if lang == 'en':
         body = f"""
 <section id="disclosure">
-  <h2>Read this first</h2>
-  <div class="lg-box lg-mint"><p>SNYPD makes one of the tools below, so this page is not neutral. To keep it useful anyway, every row uses only what each vendor says on its own website, checked on {CHECKED['en']}, and links to it. Prices and plans change: check the vendor&rsquo;s site before you pay. If a row is out of date, email <a href="mailto:{EMAIL}">{EMAIL}</a> and it will be fixed.</p></div>
+  <div class="lg-box lg-mint"><p><strong>We make SNYPD, so we&rsquo;re not neutral.</strong> Every fact about another tool on this page comes from that tool&rsquo;s own website, checked on {COMPARE_CHECKED['en']}, and is linked in the table. Prices change: check before you pay. Spotted something out of date? Email <a href="mailto:{EMAIL}">{EMAIL}</a> and it gets fixed.</p></div>
+</section>
+<section id="reasons">
+  <h2>8 reasons resellers choose SNYPD</h2>
+  {reasons('en')}
 </section>
 <section id="table">
-  <h2>Vinted bots side by side</h2>
+  <h2>SNYPD and six other Vinted bots, side by side</h2>
   {tbl}
-  <p class="ct-note">* Buying on Vinted needs a logged-in account, so any autobuy feature acts through yours. The homepages of Souk and Resell Reserve do not say how they connect to it. Speed figures are each vendor&rsquo;s own claim and are not measured the same way, so they are not comparable with each other.</p>
+  <p class="ct-note">* Buying on Vinted needs a logged-in account, so any autobuy feature acts through yours; the homepages of Souk and Resell Reserve don&rsquo;t say how they connect to it. &ldquo;Not stated&rdquo; and &ldquo;not on its site&rdquo; mean we couldn&rsquo;t find it on that tool&rsquo;s homepage, not proof it doesn&rsquo;t exist.</p>
 </section>
-<section id="choose">
-  <h2>Which kind should you pick?</h2>
-  <h3>YOU WANT TO DECIDE EVERY PURCHASE YOURSELF</h3>
-  <p>Use an alert tool. You are notified, you open the listing and you buy on Vinted like any other buyer. SNYPD, for one, never asks for your Vinted login.</p>
-  <h3>YOU WANT ITEMS BOUGHT FOR YOU</h3>
-  <p>Use an autobuy tool, and accept that it operates your Vinted account: whatever it does, it does as you. Fully automatic buying (often called autocop) also buys before you have seen the listing, so filters have to be tight.</p>
-  <h3>YOU ALSO SOURCE ON MARKTPLAATS OR 2DEHANDS</h3>
-  <p>MarktAlert covers those alongside Vinted. SNYPD covers Vinted only.</p>
-  <h3>YOU ARE TECHNICAL AND WANT IT FREE</h3>
-  <p>Self-hosted open-source scripts on GitHub post Vinted listings to Discord or Telegram. You run the server and keep it working.</p>
+<section id="speed">
+  <h2>What about speed?</h2>
+  <p>Telvin advertises alerts in 750 ms, Resell Reserve detection in under 0.15 s, V-Tools&rsquo; top-plan autocop under 0.1 s, and Crazed &ldquo;real time&rdquo; on its top plan. Those are each vendor&rsquo;s own figures, measured in their own way, so they can&rsquo;t be compared with each other, or with SNYPD.</p>
+  <p>SNYPD checks each search every 30 seconds to 5 minutes, faster on searches that keep finding things, and the same on every plan. What it adds is reach: paid searches keep running 24/7 with your laptop closed, and the alert finds you on your phone wherever you are.</p>
 </section>
-<section id="snypd">
-  <h2>Where SNYPD fits</h2>
-  <ul>
-    <li><strong>Alerts only.</strong> No autobuy, no Vinted login, no messages to sellers.</li>
-    <li><strong>Push to your phone or computer,</strong> not Discord or Telegram. On iPhone, add SNYPD to your Home Screen first.</li>
-    <li><strong>Every 30 seconds to 5 minutes,</strong> the same on every plan. Paid plans keep watching 24/7 with your dashboard closed.</li>
-    <li><strong>Price data.</strong> Pro and Elite include the Market Report: the typical Vinted asking price of an item by condition. A sample is on <a href="{SLUGS['prices']['en']}">Vinted prices</a>.</li>
-    <li><strong>&euro;14.99 to &euro;34.99 a month,</strong> VAT included, with a free plan of one search. More: <a href="{SLUGS['bot']['en']}">how SNYPD works</a>.</li>
+<section id="fit">
+  <h2>Is SNYPD right for you?</h2>
+  <ul class="fit-list">
+    <li class="fit-yes"><strong>Yes, if you want to judge every deal yourself.</strong>You see the listing first, check it against real Vinted price data, and buy it on Vinted without handing over your account.</li>
+    <li><strong>Not if you want a bot to buy for you.</strong>Automatic buying needs a tool that operates your Vinted account, such as Souk, V-Tools or Resell Reserve.</li>
+    <li><strong>Not yet if you shop on another Vinted country.</strong>SNYPD works with {MARKETS_TEXT['en']} today; more Vinted countries are being added.</li>
+    <li><strong>Also buying on Marktplaats or 2dehands?</strong>MarktAlert covers those. SNYPD is Vinted only.</li>
   </ul>
 </section>
 <section id="start">
   <h2>Try it on one search</h2>
   {cta('en')}
 </section>"""
-        return page('compare', 'en', 'Vinted Bots Compared (2026): Alerts vs Autobuy | SNYPD',
-                    'Souk, Telvin, V-Tools, Crazed, Resell Reserve, MarktAlert and SNYPD side by side: prices, free plans, alert channels and account access, from each vendor’s site.',
-                    'VINTED BOTS COMPARED', 'Vinted bots compared: alerts or autobuy?',
-                    'Prices, free plans, how alerts reach you and whether the tool uses your Vinted account, for seven Vinted bots and Vinted&rsquo;s own saved searches. Every fact comes from the vendor&rsquo;s own website and is linked.',
-                    [('disclosure', 'Read this first'), ('table', 'Side by side'), ('choose', 'Which kind to pick'), ('snypd', 'Where SNYPD fits')],
-                    body)
+        return page('compare', 'en', 'Vinted Bots Compared (2026): Why Resellers Pick SNYPD',
+                    'SNYPD vs Souk, Telvin, V-Tools, Crazed, Resell Reserve and MarktAlert: price data, account safety, phone alerts and refunds, each fact from the tool’s own site.',
+                    'VINTED BOTS COMPARED &middot; CHECKED ' + COMPARE_CHECKED_SHORT['en'], 'Why resellers pick SNYPD over other Vinted bots',
+                    'SNYPD alerts you to new Vinted listings, shows the typical Vinted asking price of what you&rsquo;re looking at, and never touches your Vinted account. Here is how that compares with six other Vinted bots, point by point, with the source for every fact.',
+                    None, body, head_extra='<ul class="glance" aria-label="SNYPD at a glance"><li><span>&#10003;</span>Price data included</li><li><span>&#10003;</span>No Vinted login, ever</li><li><span>&#10003;</span>Alerts on your phone</li><li><span>&#10003;</span>14-day refund</li></ul>')
     body = f"""
-<section id="avertissement">
-  <h2>À lire d’abord</h2>
-  <div class="lg-box lg-mint"><p>SNYPD fabrique l’un des outils ci-dessous, donc cette page n’est pas neutre. Pour qu’elle reste utile, chaque ligne reprend uniquement ce que chaque éditeur dit sur son propre site, vérifié le {CHECKED['fr']}, avec un lien. Les prix et les plans changent : vérifie sur le site de l’éditeur avant de payer. Si une ligne n’est plus à jour, écris à <a href="mailto:{EMAIL}">{EMAIL}</a> et elle sera corrigée.</p></div>
+<section id="transparence">
+  <div class="lg-box lg-mint"><p><strong>SNYPD est notre outil, donc cette page n’est pas neutre.</strong> Chaque information sur un autre outil vient du site de cet outil, vérifié le {COMPARE_CHECKED['fr']}, avec un lien dans le tableau. Les prix changent : vérifie avant de payer. Une info n’est plus à jour ? Écris à <a href="mailto:{EMAIL}">{EMAIL}</a> et elle sera corrigée.</p></div>
+</section>
+<section id="raisons">
+  <h2>8 raisons de choisir SNYPD</h2>
+  {reasons('fr')}
 </section>
 <section id="tableau">
-  <h2>Les bots Vinted côte à côte</h2>
+  <h2>SNYPD et six autres bots Vinted, côte à côte</h2>
   {tbl}
-  <p class="ct-note">* Acheter sur Vinted demande un compte connecté, donc toute fonction d’achat automatique passe par le tien. Les pages d’accueil de Souk et de Resell Reserve ne disent pas comment elles s’y connectent. Les vitesses sont celles annoncées par chaque éditeur, mesurées différemment, donc non comparables entre elles.</p>
+  <p class="ct-note">* Acheter sur Vinted demande un compte connecté, donc toute fonction d’achat automatique passe par le tien ; les pages d’accueil de Souk et de Resell Reserve ne disent pas comment elles s’y connectent. « Non précisé » et « absent de son site » veulent dire que nous ne l’avons pas trouvé sur la page d’accueil de l’outil, pas que cela n’existe pas.</p>
 </section>
-<section id="choisir">
-  <h2>Quel type choisir ?</h2>
-  <h3>TU VEUX DÉCIDER CHAQUE ACHAT TOI-MÊME</h3>
-  <p>Prends un outil d’alertes. Tu es prévenu, tu ouvres l’annonce et tu achètes sur Vinted comme n’importe quel acheteur. SNYPD, par exemple, ne demande jamais tes identifiants Vinted.</p>
-  <h3>TU VEUX QU’ON ACHÈTE À TA PLACE</h3>
-  <p>Prends un outil d’achat automatique, en acceptant qu’il utilise ton compte Vinted : tout ce qu’il fait, il le fait en ton nom. L’achat entièrement automatique (souvent appelé autocop) achète aussi avant que tu aies vu l’annonce, donc tes filtres doivent être précis.</p>
-  <h3>TU ACHÈTES AUSSI SUR MARKTPLAATS OU 2DEHANDS</h3>
-  <p>MarktAlert couvre ces sites en plus de Vinted. SNYPD ne couvre que Vinted.</p>
-  <h3>TU ES À L’AISE TECHNIQUEMENT ET TU VEUX DU GRATUIT</h3>
-  <p>Des scripts open source sur GitHub, à héberger toi-même, publient les annonces Vinted sur Discord ou Telegram. C’est toi qui gères le serveur.</p>
+<section id="vitesse">
+  <h2>Et la vitesse ?</h2>
+  <p>Telvin annonce des alertes en 750 ms, Resell Reserve une détection en moins de 0,15 s, l’autocop du plan le plus cher de V-Tools moins de 0,1 s, et Crazed du « temps réel » sur son plan le plus cher. Ce sont les chiffres de chaque éditeur, mesurés à sa façon, donc impossibles à comparer entre eux ou avec SNYPD.</p>
+  <p>SNYPD vérifie chaque recherche toutes les 30 secondes à 5 minutes, plus souvent sur les recherches qui trouvent beaucoup, et pareil pour tous les plans. Ce qu’il apporte, c’est la portée : les recherches payantes tournent 24h/24 ordinateur fermé, et l’alerte te trouve sur ton téléphone où que tu sois.</p>
 </section>
-<section id="snypd">
-  <h2>Où se situe SNYPD</h2>
-  <ul>
-    <li><strong>Alertes uniquement.</strong> Pas d’achat automatique, pas de connexion Vinted, pas de message aux vendeurs.</li>
-    <li><strong>Notifications push sur ton téléphone ou ton ordinateur,</strong> pas Discord ni Telegram. Sur iPhone, ajoute d’abord SNYPD à ton écran d’accueil.</li>
-    <li><strong>Toutes les 30 secondes à 5 minutes,</strong> pareil pour tous les plans. Les plans payants surveillent 24h/24, tableau de bord fermé.</li>
-    <li><strong>Données de prix.</strong> Pro et Elite incluent le Market Report : le prix demandé typique d’un article sur Vinted selon son état. Un exemple dans <a href="{SLUGS['prices']['fr']}">Prix Vinted</a>.</li>
-    <li><strong>De 14,99 à 34,99&nbsp;&euro; par mois,</strong> TVA incluse, avec un plan gratuit d’une recherche. Plus de détails : <a href="{SLUGS['bot']['fr']}">comment marche SNYPD</a>.</li>
+<section id="pour-qui">
+  <h2>SNYPD est-il fait pour toi ?</h2>
+  <ul class="fit-list">
+    <li class="fit-yes"><strong>Oui, si tu veux juger chaque affaire toi-même.</strong>Tu vois l’annonce en premier, tu la compares aux vrais prix Vinted, et tu achètes sur Vinted sans confier ton compte.</li>
+    <li><strong>Non, si tu veux qu’un bot achète à ta place.</strong>L’achat automatique demande un outil qui utilise ton compte Vinted, comme Souk, V-Tools ou Resell Reserve.</li>
+    <li><strong>Tu achètes aussi sur Marktplaats ou 2dehands ?</strong>MarktAlert couvre ces sites. SNYPD ne couvre que Vinted.</li>
   </ul>
 </section>
 <section id="essayer">
   <h2>Essaie sur une recherche</h2>
   {cta('fr')}
 </section>"""
-    return page('compare', 'fr', 'Comparatif bots Vinted 2026 : alertes ou achat auto | SNYPD',
-                'Souk, Telvin, V-Tools, Crazed, Resell Reserve, MarktAlert et SNYPD comparés : prix, plans gratuits, alertes et accès à ton compte, d’après chaque éditeur.',
-                'COMPARATIF DES BOTS VINTED', 'Comparatif des bots Vinted : alertes ou achat automatique ?',
-                'Prix, plans gratuits, façon de recevoir les alertes et accès à ton compte Vinted, pour sept bots Vinted et les recherches sauvegardées de Vinted. Chaque information vient du site de l’éditeur, avec un lien.',
-                [('avertissement', 'À lire d’abord'), ('tableau', 'Côte à côte'), ('choisir', 'Quel type choisir'), ('snypd', 'Où se situe SNYPD')],
-                body)
+    return page('compare', 'fr', 'Comparatif bots Vinted 2026 : pourquoi choisir SNYPD',
+                'SNYPD face à Souk, Telvin, V-Tools, Crazed, Resell Reserve et MarktAlert : prix, compte, alertes, remboursement, d’après le site de chaque outil.',
+                'COMPARATIF DES BOTS VINTED &middot; VÉRIFIÉ LE ' + COMPARE_CHECKED_SHORT['fr'], 'Pourquoi les revendeurs choisissent SNYPD plutôt qu’un autre bot Vinted',
+                'SNYPD t’alerte des nouvelles annonces Vinted, te montre le prix demandé typique d’un article sur Vinted, et ne touche jamais à ton compte Vinted. Voici la comparaison avec six autres bots Vinted, point par point, avec la source de chaque information.',
+                None, body, head_extra='<ul class="glance" aria-label="SNYPD en bref"><li><span>&#10003;</span>Données de prix incluses</li><li><span>&#10003;</span>Jamais de connexion Vinted</li><li><span>&#10003;</span>Alertes sur ton téléphone</li><li><span>&#10003;</span>Remboursement sous 14 jours</li></ul>')
 
 
 # ------------------------------------------------------------------ page: prices
@@ -788,7 +949,7 @@ def page_prices(lang):
   </ul>
   <h3>LIMITS</h3>
   <ul>
-    <li>Asking prices are what sellers want, not what buyers paid. Vinted does not publish sold prices.</li>
+    <li>Asking prices are what sellers want, not what buyers paid.</li>
     <li>All conditions and sizes are mixed. The Market Report in Pro and Elite breaks prices down by condition.</li>
     <li>Fakes are not removed. The notes column flags searches where many listings sit far above the rest.</li>
   </ul>
@@ -801,7 +962,7 @@ def page_prices(lang):
         out = page('prices', 'en', 'Vinted Prices, Sept 2026: Typical Asking Prices | SNYPD',
                    'Typical Vinted asking prices for 19 sneakers and streetwear items in September 2026: median, middle half and number of listings, from real vinted.be listings.',
                    'VINTED PRICES &middot; SEPTEMBER 2026', 'What sneakers and streetwear are listed for on Vinted',
-                   f'Median asking prices for 19 resale items, from listings SNYPD saw on vinted.be in the 14 days to {end.day} September {end.year}. The number of listings behind each price is in the table. Updated monthly. Asking prices, not sold prices.',
+                   f'Median asking prices for 19 resale items, from listings SNYPD saw on vinted.be in the 14 days to {end.day} September {end.year}. The number of listings behind each price is in the table. This is the September 2026 edition. Asking prices, not sold prices.',
                    [('answer', 'Short answer'), ('table', 'September prices'), ('refused', 'No price'), ('method', 'Method and limits'), ('report', 'Price any item')],
                    body, [dataset])
         return out, csv_rows
@@ -842,7 +1003,7 @@ def page_prices(lang):
   </ul>
   <h3>LIMITES</h3>
   <ul>
-    <li>Un prix demandé est ce que le vendeur veut, pas ce que l’acheteur a payé. Vinted ne publie pas les prix de vente.</li>
+    <li>Un prix demandé est ce que le vendeur veut, pas ce que l’acheteur a payé.</li>
     <li>Tous les états et toutes les tailles sont mélangés. Le Market Report de Pro et Elite détaille les prix par état.</li>
     <li>Les contrefaçons ne sont pas retirées. La colonne Remarque signale les recherches où beaucoup d’annonces sont bien plus chères que les autres.</li>
   </ul>
@@ -855,7 +1016,7 @@ def page_prices(lang):
     out = page('prices', 'fr', 'Prix Vinted septembre 2026 : prix demandés typiques | SNYPD',
                'Prix demandés typiques sur Vinted pour 19 sneakers et vêtements streetwear, septembre 2026 : médiane, moitié centrale et nombre d’annonces vinted.be.',
                'PRIX VINTED &middot; SEPTEMBRE 2026', 'À quel prix les sneakers et le streetwear sont mis en vente sur Vinted',
-               f'Prix demandés médians pour 19 articles de revente, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au {end.day} septembre {end.year}. Le nombre d’annonces derrière chaque prix est dans le tableau. Mis à jour chaque mois. Prix demandés, pas prix de vente.',
+               f'Prix demandés médians pour 19 articles de revente, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au {end.day} septembre {end.year}. Le nombre d’annonces derrière chaque prix est dans le tableau. Édition de septembre 2026. Prix demandés, pas prix de vente.',
                [('reponse', 'Réponse courte'), ('tableau', 'Prix de septembre'), ('sans-prix', 'Sans prix'), ('methode', 'Méthode et limites'), ('market-report', 'Estimer un article')],
                body, [dataset])
     return out, csv_rows
@@ -871,7 +1032,7 @@ def write(rel, text):
 
 
 if __name__ == '__main__':
-    for lang in ('en', 'fr'):
+    for lang in (('en', 'fr') if FR_LIVE else ('en',)):
         prefix = '' if lang == 'en' else 'fr/'
         write(prefix + SLUGS['bot'][lang].rsplit('/', 1)[1] + '.html', page_bot(lang))
         write(prefix + SLUGS['notify'][lang].rsplit('/', 1)[1] + '.html', page_notify(lang))

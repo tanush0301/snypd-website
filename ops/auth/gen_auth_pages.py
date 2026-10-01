@@ -120,9 +120,9 @@ SEO = """<link rel="canonical" href="https://www.snypd.store/{path}">
 """
 
 EXAMPLES = [
-    ('Jordan 1 Travis Scott Velvet Brown', '/assets/home/catch-jordan1-travis-velvet.jpg', '€225', 'Jordan • 42,5 • vinted.fr'),
+    ('Jordan 1 Travis Scott Velvet Brown', '/assets/home/catch-jordan1-travis-velvet.jpg', '€225', 'Jordan • 42,5 • vinted.be'),
     ('Jordan 4 Bred OG', '/assets/home/catch-jordan4-bred.jpeg', '€140', 'Jordan • 42 • vinted.be'),
-    ('Supreme 99 Football Top', '/assets/home/catch-supreme-99.webp', '€120', 'Supreme • L • vinted.fr'),
+    ('Supreme 99 Football Top', '/assets/home/catch-supreme-99.webp', '€120', 'Supreme • L • vinted.be'),
 ]
 
 CARD = """          <div style="background:var(--bg);display:flex;flex-direction:column;">

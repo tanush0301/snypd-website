@@ -30,15 +30,22 @@ PAGES = [
     ('/signup',  'signup.html',  None),
     ('/support', 'support.html', None),
     ('/cookies', 'cookies.html', None),
-    ('/vinted-bot',                   'vinted-bot.html',                   {'en': '/vinted-bot', 'fr': '/fr/bot-vinted', 'x-default': '/vinted-bot'}),
-    ('/fr/bot-vinted',                'fr/bot-vinted.html',                {'en': '/vinted-bot', 'fr': '/fr/bot-vinted', 'x-default': '/vinted-bot'}),
-    ('/vinted-saved-search-alerts',   'vinted-saved-search-alerts.html',   {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted', 'x-default': '/vinted-saved-search-alerts'}),
-    ('/fr/alertes-recherche-vinted',  'fr/alertes-recherche-vinted.html',  {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted', 'x-default': '/vinted-saved-search-alerts'}),
-    ('/vinted-bot-comparison',        'vinted-bot-comparison.html',        {'en': '/vinted-bot-comparison', 'fr': '/fr/comparatif-bot-vinted', 'x-default': '/vinted-bot-comparison'}),
-    ('/fr/comparatif-bot-vinted',     'fr/comparatif-bot-vinted.html',     {'en': '/vinted-bot-comparison', 'fr': '/fr/comparatif-bot-vinted', 'x-default': '/vinted-bot-comparison'}),
-    ('/vinted-prices',                'vinted-prices.html',                {'en': '/vinted-prices', 'fr': '/fr/prix-vinted', 'x-default': '/vinted-prices'}),
-    ('/fr/prix-vinted',               'fr/prix-vinted.html',               {'en': '/vinted-prices', 'fr': '/fr/prix-vinted', 'x-default': '/vinted-prices'}),
+    ('/vinted-bot',                 'vinted-bot.html',                 None),
+    ('/vinted-saved-search-alerts', 'vinted-saved-search-alerts.html', None),
+    ('/vinted-bot-comparison',      'vinted-bot-comparison.html',      None),
+    ('/vinted-prices',              'vinted-prices.html',              None),
 ]
+# French versions are added only while gen_content.FR_LIVE is True (they are held
+# until SNYPD polls vinted.fr). Each pair gets hreflang alternates both ways.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gen_content import FR_LIVE, SLUGS  # noqa: E402
+if FR_LIVE:
+    _done = []
+    for key, s_ in SLUGS.items():
+        alts = {'en': s_['en'], 'fr': s_['fr'], 'x-default': s_['en']}
+        _done.append((s_['fr'], s_['fr'].lstrip('/') + '.html', alts))
+        PAGES[:] = [(u, f, alts if u == s_['en'] else a) for (u, f, a) in PAGES]
+    PAGES.extend(_done)
 # Pages that carry the static listings figure, with the language of their "As of" line.
 COUNTER_PAGES = [('index.html', 'en')]
 MONTHS = {'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
