@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 """Run before committing a release of the public site:  python ops/seo/prepublish.py
 
-1. Refreshes the static listings figure on the homepage(s). The page updates it
+1. Validates that the fact-checked SNYPD positioning comparison was generated
+   after the general SEO pages. This prevents ops/seo/gen_content.py from
+   silently restoring the older neutral comparison.
+2. Refreshes the static listings figure on the homepage(s). The page updates it
    with JavaScript, but crawlers that do not run JavaScript (OpenAI, Anthropic,
    Perplexity) only ever see the number written in the HTML, so it should be
    recent and carry its own date.
-2. Rewrites sitemap.xml. lastmod is the date of the file's last commit, or today
+3. Rewrites sitemap.xml. lastmod is the date of the file's last commit, or today
    when the file has uncommitted changes (Bing and Google both ask for an accurate
    lastmod; a stale one teaches them to ignore it). Pages with language versions
    get hreflang alternates.
+
+Generation order for SEO content:
+    python ops/seo/gen_content.py
+    python ops/seo/gen_comparison.py
+    python ops/seo/prepublish.py
 
 Byte-level edits only (these files are UTF-8 with CRLF; never re-encode them).
 Afterwards, once the deploy is live:  python ops/seo/indexnow.py
@@ -20,6 +28,11 @@ SITE = 'https://www.snypd.store'
 SUPABASE = 'https://igbuqanjocfmahlzzupc.supabase.co'
 ANON = ('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwic'
         'm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ')
+
+# The dedicated comparison generator owns these pages. gen_content.py also writes
+# them, so prepublish must catch an accidental run in the wrong order.
+COMPARISON_REVISION = b'data-seo-revision="snypd-positioning-2026-10-01"'
+COMPARISON_PAGES = ('vinted-bot-comparison.html', 'fr/comparatif-bot-vinted.html')
 
 # (url path, source file, {hreflang: path} or None). Only public, indexable pages.
 # Keep in sync with vercel.json's noindex list: nothing noindexed belongs here.
@@ -45,6 +58,16 @@ MONTHS = {'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept
           'fr': ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']}
 ASOF = {'en': 'As of {d} {m} {y}', 'fr': 'Au {d} {m} {y}'}
 GROUP = {'en': ',', 'fr': ' '}  # fr: narrow no-break space
+
+
+def validate_comparison_revision():
+    for name in COMPARISON_PAGES:
+        path = os.path.join(ROOT, name)
+        if not os.path.isfile(path):
+            sys.exit(f'{name}: comparison page missing; run python ops/seo/gen_comparison.py')
+        if COMPARISON_REVISION not in open(path, 'rb').read():
+            sys.exit(f'{name}: SNYPD comparison positioning revision is missing; run python ops/seo/gen_comparison.py after gen_content.py')
+    print('comparison pages: SNYPD positioning revision present')
 
 
 def git_date(path):
@@ -97,5 +120,6 @@ def write_sitemap():
 
 
 if __name__ == '__main__':
+    validate_comparison_revision()
     refresh_counter()
     write_sitemap()
