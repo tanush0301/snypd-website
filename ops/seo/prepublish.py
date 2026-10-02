@@ -34,6 +34,7 @@ PAGES = [
     ('/vinted-saved-search-alerts', 'vinted-saved-search-alerts.html', None),
     ('/vinted-bot-comparison',      'vinted-bot-comparison.html',      None),
     ('/vinted-prices',              'vinted-prices.html',              None),
+    ('/vinted-deals',               'vinted-deals.html',               None),
 ]
 # French versions are added only while gen_content.FR_LIVE is True (they are held
 # until SNYPD polls vinted.fr). Each pair gets hreflang alternates both ways.
@@ -42,6 +43,8 @@ from gen_content import FR_LIVE, SLUGS  # noqa: E402
 if FR_LIVE:
     _done = []
     for key, s_ in SLUGS.items():
+        if 'fr' not in s_:
+            continue  # English-only page
         alts = {'en': s_['en'], 'fr': s_['fr'], 'x-default': s_['en']}
         _done.append((s_['fr'], s_['fr'].lstrip('/') + '.html', alts))
         PAGES[:] = [(u, f, alts if u == s_['en'] else a) for (u, f, a) in PAGES]

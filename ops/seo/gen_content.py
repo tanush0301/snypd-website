@@ -42,6 +42,7 @@ SLUGS = {
     'notify':  {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted'},
     'compare': {'en': '/vinted-bot-comparison',      'fr': '/fr/comparatif-bot-vinted'},
     'prices':  {'en': '/vinted-prices',              'fr': '/fr/prix-vinted'},
+    'deals':   {'en': '/vinted-deals'},  # English only for now (decided 2026-10-02)
 }
 
 CSS = r"""
@@ -133,7 +134,7 @@ UI = {
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
                foot=[('bot', 'Vinted bot'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('prices', 'Vinted prices'),
-                     ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
+                     ('deals', 'Vinted deals'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
     'fr': dict(locale='fr_FR', toc='SUR CETTE PAGE', updated='Mis à jour le', by='Par SNYPD, créé par un revendeur de sneakers belge',
@@ -146,7 +147,7 @@ UI = {
                home='Accueil'),
 }
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-02', 'compare': '2026-10-02', 'prices': '2026-10-02'}
+PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-02', 'compare': '2026-10-02', 'prices': '2026-10-02', 'deals': '2026-10-02'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
 
@@ -175,11 +176,12 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
     url = SITE + path
     other = u['switch'][1]
     alts = ''
-    if FR_LIVE:
+    has_fr = FR_LIVE and 'fr' in SLUGS[key]
+    if has_fr:
         alts = ''.join('<link rel="alternate" hreflang="%s" href="%s%s">\n' % (l, SITE, SLUGS[key][l]) for l in ('en', 'fr'))
         alts += '<link rel="alternate" hreflang="x-default" href="%s%s">\n' % (SITE, SLUGS[key]['en'])
     switch = ('<a class="lg-navlink" href="%s" hreflang="%s" lang="%s" title="%s">%s</a>'
-              % (SLUGS[key][other], other, other, u['switch'][2], u['switch'][0])) if FR_LIVE else ''
+              % (SLUGS[key][other], other, other, u['switch'][2], u['switch'][0])) if has_fr else ''
     nav = ''.join('<a class="lg-navlink" href="%s"%s>%s</a>' % (href(k, lang), ' aria-current="page"' if k == key else '', t) for k, t in u['nav'])
     foot = ''.join('<a href="%s">%s</a>' % (href(k, lang), t) for k, t in u['foot'])
     toc_html = ''.join('<a href="#%s">%s</a>' % (a, t) for a, t in (toc or []))
@@ -340,13 +342,13 @@ def page_bot(lang):
         body = f"""
 <section id="answer">
   <h2>SNYPD in one paragraph</h2>
-  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search every 30 seconds to 5 minutes. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search while your dashboard is open; paid plans from &euro;14.99 a month keep watching 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search every 30 seconds to 5 minutes. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search while your dashboard is open; paid plans from &euro;14.99 a month keep watching 24/7.</p></div>
 </section>
 <section id="kinds">
   <h2>The three kinds of Vinted bot</h2>
   <p>&ldquo;Vinted bot&rdquo; covers tools that do very different things. What separates them is whether they act on your Vinted account.</p>
-  <h3>ALERT BOTS</h3>
-  <p>They watch your searches and tell you when something new matches. You buy yourself, so they have no reason to act on your Vinted account. SNYPD, Telvin Bot and Crazed are alert tools.</p>
+  <h3>ALERT BOTS, OR VINTED MONITORS</h3>
+  <p>They watch your searches and tell you when something new matches; resellers also call them monitors. You buy yourself, so they have no reason to act on your Vinted account. SNYPD, Telvin Bot and Crazed are alert tools.</p>
   <h3>AUTOBUY AND AUTOCOP BOTS</h3>
   <p>They buy or check out for you. Buying on Vinted needs a logged-in account, so these tools act through yours; V-Tools, for example, states that you connect your own Vinted accounts. Souk, V-Tools and Resell Reserve sell autobuy features.</p>
   <h3>DO-IT-YOURSELF SCRIPTS</h3>
@@ -387,9 +389,9 @@ def page_bot(lang):
   <h2>Try it on one search</h2>
   {cta('en')}
 </section>"""
-        return page('bot', 'en', 'Vinted Bot for New Listing Alerts, No Autobuy | SNYPD',
-                    'SNYPD is a Vinted bot that watches your searches and sends a push alert when a matching listing appears. It never logs in, buys or messages for you.',
-                    'VINTED BOT', 'A Vinted bot that alerts you and never touches your account.',
+        return page('bot', 'en', 'Vinted Bot & Monitor: New Listing Alerts, No Autobuy | SNYPD',
+                    'SNYPD is a Vinted bot and monitor that watches your searches and sends a push alert when a matching listing appears. It never logs in, buys or messages for you.',
+                    'VINTED BOT &amp; MONITOR', 'A Vinted bot and monitor that alerts you and never touches your account.',
                     'Most Vinted bots are sold on buying for you, which means acting as you. SNYPD does the other part of the job: it keeps watching your Vinted searches and tells you when something new matches, so you decide and buy on Vinted yourself.',
                     [('answer', 'In one paragraph'), ('kinds', 'Three kinds of bot'), ('how', 'How it works'), ('speed', 'How fast'), ('pricing', 'What it costs'), ('account', 'Your Vinted account'), ('faq', 'Questions')],
                     body, [faq_ld(faq)])
@@ -409,8 +411,8 @@ def page_bot(lang):
 <section id="types">
   <h2>Les trois types de bot Vinted</h2>
   <p>« Bot Vinted » désigne des outils qui font des choses très différentes. Ce qui les distingue : est-ce qu’ils agissent sur ton compte Vinted ?</p>
-  <h3>BOTS D’ALERTES</h3>
-  <p>Ils surveillent tes recherches et te préviennent quand un nouvel article correspond. Tu achètes toi-même, donc ils n’ont aucune raison d’agir sur ton compte Vinted. SNYPD, Telvin Bot et Crazed sont des outils d’alertes.</p>
+  <h3>BOTS D’ALERTES, OU MONITORS VINTED</h3>
+  <p>Ils surveillent tes recherches et te préviennent quand un nouvel article correspond ; on parle aussi de « monitor Vinted ». Tu achètes toi-même, donc ils n’ont aucune raison d’agir sur ton compte Vinted. SNYPD, Telvin Bot et Crazed sont des outils d’alertes.</p>
   <h3>BOTS D’ACHAT AUTOMATIQUE (AUTOBUY, AUTOCOP)</h3>
   <p>Ils achètent ou passent commande à ta place. Acheter sur Vinted demande un compte connecté, donc ces outils agissent via le tien ; V-Tools, par exemple, indique que tu connectes tes propres comptes Vinted. Souk, V-Tools et Resell Reserve vendent de l’achat automatique.</p>
   <h3>SCRIPTS À HÉBERGER SOI-MÊME</h3>
@@ -895,9 +897,9 @@ def page_compare(lang):
   <h2>Try it on one search</h2>
   {cta('en')}
 </section>"""
-        return page('compare', 'en', 'Best Vinted Bot in 2026? 7 Bots Compared | SNYPD',
+        return page('compare', 'en', 'Best Vinted Bot & Monitor 2026: 7 Tools Compared | SNYPD',
                     'SNYPD vs Souk, Telvin, V-Tools, Crazed, Resell Reserve and MarktAlert: price data, account safety, phone alerts and refunds, each fact from the tool’s own site.',
-                    'VINTED BOTS COMPARED &middot; CHECKED ' + COMPARE_CHECKED_SHORT['en'], 'Why resellers pick SNYPD over other Vinted bots',
+                    'VINTED BOTS &amp; MONITORS COMPARED &middot; CHECKED ' + COMPARE_CHECKED_SHORT['en'], 'Why resellers pick SNYPD over other Vinted bots',
                     'SNYPD alerts you to new Vinted listings, shows the typical Vinted asking price of what you&rsquo;re looking at, and never touches your Vinted account. Here is how that compares with six other Vinted bots, point by point, with the source for every fact.',
                     None, body, head_extra='<ul class="glance" aria-label="SNYPD at a glance"><li><span>&#10003;</span>Price data included</li><li><span>&#10003;</span>No Vinted login, ever</li><li><span>&#10003;</span>Alerts on your phone</li><li><span>&#10003;</span>14-day refund</li></ul>')
     body = f"""
@@ -1142,6 +1144,133 @@ def page_prices(lang):
     return out, csv_rows
 
 
+# ------------------------------------------------------------------ page: deals guide
+# Figures come ONLY from DEALS, the verbatim output of ops/seo/deals_stats.sql (its
+# header explains the method and the md5 check). Never type a number into the copy.
+DEALS = os.path.join(ROOT, 'ops', 'seo', 'data', 'deals-2026-10.json')
+# Vinted's own English names for its condition grades (stored in French on vinted.be).
+COND_EN = {'Neuf avec étiquette': 'New with tags', 'Neuf sans étiquette': 'New without tags',
+           'Très bon état': 'Very good', 'Bon état': 'Good', 'Satisfaisant': 'Satisfactory'}
+BUY_SAFE = 'https://www.vinted.co.uk/help/82'
+
+
+def pct(a, b):
+    return '%d%%' % round(100.0 * a / b)
+
+
+def page_deals(lang):
+    d = json.load(open(DEALS, encoding='utf-8'))
+    models = d['models']
+    start = datetime.date.fromisoformat(d['window_start'][:10])
+    last = datetime.date.fromisoformat(d['window_end'][:10]) - datetime.timedelta(days=1)
+    span = f'{start.day} {MONTHS_TXT["en"][start.month - 1]} to {last.day} {MONTHS_TXT["en"][last.month - 1]} {last.year}'
+    days = d['days']
+    by = {m['name']: m for m in models}
+    top = models[0]  # most listings
+    rare = min(models, key=lambda m: m['under50'] / m['n'])
+    vg = {c['condition']: c['median_cents'] for c in top['ladder']}.get('Très bon état')
+    if vg is None:
+        sys.exit('deals: the top model has no "Très bon état" median; pick another example')
+    cap = int(round(vg * 0.7 / 100.0)) * 100
+    lad = {c['condition']: c['median_cents'] for c in top['ladder']}
+    good, nwt = lad.get('Bon état'), lad.get('Neuf avec étiquette')
+    if not good or not nwt or not (good < cap < vg):
+        sys.exit('deals: the condition example no longer holds for ' + top['name'])
+    rows = []
+    for m in models:
+        rows.append([m['name'],
+                     f'<span class="ct-num">{num(m["n"], "en")}</span>',
+                     f'<span class="ct-num">{num(m["under30"], "en")}</span><small>{pct(m["under30"], m["n"])} &middot; about {num(round(m["under30"] / days), "en")} a day</small>',
+                     f'<span class="ct-num">{num(m["under50"], "en")}</span><small>{pct(m["under50"], m["n"])}</small>'])
+    ladder_rows = [[COND_EN.get(c['condition'], esc(c['condition'])), f'<span class="ct-num">{money(c["median_cents"], "en")}</span>',
+                    f'<span class="ct-num">{num(c["n"], "en")}</span>'] for c in top['ladder']]
+    shares = [m['under30'] / m['n'] for m in models]
+    lo_pct, hi_pct = '%d%%' % round(100 * min(shares)), '%d%%' % round(100 * max(shares))
+    faq = [
+        ('What counts as a steal on Vinted?',
+         'A listing priced well below what the same item is usually listed for in the same condition, that is still the item it claims to be. A price alone does not make a steal: for the models in this guide, between %s and %s of new listings went up 30%% or more under the typical price for their condition.' % (lo_pct, hi_pct)),
+        ('Where can I see the typical Vinted price of an item?',
+         f'Vinted does not show one on its listings. SNYPD&rsquo;s free <a href="{SLUGS["prices"]["en"]}">Vinted prices</a> page lists typical asking prices for popular sneakers and streetwear, and the Market Report in Pro and Elite prices any search by condition.'),
+        ('Are very cheap Vinted listings fake?',
+         'Some are, and a low price is one of the reasons to look closer, but it is not proof. Kids&rsquo; sizes, other colourways, wear the condition label does not show and sellers who want a quick sale also explain low prices. Check the photos, the size and the seller before you buy.'),
+        ('Does SNYPD buy deals for me?',
+         'No. SNYPD watches your Vinted searches and sends you an alert when a new listing matches. You open it on Vinted and decide yourself. It never signs in to your Vinted account.'),
+    ]
+    tbl = table(['MODEL', 'NEW LISTINGS', '30% OR MORE UNDER TYPICAL', 'HALF PRICE OR LESS'], rows)
+    body = f"""
+<section id="answer">
+  <h2>Short answer</h2>
+  <div class="lg-box lg-mint"><p>A cheap Vinted listing is not rare. From {span}, {num(top['under30'], 'en')} of the {num(top['n'], 'en')} new {top['name']} listings SNYPD saw on vinted.be ({pct(top['under30'], top['n'])}) were posted at 30% or more below the typical asking price for their condition, and {num(top['under50'], 'en')} ({pct(top['under50'], top['n'])}) at half price or less. What is rare is seeing the right one first. Finding Vinted deals comes down to four things: know the typical price for the exact condition, search narrow with a price cap, get alerted to new listings instead of refreshing, and check the listing before you pay.</p></div>
+</section>
+<section id="data">
+  <h2>How often deep discounts appear</h2>
+  <p>New listings on vinted.be over {days} days, {span}, compared with the typical asking price for the same model in the same condition:</p>
+  {tbl}
+  <p>The pattern differs by model. On {top['name']}, half-price listings are common, so a cheap one proves little on its own: check the size, colourway and wear first. On {rare['name']}, only {num(rare['under50'], 'en')} of {num(rare['n'], 'en')} new listings went up at half price or less, so a big discount there is unusual and worth both speed and a closer look.</p>
+  <p class="ct-note">How these numbers are made is under <a href="#method">method and limits</a>. Asking prices, not sold prices.</p>
+</section>
+<section id="price">
+  <h2>1. Know the typical price for the exact condition</h2>
+  <p>A price only looks low against the right comparison. Condition moves Vinted prices a lot: on {top['name']}, the typical New with tags price is {nwt / good:.1f} times the Good one. Typical asking prices for new {top['name']} listings, {span}:</p>
+  {table(['CONDITION', 'TYPICAL ASKING PRICE', 'LISTINGS'], ladder_rows)}
+  <p>So the same {money(cap, 'en')} is 30% under the typical price for a Very good pair, but above the typical price for a Good pair ({money(good, 'en')}). For more models, see <a href="{SLUGS['prices']['en']}">Vinted prices</a>. In SNYPD Pro and Elite, the Market Report gives this breakdown for any search you type.</p>
+</section>
+<section id="search">
+  <h2>2. Search narrow, with a price cap</h2>
+  <ul>
+    <li><strong>Name the exact model</strong> and, for clothing, the garment. &ldquo;Nike&rdquo; alone returns too much to watch.</li>
+    <li><strong>Set your size and condition filters</strong>, so every match is one you would actually buy.</li>
+    <li><strong>Set the maximum price</strong> around 70% of the typical price for that condition. For a Very good {top['name']}, that is about {money(cap, 'en')}.</li>
+    <li><strong>Sort by newest first</strong>, so new listings come to the top. In the search link this shows as <code>order=newest_first</code>.</li>
+  </ul>
+</section>
+<section id="first">
+  <h2>3. Be first: get alerted, don&rsquo;t refresh</h2>
+  <p>Everyone watching the same search can see a new listing the moment it appears, so the first to notice it gets the first chance. Vinted&rsquo;s saved searches show a &ldquo;+N&rdquo; counter the next time you open the app; they do not send a notification for each new match (<a href="{SLUGS['notify']['en']}">how Vinted notifications work</a>). To hear about a new match while you are doing something else, you need a tool that watches the search for you.</p>
+  <p>SNYPD checks each search every 30 seconds to 5 minutes and sends a push notification to your phone or computer when a new listing matches. The free plan runs one search while your dashboard is open; paid plans from &euro;14.99 a month keep watching 24/7.</p>
+  {figure('feed', 'en')}
+</section>
+<section id="check">
+  <h2>4. Check before you pay</h2>
+  <ul>
+    <li><strong>Photos against the label.</strong> Look for wear the condition grade does not mention: soles, creases, stains, missing tags.</li>
+    <li><strong>The size.</strong> Kids&rsquo; and adult sizes share model names and differ a lot in price.</li>
+    <li><strong>The price against the typical one.</strong> Compare the discount with how often that model gets one: on {rare['name']}, a half-price listing came up {num(rare['under50'], 'en')} times in {days} days.</li>
+    <li><strong>The seller.</strong> Reviews and other listings tell you more than one photo.</li>
+    <li><strong>Pay with Vinted&rsquo;s Buy now button.</strong> Vinted says that payments made outside its system are not covered by Buyer Protection (<a href="{BUY_SAFE}" rel="noopener">Vinted help: buying safely</a>).</li>
+  </ul>
+</section>
+<section id="method">
+  <h2>Method and limits</h2>
+  <ul>
+    <li><strong>Source.</strong> Listings SNYPD&rsquo;s systems first saw on vinted.be, in euros, from {span}.</li>
+    <li><strong>Matching.</strong> A listing counts for a model when its title contains the model&rsquo;s words (for example &ldquo;dunk&rdquo; and &ldquo;low&rdquo;). This is a simpler match than the Market Report&rsquo;s, so counts differ from <a href="{SLUGS['prices']['en']}">Vinted prices</a>.</li>
+    <li><strong>Typical price</strong> is the median first asking price for that model in that condition. Conditions with fewer than 30 listings are left out.</li>
+    <li><strong>Under</strong> means a first asking price at or below 70% (or 50%) of that median.</li>
+  </ul>
+  <h3>LIMITS</h3>
+  <ul>
+    <li>Asking prices, not sold prices. We cannot see which listings sold or for how much.</li>
+    <li>Sizes and colourways are mixed, and fakes are not removed, so some low prices are a different item rather than a bargain.</li>
+    <li>One site (vinted.be) and one two-week window. Other Vinted sites and months will differ.</li>
+  </ul>
+</section>
+<section id="faq">
+  <h2>Questions</h2>
+  {faq_html(faq)}
+</section>
+<section id="start">
+  <h2>Watch one search for free</h2>
+  {cta('en')}
+</section>"""
+    return page('deals', 'en', 'Vinted Deals: How to Find Steals Before Anyone Else | SNYPD',
+                'How to find Vinted deals and steals: real data on how often listings go up far below the typical price, and four steps to see the right one first.',
+                'VINTED DEALS &middot; GUIDE', 'How to find Vinted deals before anyone else',
+                f'Low prices on Vinted are common; good deals that are still the item you want, seen before anyone else, are not. This guide uses {num(sum(m["n"] for m in models), "en")} real vinted.be listings from {span} to show how often deep discounts appear, then the four steps that get you to them first.',
+                [('answer', 'Short answer'), ('data', 'How often'), ('price', 'Know the price'), ('search', 'Search narrow'), ('first', 'Be first'), ('check', 'Check first'), ('method', 'Method'), ('faq', 'Questions')],
+                body, [faq_ld(faq)])
+
+
 def write(rel, text):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -1159,6 +1288,7 @@ if __name__ == '__main__':
         write(prefix + SLUGS['compare'][lang].rsplit('/', 1)[1] + '.html', page_compare(lang))
         html_out, csv_rows = page_prices(lang)
         write(prefix + SLUGS['prices'][lang].rsplit('/', 1)[1] + '.html', html_out)
+    write('vinted-deals.html', page_deals('en'))
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator='\n')
     w.writerow(['item', 'search', 'group', 'typical_asking_eur', 'p25_eur', 'p75_eur', 'listings', 'sellers', 'confidence', 'outlier_high_pct'])
