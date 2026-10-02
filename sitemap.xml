@@ -18,7 +18,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/support</loc>
-    <lastmod>2026-09-28</lastmod>
+    <lastmod>2026-10-02</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/cookies</loc>
@@ -57,6 +57,13 @@
     <lastmod>2026-10-02</lastmod>
   </url>
   <url>
+    <loc>https://www.snypd.store/vinted-fees</loc>
+    <lastmod>2026-10-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-fees"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/frais-vinted"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-fees"/>
+  </url>
+  <url>
     <loc>https://www.snypd.store/fr/bot-vinted</loc>
     <lastmod>2026-10-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
@@ -83,5 +90,12 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-prices"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-prices"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/fr/frais-vinted</loc>
+    <lastmod>2026-10-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-fees"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/frais-vinted"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-fees"/>
   </url>
 </urlset>

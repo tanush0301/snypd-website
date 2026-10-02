@@ -154,6 +154,17 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .ct-duel [data-t].on { display: table-cell; }
 @media (min-width: 700px) { .ct-duel { display: none; } }
 @media (max-width: 699.98px) { .ct-full { display: none; } }
+.fc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.05); padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
+.fc-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 559.98px) { .fc-in { grid-template-columns: minmax(0, 1fr); } }
+.fc label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.fc input, .fc select { font-family: inherit; font-size: 16px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 48px; width: 100%; box-sizing: border-box; }
+.fc input:focus-visible, .fc select:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.fc-out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin: 0; }
+.fc-out div { background: #0C0C0D; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.fc-out dt { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.fc-out dd { margin: 0; font-size: 18px; color: #FFFFFF; }
+.fc-out div.fc-total dd { color: #00E5A0; }
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"À quel prix les sneakers et le streetwear sont mis en vente sur Vinted","item":"https://www.snypd.store/fr/prix-vinted"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/fr/prix-vinted#page","url":"https://www.snypd.store/fr/prix-vinted","name":"Prix Vinted septembre 2026 : prix demandés typiques | SNYPD","description":"Prix demandés typiques sur Vinted pour 19 sneakers et vêtements streetwear, septembre 2026 : médiane, moitié centrale et nombre d’annonces vinted.be.","inLanguage":"fr","datePublished":"2026-09-28","dateModified":"2026-10-02","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
@@ -194,6 +205,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 <section id="reponse">
   <h2>Réponse courte</h2>
   <div class="lg-box lg-mint"><p>Ce sont des prix <strong>demandés</strong> typiques sur Vinted, pas des prix de vente : le prix médian de toutes les annonces vues par SNYPD sur vinted.be pour chaque recherche, sur les 14 jours au 28 septembre 2026, toutes tailles et tous états confondus. Par exemple, une Air Jordan 1 Mid était typiquement mise en vente à 45&nbsp;&euro;, la moitié centrale des annonces se situant entre 28,25&nbsp;&euro; et 70&nbsp;&euro;.</p></div>
+  <p>Tu cherches les frais que Vinted ajoute au prix ? Voir le <a href="/fr/frais-vinted">calculateur des frais Vinted</a>.</p>
 </section>
 <section id="tableau">
   <h2>Les prix de septembre 2026</h2>
@@ -239,7 +251,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
     <div class="lg-foot-a">
       <small>SNYPD &middot; NON AFFILIÉ À VINTED</small>
       <span class="lg-foot-t">Lit uniquement les annonces publiques.</span>
-      <span class="lg-foot-l"><a href="/fr/bot-vinted">Bot Vinted</a><a href="/fr/alertes-recherche-vinted">Alertes Vinted</a><a href="/fr/comparatif-bot-vinted">Comparatif des bots Vinted</a><a href="/fr/prix-vinted">Prix Vinted</a><a href="/faq">FAQ (anglais)</a><a href="/support">Support (anglais)</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+      <span class="lg-foot-l"><a href="/fr/bot-vinted">Bot Vinted</a><a href="/fr/alertes-recherche-vinted">Alertes Vinted</a><a href="/fr/comparatif-bot-vinted">Comparatif des bots Vinted</a><a href="/fr/prix-vinted">Prix Vinted</a><a href="/fr/frais-vinted">Frais Vinted</a><a href="/faq">FAQ (anglais)</a><a href="/support">Support (anglais)</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
     </div>
     <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a></nav>
   </div>

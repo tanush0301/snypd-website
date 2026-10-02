@@ -370,7 +370,7 @@
   .snypd-sidebar[data-focus="true"] .snypd-icon { margin-right: 0; }
   .snypd-sidebar[data-focus="true"] .snypd-sidebar__header { padding: 24px 16px; }
 </style><style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+@import url('/assets/fonts/dm-mono.css'); @import url('/assets/fonts/dm-mono-extra.css');
 
 /* Locked direction, "SNYPD Ledger" (Claude Design, Round 2) - exact values,
    not approximations. Mint is status-only text/dots, never a fill; purple is
@@ -1541,13 +1541,12 @@ body {
     .filter-sheet__list { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
     .fs-row { background: var(--panel); padding: 14px; display: flex; flex-direction: column; gap: 8px; border-left: 2px solid var(--border3, #3A4147); }
     .fs-row.is-live { border-left-color: var(--success); }
-    .fs-row.is-paused { opacity: 0.72; }
-    /* RISK 13, same reasoning as the stale-card rule: text3 at .72
-       composites to ~3.17:1, which fails 4.5:1 at 9.5-11px - and the
-       Pause/Delete controls inherit it. Promote, don't un-dim the row. */
-    .fs-row.is-paused .fs-row__status-text,
-    .fs-row.is-paused .fs-row__url,
-    .fs-row.is-paused .fs-row__actions button { color: var(--text-primary); }
+    /* Paused reads quieter than live without dimming the whole row: the old
+       opacity .72 forced the URL and buttons up to text-primary for contrast
+       (RISK 13), which made paused rows brighter than live ones. At full
+       opacity text-muted is ~5.0:1 on --panel and text-secondary ~8.3:1, so
+       both pass 4.5:1; live keeps the white name, mint edge and pulse. */
+    .fs-row.is-paused .fs-row__name { color: var(--text-secondary); }
     .fs-row__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .fs-row__name { font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .fs-row__status { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }

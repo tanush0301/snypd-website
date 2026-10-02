@@ -43,6 +43,7 @@ SLUGS = {
     'compare': {'en': '/vinted-bot-comparison',      'fr': '/fr/comparatif-bot-vinted'},
     'prices':  {'en': '/vinted-prices',              'fr': '/fr/prix-vinted'},
     'deals':   {'en': '/vinted-deals'},  # English only for now (decided 2026-10-02)
+    'fees':    {'en': '/vinted-fees',                'fr': '/fr/frais-vinted'},
 }
 
 CSS = r"""
@@ -134,20 +135,20 @@ UI = {
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
                foot=[('bot', 'Vinted bot'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('prices', 'Vinted prices'),
-                     ('deals', 'Vinted deals'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
+                     ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
     'fr': dict(locale='fr_FR', toc='SUR CETTE PAGE', updated='Mis à jour le', by='Par SNYPD, créé par un revendeur de sneakers belge',
                nav=[('bot', 'BOT VINTED'), ('prices', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('prices', 'Prix Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('prices', 'Prix Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
 }
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-02', 'compare': '2026-10-02', 'prices': '2026-10-02', 'deals': '2026-10-02'}
+PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-02', 'compare': '2026-10-02', 'prices': '2026-10-02', 'deals': '2026-10-02', 'fees': '2026-10-02'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
 
@@ -629,6 +630,17 @@ COMPARE_CSS = r"""
 .ct-duel [data-t].on { display: table-cell; }
 @media (min-width: 700px) { .ct-duel { display: none; } }
 @media (max-width: 699.98px) { .ct-full { display: none; } }
+.fc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.05); padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
+.fc-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 559.98px) { .fc-in { grid-template-columns: minmax(0, 1fr); } }
+.fc label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.fc input, .fc select { font-family: inherit; font-size: 16px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 48px; width: 100%; box-sizing: border-box; }
+.fc input:focus-visible, .fc select:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.fc-out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin: 0; }
+.fc-out div { background: #0C0C0D; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.fc-out dt { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.fc-out dd { margin: 0; font-size: 18px; color: #FFFFFF; }
+.fc-out div.fc-total dd { color: #00E5A0; }
 """
 
 # Real screenshots of the live SNYPD dashboard, taken 2 October 2026 in a signed-in session.
@@ -1043,6 +1055,7 @@ def page_prices(lang):
 <section id="answer">
   <h2>Short answer</h2>
   <div class="lg-box lg-mint"><p>These are typical <strong>asking</strong> prices on Vinted, not sold prices: the median price of every listing SNYPD saw on vinted.be for each search in the 14 days to {end.day} September {end.year}, all sizes and conditions together. For example, an Air Jordan 1 Mid was typically listed at {money(f_typ, 'en')}, with the middle half of listings between {money(f_lo, 'en')} and {money(f_hi, 'en')}.</p></div>
+  <p>Looking for what Vinted charges on top of the price? See the <a href="{SLUGS['fees']['en']}">Vinted fee calculator</a>.</p>
 </section>
 <section id="table">
   <h2>September 2026 prices</h2>
@@ -1098,6 +1111,7 @@ def page_prices(lang):
 <section id="reponse">
   <h2>Réponse courte</h2>
   <div class="lg-box lg-mint"><p>Ce sont des prix <strong>demandés</strong> typiques sur Vinted, pas des prix de vente : le prix médian de toutes les annonces vues par SNYPD sur vinted.be pour chaque recherche, sur les 14 jours au {end.day} septembre {end.year}, toutes tailles et tous états confondus. Par exemple, une Air Jordan 1 Mid était typiquement mise en vente à {money(f_typ, 'fr')}, la moitié centrale des annonces se situant entre {money(f_lo, 'fr')} et {money(f_hi, 'fr')}.</p></div>
+  <p>Tu cherches les frais que Vinted ajoute au prix ? Voir le <a href="{SLUGS['fees']['fr']}">calculateur des frais Vinted</a>.</p>
 </section>
 <section id="tableau">
   <h2>Les prix de septembre 2026</h2>
@@ -1271,6 +1285,234 @@ def page_deals(lang):
                 body, [faq_ld(faq)])
 
 
+# ------------------------------------------------------------------ page: fees + calculator
+# The fee rule is Vinted's own (price lists of vinted.fr/.de/.nl/.it/.es and vinted.com, read
+# 2 Oct 2026). FEES_CHECK is the verbatim output of ops/seo/fees_check.sql: the same integer
+# formula tested against every real vinted.be listing of a week. If it ever stops matching
+# 100%, the build stops instead of publishing a wrong claim.
+FEES_CHECK = os.path.join(ROOT, 'ops', 'seo', 'data', 'fees-check-2026-10.json')
+FEES_CHECKED = {'en': '2 October 2026', 'fr': '2 octobre 2026'}
+FEE_SRC = {
+    'fr_list': 'https://www.vinted.fr/pricelist', 'fr_help': 'https://www.vinted.fr/help/1654',
+    'us_list': 'https://www.vinted.com/pricelist', 'uk_list': 'https://www.vinted.co.uk/pricelist',
+    'free_en': 'https://www.vinted.co.uk/help/373-is-selling-on-vinted-free', 'free_fr': 'https://www.vinted.fr/help/373',
+    'ship_en': 'https://www.vinted.co.uk/help/458-who-pays-for-shipping', 'ship_fr': 'https://www.vinted.fr/help/458',
+    'safe_en': 'https://www.vinted.co.uk/help/82', 'safe_fr': 'https://www.vinted.fr/help/82',
+}
+FEE_TABLE_CENTS = [500, 1000, 2000, 3000, 5000, 10000, 20000, 50000]
+
+# Plain ASCII on purpose. Whole cents only: fee = 70 + floor((cents * 5 + 50) / 100).
+FEE_JS = r"""<script>
+(function () {
+  var f = document.getElementById('fc'); if (!f) return;
+  var inp = document.getElementById('fc-price'), cur = document.getElementById('fc-cur'), L = f.getAttribute('data-lang');
+  function fmt(c, k) {
+    var s = (c / 100).toFixed(2);
+    if (k === 'usd') return L === 'fr' ? s.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0$' : '$' + s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (L === 'fr') return s.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0\u20ac';
+    return '\u20ac' + s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  function put(id, t) { document.getElementById(id).textContent = t; }
+  function run() {
+    var r = String(inp.value).replace(/[\s\u00a0\u202f\u20ac$]/g, '');
+    r = /,\d{1,2}$/.test(r) ? r.replace(/\./g, '').replace(',', '.') : r.replace(/,/g, '');
+    var v = /^\d+(\.\d{0,2})?$/.test(r) ? parseFloat(r) : NaN;
+    if (!(v > 0) || v > 1000000) { put('fc-fee', '-'); put('fc-total', '-'); put('fc-pct', '-'); put('fc-seller', '-'); return; }
+    var c = Math.round(v * 100), fee = 70 + Math.floor((c * 5 + 50) / 100), k = cur.value;
+    put('fc-fee', fmt(fee, k)); put('fc-total', fmt(c + fee, k)); put('fc-seller', fmt(c, k));
+    var p = (100 * fee / c).toFixed(1); put('fc-pct', (L === 'fr' ? p.replace('.', ',') + '\u00a0%' : p + '%'));
+  }
+  inp.addEventListener('input', run); cur.addEventListener('change', run); run();
+})();
+</script>"""
+
+
+def fee_cents(c):
+    return 70 + (c * 5 + 50) // 100
+
+
+def m2(c, lang):
+    s = '{:,.2f}'.format(c / 100)
+    if lang == 'en':
+        return '&euro;' + s
+    return s.replace(',', '&#8239;').replace('.', ',') + '&nbsp;&euro;'
+
+
+def pct1(a, b, lang):
+    s = '%.1f' % (100.0 * a / b)
+    return s + '%' if lang == 'en' else s.replace('.', ',') + '&nbsp;%'
+
+
+def page_fees(lang):
+    chk = json.load(open(FEES_CHECK, encoding='utf-8'))
+    if not (chk['listings'] > 0 and chk['fee_matches'] == chk['listings'] == chk['total_matches']):
+        sys.exit('fees: the real-listing check no longer matches 100%; do not publish the rule as verified')
+    n = num(chk['listings'], lang)
+    lo, hi = m2(chk['min_price_cents'], lang), m2(chk['max_price_cents'], lang)
+    ws = datetime.date.fromisoformat(chk['window_start'][:10])
+    we = datetime.date.fromisoformat(chk['window_end'][:10]) - datetime.timedelta(days=1)
+    rows = [[f'<span class="ct-num">{m2(c, lang)}</span>', f'<span class="ct-num">{m2(fee_cents(c), lang)}</span>',
+             f'<span class="ct-num">{m2(c + fee_cents(c), lang)}</span>', f'<span class="ct-num">{pct1(fee_cents(c), c, lang)}</span>']
+            for c in FEE_TABLE_CENTS]
+    ex = 2000
+    small, big = FEE_TABLE_CENTS[0], FEE_TABLE_CENTS[-2]
+    b1, nb = 1000, 3
+    sep, bun = nb * fee_cents(b1), fee_cents(nb * b1)
+    ui = {'en': ('ITEM PRICE', 'CURRENCY', 'BUYER PROTECTION FEE', 'BUYER PAYS (BEFORE SHIPPING)', 'FEE AS % OF PRICE', 'SELLER RECEIVES',
+                 'Euro sites: vinted.fr, .be, .de, .nl, .it, .es', 'US dollars: vinted.com', '20.00'),
+          'fr': ('PRIX DE L’ARTICLE', 'DEVISE', 'FRAIS DE PROTECTION ACHETEURS', 'L’ACHETEUR PAIE (HORS LIVRAISON)', 'FRAIS EN % DU PRIX', 'LE VENDEUR REÇOIT',
+                 'Sites en euros : vinted.fr, .be, .de, .nl, .it, .es', 'Dollars US : vinted.com', '20,00')}[lang]
+    calc = (f'<div class="fc" id="fc" data-lang="{lang}"><div class="fc-in">'
+            f'<label>{ui[0]}<input id="fc-price" type="text" inputmode="decimal" autocomplete="off" value="{ui[8]}"></label>'
+            f'<label>{ui[1]}<select id="fc-cur"><option value="eur">{ui[6]}</option><option value="usd">{ui[7]}</option></select></label></div>'
+            f'<dl class="fc-out" aria-live="polite"><div><dt>{ui[2]}</dt><dd id="fc-fee">{m2(fee_cents(ex), lang)}</dd></div>'
+            f'<div class="fc-total"><dt>{ui[3]}</dt><dd id="fc-total">{m2(ex + fee_cents(ex), lang)}</dd></div>'
+            f'<div><dt>{ui[4]}</dt><dd id="fc-pct">{pct1(fee_cents(ex), ex, lang)}</dd></div>'
+            f'<div><dt>{ui[5]}</dt><dd id="fc-seller">{m2(ex, lang)}</dd></div></dl></div>' + FEE_JS)
+    S = FEE_SRC
+    if lang == 'en':
+        faq = [
+            ('Who pays Vinted fees?', f'The buyer. The Buyer Protection fee is added to the price at checkout, and the buyer also pays shipping. Selling is free: the seller receives the full item price (<a href="{S["free_en"]}" rel="noopener">Vinted help</a>).'),
+            ('How much is the Vinted fee on a &euro;20 item?', f'{m2(fee_cents(ex), "en")}: &euro;0.70 plus 5% of &euro;20. The buyer pays {m2(ex + fee_cents(ex), "en")} before shipping.'),
+            ('Why is the fee so high on cheap items?', f'Because &euro;0.70 of it is fixed. On a {m2(small, "en")} item the fee is {pct1(fee_cents(small), small, "en")} of the price; on a {m2(big, "en")} item it is {pct1(fee_cents(big), big, "en")}.'),
+            ('Is VAT included in the Vinted fee?', f'Yes. Vinted says the total of its fees, VAT included, is added to the final price at checkout (<a href="{S["fr_help"]}" rel="noopener">Vinted help, in French</a>).'),
+            ('Can I avoid the Buyer Protection fee?', f'Only by paying outside Vinted, and then you are not covered. Vinted says payments made outside its system are not covered by Buyer Protection (<a href="{S["safe_en"]}" rel="noopener">Vinted help</a>). Buying several items from one seller as a bundle is the legitimate way to pay the &euro;0.70 once.'),
+        ]
+        body = f"""
+<section id="answer">
+  <h2>Short answer</h2>
+  <div class="lg-box lg-mint"><p>On Vinted&rsquo;s euro sites the buyer pays a <strong>Buyer Protection fee of &euro;0.70 plus 5% of the item price</strong>, VAT included, on top of the price and shipping. Selling is free: the seller gets the full item price. On a &euro;20 item the fee is {m2(fee_cents(ex), 'en')}, so the buyer pays {m2(ex + fee_cents(ex), 'en')} before shipping. We checked the rule against all {n} vinted.be listings SNYPD saw from {ws.day} {MONTHS_TXT['en'][ws.month - 1]} to {we.day} {MONTHS_TXT['en'][we.month - 1]} {we.year}: every fee matched to the cent.</p></div>
+</section>
+<section id="calculator">
+  <h2>Vinted fee calculator</h2>
+  <p>Type the item price as shown on the listing.</p>
+  {calc}
+  <p class="ct-note">Uses the rule in Vinted&rsquo;s price lists: &euro;0.70 (or $0.70 on vinted.com) plus 5% of the item price, rounded to the nearest cent. Shipping is extra and depends on the parcel and carrier. Vinted&rsquo;s checkout always shows the exact total; it describes the rule as what is &ldquo;usually&rdquo; charged.</p>
+</section>
+<section id="table">
+  <h2>The fee at common prices</h2>
+  {table(['ITEM PRICE', 'BUYER PROTECTION FEE', 'BUYER PAYS (BEFORE SHIPPING)', 'FEE AS % OF PRICE'], rows)}
+  <p>The fixed &euro;0.70 is why the fee weighs most on cheap items: {pct1(fee_cents(small), small, 'en')} of a {m2(small, 'en')} item, but {pct1(fee_cents(big), big, 'en')} of a {m2(big, 'en')} one.</p>
+</section>
+<section id="bundles">
+  <h2>Bundles pay the fixed part once</h2>
+  <p>Vinted&rsquo;s price list charges the fee on the price of the item <em>or the bundle</em>. Buy {nb} items of {m2(b1, 'en')} from one seller separately and the fees add up to {m2(sep, 'en')}; buy them as one bundle and the fee is {m2(bun, 'en')}, saving {m2(sep - bun, 'en')}.</p>
+</section>
+<section id="sites">
+  <h2>Fees by Vinted site</h2>
+  <ul>
+    <li><strong>vinted.fr, vinted.de, vinted.nl, vinted.it, vinted.es:</strong> 5% + &euro;0.70, per each site&rsquo;s price list (<a href="{S['fr_list']}" rel="noopener">vinted.fr</a>). <strong>vinted.be:</strong> the same, checked on {n} real listings.</li>
+    <li><strong>vinted.com (US):</strong> $0.70 plus 5% of the agreed item price, not including shipping (<a href="{S['us_list']}" rel="noopener">price list</a>). Not checked against our own data.</li>
+    <li><strong>vinted.co.uk:</strong> a range, &ldquo;3% to 8% + &pound;0.3 to &pound;0.8&rdquo; plus VAT, depending on the item, the order value and the order type (<a href="{S['uk_list']}" rel="noopener">price list</a>). No exact calculator is possible; the UK checkout shows the fee.</li>
+  </ul>
+  <p>Other Vinted sites publish their own price lists; check yours before relying on these numbers.</p>
+</section>
+<section id="sellers">
+  <h2>What sellers pay</h2>
+  <p>Nothing to list or sell: Vinted says selling is free and the seller keeps the full item price (<a href="{S['free_en']}" rel="noopener">Vinted help</a>). Sellers only pay if they choose paid visibility, such as bumping an item or a wardrobe showcase; Vinted&rsquo;s price list says those prices depend on duration, item price and reach.</p>
+</section>
+<section id="shipping">
+  <h2>Who pays shipping</h2>
+  <p>The buyer, at checkout, when buying with the Buy now button. The price depends on the parcel size and the buyer&rsquo;s and seller&rsquo;s locations. The exception is custom shipping, where the seller pays upfront (<a href="{S['ship_en']}" rel="noopener">Vinted help</a>).</p>
+</section>
+<section id="resellers">
+  <h2>For resellers: count the real buying cost</h2>
+  <p>What you pay for stock is the price, plus the Buyer Protection fee, plus shipping. A &ldquo;cheap&rdquo; &euro;5 item really costs {m2(small + fee_cents(small), 'en')} before shipping. SNYPD&rsquo;s dashboard shows each new listing&rsquo;s price including Buyer Protection, and its Market Report shows the typical asking price for an item&rsquo;s condition, so you can see the margin before you buy. See <a href="{SLUGS['deals']['en']}">how to find Vinted deals</a> and <a href="{SLUGS['prices']['en']}">typical Vinted prices</a>.</p>
+  {figure('feed', 'en')}
+</section>
+<section id="method">
+  <h2>How we checked</h2>
+  <ul>
+    <li>SNYPD stores the price, fee and total Vinted reports for every listing it sees. For {n} vinted.be listings seen from {ws.day} {MONTHS_TXT['en'][ws.month - 1]} to {we.day} {MONTHS_TXT['en'][we.month - 1]} {we.year}, priced {lo} to {hi}, the fee always equalled &euro;0.70 plus 5% of the price rounded to the nearest cent, and the total always equalled price plus fee.</li>
+    <li>Price lists and help pages were read on {FEES_CHECKED['en']}. Vinted can change its fees; its checkout is the final word.</li>
+  </ul>
+</section>
+<section id="faq">
+  <h2>Questions</h2>
+  {faq_html(faq)}
+</section>
+<section id="start">
+  <h2>See new listings first</h2>
+  {cta('en')}
+</section>"""
+        return page('fees', 'en', 'Vinted Fees 2026: Buyer Protection Fee Calculator | SNYPD',
+                    'Vinted’s Buyer Protection fee is €0.70 + 5% of the price, paid by the buyer; selling is free. Calculator, fee table, and a check on real listings.',
+                    'VINTED FEES &middot; CALCULATOR', 'Vinted fees: what buyers pay and sellers keep',
+                    f'Buying on Vinted costs more than the price on the listing. Here is the Buyer Protection fee for any price, how it differs by Vinted site, and what it means for your margin, checked against {n} real listings.',
+                    [('answer', 'Short answer'), ('calculator', 'Calculator'), ('table', 'Fee table'), ('bundles', 'Bundles'), ('sites', 'By Vinted site'), ('sellers', 'Sellers'), ('shipping', 'Shipping'), ('resellers', 'For resellers'), ('method', 'How we checked'), ('faq', 'Questions')],
+                    body, [faq_ld(faq)])
+    faq = [
+        ('Qui paie les frais Vinted ?', f'L’acheteur. Les frais de protection acheteurs s’ajoutent au prix au paiement, et l’acheteur paie aussi la livraison. Vendre est gratuit : le vendeur reçoit le prix complet de l’article (<a href="{S["free_fr"]}" rel="noopener">aide Vinted</a>).'),
+        ('Combien coûtent les frais Vinted sur un article à 20&nbsp;&euro; ?', f'{m2(fee_cents(ex), "fr")} : 0,70&nbsp;&euro; plus 5&nbsp;% de 20&nbsp;&euro;. L’acheteur paie {m2(ex + fee_cents(ex), "fr")} hors livraison.'),
+        ('Pourquoi les frais sont-ils si élevés sur les petits prix ?', f'Parce que 0,70&nbsp;&euro; sont fixes. Sur un article à {m2(small, "fr")}, les frais font {pct1(fee_cents(small), small, "fr")} du prix ; sur un article à {m2(big, "fr")}, {pct1(fee_cents(big), big, "fr")}.'),
+        ('La TVA est-elle comprise dans les frais Vinted ?', f'Oui. Vinted indique que le total des frais Vinted, TVA incluse, est ajouté au prix final au paiement (<a href="{S["fr_help"]}" rel="noopener">aide Vinted</a>).'),
+        ('Peut-on éviter les frais de protection acheteurs ?', f'Seulement en payant hors de Vinted, et tu n’es alors plus protégé : Vinted indique que les paiements effectués en dehors de son système ne sont pas couverts (<a href="{S["safe_fr"]}" rel="noopener">aide Vinted</a>). Acheter plusieurs articles au même vendeur en lot est la façon normale de ne payer les 0,70&nbsp;&euro; qu’une fois.'),
+    ]
+    body = f"""
+<section id="reponse">
+  <h2>Réponse courte</h2>
+  <div class="lg-box lg-mint"><p>Sur les sites Vinted en euros, l’acheteur paie des <strong>frais de protection acheteurs de 0,70&nbsp;&euro; plus 5&nbsp;% du prix de l’article</strong>, TVA incluse, en plus du prix et de la livraison. Vendre est gratuit : le vendeur reçoit le prix complet. Sur un article à 20&nbsp;&euro;, les frais sont de {m2(fee_cents(ex), 'fr')}, donc l’acheteur paie {m2(ex + fee_cents(ex), 'fr')} hors livraison. Nous avons vérifié la règle sur les {n} annonces vinted.be vues par SNYPD du {date_txt(ws.isoformat(), 'fr')} au {date_txt(we.isoformat(), 'fr')} : tous les frais correspondaient au centime près.</p></div>
+</section>
+<section id="calculateur">
+  <h2>Calculateur des frais Vinted</h2>
+  <p>Saisis le prix de l’article tel qu’il apparaît sur l’annonce.</p>
+  {calc}
+  <p class="ct-note">Applique la règle des grilles tarifaires de Vinted : 0,70&nbsp;&euro; (ou 0,70&nbsp;$ sur vinted.com) plus 5&nbsp;% du prix, arrondi au centime le plus proche. La livraison s’ajoute et dépend du colis et du transporteur. Le paiement Vinted affiche toujours le total exact ; Vinted décrit cette règle comme ce qui est facturé « généralement ».</p>
+</section>
+<section id="tableau">
+  <h2>Les frais aux prix courants</h2>
+  {table(['PRIX DE L’ARTICLE', 'FRAIS DE PROTECTION', 'L’ACHETEUR PAIE (HORS LIVRAISON)', 'FRAIS EN % DU PRIX'], rows)}
+  <p>Les 0,70&nbsp;&euro; fixes expliquent pourquoi les frais pèsent surtout sur les petits prix : {pct1(fee_cents(small), small, 'fr')} d’un article à {m2(small, 'fr')}, mais {pct1(fee_cents(big), big, 'fr')} d’un article à {m2(big, 'fr')}.</p>
+</section>
+<section id="lots">
+  <h2>En lot, la partie fixe n’est payée qu’une fois</h2>
+  <p>La grille tarifaire de Vinted applique les frais au prix de l’article <em>ou du lot</em>. Achète {nb} articles à {m2(b1, 'fr')} chez le même vendeur séparément et les frais font {m2(sep, 'fr')} ; achète-les en un seul lot et les frais sont de {m2(bun, 'fr')}, soit {m2(sep - bun, 'fr')} d’économie.</p>
+</section>
+<section id="sites">
+  <h2>Les frais selon le site Vinted</h2>
+  <ul>
+    <li><strong>vinted.fr, vinted.de, vinted.nl, vinted.it, vinted.es :</strong> 5&nbsp;% + 0,70&nbsp;&euro;, selon la grille tarifaire de chaque site (<a href="{S['fr_list']}" rel="noopener">vinted.fr</a>). <strong>vinted.be :</strong> pareil, vérifié sur {n} annonces réelles.</li>
+    <li><strong>vinted.com (États-Unis) :</strong> 0,70&nbsp;$ plus 5&nbsp;% du prix convenu, hors livraison (<a href="{S['us_list']}" rel="noopener">grille tarifaire</a>). Non vérifié sur nos données.</li>
+    <li><strong>vinted.co.uk :</strong> une fourchette, de 3 à 8&nbsp;% + 0,30 à 0,80&nbsp;&pound;, plus TVA, selon l’article, le montant et le type de commande (<a href="{S['uk_list']}" rel="noopener">grille tarifaire</a>). Pas de calcul exact possible ; le paiement affiche les frais.</li>
+  </ul>
+  <p>Les autres sites Vinted publient leur propre grille tarifaire ; vérifie la tienne avant de te fier à ces chiffres.</p>
+</section>
+<section id="vendeurs">
+  <h2>Ce que paient les vendeurs</h2>
+  <p>Rien pour mettre en ligne ni pour vendre : Vinted indique que vendre est gratuit et que le vendeur garde le prix complet (<a href="{S['free_fr']}" rel="noopener">aide Vinted</a>). Le vendeur ne paie que s’il choisit une option de visibilité, comme le Boost ou la Vitrine ; la grille tarifaire précise que leur prix dépend de la durée, du prix de l’article et de la zone de diffusion.</p>
+</section>
+<section id="livraison">
+  <h2>Qui paie la livraison</h2>
+  <p>L’acheteur, au paiement, quand il achète avec le bouton Acheter. Le prix dépend de la taille du colis et de la localisation de l’acheteur et du vendeur. Les frais de port s’affichent au paiement et s’ajoutent au total (<a href="{S['ship_fr']}" rel="noopener">aide Vinted</a>).</p>
+</section>
+<section id="revendeurs">
+  <h2>Pour les revendeurs : compte le vrai prix d’achat</h2>
+  <p>Ton stock te coûte le prix, plus les frais de protection acheteurs, plus la livraison. Un article « pas cher » à 5&nbsp;&euro; coûte en réalité {m2(small + fee_cents(small), 'fr')} hors livraison. Le tableau de bord SNYPD affiche le prix de chaque nouvelle annonce protection acheteurs incluse, et son Market Report montre le prix demandé typique selon l’état, pour voir ta marge avant d’acheter. Voir aussi <a href="{SLUGS['prices']['fr']}">les prix Vinted typiques</a>.</p>
+  {figure('feed', 'fr')}
+</section>
+<section id="methode">
+  <h2>Comment nous avons vérifié</h2>
+  <ul>
+    <li>SNYPD enregistre le prix, les frais et le total indiqués par Vinted pour chaque annonce qu’il voit. Sur {n} annonces vinted.be vues du {date_txt(ws.isoformat(), 'fr')} au {date_txt(we.isoformat(), 'fr')}, de {lo} à {hi}, les frais étaient toujours égaux à 0,70&nbsp;&euro; plus 5&nbsp;% du prix arrondi au centime, et le total toujours égal au prix plus les frais.</li>
+    <li>Grilles tarifaires et pages d’aide lues le {FEES_CHECKED['fr']}. Vinted peut changer ses frais ; le total affiché au paiement fait foi.</li>
+  </ul>
+</section>
+<section id="questions">
+  <h2>Questions</h2>
+  {faq_html(faq)}
+</section>
+<section id="essayer">
+  <h2>Vois les nouvelles annonces en premier</h2>
+  {cta('fr')}
+</section>"""
+    return page('fees', 'fr', 'Frais Vinted 2026 : calcul de la protection acheteurs | SNYPD',
+                'Les frais Vinted : 0,70 € + 5 % du prix, payés par l’acheteur ; vendre est gratuit. Calculateur, tableau des frais et vérification sur de vraies annonces.',
+                'FRAIS VINTED &middot; CALCULATEUR', 'Frais Vinted : ce que paie l’acheteur, ce que garde le vendeur',
+                f'Acheter sur Vinted coûte plus que le prix affiché. Voici les frais de protection acheteurs pour n’importe quel prix, les différences entre sites Vinted et ce que ça change pour ta marge, vérifiés sur {n} annonces réelles.',
+                [('reponse', 'Réponse courte'), ('calculateur', 'Calculateur'), ('tableau', 'Tableau des frais'), ('lots', 'Lots'), ('sites', 'Par site Vinted'), ('vendeurs', 'Vendeurs'), ('livraison', 'Livraison'), ('revendeurs', 'Revendeurs'), ('methode', 'Vérification'), ('questions', 'Questions')],
+                body, [faq_ld(faq)])
+
+
 def write(rel, text):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -1289,6 +1531,8 @@ if __name__ == '__main__':
         html_out, csv_rows = page_prices(lang)
         write(prefix + SLUGS['prices'][lang].rsplit('/', 1)[1] + '.html', html_out)
     write('vinted-deals.html', page_deals('en'))
+    for lang in (('en', 'fr') if FR_LIVE else ('en',)):
+        write(SLUGS['fees'][lang].lstrip('/') + '.html', page_fees(lang))
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator='\n')
     w.writerow(['item', 'search', 'group', 'typical_asking_eur', 'p25_eur', 'p75_eur', 'listings', 'sellers', 'confidence', 'outlier_high_pct'])
