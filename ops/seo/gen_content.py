@@ -29,10 +29,10 @@ CHECKED = {'en': '28 September 2026', 'fr': '28 septembre 2026'}
 # French pages stay unpublished until SNYPD really polls vinted.fr (decided 2026-10-01).
 # While False: no French files are written, English pages carry no hreflang or
 # language switch, and prepublish.py leaves French URLs out of the sitemap.
-FR_LIVE = False
+FR_LIVE = True
 # The Vinted sites the scraper accepts (scraper-worker/src/catalogue_contract.py
 # MARKETS, verified live 2026-10-01). Update together with that list.
-MARKETS_TEXT = {'en': 'vinted.be, vinted.co.uk and vinted.com', 'fr': 'vinted.be, vinted.co.uk et vinted.com'}
+MARKETS_TEXT = {'en': 'every Vinted site in Europe and the US', 'fr': 'tous les sites Vinted d’Europe et des États-Unis'}
 REPORT = os.path.join(ROOT, 'ops', 'seo', 'data', 'price-report-2026-09.json')
 REPORT_CSV = 'vinted-prices-2026-09.csv'
 
@@ -146,7 +146,7 @@ UI = {
                home='Accueil'),
 }
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-01', 'notify': '2026-10-01', 'compare': '2026-10-01', 'prices': '2026-10-01'}
+PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-01', 'compare': '2026-10-02', 'prices': '2026-10-01'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
 
@@ -336,7 +336,7 @@ def page_bot(lang):
             ('How often does SNYPD check my search?', 'Every 30 seconds to 5 minutes. Searches that keep finding new items are checked more often, quiet ones less often. Speed is the same on every plan.'),
             ('Does it work on iPhone?', 'Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts in the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser.'),
             ('Is there a free plan?', 'Yes. Free includes one search with no time limit and no card. It checks while your SNYPD dashboard is open; paid plans from &euro;14.99 a month keep checking 24/7 with it closed.'),
-            ('Which Vinted countries does it work with?', 'vinted.be, vinted.co.uk and vinted.com today, with more Vinted countries being added. Paste a search link from one of those sites; prices show in that site’s currency.'),
+            ('Which Vinted countries does it work with?', 'Every Vinted site in Europe and the US, 26 in all: vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com and the rest. Paste a search link from the site you shop on; prices show in that site’s currency.'),
         ]
         body = f"""
 <section id="answer">
@@ -399,7 +399,7 @@ def page_bot(lang):
         ('À quelle fréquence SNYPD vérifie ma recherche ?', 'Toutes les 30 secondes à 5 minutes. Les recherches qui trouvent souvent de nouveaux articles sont vérifiées plus souvent, les recherches calmes moins souvent. La vitesse est la même pour tous les plans.'),
         ('Est-ce que ça marche sur iPhone ?', 'Oui, une fois SNYPD ajouté à l’écran d’accueil : ouvre snypd.store dans Safari, appuie sur Partager puis Sur l’écran d’accueil, et active les alertes dans l’app installée. Apple n’autorise les notifications web que pour les apps de l’écran d’accueil. Sur Android, Windows et Mac, les alertes marchent directement depuis le navigateur.'),
         ('Y a-t-il un plan gratuit ?', 'Oui. Le plan Free comprend une recherche, sans limite de durée et sans carte. Il vérifie tant que ton tableau de bord SNYPD est ouvert ; les plans payants, à partir de 14,99&nbsp;&euro; par mois, vérifient 24h/24 même fermé.'),
-        ('Avec quels pays Vinted ça fonctionne ?', 'Avec ' + MARKETS_TEXT['fr'] + '. Colle un lien de recherche d’un de ces sites ; les prix s’affichent dans la devise de ce site.'),
+        ('Avec quels pays Vinted ça fonctionne ?', 'Tous les sites Vinted d’Europe et des États-Unis, 26 au total : vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk et vinted.com, entre autres. Colle un lien de recherche du site où tu achètes ; les prix s’affichent dans la devise de ce site.'),
     ]
     body = f"""
 <section id="resume">
@@ -714,7 +714,7 @@ def reasons(lang):
              'Telvin alerts only inside Telegram; Resell Reserve alerts in Discord. On iPhone, add SNYPD to your Home Screen once: Apple only allows web push for Home Screen apps.'),
             ('Every Vinted filter you set',
              'Paste a Vinted search link and SNYPD keeps every filter in it: brand, size, price, condition, colour, material, category. If you can filter it on Vinted, SNYPD keeps that filter.',
-             'Souk builds alerts from its own form (brand, category, size, keywords, price). SNYPD works with %s today; more Vinted countries are being added.' % MARKETS_TEXT['en']),
+             'Souk builds alerts from its own form (brand, category, size, keywords, price). SNYPD works on %s: 26 sites, each in its own currency.' % MARKETS_TEXT['en']),
             ('14 days to change your mind',
              'Not happy with a paid plan? Email within 14 days of your first payment and you get it back in full. Prices include VAT, plans run month to month, cancel any time.',
              'Souk&rsquo;s site states one week. Resell Reserve&rsquo;s refund policy covers a change of mind only before you start using the service.'),
@@ -741,7 +741,7 @@ def reasons(lang):
              'Telvin alerte uniquement dans Telegram ; Resell Reserve dans Discord. Sur iPhone, ajoute SNYPD à ton écran d’accueil une fois : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
             ('Chaque filtre Vinted que tu règles',
              'Colle un lien de recherche Vinted et SNYPD garde tous ses filtres : marque, taille, prix, état, couleur, matière, catégorie. Si tu peux le filtrer sur Vinted, SNYPD garde ce filtre.',
-             'Souk crée les alertes depuis son propre formulaire (marque, catégorie, taille, mots-clés, prix). SNYPD fonctionne avec %s.' % MARKETS_TEXT['fr']),
+             'Souk crée les alertes depuis son propre formulaire (marque, catégorie, taille, mots-clés, prix). SNYPD fonctionne sur %s : 26 sites, chacun dans sa devise.' % MARKETS_TEXT['fr']),
             ('14 jours pour changer d’avis',
              'Pas convaincu par un plan payant ? Écris dans les 14 jours suivant ton premier paiement et tu es remboursé en totalité. Prix TVA incluse, plans au mois, résiliables à tout moment.',
              'Le site de Souk indique une semaine. La politique de Resell Reserve ne rembourse un changement d’avis qu’avant de commencer à utiliser le service.'),
@@ -786,7 +786,6 @@ def page_compare(lang):
   <ul class="fit-list">
     <li class="fit-yes"><strong>Yes, if you want to judge every deal yourself.</strong>You see the listing first, check it against real Vinted price data, and buy it on Vinted without handing over your account.</li>
     <li><strong>Not if you want a bot to buy for you.</strong>Automatic buying needs a tool that operates your Vinted account, such as Souk, V-Tools or Resell Reserve.</li>
-    <li><strong>Not yet if you shop on another Vinted country.</strong>SNYPD works with {MARKETS_TEXT['en']} today; more Vinted countries are being added.</li>
     <li><strong>Also buying on Marktplaats or 2dehands?</strong>MarktAlert covers those. SNYPD is Vinted only.</li>
   </ul>
 </section>

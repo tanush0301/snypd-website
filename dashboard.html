@@ -2471,8 +2471,15 @@ const HEARTBEAT_URL = (() => {
     // The Vinted sites the scraper actually polls. Keep in step with
     // scraper-worker/src/catalogue_contract.py MARKETS: any other site fails
     // closed there, so a search saved on it could never find anything.
-    const SUPPORTED_VINTED = ['vinted.be', 'vinted.co.uk', 'vinted.com'];
-    const SUPPORTED_VINTED_TEXT = 'vinted.be, vinted.co.uk and vinted.com';
+    // 26 sites, verified live 2026-10-02 (backend commit 4d5197c).
+    const SUPPORTED_VINTED = ['vinted.be', 'vinted.co.uk', 'vinted.com', 'vinted.fr', 'vinted.nl', 'vinted.lu',
+      'vinted.de', 'vinted.at', 'vinted.it', 'vinted.es', 'vinted.pt', 'vinted.ie', 'vinted.fi', 'vinted.sk',
+      'vinted.lt', 'vinted.lv', 'vinted.ee', 'vinted.hr', 'vinted.si', 'vinted.gr', 'vinted.pl', 'vinted.cz',
+      'vinted.se', 'vinted.dk', 'vinted.hu', 'vinted.ro'];
+    const SUPPORTED_VINTED_TEXT = 'every Vinted site in Europe and the US';
+    // Currency each non-euro site returns (same verification). Every other site is EUR.
+    const SITE_CURRENCY = { 'vinted.co.uk': 'GBP', 'vinted.com': 'USD', 'vinted.pl': 'PLN', 'vinted.cz': 'CZK',
+      'vinted.se': 'SEK', 'vinted.dk': 'DKK', 'vinted.hu': 'HUF', 'vinted.ro': 'RON' };
     function vintedSite(u) {
       try { return new URL(String(u || '').trim()).hostname.toLowerCase().replace(/^www\./, ''); }
       catch (e) { return ''; }
@@ -2488,7 +2495,7 @@ const HEARTBEAT_URL = (() => {
       if (!siteNote) return;
       const u = urlInput.value.trim();
       const show = !!u && validVintedUrl(u) && !vintedSiteSupported(u);
-      siteNote.textContent = show ? (vintedSite(u) + ' is not supported yet. SNYPD watches ' + SUPPORTED_VINTED_TEXT + ' for now: search on one of those and paste that link.') : '';
+      siteNote.textContent = show ? (vintedSite(u) + ' is not a Vinted site SNYPD watches. SNYPD watches ' + SUPPORTED_VINTED_TEXT + ': search on one of those and paste that link.') : '';
       siteNote.style.display = show ? '' : 'none';
     }
     // WHY NEW HUNTS GET A DEFAULT MINIMUM PRICE
@@ -2505,6 +2512,21 @@ const HEARTBEAT_URL = (() => {
     // Pre-filled and visible rather than injected silently: this is a nudge, not
     // a rewrite of what the user asked for. Clearing the box is a real choice.
     const DEFAULT_MIN_PRICE = 30;
+    // The same nudge in each site's own currency: about EUR30 at rough 2026
+    // exchange rates, rounded. The number is only a default the user can change;
+    // price_from is always read by Vinted in the site's currency.
+    const FLOOR_BY_CURRENCY = { EUR: 30, GBP: 25, USD: 35, PLN: 130, CZK: 750, SEK: 350, DKK: 220, HUF: 12000, RON: 150 };
+    const floorCurEl = document.querySelector('#filter-sheet-overlay .fs-floor__cur');
+    let floorCur = 'EUR';
+    function currencyFor(u) { return SITE_CURRENCY[vintedSite(u)] || 'EUR'; }
+    function syncFloorCurrency() {
+      const cur = currencyFor(urlInput.value);
+      if (cur === floorCur) return;
+      // Only replace the number while it is still the previous default, never a value the user typed.
+      if (minPriceInput && floorValue() === FLOOR_BY_CURRENCY[floorCur]) minPriceInput.value = String(FLOOR_BY_CURRENCY[cur]);
+      floorCur = cur;
+      if (floorCurEl) floorCurEl.textContent = cur;
+    }
 
     function floorValue() {
       const raw = String(minPriceInput ? minPriceInput.value : '').trim();
@@ -2530,6 +2552,7 @@ const HEARTBEAT_URL = (() => {
 
     function paintFloorNote() {
       if (!floorNote) return;
+      syncFloorCurrency();
       const u = urlInput.value.trim();
       const floor = floorValue();
       let own = false;
@@ -2538,10 +2561,10 @@ const HEARTBEAT_URL = (() => {
       if (u && own) {
         floorNote.textContent = 'This link sets its own minimum price, so yours is kept as-is.';
       } else if (floor === null) {
-        floorNote.textContent = 'No minimum set. Most Vinted items under EUR30 are fast fashion, not resale stock.';
+        floorNote.textContent = 'No minimum set. Most Vinted items under about EUR30 are fast fashion, not resale stock.';
         floorNote.classList.add('is-warn');
       } else {
-        floorNote.textContent = 'Will watch items from EUR' + floor + ' up. Clear the box to watch everything.';
+        floorNote.textContent = 'Will watch items from ' + floorCur + floor + ' up. Clear the box to watch everything.';
       }
     }
 
@@ -2596,7 +2619,7 @@ const HEARTBEAT_URL = (() => {
               </span>
             </div>
             <div class="fs-row__url">${escFs(shortUrl(r.vinted_url))}</div>
-            ${vintedSiteSupported(r.vinted_url) ? '' : `<p class="fs-floor__note is-warn" role="note">${escFs(vintedSite(r.vinted_url))} is not supported yet, so this hunt cannot find anything. Recreate it with a vinted.be, vinted.co.uk or vinted.com link.</p>`}
+            ${vintedSiteSupported(r.vinted_url) ? '' : `<p class="fs-floor__note is-warn" role="note">${escFs(vintedSite(r.vinted_url))} is not a Vinted site SNYPD watches, so this hunt cannot find anything. Recreate it with a link from a Vinted site in Europe or the US.</p>`}
             <div class="fs-row__actions">
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
               <a href="${escFs(r.vinted_url)}" target="_blank" rel="noopener" style="font-size:11px;letter-spacing:.08em;color:var(--text-muted)">OPEN ON VINTED</a>
