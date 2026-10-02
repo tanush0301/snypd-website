@@ -15,6 +15,10 @@
     {
       "source": "/(dashboard|account|admin|affiliate|filters|reset-password)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/assets/fonts/(.*).woff2",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ]
 }

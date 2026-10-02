@@ -23,9 +23,8 @@
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
 <link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <style>
 @font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
@@ -133,9 +132,31 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
 .fit-list li strong { display: block; margin-bottom: 3px; }
 .fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+.lg-fig { margin: 4px 0 20px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.lg-fig picture { display: block; }
+.lg-fig img { display: block; width: 100%; height: auto; }
+.lg-fig figcaption { padding: 10px 14px; border-top: 1px solid #1D1D20; font-size: 11.5px; line-height: 1.6; color: #8B9094; }
+.lg-fig.fig-narrow { max-width: 520px; }
+.fig-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; margin: 0 0 18px; }
+.fig-row .lg-fig { margin: 0; max-width: none; }
+@media (max-width: 759.98px) { .fig-row { grid-template-columns: minmax(0, 1fr); } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ct-duel { margin: 0 0 18px; }
+.ct-duel label { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.ct-duel select { font-family: inherit; font-size: 14px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 46px; }
+.ct-duel table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #1D1D20; }
+.ct-duel th, .ct-duel td { text-align: left; vertical-align: top; padding: 11px 10px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.5; color: #B8BCBF; overflow-wrap: anywhere; }
+.ct-duel thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .08em; color: #8B9094; }
+.ct-duel thead th.d-us { color: #FFFFFF; }
+.ct-duel tbody th { width: 28%; font-weight: 400; font-size: 11px; letter-spacing: .06em; color: #8B9094; }
+.ct-duel td.d-us { color: #FFFFFF; background: rgba(162,0,255,.07); }
+.ct-duel [data-t] { display: none; }
+.ct-duel [data-t].on { display: table-cell; }
+@media (min-width: 700px) { .ct-duel { display: none; } }
+@media (max-width: 699.98px) { .ct-full { display: none; } }
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"À quel prix les sneakers et le streetwear sont mis en vente sur Vinted","item":"https://www.snypd.store/fr/prix-vinted"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/fr/prix-vinted#page","url":"https://www.snypd.store/fr/prix-vinted","name":"Prix Vinted septembre 2026 : prix demandés typiques | SNYPD","description":"Prix demandés typiques sur Vinted pour 19 sneakers et vêtements streetwear, septembre 2026 : médiane, moitié centrale et nombre d’annonces vinted.be.","inLanguage":"fr","datePublished":"2026-09-28","dateModified":"2026-10-01","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/fr/prix-vinted#page","url":"https://www.snypd.store/fr/prix-vinted","name":"Prix Vinted septembre 2026 : prix demandés typiques | SNYPD","description":"Prix demandés typiques sur Vinted pour 19 sneakers et vêtements streetwear, septembre 2026 : médiane, moitié centrale et nombre d’annonces vinted.be.","inLanguage":"fr","datePublished":"2026-09-28","dateModified":"2026-10-02","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Prix demandés typiques sur Vinted pour des articles de revente, septembre 2026","description":"Prix demandé médian et écart interquartile pour 19 recherches de sneakers et streetwear, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au 28 septembre 2026. Prix demandés, pas prix de vente.","url":"https://www.snypd.store/fr/prix-vinted","temporalCoverage":"2026-09-14/2026-09-28","isAccessibleForFree":true,"creator":{"@id":"https://www.snypd.store/#org"},"inLanguage":"fr","distribution":[{"@type":"DataDownload","encodingFormat":"text/csv","contentUrl":"https://www.snypd.store/vinted-prices-2026-09.csv"}]}</script>
 <!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
 <script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
@@ -161,7 +182,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
     <div class="lg-wrap lg-head-in">
       <span class="lg-eyebrow">PRIX VINTED &middot; SEPTEMBRE 2026</span>
       <h1 class="lg-h1">À quel prix les sneakers et le streetwear sont mis en vente sur Vinted</h1>
-      <span class="lg-meta">Mis à jour le <time datetime="2026-10-01">1er octobre 2026</time> &middot; Par SNYPD, créé par un revendeur de sneakers belge</span>
+      <span class="lg-meta">Mis à jour le <time datetime="2026-10-02">2 octobre 2026</time> &middot; Par SNYPD, créé par un revendeur de sneakers belge</span>
       <p class="lg-lead">Prix demandés médians pour 19 articles de revente, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au 28 septembre 2026. Le nombre d’annonces derrière chaque prix est dans le tableau. Édition de septembre 2026. Prix demandés, pas prix de vente.</p>
       
     </div>
@@ -207,6 +228,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 <section id="market-report">
   <h2>Estime le prix de n’importe quel article</h2>
   <p>Le Market Report de SNYPD Pro et Elite fait ce calcul pour n’importe quelle recherche, détaillé par état, et refuse d’afficher un chiffre quand les données sont trop maigres ou trop mélangées. Pro coûte 24,99&nbsp;&euro; par mois et surveille aussi 5 recherches Vinted 24h/24. <a href="/plans">Voir les tarifs</a>.</p>
+  <figure class="lg-fig fig-narrow"><picture><source media="(max-width: 699.98px)" srcset="/assets/seo/snypd-market-report-phone.webp" width="358" height="653"><img src="/assets/seo/snypd-market-report.webp" alt="Market Report SNYPD pour jordan 1 mid : prix demandé typique de 45 euros sur 975 annonces, détaillé par état" width="781" height="665" loading="lazy" decoding="async"></picture><figcaption>Un vrai Market Report pour « jordan 1 mid », le 2 octobre 2026 : un prix demandé typique de 45 &euro; sur 975 annonces de 880 vendeurs, puis le prix pour chaque état. Interface en anglais.</figcaption></figure>
   <div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p><p class="ct-note">L’inscription et le paiement sont pour l’instant en anglais.</p><div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a><a class="ct-btn ct-ghost" href="/plans">VOIR LES TARIFS</a></div></div>
 </section>
     </article>

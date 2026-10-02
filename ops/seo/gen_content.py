@@ -146,7 +146,7 @@ UI = {
                home='Accueil'),
 }
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-01', 'compare': '2026-10-02', 'prices': '2026-10-01'}
+PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-02', 'compare': '2026-10-02', 'prices': '2026-10-02'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
 
@@ -216,9 +216,8 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
 <link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <style>{CSS}{COMPARE_CSS}</style>
 {ld_html}
@@ -363,6 +362,7 @@ def page_bot(lang):
     <li>SNYPD checks it every 30 seconds to 5 minutes. New matches go to your dashboard and, if you turned alerts on, to your phone or computer. Several finds close together arrive as one notification.</li>
     <li>Tap the alert. It opens the listing on Vinted, where you buy or make an offer.</li>
   </ol>
+  {figure('feed', 'en')}
 </section>
 <section id="speed">
   <h2>How fast is it?</h2>
@@ -426,6 +426,7 @@ def page_bot(lang):
     <li>SNYPD la vérifie toutes les 30 secondes à 5 minutes. Les nouvelles annonces arrivent dans ton tableau de bord et, si tu as activé les alertes, sur ton téléphone ou ton ordinateur. Plusieurs trouvailles rapprochées arrivent en une seule notification.</li>
     <li>Appuie sur l’alerte. Elle ouvre l’annonce sur Vinted, où tu achètes ou fais une offre.</li>
   </ol>
+  {figure('feed', 'fr')}
 </section>
 <section id="vitesse">
   <h2>C’est rapide ?</h2>
@@ -497,6 +498,7 @@ def page_notify(lang):
     <li>SNYPD checks it every 30 seconds to 5 minutes and sends a push notification to your phone or computer when a new listing matches. The alert opens the listing on Vinted.</li>
   </ol>
   <p>SNYPD never asks for your Vinted login. The free plan runs one search while your dashboard is open; paid plans from &euro;14.99 a month keep checking 24/7. More on how it works: <a href="{SLUGS['bot']['en']}">SNYPD, the Vinted alert bot</a>.</p>
+  {figure('feed', 'en')}
 </section>
 <section id="iphone">
   <h2>Alerts on iPhone</h2>
@@ -548,6 +550,7 @@ def page_notify(lang):
     <li>SNYPD la vérifie toutes les 30 secondes à 5 minutes et envoie une notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li>
   </ol>
   <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche tant que ton tableau de bord est ouvert ; les plans payants, à partir de 14,99&nbsp;&euro; par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>.</p>
+  {figure('feed', 'fr')}
 </section>
 <section id="iphone">
   <h2>Alertes sur iPhone</h2>
@@ -602,7 +605,66 @@ COMPARE_CSS = r"""
 .fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
 .fit-list li strong { display: block; margin-bottom: 3px; }
 .fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+.lg-fig { margin: 4px 0 20px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.lg-fig picture { display: block; }
+.lg-fig img { display: block; width: 100%; height: auto; }
+.lg-fig figcaption { padding: 10px 14px; border-top: 1px solid #1D1D20; font-size: 11.5px; line-height: 1.6; color: #8B9094; }
+.lg-fig.fig-narrow { max-width: 520px; }
+.fig-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; margin: 0 0 18px; }
+.fig-row .lg-fig { margin: 0; max-width: none; }
+@media (max-width: 759.98px) { .fig-row { grid-template-columns: minmax(0, 1fr); } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ct-duel { margin: 0 0 18px; }
+.ct-duel label { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.ct-duel select { font-family: inherit; font-size: 14px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 46px; }
+.ct-duel table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #1D1D20; }
+.ct-duel th, .ct-duel td { text-align: left; vertical-align: top; padding: 11px 10px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.5; color: #B8BCBF; overflow-wrap: anywhere; }
+.ct-duel thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .08em; color: #8B9094; }
+.ct-duel thead th.d-us { color: #FFFFFF; }
+.ct-duel tbody th { width: 28%; font-weight: 400; font-size: 11px; letter-spacing: .06em; color: #8B9094; }
+.ct-duel td.d-us { color: #FFFFFF; background: rgba(162,0,255,.07); }
+.ct-duel [data-t] { display: none; }
+.ct-duel [data-t].on { display: table-cell; }
+@media (min-width: 700px) { .ct-duel { display: none; } }
+@media (max-width: 699.98px) { .ct-full { display: none; } }
 """
+
+# Real screenshots of the live SNYPD dashboard, taken 2 October 2026 in a signed-in session.
+# Listing photos belong to Vinted sellers and are blurred; nothing else is edited. Files: assets/seo/.
+# Phones get their own capture (one card / the panel at phone width), because the desktop
+# capture scaled to ~350px makes its text about 7px tall.
+SHOTS = {
+    'feed':   ('/assets/seo/snypd-feed.webp', 1400, 662, ('/assets/seo/snypd-feed-phone.webp', 396, 650), ''),
+    'market': ('/assets/seo/snypd-market-report.webp', 781, 665, ('/assets/seo/snypd-market-report-phone.webp', 358, 653), ' fig-narrow'),
+    'hunts':  ('/assets/seo/snypd-hunts.webp', 635, 674, ('/assets/seo/snypd-hunts-phone.webp', 350, 537), ' fig-narrow'),
+}
+SHOT_TEXT = {
+    'en': {
+        'feed': ('SNYPD dashboard feed showing new Vinted listings with price, price including Buyer Protection, condition and the time found',
+                 'SNYPD&rsquo;s feed during a real session on 2 October 2026: new listings from one search, each with its price, the price including Vinted&rsquo;s Buyer Protection, its condition and when it was found. Photos are blurred because they belong to the sellers.'),
+        'market': ('SNYPD Market Report for jordan 1 mid: typical asking price 45 euros from 975 listings, broken down by condition',
+                   'A real Market Report for &ldquo;jordan 1 mid&rdquo; on 2 October 2026: a typical asking price of &euro;45 from 975 listings by 880 sellers, then the price for each condition.'),
+        'hunts': ('List of SNYPD hunts, each a Vinted search on vinted.be, some live and some paused',
+                  'Hunts in SNYPD: each one is a Vinted search link with its own filters, either live or paused. Screenshot from 2 October 2026.'),
+    },
+    'fr': {
+        'feed': ('Flux du tableau de bord SNYPD avec de nouvelles annonces Vinted : prix, prix avec protection acheteurs, état et moment de la détection',
+                 'Le flux SNYPD pendant une vraie session, le 2 octobre 2026 : de nouvelles annonces d’une même recherche, avec leur prix, le prix protection acheteurs de Vinted incluse, leur état et le moment où elles ont été trouvées. Photos floutées, car elles appartiennent aux vendeurs. Interface en anglais.'),
+        'market': ('Market Report SNYPD pour jordan 1 mid : prix demandé typique de 45 euros sur 975 annonces, détaillé par état',
+                   'Un vrai Market Report pour « jordan 1 mid », le 2 octobre 2026 : un prix demandé typique de 45 &euro; sur 975 annonces de 880 vendeurs, puis le prix pour chaque état. Interface en anglais.'),
+        'hunts': ('Liste des recherches SNYPD, chacune une recherche Vinted sur vinted.be, certaines actives et d’autres en pause',
+                  'Les recherches dans SNYPD : chacune est un lien de recherche Vinted avec ses propres filtres, active ou en pause. Capture du 2 octobre 2026, interface en anglais.'),
+    },
+}
+
+
+def figure(key, lang):
+    src, w, h, (psrc, pw, ph), extra = SHOTS[key]
+    alt, cap = SHOT_TEXT[lang][key]
+    return ('<figure class="lg-fig%s"><picture><source media="(max-width: 699.98px)" srcset="%s" width="%d" height="%d">'
+            '<img src="%s" alt="%s" width="%d" height="%d" loading="lazy" decoding="async"></picture><figcaption>%s</figcaption></figure>'
+            % (extra, psrc, pw, ph, src, esc(alt), w, h, cap))
+
 
 # One row per tool, cells per language: (en, fr). Order: tool, type, price data,
 # account, alerts arrive, refund, per month, free option.
@@ -697,7 +759,36 @@ def compare_table(lang):
             label += '<span class="ct-badge">%s</span>' % ('US' if lang == 'en' else 'NOUS')
             us = i
         rows.append([label] + [cell[L] for cell in c['cells']])
-    return table(head, rows, us_row=us)
+    return '<div class="ct-full">%s</div>' % table(head, rows, us_row=us)
+
+
+DUEL_HEAD = {'en': ['WHAT IT DOES', 'PRICE DATA', 'NEEDS YOUR VINTED ACCOUNT', 'ALERTS ARRIVE', 'REFUND', 'PER MONTH', 'FREE OPTION'],
+             'fr': ['CE QU’IL FAIT', 'DONNÉES DE PRIX', 'BESOIN DE TON COMPTE VINTED', 'ALERTES VIA', 'REMBOURSEMENT', 'PAR MOIS', 'OPTION GRATUITE']}
+
+
+def compare_duel(lang):
+    # Phones get SNYPD next to ONE other tool at a time (NN/g: at most 2 options side by side
+    # on small screens). Same cells as the full table; the full table is hidden below 700px.
+    L = 0 if lang == 'en' else 1
+    us, others = COMPETITORS[0], COMPETITORS[1:]
+    label = {'en': 'COMPARE SNYPD WITH', 'fr': 'COMPARER SNYPD AVEC'}[lang]
+    cap = {'en': 'SNYPD compared with the tool you pick', 'fr': 'SNYPD comparé à l’outil choisi'}[lang]
+    point = {'en': 'Point', 'fr': 'Critère'}[lang]
+    opts = ''.join('<option value="%d"%s>%s</option>' % (i, ' selected' if i == 0 else '', c['name'][L]) for i, c in enumerate(others))
+    heads = ''.join('<th scope="col" data-t="%d"%s><a href="%s" rel="nofollow noopener">%s</a></th>'
+                    % (i, ' class="on"' if i == 0 else '', c['url'] or HELP435[lang], c['name'][L]) for i, c in enumerate(others))
+    body = ''
+    for j, h in enumerate(DUEL_HEAD[lang]):
+        cells = ''.join('<td data-t="%d"%s>%s</td>' % (i, ' class="on"' if i == 0 else '', c['cells'][j][L]) for i, c in enumerate(others))
+        body += '<tr><th scope="row">%s</th><td class="d-us">%s</td>%s</tr>' % (h, us['cells'][j][L], cells)
+    js = ("<script>(function(){var s=document.getElementById('duel-pick');if(!s)return;"
+          "function on(){var v=s.value;var c=document.querySelectorAll('.ct-duel [data-t]');"
+          "for(var i=0;i<c.length;i++){c[i].className=c[i].getAttribute('data-t')===v?'on':'';}}"
+          "s.addEventListener('change',on);on();})();</script>")
+    return ('<div class="ct-duel"><label for="duel-pick">%s<select id="duel-pick">%s</select></label>'
+            '<table><caption class="sr-only">%s</caption><thead><tr><th scope="col"><span class="sr-only">%s</span></th>'
+            '<th scope="col" class="d-us">SNYPD</th>%s</tr></thead><tbody>%s</tbody></table></div>%s'
+            % (label, opts, cap, point, heads, body, js))
 
 
 def reasons(lang):
@@ -770,11 +861,22 @@ def page_compare(lang):
 <section id="reasons">
   <h2>8 reasons resellers choose SNYPD</h2>
   {reasons('en')}
+  <div class="fig-row">{figure('market', 'en')}{figure('hunts', 'en')}</div>
 </section>
 <section id="table">
   <h2>SNYPD and six other Vinted bots, side by side</h2>
   {tbl}
+  {compare_duel('en')}
   <p class="ct-note">* Buying on Vinted needs a logged-in account, so any autobuy feature acts through yours; Resell Reserve&rsquo;s homepage doesn&rsquo;t say how it connects to it. &ldquo;Not stated&rdquo;, &ldquo;not on its site&rdquo; and &ldquo;not on its homepage&rdquo; mean we couldn&rsquo;t find it on that tool&rsquo;s public pages, not proof it doesn&rsquo;t exist.</p>
+</section>
+<section id="others">
+  <h2>What other tools do better</h2>
+  <p>No tool is best at everything. Three things other Vinted bots offer that SNYPD does not, from each tool&rsquo;s own site:</p>
+  <ul class="fit-list">
+    <li><strong>They can buy for you.</strong>Souk, V-Tools and Resell Reserve sell autobuy. Buying on Vinted needs a logged-in account, so those features act through yours. SNYPD never signs in as you, so every purchase stays your decision, made on Vinted.</li>
+    <li><strong>They post alerts in Telegram or Discord.</strong>Telvin sends alerts in Telegram, Resell Reserve in Discord, MarktAlert by Telegram, email or webhooks. SNYPD sends push notifications to your phone or computer only: no extra app or server to join, but no Telegram or Discord option.</li>
+    <li><strong>Their first paid plan costs less.</strong>Telvin starts at &euro;4.90 a month and MarktAlert at &euro;6.95. SNYPD&rsquo;s first paid plan, Kickstart, is &euro;14.99 and watches 2 searches 24/7; the Market Report starts with Pro at &euro;24.99.</li>
+  </ul>
 </section>
 <section id="speed">
   <h2>What about speed?</h2>
@@ -793,7 +895,7 @@ def page_compare(lang):
   <h2>Try it on one search</h2>
   {cta('en')}
 </section>"""
-        return page('compare', 'en', 'Vinted Bots Compared (2026): Why Resellers Pick SNYPD',
+        return page('compare', 'en', 'Best Vinted Bot in 2026? 7 Bots Compared | SNYPD',
                     'SNYPD vs Souk, Telvin, V-Tools, Crazed, Resell Reserve and MarktAlert: price data, account safety, phone alerts and refunds, each fact from the tool’s own site.',
                     'VINTED BOTS COMPARED &middot; CHECKED ' + COMPARE_CHECKED_SHORT['en'], 'Why resellers pick SNYPD over other Vinted bots',
                     'SNYPD alerts you to new Vinted listings, shows the typical Vinted asking price of what you&rsquo;re looking at, and never touches your Vinted account. Here is how that compares with six other Vinted bots, point by point, with the source for every fact.',
@@ -805,11 +907,22 @@ def page_compare(lang):
 <section id="raisons">
   <h2>8 raisons de choisir SNYPD</h2>
   {reasons('fr')}
+  <div class="fig-row">{figure('market', 'fr')}{figure('hunts', 'fr')}</div>
 </section>
 <section id="tableau">
   <h2>SNYPD et six autres bots Vinted, côte à côte</h2>
   {tbl}
+  {compare_duel('fr')}
   <p class="ct-note">* Acheter sur Vinted demande un compte connecté, donc toute fonction d’achat automatique passe par le tien ; la page d’accueil de Resell Reserve ne dit pas comment elle s’y connecte. « Non précisé », « absent de son site » et « absent de sa page d’accueil » veulent dire que nous ne l’avons pas trouvé sur les pages publiques de l’outil, pas que cela n’existe pas.</p>
+</section>
+<section id="autres">
+  <h2>Ce que d’autres outils font mieux</h2>
+  <p>Aucun outil n’est le meilleur en tout. Trois choses que d’autres bots Vinted proposent et pas SNYPD, d’après le site de chaque outil :</p>
+  <ul class="fit-list">
+    <li><strong>Ils peuvent acheter à ta place.</strong>Souk, V-Tools et Resell Reserve vendent de l’achat automatique. Acheter sur Vinted demande un compte connecté, donc ces fonctions passent par le tien. SNYPD ne se connecte jamais à ta place : chaque achat reste ta décision, sur Vinted.</li>
+    <li><strong>Ils envoient les alertes dans Telegram ou Discord.</strong>Telvin alerte dans Telegram, Resell Reserve dans Discord, MarktAlert par Telegram, e-mail ou webhooks. SNYPD envoie uniquement des notifications push sur ton téléphone ou ton ordinateur : pas d’app ni de serveur en plus à rejoindre, mais pas d’option Telegram ou Discord.</li>
+    <li><strong>Leur premier plan payant coûte moins cher.</strong>Telvin commence à 4,90 &euro; par mois et MarktAlert à 6,95 &euro;. Le premier plan payant de SNYPD, Kickstart, coûte 14,99 &euro; et surveille 2 recherches 24h/24 ; le Market Report commence avec Pro à 24,99 &euro;.</li>
+  </ul>
 </section>
 <section id="vitesse">
   <h2>Et la vitesse ?</h2>
@@ -828,7 +941,7 @@ def page_compare(lang):
   <h2>Essaie sur une recherche</h2>
   {cta('fr')}
 </section>"""
-    return page('compare', 'fr', 'Comparatif bots Vinted 2026 : pourquoi choisir SNYPD',
+    return page('compare', 'fr', 'Meilleur bot Vinted 2026 ? 7 bots comparés | SNYPD',
                 'SNYPD face à Souk, Telvin, V-Tools, Crazed, Resell Reserve et MarktAlert : prix, compte, alertes, remboursement, d’après le site de chaque outil.',
                 'COMPARATIF DES BOTS VINTED &middot; VÉRIFIÉ LE ' + COMPARE_CHECKED_SHORT['fr'], 'Pourquoi les revendeurs choisissent SNYPD plutôt qu’un autre bot Vinted',
                 'SNYPD t’alerte des nouvelles annonces Vinted, te montre le prix demandé typique d’un article sur Vinted, et ne touche jamais à ton compte Vinted. Voici la comparaison avec six autres bots Vinted, point par point, avec la source de chaque information.',
@@ -962,6 +1075,7 @@ def page_prices(lang):
 <section id="report">
   <h2>Price any item yourself</h2>
   <p>The Market Report in SNYPD Pro and Elite does this for any search you type, broken down by condition, and refuses to show a number when the data is too thin or too mixed. Pro is &euro;24.99 a month and also watches 5 Vinted searches 24/7. <a href="/plans">See plans</a>.</p>
+  {figure('market', 'en')}
   {cta('en')}
 </section>"""
         out = page('prices', 'en', 'Vinted Prices, Sept 2026: Typical Asking Prices | SNYPD',
@@ -1016,6 +1130,7 @@ def page_prices(lang):
 <section id="market-report">
   <h2>Estime le prix de n’importe quel article</h2>
   <p>Le Market Report de SNYPD Pro et Elite fait ce calcul pour n’importe quelle recherche, détaillé par état, et refuse d’afficher un chiffre quand les données sont trop maigres ou trop mélangées. Pro coûte 24,99&nbsp;&euro; par mois et surveille aussi 5 recherches Vinted 24h/24. <a href="/plans">Voir les tarifs</a>.</p>
+  {figure('market', 'fr')}
   {cta('fr')}
 </section>"""
     out = page('prices', 'fr', 'Prix Vinted septembre 2026 : prix demandés typiques | SNYPD',
