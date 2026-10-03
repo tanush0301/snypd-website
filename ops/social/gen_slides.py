@@ -26,8 +26,10 @@ import gen_content as G  # noqa: E402
 OUT = sys.argv[1] if len(sys.argv) > 1 else r'C:\Users\Tanus\website\social'
 FONT = 'file:///' + ROOT.replace('\\', '/')
 NB = '\u00a0'
-TAGS = {'en': '#vinted #vintedtips #vintedfinds #reselling #resellertips #sneakers #thrifting',
-        'fr': '#vinted #vintedfrance #astucevinted #achatrevente #revente #sneakers #seconde main'.replace('seconde main', 'secondemain')}
+# Instagram allows at most 5 hashtags per post/reel since 18 Dec 2025 (@creators on Threads).
+TAGS = {'en': '#vinted #vintedfinds #vintedtips #reselling #sneakers',
+        'fr': '#vinted #vintedfrance #astucevinted #achatrevente #sneakers'}
+CTA = {'en': 'Link in bio.', 'fr': 'Lien en bio.'}
 
 CSS = f"""
 @font-face {{ font-family: 'Cabinet'; src: url('{FONT}/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; }}
@@ -81,6 +83,8 @@ def write_set(name, slides, caption, alts):
     d = os.path.join(OUT, name)
     os.makedirs(d, exist_ok=True)
     open(os.path.join(d, 'deck.html'), 'w', encoding='utf-8').write(deck(slides))
+    body, tags = caption.rsplit('\n\n', 1)  # URLs in Instagram captions aren't clickable
+    caption = f'{body}\n\n{CTA[name[-2:]]}\n\n{tags}'
     md = [f'# {name}', '', '## Caption', '', caption, '', '## Alt text (one per slide, in order)', '']
     md += [f'{i + 1}. {a}' for i, a in enumerate(alts)]
     md += ['', f'Generated {datetime.date.today().isoformat()} by ops/social/gen_slides.py from ops/seo/data.', '']
