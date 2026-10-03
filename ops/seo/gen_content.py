@@ -1049,7 +1049,7 @@ def page_prices(lang):
         dataset = {'@context': 'https://schema.org', '@type': 'Dataset', 'name': 'Typical Vinted asking prices for resale items, September 2026',
                    'description': 'Median asking price and interquartile range for 19 sneaker and streetwear searches, from listings SNYPD saw on vinted.be in the 14 days to 28 September 2026. Asking prices, not sold prices.',
                    'url': SITE + SLUGS['prices']['en'], 'temporalCoverage': f'{start.isoformat()}/{end.isoformat()}', 'isAccessibleForFree': True,
-                   'creator': {'@id': SITE + '/#org'}, 'inLanguage': 'en', 'variableMeasured': ['median asking price (EUR)', '25th percentile (EUR)', '75th percentile (EUR)', 'number of listings', 'number of sellers'],
+                   'creator': DATASET_CREATOR, 'license': DATASET_LICENSE, 'inLanguage': 'en', 'variableMeasured': ['median asking price (EUR)', '25th percentile (EUR)', '75th percentile (EUR)', 'number of listings', 'number of sellers'],
                    'distribution': [{'@type': 'DataDownload', 'encodingFormat': 'text/csv', 'contentUrl': SITE + '/' + REPORT_CSV}]}
         body = f"""
 <section id="answer">
@@ -1063,7 +1063,7 @@ def page_prices(lang):
   {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'sneakers'])}
   <h3>CLOTHING</h3>
   {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'clothing'])}
-  <p class="ct-note">Download the numbers: <a href="/{REPORT_CSV}">{REPORT_CSV}</a>. Figures come straight from SNYPD&rsquo;s Market Report, run on {end.day} September {end.year}.</p>
+  <p class="ct-note">Download the numbers: <a href="/{REPORT_CSV}">{REPORT_CSV}</a>. Figures come straight from SNYPD&rsquo;s Market Report, run on {end.day} September {end.year}. Free to reuse with credit to SNYPD (<a href="{DATASET_LICENSE}" rel="license noopener">CC BY 4.0</a>).</p>
 </section>
 <section id="refused">
   <h2>Searches with no price</h2>
@@ -1105,7 +1105,7 @@ def page_prices(lang):
     dataset = {'@context': 'https://schema.org', '@type': 'Dataset', 'name': 'Prix demandés typiques sur Vinted pour des articles de revente, septembre 2026',
                'description': 'Prix demandé médian et écart interquartile pour 19 recherches de sneakers et streetwear, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au 28 septembre 2026. Prix demandés, pas prix de vente.',
                'url': SITE + SLUGS['prices']['fr'], 'temporalCoverage': f'{start.isoformat()}/{end.isoformat()}', 'isAccessibleForFree': True,
-               'creator': {'@id': SITE + '/#org'}, 'inLanguage': 'fr',
+               'creator': DATASET_CREATOR, 'license': DATASET_LICENSE, 'inLanguage': 'fr',
                'distribution': [{'@type': 'DataDownload', 'encodingFormat': 'text/csv', 'contentUrl': SITE + '/' + REPORT_CSV}]}
     body = f"""
 <section id="reponse">
@@ -1119,7 +1119,7 @@ def page_prices(lang):
   {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'sneakers'])}
   <h3>VÊTEMENTS</h3>
   {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'clothing'])}
-  <p class="ct-note">Télécharger les chiffres : <a href="/{REPORT_CSV}">{REPORT_CSV}</a> (en anglais). Les chiffres viennent directement du Market Report de SNYPD, calculé le {end.day} septembre {end.year}.</p>
+  <p class="ct-note">Télécharger les chiffres : <a href="/{REPORT_CSV}">{REPORT_CSV}</a> (en anglais). Les chiffres viennent directement du Market Report de SNYPD, calculé le {end.day} septembre {end.year}. Réutilisation libre en citant SNYPD (<a href="{DATASET_LICENSE}" rel="license noopener">CC BY 4.0</a>).</p>
 </section>
 <section id="sans-prix">
   <h2>Recherches sans prix</h2>
@@ -1299,6 +1299,11 @@ FEE_SRC = {
     'ship_en': 'https://www.vinted.co.uk/help/458-who-pays-for-shipping', 'ship_fr': 'https://www.vinted.fr/help/458',
     'safe_en': 'https://www.vinted.co.uk/help/82', 'safe_fr': 'https://www.vinted.fr/help/82',
 }
+# Dataset rich results (Google): creator must be a typed Organization on the page itself (an @id
+# pointing at the homepage's Organization is reported as 'Invalid object type'), and a license
+# is expected. CC BY 4.0: anyone may reuse the figures if they credit SNYPD (decided 2026-10-03).
+DATASET_CREATOR = {'@type': 'Organization', '@id': SITE + '/#org', 'name': 'SNYPD', 'url': SITE + '/'}
+DATASET_LICENSE = 'https://creativecommons.org/licenses/by/4.0/'
 FEE_TABLE_CENTS = [500, 1000, 2000, 3000, 5000, 10000, 20000, 50000]
 
 # Plain ASCII on purpose. Whole cents only: fee = 70 + floor((cents * 5 + 50) / 100).
