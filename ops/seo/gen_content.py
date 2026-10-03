@@ -523,7 +523,7 @@ def page_notify(lang):
   <h2>Try it on one search</h2>
   {cta('en')}
 </section>"""
-        return page('notify', 'en', 'How to Get Notified of New Vinted Listings | SNYPD',
+        return page('notify', 'en', 'Vinted Alerts & Notifications for New Listings (2026) | SNYPD',
                     'Vinted’s saved searches show a +N counter, not a push alert. What Vinted’s own help centre says, and how to get a notification for each new match.',
                     'VINTED NOTIFICATIONS', 'How to get notified when something new is listed on Vinted',
                     'Vinted lets you save searches, but it does not document a notification for new matches. Here is exactly what Vinted&rsquo;s help centre says, and how to get an alert on your phone for every new listing that matches.',
@@ -592,8 +592,8 @@ def page_notify(lang):
 # "not stated" (never "no") when a site is silent, and re-check before changing
 # the date. Tanush chose the eight reasons on 2026-10-01; none use testimonials
 # because none exist yet.
-COMPARE_CHECKED = {'en': '1 October 2026', 'fr': '1er octobre 2026'}
-COMPARE_CHECKED_SHORT = {'en': '1 OCT 2026', 'fr': '1ER OCT. 2026'}
+COMPARE_CHECKED = {'en': '3 October 2026', 'fr': '3 octobre 2026'}
+COMPARE_CHECKED_SHORT = {'en': '3 OCT 2026', 'fr': '3 OCT. 2026'}
 
 COMPARE_CSS = r"""
 .rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
@@ -707,7 +707,7 @@ COMPETITORS = [
         _c(YES + '14 days, full, after use', YES + '14 jours, intégral, même après usage'),
         _c('&euro;14.99&ndash;&euro;34.99 <small>VAT incl.</small>', '14,99&ndash;34,99&nbsp;&euro; <small>TVA incluse</small>'),
         _c(YES + '1 search, no time limit, no notification cap', YES + '1 recherche, sans limite de durée ni de notifications')]},
-    # souk.to/en + souk.to/en/docs/pro-autobuy-billing ("after you link your Vinted account")
+    # souk.to/en + souk.to/en/docs/autobuy ("To use Autobuy, first link your Vinted account from the Souk settings.", re-read 3 Oct 2026)
     {'name': ('Souk', 'Souk'), 'url': 'https://souk.to/en', 'cells': [
         _c('Alerts + autobuy', 'Alertes + achat automatique'),
         _c('Not on its site', 'Absent de son site'),
@@ -743,13 +743,13 @@ COMPETITORS = [
         _c('Not on its homepage', 'Absent de sa page d’accueil'),
         _c('Free only; paid plans &ldquo;coming soon&rdquo;', 'Gratuit seulement ; plans payants « bientôt disponibles »'),
         _c('3 alerts, 30 items a day', '3 alertes, 30 articles par jour')]},
-    # resellreserve.co.uk (serves legacy.resellreserve.co.uk) + /refund-policy (updated 27 Sept 2026)
+    # resellreserve.co.uk + /refund-policy (updated 27 Sept 2026: "generally non-refundable", plus a Core break-even guarantee)
     {'name': ('Resell Reserve', 'Resell Reserve'), 'url': 'https://resellreserve.co.uk/', 'cells': [
         _c('Alerts + autobuy', 'Alertes + achat automatique'),
         _c('AI estimates, &pound;44.99 plan only', 'Estimations IA, plan à 44,99&nbsp;&pound; seulement'),
         _c('To buy, yes*', 'Pour acheter, oui*'),
         _c('Discord', 'Discord'),
-        _c('Change of mind: only before you start using it', 'Changement d’avis : seulement avant de commencer à l’utiliser'),
+        _c('Generally non-refundable; Core: conditional first-month guarantee', 'En général non remboursable ; Core : garantie conditionnelle le premier mois'),
         _c('&pound;19.99&ndash;&pound;44.99', '19,99&ndash;44,99&nbsp;&pound;'),
         _c('Free preview channels', 'Salons d’aperçu gratuits')]},
     # marktalert.nl/pricing: its own pages disagree on free alert count/validity, so only the check interval is used
@@ -825,7 +825,7 @@ def reasons(lang):
              'Of the six other tools here, only Resell Reserve offers price estimates, and only on its &pound;44.99 Ultimate plan. See a sample: <a href="%s">Vinted prices, September 2026</a>.' % SLUGS['prices']['en']),
             ('Your Vinted account stays yours',
              'SNYPD needs an email address and nothing else: no Vinted password, no login, no browser extension. It never buys and never messages sellers. You buy through Vinted&rsquo;s normal checkout.',
-             'Autobuy needs your account: Souk&rsquo;s docs say it works &ldquo;after you link your Vinted account&rdquo;, and V-Tools&rsquo; plans come with connected Vinted accounts. V-Tools&rsquo; own FAQ on bans: &ldquo;No tool can guarantee zero risk.&rdquo;'),
+             'Autobuy needs your account: Souk&rsquo;s docs say &ldquo;To use Autobuy, first link your Vinted account&rdquo;, and V-Tools&rsquo; plans come with connected Vinted accounts. V-Tools&rsquo; own FAQ on bans: &ldquo;No tool can guarantee zero risk.&rdquo;'),
             ('Alerts land on your phone',
              'Push notifications go straight to your phone or computer. No Telegram, no Discord server, no extra account. Several finds close together arrive as one notification, not a buzz each.',
              'Telvin alerts only inside Telegram; Resell Reserve alerts in Discord. On iPhone, add SNYPD to your Home Screen once: Apple only allows web push for Home Screen apps.'),
@@ -834,7 +834,7 @@ def reasons(lang):
              'Souk builds alerts from its own form (brand, category, size, keywords, price). SNYPD works on %s: 26 sites, each in its own currency.' % MARKETS_TEXT['en']),
             ('14 days to change your mind',
              'Not happy with a paid plan? Email within 14 days of your first payment and you get it back in full. Prices include VAT, plans run month to month, cancel any time.',
-             'Souk&rsquo;s site states one week. Resell Reserve&rsquo;s refund policy covers a change of mind only before you start using the service.'),
+             'Souk&rsquo;s site states one week. Resell Reserve&rsquo;s refund policy says payments are &ldquo;generally non-refundable&rdquo;, with a conditional first-month guarantee on its Core plan.'),
             ('Your finds, tracked to the profit',
              'Claim an item you bought and SNYPD keeps it in History: Holding, then Sold, with your realised profit added up for you. No spreadsheet next to your bot.',
              'Part of the SNYPD dashboard. Matches also carry a NEW badge and a DROP badge when the price fell since SNYPD first saw it.'),
@@ -852,7 +852,7 @@ def reasons(lang):
              'Des six autres outils ici, seul Resell Reserve propose des estimations de prix, et seulement sur son plan Ultimate à 44,99&nbsp;&pound;. Un exemple : <a href="%s">Prix Vinted, septembre 2026</a>.' % SLUGS['prices']['fr']),
             ('Ton compte Vinted reste à toi',
              'SNYPD a besoin d’une adresse e-mail, rien d’autre : pas de mot de passe Vinted, pas de connexion, pas d’extension. Il n’achète jamais et n’écrit jamais aux vendeurs. Tu achètes avec le paiement normal de Vinted.',
-             'L’achat automatique passe par ton compte : la doc de Souk dit qu’il fonctionne « after you link your Vinted account », et les plans de V-Tools incluent des comptes Vinted connectés. La FAQ de V-Tools sur les bannissements : « No tool can guarantee zero risk ».'),
+             'L’achat automatique passe par ton compte : la doc de Souk dit « To use Autobuy, first link your Vinted account », et les plans de V-Tools incluent des comptes Vinted connectés. La FAQ de V-Tools sur les bannissements : « No tool can guarantee zero risk ».'),
             ('Les alertes arrivent sur ton téléphone',
              'Les notifications push arrivent directement sur ton téléphone ou ton ordinateur. Pas de Telegram, pas de serveur Discord, pas de compte en plus. Plusieurs trouvailles rapprochées arrivent en une seule notification.',
              'Telvin alerte uniquement dans Telegram ; Resell Reserve dans Discord. Sur iPhone, ajoute SNYPD à ton écran d’accueil une fois : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
@@ -861,7 +861,7 @@ def reasons(lang):
              'Souk crée les alertes depuis son propre formulaire (marque, catégorie, taille, mots-clés, prix). SNYPD fonctionne sur %s : 26 sites, chacun dans sa devise.' % MARKETS_TEXT['fr']),
             ('14 jours pour changer d’avis',
              'Pas convaincu par un plan payant ? Écris dans les 14 jours suivant ton premier paiement et tu es remboursé en totalité. Prix TVA incluse, plans au mois, résiliables à tout moment.',
-             'Le site de Souk indique une semaine. La politique de Resell Reserve ne rembourse un changement d’avis qu’avant de commencer à utiliser le service.'),
+             'Le site de Souk indique une semaine. La politique de Resell Reserve indique que les paiements sont « generally non-refundable », avec une garantie conditionnelle le premier mois sur son plan Core.'),
             ('Tes trouvailles, suivies jusqu’au bénéfice',
              'Marque un article acheté et SNYPD le garde dans History : Holding, puis Sold, avec ton bénéfice réalisé calculé pour toi. Plus besoin d’un tableur à côté de ton bot.',
              'Inclus dans le tableau de bord SNYPD. Les annonces portent aussi un badge NEW et un badge DROP quand le prix a baissé depuis que SNYPD l’a vue.'),
@@ -935,7 +935,7 @@ def page_compare(lang):
 </section>
 <section id="speed">
   <h2>What about speed?</h2>
-  <p>Telvin advertises alerts in 750 ms, Resell Reserve detection in under 0.15 s, V-Tools detection &ldquo;in a few milliseconds&rdquo;, and Crazed &ldquo;real time&rdquo; on a plan it lists as coming soon. Those are each vendor&rsquo;s own figures, measured in their own way, so they can&rsquo;t be compared with each other, or with SNYPD.</p>
+  <p>Telvin advertises alerts in 750 ms on its paid plans, Resell Reserve detection in under 0.15 s, V-Tools detection &ldquo;in a few milliseconds&rdquo;, and Crazed &ldquo;temps r&eacute;el&rdquo; (real time). Those are each vendor&rsquo;s own figures, measured in their own way, so they can&rsquo;t be compared with each other, or with SNYPD.</p>
   <p>SNYPD checks each search every 30 seconds to 5 minutes, faster on searches that keep finding things, and the same on every plan. What it adds is reach: paid searches keep running 24/7 with your laptop closed, and the alert finds you on your phone wherever you are.</p>
 </section>
 <section id="fit">
@@ -985,7 +985,7 @@ def page_compare(lang):
 </section>
 <section id="vitesse">
   <h2>Et la vitesse ?</h2>
-  <p>Telvin annonce des alertes en 750 ms, Resell Reserve une détection en moins de 0,15 s, V-Tools une détection « in a few milliseconds », et Crazed du « temps réel » sur un plan annoncé comme bientôt disponible. Ce sont les chiffres de chaque éditeur, mesurés à sa façon, donc impossibles à comparer entre eux ou avec SNYPD.</p>
+  <p>Telvin annonce des alertes en 750 ms sur ses plans payants, Resell Reserve une détection en moins de 0,15 s, V-Tools une détection « in a few milliseconds », et Crazed du « temps réel ». Ce sont les chiffres de chaque éditeur, mesurés à sa façon, donc impossibles à comparer entre eux ou avec SNYPD.</p>
   <p>SNYPD vérifie chaque recherche toutes les 30 secondes à 5 minutes, plus souvent sur les recherches qui trouvent beaucoup, et pareil pour tous les plans. Ce qu’il apporte, c’est la portée : les recherches payantes tournent 24h/24 ordinateur fermé, et l’alerte te trouve sur ton téléphone où que tu sois.</p>
 </section>
 <section id="pour-qui">
@@ -1649,7 +1649,7 @@ def page_fees(lang):
   <ul>
     <li><strong>vinted.fr, vinted.de, vinted.nl, vinted.it, vinted.es:</strong> 5% + &euro;0.70, per each site&rsquo;s price list (<a href="{S['fr_list']}" rel="noopener">vinted.fr</a>). <strong>vinted.be:</strong> the same, checked on {n} real listings.</li>
     <li><strong>vinted.com (US):</strong> $0.70 plus 5% of the agreed item price, not including shipping (<a href="{S['us_list']}" rel="noopener">price list</a>). Not checked against our own data.</li>
-    <li><strong>vinted.co.uk:</strong> a range, &ldquo;3% to 8% + &pound;0.3 to &pound;0.8&rdquo; plus VAT, depending on the item, the order value and the order type (<a href="{S['uk_list']}" rel="noopener">price list</a>). No exact calculator is possible; the UK checkout shows the fee.</li>
+    <li><strong>vinted.co.uk:</strong> a range, &ldquo;3% to 8% + &pound;0.3 to &pound;0.8&rdquo;, VAT included, depending on the item, the order value and the order type (<a href="{S['uk_list']}" rel="noopener">price list</a>). No exact calculator is possible; the UK checkout shows the fee.</li>
   </ul>
   <p>Other Vinted sites publish their own price lists; check yours before relying on these numbers.</p>
 </section>
@@ -1719,7 +1719,7 @@ def page_fees(lang):
   <ul>
     <li><strong>vinted.fr, vinted.de, vinted.nl, vinted.it, vinted.es :</strong> 5&nbsp;% + 0,70&nbsp;&euro;, selon la grille tarifaire de chaque site (<a href="{S['fr_list']}" rel="noopener">vinted.fr</a>). <strong>vinted.be :</strong> pareil, vérifié sur {n} annonces réelles.</li>
     <li><strong>vinted.com (États-Unis) :</strong> 0,70&nbsp;$ plus 5&nbsp;% du prix convenu, hors livraison (<a href="{S['us_list']}" rel="noopener">grille tarifaire</a>). Non vérifié sur nos données.</li>
-    <li><strong>vinted.co.uk :</strong> une fourchette, de 3 à 8&nbsp;% + 0,30 à 0,80&nbsp;&pound;, plus TVA, selon l’article, le montant et le type de commande (<a href="{S['uk_list']}" rel="noopener">grille tarifaire</a>). Pas de calcul exact possible ; le paiement affiche les frais.</li>
+    <li><strong>vinted.co.uk :</strong> une fourchette, de 3 à 8&nbsp;% + 0,30 à 0,80&nbsp;&pound;, TVA incluse, selon l’article, le montant et le type de commande (<a href="{S['uk_list']}" rel="noopener">grille tarifaire</a>). Pas de calcul exact possible ; le paiement affiche les frais.</li>
   </ul>
   <p>Les autres sites Vinted publient leur propre grille tarifaire ; vérifie la tienne avant de te fier à ces chiffres.</p>
 </section>
