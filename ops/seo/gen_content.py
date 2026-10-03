@@ -44,6 +44,7 @@ SLUGS = {
     'prices':  {'en': '/vinted-prices',              'fr': '/fr/prix-vinted'},
     'deals':   {'en': '/vinted-deals'},  # English only for now (decided 2026-10-02)
     'fees':    {'en': '/vinted-fees',                'fr': '/fr/frais-vinted'},
+    'monitor': {'en': '/vinted-monitor',             'fr': '/fr/monitor-vinted'},
 }
 
 CSS = r"""
@@ -134,7 +135,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('prices', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
-               foot=[('bot', 'Vinted bot'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('prices', 'Vinted prices'),
+               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('prices', 'Vinted prices'),
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
@@ -142,13 +143,14 @@ UI = {
                nav=[('bot', 'BOT VINTED'), ('prices', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('prices', 'Prix Vinted'), ('fees', 'Frais Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('prices', 'Prix Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
 }
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-02', 'notify': '2026-10-02', 'compare': '2026-10-02', 'prices': '2026-10-02', 'deals': '2026-10-02', 'fees': '2026-10-02'}
+PAGE_MODIFIED = {'bot': '2026-10-03', 'notify': '2026-10-02', 'compare': '2026-10-03', 'prices': '2026-10-02', 'deals': '2026-10-02', 'fees': '2026-10-02',
+                 'monitor': '2026-10-03'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
 
@@ -354,7 +356,12 @@ def page_bot(lang):
   <p>They buy or check out for you. Buying on Vinted needs a logged-in account, so these tools act through yours; V-Tools, for example, states that you connect your own Vinted accounts. Souk, V-Tools and Resell Reserve sell autobuy features.</p>
   <h3>DO-IT-YOURSELF SCRIPTS</h3>
   <p>Open-source projects on GitHub that you host yourself, usually posting to Discord or Telegram. Free, but you run the server and fix it when Vinted changes something.</p>
-  <p>Prices, channels and free plans of each tool are side by side in <a href="{SLUGS['compare']['en']}">Vinted bots compared</a>.</p>
+  <p>Prices, channels and free plans of each tool are side by side in <a href="{SLUGS['compare']['en']}">Vinted bots compared</a>. How a monitor works, step by step: <a href="{SLUGS['monitor']['en']}">what is a Vinted monitor?</a></p>
+</section>
+<section id="automation">
+  <h2>Vinted automation: the buyer side, not the seller side</h2>
+  <p>&ldquo;Vinted automation&rdquo; usually means seller tools: they relist or bump your items, send offers to people who favourited them, or write your descriptions. They work on your own shop, so they act on your Vinted account.</p>
+  <p>SNYPD automates the buyer side only: it watches searches and tells you what is new. It does not touch your shop, your listings or your messages, and it never signs in. If you want your own listings bumped or relisted, SNYPD is not that tool.</p>
 </section>
 <section id="how">
   <h2>How SNYPD works</h2>
@@ -394,7 +401,7 @@ def page_bot(lang):
                     'SNYPD is a Vinted bot and monitor that watches your searches and sends a push alert when a matching listing appears. It never logs in, buys or messages for you.',
                     'VINTED BOT &amp; MONITOR', 'A Vinted bot and monitor that alerts you and never touches your account.',
                     'Most Vinted bots are sold on buying for you, which means acting as you. SNYPD does the other part of the job: it keeps watching your Vinted searches and tells you when something new matches, so you decide and buy on Vinted yourself.',
-                    [('answer', 'In one paragraph'), ('kinds', 'Three kinds of bot'), ('how', 'How it works'), ('speed', 'How fast'), ('pricing', 'What it costs'), ('account', 'Your Vinted account'), ('faq', 'Questions')],
+                    [('answer', 'In one paragraph'), ('kinds', 'Three kinds of bot'), ('automation', 'Automation'), ('how', 'How it works'), ('speed', 'How fast'), ('pricing', 'What it costs'), ('account', 'Your Vinted account'), ('faq', 'Questions')],
                     body, [faq_ld(faq)])
     faq = [
         ('Est-ce que SNYPD achète à ma place ?', 'Non. SNYPD trouve les nouvelles annonces et t’alerte. Tu ouvres l’annonce sur Vinted et tu achètes ou fais une offre toi-même, avec le paiement normal de Vinted.'),
@@ -418,7 +425,12 @@ def page_bot(lang):
   <p>Ils achètent ou passent commande à ta place. Acheter sur Vinted demande un compte connecté, donc ces outils agissent via le tien ; V-Tools, par exemple, indique que tu connectes tes propres comptes Vinted. Souk, V-Tools et Resell Reserve vendent de l’achat automatique.</p>
   <h3>SCRIPTS À HÉBERGER SOI-MÊME</h3>
   <p>Des projets open source sur GitHub que tu héberges toi-même, qui postent en général sur Discord ou Telegram. Gratuits, mais c’est toi qui gères le serveur et qui répares quand Vinted change quelque chose.</p>
-  <p>Les prix, canaux d’alerte et plans gratuits de chaque outil sont côte à côte dans le <a href="{SLUGS['compare']['fr']}">comparatif des bots Vinted</a>.</p>
+  <p>Les prix, canaux d’alerte et plans gratuits de chaque outil sont côte à côte dans le <a href="{SLUGS['compare']['fr']}">comparatif des bots Vinted</a>. Le fonctionnement d’un monitor, étape par étape : <a href="{SLUGS['monitor']['fr']}">qu’est-ce qu’un monitor Vinted ?</a></p>
+</section>
+<section id="automatisation">
+  <h2>Automatisation Vinted : côté acheteur, pas côté vendeur</h2>
+  <p>« Automatisation Vinted » désigne le plus souvent des outils pour vendeurs : ils republient ou remontent tes articles, envoient des offres aux personnes qui les ont mis en favoris, ou rédigent tes descriptions. Ils travaillent sur ta propre boutique, donc ils agissent sur ton compte Vinted.</p>
+  <p>SNYPD automatise uniquement le côté acheteur : il surveille des recherches et te dit ce qui est nouveau. Il ne touche ni à ta boutique, ni à tes annonces, ni à tes messages, et ne se connecte jamais. Si tu veux remonter ou republier tes propres annonces, SNYPD n’est pas cet outil.</p>
 </section>
 <section id="fonctionnement">
   <h2>Comment marche SNYPD</h2>
@@ -458,7 +470,7 @@ def page_bot(lang):
                 'SNYPD est un bot Vinted qui surveille tes recherches et t’envoie une alerte push quand une annonce correspond. Sans accès à ton compte, sans achat auto.',
                 'BOT VINTED', 'Un bot Vinted qui t’alerte, sans jamais toucher à ton compte.',
                 'La plupart des bots Vinted se vendent sur l’achat automatique, donc sur le fait d’agir à ta place. SNYPD fait l’autre partie du travail : il surveille tes recherches Vinted et te prévient quand un nouvel article correspond. Tu décides et tu achètes toi-même sur Vinted.',
-                [('resume', 'En un paragraphe'), ('types', 'Trois types de bot'), ('fonctionnement', 'Fonctionnement'), ('vitesse', 'Vitesse'), ('prix', 'Prix'), ('compte', 'Ton compte Vinted'), ('questions', 'Questions')],
+                [('resume', 'En un paragraphe'), ('types', 'Trois types de bot'), ('automatisation', 'Automatisation'), ('fonctionnement', 'Fonctionnement'), ('vitesse', 'Vitesse'), ('prix', 'Prix'), ('compte', 'Ton compte Vinted'), ('questions', 'Questions')],
                 body, [faq_ld(faq)])
 
 
@@ -865,8 +877,37 @@ def reasons(lang):
     return '<div class="rs-grid">%s</div>' % cards
 
 
+COMPARE_FAQ = {
+    'en': [
+        ('What is a Vinted monitor?',
+         'A tool that keeps checking a Vinted search for you and alerts you when a new listing matches it. A monitor does not buy: you open the listing and decide. All the tools on this page monitor searches; Souk, V-Tools and Resell Reserve also sell autobuy. More in <a href="%s">what is a Vinted monitor?</a>' % SLUGS['monitor']['en']),
+        ('Are Vinted bots worth it?',
+         'For resellers who buy in a narrow niche, often. Vinted&rsquo;s own saved searches show a &ldquo;+N&rdquo; counter the next time you open the app, but they do not notify you about each new match, so a well-priced listing can be gone before you look. If you only buy now and then for yourself, saved searches may be enough. Try a free plan before paying: SNYPD, Telvin, Crazed and MarktAlert all list one.'),
+        ('Can a Vinted bot get my account banned?',
+         'Vinted&rsquo;s terms prohibit bots and scraping programs, so no tool can promise there is no risk. V-Tools&rsquo; own FAQ says: &ldquo;No tool can guarantee zero risk.&rdquo; What differs is what happens on your account: autobuy tools act through your logged-in Vinted account, while SNYPD never signs in as you, so nothing it does happens on your account.'),
+        ('Is there a free Vinted bot?',
+         'Yes, with limits. According to each tool&rsquo;s own site, checked on %s: SNYPD Free runs 1 search with no time limit while your dashboard is open; Telvin&rsquo;s free plan covers 1 keyword alert and 100 notifications; Crazed is free with 3 alerts and 30 items a day; MarktAlert has a free plan that checks every 15 minutes. Open-source scripts on GitHub are free if you host them yourself.' % COMPARE_CHECKED['en']),
+        ('Which Vinted bot is the fastest?',
+         'There is no fair way to say. Each vendor measures its own speed in its own way (see <a href="#speed">what about speed?</a>). SNYPD checks each search every 30 seconds to 5 minutes on every plan, and keeps paid searches running 24/7.'),
+    ],
+    'fr': [
+        ('Qu’est-ce qu’un monitor Vinted\xa0?',
+         'Un outil qui vérifie une recherche Vinted à ta place et t’alerte quand une nouvelle annonce correspond. Un monitor n’achète pas\xa0: tu ouvres l’annonce et tu décides. Tous les outils de cette page surveillent des recherches\xa0; Souk, V-Tools et Resell Reserve vendent aussi de l’achat automatique. Plus de détails\xa0: <a href="%s">qu’est-ce qu’un monitor Vinted\xa0?</a>' % SLUGS['monitor']['fr']),
+        ('Un bot Vinted, ça vaut le coup\xa0?',
+         'Pour un revendeur qui achète dans une niche précise, souvent oui. Les recherches sauvegardées de Vinted affichent un compteur «\xa0+N\xa0» à ta prochaine visite dans l’app, mais ne te notifient pas pour chaque nouvelle annonce\xa0: une annonce bien placée peut partir avant que tu regardes. Si tu achètes de temps en temps pour toi, les recherches sauvegardées peuvent suffire. Essaie un plan gratuit avant de payer\xa0: SNYPD, Telvin, Crazed et MarktAlert en proposent un.'),
+        ('Un bot Vinted peut-il faire bannir mon compte\xa0?',
+         'Les conditions de Vinted interdisent les bots et les programmes de scraping, donc aucun outil ne peut promettre zéro risque. La FAQ de V-Tools le dit elle-même\xa0: «\xa0No tool can guarantee zero risk\xa0». Ce qui change, c’est ce qui se passe sur ton compte\xa0: les outils d’achat automatique agissent via ton compte Vinted connecté, alors que SNYPD ne se connecte jamais à ta place, donc rien de ce qu’il fait ne se passe sur ton compte.'),
+        ('Existe-t-il un bot Vinted gratuit\xa0?',
+         'Oui, avec des limites. D’après le site de chaque outil, vérifié le %s\xa0: SNYPD Free fait tourner 1 recherche sans limite de durée tant que ton tableau de bord est ouvert\xa0; le plan gratuit de Telvin couvre 1 alerte mot-clé et 100 notifications\xa0; Crazed est gratuit avec 3 alertes et 30 articles par jour\xa0; MarktAlert a un plan gratuit qui vérifie toutes les 15 minutes. Les scripts open source sur GitHub sont gratuits si tu les héberges toi-même.' % COMPARE_CHECKED['fr']),
+        ('Quel est le bot Vinted le plus rapide\xa0?',
+         'Impossible de le dire honnêtement. Chaque éditeur mesure sa vitesse à sa façon (voir <a href="#vitesse">et la vitesse\xa0?</a>). SNYPD vérifie chaque recherche toutes les 30 secondes à 5 minutes sur tous les plans, et les recherches payantes tournent 24h/24.'),
+    ],
+}
+
+
 def page_compare(lang):
     tbl = compare_table(lang)
+    faq = COMPARE_FAQ[lang]
     if lang == 'en':
         body = f"""
 <section id="disclosure">
@@ -905,15 +946,19 @@ def page_compare(lang):
     <li><strong>Also buying on Marktplaats or 2dehands?</strong>MarktAlert covers those. SNYPD is Vinted only.</li>
   </ul>
 </section>
+<section id="faq">
+  <h2>Questions about Vinted bots</h2>
+  {faq_html(faq)}
+</section>
 <section id="start">
   <h2>Try it on one search</h2>
   {cta('en')}
 </section>"""
         return page('compare', 'en', 'Best Vinted Bot & Monitor 2026: 7 Tools Compared | SNYPD',
                     'SNYPD vs Souk, Telvin, V-Tools, Crazed, Resell Reserve and MarktAlert: price data, account safety, phone alerts and refunds, each fact from the tool’s own site.',
-                    'VINTED BOTS &amp; MONITORS COMPARED &middot; CHECKED ' + COMPARE_CHECKED_SHORT['en'], 'Why resellers pick SNYPD over other Vinted bots',
+                    'VINTED BOTS &amp; MONITORS COMPARED &middot; CHECKED ' + COMPARE_CHECKED_SHORT['en'], 'Best Vinted bots and monitors in 2026: SNYPD and six others compared',
                     'SNYPD alerts you to new Vinted listings, shows the typical Vinted asking price of what you&rsquo;re looking at, and never touches your Vinted account. Here is how that compares with six other Vinted bots, point by point, with the source for every fact.',
-                    None, body, head_extra='<ul class="glance" aria-label="SNYPD at a glance"><li><span>&#10003;</span>Price data included</li><li><span>&#10003;</span>No Vinted login, ever</li><li><span>&#10003;</span>Alerts on your phone</li><li><span>&#10003;</span>14-day refund</li></ul>')
+                    None, body, [faq_ld(faq)], head_extra='<ul class="glance" aria-label="SNYPD at a glance"><li><span>&#10003;</span>Price data included</li><li><span>&#10003;</span>No Vinted login, ever</li><li><span>&#10003;</span>Alerts on your phone</li><li><span>&#10003;</span>14-day refund</li></ul>')
     body = f"""
 <section id="transparence">
   <div class="lg-box lg-mint"><p><strong>SNYPD est notre outil, donc cette page n’est pas neutre.</strong> Chaque information sur un autre outil vient du site de cet outil, vérifié le {COMPARE_CHECKED['fr']}, avec un lien dans le tableau. Les prix changent : vérifie avant de payer. Une info n’est plus à jour ? Écris à <a href="mailto:{EMAIL}">{EMAIL}</a> et elle sera corrigée.</p></div>
@@ -951,15 +996,211 @@ def page_compare(lang):
     <li><strong>Tu achètes aussi sur Marktplaats ou 2dehands ?</strong>MarktAlert couvre ces sites. SNYPD ne couvre que Vinted.</li>
   </ul>
 </section>
+<section id="questions">
+  <h2>Questions sur les bots Vinted</h2>
+  {faq_html(faq)}
+</section>
 <section id="essayer">
   <h2>Essaie sur une recherche</h2>
   {cta('fr')}
 </section>"""
     return page('compare', 'fr', 'Meilleur bot Vinted 2026 ? 7 bots comparés | SNYPD',
                 'SNYPD face à Souk, Telvin, V-Tools, Crazed, Resell Reserve et MarktAlert : prix, compte, alertes, remboursement, d’après le site de chaque outil.',
-                'COMPARATIF DES BOTS VINTED &middot; VÉRIFIÉ LE ' + COMPARE_CHECKED_SHORT['fr'], 'Pourquoi les revendeurs choisissent SNYPD plutôt qu’un autre bot Vinted',
+                'COMPARATIF DES BOTS VINTED &middot; VÉRIFIÉ LE ' + COMPARE_CHECKED_SHORT['fr'], 'Meilleur bot Vinted en 2026 : SNYPD et six autres bots comparés',
                 'SNYPD t’alerte des nouvelles annonces Vinted, te montre le prix demandé typique d’un article sur Vinted, et ne touche jamais à ton compte Vinted. Voici la comparaison avec six autres bots Vinted, point par point, avec la source de chaque information.',
-                None, body, head_extra='<ul class="glance" aria-label="SNYPD en bref"><li><span>&#10003;</span>Données de prix incluses</li><li><span>&#10003;</span>Jamais de connexion Vinted</li><li><span>&#10003;</span>Alertes sur ton téléphone</li><li><span>&#10003;</span>Remboursement sous 14 jours</li></ul>')
+                None, body, [faq_ld(faq)], head_extra='<ul class="glance" aria-label="SNYPD en bref"><li><span>&#10003;</span>Données de prix incluses</li><li><span>&#10003;</span>Jamais de connexion Vinted</li><li><span>&#10003;</span>Alertes sur ton téléphone</li><li><span>&#10003;</span>Remboursement sous 14 jours</li></ul>')
+
+
+# ------------------------------------------------------------------ page: what is a vinted monitor
+# Added 2026-10-03: "vinted monitor" ranks the same sites as "vinted bot" on Google UK, and
+# Google's People-also-ask shows "What is a Vinted monitor?" and "Are Vinted bots worth it?".
+# Competitor facts below come from COMPETITORS (each vendor's own site, COMPARE_CHECKED).
+MONITOR_TYPES_HEAD = {'en': ['TYPE', 'WHAT IT DOES', 'ACTS ON YOUR VINTED ACCOUNT', 'WHO DECIDES EACH PURCHASE'],
+                      'fr': ['TYPE', 'CE QU’IL FAIT', 'AGIT SUR TON COMPTE VINTED', 'QUI DÉCIDE DE CHAQUE ACHAT']}
+MONITOR_TYPES = {
+    'en': [['Monitor (alert bot)', 'Finds new listings in your searches and alerts you', 'No need to: it only reads search results', 'You'],
+           ['Autobuy or autocop bot', 'Buys or checks out for you', 'Yes: buying needs a logged-in account', 'The bot, following your rules'],
+           ['Seller automation', 'Relists, bumps or sends offers from your shop', 'Yes: it works on your own shop', 'Not a buying tool'],
+           ['Script you host (GitHub)', 'A monitor you run on your own server', 'Depends on the script', 'You']],
+    'fr': [['Monitor (bot d’alertes)', 'Trouve les nouvelles annonces de tes recherches et t’alerte', 'Pas besoin : il lit seulement les résultats de recherche', 'Toi'],
+           ['Bot d’achat automatique (autobuy)', 'Achète ou passe commande à ta place', 'Oui : acheter demande un compte connecté', 'Le bot, selon tes règles'],
+           ['Automatisation vendeur', 'Republie, remonte ou envoie des offres depuis ta boutique', 'Oui : il travaille sur ta propre boutique', 'Pas un outil d’achat'],
+           ['Script à héberger (GitHub)', 'Un monitor que tu fais tourner sur ton propre serveur', 'Dépend du script', 'Toi']],
+}
+
+
+def page_monitor(lang):
+    if lang == 'en':
+        faq = [
+            ('What is the difference between a Vinted monitor and a Vinted bot?',
+             '&ldquo;Vinted bot&rdquo; is the wider word: it covers monitors, autobuy bots and seller tools. A monitor is the kind that only watches searches and alerts you. Resellers often use the two words for the same thing, which is why most monitors also call themselves bots.'),
+            ('Is there a free Vinted monitor?',
+             'Yes, with limits. SNYPD Free runs one search with no time limit while your dashboard is open. Other tools list free plans too; their limits are side by side in <a href="%s">Vinted bots compared</a>.' % SLUGS['compare']['en']),
+            ('How fast is a Vinted monitor?',
+             'It depends on how often the tool checks. SNYPD checks each search every 30 seconds to 5 minutes, faster on searches that keep finding new items, on every plan. Some vendors advertise milliseconds; those are their own figures, measured their own way.'),
+            ('Do I need Discord or Telegram?',
+             'Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, so there is nothing else to install. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps.'),
+            ('Which Vinted countries can a monitor watch?',
+             'That depends on the tool. SNYPD works on %s, 26 sites in all, each in its own currency: paste a search link from the site you shop on.' % MARKETS_TEXT['en']),
+        ]
+        body = f"""
+<section id="answer">
+  <h2>The short answer</h2>
+  <div class="lg-box lg-mint"><p>A Vinted monitor is a tool that checks your Vinted searches over and over and alerts you when a listing appears that was not there before. Resellers also call it a Vinted alert bot. A monitor only finds and tells: you open the listing on Vinted and decide whether to buy. Tools that also buy for you are autobuy bots, and they need your logged-in Vinted account.</p></div>
+</section>
+<section id="why">
+  <h2>Why resellers use one</h2>
+  <p>Vinted&rsquo;s own saved searches show a &ldquo;+N&rdquo; counter the next time you open the app (<a href="{HELP435['en']}" rel="nofollow noopener">Vinted help</a>). They do not send a notification for each new match, so you only find out when you look.</p>
+  <p>Everyone watching the same search can see a new listing the moment it appears, and the first person to notice it gets the first chance to buy. Well-priced listings are exactly the ones that go first. How often listings come up well under the typical price is measured in <a href="{SLUGS['deals']['en']}">Vinted deals</a>.</p>
+</section>
+<section id="how">
+  <h2>How a Vinted monitor works</h2>
+  <ol>
+    <li>You give it a search: usually a Vinted search link with your filters, or keywords in the tool&rsquo;s own form.</li>
+    <li>It loads the newest results of that search: the same public results anyone can open on Vinted.</li>
+    <li>It compares them with what it saw last time. A listing it has not seen before is new.</li>
+    <li>It sends you the new listing: a push notification, a Telegram or Discord message, or a line in an app, depending on the tool.</li>
+    <li>It repeats. How often depends on the tool; SNYPD checks every 30 seconds to 5 minutes, faster on searches that keep finding things.</li>
+  </ol>
+  {figure('feed', 'en')}
+</section>
+<section id="types">
+  <h2>Monitor, autobuy bot or seller automation?</h2>
+  <p>All three get called &ldquo;Vinted bots&rdquo;. What separates them is what they do with your Vinted account.</p>
+  {table(MONITOR_TYPES_HEAD['en'], MONITOR_TYPES['en'])}
+  <p>Searches for &ldquo;Vinted automation&rdquo; mostly lead to seller tools. A monitor automates the buyer side only. More on the differences in <a href="{SLUGS['bot']['en']}">Vinted bot</a>.</p>
+</section>
+<section id="alerts">
+  <h2>Where the alerts arrive</h2>
+  <p>Monitors differ most in how they reach you. From each tool&rsquo;s own site, checked on {COMPARE_CHECKED['en']}:</p>
+  <ul>
+    <li><strong>Push notifications</strong> to your phone or computer: SNYPD. Nothing else to install.</li>
+    <li><strong>Telegram</strong>: Telvin Bot sends alerts only there; MarktAlert offers Telegram among other channels.</li>
+    <li><strong>Discord</strong>: Resell Reserve posts alerts in Discord channels.</li>
+    <li><strong>An app feed</strong>: V-Tools shows finds in its own app.</li>
+  </ul>
+  <p>Whichever you pick, check that the alert reaches you with your laptop closed. A monitor that only runs while a browser tab is open misses most of the night.</p>
+</section>
+<section id="checklist">
+  <h2>What to check before you pick one</h2>
+  <ul class="fit-list">
+    <li><strong>Does it ask for your Vinted login?</strong>A monitor only reads search results, so it has no reason to. Tools that buy for you do need it.</li>
+    <li><strong>Does it keep every filter?</strong>Pasting a Vinted search link keeps all of them: brand, size, price, condition, colour, material. A tool&rsquo;s own form may offer fewer.</li>
+    <li><strong>Does it keep watching when you are not there?</strong>On SNYPD&rsquo;s free plan, a search runs while your dashboard is open; paid plans keep it running 24/7.</li>
+    <li><strong>Does it cover your Vinted country?</strong>Each Vinted site has its own listings and currency.</li>
+    <li><strong>Can you test it before paying?</strong>Look for a free plan or a refund you can actually use after trying it.</li>
+  </ul>
+  <p>How seven tools answer these questions: <a href="{SLUGS['compare']['en']}">Vinted bots and monitors compared</a>.</p>
+</section>
+<section id="rules">
+  <h2>Is a Vinted monitor allowed?</h2>
+  <p>Vinted&rsquo;s terms prohibit bots and scraping programs, and no monitor can promise how Vinted applies them. What you can control is what happens on your own account. A monitor that never signs in, like SNYPD, does nothing on your Vinted account: you find the listing through the alert and buy it through Vinted&rsquo;s normal checkout. Tools that buy for you act through your logged-in account.</p>
+</section>
+<section id="snypd">
+  <h2>SNYPD as a Vinted monitor</h2>
+  <p>Paste a Vinted search link, switch it on, and SNYPD checks it every 30 seconds to 5 minutes. New matches land in your dashboard with their price, the price including Buyer Protection and their condition, and as a push notification on your phone. It never asks for your Vinted password, never buys and never messages sellers. Pro and Elite add the Market Report: the typical Vinted asking price of an item by condition.</p>
+  {table(PLANS_HEAD['en'], PLANS_ROWS['en'])}
+</section>
+<section id="faq">
+  <h2>Questions</h2>
+  {faq_html(faq)}
+</section>
+<section id="start">
+  <h2>Try a monitor on one search</h2>
+  {cta('en')}
+</section>"""
+        return page('monitor', 'en', 'What Is a Vinted Monitor? How It Works (2026 Guide) | SNYPD',
+                    'A Vinted monitor checks your Vinted searches and alerts you when a new listing matches. How monitors work, how they differ from autobuy bots, and what to check.',
+                    'VINTED MONITOR &middot; GUIDE', 'What is a Vinted monitor?',
+                    'A Vinted monitor watches your Vinted searches and tells you when something new matches. Here is how monitors work, how they differ from autobuy bots and seller tools, what to check before you pick one, and where SNYPD fits.',
+                    [('answer', 'Short answer'), ('why', 'Why use one'), ('how', 'How it works'), ('types', 'Monitor or autobuy'), ('alerts', 'Where alerts arrive'),
+                     ('checklist', 'What to check'), ('rules', 'Is it allowed?'), ('snypd', 'SNYPD'), ('faq', 'Questions')],
+                    body, [faq_ld(faq)])
+    faq = [
+        ('Quelle différence entre un monitor Vinted et un bot Vinted ?',
+         '« Bot Vinted » est le mot le plus large : il couvre les monitors, les bots d’achat automatique et les outils pour vendeurs. Un monitor est le type qui surveille seulement des recherches et t’alerte. Les revendeurs emploient souvent les deux mots pour la même chose, c’est pourquoi la plupart des monitors se présentent aussi comme des bots.'),
+        ('Existe-t-il un monitor Vinted gratuit ?',
+         'Oui, avec des limites. SNYPD Free fait tourner une recherche sans limite de durée tant que ton tableau de bord est ouvert. D’autres outils proposent aussi un plan gratuit ; leurs limites sont côte à côte dans le <a href="%s">comparatif des bots Vinted</a>.' % SLUGS['compare']['fr']),
+        ('Un monitor Vinted, c’est rapide ?',
+         'Ça dépend de la fréquence de vérification de l’outil. SNYPD vérifie chaque recherche toutes les 30 secondes à 5 minutes, plus souvent sur les recherches qui trouvent beaucoup, sur tous les plans. Certains éditeurs annoncent des millisecondes ; ce sont leurs propres chiffres, mesurés à leur façon.'),
+        ('Faut-il Discord ou Telegram ?',
+         'Seulement si le monitor choisi envoie ses alertes là-bas. SNYPD envoie des notifications push sur ton téléphone ou ton ordinateur, sans rien d’autre à installer. Sur iPhone, ajoute d’abord SNYPD à ton écran d’accueil : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
+        ('Quels pays Vinted un monitor peut-il surveiller ?',
+         'Ça dépend de l’outil. SNYPD fonctionne sur %s, 26 sites au total, chacun dans sa devise : colle un lien de recherche du site où tu achètes.' % MARKETS_TEXT['fr']),
+    ]
+    body = f"""
+<section id="reponse">
+  <h2>La réponse courte</h2>
+  <div class="lg-box lg-mint"><p>Un monitor Vinted est un outil qui vérifie tes recherches Vinted encore et encore et t’alerte quand une annonce apparaît qui n’était pas là avant. On parle aussi de bot d’alertes Vinted. Un monitor se contente de trouver et de prévenir : tu ouvres l’annonce sur Vinted et tu décides d’acheter ou non. Les outils qui achètent aussi à ta place sont des bots d’achat automatique, et ils ont besoin de ton compte Vinted connecté.</p></div>
+</section>
+<section id="pourquoi">
+  <h2>Pourquoi les revendeurs en utilisent un</h2>
+  <p>Les recherches sauvegardées de Vinted affichent un compteur « +N » à ta prochaine visite dans l’app (<a href="{HELP435['fr']}" rel="nofollow noopener">aide Vinted</a>). Elles n’envoient pas de notification pour chaque nouvelle annonce : tu ne le découvres qu’en allant voir.</p>
+  <p>Tous ceux qui surveillent la même recherche voient une nouvelle annonce au même moment, et le premier qui la remarque a la première chance de l’acheter. Les annonces bien placées sont justement celles qui partent en premier.</p>
+</section>
+<section id="fonctionnement">
+  <h2>Comment marche un monitor Vinted</h2>
+  <ol>
+    <li>Tu lui donnes une recherche : en général un lien de recherche Vinted avec tes filtres, ou des mots-clés dans le formulaire de l’outil.</li>
+    <li>Il charge les résultats les plus récents de cette recherche : les mêmes résultats publics que n’importe qui peut ouvrir sur Vinted.</li>
+    <li>Il les compare à ce qu’il a vu la dernière fois. Une annonce qu’il n’a jamais vue est nouvelle.</li>
+    <li>Il t’envoie la nouvelle annonce : une notification push, un message Telegram ou Discord, ou une ligne dans une app, selon l’outil.</li>
+    <li>Il recommence. La fréquence dépend de l’outil ; SNYPD vérifie toutes les 30 secondes à 5 minutes, plus souvent sur les recherches qui trouvent beaucoup.</li>
+  </ol>
+  {figure('feed', 'fr')}
+</section>
+<section id="types">
+  <h2>Monitor, bot d’achat automatique ou automatisation vendeur ?</h2>
+  <p>Les trois sont appelés « bots Vinted ». Ce qui les distingue, c’est ce qu’ils font de ton compte Vinted.</p>
+  {table(MONITOR_TYPES_HEAD['fr'], MONITOR_TYPES['fr'])}
+  <p>Les recherches « automatisation Vinted » mènent surtout à des outils pour vendeurs. Un monitor automatise uniquement le côté acheteur. Plus de détails sur la page <a href="{SLUGS['bot']['fr']}">bot Vinted</a>.</p>
+</section>
+<section id="alertes">
+  <h2>Où arrivent les alertes</h2>
+  <p>Les monitors diffèrent surtout par la façon de te prévenir. D’après le site de chaque outil, vérifié le {COMPARE_CHECKED['fr']} :</p>
+  <ul>
+    <li><strong>Notifications push</strong> sur ton téléphone ou ton ordinateur : SNYPD. Rien d’autre à installer.</li>
+    <li><strong>Telegram</strong> : Telvin Bot alerte uniquement là ; MarktAlert propose Telegram parmi d’autres canaux.</li>
+    <li><strong>Discord</strong> : Resell Reserve publie les alertes dans des salons Discord.</li>
+    <li><strong>Le flux d’une app</strong> : V-Tools affiche les trouvailles dans sa propre app.</li>
+  </ul>
+  <p>Quel que soit ton choix, vérifie que l’alerte t’arrive ordinateur fermé. Un monitor qui ne tourne que dans un onglet ouvert rate la plus grande partie de la nuit.</p>
+</section>
+<section id="verifier">
+  <h2>Ce qu’il faut vérifier avant de choisir</h2>
+  <ul class="fit-list">
+    <li><strong>Il demande tes identifiants Vinted ?</strong>Un monitor lit seulement des résultats de recherche, il n’en a donc pas besoin. Les outils qui achètent à ta place, si.</li>
+    <li><strong>Il garde tous tes filtres ?</strong>Coller un lien de recherche Vinted les garde tous : marque, taille, prix, état, couleur, matière. Le formulaire d’un outil peut en proposer moins.</li>
+    <li><strong>Il continue quand tu n’es pas là ?</strong>Avec le plan gratuit de SNYPD, une recherche tourne tant que ton tableau de bord est ouvert ; les plans payants la font tourner 24h/24.</li>
+    <li><strong>Il couvre ton pays Vinted ?</strong>Chaque site Vinted a ses propres annonces et sa devise.</li>
+    <li><strong>Tu peux l’essayer avant de payer ?</strong>Cherche un plan gratuit ou un remboursement utilisable après l’avoir essayé.</li>
+  </ul>
+  <p>Les réponses de sept outils à ces questions : <a href="{SLUGS['compare']['fr']}">comparatif des bots Vinted</a>.</p>
+</section>
+<section id="regles">
+  <h2>Un monitor Vinted, c’est autorisé ?</h2>
+  <p>Les conditions de Vinted interdisent les bots et les programmes de scraping, et aucun monitor ne peut promettre comment Vinted les applique. Ce que tu maîtrises, c’est ce qui se passe sur ton propre compte. Un monitor qui ne se connecte jamais, comme SNYPD, ne fait rien sur ton compte Vinted : tu trouves l’annonce grâce à l’alerte et tu l’achètes avec le paiement normal de Vinted. Les outils qui achètent à ta place agissent via ton compte connecté.</p>
+</section>
+<section id="snypd">
+  <h2>SNYPD, un monitor Vinted</h2>
+  <p>Colle un lien de recherche Vinted, active-le, et SNYPD le vérifie toutes les 30 secondes à 5 minutes. Les nouvelles annonces arrivent dans ton tableau de bord avec leur prix, le prix protection acheteurs incluse et leur état, et en notification push sur ton téléphone. Il ne demande jamais ton mot de passe Vinted, n’achète rien et n’écrit jamais aux vendeurs. Pro et Elite ajoutent le Market Report : le prix demandé typique d’un article sur Vinted selon son état.</p>
+  {table(PLANS_HEAD['fr'], PLANS_ROWS['fr'])}
+</section>
+<section id="questions">
+  <h2>Questions</h2>
+  {faq_html(faq)}
+</section>
+<section id="essayer">
+  <h2>Essaie un monitor sur une recherche</h2>
+  {cta('fr')}
+</section>"""
+    return page('monitor', 'fr', 'Monitor Vinted : c’est quoi et comment ça marche (2026) | SNYPD',
+                'Un monitor Vinted surveille tes recherches Vinted et t’alerte quand une nouvelle annonce correspond. Fonctionnement, différences avec l’achat auto, quoi vérifier.',
+                'MONITOR VINTED &middot; GUIDE', 'Qu’est-ce qu’un monitor Vinted ?',
+                'Un monitor Vinted surveille tes recherches Vinted et te prévient quand un nouvel article correspond. Voici comment marchent les monitors, en quoi ils diffèrent des bots d’achat automatique et des outils pour vendeurs, quoi vérifier avant d’en choisir un, et où se place SNYPD.',
+                [('reponse', 'Réponse courte'), ('pourquoi', 'Pourquoi'), ('fonctionnement', 'Fonctionnement'), ('types', 'Monitor ou achat auto'), ('alertes', 'Où arrivent les alertes'),
+                 ('verifier', 'Quoi vérifier'), ('regles', 'Autorisé ?'), ('snypd', 'SNYPD'), ('questions', 'Questions')],
+                body, [faq_ld(faq)])
 
 
 # ------------------------------------------------------------------ page: prices
@@ -1536,6 +1777,8 @@ if __name__ == '__main__':
         html_out, csv_rows = page_prices(lang)
         write(prefix + SLUGS['prices'][lang].rsplit('/', 1)[1] + '.html', html_out)
     write('vinted-deals.html', page_deals('en'))
+    for lang in (('en', 'fr') if FR_LIVE else ('en',)):
+        write(SLUGS['monitor'][lang].lstrip('/') + '.html', page_monitor(lang))
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):
         write(SLUGS['fees'][lang].lstrip('/') + '.html', page_fees(lang))
     buf = io.StringIO()

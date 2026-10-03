@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What Is a Vinted Monitor? How It Works (2026 Guide) | SNYPD</title>
+<meta name="description" content="A Vinted monitor checks your Vinted searches and alerts you when a new listing matches. How monitors work, how they differ from autobuy bots, and what to check.">
+<link rel="canonical" href="https://www.snypd.store/vinted-monitor">
+<link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-monitor">
+<link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/monitor-vinted">
+<link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-monitor">
+<meta property="og:title" content="What Is a Vinted Monitor? How It Works (2026 Guide) | SNYPD">
+<meta property="og:description" content="A Vinted monitor checks your Vinted searches and alerts you when a new listing matches. How monitors work, how they differ from autobuy bots, and what to check.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.snypd.store/vinted-monitor">
+<meta property="og:site_name" content="SNYPD">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
+<link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<style>
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+html, body { margin: 0; background: #0A0A0B; }
+body { font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; -webkit-font-smoothing: antialiased; }
+a { color: #00E5A0; text-decoration: none; }
+a:hover { color: #57FFC8; }
+a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+::selection { background: #A200FF; color: #FFFFFF; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor { animation: none !important; } }
+.lg-wrap { max-width: 1320px; margin: 0 auto; padding-left: 20px; padding-right: 20px; box-sizing: border-box; }
+.lg-nav { position: sticky; top: 0; z-index: 30; background: rgba(10,10,11,.92); border-bottom: 1px solid #1D1D20; }
+.lg-nav-in { display: flex; align-items: center; gap: 10px 18px; padding-top: 8px; padding-bottom: 8px; }
+.lg-brand { display: flex; align-items: center; gap: 9px; color: #FFFFFF; min-height: 44px; }
+.lg-brand:hover { color: #FFFFFF; }
+.lg-brand img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.lg-brand span { font-size: 15.5px; font-weight: 700; letter-spacing: .02em; }
+.lg-cursor { animation: blink 1.2s step-end infinite; }
+.lg-links { display: flex; gap: 4px; flex: 1; }
+.lg-navlink { font-size: 12px; letter-spacing: .1em; color: #8B9094; padding: 14px 10px; }
+.lg-navlink:hover { color: #FFFFFF; }
+.lg-navlink[aria-current="page"] { color: #FFFFFF; }
+.lg-cta { font-size: 12px; letter-spacing: .1em; color: #FFFFFF; background: #A200FF; padding: 14px 16px; }
+.lg-cta:hover { color: #FFFFFF; filter: brightness(1.18); }
+@media (max-width: 699.98px) { .lg-links { display: none; } .lg-nav-in { justify-content: space-between; } .lg-login { margin-left: auto; } }
+@media (max-width: 459.98px) { .lg-nav-in { gap: 4px; } .lg-navlink { padding: 14px 6px; letter-spacing: .05em; } .lg-cta { padding: 14px 10px; letter-spacing: .05em; } .lg-brand span { font-size: 14px; } }
+.lg-head { border-bottom: 1px solid #1D1D20; }
+.lg-head-in { padding-top: 56px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 14px; }
+.lg-eyebrow { font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+.lg-h1 { margin: 0; max-width: 20ch; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(36px, 6vw, 60px); line-height: .98; letter-spacing: -.04em; color: #FFFFFF; }
+.lg-meta { font-size: 12px; color: #8B9094; }
+.lg-lead { margin: 6px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.7; color: #B8BCBF; }
+.lg-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding-top: 40px; padding-bottom: 72px; align-items: start; }
+@media (max-width: 899.98px) { .lg-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 28px; } }
+.lg-toc { position: sticky; top: 84px; border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 18px; display: flex; flex-direction: column; gap: 2px; }
+@media (max-width: 899.98px) { .lg-toc { position: static; } }
+.lg-toc span { font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.lg-toc a { font-size: 12px; line-height: 1.5; color: #B8BCBF; padding: 5px 0; }
+.lg-toc a:hover { color: #00E5A0; }
+.lg-doc { max-width: 820px; min-width: 0; }
+.lg-wide { grid-template-columns: minmax(0, 1fr); }
+.lg-wide .lg-doc { max-width: 1120px; }
+.lg-doc section { border-top: 1px solid #1D1D20; padding: 30px 0 6px; scroll-margin-top: 80px; }
+.lg-doc section:first-child { border-top: 0; padding-top: 0; }
+.lg-doc h2 { margin: 0 0 14px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(24px, 3.2vw, 30px); line-height: 1.05; letter-spacing: -.03em; color: #FFFFFF; }
+.lg-doc h3 { margin: 22px 0 8px; font-size: 12.5px; font-weight: 400; letter-spacing: .1em; color: #FFFFFF; }
+.lg-doc p, .lg-doc li { font-size: 13px; line-height: 1.75; color: #B8BCBF; }
+.lg-doc p { margin: 0 0 14px; }
+.lg-doc ul, .lg-doc ol { margin: 0 0 14px; padding-left: 20px; }
+.lg-doc li { margin: 0 0 6px; }
+.lg-doc strong { font-weight: 400; color: #FFFFFF; }
+.lg-doc code { font-family: inherit; font-size: 12px; color: #FFFFFF; background: #141416; border: 1px solid #26262A; padding: 1px 5px; overflow-wrap: anywhere; }
+.lg-doc blockquote { margin: 0 0 14px; padding: 12px 16px; border-left: 2px solid #00E5A0; background: #0C0C0D; font-size: 13px; line-height: 1.7; color: #E8EAEB; }
+.lg-doc blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: 11.5px; color: #8B9094; }
+.lg-box { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 12px; }
+.lg-box.lg-mint { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.06); }
+.lg-box p { margin: 0; }
+.ct-scroll { overflow-x: auto; margin: 0 0 18px; border: 1px solid #1D1D20; -webkit-overflow-scrolling: touch; }
+.ct-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.ct-table th, .ct-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.55; color: #B8BCBF; }
+.ct-table thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .1em; color: #8B9094; }
+.ct-table tbody th { font-weight: 400; color: #FFFFFF; min-width: 150px; }
+.ct-table tbody tr { background: #0C0C0D; }
+.ct-table tbody tr.ct-us { background: rgba(162,0,255,.07); }
+.ct-table .ct-num { white-space: nowrap; color: #FFFFFF; }
+.ct-table small { display: block; color: #8B9094; font-size: 11px; }
+.ct-note { font-size: 11.5px !important; color: #8B9094 !important; }
+.ct-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ct-btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; font-size: 12px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; }
+.ct-btn:hover { color: #FFFFFF; filter: brightness(1.18); }
+.ct-btn.ct-ghost { background: #141416; border: 1px solid #3A3A40; }
+.ct-btn.ct-ghost:hover { filter: none; background: #1C1C1F; border-color: #55555C; }
+.lg-foot { border-top: 1px solid #1D1D20; }
+.lg-foot-in { padding-top: 24px; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lg-foot-a { display: flex; flex-direction: column; gap: 6px; }
+.lg-foot small { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.lg-foot-t { font-size: 12px; color: #8B9094; }
+.lg-foot-l { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-top: 4px; }
+.lg-foot-l a, .lg-foot-l button { font-size: 12px; }
+.lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
+.lg-foot-l button:hover { color: #57FFC8; }
+
+.rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+@media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
+.rs-card { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.rs-card:first-child, .rs-card:nth-child(2) { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.05); }
+.rs-num { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+.lg-doc .rs-title { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.02em; color: #FFFFFF; }
+.lg-doc .rs-card p { margin: 0; font-size: 12.5px; line-height: 1.7; }
+.lg-doc .rs-card p.rs-proof { padding-top: 9px; border-top: 1px dashed #26262A; font-size: 11.5px; color: #8B9094; }
+.rs-proof a { color: #00E5A0; }
+.ct-yes { color: #00E5A0; }
+.ct-table tbody tr.ct-us th, .ct-table tbody tr.ct-us td { color: #FFFFFF; border-top-color: rgba(0,229,160,.45); }
+.ct-table tbody tr.ct-us th { box-shadow: inset 3px 0 0 #00E5A0; }
+.ct-badge { display: inline-block; margin-left: 6px; padding: 2px 6px; font-size: 10px; letter-spacing: .1em; color: #0A0A0B; background: #00E5A0; vertical-align: 1px; }
+.ct-table tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: #0C0C0D; }
+.ct-table thead th:first-child { position: sticky; left: 0; z-index: 2; background: #121214; }
+.ct-table tbody tr.ct-us th[scope="row"] { background: #160C20; }
+@media (max-width: 699.98px) { .ct-table tbody th { min-width: 118px; } }
+.glance { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.glance li { font-size: 12px; letter-spacing: .04em; color: #FFFFFF; border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 8px 11px; }
+.glance li span { color: #00E5A0; margin-right: 6px; }
+.fit-list { list-style: none; padding: 0 !important; margin: 0 0 18px !important; display: flex; flex-direction: column; gap: 10px; }
+.fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.fit-list li strong { display: block; margin-bottom: 3px; }
+.fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+.lg-fig { margin: 4px 0 20px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.lg-fig picture { display: block; }
+.lg-fig img { display: block; width: 100%; height: auto; }
+.lg-fig figcaption { padding: 10px 14px; border-top: 1px solid #1D1D20; font-size: 11.5px; line-height: 1.6; color: #8B9094; }
+.lg-fig.fig-narrow { max-width: 520px; }
+.fig-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; margin: 0 0 18px; }
+.fig-row .lg-fig { margin: 0; max-width: none; }
+@media (max-width: 759.98px) { .fig-row { grid-template-columns: minmax(0, 1fr); } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ct-duel { margin: 0 0 18px; }
+.ct-duel label { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.ct-duel select { font-family: inherit; font-size: 14px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 46px; }
+.ct-duel table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #1D1D20; }
+.ct-duel th, .ct-duel td { text-align: left; vertical-align: top; padding: 11px 10px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.5; color: #B8BCBF; overflow-wrap: anywhere; }
+.ct-duel thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .08em; color: #8B9094; }
+.ct-duel thead th.d-us { color: #FFFFFF; }
+.ct-duel tbody th { width: 28%; font-weight: 400; font-size: 11px; letter-spacing: .06em; color: #8B9094; }
+.ct-duel td.d-us { color: #FFFFFF; background: rgba(162,0,255,.07); }
+.ct-duel [data-t] { display: none; }
+.ct-duel [data-t].on { display: table-cell; }
+@media (min-width: 700px) { .ct-duel { display: none; } }
+@media (max-width: 699.98px) { .ct-full { display: none; } }
+.fc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.05); padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
+.fc-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 559.98px) { .fc-in { grid-template-columns: minmax(0, 1fr); } }
+.fc label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.fc input, .fc select { font-family: inherit; font-size: 16px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 48px; width: 100%; box-sizing: border-box; }
+.fc input:focus-visible, .fc select:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.fc-out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin: 0; }
+.fc-out div { background: #0C0C0D; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.fc-out dt { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.fc-out dd { margin: 0; font-size: 18px; color: #FFFFFF; }
+.fc-out div.fc-total dd { color: #00E5A0; }
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"What is a Vinted monitor?","item":"https://www.snypd.store/vinted-monitor"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/vinted-monitor#page","url":"https://www.snypd.store/vinted-monitor","name":"What Is a Vinted Monitor? How It Works (2026 Guide) | SNYPD","description":"A Vinted monitor checks your Vinted searches and alerts you when a new listing matches. How monitors work, how they differ from autobuy bots, and what to check.","inLanguage":"en","datePublished":"2026-09-28","dateModified":"2026-10-03","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the difference between a Vinted monitor and a Vinted bot?","acceptedAnswer":{"@type":"Answer","text":"“Vinted bot” is the wider word: it covers monitors, autobuy bots and seller tools. A monitor is the kind that only watches searches and alerts you. Resellers often use the two words for the same thing, which is why most monitors also call themselves bots."}},{"@type":"Question","name":"Is there a free Vinted monitor?","acceptedAnswer":{"@type":"Answer","text":"Yes, with limits. SNYPD Free runs one search with no time limit while your dashboard is open. Other tools list free plans too; their limits are side by side in <a href=\"/vinted-bot-comparison\">Vinted bots compared</a>."}},{"@type":"Question","name":"How fast is a Vinted monitor?","acceptedAnswer":{"@type":"Answer","text":"It depends on how often the tool checks. SNYPD checks each search every 30 seconds to 5 minutes, faster on searches that keep finding new items, on every plan. Some vendors advertise milliseconds; those are their own figures, measured their own way."}},{"@type":"Question","name":"Do I need Discord or Telegram?","acceptedAnswer":{"@type":"Answer","text":"Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, so there is nothing else to install. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps."}},{"@type":"Question","name":"Which Vinted countries can a monitor watch?","acceptedAnswer":{"@type":"Answer","text":"That depends on the tool. SNYPD works on every Vinted site in Europe and the US, 26 sites in all, each in its own currency: paste a search link from the site you shop on."}}]}</script>
+<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VBC0SXPR6F');
+</script>
+</head>
+<body>
+<header class="lg-nav">
+  <div class="lg-wrap lg-nav-in">
+    <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
+    <nav class="lg-links" aria-label="Main"><a class="lg-navlink" href="/vinted-bot">VINTED BOT</a><a class="lg-navlink" href="/vinted-prices">VINTED PRICES</a><a class="lg-navlink" href="/plans">PRICING</a><a class="lg-navlink" href="https://discord.gg/gjKD4auXhK">DISCORD</a></nav>
+    <a class="lg-navlink" href="/fr/monitor-vinted" hreflang="fr" lang="fr" title="Version française">FR</a>
+    <a class="lg-navlink lg-login" href="/login">LOG IN</a>
+    <a class="lg-cta" href="/signup">START FREE</a>
+  </div>
+</header>
+<main>
+  <div class="lg-head">
+    <div class="lg-wrap lg-head-in">
+      <span class="lg-eyebrow">VINTED MONITOR &middot; GUIDE</span>
+      <h1 class="lg-h1">What is a Vinted monitor?</h1>
+      <span class="lg-meta">Updated <time datetime="2026-10-03">3 October 2026</time> &middot; By SNYPD, built by a Belgian sneaker reseller</span>
+      <p class="lg-lead">A Vinted monitor watches your Vinted searches and tells you when something new matches. Here is how monitors work, how they differ from autobuy bots and seller tools, what to check before you pick one, and where SNYPD fits.</p>
+      
+    </div>
+  </div>
+  <div class="lg-wrap lg-grid">
+    <nav class="lg-toc" aria-label="On This Page"><span>ON THIS PAGE</span><a href="#answer">Short answer</a><a href="#why">Why use one</a><a href="#how">How it works</a><a href="#types">Monitor or autobuy</a><a href="#alerts">Where alerts arrive</a><a href="#checklist">What to check</a><a href="#rules">Is it allowed?</a><a href="#snypd">SNYPD</a><a href="#faq">Questions</a></nav>
+    <article class="lg-doc">
+
+<section id="answer">
+  <h2>The short answer</h2>
+  <div class="lg-box lg-mint"><p>A Vinted monitor is a tool that checks your Vinted searches over and over and alerts you when a listing appears that was not there before. Resellers also call it a Vinted alert bot. A monitor only finds and tells: you open the listing on Vinted and decide whether to buy. Tools that also buy for you are autobuy bots, and they need your logged-in Vinted account.</p></div>
+</section>
+<section id="why">
+  <h2>Why resellers use one</h2>
+  <p>Vinted&rsquo;s own saved searches show a &ldquo;+N&rdquo; counter the next time you open the app (<a href="https://www.vinted.co.uk/help/435-save-your-searches" rel="nofollow noopener">Vinted help</a>). They do not send a notification for each new match, so you only find out when you look.</p>
+  <p>Everyone watching the same search can see a new listing the moment it appears, and the first person to notice it gets the first chance to buy. Well-priced listings are exactly the ones that go first. How often listings come up well under the typical price is measured in <a href="/vinted-deals">Vinted deals</a>.</p>
+</section>
+<section id="how">
+  <h2>How a Vinted monitor works</h2>
+  <ol>
+    <li>You give it a search: usually a Vinted search link with your filters, or keywords in the tool&rsquo;s own form.</li>
+    <li>It loads the newest results of that search: the same public results anyone can open on Vinted.</li>
+    <li>It compares them with what it saw last time. A listing it has not seen before is new.</li>
+    <li>It sends you the new listing: a push notification, a Telegram or Discord message, or a line in an app, depending on the tool.</li>
+    <li>It repeats. How often depends on the tool; SNYPD checks every 30 seconds to 5 minutes, faster on searches that keep finding things.</li>
+  </ol>
+  <figure class="lg-fig"><picture><source media="(max-width: 699.98px)" srcset="/assets/seo/snypd-feed-phone.webp" width="396" height="650"><img src="/assets/seo/snypd-feed.webp" alt="SNYPD dashboard feed showing new Vinted listings with price, price including Buyer Protection, condition and the time found" width="1400" height="662" loading="lazy" decoding="async"></picture><figcaption>SNYPD&rsquo;s feed during a real session on 2 October 2026: new listings from one search, each with its price, the price including Vinted&rsquo;s Buyer Protection, its condition and when it was found. Photos are blurred because they belong to the sellers.</figcaption></figure>
+</section>
+<section id="types">
+  <h2>Monitor, autobuy bot or seller automation?</h2>
+  <p>All three get called &ldquo;Vinted bots&rdquo;. What separates them is what they do with your Vinted account.</p>
+  <div class="ct-scroll"><table class="ct-table"><thead><tr><th scope="col">TYPE</th><th scope="col">WHAT IT DOES</th><th scope="col">ACTS ON YOUR VINTED ACCOUNT</th><th scope="col">WHO DECIDES EACH PURCHASE</th></tr></thead><tbody><tr><th scope="row">Monitor (alert bot)</th><td>Finds new listings in your searches and alerts you</td><td>No need to: it only reads search results</td><td>You</td></tr><tr><th scope="row">Autobuy or autocop bot</th><td>Buys or checks out for you</td><td>Yes: buying needs a logged-in account</td><td>The bot, following your rules</td></tr><tr><th scope="row">Seller automation</th><td>Relists, bumps or sends offers from your shop</td><td>Yes: it works on your own shop</td><td>Not a buying tool</td></tr><tr><th scope="row">Script you host (GitHub)</th><td>A monitor you run on your own server</td><td>Depends on the script</td><td>You</td></tr></tbody></table></div>
+  <p>Searches for &ldquo;Vinted automation&rdquo; mostly lead to seller tools. A monitor automates the buyer side only. More on the differences in <a href="/vinted-bot">Vinted bot</a>.</p>
+</section>
+<section id="alerts">
+  <h2>Where the alerts arrive</h2>
+  <p>Monitors differ most in how they reach you. From each tool&rsquo;s own site, checked on 1 October 2026:</p>
+  <ul>
+    <li><strong>Push notifications</strong> to your phone or computer: SNYPD. Nothing else to install.</li>
+    <li><strong>Telegram</strong>: Telvin Bot sends alerts only there; MarktAlert offers Telegram among other channels.</li>
+    <li><strong>Discord</strong>: Resell Reserve posts alerts in Discord channels.</li>
+    <li><strong>An app feed</strong>: V-Tools shows finds in its own app.</li>
+  </ul>
+  <p>Whichever you pick, check that the alert reaches you with your laptop closed. A monitor that only runs while a browser tab is open misses most of the night.</p>
+</section>
+<section id="checklist">
+  <h2>What to check before you pick one</h2>
+  <ul class="fit-list">
+    <li><strong>Does it ask for your Vinted login?</strong>A monitor only reads search results, so it has no reason to. Tools that buy for you do need it.</li>
+    <li><strong>Does it keep every filter?</strong>Pasting a Vinted search link keeps all of them: brand, size, price, condition, colour, material. A tool&rsquo;s own form may offer fewer.</li>
+    <li><strong>Does it keep watching when you are not there?</strong>On SNYPD&rsquo;s free plan, a search runs while your dashboard is open; paid plans keep it running 24/7.</li>
+    <li><strong>Does it cover your Vinted country?</strong>Each Vinted site has its own listings and currency.</li>
+    <li><strong>Can you test it before paying?</strong>Look for a free plan or a refund you can actually use after trying it.</li>
+  </ul>
+  <p>How seven tools answer these questions: <a href="/vinted-bot-comparison">Vinted bots and monitors compared</a>.</p>
+</section>
+<section id="rules">
+  <h2>Is a Vinted monitor allowed?</h2>
+  <p>Vinted&rsquo;s terms prohibit bots and scraping programs, and no monitor can promise how Vinted applies them. What you can control is what happens on your own account. A monitor that never signs in, like SNYPD, does nothing on your Vinted account: you find the listing through the alert and buy it through Vinted&rsquo;s normal checkout. Tools that buy for you act through your logged-in account.</p>
+</section>
+<section id="snypd">
+  <h2>SNYPD as a Vinted monitor</h2>
+  <p>Paste a Vinted search link, switch it on, and SNYPD checks it every 30 seconds to 5 minutes. New matches land in your dashboard with their price, the price including Buyer Protection and their condition, and as a push notification on your phone. It never asks for your Vinted password, never buys and never messages sellers. Pro and Elite add the Market Report: the typical Vinted asking price of an item by condition.</p>
+  <div class="ct-scroll"><table class="ct-table"><thead><tr><th scope="col">PLAN</th><th scope="col">PER MONTH, VAT INCL.</th><th scope="col">ACTIVE SEARCHES</th><th scope="col">WATCHES WITH DASHBOARD CLOSED</th><th scope="col">MARKET REPORT</th></tr></thead><tbody><tr><th scope="row">Free</th><td><span class="ct-num">&euro;0</span></td><td>1</td><td>No, only while your dashboard is open</td><td>No</td></tr><tr><th scope="row">Kickstart</th><td><span class="ct-num">&euro;14.99</span></td><td>2</td><td>Yes, 24/7</td><td>No</td></tr><tr><th scope="row">Pro</th><td><span class="ct-num">&euro;24.99</span></td><td>5</td><td>Yes, 24/7</td><td>Yes</td></tr><tr><th scope="row">Elite</th><td><span class="ct-num">&euro;34.99</span></td><td>10</td><td>Yes, 24/7</td><td>Yes</td></tr></tbody></table></div>
+</section>
+<section id="faq">
+  <h2>Questions</h2>
+  <h3>What is the difference between a Vinted monitor and a Vinted bot?</h3><p>&ldquo;Vinted bot&rdquo; is the wider word: it covers monitors, autobuy bots and seller tools. A monitor is the kind that only watches searches and alerts you. Resellers often use the two words for the same thing, which is why most monitors also call themselves bots.</p><h3>Is there a free Vinted monitor?</h3><p>Yes, with limits. SNYPD Free runs one search with no time limit while your dashboard is open. Other tools list free plans too; their limits are side by side in <a href="/vinted-bot-comparison">Vinted bots compared</a>.</p><h3>How fast is a Vinted monitor?</h3><p>It depends on how often the tool checks. SNYPD checks each search every 30 seconds to 5 minutes, faster on searches that keep finding new items, on every plan. Some vendors advertise milliseconds; those are their own figures, measured their own way.</p><h3>Do I need Discord or Telegram?</h3><p>Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, so there is nothing else to install. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps.</p><h3>Which Vinted countries can a monitor watch?</h3><p>That depends on the tool. SNYPD works on every Vinted site in Europe and the US, 26 sites in all, each in its own currency: paste a search link from the site you shop on.</p>
+</section>
+<section id="start">
+  <h2>Try a monitor on one search</h2>
+  <div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. Upgrade when you want it to keep watching with your dashboard closed.</p><div class="ct-actions"><a class="ct-btn" href="/signup">START FREE</a><a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>
+</section>
+    </article>
+  </div>
+</main>
+<footer class="lg-foot">
+  <div class="lg-wrap lg-foot-in">
+    <div class="lg-foot-a">
+      <small>SNYPD &middot; NOT AFFILIATED WITH VINTED</small>
+      <span class="lg-foot-t">Reads public listings only.</span>
+      <span class="lg-foot-l"><a href="/vinted-bot">Vinted bot</a><a href="/vinted-monitor">Vinted monitor</a><a href="/vinted-saved-search-alerts">Vinted notifications</a><a href="/vinted-bot-comparison">Vinted bots compared</a><a href="/vinted-prices">Vinted prices</a><a href="/vinted-deals">Vinted deals</a><a href="/vinted-fees">Vinted fees</a><a href="/faq">FAQ</a><a href="/support">Support</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+    </div>
+    <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a></nav>
+  </div>
+</footer>
+</body>
+</html>

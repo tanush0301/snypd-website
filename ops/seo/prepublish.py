@@ -36,6 +36,7 @@ PAGES = [
     ('/vinted-prices',              'vinted-prices.html',              None),
     ('/vinted-deals',               'vinted-deals.html',               None),
     ('/vinted-fees',                'vinted-fees.html',                None),
+    ('/vinted-monitor',             'vinted-monitor.html',             None),
 ]
 # French versions are added only while gen_content.FR_LIVE is True (they are held
 # until SNYPD polls vinted.fr). Each pair gets hreflang alternates both ways.
