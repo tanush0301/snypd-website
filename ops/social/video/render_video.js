@@ -1,11 +1,11 @@
-// node ops/social/video/render_video.js OUT_DIR  -- steps scene.html frame by frame (30 fps, 15 s)
+// node ops/social/video/render_video.js OUT_DIR  -- steps scene.html frame by frame (FPS env var, default 30; 15 s; FPS=24 keeps the MP4 under Ads Manager's 10 MB upload limit)
 // and writes OUT_DIR/frames/NNNN.jpg plus OUT_DIR/keyframes/*.png for review. encode.py turns the
 // frames into an H.264 MP4. Same puppeteer-core + local Chrome as ../render.js.
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require(path.join(__dirname, '..', '..', '..', 'node_modules', 'puppeteer-core'));
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const FPS = 30, SECONDS = 15, KEY = [0, 1.8, 3.0, 4.8, 6.6, 9.0, 10.8, 12.2, 14.0];
+const FPS = Number(process.env.FPS || 30), SECONDS = 15, KEY = [0, 1.8, 3.0, 4.8, 6.6, 9.0, 10.8, 12.2, 14.0];
 
 (async () => {
   const out = process.argv[2];
