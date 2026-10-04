@@ -327,3 +327,26 @@
   else if (document.body) showBanner();
   else document.addEventListener('DOMContentLoaded', showBanner);
 })();
+
+/* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) on links to
+   other SNYPD pages, so the sign-up page can save them with the new account
+   (assets/auth.js). Nothing is stored on the device. */
+(function () {
+  var q = new URLSearchParams(location.search), tags = [];
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
+    var v = q.get(k);
+    if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) tags.push([k, v]);
+  });
+  if (!tags.length) return;
+  function decorate() {
+    [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
+      var u;
+      try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
+      if (u.origin !== location.origin || u.pathname === location.pathname) return;
+      tags.forEach(function (t) { if (!u.searchParams.has(t[0])) u.searchParams.set(t[0], t[1]); });
+      a.setAttribute('href', u.pathname + u.search + u.hash);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
+  else decorate();
+})();

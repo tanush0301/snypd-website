@@ -5244,6 +5244,12 @@ const HEARTBEAT_URL = (() => {
     return /iPad|iPhone|iPod/.test(navigator.userAgent)
       || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
+  // Instagram and Facebook open links in their own in-app browser (most ad clicks
+  // land there). On iPhone it cannot add SNYPD to the Home Screen; on Android it
+  // has no push. Tell people to open the page in Safari or Chrome instead.
+  function isInAppBrowser() {
+    return /Instagram|FBAN|FBAV|FB_IAB/.test(navigator.userAgent);
+  }
   function isStandalone() {
     return window.navigator.standalone === true
       || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
@@ -5358,11 +5364,15 @@ const HEARTBEAT_URL = (() => {
         btn.style.display = '';
         btn.disabled = false;
         btn.classList.add('btn-cta-instruct');
-        btn.innerHTML = '<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><rect height="8" rx="2" width="14" x="5" y="13"></rect></svg>Add to Home Screen for alerts';
-        say('On iPhone and iPad, alerts only work once SNYPD is on your Home '
-          + 'Screen. Tap the Share button, then "Add to Home Screen", and open '
-          + 'SNYPD from that icon. Apple does not allow websites to do this step '
-          + 'for you.');
+        btn.innerHTML = '<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><rect height="8" rx="2" width="14" x="5" y="13"></rect></svg>' + (isInAppBrowser() ? 'Open in Safari for alerts' : 'Add to Home Screen for alerts');
+        say(isInAppBrowser()
+          ? 'You opened SNYPD inside Instagram or Facebook, which cannot add it to '
+            + 'your Home Screen. Tap the ... menu at the top, open this page in '
+            + 'Safari, then tap Share and "Add to Home Screen".'
+          : 'On iPhone and iPad, alerts only work once SNYPD is on your Home '
+            + 'Screen. Tap the Share button, then "Add to Home Screen", and open '
+            + 'SNYPD from that icon. Apple does not allow websites to do this step '
+            + 'for you.');
         note.classList.add('cta-note');
       } else if (isIOS()) {
         // Standalone per our own check, yet iOS is not exposing the push APIs -
@@ -5379,10 +5389,16 @@ const HEARTBEAT_URL = (() => {
         say('Alerts are not available in this app right now. Try removing SNYPD '
           + 'from your Home Screen and adding it again.');
         pushState = { ready: false, state: 'unavailable', message: 'Alerts are not available in this app. Remove SNYPD from your Home Screen and add it again.' };
+      } else if (isInAppBrowser()) {
+        pushState = { ready: false, state: 'unsupported', message: 'You opened SNYPD inside Instagram or Facebook, which cannot deliver alerts. Tap the ... menu at the top and open this page in Chrome or your phone browser.' };
+        say(pushState.message);
+        note.classList.add('cta-note');
       } else {
         pushState = { ready: false, state: 'unsupported', message: 'This browser cannot deliver alerts. Chrome or Edge on desktop can, and so can SNYPD installed to a phone home screen.' };
       }
-      if (isIOS() && !isStandalone()) {
+      if (isIOS() && !isStandalone() && isInAppBrowser()) {
+        pushState = { ready: false, state: 'ios-install', message: 'You opened SNYPD inside Instagram or Facebook. Tap the ... menu at the top, open this page in Safari, then tap Share and Add to Home Screen.' };
+      } else if (isIOS() && !isStandalone()) {
         pushState = { ready: false, state: 'ios-install', message: 'On iPhone and iPad, alerts only work once SNYPD is on your Home Screen. Tap Share, then Add to Home Screen, and open SNYPD from that icon. Apple does not let a website do this step for you.' };
       }
       return;   // desktop browsers without push: leave the button hidden

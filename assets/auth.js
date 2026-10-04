@@ -147,8 +147,22 @@
     setTimeout(function () { location.replace('/dashboard'); }, 600);
   }
 
+  /* Campaign tags (utm_*) from the address, e.g. from a Meta ad. Read from the URL
+     only, never stored on the device; saved with the new account so sign-ups can be
+     counted per ad (assets/consent.js keeps them on links between pages). */
+  function campaignTags() {
+    var out = {}, q = new URLSearchParams(location.search);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
+      var v = q.get(k);
+      if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) out[k] = v;
+    });
+    return out;
+  }
+
   function signupData() {
     var data = { marketing_opt_in: !!S.marketing };
+    var tags = campaignTags();
+    for (var k in tags) data[k] = tags[k];
     if (S.marketing) data.marketing_opt_in_at = new Date().toISOString();
     var ref = lsGet('snypd_ref');
     if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;
@@ -561,10 +575,15 @@
       try { await sb.auth.verifyOtp({ token_hash: th, type: type }); } catch (e) {}
       cleanUrl();
     }
+    var oauthReturn = /access_token/.test(location.hash);
     var sess = null;
     try { var r = await sb.auth.getSession(); sess = r.data && r.data.session; } catch (e) {}
     if (location.hash && /access_token|refresh_token/.test(location.hash)) cleanUrl();
     if (sess && sess.user) {
+      /* Google sign-ups come back here from Google; count a brand-new account as a sign-up
+         (email sign-ups are counted in signup()). */
+      var created = Date.parse(sess.user.created_at || '');
+      if (oauthReturn && created && Date.now() - created < 15 * 60 * 1000) track('sign_up', { method: 'google' });
       if (PAGE === 'signup') { if (sess.user.email) lsSet(LAST_EMAIL_KEY, sess.user.email); location.replace('/dashboard'); return; }
       openDashboard(sess.user.email || '');
       return;
