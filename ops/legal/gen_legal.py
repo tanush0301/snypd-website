@@ -6,7 +6,7 @@ import sys, os
 
 REPO, MODE = sys.argv[1], sys.argv[2]
 LIVE = MODE == 'live'
-UPDATED = '27 September 2026'
+UPDATED = '4 October 2026'
 EMAIL = 'snypd@gmail.com'
 DISCORD = 'https://discord.gg/gjKD4auXhK'
 
@@ -96,7 +96,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 def legal_links():
     parts = []
     if LIVE:
-        parts += ['<a href="/privacy">Privacy</a>', '<a href="/terms">Terms</a>']
+        parts += ['<a href="/privacy">Privacy</a>', '<a href="/terms">Terms</a>', '<a href="mailto:%s">Contact</a>' % EMAIL]
     parts += ['<a href="/cookies">Cookies</a>', '<a href="/cookies" data-cookie-settings>Cookie settings</a>']
     if not LIVE:
         parts += ['<span class="lg-foot-t">Privacy and Terms pages coming soon.</span>']

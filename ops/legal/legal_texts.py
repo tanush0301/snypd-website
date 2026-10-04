@@ -1,21 +1,13 @@
 # Body text for privacy.html and terms.html. Every factual statement here was
-# checked against the running system on 2026-09-27 (see CLAUDE.md, Session 27).
-# DRAFT_NOTE marks what must be settled before these pages are published.
+# checked against the running system on 2026-09-27 (see CLAUDE.md, Session 27) and
+# again on 2026-10-04 when the pages went live (operator, Meta Pixel, log retention).
+# Still open: address + KBO/VAT number once SNYPD is registered, and a lawyer's read.
 
-DRAFT_NOTE = """
-<div class="lg-box lg-amber">
-  <p><strong>DRAFT, NOT PUBLISHED.</strong> Before this page goes live:</p>
-  <ul style="margin:0;">
-    <li>Operator details: the legal name, geographic address and enterprise (KBO) number of whoever runs SNYPD, plus the VAT number if there is one. Belgian law requires them on the site, and the GDPR requires the controller's identity.</li>
-    <li>Server logs: limit the VPS access logs to 30 days (today they have no limit), so the retention stated below is true.</li>
-    <li>Have a lawyer read it. It describes what the system really does, but it is not legal advice.</li>
-  </ul>
-</div>
-"""
+DRAFT_NOTE = ''
 
 OPERATOR = """
 <div class="lg-box">
-  <p><strong>Operator:</strong> [legal name, geographic address, enterprise number and VAT number go here once SNYPD is registered]</p>
+  <p><strong>Operator:</strong> Tanush Khandelwal, Belgium</p>
   <p><strong>Contact:</strong> <a href="mailto:{email}">{email}</a></p>
 </div>
 """
@@ -65,7 +57,7 @@ def privacy_body(email, discord):
     <li>When someone opens a partner link: the partner code and the page they came from. No identifier of the visitor is stored with it.</li>
   </ul>
   <h3>ONLY WITH YOUR CONSENT</h3>
-  <p>Google Analytics and the Whop pixel. See the <a href="/cookies">cookie policy</a> for exactly what they store.</p>
+  <p>Google Analytics, the Whop pixel and the Meta Pixel. See the <a href="/cookies">cookie policy</a> for exactly what they store.</p>
   <h3>WHEN YOU CONTACT US</h3>
   <p>What you write to us by email or in our Discord server, and your contact details.</p>
 </section>
@@ -93,7 +85,8 @@ def privacy_body(email, discord):
     <li><strong>IONOS</strong>: the server that runs monitoring and alerts, in Frankfurt, Germany.</li>
     <li><strong>Vercel</strong>: hosts this website and delivers it through its global network.</li>
     <li><strong>Whop</strong>: checkout, payments and subscriptions. Its checkout, which loads only when you open one, also runs Whop's own measurement script. The Whop pixel on the rest of the site runs only with your consent.</li>
-    <li><strong>Google</strong>: sign in with Google, Google Fonts, Google Analytics (only with consent) and, in Chrome, delivery of alerts. Other browsers deliver alerts through their maker's push service, such as Apple, Mozilla or Microsoft.</li>
+    <li><strong>Meta</strong>: the Meta Pixel, only with your consent. It tells Meta which SNYPD pages you visit and that a sign-up happened, so we can see which Facebook or Instagram ads work.</li>
+    <li><strong>Google</strong>: sign in with Google, Google Analytics (only with consent) and, in Chrome, delivery of alerts. Other browsers deliver alerts through their maker's push service, such as Apple, Mozilla or Microsoft.</li>
     <li><strong>jsDelivr</strong>: delivers the sign-in library to your browser.</li>
     <li><strong>Discord</strong>: only if you join our <a href="{discord}">Discord server</a>.</li>
     <li><strong>Gmail</strong> (Google): if you email us.</li>
@@ -111,7 +104,7 @@ def privacy_body(email, discord):
     <li><strong>Listings shown in your feed</strong>: removed automatically within an hour.</li>
     <li><strong>Market-price data</strong>: 14 days after a listing was last seen.</li>
     <li><strong>Push address</strong>: until you turn alerts off, or your browser tells us the address no longer works.</li>
-    <li><strong>Server access logs</strong>: 30 days.</li>
+    <li><strong>Server logs</strong>, including access logs: emptied automatically on the 1st of every month, so they are never more than about a month old.</li>
     <li><strong>Payment records</strong>: as long as tax law requires, which in Belgium is up to 10 years.</li>
     <li><strong>Emails and support messages</strong>: as long as needed to help you, then up to one year.</li>
   </ul>

@@ -30,6 +30,8 @@ PAGES = [
     ('/signup',  'signup.html',  None),
     ('/support', 'support.html', None),
     ('/cookies', 'cookies.html', None),
+    ('/privacy', 'privacy.html', None),
+    ('/terms',   'terms.html',   None),
     ('/vinted-bot',                 'vinted-bot.html',                 None),
     ('/vinted-saved-search-alerts', 'vinted-saved-search-alerts.html', None),
     ('/vinted-bot-comparison',      'vinted-bot-comparison.html',      None),

@@ -33,7 +33,7 @@
   /* The sign-up line links /terms and /privacy. Those pages are drafted but
      not published yet (see CLAUDE.md, Session 27), so the line stays hidden
      until they are live. Flip to true in the same commit that publishes them. */
-  var LEGAL_LIVE = false;
+  var LEGAL_LIVE = true;
 
   var TITLES = {
     login: 'Log in to SNYPD', signup: 'Sign up free - SNYPD Vinted Monitor',
