@@ -131,7 +131,7 @@ def page(slug, title, desc, h1, lead, toc, body):
 <link rel="stylesheet" href="/assets/fonts/dm-mono.css">
 <link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <style>{CSS}</style>
-<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<!-- Cookie consent: Google Analytics, the Whop pixel and the Meta Pixel load only after the visitor agrees -->
 <script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -209,6 +209,8 @@ analytics = [
 marketing = [
     ('<code>_wuid</code>, <code>_wuid_link</code><br>cookie, Whop', 'Whop pixel: connects a sign-up or purchase to the ad or partner link that led to it.', 'Up to 400 days'),
     ('<code>_wuid</code>, <code>_wuid_link_domain</code>, <code>_wsc</code>, <code>_wsc_probed_at</code>, <code>_wfp</code>, <code>_wsc_probed</code><br>local and session storage, Whop', 'Used by the same Whop pixel for the same purpose.', 'Until you clear your browser (<code>_wsc_probed</code>: until you close the tab)'),
+    ('<code>_fbp</code><br>cookie, Meta', 'Meta Pixel: tells visits apart so Meta can connect a SNYPD sign-up to the Facebook or Instagram ad that led to it.', '90 days'),
+    ('<code>_fbc</code><br>cookie, Meta', 'Meta Pixel: only set when you arrive by clicking a Facebook or Instagram ad; stores that click so the sign-up can be credited to the ad.', '90 days'),
     ('<code>snypd_ref</code><br>local storage, SNYPD', 'The partner code from a partner link you arrived through, so the partner is credited if you sign up.', 'Until you clear your browser'),
 ]
 
@@ -237,7 +239,7 @@ cookies_body = f"""
 </section>
 <section id="marketing">
   <h2>Marketing</h2>
-  <p>Only with your consent. Whop receives your IP address and browser details when its pixel loads.</p>
+  <p>Only with your consent. Whop and Meta receive your IP address and browser details when their pixels load; Meta also receives which SNYPD pages you visit and, if you sign up, that a sign-up happened.</p>
   {rows(COOKIE_HEAD, marketing)}
 </section>
 <section id="other">

@@ -6,7 +6,8 @@
  *
  *   analytics  -> Google Analytics 4 (gtag.js) and, where a page had it,
  *                 Google Tag Manager (whose only tags are the same GA4 property)
- *   marketing  -> the Whop pixel, and the stored referral code (snypd_ref)
+ *   marketing  -> the Whop pixel, the Meta Pixel (dataset 1104479635308667,
+ *                 Facebook/Instagram ads) and the stored referral code (snypd_ref)
  *
  * Each page declares what it loaded before this existed, so behaviour after
  * consent is unchanged page by page:
@@ -23,13 +24,14 @@
 (function () {
   if (window.SNYPDConsent) return;
 
-  var VERSION = 1;
+  var VERSION = 2; /* 2: Meta Pixel added to marketing (Oct 2026) */
   var KEY = 'snypd_consent';
   var me = document.currentScript;
   var cfg = {
     ga: me && me.getAttribute('data-ga'),
     gtm: me && me.getAttribute('data-gtm'),
-    whop: me && me.getAttribute('data-whop')
+    whop: me && me.getAttribute('data-whop'),
+    meta: (me && me.getAttribute('data-meta')) || '1104479635308667'
   };
 
   var loaded = { analytics: false, marketing: false };
@@ -70,6 +72,16 @@
   function runMarketing() {
     if (loaded.marketing) return;
     loaded.marketing = true;
+    if (cfg.meta) {
+      /* Meta's own base code, unchanged. It is only ever added after consent, so
+         nothing reaches Meta before the visitor says yes. */
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      /* No automatic events: Meta would otherwise also report button clicks (even
+         the Reject click) and page metadata. Only PageView + CompleteRegistration. */
+      window.fbq('set', 'autoConfig', false, cfg.meta);
+      window.fbq('init', cfg.meta);
+      window.fbq('track', 'PageView');
+    }
     if (!cfg.whop) return;
     /* The Whop pixel's own loader, unchanged, followed by the same two calls
        every page made before. */
@@ -107,7 +119,7 @@
     for (var i = 0; i < names.length; i++) {
       var n = names[i];
       if (analytics && (n === '_ga' || n.indexOf('_ga_') === 0 || n === '_gid')) clearCookie(n);
-      if (marketing && n.indexOf('_wuid') === 0) clearCookie(n);
+      if (marketing && (n.indexOf('_wuid') === 0 || n === '_fbp' || n === '_fbc')) clearCookie(n);
     }
     if (marketing) {
       ['_wuid', '_wuid_link_domain', '_wsc', '_wsc_probed_at', '_wfp', 'snypd_ref'].forEach(function (k) {
@@ -197,7 +209,7 @@
     bar.innerHTML =
       '<div class="snc-in">' +
         '<p class="snc-txt"><b>Cookies.</b> SNYPD only stores what it needs to keep you signed in. ' +
-        'With your OK we also use Google Analytics to see how the site is used, and the Whop pixel to measure sign-ups from ads and partner links. ' +
+        'With your OK we also use Google Analytics to see how the site is used, and the Whop pixel and Meta Pixel to measure sign-ups from ads and partner links. ' +
         '<a href="/cookies">Cookie policy</a></p>' +
         '<div class="snc-btns">' +
           '<button type="button" class="snc-btn" data-snc="reject">REJECT ALL</button>' +
@@ -257,7 +269,7 @@
           '<a href="/cookies">Full list of cookies</a></p></div>' +
         row('snc-nec', 'NECESSARY', 'Keeps you signed in, remembers the plan you picked before checkout and your dashboard settings. The site cannot work without these, so they are always on.', true, true) +
         row('snc-an', 'ANALYTICS', 'Google Analytics 4: which pages are visited and how people find SNYPD. Google receives your IP address and browser details.', c.analytics, false) +
-        row('snc-mk', 'MARKETING', 'Whop pixel: measures sign-ups that came from ads and partner links. Also remembers the partner code in a partner link you arrived through.', c.marketing, false) +
+        row('snc-mk', 'MARKETING', 'Whop pixel and Meta Pixel: measure sign-ups that came from ads (including Facebook and Instagram ads) and partner links. Meta receives your IP address, browser details and the SNYPD pages you visit. Also remembers the partner code in a partner link you arrived through.', c.marketing, false) +
         '<div class="snc-ft">' +
           '<button type="button" class="snc-btn" data-snc="save">SAVE CHOICES</button>' +
           '<button type="button" class="snc-btn" data-snc="reject">REJECT ALL</button>' +
