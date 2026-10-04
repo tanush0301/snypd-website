@@ -244,7 +244,7 @@ cookies_body = f"""
 </section>
 <section id="other">
   <h2>Other services your browser contacts</h2>
-  <p>These store nothing on your device, but your browser fetches files from them, so they see your IP address: <strong>Google Fonts</strong> (the DM Mono typeface) and <strong>jsDelivr</strong> (the library that handles sign-in). On pages where you are signed in, your browser also talks to <strong>Supabase</strong>, which runs SNYPD's database.</p>
+  <p>It stores nothing on your device, but your browser fetches a file from it, so it sees your IP address: <strong>jsDelivr</strong> (the library that handles sign-in). SNYPD's fonts are served from snypd.store itself. On pages where you are signed in, your browser also talks to <strong>Supabase</strong>, which runs SNYPD's database.</p>
 </section>
 <section id="contact">
   <h2>Questions</h2>
