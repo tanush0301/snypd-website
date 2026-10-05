@@ -1555,7 +1555,7 @@ body {
     .fs-row__status-text { font-size: 9.5px; letter-spacing: 0.1em; color: var(--text-muted); }
     .fs-row.is-live .fs-row__status-text { color: var(--success); }
     .fs-row__url { font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .fs-row__actions { display: flex; gap: 16px; padding-top: 4px; }
+    .fs-row__actions { display: flex; flex-wrap: wrap; gap: 8px 16px; padding-top: 4px; }
     .fs-row__actions button { background: none; border: none; padding: 0; font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted); font-family: var(--font); cursor: pointer; }
     .fs-row__actions button.fs-danger { color: var(--danger); }
     .filter-sheet__new { border: 1px dashed var(--border-hover); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -2490,12 +2490,57 @@ const HEARTBEAT_URL = (() => {
         return /(^|\.)vinted\./i.test(x.hostname) && x.pathname.replace(/\/+$/, '') === '/catalog' && x.search.length > 1;
       } catch (e) { return false; }
     }
+    // Mirror of scraper-worker/src/catalogue_contract.py build_catalogue_request:
+    // the scraper REFUSES (never trims) a link it cannot translate exactly, and
+    // it does so silently on every poll. Measured 2026-10-05: one saved hunt
+    // with currency=USD on vinted.be had been refused 2,271 times in 48h while
+    // showing LIVE here. Keep VOLATILE/SCALARS in step with that file.
+    const CONTRACT_VOLATILE = ['page', 'per_page', 'order', 'time', 'search_id'];
+    const CONTRACT_SCALARS = ['search_text', 'price_from', 'price_to', 'currency', 'catalog_from',
+      'search_by_image_uuid', 'search_by_image_id', 'disable_search_saving'];
+    function contractProblem(u) {
+      let x;
+      try { x = new URL(String(u || '').trim()); } catch (e) { return null; }
+      const site = vintedSite(u);
+      if (!vintedSiteSupported(u)) return null; // paintSiteNote covers this
+      if (x.protocol !== 'https:' || x.username || x.password || x.port) return 'SNYPD needs a normal https Vinted link. Copy it again from the address bar.';
+      if (x.pathname.replace(/\/+$/, '') !== '/catalog') return 'This is not a Vinted search link. Run the search on Vinted and copy the address of the results page.';
+      const scalars = {};
+      for (const [key, value] of x.searchParams) {
+        if (CONTRACT_VOLATILE.indexOf(key) !== -1 || value === '') continue;
+        const name = key.replace(/\[\]$/, '');
+        if (name === 'catalog' || /_ids$/.test(name) || name.indexOf('attribute_ids[') === 0) {
+          const code = name.indexOf('attribute_ids[') === 0 ? name.slice(14).replace(/\]$/, '') : name.replace(/_ids$/, '');
+          if (!/^[a-z][a-z0-9_]*$/.test(code) || !value.split(',').every(v => /^[0-9]+$/.test(v))) {
+            return 'SNYPD cannot read the "' + key + '" filter in this link, so it would never run. Remove that filter on Vinted and copy the link again.';
+          }
+        } else if (CONTRACT_SCALARS.indexOf(key) !== -1) {
+          if (key in scalars && scalars[key] !== value) return 'This link sets "' + key + '" twice with different values. Copy it again from Vinted.';
+          scalars[key] = value;
+        } else {
+          return 'SNYPD cannot read the "' + key + '" filter in this link yet, so it would never run. Remove that filter on Vinted and copy the link again.';
+        }
+      }
+      const cur = currencyFor(u);
+      if (scalars.currency && scalars.currency !== cur) {
+        return 'This link is set to ' + scalars.currency + ', but ' + site + ' lists prices in ' + cur + ', so SNYPD cannot run it. Switch the currency to ' + cur + ' on Vinted and copy the link again.';
+      }
+      for (const k of ['price_from', 'price_to']) {
+        if (k in scalars && !(/^\s*([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?\s*$/.test(scalars[k]))) return 'The price in this link is not a plain number. Set the price again on Vinted and copy the link.';
+      }
+      return null;
+    }
     function paintSiteNote() {
       if (!siteNote) return;
       const u = urlInput.value.trim();
-      const show = !!u && validVintedUrl(u) && !vintedSiteSupported(u);
-      siteNote.textContent = show ? (vintedSite(u) + ' is not a Vinted site SNYPD watches. SNYPD watches ' + SUPPORTED_VINTED_TEXT + ': search on one of those and paste that link.') : '';
-      siteNote.style.display = show ? '' : 'none';
+      let msg = '';
+      if (u && validVintedUrl(u)) {
+        msg = !vintedSiteSupported(u)
+          ? (vintedSite(u) + ' is not a Vinted site SNYPD watches. SNYPD watches ' + SUPPORTED_VINTED_TEXT + ': search on one of those and paste that link.')
+          : (contractProblem(u) || '');
+      }
+      siteNote.textContent = msg;
+      siteNote.style.display = msg ? '' : 'none';
     }
     // WHY NEW HUNTS GET A DEFAULT MINIMUM PRICE
     // Measured live 2026-09-18 against the real Vinted catalogue gateway: the
@@ -2619,8 +2664,13 @@ const HEARTBEAT_URL = (() => {
             </div>
             <div class="fs-row__url">${escFs(shortUrl(r.vinted_url))}</div>
             ${vintedSiteSupported(r.vinted_url) ? '' : `<p class="fs-floor__note is-warn" role="note">${escFs(vintedSite(r.vinted_url))} is not a Vinted site SNYPD watches, so this hunt cannot find anything. Recreate it with a link from a Vinted site in Europe or the US.</p>`}
+            ${contractProblem(r.vinted_url) ? `<p class="fs-floor__note is-warn" role="note">This hunt cannot run. ${escFs(contractProblem(r.vinted_url))} Then delete this hunt and add the new link.</p>` : ''}
+            <p class="fs-floor__note" role="note">${r.show_all_results
+              ? 'Showing everything Vinted returns, including listings that only mention your words in the description.'
+              : 'Showing listings with every word of your search in the title or brand. Vinted also returns listings that only mention it in the description.'}</p>
             <div class="fs-row__actions">
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
+              <button type="button" data-fs-showall aria-pressed="${r.show_all_results ? 'true' : 'false'}">${r.show_all_results ? 'TITLE MATCH ONLY' : 'SHOW ALL VINTED RESULTS'}</button>
               <a href="${escFs(r.vinted_url)}" target="_blank" rel="noopener" style="font-size:11px;letter-spacing:.08em;color:var(--text-muted)">OPEN ON VINTED</a>
               <button type="button" class="fs-danger" data-fs-delete>DELETE</button>
             </div>
@@ -2643,6 +2693,7 @@ const HEARTBEAT_URL = (() => {
       if (quota.remaining <= 0) return;
       if (!validVintedUrl(url)) { urlInput.style.borderColor = 'var(--danger)'; return; }
       if (!vintedSiteSupported(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
+      if (contractProblem(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
       urlInput.style.borderColor = '';
       saveBtn.disabled = true;
       try {
@@ -2692,6 +2743,14 @@ const HEARTBEAT_URL = (() => {
         if (error) console.error('SNYPD filter sheet: could not toggle hunt', error);
         await reloadHunts();
         await loadAds();
+        return;
+      }
+      if (e.target.closest('[data-fs-showall]')) {
+        // Read by the backend on its next sync (paid plans: within 5 minutes;
+        // migration 039, user_searches.show_all_results).
+        const { error } = await sb.from('user_searches').update({ show_all_results: !item.show_all_results }).eq('id', id).eq('user_id', uid);
+        if (error) console.error('SNYPD filter sheet: could not change match mode', error);
+        await reloadHunts();
         return;
       }
       if (e.target.closest('[data-fs-delete]')) {
@@ -4105,7 +4164,9 @@ const HEARTBEAT_URL = (() => {
   if (newPill) {
     newPill.onclick = () => {
       if (!pendingNew.length) return;
-      list.insertBefore(insertCards(pendingNew, 'new'), list.firstChild);
+      const onScreen = new Set(Array.from(list.querySelectorAll('.card')).map(c => c.dataset.id));
+      const fresh = pendingNew.filter(r => !onScreen.has(String(r.listing_id)));
+      if (fresh.length) list.insertBefore(insertCards(fresh, 'new'), list.firstChild);
       pendingNew = [];
       updatePill();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4680,12 +4741,23 @@ const HEARTBEAT_URL = (() => {
     // shift anything the user is currently looking at.
     existingCards.forEach(c => { if (!incomingIds.has(c.dataset.id)) c.remove(); });
 
+    // The "N new" buffer must never hold a card that is already on screen or
+    // has aged out: it is inserted blindly on tap, and before this a row
+    // buffered while scrolled down was ALSO inserted by the next refresh once
+    // the user scrolled back up, so the tap added it a second time (seen live
+    // 2026-10-05: the same "Air Jordan 4 Daim Gris" card twice, one DB row).
+    pendingNew = pendingNew.filter(r => incomingIds.has(String(r.listing_id))
+      && !existingIds.has(String(r.listing_id)));
     const newRows = rows.filter(r => !existingIds.has(String(r.listing_id)));
-    if (!newRows.length) return;
+    if (!newRows.length) { updatePill(); return; }
 
     const nearTop = pageScrollTop() <= 32;
     if (nearTop) {
+      // Everything not yet on screen goes in now, so the buffer is emptied
+      // rather than left to re-insert the same rows later.
+      pendingNew = [];
       list.insertBefore(insertCards(newRows, 'new'), list.firstChild);
+      updatePill();
     } else {
       // Buffer instead of yanking the list under a user scrolled into it -
       // show the "N new" pill, insert only when they tap it.
