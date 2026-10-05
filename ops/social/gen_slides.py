@@ -247,9 +247,40 @@ def monitor(lang):
     write_set('monitor-fr', slides, caption, alts)
 
 
+# ------------------------------------------------------------------ Meta ads v2 (EN)
+# Written 5 Oct 2026 after Meta rejected the first ads (Prohibited Commercial Practices).
+# Each slide runs alone as a single-image ad: no savings or price claims, no example push
+# with a price, no comparison with Vinted's own features; what it does, what it never does.
+def ads_v2():
+    slides = [
+        '<div class="eyebrow">For Vinted buyers</div><div class="h s">Get a push when a new listing matches your search.</div><ol>'
+        '<li><span>1</span>On Vinted, set your filters and copy the search link.</li>'
+        '<li><span>2</span>Paste it into SNYPD. It checks every <b>30 seconds to 5 minutes</b>.</li>'
+        '<li><span>3</span>A new match arrives as a <b>push notification</b>. You open it on Vinted and decide.</li></ol>'
+        '<div class="src">Not affiliated with Vinted.</div>',
+        '<div class="eyebrow">How SNYPD works</div><div class="h s">It finds and tells. You decide.</div><ol>'
+        '<li><span>&times;</span>Never asks for your Vinted password.</li>'
+        '<li><span>&times;</span>Never signs in to your Vinted account.</li>'
+        '<li><span>&times;</span>Never buys or messages sellers.</li></ol>'
+        # Real dashboard capture (assets/seo, 2 Oct 2026; seller photos blurred).
+        f'<img src="{FONT}/assets/seo/snypd-feed-phone.webp" alt="" style="display:block;height:560px;margin:36px auto 0;border:1px solid #26262A;">'
+        '<div class="cta">Free plan: <b>1 search, no card.</b></div>'
+        '<div class="src">Not affiliated with Vinted.</div>',
+    ]
+    caption = ('Paste a Vinted search link with your filters. SNYPD checks it every 30 s to 5 min and sends a push when a new listing matches. '
+               f'It never asks for your Vinted password and never buys for you.\n\nsnypd.store\n\n{TAGS["en"]}')
+    alts = ['How SNYPD works: copy a Vinted search link, paste it into SNYPD, get a push notification when a new listing matches.',
+            'SNYPD never asks for your Vinted password, never signs in to your account and never buys or messages sellers. Free plan: one search.']
+    write_set('adsv2-en', slides, caption, alts)
+
+
 if __name__ == '__main__':
+    if sys.argv[2:] == ['adsv2']:  # python gen_slides.py OUT adsv2 -> only the ad set
+        ads_v2()
+        sys.exit(0)
     deals_en()
     fees('en')
     fees('fr')
     monitor('en')
     monitor('fr')
+    ads_v2()

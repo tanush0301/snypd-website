@@ -14,7 +14,7 @@ const FPS = Number(process.env.FPS || 30), SECONDS = 15, KEY = [0, 1.8, 3.0, 4.8
   const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--allow-file-access-from-files'] });
   const page = await browser.newPage();
   await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
-  await page.goto('file:///' + path.join(__dirname, 'scene.html').replace(/\\/g, '/'), { waitUntil: 'networkidle0' });
+  await page.goto('file:///' + path.join(__dirname, process.env.SCENE || 'scene.html').replace(/\\/g, '/'), { waitUntil: 'networkidle0' });
   await page.evaluate(() => document.fonts.ready);
   const ok = await page.evaluate(() => document.fonts.check('900 40px Cabinet') && document.fonts.check('400 20px DMMono')
     && [...document.images].every(i => i.complete && i.naturalWidth > 0));

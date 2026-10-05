@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!-- v2 (5 Oct 2026, after Meta rejected v1): same timeline and layout as scene.html, but a neutral
+     hook (no "Vinted's saved searches don't ping you" comparison) and a generic example push in the real format (price - title (size - condition)) with no brand.
+     Render with SCENE=scene_v2.html.
+     15 s vertical demo for Meta ads (1080x1920). window.setT(seconds) puts every element in its
+     state for that moment, so render_video.js can step frame by frame (deterministic, no timers).
+     All text stays inside y 300-1240 and x 72-1008: Meta's Reels safe zone (top 14%, bottom 35%,
+     6% each side) and also inside the centre 4:5 crop Meta uses in Feed (y 285-1635).
+     Dashboard images in shots/ are real dashboard.html screenshots taken against ops/qa_mock.js
+     (capture.js). Facts: outreach/00-fact-sheet.md only. -->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family: 'Cabinet'; src: url('../../../assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; }
+@font-face { font-family: 'DMMono'; src: url('../../../assets/fonts/dm-mono-400-latin.woff2') format('woff2'); font-weight: 400; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; background: #0A0A0B; overflow: hidden; }
+body { color: #FFF; font-family: 'DMMono', monospace; position: relative; }
+.sc { position: absolute; left: 72px; right: 72px; top: 300px; height: 940px; opacity: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.sc > * { max-width: 100%; }
+.sc > .urlbar, .sc > .notif, .sc > .wrap { align-self: stretch; }
+.eyebrow { font-size: 30px; letter-spacing: .16em; color: #00E5A0; text-transform: uppercase; }
+.h { font-family: 'Cabinet', sans-serif; font-weight: 900; font-size: 104px; line-height: .98; letter-spacing: -.02em; margin-top: 34px; }
+.h.m { font-size: 76px; }
+.mint { color: #00E5A0; }
+.p { font-size: 38px; line-height: 1.4; color: #B8BCBF; margin-top: 36px; }
+.step { display: flex; gap: 26px; align-items: baseline; }
+.step .n { font-family: 'Cabinet'; font-weight: 900; font-size: 92px; color: #00E5A0; line-height: 1; }
+.step .t { font-family: 'Cabinet'; font-weight: 900; font-size: 72px; line-height: 1.02; letter-spacing: -.01em; }
+.note { font-size: 28px; color: #8B9094; margin-top: 22px; }
+.urlbar { margin-top: 70px; background: #1A1B1E; border: 1px solid #2A2B2F; border-radius: 22px; padding: 30px 30px; font-size: 32px; line-height: 1.5; word-break: break-all; color: #E6E6E6; position: relative; }
+.urlbar .lock { color: #8B9094; }
+.urlbar .sel { background: rgba(0,229,160,0); transition: none; }
+.pill { display: inline-block; margin-top: 34px; border: 2px solid #00E5A0; color: #00E5A0; font-size: 30px; padding: 14px 26px; border-radius: 999px; opacity: 0; }
+.shot { display: block; width: 100%; margin-top: 60px; border: 1px solid #2A2B2F; border-radius: 18px; }
+.notif { margin-top: 70px; background: #1E1F23; border-radius: 34px; padding: 30px 32px; display: flex; gap: 26px; align-items: flex-start; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.notif .ic { flex: 0 0 92px; height: 92px; border-radius: 22px; background: #0A0A0B; border: 2px solid #00E5A0; color: #00E5A0; font-family: 'Cabinet'; font-weight: 900; font-size: 56px; display: flex; align-items: center; justify-content: center; }
+.notif .app { font-size: 26px; color: #8B9094; letter-spacing: .08em; }
+.notif .ti { font-size: 36px; color: #FFF; margin-top: 8px; }
+.notif .bo { font-size: 32px; color: #C9CCCF; line-height: 1.4; margin-top: 8px; }
+.tag { font-size: 24px; color: #6E7377; margin-top: 18px; letter-spacing: .06em; }
+.word { font-family: 'Cabinet'; font-weight: 900; font-size: 150px; letter-spacing: .02em; }
+.cta { display: inline-block; margin-top: 60px; background: #A100FF; color: #FFF; font-size: 44px; padding: 30px 52px; letter-spacing: .06em; }
+.fine { font-size: 27px; color: #8B9094; line-height: 1.5; margin-top: 56px; }
+</style></head><body>
+
+<section class="sc" id="s1">
+  <div class="eyebrow">For Vinted buyers</div>
+  <div class="h m">Get a push when a new listing matches your search.</div>
+  <div class="h m mint" id="s1b" style="opacity:0">SNYPD checks it for you.</div>
+  <!-- The product in the first second (hook research, 4 Oct 2026): the real push format. -->
+  <div class="notif" style="margin-top:56px">
+    <div class="ic">S</div>
+    <div>
+      <div class="app">SNYPD</div>
+      <div class="ti">New find</div>
+      <div class="bo">25.00 GBP &mdash; Denim jacket (M &middot; Very good)</div>
+    </div>
+  </div>
+  <div class="tag">EXAMPLE NOTIFICATION</div>
+</section>
+
+<section class="sc" id="s2">
+  <div class="step"><span class="n">1</span><span class="t">Set your filters on Vinted. Copy the link.</span></div>
+  <div class="note">Easiest on a computer.</div>
+  <div class="urlbar"><span class="lock">&#128274; </span><span class="sel" id="sel">vinted.co.uk/catalog?search_text=denim%20jacket&amp;price_to=40&amp;currency=GBP&amp;status_ids[]=2&amp;status_ids[]=3&amp;order=newest_first</span></div>
+  <div class="pill" id="copied">Copied</div>
+</section>
+
+<section class="sc" id="s3">
+  <div class="step"><span class="n">2</span><span class="t">Paste it into SNYPD.</span></div>
+  <div class="wrap" style="position:relative">
+    <img class="shot" id="form" src="shots/paste_form.png">
+    <div id="after" style="position:absolute; left:0; right:0; top:60px; opacity:0">
+      <img class="shot" style="margin-top:0" src="shots/hunt_0.png">
+      <div class="p" id="s3n" style="opacity:0">Checked every <b style="color:#FFF;font-weight:400">30&nbsp;s to 5&nbsp;min</b>. Same on every plan.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sc" id="s4">
+  <div class="step"><span class="n">3</span><span class="t">New match? A push on your phone.</span></div>
+  <div class="notif" id="notif">
+    <div class="ic">S</div>
+    <div>
+      <div class="app">SNYPD</div>
+      <div class="ti">New find</div>
+      <div class="bo">25.00 GBP &mdash; Denim jacket (M &middot; Very good)</div>
+    </div>
+  </div>
+  <div class="tag">EXAMPLE NOTIFICATION</div>
+  <div class="p" id="s4n" style="opacity:0">You open it on Vinted and decide. SNYPD never buys for you.</div>
+</section>
+
+<section class="sc" id="s5">
+  <div class="word">SNYPD</div>
+  <div class="h m">Vinted alerts on your phone.</div>
+  <div class="p">Free plan: 1&nbsp;search, no card.</div>
+  <div class="cta">SNYPD.STORE</div>
+  <div class="fine">Never logs into your Vinted account.<br>Not affiliated with Vinted.</div>
+</section>
+
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+// [id, start, end] in seconds; each scene fades in over 0.3 s and out over 0.25 s.
+const SCENES = [['s1', 0, 2.6], ['s2', 2.6, 6.0], ['s3', 6.0, 9.6], ['s4', 9.6, 12.6], ['s5', 12.6, 15.0]];
+function vis(t, a, b, last) {
+  const fin = ease((t - a) / 0.3), fout = last ? 1 : 1 - ease((t - (b - 0.25)) / 0.25);
+  return t < a || t > b ? 0 : Math.min(fin, fout);
+}
+window.setT = function (t) {
+  SCENES.forEach(([id, a, b], i) => {
+    const el = document.getElementById(id), v = i === 0 && t < 0.3 ? 1 : vis(t, a, b, i === SCENES.length - 1);
+    el.style.opacity = v;
+    el.style.transform = 'translateY(' + ((1 - v) * 24).toFixed(1) + 'px)';
+  });
+  document.getElementById('s1b').style.opacity = ease((t - 1.3) / 0.3);
+  document.getElementById('sel').style.background = 'rgba(0,229,160,' + (0.32 * ease((t - 3.4) / 0.6)).toFixed(3) + ')';
+  document.getElementById('copied').style.opacity = ease((t - 4.3) / 0.3);
+  const swap = ease((t - 7.8) / 0.4);
+  document.getElementById('form').style.opacity = 1 - swap;
+  document.getElementById('after').style.opacity = swap;
+  document.getElementById('s3n').style.opacity = ease((t - 8.2) / 0.3);
+  const n = ease((t - 10.0) / 0.45);
+  const notif = document.getElementById('notif');
+  notif.style.opacity = n;
+  notif.style.transform = 'translateY(' + ((1 - n) * -60).toFixed(1) + 'px)';
+  document.getElementById('s4n').style.opacity = ease((t - 11.0) / 0.3);
+};
+window.setT(0);
+</script>
+</body></html>
