@@ -159,10 +159,25 @@
     return out;
   }
 
+  /* Whop partner code (a=<Whop username>) from a partner's link: from the address
+     (assets/consent.js keeps it on links), else from this browser (snypd_aff, only
+     stored with marketing consent, 30 days). Saved with the account so /plans can
+     pass it to Whop's checkout after the email is confirmed, maybe in another tab. */
+  function partnerCode() {
+    var v = null;
+    try { v = new URLSearchParams(location.search).get('a'); } catch (e) {}
+    if (!v) {
+      try { var s = JSON.parse(lsGet('snypd_aff') || 'null'); if (s && s.a && Date.now() - s.t < 30 * 864e5) v = s.a; } catch (e) {}
+    }
+    return v && /^[A-Za-z0-9_.-]{1,60}$/.test(v) ? v : null;
+  }
+
   function signupData() {
     var data = { marketing_opt_in: !!S.marketing };
     var tags = campaignTags();
     for (var k in tags) data[k] = tags[k];
+    var aff = partnerCode();
+    if (aff) data.whop_aff = aff;
     if (S.marketing) data.marketing_opt_in_at = new Date().toISOString();
     var ref = lsGet('snypd_ref');
     if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;

@@ -36,6 +36,7 @@ def privacy_body(email, discord):
     <li>Your email address and a password, which our database provider stores only in hashed form. We never see it.</li>
     <li>If you sign in with Google: the name, email address and profile picture link Google shares with us.</li>
     <li>The plan you picked before signing up, and the partner code if you arrived through a partner link and allowed marketing cookies.</li>
+    <li>If you arrived through a Whop partner link (an address ending in <code>?a=</code> and a name): that partner's Whop username. It is saved with your account and passed to Whop's checkout, so Whop can pay the partner. Your browser keeps it only if you allowed marketing cookies.</li>
     <li>Your founding-member number, if you are one of the first 100 accounts.</li>
     <li>If you arrived through a link with campaign tags in the address (for example one of our ads): those tags, which name the source, campaign and ad, not you. They come from the link only; nothing is stored on your device for this.</li>
   </ul>

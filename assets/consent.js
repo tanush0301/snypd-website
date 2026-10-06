@@ -328,16 +328,25 @@
   else document.addEventListener('DOMContentLoaded', showBanner);
 })();
 
-/* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) on links to
-   other SNYPD pages, so the sign-up page can save them with the new account
-   (assets/auth.js). Nothing is stored on the device. */
+/* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) and a Whop
+   partner code (a=<Whop username>, from a partner's link) on links to other SNYPD
+   pages, so the sign-up page can save them with the new account (assets/auth.js)
+   and /plans can pass the partner code to Whop's checkout. The only thing stored
+   on the device is the partner code, and only once marketing is allowed
+   (snypd_aff, read for 30 days: the same window as Whop's own partner links). */
 (function () {
   var q = new URLSearchParams(location.search), tags = [];
-  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'a'].forEach(function (k) {
     var v = q.get(k);
     if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) tags.push([k, v]);
   });
   if (!tags.length) return;
+  var aff = q.get('a');
+  if (aff && /^[A-Za-z0-9_.-]{1,60}$/.test(aff) && window.SNYPDConsent) {
+    SNYPDConsent.whenGranted('marketing', function () {
+      try { localStorage.setItem('snypd_aff', JSON.stringify({ a: aff, t: Date.now() })); } catch (e) {}
+    });
+  }
   function decorate() {
     [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
       var u;

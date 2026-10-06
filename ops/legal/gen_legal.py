@@ -212,6 +212,7 @@ marketing = [
     ('<code>_fbp</code><br>cookie, Meta', 'Meta Pixel: tells visits apart so Meta can connect a SNYPD sign-up to the Facebook or Instagram ad that led to it.', '90 days'),
     ('<code>_fbc</code><br>cookie, Meta', 'Meta Pixel: only set when you arrive by clicking a Facebook or Instagram ad; stores that click so the sign-up can be credited to the ad.', '90 days'),
     ('<code>snypd_ref</code><br>local storage, SNYPD', 'The partner code from a partner link you arrived through, so the partner is credited if you sign up.', 'Until you clear your browser'),
+    ('<code>snypd_aff</code><br>local storage, SNYPD', 'The Whop username of the partner whose link you arrived through, so Whop credits that partner if you subscribe.', 'Read for 30 days; stays until you clear your browser'),
 ]
 
 cookies_body = f"""

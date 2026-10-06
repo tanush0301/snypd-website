@@ -671,6 +671,25 @@
 
   // ----- Signed-in state ----------------------------------------------------
   var auth = { signedIn: false, plan: null, manageUrl: MANAGE };
+  // Whop partner code (a=<Whop username>, from a partner's link): this address
+  // first, then the account (user_metadata.whop_aff, saved at sign-up, set in
+  // loadPlan), then this browser (snypd_aff, marketing consent only, 30 days).
+  // Passed to Whop's checkout (?a= / data-whop-checkout-affiliate-code, both
+  // read by Whop) so the partner is credited.
+  var AFF_RE = /^[A-Za-z0-9_.-]{1,60}$/;
+  var aff = null, affFromUrl = false;
+  try { aff = new URLSearchParams(location.search).get('a'); affFromUrl = !!aff; } catch (e) {}
+  if (!aff) {
+    try { var sa = JSON.parse(localStorage.getItem('snypd_aff') || 'null'); if (sa && sa.a && Date.now() - sa.t < 30 * 864e5) aff = sa.a; } catch (e) {}
+  }
+  if (aff && !AFF_RE.test(aff)) { aff = null; affFromUrl = false; }
+  function withAff(href) {
+    if (!aff) return href;
+    var u = new URL(href, location.origin);
+    u.searchParams.set('a', aff);
+    return u.origin === location.origin ? u.pathname + u.search : u.href;
+  }
+
   var ref = null;
   try { ref = new URLSearchParams(location.search).get('r'); if (ref && !/^[a-z2-9]{4,8}$/.test(ref)) ref = null; } catch (e) {}
   if (ref && window.SNYPDConsent) {
@@ -697,11 +716,16 @@
     a.textContent = c.label;
     a.setAttribute('data-act', c.act);
     a.setAttribute('data-plan', k);
-    if (c.href) { a.href = c.href; a.removeAttribute('aria-disabled'); }
+    var h = c.href && (c.act === 'checkout' || c.act === 'signup') ? withAff(c.href) : c.href;
+    if (h) { a.href = h; a.removeAttribute('aria-disabled'); }
     else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); a.setAttribute('role', 'link'); }
   }
 
   function paintAll() {
+    document.querySelectorAll('[data-whop-checkout-plan-id]').forEach(function (d) {
+      if (aff) d.setAttribute('data-whop-checkout-affiliate-code', aff);
+      else d.removeAttribute('data-whop-checkout-affiliate-code');
+    });
     document.querySelectorAll('[data-cta]').forEach(function (a) { paintCta(a, a.getAttribute('data-cta')); });
     PLANS.forEach(function (k) {
       var tag = document.querySelector('[data-cur="' + k + '"]');
@@ -870,6 +894,10 @@
     if (!user) return;
     auth.signedIn = true;
     auth.plan = 'free';
+    var md = user.user_metadata || {};
+    var savedAff = md.whop_aff && AFF_RE.test(md.whop_aff) ? md.whop_aff : null;
+    if (!affFromUrl && savedAff) aff = savedAff;
+    if (aff && !savedAff && sb.auth.updateUser) sb.auth.updateUser({ data: { whop_aff: aff } }).catch(function () {});
     var pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id').eq('id', user.id).maybeSingle();
     var row = pr && pr.data;
     if (row) {
