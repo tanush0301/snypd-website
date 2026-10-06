@@ -162,6 +162,24 @@
     .pitch-cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
     .pitch-cta .fineprint { color: var(--muted); font-size: 13px; }
 
+    /* ---- join: 3 steps, the page an Instagram-recruited partner is sent to ---- */
+    .join { border: 1px solid var(--brand); }
+    .join-step { padding: 18px 0; border-top: 1px solid var(--border); }
+    .join-step:first-of-type { border-top: 0; padding-top: 4px; }
+    .join-step h4 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+    .join-step h4 span { color: var(--brand); margin-right: 8px; }
+    .join-step p { color: var(--muted); font-size: 14px; margin: 0 0 12px; line-height: 1.55; max-width: 62ch; }
+    .join-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .join-row input {
+      flex: 1 1 220px; min-width: 0; height: 44px; padding: 0 14px; font: inherit; font-size: 16px;
+      color: var(--text); background: var(--panel-2); border: 1px solid var(--border); border-radius: 9px; outline: none;
+    }
+    .join-row input:focus { border-color: var(--brand); }
+    .join-msg { font-size: 14px; margin: 10px 0 0; min-height: 1em; }
+    .join-msg.ok { color: var(--success); }
+    .join-msg.bad { color: var(--warn); }
+    .join-rules { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
     /* ---- states ---- */
     .state {
       border: 1px solid var(--border);
@@ -333,6 +351,45 @@
        referral pays you twelve times.</p>
   </div>
 
+  <div class="pitch-card join" id="join">
+    <h3>Join in 3 steps</h3>
+
+    <div class="join-step">
+      <h4><span>1</span>Join on Whop</h4>
+      <p>Whop runs the program and pays you. Open the link, sign in or create a free
+         Whop account with your email, then join the SNYPD affiliate program.</p>
+      <a class="btn" href="https://whop.com/snypdstore/affiliates" target="_blank" rel="noopener">Join on Whop</a>
+    </div>
+
+    <div class="join-step">
+      <h4><span>2</span>Get your SNYPD link</h4>
+      <p>Type your Whop username (the name after the @ on Whop). We check it against
+         the program, so you never post a link that does not pay.</p>
+      <form class="join-row" id="joinForm" autocomplete="off">
+        <input id="joinUser" name="username" type="text" placeholder="your Whop username"
+               autocapitalize="none" spellcheck="false" aria-label="Your Whop username" maxlength="200">
+        <button class="btn" type="submit" id="joinBtn">Get my link</button>
+      </form>
+      <p class="join-msg" id="joinMsg" role="status" aria-live="polite"></p>
+      <div class="join-row hidden" id="joinOut">
+        <input id="joinLink" type="text" readonly aria-label="Your SNYPD partner link">
+        <button class="btn ghost" type="button" id="joinCopy">Copy</button>
+      </div>
+    </div>
+
+    <div class="join-step">
+      <h4><span>3</span>Share it</h4>
+      <p>Put it in your bio, stories, Discord or video descriptions. People see the
+         SNYPD site first, and you are credited when they subscribe within 30 days.</p>
+      <ul class="join-rules">
+        <li>Say you earn a commission (for example &ldquo;affiliate link&rdquo; or #ad).</li>
+        <li>No paid ads on the name SNYPD, no spam or mass DMs, and do not pretend to be SNYPD.</li>
+        <li>Do not promise &ldquo;instant&rdquo;, &ldquo;real-time&rdquo;, &ldquo;safe&rdquo;, &ldquo;undetectable&rdquo;, sold prices or exact speeds.</li>
+        <li>Keep your Whop username: your link is built from it, so a new name means a new link.</li>
+      </ul>
+    </div>
+  </div>
+
   <div class="pitch-grid">
     <div class="pitch-card">
       <h3>What you earn</h3>
@@ -346,10 +403,10 @@
     <div class="pitch-card">
       <h3>How it works</h3>
       <ol class="steps">
-        <li><b>Get your link.</b> Whop generates a personal referral link the moment
-            you join. Nothing to install.</li>
+        <li><b>Join on Whop and get your link</b> here, in the 3 steps above.
+            Nothing to install.</li>
         <li><b>Share it</b> where resellers already are - your bio, a story, a
-            Discord, a video description.</li>
+            Discord, a video description. Visitors land on the SNYPD site.</li>
         <li><b>Get paid every month.</b> Whop tracks the referral and pays your
             commission for as long as that person stays subscribed.</li>
       </ol>
@@ -403,9 +460,8 @@
        customers who were already looking for us. Everything else is fair game.</p>
 
     <div class="pitch-cta" id="joinCta">
-      <a class="btn" href="/support">Become a partner</a>
-      <span class="fineprint">Free to join. Tell us where your audience is and we
-        will set you up.</span>
+      <a class="btn" href="#join">Get your link</a>
+      <span class="fineprint">Free to join. Questions: snypd@gmail.com</span>
     </div>
   </div>
 
@@ -426,8 +482,8 @@
 <!-- Not an affiliate -->
 <div class="state hidden" id="stateNotPartner">
 <h2>You are not a partner yet</h2>
-<p id="notPartnerCopy">Partners earn recurring commission on every subscriber they bring in, for as long as that subscriber stays. Ask about joining and we will set you up.</p>
-<a class="btn" href="/support">Apply to become a partner</a>
+<p id="notPartnerCopy">Partners earn recurring commission on every subscriber they bring in, for as long as that subscriber stays. Join on Whop and get your link in the 3 steps above.</p>
+<a class="btn" href="#join">Get your link</a>
 </div>
 
 <!-- Provider / config problem -->
@@ -658,6 +714,51 @@
   el('retryBtn').addEventListener('click', load);
 
   load();
+})();
+</script>
+<script>
+/* Step 2 of "Join in 3 steps": Whop username -> confirmed SNYPD partner link.
+   api.snypd.store/api/v1/affiliate/lookup answers only yes/no + the link, from
+   Whop's active affiliate list (cached 2 minutes). A link is shown only when the
+   name is confirmed, because an unconfirmed ?a= link silently never pays out. */
+(function () {
+  var form = document.getElementById('joinForm');
+  if (!form) return;
+  var input = document.getElementById('joinUser'), btn = document.getElementById('joinBtn');
+  var msg = document.getElementById('joinMsg'), out = document.getElementById('joinOut');
+  var link = document.getElementById('joinLink'), copy = document.getElementById('joinCopy');
+  function say(text, kind) { msg.textContent = text; msg.className = 'join-msg' + (kind ? ' ' + kind : ''); }
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var raw = input.value.trim();
+    out.classList.add('hidden');
+    if (!raw) { say('Type your Whop username first.', 'bad'); input.focus(); return; }
+    btn.disabled = true; say('Checking with Whop...', '');
+    try {
+      var r = await fetch('https://api.snypd.store/api/v1/affiliate/lookup?username=' + encodeURIComponent(raw));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var d = await r.json();
+      if (d.active && d.link) {
+        link.value = d.link;
+        out.classList.remove('hidden');
+        say('Confirmed: @' + d.username + ' is a SNYPD partner. This is your link.', 'ok');
+      } else if (d.reason === 'invalid') {
+        say('That does not look like a Whop username. Use letters, numbers, dots, dashes or underscores, without spaces.', 'bad');
+      } else {
+        say('We cannot find @' + raw.replace(/^@/, '') + ' in the SNYPD program yet. Finish step 1 first. Just joined? Try again in 2 minutes. Still nothing? Check the spelling on your Whop profile.', 'bad');
+      }
+    } catch (err) {
+      say('Could not reach Whop right now. Try again in a minute.', 'bad');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+  copy.addEventListener('click', function () {
+    link.select();
+    var done = function () { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy'; }, 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link.value).then(done, function () { document.execCommand('copy'); done(); });
+    else { document.execCommand('copy'); done(); }
+  });
 })();
 </script>
 </body>
