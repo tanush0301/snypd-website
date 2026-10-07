@@ -1716,7 +1716,7 @@ body {
     <div class="filter-sheet__list" id="filter-sheet-list"></div>
     <div class="filter-sheet__new" id="filter-sheet-new">
       <div class="filter-sheet__new-title">+ New hunt — brand, size, price cap</div>
-      <div class="filter-sheet__new-hint">Built here. No Vinted link to copy — the app can't read one from the Vinted app anyway.</div>
+      <div class="filter-sheet__new-hint">Set your filters on Vinted in a browser (brand, size, price), copy the address bar and paste it below.</div>
       <div class="filter-sheet__mobile-notice">Building a filtered Vinted search works best from a computer - come back here once you've got the link.</div>
       <div class="filter-sheet__new-form">
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
@@ -1775,7 +1775,7 @@ body {
         <span class="wiz-progress__bar"></span>
       </div>
       <h2 class="wiz-title">How should we tell you?</h2>
-      <p class="wiz-sub">Under-market listings go fast. We alert you the moment one matches.</p>
+      <p class="wiz-sub">We check your hunt every 30 s to 5 min and send a push when a new listing matches.</p>
       <!-- RISK 15: each toggle's only content is a decorative knob span, so
            without an explicit name a screen reader announces "switch, on"
            with no subject. aria-labelledby points at the visible label that
@@ -1785,16 +1785,9 @@ body {
         <div class="wiz-alert-row">
           <div>
             <div class="wiz-alert-row__title" id="wiz-label-push">Push notification</div>
-            <div class="wiz-alert-row__note">the fast one</div>
+            <div class="wiz-alert-row__note">on your phone or computer</div>
           </div>
           <button type="button" class="toggle-switch is-on" id="wiz-toggle-push" role="switch" aria-checked="true" aria-labelledby="wiz-label-push"><span class="toggle-switch__knob"></span></button>
-        </div>
-        <div class="wiz-alert-row">
-          <div>
-            <div class="wiz-alert-row__title" id="wiz-label-email">Email digest</div>
-            <div class="wiz-alert-row__note">not built yet</div>
-          </div>
-          <button type="button" class="toggle-switch is-disabled" disabled role="switch" aria-checked="false" aria-labelledby="wiz-label-email" title="Coming soon"><span class="toggle-switch__knob"></span></button>
         </div>
         <div class="wiz-alert-row">
           <div>

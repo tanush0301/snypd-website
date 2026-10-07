@@ -34,6 +34,19 @@
     meta: (me && me.getAttribute('data-meta')) || '1104479635308667'
   };
 
+  /* Google Consent Mode v2 (Google requires it for ads measured in the EEA).
+     Every page starts with all four Google signals denied; apply() grants
+     them per category: analytics -> analytics_storage, marketing -> the three
+     ad signals. Google's scripts still only load after consent (runAnalytics).
+     This runs before the pages' inline gtag('config') because consent.js is
+     included above it on every page. */
+  window.dataLayer = window.dataLayer || [];
+  function gConsent() { window.dataLayer.push(arguments); }
+  gConsent('consent', 'default', {
+    ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
+    analytics_storage: 'denied', wait_for_update: 500
+  });
+
   var loaded = { analytics: false, marketing: false };
   var waiting = { analytics: [], marketing: [] };
 
@@ -97,6 +110,12 @@
   }
 
   function apply(c) {
+    gConsent('consent', 'update', {
+      analytics_storage: c.analytics ? 'granted' : 'denied',
+      ad_storage: c.marketing ? 'granted' : 'denied',
+      ad_user_data: c.marketing ? 'granted' : 'denied',
+      ad_personalization: c.marketing ? 'granted' : 'denied'
+    });
     if (c.analytics) { runAnalytics(); flush('analytics'); }
     if (c.marketing) { runMarketing(); flush('marketing'); }
   }
