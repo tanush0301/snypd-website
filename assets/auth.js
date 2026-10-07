@@ -383,7 +383,12 @@
 
     out.push(bannerHTML(banner()));
 
-    if (isLogin || isSignup) {
+    /* Instagram/Facebook/TikTok open links in their own in-app browser, and Google
+       refuses sign-in there (disallowed_useragent). Most SNYPD visitors arrive from
+       Instagram, so there the email form comes first and Google is not offered. */
+    if ((isLogin || isSignup) && IN_APP) {
+      out.push('<div role="note" style="border:1px solid var(--border-hover);background:var(--panel);padding:14px 16px;font-size:13px;line-height:1.55;color:var(--text-secondary);">You opened this inside Instagram or another app. Google sign-in does not work here, so use your email below. Prefer Google? Tap the <b style="color:var(--text-primary);font-weight:500;">...</b> menu at the top and open this page in your browser.</div>');
+    } else if (isLogin || isSignup) {
       out.push('<button type="button" data-act="google"' + attr('disabled', lock) + ' class="h-ghost" style="display:flex;align-items:center;justify-content:center;gap:12px;height:52px;width:100%;background:var(--panel);border:1px solid var(--border-hover);color:var(--text-primary);font-size:13px;letter-spacing:.08em;cursor:pointer;">' + GOOGLE_SVG + '<span>CONTINUE WITH GOOGLE</span></button>');
       out.push('<div style="display:flex;align-items:center;gap:12px;"><span style="flex:1;height:1px;background:var(--border);"></span><span style="font-size:12px;letter-spacing:.12em;color:var(--text-muted);">OR</span><span style="flex:1;height:1px;background:var(--border);"></span></div>');
     }
@@ -443,6 +448,8 @@
 
   function fieldEl(f) { return document.getElementById(ID + (f === 'email' ? '-em' : f === 'pw' ? '-pw' : '-pw2')); }
   function focusField(f) { setTimeout(function () { var el = fieldEl(f); if (el) { try { el.focus(); } catch (e) {} } }, 0); }
+
+  var IN_APP = /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Snapchat/i.test(navigator.userAgent || '');
 
   function render() {
     if (!S.ready) { form.innerHTML = ''; return; }

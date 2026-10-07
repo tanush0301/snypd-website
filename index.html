@@ -739,7 +739,7 @@
   // life"). Once all 100 are taken the offer is gone, so stop advertising it.
   function paintFounding() {
     var c = s.claimed, known = typeof c === 'number', full = known && c >= 100;
-    $('founding-badge').textContent = full ? 'FOUNDING · ALL 100 TAKEN' : known ? 'FOUNDING · ' + c + ' OF 100 ACCOUNTS' : 'FOUNDING STATUS OPEN';
+    $('founding-badge').textContent = full ? 'FOUNDING · ALL 100 TAKEN' : known ? 'FOUNDING · ' + (100 - c) + ' OF 100 SPOTS LEFT' : 'FOUNDING STATUS OPEN';
     $('founding-detail').textContent = full
       ? 'All 100 founding accounts are taken.'
       : 'The first 100 accounts keep Pro pricing for life, free accounts included.';

@@ -1,7 +1,7 @@
 {
   "name": "SNYPD — Vinted monitor",
   "short_name": "SNYPD",
-  "description": "Near-real-time Vinted monitoring. Get alerted the moment a listing appears.",
+  "description": "Vinted search alerts. Get a push when a new listing matches your saved search.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

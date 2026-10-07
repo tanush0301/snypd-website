@@ -1570,6 +1570,7 @@ body {
     .filter-sheet__mobile-notice { display: none; }
     @media (max-width: 767px) {
       .filter-sheet__mobile-notice { display: block; font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+      .filter-sheet__new-hint { display: none; }
     }
     .filter-sheet__new-form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
     .filter-sheet__new-form input {
@@ -1585,6 +1586,20 @@ body {
     .fs-floor__note.is-warn { color: var(--warning); }
     .filter-sheet__footer { display: flex; gap: 9px; }
     .wiz-presets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    /* Quick search (2026-10-07): words + country + max price -> a /catalog link,
+       so a phone user never has to copy a link out of Vinted. 7 of 11 Sept-Oct
+       sign-ups never saved a first search. */
+    .vq-row { display: flex; gap: 8px; }
+    .vq-row > * { flex: 1 1 0; min-width: 0; }
+    .vq-row > input { flex: 0 0 34%; }
+    .vq-input, .vq-row select, .vq-row input {
+      background: var(--field, #191C1E); border: 1px solid var(--border); color: var(--text-primary);
+      padding: 10px 12px; font-family: var(--font); font-size: 16px; border-radius: 0; width: 100%; box-sizing: border-box;
+    }
+    .vq-or { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); margin: 6px 0 0; }
+    .wiz-quick { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .wiz-quick__note { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+    .wiz-quick__err { font-size: 12px; color: var(--warning); line-height: 1.5; margin: 0; }
     .wiz-preset {
       display: flex; flex-direction: column; gap: 4px;
       text-align: left; width: 100%; padding: 14px 16px;
@@ -1717,9 +1732,15 @@ body {
     <div class="filter-sheet__new" id="filter-sheet-new">
       <div class="filter-sheet__new-title">+ New hunt — brand, size, price cap</div>
       <div class="filter-sheet__new-hint">Set your filters on Vinted in a browser (brand, size, price), copy the address bar and paste it below.</div>
-      <div class="filter-sheet__mobile-notice">Building a filtered Vinted search works best from a computer - come back here once you've got the link.</div>
+      <div class="filter-sheet__mobile-notice">On a phone, the quick search is easiest. To paste a link instead: open Vinted in your browser (not the app), search and set filters, then copy the address bar.</div>
       <div class="filter-sheet__new-form">
+        <input type="text" class="vq-input" id="fs-q-words" placeholder="Quick search: what are you looking for?" autocomplete="off" autocapitalize="none" />
+        <div class="vq-row">
+          <select id="fs-q-site" aria-label="Which Vinted country"></select>
+          <input type="number" id="fs-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
+        </div>
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
+        <p class="vq-or">or paste a Vinted search link</p>
         <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
         <p class="fs-floor__note is-warn" id="filter-new-site-note" role="status" style="display:none"></p>
         <div class="fs-floor">
@@ -1745,24 +1766,19 @@ body {
     <div class="wiz-step" id="wiz-step-1">
       <div class="wiz-eyebrow">Step 1 of 2</div>
       <h2 class="wiz-title">What are you hunting?</h2>
-      <p class="wiz-sub">Pick one to start. You can add more from Filters anytime.</p>
-      <div class="wiz-presets" id="wiz-presets">
-        <button class="wiz-preset" type="button" data-name="Jordan 1 Travis Scott" data-url="https://www.vinted.be/catalog?search_text=jordan%20travis%20scott&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=782&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=791&amp;size_ids[]=792&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
-          <span class="wiz-preset__name">Jordan 1 Travis Scott</span>
-          <span class="wiz-preset__meta">Sneakers &middot; from &euro;150</span>
-        </button>
-        <button class="wiz-preset" type="button" data-name="Off-White" data-url="https://www.vinted.be/catalog?search_text=off%20white&amp;catalog[]=1231&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=791&amp;size_ids[]=792&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
-          <span class="wiz-preset__name">Off-White</span>
-          <span class="wiz-preset__meta">Streetwear &middot; from &euro;150</span>
-        </button>
-        <button class="wiz-preset" type="button" data-name="Jordan (all)" data-url="https://www.vinted.be/catalog?search_text=jordan&amp;price_from=150.0&amp;currency=EUR&amp;size_ids[]=782&amp;size_ids[]=784&amp;size_ids[]=785&amp;size_ids[]=786&amp;size_ids[]=788&amp;size_ids[]=789&amp;size_ids[]=790&amp;size_ids[]=792&amp;size_ids[]=791&amp;status_ids[]=2&amp;status_ids[]=3&amp;status_ids[]=4&amp;order=newest_first">
-          <span class="wiz-preset__name">Jordan (all)</span>
-          <span class="wiz-preset__meta">Sneakers &middot; broadest &middot; from &euro;150</span>
-        </button>
+      <p class="wiz-sub">Type what you want. SNYPD runs that search on Vinted for you, no link needed. You can add more from Filters anytime.</p>
+      <div class="wiz-quick">
+        <input type="text" class="vq-input" id="wiz-q-words" placeholder="e.g. ralph lauren, jordan 4, carhartt jacket" autocomplete="off" autocapitalize="none" aria-label="What are you looking for?" />
+        <div class="vq-row">
+          <select id="wiz-q-site" aria-label="Which Vinted country"></select>
+          <input type="number" id="wiz-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
+        </div>
+        <p class="wiz-quick__note" id="wiz-q-note">Every word must be in the listing title or brand. Starts at about EUR30 to skip cheap fast fashion; change it later in Filters.</p>
+        <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
       </div>
       <div class="wiz-actions">
-        <button class="btn btn-ghost" id="wiz-build-own" type="button">+ Build my own</button>
-        <button class="btn btn-ghost" id="wiz-skip" type="button">Skip &mdash; start me broad</button>
+        <button class="btn btn-prim" id="wiz-q-save" type="button">Start this hunt</button>
+        <button class="btn btn-ghost" id="wiz-build-own" type="button">I have a Vinted link</button>
       </div>
     </div>
     <div class="wiz-step" id="wiz-step-2" style="display:none">
@@ -1789,15 +1805,8 @@ body {
           </div>
           <button type="button" class="toggle-switch is-on" id="wiz-toggle-push" role="switch" aria-checked="true" aria-labelledby="wiz-label-push"><span class="toggle-switch__knob"></span></button>
         </div>
-        <div class="wiz-alert-row">
-          <div>
-            <div class="wiz-alert-row__title" id="wiz-label-quiet">Quiet hours</div>
-            <div class="wiz-alert-row__note">23:00 &ndash; 08:00 UTC</div>
-          </div>
-          <button type="button" class="toggle-switch is-on" id="wiz-toggle-quiet" role="switch" aria-checked="true" aria-labelledby="wiz-label-quiet"><span class="toggle-switch__knob"></span></button>
-        </div>
       </div>
-      <p class="wiz-sub" style="margin:16px 0 0;font-size:11.5px;">Threshold-based filtering ("only ping me under X% below market") isn't built yet - every match on an enabled push alerts you today.</p>
+      <p class="wiz-sub" id="wiz-trial-note" style="display:none;margin:14px 0 0;font-size:12px;color:var(--text-primary)"></p>
       <p class="wiz-alert-result" id="wiz-alert-result" style="display:none"></p>
       <div class="wiz-actions">
         <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Turn on alerts &amp; start hunting</button>
@@ -1870,12 +1879,12 @@ body {
 <div class="dash-wrap">
 <div class="activation-gate is-hidden" id="activation-gate">
 <h2>Unlock Your Arsenal</h2>
-<p>Your SNYPD account is primed. Start the free plan on Whop to unlock your first search lane and dominate the market.</p>
+<p>Your SNYPD account is ready. Start the free plan to save your first Vinted search.</p>
 <div class="activation-actions">
 <a class="btn btn-prim" href="https://whop.com/checkout/plan_jPBUwsY7FaO3w">Activate Free Plan</a>
 <a class="btn btn-ghost" href="/#pricing">View Plans</a>
 </div>
-<p class="activation-note">Use the same email as your SNYPD account for instant access.</p>
+<p class="activation-note">Use the same email as your SNYPD account.</p>
 </div>
 <div class="panel" id="dashboard-panel" style="margin-bottom:16px">
 <div id="pull-refresh" data-armed="false" data-refreshing="false" aria-hidden="true">
@@ -2350,7 +2359,7 @@ const HEARTBEAT_URL = (() => {
   // alone (and log loudly) if that's specifically what's failing.
   const CORE_USER_COLUMNS = 'subscription_plan, sub_status, billing_provider, whop_product_id, whop_manage_url, is_founding_member';
   let me = await sb.from('users')
-    .select(CORE_USER_COLUMNS + ', founding_number')
+    .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at')
     .eq('id', uid)
     .maybeSingle();
   if (me.error) {
@@ -2405,6 +2414,17 @@ const HEARTBEAT_URL = (() => {
   const eliteBanner = document.getElementById('elite-banner');
   // All paid plans run 24/7 (PAID_PLANS-gated), so this is a Free-only nudge.
   if (eliteBanner) eliteBanner.style.display = (effectivePlan === 'free') ? '' : 'none';
+  // Free 24/7 trial (migration 042: 7 days from the first saved search). During
+  // it, "Free only checks while this tab is open" would be false.
+  if (eliteBanner && effectivePlan === 'free' && profile.free_trial_started_at) {
+    const trialLeft = Math.ceil((Date.parse(profile.free_trial_started_at) + 7 * 864e5 - Date.now()) / 864e5);
+    const tTitle = eliteBanner.querySelector('.elite-banner__title');
+    const tText = eliteBanner.querySelector('.elite-banner__text');
+    if (trialLeft > 0 && tTitle && tText) {
+      tTitle.textContent = 'Free 24/7 trial: ' + trialLeft + (trialLeft === 1 ? ' day' : ' days') + ' left';
+      tText.textContent = 'Your hunt keeps running with this tab closed until then. After that, Free only checks while this tab is open; paid plans keep hunting 24/7.';
+    }
+  }
 
   // Topbar founding badge: mirrors the Profile panel's own badge (below),
   // but populated here unconditionally on load rather than only when the
@@ -2556,6 +2576,71 @@ const HEARTBEAT_URL = (() => {
     const floorCurEl = document.querySelector('#filter-sheet-overlay .fs-floor__cur');
     let floorCur = 'EUR';
     function currencyFor(u) { return SITE_CURRENCY[vintedSite(u)] || 'EUR'; }
+    // Quick search: words + country + optional max price -> a plain /catalog
+    // link the scraper accepts (search_text, price_from, price_to; never a
+    // currency param, see applyPriceFloor). Shared with the first-run wizard.
+    const VQ_NAMES = { 'vinted.be': 'Belgium', 'vinted.co.uk': 'United Kingdom', 'vinted.com': 'United States',
+      'vinted.fr': 'France', 'vinted.nl': 'Netherlands', 'vinted.lu': 'Luxembourg', 'vinted.de': 'Germany',
+      'vinted.at': 'Austria', 'vinted.it': 'Italy', 'vinted.es': 'Spain', 'vinted.pt': 'Portugal',
+      'vinted.ie': 'Ireland', 'vinted.fi': 'Finland', 'vinted.sk': 'Slovakia', 'vinted.lt': 'Lithuania',
+      'vinted.lv': 'Latvia', 'vinted.ee': 'Estonia', 'vinted.hr': 'Croatia', 'vinted.si': 'Slovenia',
+      'vinted.gr': 'Greece', 'vinted.pl': 'Poland', 'vinted.cz': 'Czechia', 'vinted.se': 'Sweden',
+      'vinted.dk': 'Denmark', 'vinted.hu': 'Hungary', 'vinted.ro': 'Romania' };
+    function vqGuessSite() {
+      const l = String((navigator.languages && navigator.languages[0]) || navigator.language || 'en').toLowerCase();
+      const exact = { 'fr-be': 'vinted.be', 'nl-be': 'vinted.be', 'de-at': 'vinted.at', 'en-ie': 'vinted.ie',
+        'en-us': 'vinted.com', 'fr-lu': 'vinted.lu', 'de-lu': 'vinted.lu' };
+      if (exact[l]) return exact[l];
+      const byLang = { fr: 'vinted.fr', nl: 'vinted.nl', de: 'vinted.de', it: 'vinted.it', es: 'vinted.es',
+        pt: 'vinted.pt', pl: 'vinted.pl', cs: 'vinted.cz', sk: 'vinted.sk', lt: 'vinted.lt', lv: 'vinted.lv',
+        et: 'vinted.ee', hr: 'vinted.hr', sl: 'vinted.si', el: 'vinted.gr', sv: 'vinted.se', da: 'vinted.dk',
+        hu: 'vinted.hu', ro: 'vinted.ro', fi: 'vinted.fi', en: 'vinted.co.uk' };
+      return byLang[l.split('-')[0]] || 'vinted.co.uk';
+    }
+    function vqFillSites(sel) {
+      if (!sel || sel.options.length) return;
+      const guess = vqGuessSite();
+      SUPPORTED_VINTED.slice().sort((a, b) => VQ_NAMES[a].localeCompare(VQ_NAMES[b])).forEach(site => {
+        const o = document.createElement('option');
+        o.value = site; o.textContent = VQ_NAMES[site]; o.title = site;
+        if (site === guess) o.selected = true;
+        sel.appendChild(o);
+      });
+    }
+    // floor: number or null. price_from is left out when it would sit at or
+    // above the max price, which would return nothing.
+    function vqBuild(site, words, max, floor) {
+      const x = new URL('https://www.' + site + '/catalog');
+      x.searchParams.set('search_text', String(words || '').trim().replace(/\s+/g, ' '));
+      const m = Number(max);
+      const hasMax = String(max || '').trim() !== '' && isFinite(m) && m > 0;
+      if (floor !== null && floor !== undefined && (!hasMax || floor < m)) x.searchParams.set('price_from', String(floor));
+      if (hasMax) x.searchParams.set('price_to', String(Math.round(m)));
+      x.searchParams.set('order', 'newest_first');
+      return x.toString();
+    }
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.vq = { fillSites: vqFillSites, build: vqBuild,
+      floorFor: site => FLOOR_BY_CURRENCY[SITE_CURRENCY[site] || 'EUR'],
+      currencyFor: site => SITE_CURRENCY[site] || 'EUR' };
+    // Plain-language reason a pasted value cannot be saved, or '' if it is a
+    // Vinted search link (site/filter checks then run as before). Before
+    // 2026-10-07 every one of these only turned the field red.
+    function linkProblem(u) {
+      if (!u) return 'Type what you are looking for in the quick search above, or paste a Vinted search link.';
+      let x;
+      try { x = new URL(u); } catch (e) {
+        return /vinted/i.test(u)
+          ? 'That is not a complete link. Copy the whole address from Vinted, starting with https://'
+          : 'That is not a link. Type your words in the quick search above instead.';
+      }
+      if (!/(^|\.)vinted\./i.test(x.hostname)) return 'That is not a Vinted link. Search on Vinted in your browser and copy the address of the results page.';
+      const path = x.pathname.replace(/\/+$/, '');
+      if (/\/items\//.test(path)) return 'That is one listing, not a search. Search on Vinted, then copy the address of the results page.';
+      if (path !== '/catalog') return 'That is not a Vinted search link. Run a search on Vinted and copy the address of the results page (it contains /catalog).';
+      if (x.search.length <= 1) return 'This search has no words or filters yet. Add at least one on Vinted, then copy the link again.';
+      return '';
+    }
     function syncFloorCurrency() {
       const cur = currencyFor(urlInput.value);
       if (cur === floorCur) return;
@@ -2680,15 +2765,26 @@ const HEARTBEAT_URL = (() => {
       renderList();
     }
 
+    function showLinkNote(msg) {
+      if (!siteNote) return;
+      siteNote.textContent = msg;
+      siteNote.style.display = msg ? '' : 'none';
+    }
     async function addHunt() {
-      const url = urlInput.value.trim();
+      let url = urlInput.value.trim();
+      // A link copied without its scheme ("vinted.fr/catalog?...") is still a link.
+      if (url && !/^[a-z]+:\/\//i.test(url) && /^(www\.)?vinted\.[a-z.]+\//i.test(url)) {
+        url = 'https://' + (/^www\./i.test(url) ? '' : 'www.') + url;
+        urlInput.value = url;
+      }
       const name = nameInput.value.trim();
       if (quota.remaining <= 0) return;
-      if (!validVintedUrl(url)) { urlInput.style.borderColor = 'var(--danger)'; return; }
+      if (!validVintedUrl(url)) { urlInput.style.borderColor = 'var(--danger)'; showLinkNote(linkProblem(url)); return; }
       if (!vintedSiteSupported(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
       if (contractProblem(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
       urlInput.style.borderColor = '';
       saveBtn.disabled = true;
+      const wasFirst = rows.length === 0;
       try {
         const { data: inserted, error } = await sb.from('user_searches')
           .insert({ user_id: uid, search_name: name || nameFromUrl(url), vinted_url: applyPriceFloor(url), is_active: true })
@@ -2702,8 +2798,17 @@ const HEARTBEAT_URL = (() => {
         if (minPriceInput) minPriceInput.value = String(DEFAULT_MIN_PRICE);
         paintFloorNote();
         await reloadHunts();
+        if (qWords) { qWords.value = ''; if (qMax) qMax.value = ''; }
+        window.dispatchEvent(new Event('snypd:hunts-changed'));
+        // First hunt from the sheet ("I have a Vinted link"): that path used to
+        // skip the alerts step entirely, so nobody was ever asked.
+        if (wasFirst && window.SNYPD && typeof window.SNYPD.showAlertsStep === 'function') {
+          closeSheet();
+          window.SNYPD.showAlertsStep();
+        }
       } catch (e) {
         console.error('SNYPD filter sheet: could not save hunt', e);
+        showLinkNote('Could not save this hunt' + (e && e.message ? ': ' + e.message : '') + '. Check your connection and try again.');
         saveBtn.disabled = false;
       }
     }
@@ -2722,6 +2827,27 @@ const HEARTBEAT_URL = (() => {
     urlInput.addEventListener('input', paintFloorNote);
     urlInput.addEventListener('input', paintSiteNote);
     paintFloorNote();
+    // Quick search writes a normal link into the paste field, so saving,
+    // the price floor and every link check stay the one tested path.
+    const qWords = document.getElementById('fs-q-words');
+    const qSite = document.getElementById('fs-q-site');
+    const qMax = document.getElementById('fs-q-max');
+    if (qWords && qSite) {
+      vqFillSites(qSite);
+      const fillFromQuick = () => {
+        if (qMax) qMax.placeholder = 'Max ' + (SITE_CURRENCY[qSite.value] || 'EUR');
+        const w = qWords.value.trim();
+        if (!w) return;
+        urlInput.value = vqBuild(qSite.value, w, qMax ? qMax.value : '', null);
+        if (!nameInput.value.trim() || nameInput.dataset.auto === '1') { nameInput.value = w; nameInput.dataset.auto = '1'; }
+        const m = qMax ? Number(qMax.value) : 0;
+        if (minPriceInput && m > 0 && Number(minPriceInput.value) >= m) minPriceInput.value = '';
+        urlInput.style.borderColor = '';
+        urlInput.dispatchEvent(new Event('input'));
+      };
+      [qWords, qSite, qMax].forEach(el => { if (el) { el.addEventListener('input', fillFromQuick); el.addEventListener('change', fillFromQuick); } });
+      fillFromQuick();
+    }
 
     listEl.addEventListener('click', async (e) => {
       const row = e.target.closest('.fs-row');
@@ -2843,6 +2969,59 @@ const HEARTBEAT_URL = (() => {
         });
       });
 
+      // Opened again from the filter sheet when the first hunt is saved there.
+      window.SNYPD = window.SNYPD || {};
+      window.SNYPD.showAlertsStep = () => {
+        overlay.style.display = 'flex';
+        step1.style.display = 'none';
+        step2.style.display = '';
+      };
+
+      // Free plan: what happens to this hunt (migration 042 trial: 24/7 for
+      // 7 days from the first saved search, then only while SNYPD is open).
+      const trialNote = document.getElementById('wiz-trial-note');
+      if (trialNote && effectivePlan === 'free') {
+        const started = profile.free_trial_started_at ? Date.parse(profile.free_trial_started_at) : NaN;
+        const left = isNaN(started) ? 7 : Math.ceil((started + 7 * 864e5 - Date.now()) / 864e5);
+        trialNote.textContent = left > 0
+          ? 'Free plan: for the next ' + left + ' day' + (left === 1 ? '' : 's') + ' this hunt runs 24/7, even with SNYPD closed, and alerts reach this device. After that, Free checks only while SNYPD is open.'
+          : 'Free plan: SNYPD checks only while it is open on this device. Paid plans run 24/7.';
+        trialNote.style.display = 'block';
+      }
+
+      const vq = window.SNYPD.vq;
+      const wqWords = document.getElementById('wiz-q-words');
+      const wqSite = document.getElementById('wiz-q-site');
+      const wqMax = document.getElementById('wiz-q-max');
+      const wqSave = document.getElementById('wiz-q-save');
+      const wqErr = document.getElementById('wiz-q-err');
+      const wqNote = document.getElementById('wiz-q-note');
+      if (vq && wqWords && wqSite && wqSave) {
+        vq.fillSites(wqSite);
+        const paintWqNote = () => {
+          const cur = vq.currencyFor(wqSite.value);
+          if (wqMax) wqMax.placeholder = 'Max ' + cur;
+          if (wqNote) wqNote.textContent = 'Every word must be in the listing title or brand. Starts at ' + cur + ' ' + vq.floorFor(wqSite.value) + ' to skip cheap fast fashion; change it later in Filters.';
+        };
+        wqSite.addEventListener('change', paintWqNote);
+        paintWqNote();
+        wqSave.addEventListener('click', async () => {
+          const words = wqWords.value.trim();
+          if (!words) {
+            wqErr.textContent = 'Type at least one word, for example a brand.';
+            wqErr.style.display = 'block';
+            wqWords.focus();
+            return;
+          }
+          wqErr.style.display = 'none';
+          wqSave.disabled = true;
+          wqSave.textContent = 'Saving...';
+          await saveSearch(words, vq.build(wqSite.value, words, wqMax ? wqMax.value : '', vq.floorFor(wqSite.value)));
+          window.dispatchEvent(new Event('snypd:hunts-changed'));
+        });
+        wqWords.addEventListener('keydown', e => { if (e.key === 'Enter') wqSave.click(); });
+      }
+
       const buildOwnBtn = document.getElementById('wiz-build-own');
       if (buildOwnBtn) {
         buildOwnBtn.addEventListener('click', () => {
@@ -2894,20 +3073,6 @@ const HEARTBEAT_URL = (() => {
         enableBtn.addEventListener('click', async () => {
           const resultEl = document.getElementById('wiz-alert-result');
 
-          // Quiet hours (migration 028, backend/src/push.py) - real, unlike
-          // email digest and the threshold selector below, which are
-          // genuinely not built yet. 23:00-08:00 UTC matches the mockup's
-          // shown default; not user-adjustable yet, just on/off.
-          const quietOn = quietToggle && quietToggle.classList.contains('is-on');
-          try {
-            await sb.from('users').update({
-              push_quiet_hours_start: quietOn ? 23 : null,
-              push_quiet_hours_end: quietOn ? 8 : null,
-            }).eq('id', uid);
-          } catch (e) {
-            console.error('SNYPD wizard: could not save quiet hours', e);
-          }
-
           const wantsPush = pushToggle && pushToggle.classList.contains('is-on');
           if (!wantsPush || alertFailureShown) { overlay.style.display = 'none'; return; }
 
@@ -2935,9 +3100,10 @@ const HEARTBEAT_URL = (() => {
           // Stay open. Closing here is what told 48 of 49 accounts that
           // alerts were on when they were not.
           if (resultEl) {
-            resultEl.textContent = (res && res.message)
+            resultEl.textContent = ((res && res.message)
               ? res.message
-              : 'Alerts could not be turned on on this device.';
+              : 'Alerts could not be turned on on this device.')
+              + (res && res.state === 'ios-install' ? ' Then log in once more inside the new SNYPD icon and tap Enable alerts. Your hunt keeps running in the meantime.' : '');
             resultEl.style.display = 'block';
           }
           enableBtn.textContent = 'Continue without alerts';
@@ -4106,6 +4272,7 @@ const HEARTBEAT_URL = (() => {
     }
     loadClaims();
     loadHuntsRunningCount();
+    window.addEventListener('snypd:hunts-changed', () => { loadHuntsRunningCount(); });
   })();
 
   const list    = document.getElementById('list');
@@ -4185,7 +4352,7 @@ const HEARTBEAT_URL = (() => {
     if (hasActiveHunts === false) {
       empty.innerHTML = EMPTY_ICON
         + '<div style="font-size:15px;color:var(--text-primary);margin-bottom:8px">No hunts yet</div>'
-        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD watches it around the clock and every new match lands here, newest first.</div>'
+        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD checks it every 30 seconds to 5 minutes and every new match lands here, newest first.</div>'
         + '<div style="margin-top:18px"><button class="btn btn-prim" type="button" id="empty-add-hunt">Add your first hunt</button></div>';
       empty.style.display = 'block';
       const zeroPill = document.getElementById('filter-pill');
@@ -4802,6 +4969,7 @@ const HEARTBEAT_URL = (() => {
 
   // ----------------- LOAD ADS (main logic) -----------------
 
+  window.addEventListener('snypd:hunts-changed', () => { loadAds().catch(e => console.error('SNYPD: refresh after save failed', e)); });
   async function loadAds() {
     setLoading(true);
     try {

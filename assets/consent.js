@@ -245,6 +245,9 @@
       else if (a === 'settings') openSettings();
     });
     document.body.appendChild(bar);
+    // Room under the page so the bar never hides the last buttons (it covered
+    // CREATE ACCOUNT on /signup at 390px, 2026-10-07).
+    document.body.style.paddingBottom = bar.offsetHeight + 'px';
     /* The bar is fixed to the bottom, so without room for it the end of the
        page - including the footer's Privacy/Cookies links - sits under it. */
     prevPad = document.body.style.paddingBottom;
@@ -261,6 +264,7 @@
     if (!bar) return;
     if (bar.parentNode) bar.parentNode.removeChild(bar);
     bar = null;
+    document.body.style.paddingBottom = '';
     window.removeEventListener('resize', padForBar);
     document.body.style.paddingBottom = prevPad;
   }
