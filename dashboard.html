@@ -973,6 +973,7 @@ body {
 /* List */
 .panel .bd { padding: 24px; }
 .list { display: grid; gap: 12px; }
+.feed-more { display: block; width: 100%; margin: 16px 0 4px; }
 .list.loading { opacity: 0.6; pointer-events: none; transition: opacity 0.3s ease; }
 
 /* Ledger 2e: one big image per card, full list width, stacked vertically -
@@ -1948,6 +1949,7 @@ body {
 <div class="skeleton"></div>
 <div class="skeleton"></div>
 </div>
+<button type="button" class="btn btn-ghost feed-more" id="feed-more" style="display:none"></button>
 <div class="tiny" id="msg" style="margin-top:10px; display:none;"></div>
 </div>
 </div>
@@ -4578,7 +4580,9 @@ const HEARTBEAT_URL = (() => {
     const brand = r.brand_title;
     const size  = r.size_title;
     const status = r.status;
-    const src   = r.content_source;
+    // Paid-boost listings are shown since 2026-10-08 (Vinted shows them in
+    // its own results) and say so; the raw source value is not shown.
+    const src   = (r.promoted || r.content_source === 'search_promoted_items') ? 'Promoted' : '';
 
     const knownUploadMs = knownUploadTimeMs(r);
     const uploadedMs = uploadedTimeMs(r) || Date.now();
@@ -4908,7 +4912,14 @@ const HEARTBEAT_URL = (() => {
     // 2026-10-05: the same "Air Jordan 4 Daim Gris" card twice, one DB row).
     pendingNew = pendingNew.filter(r => incomingIds.has(String(r.listing_id))
       && !existingIds.has(String(r.listing_id)));
-    const newRows = rows.filter(r => !existingIds.has(String(r.listing_id)));
+    const unseenRows = rows.filter(r => !existingIds.has(String(r.listing_id)));
+    // Rows older than the oldest card on screen come from "Show more": they
+    // belong at the bottom, in order, never in the "new" path at the top.
+    const shownMs = Array.from(list.querySelectorAll('.card')).map(c => Number(c.dataset.uploadedMs) || 0);
+    const oldestShownMs = shownMs.length ? Math.min(...shownMs) : Infinity;
+    const olderRows = unseenRows.filter(r => uploadedTimeMs(r) < oldestShownMs);
+    if (olderRows.length) list.appendChild(insertCards(olderRows, 'enter'));
+    const newRows = unseenRows.filter(r => !(uploadedTimeMs(r) < oldestShownMs));
     if (!newRows.length) { updatePill(); return; }
 
     const nearTop = pageScrollTop() <= 32;
@@ -4970,6 +4981,27 @@ const HEARTBEAT_URL = (() => {
   // ----------------- LOAD ADS (main logic) -----------------
 
   window.addEventListener('snypd:hunts-changed', () => { loadAds().catch(e => console.error('SNYPD: refresh after save failed', e)); });
+  // "Show more": the feed shows the newest FEED_PAGE_SIZE cards and loads
+  // the next FEED_PAGE_SIZE (older) ones per tap, up to everything inside the
+  // 30-minute window. feedEligibleCount is set by loadAds' light pass.
+  const FEED_PAGE_SIZE = 60;
+  let feedVisibleLimit = FEED_PAGE_SIZE;
+  let feedEligibleCount = 0;
+  const feedMoreBtn = document.getElementById('feed-more');
+  function paintFeedMore() {
+    if (!feedMoreBtn) return;
+    const hidden = Math.max(0, feedEligibleCount - feedVisibleLimit);
+    feedMoreBtn.style.display = hidden > 0 ? '' : 'none';
+    feedMoreBtn.textContent = 'Show more (' + hidden + ' older)';
+  }
+  if (feedMoreBtn) {
+    feedMoreBtn.addEventListener('click', async () => {
+      feedVisibleLimit += FEED_PAGE_SIZE;
+      feedMoreBtn.disabled = true;
+      try { await loadAds(); } finally { feedMoreBtn.disabled = false; paintFeedMore(); }
+    });
+  }
+
   async function loadAds() {
     setLoading(true);
     try {
@@ -5018,10 +5050,35 @@ const HEARTBEAT_URL = (() => {
       // server-side meant the page never even received those rows, so no
       // client-side treatment could have shown them. They're fetched now and
       // rendered dimmed by cardHTML.
-      function adsQuery(columns) {
+      // Light pass first: every matching listing inside the 30-minute window,
+      // ids and upload times only. A busy hunt reaches ~250 listings in 30
+      // minutes (measured 2026-10-07 on "Ralph Lauren"), and the old single
+      // query stopped at 80 rows / 60 cards, so most of them could never be
+      // reached. Full rows are then fetched only for the cards on screen;
+      // "Show more" raises feedVisibleLimit.
+      const { data: idx, error: idxErr } = await sb
+        .from('current_ads')
+        .select('listing_id, uploaded_at_ts, uploaded_ts, created_at, contract:item_box->snypd_filter_contract')
+        .eq('user_id', uid)
+        .eq('item_box->snypd_filter_contract->>version', '1')
+        .gte('uploaded_at_ts', cutoffIso)
+        .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
+        .order('listing_id', { ascending: false })
+        .limit(1000);
+      if (idxErr) throw idxErr;
+      const eligible = (idx || [])
+        .map(r => ({ ...r, item_box: r.item_box || { snypd_filter_contract: r.contract } }))
+        .filter(r => matchesActiveSearch(r, activeSearches))
+        .filter(isFreshListing)
+        .sort(sortNewestUploadedFirst);
+      feedEligibleCount = eligible.length;
+      const wantedIds = eligible.slice(0, feedVisibleLimit).map(r => r.listing_id);
+
+      function adsQuery(columns, ids) {
         return sb
           .from('current_ads')
           .select(columns)
+          .in('listing_id', ids)
           .eq('user_id', uid)
           .eq('item_box->snypd_filter_contract->>version', '1')
           // Hard 30-minute gate, fail-closed. Vinted's 2026-09-15 API
@@ -5035,10 +5092,7 @@ const HEARTBEAT_URL = (() => {
           // feed was stale that way, including listings 4 and 5 days old
           // rendered as "Seen 11m ago". Sorting is by real upload time too,
           // not by insert order, so the newest upload is genuinely on top.
-          .gte('uploaded_at_ts', cutoffIso)
-          .order('uploaded_at_ts', { ascending: false, nullsFirst: false })
-          .order('listing_id', { ascending: false })
-          .limit(80);
+          .gte('uploaded_at_ts', cutoffIso);
       }
 
       // is_suspicious (migration 029) is requested alongside columns that
@@ -5046,20 +5100,30 @@ const HEARTBEAT_URL = (() => {
       // any one selected column is missing - a pending migration must never
       // take the entire feed offline over one optional field. Try the full
       // select first; if it's specifically that column causing the failure,
-      // retry without it rather than throwing.
-      let { data, error } = await adsQuery(CORE_AD_COLUMNS + ', is_suspicious');
+      // retry without it rather than throwing. Ids go in chunks of 150 so the
+      // request URL stays short however far "Show more" has gone.
+      async function fetchFullRows(columns) {
+        const out = [];
+        for (let i = 0; i < wantedIds.length; i += 150) {
+          const { data: part, error: partErr } = await adsQuery(columns, wantedIds.slice(i, i + 150));
+          if (partErr) return { data: null, error: partErr };
+          out.push(...(part || []));
+        }
+        return { data: out, error: null };
+      }
+      let { data, error } = await fetchFullRows(CORE_AD_COLUMNS + ', is_suspicious');
       if (error) {
         console.error('SNYPD: ads query with is_suspicious failed, retrying without it', error);
-        ({ data, error } = await adsQuery(CORE_AD_COLUMNS));
+        ({ data, error } = await fetchFullRows(CORE_AD_COLUMNS));
       }
       if (error) throw error;
 
+      // Promoted listings are no longer filtered out (2026-10-08): Vinted
+      // shows them in its own results; cardHTML labels them "Promoted".
       const rows = (data || [])
         .filter(r => matchesActiveSearch(r, activeSearches))
-        .filter(r => !(r.promoted || r.content_source === 'search_promoted_items'))
         .filter(isFreshListing)
-        .sort(sortNewestUploadedFirst)
-        .slice(0, 60);
+        .sort(sortNewestUploadedFirst);
 
       console.log('Dashboard rows:', rows.map(r => ({
         id: r.listing_id,
@@ -5116,6 +5180,7 @@ const HEARTBEAT_URL = (() => {
       }
 
       renderRows(rows, lastMatchTs);
+      paintFeedMore();
       // lastSuccessfulSync is this branch's - the offline banner's "Last
       // sync HH:MM - N min ago" line reads it, so it must keep being set.
       lastSuccessfulSync = new Date();
