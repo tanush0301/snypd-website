@@ -4323,12 +4323,28 @@ const HEARTBEAT_URL = (() => {
     return frag;
   }
 
+  // Places each card at its upload-time position (newest first) instead of
+  // always at the top. Since the scraper also reads Vinted's results page
+  // (business sellers) and deeper pages (late-listed items), a card can
+  // arrive minutes after its upload time; prepending it broke the order
+  // (seen live 2026-10-08: four 7-minute-old cards above a 1-minute-old one).
+  function insertInOrder(rowsToPlace, mode) {
+    const sorted = rowsToPlace.slice().sort(sortNewestUploadedFirst);
+    for (const r of sorted) {
+      const ms = uploadedTimeMs(r) || Date.now(); // same value as data-uploaded-ms
+      const before = Array.from(list.querySelectorAll('.card'))
+        .find(c => (Number(c.dataset.uploadedMs) || 0) < ms);
+      const frag = insertCards([r], mode);
+      if (before) list.insertBefore(frag, before); else list.appendChild(frag);
+    }
+  }
+
   if (newPill) {
     newPill.onclick = () => {
       if (!pendingNew.length) return;
       const onScreen = new Set(Array.from(list.querySelectorAll('.card')).map(c => c.dataset.id));
       const fresh = pendingNew.filter(r => !onScreen.has(String(r.listing_id)));
-      if (fresh.length) list.insertBefore(insertCards(fresh, 'new'), list.firstChild);
+      if (fresh.length) insertInOrder(fresh, 'new');
       pendingNew = [];
       updatePill();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4918,7 +4934,7 @@ const HEARTBEAT_URL = (() => {
     const shownMs = Array.from(list.querySelectorAll('.card')).map(c => Number(c.dataset.uploadedMs) || 0);
     const oldestShownMs = shownMs.length ? Math.min(...shownMs) : Infinity;
     const olderRows = unseenRows.filter(r => uploadedTimeMs(r) < oldestShownMs);
-    if (olderRows.length) list.appendChild(insertCards(olderRows, 'enter'));
+    if (olderRows.length) insertInOrder(olderRows, 'enter');
     const newRows = unseenRows.filter(r => !(uploadedTimeMs(r) < oldestShownMs));
     if (!newRows.length) { updatePill(); return; }
 
@@ -4927,7 +4943,7 @@ const HEARTBEAT_URL = (() => {
       // Everything not yet on screen goes in now, so the buffer is emptied
       // rather than left to re-insert the same rows later.
       pendingNew = [];
-      list.insertBefore(insertCards(newRows, 'new'), list.firstChild);
+      insertInOrder(newRows, 'new');
       updatePill();
     } else {
       // Buffer instead of yanking the list under a user scrolled into it -
