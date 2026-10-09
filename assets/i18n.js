@@ -39,9 +39,9 @@
   var COUNT = /^\d{1,3}(?:,\d{3})+$/;
   function money(s) {
     if (lang !== 'fr') return s;
-    if (COUNT.test(s)) return s.replace(/,/g, '\u202f');
+    if (COUNT.test(s)) return s.replace(/,/g, '\u00a0');
     return s.replace(MONEY, function (all, sym, whole, dec) {
-      return whole.replace(/,/g, '\u202f') + (dec ? ',' + (dec.length === 1 ? dec + '0' : dec) : '') + '\u00a0' + sym;
+      return whole.replace(/,/g, '\u00a0') + (dec ? ',' + (dec.length === 1 ? dec + '0' : dec) : '') + '\u00a0' + sym;
     });
   }
   var VALUES = {};

@@ -30,7 +30,7 @@ const cases = [
   ['Nike • M • Très bon état • Promoted • Seen 5m ago', 'Nike • M • Très bon état • Sponsorisé • vu il y a 5 min'],
   ['Levis • 32 • 2h ago', 'Levis • 32 • il y a 2 h'],
   ['€62.50', '62,50' + NB + '€'],
-  ['€1,250.00 incl. protection', '1 250,00' + NB + '€ protection incluse'],
+  ['€1,250.00 incl. protection', '1 250,00' + NB + '€ protection incluse'],
   ['(€30 – €60)', '(30' + NB + '€ – 60' + NB + '€)'],
   ['Last sync 17:05 · 1 min ago', 'Dernière synchro 17:05 · il y a 1 min'],
   ['Quiet right now — last match under a minute ago.', 'Calme pour l’instant — dernière annonce il y a moins d’une minute.'],
@@ -60,7 +60,7 @@ const cases = [
   ['Found 120 listings, but', 'On a trouvé 120 annonces, mais'],
   ['SNYPD cannot read the "foo_bar" filter in this link yet, so it would never run. Remove that filter on Vinted and copy the link again.',
    'SNYPD ne sait pas lire le filtre «' + NB + 'foo_bar' + NB + '» de ce lien, la recherche ne tournerait donc jamais. Retire ce filtre sur Vinted et copie à nouveau le lien.'],
-  ['5,399', '5 399'],
+  ['5,399', '5 399'],
   ['Recent', 'Récentes'],
   // untranslated text must come back unchanged
   ['Hello world untranslated', 'Hello world untranslated'],
