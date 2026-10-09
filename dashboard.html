@@ -2063,8 +2063,9 @@ body {
   </div>
   <p class="wiz-alert-result" id="prof-notify-result" style="display:none"></p>
 </div>
-<p class="tiny-note" id="prof-elite-streak-note" style="display:none">Elite's own streak condition (always-on monitoring, no tab-open requirement) isn't wired up yet - streak tracking above is currently Free-tier only.</p>
-<p class="tiny-note">Per-category alert settings shown in early mockups aren't wired to real data yet - not shown here rather than shown with invented numbers.</p>
+<!-- Dev notes (kept out of the UI): Elite's own streak condition (always-on monitoring, no tab-open
+     requirement) isn't wired up yet - streak tracking is Free-tier only. Per-category alert settings from
+     early mockups aren't wired to real data, so they are not shown rather than shown with invented numbers. -->
 <div class="controls" style="margin-top:16px">
 <a class="btn btn-prim" href="/plans" id="prof-go-elite">Go Elite</a>
 <button class="btn btn-ghost" id="prof-export" type="button">Export history as CSV</button>
@@ -3900,7 +3901,6 @@ const HEARTBEAT_URL = (() => {
       const nextText = document.getElementById('prof-xp-next');
       const streakRow = document.getElementById('prof-streak-row');
       const streakText = document.getElementById('prof-streak-text');
-      const eliteNote = document.getElementById('prof-elite-streak-note');
       const topbarStreak = document.getElementById('topbar-streak');
 
       let tierLabel = null;
@@ -3932,14 +3932,12 @@ const HEARTBEAT_URL = (() => {
       // yet, so an Elite account correctly has no row here until it is.
       if (effectivePlan === 'elite') {
         streakRow.style.display = 'none';
-        eliteNote.style.display = '';
         if (topbarStreak) {
           topbarStreak.style.display = tierLabel ? '' : 'none';
           topbarStreak.textContent = tierLabel || '';
         }
         return;
       }
-      eliteNote.style.display = 'none';
       try {
         const { data, error } = await sb.from('user_streak_state').select('current_streak').eq('user_id', uid).maybeSingle();
         if (error) throw error;
