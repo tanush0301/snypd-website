@@ -183,7 +183,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-lang { position: relative; }
 .lg-lang > summary { list-style: none; cursor: pointer; }
 .lg-lang > summary::-webkit-details-marker { display: none; }
-.lg-lang > div { position: absolute; right: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
+.lg-lang > div { position: absolute; left: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
 """
 
 UI = {
