@@ -150,8 +150,8 @@
   /* Campaign tags (utm_*) from the address, e.g. from a Meta ad. Read from the URL
      only, never stored on the device; saved with the new account so sign-ups can be
      counted per ad (assets/consent.js keeps them on links between pages). */
-  function campaignTags() {
-    var out = {}, q = new URLSearchParams(location.search);
+  function campaignTags(src) {
+    var out = {}, q = src || new URLSearchParams(location.search);
     ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
       var v = q.get(k);
       if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) out[k] = v;
@@ -287,10 +287,16 @@
     if (S.status === 'loading' || S.status === 'slow' || S.oauth) return;
     S.oauth = true; S.errText = ''; if (S.status !== 'field-errors') S.status = 'idle'; render();
     track('login_start', { method: 'google' });
+    /* Google can't carry account data, so campaign tags and the partner code ride
+       on the return address and are saved on the new account back on /login. */
+    var back = new URLSearchParams(campaignTags());
+    var aff = partnerCode();
+    if (aff) back.set('a', aff);
+    var backQs = back.toString();
     Promise.resolve().then(function () {
       return sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: SITE + '/login', queryParams: { prompt: 'select_account' } }
+        options: { redirectTo: SITE + '/login' + (backQs ? '?' + backQs : ''), queryParams: { prompt: 'select_account' } }
       });
     }).then(function (r) {
       if (r && r.error) throw r.error;
@@ -605,7 +611,13 @@
       /* Google sign-ups come back here from Google; count a brand-new account as a sign-up
          (email sign-ups are counted in signup()). */
       var created = Date.parse(sess.user.created_at || '');
-      if (oauthReturn && created && Date.now() - created < 15 * 60 * 1000) track('sign_up', { method: 'google' });
+      if (oauthReturn && created && Date.now() - created < 15 * 60 * 1000) {
+        track('sign_up', { method: 'google' });
+        /* Tags from the return address set in google(): same fields as an email sign-up. */
+        var md = sess.user.user_metadata || {}, add = md.utm_source ? {} : campaignTags(qs), retAff = qs.get('a');
+        if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;
+        if (Object.keys(add).length) { try { await sb.auth.updateUser({ data: add }); } catch (e) {} }
+      }
       if (PAGE === 'signup') { if (sess.user.email) lsSet(LAST_EMAIL_KEY, sess.user.email); location.replace('/dashboard'); return; }
       openDashboard(sess.user.email || '');
       return;
