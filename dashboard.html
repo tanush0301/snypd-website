@@ -1970,7 +1970,7 @@ body {
 <div class="mr-quota" id="mr-quota" style="display:none"></div>
 <div class="mr-locked" id="mr-locked" style="display:none">
 <h3>Market Report is part of Pro and Elite</h3>
-<p>See what an item actually sells for across Vinted right now, broken down by condition, with a warning when the listings are too mixed to trust a single price.</p>
+<p>See the typical asking price of an item across Vinted right now, broken down by condition, with a warning when the listings are too mixed to trust a single price.</p>
 <a class="btn btn-prim" href="/plans">View plans</a>
 </div>
 </div>
@@ -2745,7 +2745,7 @@ const HEARTBEAT_URL = (() => {
         return `
           <div class="fs-row ${live ? 'is-live' : 'is-paused'}" data-id="${escFs(r.id)}">
             <div class="fs-row__top">
-              <span class="fs-row__name">${escFs(r.search_name || nameFromUrl(r.vinted_url))}</span>
+              <span class="fs-row__name" data-i18n-skip>${escFs(r.search_name || nameFromUrl(r.vinted_url))}</span>
               <span class="fs-row__status">
                 <span class="fs-row__dot"></span>
                 <span class="fs-row__status-text">${live ? 'LIVE' : 'PAUSED'}</span>
@@ -3285,7 +3285,7 @@ const HEARTBEAT_URL = (() => {
             ${img}
             <div>
               <div class="meta-top">
-                <div class="t">${esc(row.title) || 'Claimed item'}</div>
+                <div class="t"${row.title ? ' data-i18n-skip' : ''}>${esc(row.title) || 'Claimed item'}</div>
                 <div class="p ${profitCls}">${profitLabel}</div>
               </div>
               <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')} · bought ${eur(row.bought_price_cents)}${soldPart}</div>
@@ -3304,7 +3304,7 @@ const HEARTBEAT_URL = (() => {
           ${img}
           <div>
             <div class="meta-top">
-              <div class="t">${esc(row.title) || 'Claimed item'}</div>
+              <div class="t"${row.title ? ' data-i18n-skip' : ''}>${esc(row.title) || 'Claimed item'}</div>
               <div class="p">${eur(row.bought_price_cents)}</div>
             </div>
             <div class="muted">${[row.brand_title, row.size_title].filter(Boolean).map(esc).join(' · ')}</div>
@@ -4679,7 +4679,7 @@ const HEARTBEAT_URL = (() => {
         <div class="thumb-wrap">${imgHtml}${isGone ? '' : badge}</div>
         <div>
           <div class="meta-top">
-            <div class="t">${esc(r.title) || 'View listing'}</div>
+            <div class="t"${r.title ? ' data-i18n-skip' : ''}>${esc(r.title) || 'View listing'}</div>
             <!-- RISK 9: this wrapper is the actual flex child, so it needs
                  the shrink guard - .p's own flex:0 0 auto applies to the
                  inner node and never protected the title's ellipsis. -->
