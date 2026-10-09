@@ -34,8 +34,8 @@ FR_LIVE = True
 # is not live is still generated, into ops/seo/preview/ (not deployed), for review.
 # German: live on Claude's translation (Tanush's decision 9 Oct 2026). Dutch: held
 # until Tanush has read it.
-LIVE = {'en': True, 'fr': FR_LIVE, 'de': True, 'nl': False}
-LANG_NAME = {'en': 'English', 'fr': 'Français', 'de': 'Deutsch', 'nl': 'Nederlands'}
+LIVE = {'en': True, 'fr': FR_LIVE, 'de': True, 'nl': False, 'it': True, 'es': True}
+LANG_NAME = {'en': 'English', 'fr': 'Français', 'de': 'Deutsch', 'nl': 'Nederlands', 'it': 'Italiano', 'es': 'Español'}
 # The Vinted sites the scraper accepts (scraper-worker/src/catalogue_contract.py
 # MARKETS, verified live 2026-10-01). Update together with that list.
 MARKETS_TEXT = {'en': 'every Vinted site in Europe and the US', 'fr': 'tous les sites Vinted d’Europe et des États-Unis',
@@ -51,7 +51,9 @@ if CHECK['median_seconds'] != 30:
 _MONTHS = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
            'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
            'de': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-           'nl': ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']}
+           'nl': ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
+           'it': ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
+           'es': ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']}
 _SPAN_SAME_MONTH = {'en': '%d-%d %s %d', 'fr': '%d au %d %s %d', 'de': '%d.-%d. %s %d', 'nl': '%d-%d %s %d'}
 _SPAN_TWO_MONTHS = {'en': '%d %s to %d %s %d', 'fr': 'du %d %s au %d %s %d', 'de': '%d. %s bis %d. %s %d', 'nl': '%d %s tot %d %s %d'}
 def _check_span(lang):
@@ -97,6 +99,9 @@ SLUGS = {
     'deals':   {'en': '/vinted-deals'},  # English only for now (decided 2026-10-02)
     'fees':    {'en': '/vinted-fees',                'fr': '/fr/frais-vinted'},
     'monitor': {'en': '/vinted-monitor',             'fr': '/fr/monitor-vinted'},
+    'notwork': {'en': '/vinted-notifications-not-working', 'fr': '/fr/notification-vinted-ne-fonctionne-pas',
+                'de': '/de/vinted-benachrichtigung-funktioniert-nicht', 'nl': '/nl/vinted-meldingen-werken-niet',
+                'it': '/it/notifiche-vinted-non-funzionano', 'es': '/es/notificaciones-vinted-no-funcionan'},
 }
 
 CSS = r"""
@@ -191,7 +196,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/vinted-price-guide', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
-               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('prices', 'Vinted prices (Sept 2026)'),
+               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('prices', 'Vinted prices (Sept 2026)'),
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
@@ -199,7 +204,7 @@ UI = {
                nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('prices', 'Prix Vinted (sept. 2026)'), ('fees', 'Frais Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('prices', 'Prix Vinted (sept. 2026)'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
@@ -207,7 +212,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
                login='ANMELDEN', start='LOSLEGEN',
                foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
-               foot=[('bot', 'Vinted Bot'), ('compare', 'Vinted Bots im Vergleich (EN)'), ('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
+               foot=[('bot', 'Vinted Bot'), ('notwork', 'Vinted-Benachrichtigungen'), ('compare', 'Vinted Bots im Vergleich (EN)'), ('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
@@ -215,27 +220,45 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PRIJZEN'), (DISCORD, 'DISCORD')],
                login='INLOGGEN', start='BEGINNEN',
                foot_tag='SNYPD &middot; NIET VERBONDEN AAN VINTED', foot_t='Leest alleen openbare advertenties.',
-               foot=[('bot', 'Vinted bot'), ('compare', 'Vinted bots vergeleken (EN)'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
+               foot=[('bot', 'Vinted bot'), ('notwork', 'Vinted-meldingen'), ('compare', 'Vinted bots vergeleken (EN)'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
                home='Home'),
+    'it': dict(locale='it_IT', toc='IN QUESTA PAGINA', updated='Aggiornato il', by='Di SNYPD, creato da un reseller di sneaker belga',
+               nav=[('bot', 'VINTED BOT'), ('/plans', 'PREZZI'), (DISCORD, 'DISCORD')],
+               login='ACCEDI', start='INIZIA',
+               foot_tag='SNYPD &middot; NON AFFILIATO A VINTED', foot_t='Legge solo annunci pubblici.',
+               foot=[('bot', 'Vinted bot (EN)'), ('notwork', 'Notifiche Vinted'), ('compare', 'Bot Vinted a confronto (EN)'), ('fees', 'Commissioni Vinted (EN)'),
+                     ('/faq', 'FAQ (EN)'), ('/support', 'Supporto (EN)'), (DISCORD, 'Discord')],
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:snypd@gmail.com">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
+               home='Home'),
+    'es': dict(locale='es_ES', toc='EN ESTA PÁGINA', updated='Actualizado el', by='Por SNYPD, creado por un revendedor de zapatillas belga',
+               nav=[('bot', 'VINTED BOT'), ('/plans', 'PRECIOS'), (DISCORD, 'DISCORD')],
+               login='ENTRAR', start='EMPEZAR',
+               foot_tag='SNYPD &middot; SIN RELACIÓN CON VINTED', foot_t='Solo lee anuncios públicos.',
+               foot=[('bot', 'Vinted bot (EN)'), ('notwork', 'Notificaciones de Vinted'), ('compare', 'Bots de Vinted comparados (EN)'), ('fees', 'Comisiones de Vinted (EN)'),
+                     ('/faq', 'FAQ (EN)'), ('/support', 'Soporte (EN)'), (DISCORD, 'Discord')],
+               legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:snypd@gmail.com">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
+               home='Inicio'),
 }
 
 
 def live_langs(key):
     """Published languages of a page, English first."""
-    return [l for l in ('en', 'fr', 'de', 'nl') if l in SLUGS[key] and LIVE[l]]
+    return [l for l in ('en', 'fr', 'de', 'nl', 'it', 'es') if l in SLUGS[key] and LIVE[l]]
 # Last real content change per page (shown as 'Updated' and used as dateModified).
 PAGE_MODIFIED = {'bot': '2026-10-09', 'notify': '2026-10-09', 'compare': '2026-10-09', 'prices': '2026-10-02', 'deals': '2026-10-09', 'fees': '2026-10-02',
-                 'monitor': '2026-10-09'}
+                 'monitor': '2026-10-09', 'notwork': '2026-10-09'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
-              'de': _MONTHS['de'], 'nl': _MONTHS['nl']}
+              'de': _MONTHS['de'], 'nl': _MONTHS['nl'], 'it': _MONTHS['it'], 'es': _MONTHS['es']}
 
 
 def date_txt(iso, lang):
     y, m, d = (int(x) for x in iso.split('-'))
     day = {'fr': '1er' if d == 1 else str(d), 'de': '%d.' % d}.get(lang, str(d))
+    if lang == 'es':
+        return '%s de %s de %d' % (day, MONTHS_TXT[lang][m - 1], y)
     return '%s %s %d' % (day, MONTHS_TXT[lang][m - 1], y)
 
 
@@ -389,6 +412,18 @@ def faq_html(pairs):
 
 
 def cta(lang):
+    if lang == 'it':
+        return ('<div class="lg-box lg-mint"><p><strong>Inizia gratis con una ricerca.</strong> Nessuna carta, nessun limite di tempo, nessun limite di notifiche. I primi 7 giorni funziona 24 ore su 24 con le notifiche. '
+                'Passa a un piano a pagamento quando vuoi che la ricerca continui anche con la dashboard chiusa.</p>'
+                '<p class="ct-note">Per ora registrazione e pagamento sono in inglese.</p>'
+                '<div class="ct-actions"><a class="ct-btn" href="/signup">INIZIA GRATIS</a>'
+                '<a class="ct-btn ct-ghost" href="/plans">VEDI I PIANI</a></div></div>')
+    if lang == 'es':
+        return ('<div class="lg-box lg-mint"><p><strong>Empieza gratis con una búsqueda.</strong> Sin tarjeta, sin límite de tiempo, sin límite de notificaciones. Los primeros 7 días funciona 24/7 con notificaciones. '
+                'Pásate a un plan de pago cuando quieras que la búsqueda siga funcionando con el panel cerrado.</p>'
+                '<p class="ct-note">De momento, el registro y el pago están en inglés.</p>'
+                '<div class="ct-actions"><a class="ct-btn" href="/signup">EMPEZAR GRATIS</a>'
+                '<a class="ct-btn ct-ghost" href="/plans">VER PLANES</a></div></div>')
     if lang == 'de':
         return ('<div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten 7 Tage laufen rund um die Uhr mit Benachrichtigungen. '
                 'Wechsle zu einem bezahlten Tarif, wenn deine Suche auch bei geschlossenem Dashboard weiterlaufen soll.</p>'
@@ -2025,6 +2060,207 @@ def page_fees(lang):
                 body, [faq_ld(faq)])
 
 
+# ------------------------------------------------------------------ page: notifications not working
+# Every fact from Vinted's own help centre, read in each language on 9 Oct 2026: help 435 (saved
+# searches: only a "+N" counter in the search bar, unlimited, removed after 6 months unopened) and
+# help 433 (the list of notification triggers, which has no saved-search item; app menu names;
+# the daily limit for non-priority notifications). Re-check both before changing NOTWORK_CHECKED.
+NOTWORK_CHECKED = '2026-10-09'
+_VH = {'en': 'https://www.vinted.co.uk/help/', 'fr': 'https://www.vinted.fr/help/', 'de': 'https://www.vinted.de/help/',
+       'nl': 'https://www.vinted.nl/help/', 'it': 'https://www.vinted.it/help/', 'es': 'https://www.vinted.es/help/'}
+NOTWORK = {
+    'en': dict(
+        title='Vinted saved search notifications not working? Why, and the fix | SNYPD',
+        desc='Vinted saved searches do not send a push for each new listing: Vinted only shows a "+" counter in the search bar. What Vinted does notify you about, the settings to check, and how to get a push for every new match.',
+        eyebrow='VINTED NOTIFICATIONS', h1='Vinted not notifying you about new listings? Here is why.',
+        lead='Vinted&rsquo;s saved searches do not send a push notification for every new listing. Vinted&rsquo;s own help centre describes only a counter in the search bar. Below: what Vinted does notify you about, the settings to check if other notifications stopped too, and how to get a push for every new match.',
+        toc=[('short', 'Short answer'), ('notifies', 'What Vinted notifies'), ('settings', 'Check your settings'), ('every', 'A push for every listing'), ('faq', 'Questions')],
+        h_short='The short answer', h_notifies='What Vinted does send notifications for', h_settings='If other Vinted notifications stopped too', h_every='How to get a push for every new listing', h_faq='Questions', h_start='Try it on one search',
+        short=('When you save a search, Vinted shows a number with a plus next to it the next time you open the search bar: the new listings since you last looked. Opening the search resets it (<a href="{h435}" rel="nofollow">Vinted help: saved searches</a>). '
+               'New listings in a saved search are not on Vinted&rsquo;s list of push notification triggers (<a href="{h433}" rel="nofollow">Vinted help: managing notifications</a>). So if you expected a push for each new listing, nothing on your phone is broken. Both pages checked {checked}.'),
+        notifies_intro='According to Vinted&rsquo;s help centre, you get a notification when:',
+        triggers=['a member you follow lists a new item', 'the price of an item in your favourites drops', 'an item in your favourites sells', 'someone favourites an item you listed',
+                  'someone starts following you', 'you get feedback from another member', 'you get a new message', 'Vinted sends you news'],
+        notifies_tip='Two of these help buyers: follow sellers whose style you like, and favourite items you want, to hear when their price drops. Neither covers brand-new listings from people you don&rsquo;t follow.',
+        settings_steps=['In the Vinted app, go to your profile, then <strong>Settings</strong>, then <strong>Push notifications</strong>. The first option turns all of them on or off.',
+                        'In the same list, <strong>Other notifications</strong> has a daily limit for notifications that are not high priority. A low limit means some stop arriving for the rest of the day.',
+                        'On the phone: iPhone <strong>Settings &gt; Notifications &gt; Vinted</strong>; Android <strong>Settings &gt; Apps &gt; Vinted &gt; Notifications</strong> (names differ by phone maker). Focus or Do Not Disturb also hides them.',
+                        'On the Vinted website, notifications cannot be turned off; you can only choose which ones also arrive by email.'],
+        settings_more='Saved searches you never open are removed after 6 months, and you can save as many as you like (<a href="{h435}" rel="nofollow">Vinted help</a>).',
+        every=('SNYPD watches a Vinted search for you and sends a push notification when a new listing matches. Paste the same search link you would save on Vinted, filters included, or type a few words. '
+               'SNYPD checks it about every 30 seconds and the alert opens the listing on Vinted. It never asks for your Vinted password and never buys for you. On iPhone, alerts work once SNYPD is on your Home Screen. '
+               'More: <a href="{notify}">Vinted saved search alerts</a> and <a href="{bot}">how SNYPD works</a>.'),
+        faq=[('Why doesn&rsquo;t Vinted notify me about my saved search?', 'Because Vinted&rsquo;s saved searches only show a counter (a number with a plus) in the search bar the next time you open it. New listings in a saved search are not among the push notifications Vinted lists in its help centre.'),
+             ('Does Vinted send push notifications for new items?', 'Only for members you follow: when someone you follow lists a new item. Not for new listings that match a saved search.'),
+             ('How do I turn Vinted notifications back on?', 'In the app: profile, Settings, Push notifications. Then check your phone&rsquo;s settings for Vinted and the daily limit under Other notifications.'),
+             ('How do I get notified when a new item is listed on Vinted?', 'Use a tool that watches the search for you. SNYPD checks a Vinted search about every 30 seconds and sends a push for each new match; the first search is free, 24/7 for the first 7 days.')]),
+    'fr': dict(
+        title='Notifications Vinted qui ne marchent pas : pourquoi, et la solution | SNYPD',
+        desc='Les recherches sauvegardées Vinted n’envoient pas de notification pour chaque nouvelle annonce : Vinted affiche seulement un compteur « + ». Ce que Vinted notifie, les réglages à vérifier, et comment être alerté à chaque annonce.',
+        eyebrow='NOTIFICATIONS VINTED', h1='Vinted ne te prévient pas des nouvelles annonces ? Voici pourquoi.',
+        lead='Les recherches sauvegardées de Vinted n’envoient pas de notification push pour chaque nouvelle annonce. Le centre d’aide de Vinted ne décrit qu’un compteur dans la barre de recherche. Ci-dessous : ce que Vinted notifie vraiment, les réglages à vérifier si d’autres notifications ont aussi disparu, et comment recevoir une notification à chaque nouvelle annonce.',
+        toc=[('reponse', 'En bref'), ('notifie', 'Ce que Vinted notifie'), ('reglages', 'Tes réglages'), ('chaque', 'Une alerte par annonce'), ('questions', 'Questions')],
+        h_short='La réponse courte', h_notifies='Ce que Vinted notifie', h_settings='Si d’autres notifications Vinted ont aussi disparu', h_every='Recevoir une notification à chaque nouvelle annonce', h_faq='Questions', h_start='Essaie sur une recherche',
+        short=('Quand tu sauvegardes une recherche, Vinted affiche un nombre suivi d’un signe plus à côté la prochaine fois que tu ouvres la barre de recherche : les nouvelles annonces depuis ta dernière visite. Ouvrir la recherche le remet à zéro (<a href="{h435}" rel="nofollow">aide Vinted : recherches sauvegardées</a>). '
+               'Les nouvelles annonces d’une recherche sauvegardée ne font pas partie des notifications push listées par Vinted (<a href="{h433}" rel="nofollow">aide Vinted : notifications</a>). Si tu attendais une notification par annonce, ton téléphone n’est donc pas en panne. Pages vérifiées le {checked}.'),
+        notifies_intro='Selon le centre d’aide de Vinted, tu reçois une notification quand :',
+        triggers=['un membre que tu suis met en ligne un nouvel article', 'le prix d’un article de tes favoris baisse', 'un article de tes favoris est vendu', 'un membre ajoute un de tes articles à ses favoris',
+                  'un membre commence à te suivre', 'un membre te laisse une évaluation', 'tu reçois un nouveau message', 'Vinted t’envoie un message'],
+        notifies_tip='Deux d’entre elles aident les acheteurs : suis les vendeurs dont tu aimes le style, et mets en favoris les articles que tu veux pour savoir quand leur prix baisse. Aucune ne couvre les nouvelles annonces de membres que tu ne suis pas.',
+        settings_steps=['Dans l’app Vinted, va sur ton profil, puis <strong>Paramètres</strong>, puis <strong>Notifications (Mobile)</strong>. La première option les active ou les coupe toutes.',
+                        'Dans la même liste, <strong>Notifications secondaires</strong> fixe un nombre maximal par jour de notifications non prioritaires. Avec une limite basse, certaines n’arrivent plus jusqu’au lendemain.',
+                        'Sur le téléphone : iPhone <strong>Réglages &gt; Notifications &gt; Vinted</strong> ; Android <strong>Paramètres &gt; Applications &gt; Vinted &gt; Notifications</strong> (les noms varient selon la marque). Les modes Concentration ou Ne pas déranger les masquent aussi.',
+                        'Sur le site Vinted, les notifications ne peuvent pas être désactivées ; tu peux seulement choisir celles qui arrivent aussi par e-mail.'],
+        settings_more='Les recherches sauvegardées que tu n’ouvres jamais sont retirées au bout de 6 mois, et tu peux en sauvegarder autant que tu veux (<a href="{h435}" rel="nofollow">aide Vinted</a>).',
+        every=('SNYPD surveille une recherche Vinted pour toi et t’envoie une notification push quand une nouvelle annonce correspond. Colle le même lien de recherche que tu sauvegarderais sur Vinted, filtres compris, ou tape quelques mots. '
+               'SNYPD la vérifie environ toutes les 30 secondes et l’alerte ouvre l’annonce sur Vinted. Il ne demande jamais ton mot de passe Vinted et n’achète jamais à ta place. Sur iPhone, les alertes marchent une fois SNYPD ajouté à l’écran d’accueil. '
+               'Plus de détails : <a href="{notify}">alertes de recherche Vinted</a> et <a href="{bot}">comment marche SNYPD</a>.'),
+        faq=[('Pourquoi Vinted ne me prévient pas pour ma recherche sauvegardée ?', 'Parce que les recherches sauvegardées de Vinted affichent seulement un compteur (un nombre suivi d’un plus) dans la barre de recherche la prochaine fois que tu l’ouvres. Les nouvelles annonces d’une recherche sauvegardée ne figurent pas parmi les notifications push listées dans le centre d’aide de Vinted.'),
+             ('Vinted envoie-t-il des notifications pour les nouveaux articles ?', 'Seulement pour les membres que tu suis : quand un membre que tu suis met en ligne un article. Pas pour les nouvelles annonces qui correspondent à une recherche sauvegardée.'),
+             ('Comment réactiver les notifications Vinted ?', 'Dans l’app : profil, Paramètres, Notifications (Mobile). Vérifie ensuite les réglages de ton téléphone pour Vinted et la limite quotidienne dans Notifications secondaires.'),
+             ('Comment être prévenu dès qu’un article est mis en ligne sur Vinted ?', 'Avec un outil qui surveille la recherche pour toi. SNYPD vérifie une recherche Vinted environ toutes les 30 secondes et envoie une notification push pour chaque nouvelle annonce ; la première recherche est gratuite, 24h/24 pendant les 7 premiers jours.')]),
+    'de': dict(
+        title='Vinted-Benachrichtigung funktioniert nicht? Der Grund und die Lösung | SNYPD',
+        desc='Gespeicherte Suchen bei Vinted schicken keine Push-Benachrichtigung für jede neue Anzeige: Vinted zeigt nur einen „+“-Zähler in der Suche. Wofür Vinted benachrichtigt, welche Einstellungen du prüfen solltest und wie du bei jeder neuen Anzeige Bescheid bekommst.',
+        eyebrow='VINTED-BENACHRICHTIGUNGEN', h1='Vinted sagt dir nicht Bescheid, wenn neue Artikel kommen? Darum.',
+        lead='Gespeicherte Suchen bei Vinted schicken keine Push-Benachrichtigung für jede neue Anzeige. Vinteds eigenes Hilfe-Center beschreibt nur einen Zähler im Suchfeld. Hier steht, wofür Vinted wirklich benachrichtigt, welche Einstellungen du prüfen solltest, wenn auch andere Benachrichtigungen fehlen, und wie du bei jeder neuen passenden Anzeige eine Push-Benachrichtigung bekommst.',
+        toc=[('kurz', 'Kurze Antwort'), ('wofuer', 'Wofür Vinted benachrichtigt'), ('einstellungen', 'Einstellungen prüfen'), ('jede', 'Push für jede Anzeige'), ('fragen', 'Fragen')],
+        h_short='Die kurze Antwort', h_notifies='Wofür Vinted Benachrichtigungen schickt', h_settings='Wenn auch andere Vinted-Benachrichtigungen fehlen', h_every='So bekommst du für jede neue Anzeige eine Push-Benachrichtigung', h_faq='Fragen', h_start='Probier es mit einer Suche',
+        short=('Wenn du eine Suche speicherst, zeigt Vinted beim nächsten Öffnen des Suchfelds eine Zahl mit einem Pluszeichen daneben: die neuen Artikel seit deinem letzten Blick. Öffnest du die Suche, steht der Zähler wieder auf null (<a href="{h435}" rel="nofollow">Vinted-Hilfe: gespeicherte Suchen</a>). '
+               'Neue Anzeigen in einer gespeicherten Suche stehen nicht auf Vinteds Liste der Push-Benachrichtigungen (<a href="{h433}" rel="nofollow">Vinted-Hilfe: Benachrichtigungen</a>). Wenn du für jede neue Anzeige eine Benachrichtigung erwartet hast, ist an deinem Handy also nichts kaputt. Beide Seiten geprüft am {checked}.'),
+        notifies_intro='Laut Vinteds Hilfe-Center bekommst du eine Benachrichtigung, wenn:',
+        triggers=['ein Mitglied, dem du folgst, einen neuen Artikel hochlädt', 'der Preis eines deiner Favoriten gesenkt wird', 'einer deiner Favoriten verkauft wird', 'jemand einen deiner Artikel favorisiert',
+                  'dir jemand neu folgt', 'du eine Bewertung bekommst', 'du eine neue Nachricht bekommst', 'Vinted dir Neuigkeiten schickt'],
+        notifies_tip='Zwei davon helfen Käufern: Folge Verkäufern, deren Stil dir gefällt, und favorisiere Artikel, die du willst, um von Preissenkungen zu erfahren. Keine davon deckt neue Anzeigen von Leuten ab, denen du nicht folgst.',
+        settings_steps=['In der Vinted-App: <strong>Mein Profil</strong>, dann <strong>Meine Einstellungen</strong>, dann <strong>Push-Benachrichtigungen</strong>. Die erste Option schaltet alle ein oder aus.',
+                        'In derselben Liste legt <strong>Andere Benachrichtigungen</strong> ein Tageslimit für nicht vorrangige Benachrichtigungen fest. Bei einem niedrigen Limit kommen manche bis zum nächsten Tag nicht mehr an.',
+                        'Am Handy: iPhone <strong>Einstellungen &gt; Mitteilungen &gt; Vinted</strong>; Android <strong>Einstellungen &gt; Apps &gt; Vinted &gt; Benachrichtigungen</strong> (die Namen unterscheiden sich je nach Hersteller). Fokus oder „Nicht stören“ blenden sie ebenfalls aus.',
+                        'Auf der Vinted-Website lassen sich Benachrichtigungen nicht abschalten; du kannst nur wählen, welche zusätzlich per E-Mail kommen.'],
+        settings_more='Gespeicherte Suchen, die du 6 Monate lang nicht öffnest, werden entfernt, und du kannst so viele speichern, wie du möchtest (<a href="{h435}" rel="nofollow">Vinted-Hilfe</a>).',
+        every=('SNYPD beobachtet eine Vinted-Suche für dich und schickt dir eine Push-Benachrichtigung, sobald eine neue Anzeige passt. Füge denselben Suchlink ein, den du bei Vinted speichern würdest, mit allen Filtern, oder tippe ein paar Wörter. '
+               'SNYPD prüft ihn etwa alle 30 Sekunden, und die Benachrichtigung öffnet die Anzeige auf Vinted. SNYPD fragt nie nach deinem Vinted-Passwort und kauft nie für dich. Auf dem iPhone funktionieren die Benachrichtigungen, sobald SNYPD auf dem Home-Bildschirm ist. '
+               'Mehr: <a href="{bot}">so funktioniert SNYPD</a>.'),
+        faq=[('Warum benachrichtigt mich Vinted nicht über meine gespeicherte Suche?', 'Weil gespeicherte Suchen bei Vinted nur einen Zähler (eine Zahl mit Pluszeichen) im Suchfeld zeigen, wenn du es das nächste Mal öffnest. Neue Anzeigen in einer gespeicherten Suche gehören nicht zu den Push-Benachrichtigungen, die Vinted in seinem Hilfe-Center aufzählt.'),
+             ('Schickt Vinted Benachrichtigungen für neue Artikel?', 'Nur für Mitglieder, denen du folgst: wenn jemand, dem du folgst, einen neuen Artikel hochlädt. Nicht für neue Anzeigen, die zu einer gespeicherten Suche passen.'),
+             ('Wie schalte ich Vinted-Benachrichtigungen wieder ein?', 'In der App: Mein Profil, Meine Einstellungen, Push-Benachrichtigungen. Prüfe danach die Handy-Einstellungen für Vinted und das Tageslimit unter Andere Benachrichtigungen.'),
+             ('Wie werde ich benachrichtigt, wenn ein neuer Artikel bei Vinted eingestellt wird?', 'Mit einem Tool, das die Suche für dich beobachtet. SNYPD prüft eine Vinted-Suche etwa alle 30 Sekunden und schickt für jeden neuen Treffer eine Push-Benachrichtigung; die erste Suche ist kostenlos, in den ersten 7 Tagen rund um die Uhr.')]),
+    'nl': dict(
+        title='Vinted-meldingen werken niet? Waarom, en de oplossing | SNYPD',
+        desc='Bewaarde zoekopdrachten op Vinted sturen geen pushmelding voor elke nieuwe advertentie: Vinted toont alleen een "+"-teller in de zoekbalk. Waarvoor Vinted wel meldingen stuurt, welke instellingen je checkt en hoe je bij elke nieuwe advertentie een melding krijgt.',
+        eyebrow='VINTED-MELDINGEN', h1='Krijg je geen melding van Vinted bij nieuwe artikelen? Daarom.',
+        lead='Bewaarde zoekopdrachten op Vinted sturen geen pushmelding voor elke nieuwe advertentie. Het eigen helpcentrum van Vinted beschrijft alleen een teller in de zoekbalk. Hieronder: waarvoor Vinted wel meldingen stuurt, welke instellingen je checkt als ook andere meldingen wegblijven, en hoe je voor elke nieuwe passende advertentie een pushmelding krijgt.',
+        toc=[('kort', 'Kort antwoord'), ('waarvoor', 'Waarvoor Vinted meldt'), ('instellingen', 'Instellingen checken'), ('elke', 'Melding per advertentie'), ('vragen', 'Vragen')],
+        h_short='Het korte antwoord', h_notifies='Waarvoor Vinted wel meldingen stuurt', h_settings='Als ook andere Vinted-meldingen wegblijven', h_every='Zo krijg je een pushmelding voor elke nieuwe advertentie', h_faq='Vragen', h_start='Probeer het met één zoekopdracht',
+        short=('Als je een zoekopdracht bewaart, toont Vinted er de volgende keer dat je de zoekbalk opent een getal met een plusteken naast: de nieuwe artikelen sinds je laatste bezoek. Open je de zoekopdracht, dan staat de teller weer op nul (<a href="{h435}" rel="nofollow">Vinted-hulp: zoekopdrachten bewaren</a>). '
+               'Nieuwe advertenties in een bewaarde zoekopdracht staan niet in de lijst van pushmeldingen van Vinted (<a href="{h433}" rel="nofollow">Vinted-hulp: meldingen</a>). Verwachtte je een melding per advertentie, dan is er aan je telefoon dus niets kapot. Beide pagina&rsquo;s gecontroleerd op {checked}.'),
+        notifies_intro='Volgens het helpcentrum van Vinted krijg je een melding wanneer:',
+        triggers=['een lid dat je volgt een nieuw artikel uploadt', 'de prijs van een van je favorieten daalt', 'een van je favorieten verkocht is', 'iemand een artikel van jou als favoriet bewaart',
+                  'iemand je begint te volgen', 'je een beoordeling krijgt', 'je een nieuw bericht krijgt', 'Vinted je nieuws stuurt'],
+        notifies_tip='Twee daarvan helpen kopers: volg verkopers van wie je de stijl leuk vindt, en bewaar artikelen die je wilt als favoriet om te horen wanneer de prijs daalt. Geen enkele dekt nieuwe advertenties van mensen die je niet volgt.',
+        settings_steps=['In de Vinted-app: ga naar je <strong>profiel</strong>, dan <strong>Mijn instellingen</strong>, dan <strong>Pushmeldingen</strong>. De eerste optie zet ze allemaal aan of uit.',
+                        'In dezelfde lijst stelt <strong>Minder belangrijke notificaties</strong> een daglimiet in voor meldingen zonder hoge prioriteit. Met een lage limiet komen sommige pas de volgende dag weer binnen.',
+                        'Op je telefoon: iPhone <strong>Instellingen &gt; Berichtgeving &gt; Vinted</strong>; Android <strong>Instellingen &gt; Apps &gt; Vinted &gt; Meldingen</strong> (namen verschillen per merk). Focus of Niet storen verbergt ze ook.',
+                        'Op de Vinted-website kun je meldingen niet uitzetten; je kiest alleen welke ook per e-mail komen.'],
+        settings_more='Bewaarde zoekopdrachten die je 6 maanden lang niet bekijkt, worden verwijderd, en je kunt er zoveel bewaren als je wilt (<a href="{h435}" rel="nofollow">Vinted-hulp</a>).',
+        every=('SNYPD houdt een Vinted-zoekopdracht voor je in de gaten en stuurt een pushmelding zodra er een nieuwe passende advertentie is. Plak dezelfde zoeklink die je op Vinted zou bewaren, met filters, of typ een paar woorden. '
+               'SNYPD controleert hem ongeveer elke 30 seconden en de melding opent de advertentie op Vinted. SNYPD vraagt nooit om je Vinted-wachtwoord en koopt nooit voor je. Op een iPhone werken meldingen zodra SNYPD op je beginscherm staat. '
+               'Meer: <a href="{bot}">zo werkt SNYPD</a>.'),
+        faq=[('Waarom krijg ik geen melding van Vinted voor mijn bewaarde zoekopdracht?', 'Omdat bewaarde zoekopdrachten op Vinted alleen een teller (een getal met een plusteken) in de zoekbalk tonen als je die de volgende keer opent. Nieuwe advertenties in een bewaarde zoekopdracht horen niet bij de pushmeldingen die Vinted in zijn helpcentrum noemt.'),
+             ('Stuurt Vinted meldingen voor nieuwe artikelen?', 'Alleen voor leden die je volgt: als iemand die je volgt een nieuw artikel uploadt. Niet voor nieuwe advertenties die bij een bewaarde zoekopdracht passen.'),
+             ('Hoe zet ik Vinted-meldingen weer aan?', 'In de app: profiel, Mijn instellingen, Pushmeldingen. Check daarna de instellingen van je telefoon voor Vinted en de daglimiet onder Minder belangrijke notificaties.'),
+             ('Hoe krijg ik een melding als er een nieuw artikel op Vinted komt?', 'Met een tool die de zoekopdracht voor je in de gaten houdt. SNYPD controleert een Vinted-zoekopdracht ongeveer elke 30 seconden en stuurt voor elke nieuwe treffer een pushmelding; de eerste zoekopdracht is gratis, de eerste 7 dagen 24/7.')]),
+    'it': dict(
+        title='Notifiche Vinted che non funzionano? Il motivo e la soluzione | SNYPD',
+        desc='Le ricerche salvate su Vinted non inviano una notifica per ogni nuovo annuncio: Vinted mostra solo un contatore "+" nella barra di ricerca. Per cosa Vinted invia notifiche, le impostazioni da controllare e come ricevere un avviso per ogni nuovo annuncio.',
+        eyebrow='NOTIFICHE VINTED', h1='Vinted non ti avvisa dei nuovi annunci? Ecco perché.',
+        lead='Le ricerche salvate su Vinted non inviano una notifica push per ogni nuovo annuncio. Il centro assistenza di Vinted descrive solo un contatore nella barra di ricerca. Qui sotto: per cosa Vinted invia davvero notifiche, le impostazioni da controllare se sono sparite anche altre notifiche e come ricevere una notifica push per ogni nuovo annuncio che corrisponde.',
+        toc=[('breve', 'In breve'), ('cosa', 'Cosa notifica Vinted'), ('impostazioni', 'Le impostazioni'), ('ogni', 'Una notifica per annuncio'), ('domande', 'Domande')],
+        h_short='La risposta breve', h_notifies='Per cosa Vinted invia notifiche', h_settings='Se sono sparite anche altre notifiche di Vinted', h_every='Come ricevere una notifica per ogni nuovo annuncio', h_faq='Domande', h_start='Provalo con una ricerca',
+        short=('Quando salvi una ricerca, la prossima volta che apri la barra di ricerca Vinted mostra accanto un numero con il segno più: i nuovi annunci dall&rsquo;ultima volta. Aprendo la ricerca il contatore si azzera (<a href="{h435}" rel="nofollow">assistenza Vinted: ricerche salvate</a>). '
+               'I nuovi annunci di una ricerca salvata non sono nell&rsquo;elenco delle notifiche push di Vinted (<a href="{h433}" rel="nofollow">assistenza Vinted: notifiche</a>). Se ti aspettavi una notifica per ogni annuncio, il tuo telefono non ha nessun problema. Pagine controllate il {checked}.'),
+        notifies_intro='Secondo il centro assistenza di Vinted, ricevi una notifica quando:',
+        triggers=['un utente che segui carica un nuovo articolo', 'il prezzo di un articolo nei tuoi Preferiti scende', 'un articolo nei tuoi Preferiti viene venduto', 'qualcuno aggiunge ai Preferiti un tuo articolo',
+                  'qualcuno inizia a seguirti', 'ricevi una recensione', 'ricevi un nuovo messaggio', 'Vinted ti invia novità'],
+        notifies_tip='Due di queste aiutano chi compra: segui i venditori di cui ti piace lo stile e aggiungi ai Preferiti gli articoli che vuoi, per sapere quando il prezzo scende. Nessuna copre i nuovi annunci di persone che non segui.',
+        settings_steps=['Nell&rsquo;app Vinted vai sul tuo <strong>profilo</strong>, poi <strong>Impostazioni</strong>, poi <strong>Notifiche push</strong>. La prima opzione le attiva o le disattiva tutte.',
+                        'Nella stessa lista, <strong>Altre notifiche</strong> imposta un limite giornaliero per le notifiche senza priorità alta. Con un limite basso alcune non arrivano più fino al giorno dopo.',
+                        'Sul telefono: iPhone <strong>Impostazioni &gt; Notifiche &gt; Vinted</strong>; Android <strong>Impostazioni &gt; App &gt; Vinted &gt; Notifiche</strong> (i nomi cambiano secondo il produttore). Anche Full immersion o Non disturbare le nascondono.',
+                        'Sul sito Vinted le notifiche non si possono disattivare; puoi solo scegliere quali ricevere anche via email.'],
+        settings_more='Le ricerche salvate che non apri per 6 mesi non sono più visibili, e puoi salvarne quante vuoi (<a href="{h435}" rel="nofollow">assistenza Vinted</a>).',
+        every=('SNYPD controlla una ricerca Vinted per te e ti invia una notifica push quando c&rsquo;è un nuovo annuncio che corrisponde. Incolla lo stesso link di ricerca che salveresti su Vinted, filtri compresi, oppure scrivi qualche parola. '
+               'SNYPD lo controlla circa ogni 30 secondi e la notifica apre l&rsquo;annuncio su Vinted. Non chiede mai la tua password di Vinted e non compra mai al posto tuo. Su iPhone le notifiche funzionano una volta aggiunto SNYPD alla schermata Home. '
+               'Di più: <a href="{bot}">come funziona SNYPD</a> (in inglese).'),
+        faq=[('Perché Vinted non mi avvisa per la mia ricerca salvata?', 'Perché le ricerche salvate di Vinted mostrano solo un contatore (un numero con il segno più) nella barra di ricerca la volta successiva che la apri. I nuovi annunci di una ricerca salvata non sono tra le notifiche push elencate nel centro assistenza di Vinted.'),
+             ('Vinted invia notifiche per i nuovi articoli?', 'Solo per gli utenti che segui: quando qualcuno che segui carica un nuovo articolo. Non per i nuovi annunci che corrispondono a una ricerca salvata.'),
+             ('Come riattivo le notifiche di Vinted?', 'Nell&rsquo;app: profilo, Impostazioni, Notifiche push. Poi controlla le impostazioni del telefono per Vinted e il limite giornaliero in Altre notifiche.'),
+             ('Come ricevo un avviso quando viene pubblicato un nuovo articolo su Vinted?', 'Con uno strumento che controlla la ricerca per te. SNYPD controlla una ricerca Vinted circa ogni 30 secondi e invia una notifica push per ogni nuovo annuncio; la prima ricerca è gratis, 24 ore su 24 per i primi 7 giorni.')]),
+    'es': dict(
+        title='¿Las notificaciones de Vinted no funcionan? Por qué, y la solución | SNYPD',
+        desc='Las búsquedas guardadas de Vinted no envían una notificación por cada anuncio nuevo: Vinted solo muestra un contador "+" en la barra de búsqueda. Para qué envía notificaciones Vinted, qué ajustes revisar y cómo recibir un aviso con cada anuncio nuevo.',
+        eyebrow='NOTIFICACIONES DE VINTED', h1='¿Vinted no te avisa de los anuncios nuevos? Este es el motivo.',
+        lead='Las búsquedas guardadas de Vinted no envían una notificación push por cada anuncio nuevo. El propio centro de ayuda de Vinted solo describe un contador en la barra de búsqueda. Aquí: para qué envía Vinted notificaciones de verdad, qué ajustes revisar si también han desaparecido otras notificaciones y cómo recibir una notificación push con cada anuncio nuevo que encaje.',
+        toc=[('corta', 'Respuesta corta'), ('que', 'Qué notifica Vinted'), ('ajustes', 'Revisa tus ajustes'), ('cada', 'Un aviso por anuncio'), ('preguntas', 'Preguntas')],
+        h_short='La respuesta corta', h_notifies='Para qué envía Vinted notificaciones', h_settings='Si también han desaparecido otras notificaciones de Vinted', h_every='Cómo recibir una notificación con cada anuncio nuevo', h_faq='Preguntas', h_start='Pruébalo con una búsqueda',
+        short=('Cuando guardas una búsqueda, la próxima vez que abres la barra de búsqueda Vinted muestra a su lado un número con el signo "+": los anuncios nuevos desde tu última visita. Al abrir la búsqueda, el contador vuelve a cero (<a href="{h435}" rel="nofollow">ayuda de Vinted: búsquedas guardadas</a>). '
+               'Los anuncios nuevos de una búsqueda guardada no están en la lista de notificaciones push de Vinted (<a href="{h433}" rel="nofollow">ayuda de Vinted: notificaciones</a>). Si esperabas una notificación por cada anuncio, a tu móvil no le pasa nada. Páginas comprobadas el {checked}.'),
+        notifies_intro='Según el centro de ayuda de Vinted, recibes una notificación cuando:',
+        triggers=['un miembro al que sigues sube un artículo nuevo', 'baja el precio de un artículo de tus favoritos', 'se vende un artículo de tus favoritos', 'alguien marca como favorito un artículo tuyo',
+                  'alguien empieza a seguirte', 'recibes una valoración', 'recibes un mensaje nuevo', 'Vinted te envía novedades'],
+        notifies_tip='Dos de ellas ayudan a quien compra: sigue a los vendedores cuyo estilo te gusta y marca como favoritos los artículos que quieres para saber cuándo baja su precio. Ninguna cubre los anuncios nuevos de personas a las que no sigues.',
+        settings_steps=['En la app de Vinted, ve a tu <strong>perfil</strong>, luego <strong>Ajustes</strong> y luego <strong>Notificaciones de la app</strong>. La primera opción las activa o desactiva todas.',
+                        'En la misma lista, <strong>Otras notificaciones</strong> fija un límite diario para las notificaciones sin prioridad. Con un límite bajo, algunas dejan de llegar hasta el día siguiente.',
+                        'En el móvil: iPhone <strong>Ajustes &gt; Notificaciones &gt; Vinted</strong>; Android <strong>Ajustes &gt; Aplicaciones &gt; Vinted &gt; Notificaciones</strong> (los nombres cambian según el fabricante). Los modos Concentración o No molestar también las ocultan.',
+                        'En la web de Vinted las notificaciones no se pueden desactivar; solo puedes elegir cuáles te llegan también por email.'],
+        settings_more='Las búsquedas guardadas que no abres en 6 meses desaparecen, y puedes guardar tantas como quieras (<a href="{h435}" rel="nofollow">ayuda de Vinted</a>).',
+        every=('SNYPD vigila una búsqueda de Vinted por ti y te envía una notificación push cuando aparece un anuncio nuevo que encaja. Pega el mismo enlace de búsqueda que guardarías en Vinted, con filtros incluidos, o escribe unas palabras. '
+               'SNYPD lo comprueba más o menos cada 30 segundos y la notificación abre el anuncio en Vinted. Nunca te pide la contraseña de Vinted y nunca compra por ti. En iPhone, las notificaciones funcionan cuando SNYPD está en la pantalla de inicio. '
+               'Más: <a href="{bot}">cómo funciona SNYPD</a> (en inglés).'),
+        faq=[('¿Por qué Vinted no me avisa de mi búsqueda guardada?', 'Porque las búsquedas guardadas de Vinted solo muestran un contador (un número con el signo +) en la barra de búsqueda la próxima vez que la abres. Los anuncios nuevos de una búsqueda guardada no están entre las notificaciones push que Vinted enumera en su centro de ayuda.'),
+             ('¿Vinted envía notificaciones de artículos nuevos?', 'Solo de los miembros a los que sigues: cuando alguien al que sigues sube un artículo. No de los anuncios nuevos que encajan con una búsqueda guardada.'),
+             ('¿Cómo vuelvo a activar las notificaciones de Vinted?', 'En la app: perfil, Ajustes, Notificaciones de la app. Después revisa los ajustes del móvil para Vinted y el límite diario en Otras notificaciones.'),
+             ('¿Cómo recibo un aviso cuando se publica un artículo nuevo en Vinted?', 'Con una herramienta que vigile la búsqueda por ti. SNYPD comprueba una búsqueda de Vinted más o menos cada 30 segundos y envía una notificación push por cada anuncio nuevo; la primera búsqueda es gratis, 24/7 durante los 7 primeros días.')]),
+}
+
+
+def page_notwork(lang):
+    t = NOTWORK[lang]
+    links = {'h435': _VH[lang] + '435', 'h433': _VH[lang] + '433', 'checked': date_txt(NOTWORK_CHECKED, lang),
+             'notify': href('notify', lang), 'bot': href('bot', lang)}
+    ids = [a for a, _ in t['toc']]
+    faq = t['faq']
+    body = f"""
+<section id="{ids[0]}">
+  <h2>{t['h_short']}</h2>
+  <div class="lg-box lg-mint"><p>{t['short'].format(**links)}</p></div>
+</section>
+<section id="{ids[1]}">
+  <h2>{t['h_notifies']}</h2>
+  <p>{t['notifies_intro']}</p>
+  <ul>{''.join('<li>%s</li>' % x for x in t['triggers'])}</ul>
+  <p>{t['notifies_tip']}</p>
+</section>
+<section id="{ids[2]}">
+  <h2>{t['h_settings']}</h2>
+  <ol>{''.join('<li>%s</li>' % x for x in t['settings_steps'])}</ol>
+  <p>{t['settings_more'].format(**links)}</p>
+</section>
+<section id="{ids[3]}">
+  <h2>{t['h_every']}</h2>
+  <p>{t['every'].format(**links)}</p>
+  {figure('feed', lang) if lang in SHOT_TEXT else ''}
+</section>
+<section id="{ids[4]}">
+  <h2>{t['h_faq']}</h2>
+  {faq_html([(html.unescape(q), a) for q, a in faq])}
+</section>
+<section id="start">
+  <h2>{t['h_start']}</h2>
+  {cta(lang)}
+</section>"""
+    return page('notwork', lang, html.unescape(t['title']), html.unescape(t['desc']), t['eyebrow'], t['h1'], t['lead'], t['toc'],
+                body, [faq_ld([(html.unescape(q), a) for q, a in faq])])
+
+
 def write(rel, text):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -2042,6 +2278,9 @@ if __name__ == '__main__':
         write(prefix + SLUGS['compare'][lang].rsplit('/', 1)[1] + '.html', page_compare(lang))
         html_out, csv_rows = page_prices(lang)
         write(prefix + SLUGS['prices'][lang].rsplit('/', 1)[1] + '.html', html_out)
+    for lang in SLUGS['notwork']:
+        rel = SLUGS['notwork'][lang].lstrip('/') + '.html'
+        write(rel if LIVE[lang] else 'ops/seo/preview/' + rel.replace('/', '-'), page_notwork(lang))
     for lang in ('de', 'nl'):
         rel = SLUGS['bot'][lang].lstrip('/') + '.html'
         write(rel if LIVE[lang] else 'ops/seo/preview/' + rel.replace('/', '-'), page_bot(lang))
