@@ -1774,7 +1774,7 @@ body {
           <select id="wiz-q-site" aria-label="Which Vinted country"></select>
           <input type="number" id="wiz-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
         </div>
-        <p class="wiz-quick__note" id="wiz-q-note">Every word must be in the listing title or brand. Starts at about EUR30 to skip cheap fast fashion; change it later in Filters.</p>
+        <p class="wiz-quick__note" id="wiz-q-note">Like Vinted's own search, this includes listings that mention your words only in the description. Starts at about EUR30 to skip cheap fast fashion; change it later in Filters.</p>
         <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
       </div>
       <div class="wiz-actions">
@@ -3003,7 +3003,7 @@ const HEARTBEAT_URL = (() => {
         const paintWqNote = () => {
           const cur = vq.currencyFor(wqSite.value);
           if (wqMax) wqMax.placeholder = 'Max ' + cur;
-          if (wqNote) wqNote.textContent = 'Every word must be in the listing title or brand. Starts at ' + cur + ' ' + vq.floorFor(wqSite.value) + ' to skip cheap fast fashion; change it later in Filters.';
+          if (wqNote) wqNote.textContent = 'Like Vinted\'s own search, this includes listings that mention your words only in the description. Starts at ' + cur + ' ' + vq.floorFor(wqSite.value) + ' to skip cheap fast fashion; change it later in Filters.';
         };
         wqSite.addEventListener('change', paintWqNote);
         paintWqNote();
