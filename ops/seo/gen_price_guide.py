@@ -296,7 +296,7 @@ def page_hub(lang):
     if lang == 'en':
         intro = ('<section id="about"><h2>What this guide is</h2><div class="lg-box lg-mint"><p>Typical Vinted asking prices for %d popular items, from %s vinted.be listings that SNYPD saw %s. '
                  'Each item page shows the median asking price, the middle half of listings and prices by condition. Asking prices, not sale prices: Vinted does not publish what items sell for. '
-                 'Only items with at least %d listings and a clear price are included. Updated monthly; free to reuse with a link (CC BY 4.0).</p></div></section>' % (len(PUB), num(total, 'en'), win, MIN_LISTINGS))
+                 'Only items with at least %d listings and a clear price are included. Updated monthly; free to reuse with a link (CC BY 4.0). Trends, condition premium and price cuts: <a href="/vinted-market-report">the monthly Vinted Market Report</a>.</p></div></section>' % (len(PUB), num(total, 'en'), win, MIN_LISTINGS))
         tail = ('<section id="alerts"><h2>Found your price?</h2><p>A good price only helps if you see the listing first. SNYPD checks your Vinted search about every 30 seconds and sends new matches to your phone. '
                 'Each item page has a button that starts that search with the cheapest-quarter price as the maximum.</p>%s</section>' % gc.cta('en'))
         title = 'Vinted price guide: typical prices for %d items (%s) | SNYPD' % (len(PUB), month_year('en'))
@@ -306,7 +306,7 @@ def page_hub(lang):
                        [('about', 'About')] + toc + [('alerts', 'Alerts')], intro + ''.join(sections) + tail)
     intro = ('<section id="about"><h2>Ce qu’est ce guide</h2><div class="lg-box lg-mint"><p>Les prix demandés typiques sur Vinted pour %d articles populaires, à partir de %s annonces vinted.be vues par SNYPD %s. '
              'Chaque page article montre le prix demandé médian, la moitié centrale des annonces et les prix selon l’état. Ce sont des prix demandés, pas des prix de vente%s: Vinted ne publie pas le prix auquel les articles se vendent. '
-             'Seuls les articles avec au moins %d annonces et un prix clair sont inclus. Mis à jour chaque mois%s; libre de réutilisation avec un lien (CC BY 4.0).</p></div></section>' % (len(PUB), num(total, 'fr'), win, nb, MIN_LISTINGS, nb))
+             'Seuls les articles avec au moins %d annonces et un prix clair sont inclus. Mis à jour chaque mois%s; libre de réutilisation avec un lien (CC BY 4.0). Écart selon l’état et baisses de prix%s: <a href="/fr/rapport-marche-vinted">le rapport mensuel du marché Vinted</a>.</p></div></section>' % (len(PUB), num(total, 'fr'), win, nb, MIN_LISTINGS, nb, nb))
     tail = ('<section id="alertes"><h2>Tu as trouvé ton prix%s?</h2><p>Un bon prix ne sert que si tu vois l’annonce en premier. SNYPD vérifie ta recherche Vinted environ toutes les 30 secondes et envoie les nouvelles annonces sur ton téléphone. '
             'Chaque page article a un bouton qui lance cette recherche avec le prix du quart le moins cher comme maximum.</p>%s</section>' % (nb, gc.cta('fr')))
     title = 'Guide des prix Vinted%s: prix typiques de %d articles (%s) | SNYPD' % (nb, len(PUB), month_year('fr'))

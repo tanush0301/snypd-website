@@ -58,6 +58,8 @@ PAGES.extend(_done)
 # Vinted price guide (hub + one page per item, EN + FR): its own generator knows the published items.
 from gen_price_guide import sitemap_pages  # noqa: E402
 PAGES.extend(sitemap_pages())
+from gen_market_report import sitemap_pages as market_report_pages  # noqa: E402
+PAGES.extend(market_report_pages())
 # Pages that carry the static listings figure, with the language of their "As of" line.
 COUNTER_PAGES = [('index.html', 'en')]
 MONTHS = {'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
