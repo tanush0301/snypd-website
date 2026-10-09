@@ -28,6 +28,10 @@
   }
 
   var lang = pick();
+  /* sw.js cannot read localStorage: it reads this to word push notifications. */
+  if (isApp && window.caches) {
+    try { caches.open('snypd-prefs').then(function (c) { return c.put('/__ui_lang', new Response(lang)); })['catch'](function () {}); } catch (e) {}
+  }
   var D = DICT[lang] || null;
   var P = (PATTERNS[lang] || []).map(function (p) { return [new RegExp(p[0]), p[1]]; });
   var missing = {};

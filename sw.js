@@ -40,9 +40,41 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  const title = data.title || 'SNYPD';
+  event.waitUntil(show(data));
+});
+
+/* UI language for the few fixed words the backend puts in a push (backend
+ * push.py: "New find", "N new finds", "& N more", "New listing"). A service
+ * worker cannot read localStorage, so /assets/i18n.js stores the language the
+ * visitor uses in cache storage ('snypd-prefs', '/__ui_lang'); without it the
+ * browser language decides. Any failure here falls back to English text: the
+ * notification itself must always be shown. */
+async function uiLang() {
+  try {
+    const c = await caches.open('snypd-prefs');
+    const r = await c.match('/__ui_lang');
+    if (r) return (await r.text()).slice(0, 2);
+  } catch (e) {}
+  try { return String(self.navigator.language || 'en').slice(0, 2).toLowerCase(); } catch (e) { return 'en'; }
+}
+
+function toFrench(s) {
+  return String(s)
+    .replace(/^New find$/, 'Nouvelle trouvaille')
+    .replace(/^(\d+) new finds$/, '$1 nouvelles trouvailles')
+    .replace(/ & (\d+) more$/, ' et $1 de plus')
+    .replace(/(^|\u2014 )New listing\b/, '$1Nouvelle annonce')
+    .replace(/^A new listing matched your search\.$/, 'Une nouvelle annonce correspond \u00e0 ta recherche.');
+}
+
+async function show(data) {
+  let title = data.title || 'SNYPD';
+  let body = data.body || 'A new listing matched your search.';
+  try {
+    if ((await uiLang()) === 'fr') { title = toFrench(title); body = toFrench(body); }
+  } catch (e) {}
   const options = {
-    body: data.body || 'A new listing matched your search.',
+    body: body,
     icon: '/assets/icons/icon-192.png',
     badge: '/assets/icons/icon-192.png',
     // A stable tag means a second alert replaces the first instead of stacking
@@ -62,8 +94,8 @@ self.addEventListener('push', (event) => {
     options.image = data.image;
   }
 
-  event.waitUntil(self.registration.showNotification(title, options));
-});
+  return self.registration.showNotification(title, options);
+}
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
