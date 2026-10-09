@@ -59,6 +59,14 @@
   var hs = new URLSearchParams(((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.hash) || location.hash).replace(/^#/, ''));
   var plan = (qs.get('plan') || '').toLowerCase();
 
+  /* A price-guide page's "alert me" button (/signup?hunt=<words>&max=<EUR>): kept for a
+     day so the dashboard's first-hunt wizard opens with this search filled in
+     (dashboard.html). Stored only because the visitor asked for exactly this search. */
+  (function () {
+    var h = (qs.get('hunt') || '').trim().replace(/\s+/g, ' '), m = Number(qs.get('max'));
+    if (h && h.length <= 80) lsSet('snypd_hunt_intent', JSON.stringify({ q: h, max: m > 0 ? Math.round(m) : 0, t: Date.now() }));
+  })();
+
   var S = {
     view: PAGE === 'signup' ? 'signup' : PAGE === 'reset' ? 'reset' : 'login',
     status: 'idle', email: '', pw: '', pw2: '', show: false, errors: {},
@@ -172,6 +180,15 @@
     return v && /^[A-Za-z0-9_.-]{1,60}$/.test(v) ? v : null;
   }
 
+  /* The item a price-guide page sent this visitor for (snypd_hunt_intent, set above),
+     saved with the new account so sign-ups can be counted per price page. */
+  function huntIntent() {
+    try {
+      var h = JSON.parse(lsGet('snypd_hunt_intent') || 'null');
+      return h && typeof h.q === 'string' && Date.now() - Number(h.t) < 864e5 ? h.q.slice(0, 80) : null;
+    } catch (e) { return null; }
+  }
+
   function signupData() {
     var data = { marketing_opt_in: !!S.marketing };
     var tags = campaignTags();
@@ -179,6 +196,8 @@
     var aff = partnerCode();
     if (aff) data.whop_aff = aff;
     if (S.marketing) data.marketing_opt_in_at = new Date().toISOString();
+    var hi = huntIntent();
+    if (hi) data.entry_hunt = hi;
     var ref = lsGet('snypd_ref');
     if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;
     try {
@@ -615,6 +634,8 @@
         track('sign_up', { method: 'google' });
         /* Tags from the return address set in google(): same fields as an email sign-up. */
         var md = sess.user.user_metadata || {}, add = md.utm_source ? {} : campaignTags(qs), retAff = qs.get('a');
+        var hi = huntIntent();
+        if (hi && !md.entry_hunt) add.entry_hunt = hi;
         if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;
         if (Object.keys(add).length) { try { await sb.auth.updateUser({ data: add }); } catch (e) {} }
       }

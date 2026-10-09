@@ -188,18 +188,18 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 
 UI = {
     'en': dict(locale='en_GB', toc='ON THIS PAGE', updated='Updated', by='By SNYPD, built by a Belgian sneaker reseller',
-               nav=[('bot', 'VINTED BOT'), ('prices', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
+               nav=[('bot', 'VINTED BOT'), ('/vinted-price-guide', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
-               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('prices', 'Vinted prices'),
+               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('prices', 'Vinted prices (Sept 2026)'),
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
     'fr': dict(locale='fr_FR', toc='SUR CETTE PAGE', updated='Mis à jour le', by='Par SNYPD, créé par un revendeur de sneakers belge',
-               nav=[('bot', 'BOT VINTED'), ('prices', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
+               nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('prices', 'Prix Vinted'), ('fees', 'Frais Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('prices', 'Prix Vinted (sept. 2026)'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
@@ -252,7 +252,8 @@ def jsonld(obj):
     return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '</script>'
 
 
-def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra=''):
+def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None):
+    """parent: optional (name, path) shown between Home and this page in the breadcrumb."""
     u = UI[lang]
     path = SLUGS[key][lang]
     url = SITE + path
@@ -279,8 +280,8 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
     grid_cls = 'lg-grid' if toc else 'lg-grid lg-wide'
     ld = [
         {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
-            {'@type': 'ListItem', 'position': 1, 'name': u['home'], 'item': SITE + '/'},
-            {'@type': 'ListItem', 'position': 2, 'name': h1_plain(h1), 'item': url}]},
+            {'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': it} for i, (n, it) in enumerate(
+                [(u['home'], SITE + '/')] + ([(parent[0], SITE + parent[1])] if parent else []) + [(h1_plain(h1), url)])]},
         {'@context': 'https://schema.org', '@type': 'WebPage', '@id': url + '#page', 'url': url, 'name': title,
          'description': desc, 'inLanguage': lang, 'datePublished': PUBLISHED, 'dateModified': PAGE_MODIFIED[key],
          'isPartOf': {'@id': SITE + '/#website'}, 'publisher': {'@id': SITE + '/#org'}, 'about': {'@id': SITE + '/#app'}},

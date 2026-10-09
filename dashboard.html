@@ -3007,6 +3007,18 @@ const HEARTBEAT_URL = (() => {
         };
         wqSite.addEventListener('change', paintWqNote);
         paintWqNote();
+        // A price-guide page sent this visitor here for one item ("alert me under
+        // EUR X"): assets/auth.js keeps it as snypd_hunt_intent for a day. Fill the
+        // words and max price only (country stays the browser guess); never save
+        // on the user's behalf.
+        try {
+          const hi = JSON.parse(localStorage.getItem('snypd_hunt_intent') || 'null');
+          if (hi && typeof hi.q === 'string' && hi.q.trim() && Date.now() - Number(hi.t) < 864e5) {
+            wqWords.value = hi.q.trim().slice(0, 80);
+            if (wqMax && Number(hi.max) > 0) wqMax.value = String(Math.round(Number(hi.max)));
+          }
+          localStorage.removeItem('snypd_hunt_intent');
+        } catch (e) {}
         wqSave.addEventListener('click', async () => {
           const words = wqWords.value.trim();
           if (!words) {

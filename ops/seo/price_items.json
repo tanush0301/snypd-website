@@ -1,0 +1,348 @@
+{
+ "_doc": "Items of the Vinted price guide (ops/seo/gen_price_guide.py). query = the Market Report search, run by price_guide_batch.py inside the backend container. Only items whose report is verdict ok, confidence medium/high and >= 100 listings get a page; the rest are skipped at build time, never published thin. Names are shown as written in every language; category labels are translated in the generator. name_fr: French name where word order or the noun differs.",
+ "items": [
+  {
+   "slug": "nike-dunk-low",
+   "query": "nike dunk low",
+   "name": "Nike Dunk Low",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "nike-air-force-1",
+   "query": "nike air force 1",
+   "name": "Nike Air Force 1",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "jordan-1-mid",
+   "query": "jordan 1 mid",
+   "name": "Jordan 1 Mid",
+   "cat": "sneakers",
+   "brand": "Jordan"
+  },
+  {
+   "slug": "jordan-4",
+   "query": "jordan 4",
+   "name": "Jordan 4",
+   "cat": "sneakers",
+   "brand": "Jordan"
+  },
+  {
+   "slug": "nike-air-max-90",
+   "query": "air max 90",
+   "name": "Nike Air Max 90",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "nike-air-max-95",
+   "query": "air max 95",
+   "name": "Nike Air Max 95",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "nike-air-max-plus-tn",
+   "query": "air max plus",
+   "name": "Nike Air Max Plus (TN)",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "nike-shox",
+   "query": "nike shox",
+   "name": "Nike Shox",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "nike-vomero",
+   "query": "nike vomero",
+   "name": "Nike Vomero",
+   "cat": "sneakers",
+   "brand": "Nike"
+  },
+  {
+   "slug": "adidas-samba",
+   "query": "adidas samba",
+   "name": "Adidas Samba",
+   "cat": "sneakers",
+   "brand": "Adidas"
+  },
+  {
+   "slug": "adidas-gazelle",
+   "query": "adidas gazelle",
+   "name": "Adidas Gazelle",
+   "cat": "sneakers",
+   "brand": "Adidas"
+  },
+  {
+   "slug": "adidas-campus",
+   "query": "adidas campus",
+   "name": "Adidas Campus",
+   "cat": "sneakers",
+   "brand": "Adidas"
+  },
+  {
+   "slug": "adidas-spezial",
+   "query": "adidas spezial",
+   "name": "Adidas Spezial",
+   "cat": "sneakers",
+   "brand": "Adidas"
+  },
+  {
+   "slug": "new-balance-550",
+   "query": "new balance 550",
+   "name": "New Balance 550",
+   "cat": "sneakers",
+   "brand": "New Balance"
+  },
+  {
+   "slug": "new-balance-9060",
+   "query": "new balance 9060",
+   "name": "New Balance 9060",
+   "cat": "sneakers",
+   "brand": "New Balance"
+  },
+  {
+   "slug": "new-balance-2002r",
+   "query": "new balance 2002r",
+   "name": "New Balance 2002R",
+   "cat": "sneakers",
+   "brand": "New Balance"
+  },
+  {
+   "slug": "asics-gel-kayano-14",
+   "query": "asics gel kayano 14",
+   "name": "Asics Gel-Kayano 14",
+   "cat": "sneakers",
+   "brand": "Asics"
+  },
+  {
+   "slug": "asics-gel-1130",
+   "query": "asics gel 1130",
+   "name": "Asics Gel-1130",
+   "cat": "sneakers",
+   "brand": "Asics"
+  },
+  {
+   "slug": "onitsuka-tiger-mexico-66",
+   "query": "onitsuka tiger mexico 66",
+   "name": "Onitsuka Tiger Mexico 66",
+   "cat": "sneakers",
+   "brand": "Onitsuka Tiger"
+  },
+  {
+   "slug": "ralph-lauren-polo",
+   "query": "ralph lauren polo",
+   "name": "Ralph Lauren polo",
+   "cat": "clothing",
+   "brand": "Ralph Lauren",
+   "name_fr": "Polo Ralph Lauren"
+  },
+  {
+   "slug": "ralph-lauren-quarter-zip",
+   "query": "ralph lauren quarter zip",
+   "name": "Ralph Lauren quarter zip",
+   "cat": "clothing",
+   "brand": "Ralph Lauren",
+   "name_fr": "Pull Ralph Lauren demi-zip"
+  },
+  {
+   "slug": "ralph-lauren-jumper",
+   "query": "ralph lauren pull",
+   "name": "Ralph Lauren jumper",
+   "cat": "clothing",
+   "brand": "Ralph Lauren",
+   "name_fr": "Pull Ralph Lauren"
+  },
+  {
+   "slug": "ralph-lauren-shirt",
+   "query": "ralph lauren chemise",
+   "name": "Ralph Lauren shirt",
+   "cat": "clothing",
+   "brand": "Ralph Lauren",
+   "name_fr": "Chemise Ralph Lauren"
+  },
+  {
+   "slug": "stone-island",
+   "query": "stone island",
+   "name": "Stone Island",
+   "cat": "clothing",
+   "brand": "Stone Island"
+  },
+  {
+   "slug": "cp-company",
+   "query": "cp company",
+   "name": "C.P. Company",
+   "cat": "clothing",
+   "brand": "C.P. Company"
+  },
+  {
+   "slug": "carhartt-detroit-jacket",
+   "query": "carhartt detroit jacket",
+   "name": "Carhartt Detroit jacket",
+   "cat": "clothing",
+   "brand": "Carhartt",
+   "name_fr": "Veste Carhartt Detroit"
+  },
+  {
+   "slug": "carhartt-double-knee",
+   "query": "carhartt double knee",
+   "name": "Carhartt Double Knee",
+   "cat": "clothing",
+   "brand": "Carhartt"
+  },
+  {
+   "slug": "carhartt-jacket",
+   "query": "carhartt jacket",
+   "name": "Carhartt jacket",
+   "cat": "clothing",
+   "brand": "Carhartt",
+   "name_fr": "Veste Carhartt"
+  },
+  {
+   "slug": "the-north-face-nuptse",
+   "query": "the north face nuptse",
+   "name": "The North Face Nuptse",
+   "cat": "clothing",
+   "brand": "The North Face"
+  },
+  {
+   "slug": "the-north-face-1996",
+   "query": "the north face 1996",
+   "name": "The North Face 1996 Retro Nuptse",
+   "cat": "clothing",
+   "brand": "The North Face",
+   "name_fr": "The North Face 1996 Retro Nuptse"
+  },
+  {
+   "slug": "patagonia-fleece",
+   "query": "patagonia fleece",
+   "name": "Patagonia fleece",
+   "cat": "clothing",
+   "brand": "Patagonia",
+   "name_fr": "Polaire Patagonia"
+  },
+  {
+   "slug": "patagonia-retro-x",
+   "query": "patagonia retro x",
+   "name": "Patagonia Retro-X",
+   "cat": "clothing",
+   "brand": "Patagonia"
+  },
+  {
+   "slug": "nike-tech-fleece",
+   "query": "nike tech fleece",
+   "name": "Nike Tech Fleece",
+   "cat": "clothing",
+   "brand": "Nike"
+  },
+  {
+   "slug": "stussy-hoodie",
+   "query": "stussy hoodie",
+   "name": "Stüssy hoodie",
+   "cat": "clothing",
+   "brand": "Stüssy",
+   "name_fr": "Sweat à capuche Stüssy"
+  },
+  {
+   "slug": "supreme-box-logo",
+   "query": "supreme box logo",
+   "name": "Supreme Box Logo",
+   "cat": "clothing",
+   "brand": "Supreme"
+  },
+  {
+   "slug": "levis-501",
+   "query": "levis 501",
+   "name": "Levi's 501",
+   "cat": "clothing",
+   "brand": "Levi's"
+  },
+  {
+   "slug": "dickies-874",
+   "query": "dickies 874",
+   "name": "Dickies 874",
+   "cat": "clothing",
+   "brand": "Dickies"
+  },
+  {
+   "slug": "tommy-hilfiger",
+   "query": "tommy hilfiger",
+   "name": "Tommy Hilfiger",
+   "cat": "clothing",
+   "brand": "Tommy Hilfiger"
+  },
+  {
+   "slug": "columbia-fleece",
+   "query": "columbia fleece",
+   "name": "Columbia fleece",
+   "cat": "clothing",
+   "brand": "Columbia",
+   "name_fr": "Polaire Columbia"
+  },
+  {
+   "slug": "longchamp-le-pliage",
+   "query": "longchamp le pliage",
+   "name": "Longchamp Le Pliage",
+   "cat": "accessories",
+   "brand": "Longchamp"
+  },
+  {
+   "slug": "casio-g-shock",
+   "query": "g-shock",
+   "name": "Casio G-Shock",
+   "cat": "accessories",
+   "brand": "Casio"
+  },
+  {
+   "slug": "seiko-5",
+   "query": "seiko 5",
+   "name": "Seiko 5",
+   "cat": "accessories",
+   "brand": "Seiko"
+  },
+  {
+   "slug": "pandora-bracelet",
+   "query": "pandora bracelet",
+   "name": "Pandora bracelet",
+   "cat": "accessories",
+   "brand": "Pandora",
+   "name_fr": "Bracelet Pandora"
+  },
+  {
+   "slug": "michael-kors",
+   "query": "michael kors",
+   "name": "Michael Kors",
+   "cat": "accessories",
+   "brand": "Michael Kors"
+  },
+  {
+   "slug": "coach-bag",
+   "query": "coach bag",
+   "name": "Coach bag",
+   "cat": "accessories",
+   "brand": "Coach",
+   "name_fr": "Sac Coach"
+  },
+  {
+   "slug": "pokemon-booster",
+   "query": "pokemon booster",
+   "name": "Pokémon booster packs",
+   "cat": "collectibles",
+   "brand": "Pokémon",
+   "name_fr": "Boosters Pokémon"
+  },
+  {
+   "slug": "pokemon-elite-trainer-box",
+   "query": "pokemon etb",
+   "name": "Pokémon Elite Trainer Box",
+   "cat": "collectibles",
+   "brand": "Pokémon",
+   "name_fr": "Coffret Dresseur d’élite Pokémon"
+  }
+ ]
+}
