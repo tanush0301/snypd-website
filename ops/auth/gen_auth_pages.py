@@ -21,7 +21,9 @@ SUPABASE_ANON = ('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 PAGES = {
     'login': dict(file='login.html', title='Log in to SNYPD',
                   desc='Log in to your SNYPD dashboard to see new Vinted listings that match your saved searches.',
-                  index=True),
+                  # noindex since 9 Oct 2026: 33 Google impressions in 28 days, 0 clicks (GSC), taking brand
+                  # queries that the homepage answers better. Not in the sitemap.
+                  index=False),
     'signup': dict(file='signup.html', title='Sign up free - SNYPD Vinted Monitor',
                    desc='Create a free SNYPD account: one Vinted search free with no time limit. Get alerted to new '
                         'Vinted listings that match your filters before other resellers see them.',
