@@ -25,8 +25,8 @@ PAGES = {
                   # queries that the homepage answers better. Not in the sitemap.
                   index=False),
     'signup': dict(file='signup.html', title='Sign up free - SNYPD Vinted Monitor',
-                   desc='Create a free SNYPD account: one Vinted search free with no time limit. Get alerted to new '
-                        'Vinted listings that match your filters before other resellers see them.',
+                   desc='Create a free SNYPD account: one Vinted search free with no time limit, 24/7 for the first '
+                        '7 days. Get a push alert when a new Vinted listing matches your filters.',
                    index=True),
     'reset': dict(file='reset-password.html', title='Set a new password - SNYPD',
                   desc='Set a new password for your SNYPD account.', index=False),
