@@ -1,8 +1,9 @@
 ﻿
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-i18n-app>
 <head>
+<script src="/assets/i18n.js"></script>
 <script>
   /* Plan intent: a visitor who clicked START KICKSTART / PRO / ELITE on the
      homepage signed up via /signup?plan=<plan>. Once they are signed in, send
@@ -2020,6 +2021,7 @@ body {
 </div>
 <div class="bd">
 <div class="rows-simple" id="prof-rows">
+  <div class="prof-row"><span>Language</span><span data-i18n-switch></span></div>
   <div class="prof-row"><span>Email</span><span id="prof-email">—</span></div>
   <div class="prof-row"><span>Joined</span><span id="prof-joined">—</span></div>
   <div class="prof-row"><span>Plan</span><span id="prof-plan-detail">—</span></div>
@@ -2198,6 +2200,12 @@ const HEARTBEAT_URL = (() => {
   // signup, no separate tracking needed for a real "joined" date.
   const joinedAt = session.user.created_at || null;
   set('user-bar', `Logged in as ${email}`);
+  // UI language (assets/i18n.js): a choice saved on the account follows the user to
+  // other devices; flipping the switch saves it there before the page reloads.
+  if (window.SNYPD_I18N) {
+    window.SNYPD_I18N.onChange = (l) => sb.auth.updateUser({ data: { ui_lang: l } }).catch(() => {});
+    window.SNYPD_I18N.fromUser(session.user);
+  }
 
   // ----------------- XP (Streak/XP/Tier Specification v1, sections 2 & 5) -----------------
   // Client-inserted, same trust model migration 024 already accepts for every

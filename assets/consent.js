@@ -345,10 +345,43 @@
     openSettings();
   });
 
+  /* French pages: the banner text comes from /assets/i18n.js (the app's translation
+     layer), loaded here first so the banner never flashes up in English. */
+  function whenLangReady(fn) {
+    var lang = (document.documentElement.getAttribute('lang') || 'en').slice(0, 2);
+    if (lang !== 'fr' || window.SNYPD_I18N) { fn(); return; }
+    var done = false, go = function () { if (!done) { done = true; fn(); } };
+    var s = document.createElement('script');
+    s.src = '/assets/i18n.js';
+    s.onload = go; s.onerror = go;
+    setTimeout(go, 2000);
+    document.head.appendChild(s);
+  }
+
   var existing = read();
   if (existing) apply(existing);
-  else if (document.body) showBanner();
-  else document.addEventListener('DOMContentLoaded', showBanner);
+  else whenLangReady(function () {
+    if (document.body) showBanner();
+    else document.addEventListener('DOMContentLoaded', showBanner);
+  });
+})();
+
+/* Not about consent: a visitor reading a French page who goes on to sign up or log
+   in gets the app in French (?lang=fr; /assets/i18n.js keeps that choice). */
+(function () {
+  var h = document.documentElement;
+  if (!/^fr/.test(h.getAttribute('lang') || '') || h.hasAttribute('data-i18n-app')) return;
+  function decorate() {
+    [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
+      var u;
+      try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
+      if (u.origin !== location.origin || !/^\/(signup|login|dashboard)$/.test(u.pathname) || u.searchParams.has('lang')) return;
+      u.searchParams.set('lang', 'fr');
+      a.setAttribute('href', u.pathname + u.search + u.hash);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
+  else decorate();
 })();
 
 /* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) and a Whop
