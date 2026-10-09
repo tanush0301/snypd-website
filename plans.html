@@ -336,7 +336,7 @@
         <p class="card__for">Try SNYPD on one real search.</p>
         <ul class="feats">
           <li>1 active Vinted search</li>
-          <li class="part">Runs while your dashboard is open</li>
+          <li class="part">24/7 for the first 7 days, then while your dashboard is open</li>
           <li>Matches in your dashboard</li>
           <li>Free Discord community</li>
         </ul>
@@ -587,7 +587,7 @@
     { title: 'MONITORING', rows: [
       { l: 'Active Vinted searches', note: 'Pause one any time to free the slot.', c: [T('1'), T('2'), T('5'), T('10')] },
       { l: 'Runs with your dashboard closed', note: 'Free stops when you close the tab.', c: [W('Tab open only'), Y, Y, Y] },
-      { l: 'Check speed', note: '30s to 5 min, faster on busy searches. Same on every plan.', c: [T('Same'), T('Same'), T('Same'), T('Same')] },
+      { l: 'Check speed', note: 'About every 30 s (measured median), up to 5 min on quiet searches. Same on every plan.', c: [T('Same'), T('Same'), T('Same'), T('Same')] },
       { l: 'Every Vinted site in Europe and the US', note: '26 sites. Prices in that site’s currency.', c: [Y, Y, Y, Y] }
     ] },
     { title: 'ALERTS', rows: [
@@ -615,9 +615,9 @@
   ];
 
   var FAQS = [
-    ['Is Free actually free?', 'Yes. No card and no time limit. One search, checked while your dashboard is open.'],
-    ['Do paid plans find listings faster?', 'No. Every plan checks every 30 seconds to 5 minutes, faster on busy searches. Paid plans add searches and keep checking with your dashboard closed.'],
-    ['Is there a free trial?', 'There is no trial, because there is no need for one: Free runs on one real search for as long as you like.'],
+    ['Is Free actually free?', 'Yes. No card and no time limit. One search: for the first 7 days after you save it, it runs 24/7 with alerts like a paid plan; after that it is checked while your dashboard is open.'],
+    ['Do paid plans find listings faster?', 'No. Every plan checks about every 30 seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.'],
+    ['Is there a free trial?', 'Yes. Free runs your first search 24/7 with alerts for 7 days, counted from when you save it, with no card. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.'],
     ['Does the price include VAT?', 'Yes. €14.99, €24.99 and €34.99 a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.'],
     ['How do I pay?', 'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.'],
     ['Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account.'],
@@ -764,7 +764,7 @@
     var rank = Math.max(q.n >= 6 ? 3 : q.n >= 3 ? 2 : q.n >= 2 ? 1 : 0, q.closed ? 1 : 0, q.price ? 2 : 0);
     var k = PLANS[rank];
     var reasons = [SEARCHES[k] + ' active search' + (SEARCHES[k] > 1 ? 'es' : '')];
-    reasons.push(k === 'free' ? 'Runs while your dashboard is open' : 'Keeps hunting with the tab closed');
+    reasons.push(k === 'free' ? '24/7 for 7 days, then while your dashboard is open' : 'Keeps hunting with the tab closed');
     if (rank >= 2) reasons.push('Market Report price checks');
     focusPlan = k;
     $('fit-name').textContent = NAMES[k];
