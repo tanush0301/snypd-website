@@ -382,3 +382,29 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
   else decorate();
 })();
+
+/* Not about consent: Vercel Web Analytics counts page views without cookies and
+   without storing anything on the device (a visitor is a hash of the request that
+   Vercel discards after 24 h; vercel.com/docs/analytics/privacy-policy), so it runs
+   for every visitor. Addresses are cut to the path plus campaign tags before they
+   are sent, so sign-in codes and reset tokens never leave the page; account pages
+   are not counted at all. */
+(function () {
+  if (/^\/(account|reset-password|dashboard|admin)(\/|$)/.test(location.pathname)) return;
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  window.va('beforeSend', function (ev) {
+    try {
+      var u = new URL(ev.url), keep = new URLSearchParams();
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'a'].forEach(function (k) {
+        if (u.searchParams.has(k)) keep.set(k, u.searchParams.get(k));
+      });
+      var q = keep.toString();
+      ev.url = u.origin + u.pathname + (q ? '?' + q : '');
+      return ev;
+    } catch (e) { return null; }
+  });
+  var s = document.createElement('script');
+  s.defer = true;
+  s.src = '/_vercel/insights/script.js';
+  (document.head || document.documentElement).appendChild(s);
+})();

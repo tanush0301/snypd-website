@@ -6,7 +6,7 @@ import sys, os
 
 REPO, MODE = sys.argv[1], sys.argv[2]
 LIVE = MODE == 'live'
-UPDATED = '4 October 2026'
+UPDATED = '9 October 2026'
 EMAIL = 'snypd@gmail.com'
 DISCORD = 'https://discord.gg/gjKD4auXhK'
 
@@ -245,7 +245,7 @@ cookies_body = f"""
 </section>
 <section id="other">
   <h2>Other services your browser contacts</h2>
-  <p>It stores nothing on your device, but your browser fetches a file from it, so it sees your IP address: <strong>jsDelivr</strong> (the library that handles sign-in). SNYPD's fonts are served from snypd.store itself. On pages where you are signed in, your browser also talks to <strong>Supabase</strong>, which runs SNYPD's database.</p>
+  <p>It stores nothing on your device, but your browser fetches a file from it, so it sees your IP address: <strong>jsDelivr</strong> (the library that handles sign-in). SNYPD's fonts are served from snypd.store itself. <strong>Vercel Web Analytics</strong>, which hosts the site, counts page views without cookies or anything stored on your device, so it runs without asking. On pages where you are signed in, your browser also talks to <strong>Supabase</strong>, which runs SNYPD's database.</p>
 </section>
 <section id="contact">
   <h2>Questions</h2>

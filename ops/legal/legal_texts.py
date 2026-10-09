@@ -57,6 +57,7 @@ def privacy_body(email, discord):
     <li>Our server's access logs: IP address, time, the address requested and browser details.</li>
     <li>Our database provider's sign-in records, which include the IP address of each sign-in.</li>
     <li>When someone opens a partner link: the partner code and the page they came from. No identifier of the visitor is stored with it.</li>
+    <li>Page views, counted by Vercel Web Analytics without cookies and without storing anything on your device: the page, the site you came from, campaign tags, country, browser, operating system and device type. Vercel tells visits apart with a code calculated from the request and discards it after 24 hours; we only see totals.</li>
   </ul>
   <h3>ONLY WITH YOUR CONSENT</h3>
   <p>Google Analytics, the Whop pixel and the Meta Pixel. See the <a href="/cookies">cookie policy</a> for exactly what they store.</p>
@@ -68,6 +69,7 @@ def privacy_body(email, discord):
   <ul>
     <li><strong>To run the service you signed up for</strong>: your account, searches, alerts, dashboard, plan and payments. Legal basis: the contract with you (GDPR article 6(1)(b)).</li>
     <li><strong>To keep SNYPD secure and working</strong>: server logs, sign-in records, preventing abuse and fixing faults. Legal basis: our legitimate interest in a secure, working service (article 6(1)(f)).</li>
+    <li><strong>To see which pages are read and where visitors come from</strong>, as page-view totals counted without cookies. Legal basis: our legitimate interest in knowing what works on our website (article 6(1)(f)).</li>
     <li><strong>To see which ads and links bring sign-ups</strong>, using the campaign tags above. Legal basis: our legitimate interest in knowing which marketing works (article 6(1)(f)).</li>
     <li><strong>To credit partners</strong> who send you to SNYPD, and to count partner-link visits. Legal basis: our legitimate interest in running the partner programme, and your consent for anything stored on your device.</li>
     <li><strong>Analytics and ad measurement</strong>. Legal basis: your consent (article 6(1)(a)), which you can withdraw at any time in the <a href="/cookies">cookie settings</a>.</li>
@@ -86,7 +88,8 @@ def privacy_body(email, discord):
   <ul>
     <li><strong>Supabase</strong>: database and sign-in. Our database runs in the EU (Paris).</li>
     <li><strong>IONOS</strong>: the server that runs monitoring and alerts, in Frankfurt, Germany.</li>
-    <li><strong>Vercel</strong>: hosts this website and delivers it through its global network.</li>
+    <li><strong>Vercel</strong>: hosts this website, delivers it through its global network and counts page views without cookies (Vercel Web Analytics).</li>
+    <li><strong>Resend</strong>: sends SNYPD&rsquo;s emails about your account, such as the notice that your free trial is about to end.</li>
     <li><strong>Whop</strong>: checkout, payments and subscriptions. Its checkout, which loads only when you open one, also runs Whop's own measurement script. The Whop pixel on the rest of the site runs only with your consent.</li>
     <li><strong>Meta</strong>: the Meta Pixel, only with your consent. It tells Meta which SNYPD pages you visit and that a sign-up happened, so we can see which Facebook or Instagram ads work.</li>
     <li><strong>Google</strong>: sign in with Google, Google Analytics (only with consent) and, in Chrome, delivery of alerts. Other browsers deliver alerts through their maker's push service, such as Apple, Mozilla or Microsoft.</li>
