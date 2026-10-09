@@ -4,6 +4,8 @@
 #
 # Run from the site repo root in Git Bash (writes the data file the generator reads):
 #   python -c "import json;print(json.dumps([i['query'] for i in json.load(open('ops/seo/price_items.json',encoding='utf-8'))['items']]))" | ssh snypd-vps "cat > /tmp/q.json" && tr -d '\r' < ops/seo/price_guide_batch.py | ssh snypd-vps "cat > /tmp/pgb.py && docker cp /tmp/q.json backend:/tmp/q.json && docker cp /tmp/pgb.py backend:/tmp/pgb.py && docker exec backend python /tmp/pgb.py /tmp/q.json" > ops/seo/data/price-guide.json
+# Then keep a dated copy (cp ops/seo/data/price-guide.json ops/seo/data/price-guide-$(date +%F).json) and commit it:
+# price_history only keeps 14 days, so these monthly snapshots are the only price history SNYPD will have.
 import asyncio, json, sys, datetime
 sys.path.insert(0, '/app')
 from src import market_report as mr

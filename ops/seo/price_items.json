@@ -1,5 +1,5 @@
 {
- "_doc": "Items of the Vinted price guide (ops/seo/gen_price_guide.py). query = the Market Report search, run by price_guide_batch.py inside the backend container. Only items whose report is verdict ok, confidence medium/high and >= 100 listings get a page; the rest are skipped at build time, never published thin. Names are shown as written in every language; category labels are translated in the generator. name_fr: French name where word order or the noun differs.",
+ "_doc": "Items of the Vinted price guide (ops/seo/gen_price_guide.py). query = the Market Report search, run by price_guide_batch.py inside the backend container. Only items whose report is verdict ok, confidence medium/high and >= 100 listings get a page; the rest are skipped at build time, never published thin. Names are shown as written in every language; category labels are translated in the generator. name_fr: French name where word order or the noun differs. skip: reason an item gets no page even though the data passes (mixes products that sell at different prices).",
  "items": [
   {
    "slug": "nike-dunk-low",
@@ -171,14 +171,16 @@
    "query": "stone island",
    "name": "Stone Island",
    "cat": "clothing",
-   "brand": "Stone Island"
+   "brand": "Stone Island",
+   "skip": "brand only: jackets, jumpers and T-shirts in one price"
   },
   {
    "slug": "cp-company",
    "query": "cp company",
    "name": "C.P. Company",
    "cat": "clothing",
-   "brand": "C.P. Company"
+   "brand": "C.P. Company",
+   "skip": "brand only: mixed garments"
   },
   {
    "slug": "carhartt-detroit-jacket",
@@ -201,7 +203,8 @@
    "name": "Carhartt jacket",
    "cat": "clothing",
    "brand": "Carhartt",
-   "name_fr": "Veste Carhartt"
+   "name_fr": "Veste Carhartt",
+   "skip": "many jacket models (Detroit has its own page)"
   },
   {
    "slug": "the-north-face-nuptse",
@@ -274,7 +277,8 @@
    "query": "tommy hilfiger",
    "name": "Tommy Hilfiger",
    "cat": "clothing",
-   "brand": "Tommy Hilfiger"
+   "brand": "Tommy Hilfiger",
+   "skip": "brand only: mixed garments"
   },
   {
    "slug": "columbia-fleece",
@@ -296,7 +300,8 @@
    "query": "g-shock",
    "name": "Casio G-Shock",
    "cat": "accessories",
-   "brand": "Casio"
+   "brand": "Casio",
+   "skip": "many watch models in one price"
   },
   {
    "slug": "seiko-5",
@@ -318,7 +323,8 @@
    "query": "michael kors",
    "name": "Michael Kors",
    "cat": "accessories",
-   "brand": "Michael Kors"
+   "brand": "Michael Kors",
+   "skip": "brand only: bags, watches and clothes in one price"
   },
   {
    "slug": "coach-bag",
@@ -326,7 +332,8 @@
    "name": "Coach bag",
    "cat": "accessories",
    "brand": "Coach",
-   "name_fr": "Sac Coach"
+   "name_fr": "Sac Coach",
+   "skip": "many bag models in one price"
   },
   {
    "slug": "pokemon-booster",
@@ -334,7 +341,8 @@
    "name": "Pokémon booster packs",
    "cat": "collectibles",
    "brand": "Pokémon",
-   "name_fr": "Boosters Pokémon"
+   "name_fr": "Boosters Pokémon",
+   "skip": "boosters of many sets in one price"
   },
   {
    "slug": "pokemon-elite-trainer-box",
@@ -342,7 +350,8 @@
    "name": "Pokémon Elite Trainer Box",
    "cat": "collectibles",
    "brand": "Pokémon",
-   "name_fr": "Coffret Dresseur d’élite Pokémon"
+   "name_fr": "Coffret Dresseur d’élite Pokémon",
+   "skip": "boxes of many sets in one price"
   }
  ]
 }

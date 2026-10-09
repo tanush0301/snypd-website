@@ -66,6 +66,8 @@ def views():
     by_q = {r['q']: r['view'] for r in DATA['results'] if r.get('ok')}
     out = {}
     for it in ITEMS:
+        if it.get('skip'):
+            continue  # one price would mislead (see price_items.json)
         v = by_q.get(it['query'])
         if v and v.get('display_verdict') == 'ok' and v.get('confidence') in ('medium', 'high') \
                 and (v.get('sample_size') or 0) >= MIN_LISTINGS and v.get('typical_cents') and v.get('range_cents'):
