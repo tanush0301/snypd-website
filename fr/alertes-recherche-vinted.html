@@ -107,6 +107,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-foot-l a, .lg-foot-l button { font-size: 12px; }
 .lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
 .lg-foot-l button:hover { color: #57FFC8; }
+.lg-lang { position: relative; }
+.lg-lang > summary { list-style: none; cursor: pointer; }
+.lg-lang > summary::-webkit-details-marker { display: none; }
+.lg-lang > div { position: absolute; right: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
 
 .rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
 @media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -182,7 +186,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
   <div class="lg-wrap lg-nav-in">
     <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
     <nav class="lg-links" aria-label="Main"><a class="lg-navlink" href="/fr/bot-vinted">BOT VINTED</a><a class="lg-navlink" href="/fr/prix-vinted">PRIX VINTED</a><a class="lg-navlink" href="/plans">TARIFS</a><a class="lg-navlink" href="https://discord.gg/gjKD4auXhK">DISCORD</a></nav>
-    <a class="lg-navlink" href="/vinted-saved-search-alerts" hreflang="en" lang="en" title="English version">EN</a>
+    <a class="lg-navlink" href="/vinted-saved-search-alerts" hreflang="en" lang="en" title="English">EN</a>
     <a class="lg-navlink lg-login" href="/login">CONNEXION</a>
     <a class="lg-cta" href="/signup">COMMENCER</a>
   </div>

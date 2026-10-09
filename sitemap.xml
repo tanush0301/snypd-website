@@ -22,21 +22,22 @@
   </url>
   <url>
     <loc>https://www.snypd.store/cookies</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-09</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/privacy</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-09</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/terms</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-09</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-bot</loc>
     <lastmod>2026-10-09</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-bot"/>
   </url>
   <url>
@@ -83,6 +84,15 @@
     <lastmod>2026-10-09</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-bot"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/de/vinted-bot</loc>
+    <lastmod>2026-10-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-bot"/>
   </url>
   <url>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vinted Bot: Benachrichtigung bei neuen Anzeigen, ohne Autobuy | SNYPD</title>
+<meta name="description" content="SNYPD ist ein Vinted Bot, der deine Suchen überwacht und dir eine Push-Benachrichtigung schickt, sobald eine passende Anzeige erscheint. Ohne Login, ohne Autobuy.">
+<link rel="canonical" href="https://www.snypd.store/de/vinted-bot">
+<link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot">
+<link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted">
+<link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot">
+<link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-bot">
+<meta property="og:title" content="Vinted Bot: Benachrichtigung bei neuen Anzeigen, ohne Autobuy | SNYPD">
+<meta property="og:description" content="SNYPD ist ein Vinted Bot, der deine Suchen überwacht und dir eine Push-Benachrichtigung schickt, sobald eine passende Anzeige erscheint. Ohne Login, ohne Autobuy.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.snypd.store/de/vinted-bot">
+<meta property="og:site_name" content="SNYPD">
+<meta property="og:locale" content="de_DE">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
+<link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<style>
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+html, body { margin: 0; background: #0A0A0B; }
+body { font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; -webkit-font-smoothing: antialiased; }
+a { color: #00E5A0; text-decoration: none; }
+a:hover { color: #57FFC8; }
+a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+::selection { background: #A200FF; color: #FFFFFF; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor { animation: none !important; } }
+.lg-wrap { max-width: 1320px; margin: 0 auto; padding-left: 20px; padding-right: 20px; box-sizing: border-box; }
+.lg-nav { position: sticky; top: 0; z-index: 30; background: rgba(10,10,11,.92); border-bottom: 1px solid #1D1D20; }
+.lg-nav-in { display: flex; align-items: center; gap: 10px 18px; padding-top: 8px; padding-bottom: 8px; }
+.lg-brand { display: flex; align-items: center; gap: 9px; color: #FFFFFF; min-height: 44px; }
+.lg-brand:hover { color: #FFFFFF; }
+.lg-brand img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.lg-brand span { font-size: 15.5px; font-weight: 700; letter-spacing: .02em; }
+.lg-cursor { animation: blink 1.2s step-end infinite; }
+.lg-links { display: flex; gap: 4px; flex: 1; }
+.lg-navlink { font-size: 12px; letter-spacing: .1em; color: #8B9094; padding: 14px 10px; }
+.lg-navlink:hover { color: #FFFFFF; }
+.lg-navlink[aria-current="page"] { color: #FFFFFF; }
+.lg-cta { font-size: 12px; letter-spacing: .1em; color: #FFFFFF; background: #A200FF; padding: 14px 16px; }
+.lg-cta:hover { color: #FFFFFF; filter: brightness(1.18); }
+@media (max-width: 699.98px) { .lg-links { display: none; } .lg-nav-in { justify-content: space-between; } .lg-login { margin-left: auto; } }
+@media (max-width: 459.98px) { .lg-nav-in { gap: 4px; } .lg-navlink { padding: 14px 6px; letter-spacing: .05em; } .lg-cta { padding: 14px 10px; letter-spacing: .05em; } .lg-brand span { font-size: 14px; } }
+.lg-head { border-bottom: 1px solid #1D1D20; }
+.lg-head-in { padding-top: 56px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 14px; }
+.lg-eyebrow { font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+.lg-h1 { margin: 0; max-width: 20ch; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(36px, 6vw, 60px); line-height: .98; letter-spacing: -.04em; color: #FFFFFF; }
+.lg-meta { font-size: 12px; color: #8B9094; }
+.lg-lead { margin: 6px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.7; color: #B8BCBF; }
+.lg-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding-top: 40px; padding-bottom: 72px; align-items: start; }
+@media (max-width: 899.98px) { .lg-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 28px; } }
+.lg-toc { position: sticky; top: 84px; border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 18px; display: flex; flex-direction: column; gap: 2px; }
+@media (max-width: 899.98px) { .lg-toc { position: static; } }
+.lg-toc span { font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.lg-toc a { font-size: 12px; line-height: 1.5; color: #B8BCBF; padding: 5px 0; }
+.lg-toc a:hover { color: #00E5A0; }
+.lg-doc { max-width: 820px; min-width: 0; }
+.lg-wide { grid-template-columns: minmax(0, 1fr); }
+.lg-wide .lg-doc { max-width: 1120px; }
+.lg-doc section { border-top: 1px solid #1D1D20; padding: 30px 0 6px; scroll-margin-top: 80px; }
+.lg-doc section:first-child { border-top: 0; padding-top: 0; }
+.lg-doc h2 { margin: 0 0 14px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(24px, 3.2vw, 30px); line-height: 1.05; letter-spacing: -.03em; color: #FFFFFF; }
+.lg-doc h3 { margin: 22px 0 8px; font-size: 12.5px; font-weight: 400; letter-spacing: .1em; color: #FFFFFF; }
+.lg-doc p, .lg-doc li { font-size: 13px; line-height: 1.75; color: #B8BCBF; }
+.lg-doc p { margin: 0 0 14px; }
+.lg-doc ul, .lg-doc ol { margin: 0 0 14px; padding-left: 20px; }
+.lg-doc li { margin: 0 0 6px; }
+.lg-doc strong { font-weight: 400; color: #FFFFFF; }
+.lg-doc code { font-family: inherit; font-size: 12px; color: #FFFFFF; background: #141416; border: 1px solid #26262A; padding: 1px 5px; overflow-wrap: anywhere; }
+.lg-doc blockquote { margin: 0 0 14px; padding: 12px 16px; border-left: 2px solid #00E5A0; background: #0C0C0D; font-size: 13px; line-height: 1.7; color: #E8EAEB; }
+.lg-doc blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: 11.5px; color: #8B9094; }
+.lg-box { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 12px; }
+.lg-box.lg-mint { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.06); }
+.lg-box p { margin: 0; }
+.ct-scroll { overflow-x: auto; margin: 0 0 18px; border: 1px solid #1D1D20; -webkit-overflow-scrolling: touch; }
+.ct-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.ct-table th, .ct-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.55; color: #B8BCBF; }
+.ct-table thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .1em; color: #8B9094; }
+.ct-table tbody th { font-weight: 400; color: #FFFFFF; min-width: 150px; }
+.ct-table tbody tr { background: #0C0C0D; }
+.ct-table tbody tr.ct-us { background: rgba(162,0,255,.07); }
+.ct-table .ct-num { white-space: nowrap; color: #FFFFFF; }
+.ct-table small { display: block; color: #8B9094; font-size: 11px; }
+.ct-note { font-size: 11.5px !important; color: #8B9094 !important; }
+.ct-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ct-btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; font-size: 12px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; }
+.ct-btn:hover { color: #FFFFFF; filter: brightness(1.18); }
+.ct-btn.ct-ghost { background: #141416; border: 1px solid #3A3A40; }
+.ct-btn.ct-ghost:hover { filter: none; background: #1C1C1F; border-color: #55555C; }
+.lg-foot { border-top: 1px solid #1D1D20; }
+.lg-foot-in { padding-top: 24px; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lg-foot-a { display: flex; flex-direction: column; gap: 6px; }
+.lg-foot small { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.lg-foot-t { font-size: 12px; color: #8B9094; }
+.lg-foot-l { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-top: 4px; }
+.lg-foot-l a, .lg-foot-l button { font-size: 12px; }
+.lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
+.lg-foot-l button:hover { color: #57FFC8; }
+.lg-lang { position: relative; }
+.lg-lang > summary { list-style: none; cursor: pointer; }
+.lg-lang > summary::-webkit-details-marker { display: none; }
+.lg-lang > div { position: absolute; right: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
+
+.rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+@media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
+.rs-card { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.rs-card:first-child, .rs-card:nth-child(2) { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.05); }
+.rs-num { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+.lg-doc .rs-title { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.02em; color: #FFFFFF; }
+.lg-doc .rs-card p { margin: 0; font-size: 12.5px; line-height: 1.7; }
+.lg-doc .rs-card p.rs-proof { padding-top: 9px; border-top: 1px dashed #26262A; font-size: 11.5px; color: #8B9094; }
+.rs-proof a { color: #00E5A0; }
+.ct-yes { color: #00E5A0; }
+.ct-table tbody tr.ct-us th, .ct-table tbody tr.ct-us td { color: #FFFFFF; border-top-color: rgba(0,229,160,.45); }
+.ct-table tbody tr.ct-us th { box-shadow: inset 3px 0 0 #00E5A0; }
+.ct-badge { display: inline-block; margin-left: 6px; padding: 2px 6px; font-size: 10px; letter-spacing: .1em; color: #0A0A0B; background: #00E5A0; vertical-align: 1px; }
+.ct-table tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: #0C0C0D; }
+.ct-table thead th:first-child { position: sticky; left: 0; z-index: 2; background: #121214; }
+.ct-table tbody tr.ct-us th[scope="row"] { background: #160C20; }
+@media (max-width: 699.98px) { .ct-table tbody th { min-width: 118px; } }
+.glance { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.glance li { font-size: 12px; letter-spacing: .04em; color: #FFFFFF; border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 8px 11px; }
+.glance li span { color: #00E5A0; margin-right: 6px; }
+.fit-list { list-style: none; padding: 0 !important; margin: 0 0 18px !important; display: flex; flex-direction: column; gap: 10px; }
+.fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.fit-list li strong { display: block; margin-bottom: 3px; }
+.fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+.lg-fig { margin: 4px 0 20px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.lg-fig picture { display: block; }
+.lg-fig img { display: block; width: 100%; height: auto; }
+.lg-fig figcaption { padding: 10px 14px; border-top: 1px solid #1D1D20; font-size: 11.5px; line-height: 1.6; color: #8B9094; }
+.lg-fig.fig-narrow { max-width: 520px; }
+.fig-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; margin: 0 0 18px; }
+.fig-row .lg-fig { margin: 0; max-width: none; }
+@media (max-width: 759.98px) { .fig-row { grid-template-columns: minmax(0, 1fr); } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ct-duel { margin: 0 0 18px; }
+.ct-duel label { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.ct-duel select { font-family: inherit; font-size: 14px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 46px; }
+.ct-duel table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #1D1D20; }
+.ct-duel th, .ct-duel td { text-align: left; vertical-align: top; padding: 11px 10px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.5; color: #B8BCBF; overflow-wrap: anywhere; }
+.ct-duel thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .08em; color: #8B9094; }
+.ct-duel thead th.d-us { color: #FFFFFF; }
+.ct-duel tbody th { width: 28%; font-weight: 400; font-size: 11px; letter-spacing: .06em; color: #8B9094; }
+.ct-duel td.d-us { color: #FFFFFF; background: rgba(162,0,255,.07); }
+.ct-duel [data-t] { display: none; }
+.ct-duel [data-t].on { display: table-cell; }
+@media (min-width: 700px) { .ct-duel { display: none; } }
+@media (max-width: 699.98px) { .ct-full { display: none; } }
+.fc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.05); padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
+.fc-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 559.98px) { .fc-in { grid-template-columns: minmax(0, 1fr); } }
+.fc label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.fc input, .fc select { font-family: inherit; font-size: 16px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 48px; width: 100%; box-sizing: border-box; }
+.fc input:focus-visible, .fc select:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.fc-out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin: 0; }
+.fc-out div { background: #0C0C0D; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.fc-out dt { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.fc-out dd { margin: 0; font-size: 18px; color: #FFFFFF; }
+.fc-out div.fc-total dd { color: #00E5A0; }
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Startseite","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"Ein Vinted Bot, der dich benachrichtigt und nie dein Konto anfasst.","item":"https://www.snypd.store/de/vinted-bot"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/de/vinted-bot#page","url":"https://www.snypd.store/de/vinted-bot","name":"Vinted Bot: Benachrichtigung bei neuen Anzeigen, ohne Autobuy | SNYPD","description":"SNYPD ist ein Vinted Bot, der deine Suchen überwacht und dir eine Push-Benachrichtigung schickt, sobald eine passende Anzeige erscheint. Ohne Login, ohne Autobuy.","inLanguage":"de","datePublished":"2026-09-28","dateModified":"2026-10-09","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Kauft SNYPD Artikel für mich?","acceptedAnswer":{"@type":"Answer","text":"Nein. SNYPD findet neue Anzeigen und benachrichtigt dich. Du öffnest die Anzeige auf Vinted und kaufst oder machst selbst ein Angebot, über den normalen Vinted-Checkout."}},{"@type":"Question","name":"Muss ich SNYPD mein Vinted-Passwort geben?","acceptedAnswer":{"@type":"Answer","text":"Nein. SNYPD fragt nie nach deinen Vinted-Zugangsdaten und meldet sich nie in deinem Konto an. Für dein SNYPD-Konto brauchst du nur eine E-Mail-Adresse."}},{"@type":"Question","name":"Wie oft prüft SNYPD meine Suche?","acceptedAnswer":{"@type":"Answer","text":"Etwa alle 30 Sekunden. Gemessen in unseren eigenen Logs (8.-9. Oktober 2026, 32.469 Prüfungen über 35 Suchen): Der Median des Abstands zwischen zwei Prüfungen derselben Suche lag bei 30 Sekunden, und 93 % der Prüfungen kamen innerhalb von 2 Minuten. Ruhige Suchen werden langsamer geprüft, höchstens alle 5 Minuten. Das Tempo ist in jedem Tarif gleich."}},{"@type":"Question","name":"Funktioniert es auf dem iPhone?","acceptedAnswer":{"@type":"Answer","text":"Ja, sobald SNYPD auf deinem Home-Bildschirm ist: Öffne snypd.store in Safari, tippe auf Teilen und dann auf „Zum Home-Bildschirm“, und schalte die Benachrichtigungen in der installierten App ein. Apple erlaubt Web-Push nur für Apps auf dem Home-Bildschirm. Auf Android, Windows und Mac funktionieren die Benachrichtigungen direkt im Browser."}},{"@type":"Question","name":"Gibt es einen kostenlosen Tarif?","acceptedAnswer":{"@type":"Answer","text":"Ja. Free enthält eine Suche, ohne Zeitlimit und ohne Karte. In den ersten 7 Tagen nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif. Danach prüft Free, solange dein SNYPD-Dashboard geöffnet ist; bezahlte Tarife ab 14,99 € im Monat prüfen rund um die Uhr, auch wenn es geschlossen ist."}},{"@type":"Question","name":"Mit welchen Vinted-Ländern funktioniert es?","acceptedAnswer":{"@type":"Answer","text":"Mit jeder Vinted-Seite in Europa und den USA, 26 insgesamt: vinted.de, vinted.at, vinted.fr, vinted.nl, vinted.be, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com und die übrigen. Füge einen Suchlink der Seite ein, auf der du einkaufst; die Preise erscheinen in deren Währung."}}]}</script>
+<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VBC0SXPR6F');
+</script>
+</head>
+<body>
+<header class="lg-nav">
+  <div class="lg-wrap lg-nav-in">
+    <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
+    <nav class="lg-links" aria-label="Main"><a class="lg-navlink" href="/de/vinted-bot" aria-current="page">VINTED BOT</a><a class="lg-navlink" href="/plans">TARIFE</a><a class="lg-navlink" href="https://discord.gg/gjKD4auXhK">DISCORD</a></nav>
+    <details class="lg-lang"><summary class="lg-navlink" title="Deutsch">DE &#9662;</summary><div><a class="lg-navlink" href="/vinted-bot" hreflang="en" lang="en">English</a><a class="lg-navlink" href="/fr/bot-vinted" hreflang="fr" lang="fr">Français</a></div></details>
+    <a class="lg-navlink lg-login" href="/login">ANMELDEN</a>
+    <a class="lg-cta" href="/signup">LOSLEGEN</a>
+  </div>
+</header>
+<main>
+  <div class="lg-head">
+    <div class="lg-wrap lg-head-in">
+      <span class="lg-eyebrow">VINTED BOT</span>
+      <h1 class="lg-h1">Ein Vinted Bot, der dich benachrichtigt und nie dein Konto anfasst.</h1>
+      <span class="lg-meta">Aktualisiert am <time datetime="2026-10-09">9. Oktober 2026</time> &middot; Von SNYPD, gebaut von einem belgischen Sneaker-Reseller</span>
+      <p class="lg-lead">Die meisten Vinted Bots werden mit automatischem Kaufen beworben, also damit, in deinem Namen zu handeln. SNYPD übernimmt den anderen Teil: Es beobachtet deine Vinted-Suchen und sagt dir Bescheid, wenn etwas Neues passt. Du entscheidest und kaufst selbst auf Vinted.</p>
+      
+    </div>
+  </div>
+  <div class="lg-wrap lg-grid">
+    <nav class="lg-toc" aria-label="Auf Dieser Seite"><span>AUF DIESER SEITE</span><a href="#kurz">In einem Absatz</a><a href="#arten">Drei Arten von Bots</a><a href="#automatisierung">Automatisierung</a><a href="#so-gehts">So funktioniert es</a><a href="#tempo">Wie schnell</a><a href="#kosten">Kosten</a><a href="#konto">Dein Vinted-Konto</a><a href="#fragen">Fragen</a></nav>
+    <article class="lg-doc">
+
+<section id="kurz">
+  <h2>SNYPD in einem Absatz</h2>
+  <div class="lg-box lg-mint"><p>SNYPD ist ein Vinted Bot für Benachrichtigungen, auch Vinted-Monitor genannt, für Reseller. Du fügst einen Vinted-Suchlink mit deinen Filtern ein (Marke, Größe, Preis, Zustand), und SNYPD prüft diese Suche etwa alle 30 Sekunden. Sobald eine neue Anzeige passt, erscheint sie in deinem Dashboard und du bekommst eine Push-Benachrichtigung auf Handy oder Computer. SNYPD fragt nie nach deinem Vinted-Passwort, meldet sich nie in deinem Konto an, kauft nichts und schreibt keinen Verkäufern. Der kostenlose Tarif lässt eine Suche laufen: in den ersten 7 Tagen rund um die Uhr, danach solange dein Dashboard geöffnet ist. Bezahlte Tarife ab 14,99&nbsp;&euro; im Monat überwachen rund um die Uhr.</p></div>
+</section>
+<section id="arten">
+  <h2>Die drei Arten von Vinted Bots</h2>
+  <p>&bdquo;Vinted Bot&ldquo; steht für Tools, die sehr Unterschiedliches tun. Der entscheidende Unterschied: Handeln sie über dein Vinted-Konto?</p>
+  <h3>BENACHRICHTIGUNGS-BOTS ODER VINTED-MONITORE</h3>
+  <p>Sie beobachten deine Suchen und sagen dir Bescheid, wenn etwas Neues passt; Reseller nennen sie auch Monitore. Du kaufst selbst, deshalb müssen sie nichts über dein Vinted-Konto tun. SNYPD, Telvin Bot und Crazed sind Benachrichtigungs-Tools.</p>
+  <h3>AUTOBUY- UND AUTOCOP-BOTS</h3>
+  <p>Sie kaufen oder bestellen für dich. Kaufen auf Vinted braucht ein angemeldetes Konto, also handeln diese Tools über deins; V-Tools zum Beispiel gibt an, dass du deine eigenen Vinted-Konten verbindest. Souk, V-Tools und Resell Reserve verkaufen Autobuy-Funktionen.</p>
+  <h3>SKRIPTE ZUM SELBST-HOSTEN</h3>
+  <p>Open-Source-Projekte auf GitHub, die du selbst betreibst und die meist an Discord oder Telegram posten. Kostenlos, aber du betreibst den Server und reparierst ihn, wenn Vinted etwas ändert.</p>
+  <p>Preise, Benachrichtigungswege und kostenlose Tarife der einzelnen Tools stehen nebeneinander im <a href="/vinted-bot-comparison">Vergleich der Vinted Bots</a> (auf Englisch). Wie ein Monitor Schritt für Schritt funktioniert: <a href="/vinted-monitor">Was ist ein Vinted-Monitor?</a> (auf Englisch)</p>
+</section>
+<section id="automatisierung">
+  <h2>Vinted-Automatisierung: Käuferseite, nicht Verkäuferseite</h2>
+  <p>&bdquo;Vinted-Automatisierung&ldquo; meint meistens Tools für Verkäufer: Sie stellen deine Artikel neu ein oder schieben sie hoch, schicken Angebote an Leute, die sie favorisiert haben, oder schreiben deine Beschreibungen. Sie arbeiten an deinem eigenen Shop, also handeln sie über dein Vinted-Konto.</p>
+  <p>SNYPD automatisiert nur die Käuferseite: Es beobachtet Suchen und sagt dir, was neu ist. Es fasst weder deinen Shop noch deine Anzeigen noch deine Nachrichten an und meldet sich nie an. Wenn du deine eigenen Anzeigen hochschieben oder neu einstellen willst, ist SNYPD nicht das richtige Tool.</p>
+</section>
+<section id="so-gehts">
+  <h2>So funktioniert SNYPD</h2>
+  <ol>
+    <li>Suche im Browser auf deiner Vinted-Seite und setze deine Filter: Marke, Größe, Preis, Zustand.</li>
+    <li>Kopiere die Adresse aus der Adresszeile. Eine Suchadresse enthält <code>/catalog?</code>.</li>
+    <li>Füge sie in SNYPD ein, gib ihr einen kurzen Namen und schalte sie ein.</li>
+    <li>SNYPD prüft sie etwa alle 30 Sekunden. Neue Treffer landen in deinem Dashboard und, wenn du Benachrichtigungen eingeschaltet hast, auf deinem Handy oder Computer. Mehrere Funde kurz hintereinander kommen als eine Benachrichtigung.</li>
+    <li>Tippe auf die Benachrichtigung. Sie öffnet die Anzeige auf Vinted, wo du kaufst oder ein Angebot machst.</li>
+  </ol>
+  <figure class="lg-fig"><picture><source media="(max-width: 699.98px)" srcset="/assets/seo/snypd-feed-phone.webp" width="396" height="650"><img src="/assets/seo/snypd-feed.webp" alt="SNYPD-Dashboard mit neuen Vinted-Anzeigen: Preis, Preis mit Käuferschutz, Zustand und Fundzeit" width="1400" height="662" loading="lazy" decoding="async"></picture><figcaption>Der SNYPD-Feed in einer echten Sitzung am 2. Oktober 2026: neue Anzeigen aus einer Suche, jeweils mit Preis, Preis inklusive Vinted-Käuferschutz, Zustand und Fundzeit. Die Fotos sind unscharf, weil sie den Verkäufern gehören. Oberfläche auf Englisch.</figcaption></figure>
+</section>
+<section id="tempo">
+  <h2>Wie schnell ist es?</h2>
+  <p>SNYPD prüft jede aktive Suche etwa alle 30 Sekunden. Gemessen in unseren eigenen Logs (8.-9. Oktober 2026, 32.469 Prüfungen über 35 Suchen): Der Median des Abstands zwischen zwei Prüfungen derselben Suche lag bei 30 Sekunden, und 93 % der Prüfungen kamen innerhalb von 2 Minuten. So oft schaut SNYPD nach, nicht so schnell erreicht dich ein Artikel: Vinted zeigt eine neue Anzeige selbst erst einige Minuten nach dem Einstellen in seiner Suche an, für jedes Tool. Suchen, die oft neue Artikel finden, bleiben bei diesem Tempo; Suchen, die ruhig werden, werden langsamer geprüft, bis zu etwa 5 Minuten zwischen zwei Prüfungen, und werden wieder schneller, sobald sie etwas finden. Das Tempo ist in jedem Tarif gleich: Bezahlen bringt mehr Suchen und Überwachung rund um die Uhr, keine schnelleren Prüfungen.</p>
+  <p>Manche Tools werben mit Benachrichtigungen in Millisekunden. SNYPD macht diese Aussage nicht. Was SNYPD verspricht: Eine bezahlte Suche läuft weiter, wenn dein Laptop zu ist und dein Handy in der Tasche steckt, also genau dann, wenn man die meisten Funde verpasst.</p>
+</section>
+<section id="kosten">
+  <h2>Was es kostet</h2>
+  <div class="ct-scroll"><table class="ct-table"><thead><tr><th scope="col">TARIF</th><th scope="col">PRO MONAT, INKL. MWST.</th><th scope="col">AKTIVE SUCHEN</th><th scope="col">PRÜFT BEI GESCHLOSSENEM DASHBOARD</th><th scope="col">MARKET REPORT</th></tr></thead><tbody><tr><th scope="row">Free</th><td><span class="ct-num">0&nbsp;&euro;</span></td><td>1</td><td>Erste 7 Tage, danach nur bei geöffnetem Dashboard</td><td>Nein</td></tr><tr><th scope="row">Kickstart</th><td><span class="ct-num">14,99&nbsp;&euro;</span></td><td>2</td><td>Ja, rund um die Uhr</td><td>Nein</td></tr><tr><th scope="row">Pro</th><td><span class="ct-num">24,99&nbsp;&euro;</span></td><td>5</td><td>Ja, rund um die Uhr</td><td>Ja</td></tr><tr><th scope="row">Elite</th><td><span class="ct-num">34,99&nbsp;&euro;</span></td><td>10</td><td>Ja, rund um die Uhr</td><td>Ja</td></tr></tbody></table></div>
+  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel unter <a href="/vinted-prices">Vinted-Preise</a> (auf Englisch). Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
+</section>
+<section id="konto">
+  <h2>Was SNYPD von dir braucht</h2>
+  <p>Eine E-Mail-Adresse für dein SNYPD-Konto. Kein Vinted-Passwort, keine Vinted-Anmeldung, keine Browser-Erweiterung. SNYPD liest öffentliche Anzeigen mit eigenen Systemen: dieselben Suchergebnisse, die jeder auf Vinted ohne Konto öffnen kann.</p>
+  <p>Weil SNYPD sich nie als du anmeldet, passiert nichts davon in deinem Vinted-Konto. Wenn du kaufst, kaufst du über Vinted wie jeder andere Käufer.</p>
+</section>
+<section id="fragen">
+  <h2>Fragen</h2>
+  <h3>Kauft SNYPD Artikel für mich?</h3><p>Nein. SNYPD findet neue Anzeigen und benachrichtigt dich. Du öffnest die Anzeige auf Vinted und kaufst oder machst selbst ein Angebot, über den normalen Vinted-Checkout.</p><h3>Muss ich SNYPD mein Vinted-Passwort geben?</h3><p>Nein. SNYPD fragt nie nach deinen Vinted-Zugangsdaten und meldet sich nie in deinem Konto an. Für dein SNYPD-Konto brauchst du nur eine E-Mail-Adresse.</p><h3>Wie oft prüft SNYPD meine Suche?</h3><p>Etwa alle 30 Sekunden. Gemessen in unseren eigenen Logs (8.-9. Oktober 2026, 32.469 Prüfungen über 35 Suchen): Der Median des Abstands zwischen zwei Prüfungen derselben Suche lag bei 30 Sekunden, und 93 % der Prüfungen kamen innerhalb von 2 Minuten. Ruhige Suchen werden langsamer geprüft, höchstens alle 5 Minuten. Das Tempo ist in jedem Tarif gleich.</p><h3>Funktioniert es auf dem iPhone?</h3><p>Ja, sobald SNYPD auf deinem Home-Bildschirm ist: Öffne snypd.store in Safari, tippe auf Teilen und dann auf &bdquo;Zum Home-Bildschirm&ldquo;, und schalte die Benachrichtigungen in der installierten App ein. Apple erlaubt Web-Push nur für Apps auf dem Home-Bildschirm. Auf Android, Windows und Mac funktionieren die Benachrichtigungen direkt im Browser.</p><h3>Gibt es einen kostenlosen Tarif?</h3><p>Ja. Free enthält eine Suche, ohne Zeitlimit und ohne Karte. In den ersten 7 Tagen nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif. Danach prüft Free, solange dein SNYPD-Dashboard geöffnet ist; bezahlte Tarife ab 14,99&nbsp;&euro; im Monat prüfen rund um die Uhr, auch wenn es geschlossen ist.</p><h3>Mit welchen Vinted-Ländern funktioniert es?</h3><p>Mit jeder Vinted-Seite in Europa und den USA, 26 insgesamt: vinted.de, vinted.at, vinted.fr, vinted.nl, vinted.be, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com und die übrigen. Füge einen Suchlink der Seite ein, auf der du einkaufst; die Preise erscheinen in deren Währung.</p>
+</section>
+<section id="testen">
+  <h2>Probier es mit einer Suche</h2>
+  <div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten 7 Tage laufen rund um die Uhr mit Benachrichtigungen. Wechsle zu einem bezahlten Tarif, wenn deine Suche auch bei geschlossenem Dashboard weiterlaufen soll.</p><p class="ct-note">Anmeldung und Bezahlung sind vorerst auf Englisch.</p><div class="ct-actions"><a class="ct-btn" href="/signup">KOSTENLOS STARTEN</a><a class="ct-btn ct-ghost" href="/plans">TARIFE ANSEHEN</a></div></div>
+</section>
+    </article>
+  </div>
+</main>
+<footer class="lg-foot">
+  <div class="lg-wrap lg-foot-in">
+    <div class="lg-foot-a">
+      <small>SNYPD &middot; NICHT MIT VINTED VERBUNDEN</small>
+      <span class="lg-foot-t">Liest nur öffentliche Anzeigen.</span>
+      <span class="lg-foot-l"><a href="/de/vinted-bot">Vinted Bot</a><a href="/vinted-bot-comparison">Vinted Bots im Vergleich (EN)</a><a href="/vinted-monitor">Vinted-Monitor (EN)</a><a href="/vinted-fees">Vinted-Gebühren (EN)</a><a href="/faq">FAQ (EN)</a><a href="/support">Support (EN)</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+    </div>
+    <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a></nav>
+  </div>
+</footer>
+</body>
+</html>

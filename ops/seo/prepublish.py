@@ -40,19 +40,20 @@ PAGES = [
     ('/vinted-fees',                'vinted-fees.html',                None),
     ('/vinted-monitor',             'vinted-monitor.html',             None),
 ]
-# French versions are added only while gen_content.FR_LIVE is True (they are held
-# until SNYPD polls vinted.fr). Each pair gets hreflang alternates both ways.
+# Language versions are added for every language gen_content.LIVE publishes
+# (French, German, ...). Each set gets hreflang alternates in every direction.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gen_content import FR_LIVE, SLUGS  # noqa: E402
-if FR_LIVE:
-    _done = []
-    for key, s_ in SLUGS.items():
-        if 'fr' not in s_:
-            continue  # English-only page
-        alts = {'en': s_['en'], 'fr': s_['fr'], 'x-default': s_['en']}
-        _done.append((s_['fr'], s_['fr'].lstrip('/') + '.html', alts))
-        PAGES[:] = [(u, f, alts if u == s_['en'] else a) for (u, f, a) in PAGES]
-    PAGES.extend(_done)
+from gen_content import SLUGS, live_langs  # noqa: E402
+_done = []
+for key, s_ in SLUGS.items():
+    langs = live_langs(key)
+    if len(langs) < 2:
+        continue  # English-only page
+    alts = {l: s_[l] for l in langs}
+    alts['x-default'] = s_['en']
+    _done.extend((s_[l], s_[l].lstrip('/') + '.html', alts) for l in langs if l != 'en')
+    PAGES[:] = [(u, f, alts if u == s_['en'] else a) for (u, f, a) in PAGES]
+PAGES.extend(_done)
 # Pages that carry the static listings figure, with the language of their "As of" line.
 COUNTER_PAGES = [('index.html', 'en')]
 MONTHS = {'en': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],

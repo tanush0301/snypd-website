@@ -30,9 +30,16 @@ CHECKED = {'en': '28 September 2026', 'fr': '28 septembre 2026'}
 # While False: no French files are written, English pages carry no hreflang or
 # language switch, and prepublish.py leaves French URLs out of the sitemap.
 FR_LIVE = True
+# Every language a page can exist in, and whether it is published. A language that
+# is not live is still generated, into ops/seo/preview/ (not deployed), for review.
+# German: live on Claude's translation (Tanush's decision 9 Oct 2026). Dutch: held
+# until Tanush has read it.
+LIVE = {'en': True, 'fr': FR_LIVE, 'de': True, 'nl': False}
+LANG_NAME = {'en': 'English', 'fr': 'Français', 'de': 'Deutsch', 'nl': 'Nederlands'}
 # The Vinted sites the scraper accepts (scraper-worker/src/catalogue_contract.py
 # MARKETS, verified live 2026-10-01). Update together with that list.
-MARKETS_TEXT = {'en': 'every Vinted site in Europe and the US', 'fr': 'tous les sites Vinted d’Europe et des États-Unis'}
+MARKETS_TEXT = {'en': 'every Vinted site in Europe and the US', 'fr': 'tous les sites Vinted d’Europe et des États-Unis',
+                'de': 'jede Vinted-Seite in Europa und den USA', 'nl': 'elke Vinted-site in Europa en de VS'}
 REPORT = os.path.join(ROOT, 'ops', 'seo', 'data', 'price-report-2026-09.json')
 REPORT_CSV = 'vinted-prices-2026-09.csv'
 # How often SNYPD really checks a hunt, measured from the scraper's own log by
@@ -42,7 +49,11 @@ CHECK = json.load(open(os.path.join(ROOT, 'ops', 'seo', 'data', 'check-interval.
 if CHECK['median_seconds'] != 30:
     sys.exit('check-interval.json median is %ss: update the "about every 30 seconds" copy' % CHECK['median_seconds'])
 _MONTHS = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-           'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
+           'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+           'de': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+           'nl': ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']}
+_SPAN_SAME_MONTH = {'en': '%d-%d %s %d', 'fr': '%d au %d %s %d', 'de': '%d.-%d. %s %d', 'nl': '%d-%d %s %d'}
+_SPAN_TWO_MONTHS = {'en': '%d %s to %d %s %d', 'fr': 'du %d %s au %d %s %d', 'de': '%d. %s bis %d. %s %d', 'nl': '%d %s tot %d %s %d'}
 def _check_span(lang):
     a = datetime.date.fromisoformat(CHECK['measured_from'][:10])
     b = datetime.date.fromisoformat(CHECK['measured_to'][:10])
@@ -50,29 +61,36 @@ def _check_span(lang):
     if a == b:
         return '%d %s %d' % (b.day, m[b.month - 1], b.year)
     if (a.month, a.year) == (b.month, b.year):
-        return ('%d-%d %s %d' if lang == 'en' else '%d au %d %s %d') % (a.day, b.day, m[b.month - 1], b.year)
-    return '%d %s to %d %s %d' % (a.day, m[a.month - 1], b.day, m[b.month - 1], b.year) if lang == 'en' else \
-           'du %d %s au %d %s %d' % (a.day, m[a.month - 1], b.day, m[b.month - 1], b.year)
+        return _SPAN_SAME_MONTH[lang] % (a.day, b.day, m[b.month - 1], b.year)
+    return _SPAN_TWO_MONTHS[lang] % (a.day, m[a.month - 1], b.day, m[b.month - 1], b.year)
 SPEED_MEASURED = {
     'en': 'Measured in our own logs (%s, %s checks across %d searches): the median gap between two checks of the same search was %d seconds, and %d%% of checks came within 2 minutes.'
           % (_check_span('en'), format(CHECK['checks'], ','), CHECK['hunts'], CHECK['median_seconds'], CHECK['share_within_120s']),
     'fr': 'Mesuré dans nos propres journaux (%s, %s vérifications sur %d recherches)\xa0: l’écart médian entre deux vérifications d’une même recherche était de %d secondes, et %d\xa0%% des vérifications arrivaient en moins de 2 minutes.'
           % (_check_span('fr'), format(CHECK['checks'], ',').replace(',', '\xa0'), CHECK['hunts'], CHECK['median_seconds'], CHECK['share_within_120s']),
+    'de': 'Gemessen in unseren eigenen Logs (%s, %s Prüfungen über %d Suchen): Der Median des Abstands zwischen zwei Prüfungen derselben Suche lag bei %d Sekunden, und %d\xa0%% der Prüfungen kamen innerhalb von 2 Minuten.'
+          % (_check_span('de'), format(CHECK['checks'], ',').replace(',', '.'), CHECK['hunts'], CHECK['median_seconds'], CHECK['share_within_120s']),
+    'nl': 'Gemeten in onze eigen logs (%s, %s controles over %d zoekopdrachten): de mediaan van de tijd tussen twee controles van dezelfde zoekopdracht was %d seconden, en %d%% van de controles kwam binnen 2 minuten.'
+          % (_check_span('nl'), format(CHECK['checks'], ',').replace(',', '.'), CHECK['hunts'], CHECK['median_seconds'], CHECK['share_within_120s']),
 }
 # Applies to every tool that reads Vinted's search (CLAUDE.md section 3: 3-15 min, verified 9 Oct 2026).
 VINTED_LAG = {
     'en': 'That is how often SNYPD looks, not how fast an item reaches you: Vinted itself shows a new listing in its search a few minutes after it is posted, for every tool.',
     'fr': 'C’est la fréquence à laquelle SNYPD regarde, pas le délai jusqu’à toi\xa0: Vinted affiche lui-même une nouvelle annonce dans sa recherche quelques minutes après sa publication, pour tous les outils.',
+    'de': 'So oft schaut SNYPD nach, nicht so schnell erreicht dich ein Artikel: Vinted zeigt eine neue Anzeige selbst erst einige Minuten nach dem Einstellen in seiner Suche an, für jedes Tool.',
+    'nl': 'Zo vaak kijkt SNYPD, niet zo snel bereikt een artikel je: Vinted toont een nieuwe advertentie zelf pas enkele minuten na plaatsing in de zoekresultaten, voor elke tool.',
 }
 # Free 24/7 trial (migration 042, backend FREE_TRIAL_DAYS=7, since 7 Oct 2026).
 TRIAL = {
     'en': 'For the first 7 days after you save your first search, Free runs 24/7 with alerts, like a paid plan.',
     'fr': 'Pendant les 7 premiers jours après ta première recherche enregistrée, Free tourne 24h/24 avec les alertes, comme un plan payant.',
+    'de': 'In den ersten 7 Tagen nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif.',
+    'nl': 'De eerste 7 dagen nadat je je eerste zoekopdracht opslaat, draait Free 24/7 met meldingen, net als een betaald abonnement.',
 }
 
 # slug per language; the key is the page id
 SLUGS = {
-    'bot':     {'en': '/vinted-bot',                 'fr': '/fr/bot-vinted'},
+    'bot':     {'en': '/vinted-bot',                 'fr': '/fr/bot-vinted', 'de': '/de/vinted-bot', 'nl': '/nl/vinted-bot'},
     'notify':  {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted'},
     'compare': {'en': '/vinted-bot-comparison',      'fr': '/fr/comparatif-bot-vinted'},
     'prices':  {'en': '/vinted-prices',              'fr': '/fr/prix-vinted'},
@@ -162,6 +180,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-foot-l a, .lg-foot-l button { font-size: 12px; }
 .lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
 .lg-foot-l button:hover { color: #57FFC8; }
+.lg-lang { position: relative; }
+.lg-lang > summary { list-style: none; cursor: pointer; }
+.lg-lang > summary::-webkit-details-marker { display: none; }
+.lg-lang > div { position: absolute; right: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
 """
 
 UI = {
@@ -181,17 +203,39 @@ UI = {
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
+    'de': dict(locale='de_DE', toc='AUF DIESER SEITE', updated='Aktualisiert am', by='Von SNYPD, gebaut von einem belgischen Sneaker-Reseller',
+               nav=[('bot', 'VINTED BOT'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
+               login='ANMELDEN', start='LOSLEGEN',
+               foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
+               foot=[('bot', 'Vinted Bot'), ('compare', 'Vinted Bots im Vergleich (EN)'), ('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
+                     ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
+               legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
+               home='Startseite'),
+    'nl': dict(locale='nl_NL', toc='OP DEZE PAGINA', updated='Bijgewerkt op', by='Door SNYPD, gemaakt door een Belgische sneakerreseller',
+               nav=[('bot', 'VINTED BOT'), ('/plans', 'PRIJZEN'), (DISCORD, 'DISCORD')],
+               login='INLOGGEN', start='BEGINNEN',
+               foot_tag='SNYPD &middot; NIET VERBONDEN AAN VINTED', foot_t='Leest alleen openbare advertenties.',
+               foot=[('bot', 'Vinted bot'), ('compare', 'Vinted bots vergeleken (EN)'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
+                     ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
+               home='Home'),
 }
+
+
+def live_langs(key):
+    """Published languages of a page, English first."""
+    return [l for l in ('en', 'fr', 'de', 'nl') if l in SLUGS[key] and LIVE[l]]
 # Last real content change per page (shown as 'Updated' and used as dateModified).
 PAGE_MODIFIED = {'bot': '2026-10-09', 'notify': '2026-10-09', 'compare': '2026-10-09', 'prices': '2026-10-02', 'deals': '2026-10-09', 'fees': '2026-10-02',
                  'monitor': '2026-10-09'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-              'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']}
+              'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+              'de': _MONTHS['de'], 'nl': _MONTHS['nl']}
 
 
 def date_txt(iso, lang):
     y, m, d = (int(x) for x in iso.split('-'))
-    day = ('1er' if d == 1 else str(d)) if lang == 'fr' else str(d)
+    day = {'fr': '1er' if d == 1 else str(d), 'de': '%d.' % d}.get(lang, str(d))
     return '%s %s %d' % (day, MONTHS_TXT[lang][m - 1], y)
 
 
@@ -200,7 +244,8 @@ def esc(s):
 
 
 def href(key, lang):
-    return SLUGS[key][lang] if key in SLUGS else key
+    # a page that does not exist in this language links to its English version
+    return SLUGS[key].get(lang, SLUGS[key]['en']) if key in SLUGS else key
 
 
 def jsonld(obj):
@@ -211,14 +256,22 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
     u = UI[lang]
     path = SLUGS[key][lang]
     url = SITE + path
-    other = u['switch'][1]
+    langs = live_langs(key)
     alts = ''
-    has_fr = FR_LIVE and 'fr' in SLUGS[key]
-    if has_fr:
-        alts = ''.join('<link rel="alternate" hreflang="%s" href="%s%s">\n' % (l, SITE, SLUGS[key][l]) for l in ('en', 'fr'))
+    if len(langs) > 1:
+        alts = ''.join('<link rel="alternate" hreflang="%s" href="%s%s">\n' % (l, SITE, SLUGS[key][l]) for l in langs)
         alts += '<link rel="alternate" hreflang="x-default" href="%s%s">\n' % (SITE, SLUGS[key]['en'])
-    switch = ('<a class="lg-navlink" href="%s" hreflang="%s" lang="%s" title="%s">%s</a>'
-              % (SLUGS[key][other], other, other, u['switch'][2], u['switch'][0])) if has_fr else ''
+    others = [l for l in langs if l != lang]
+    if len(others) == 1:
+        o = others[0]
+        switch = ('<a class="lg-navlink" href="%s" hreflang="%s" lang="%s" title="%s">%s</a>'
+                  % (SLUGS[key][o], o, o, LANG_NAME[o], o.upper()))
+    elif others:
+        switch = ('<details class="lg-lang"><summary class="lg-navlink" title="%s">%s &#9662;</summary><div>%s</div></details>'
+                  % (LANG_NAME[lang], lang.upper(), ''.join('<a class="lg-navlink" href="%s" hreflang="%s" lang="%s">%s</a>'
+                                                          % (SLUGS[key][o], o, o, LANG_NAME[o]) for o in others)))
+    else:
+        switch = ''
     nav = ''.join('<a class="lg-navlink" href="%s"%s>%s</a>' % (href(k, lang), ' aria-current="page"' if k == key else '', t) for k, t in u['nav'])
     foot = ''.join('<a href="%s">%s</a>' % (href(k, lang), t) for k, t in u['foot'])
     toc_html = ''.join('<a href="#%s">%s</a>' % (a, t) for a, t in (toc or []))
@@ -335,6 +388,18 @@ def faq_html(pairs):
 
 
 def cta(lang):
+    if lang == 'de':
+        return ('<div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten 7 Tage laufen rund um die Uhr mit Benachrichtigungen. '
+                'Wechsle zu einem bezahlten Tarif, wenn deine Suche auch bei geschlossenem Dashboard weiterlaufen soll.</p>'
+                '<p class="ct-note">Anmeldung und Bezahlung sind vorerst auf Englisch.</p>'
+                '<div class="ct-actions"><a class="ct-btn" href="/signup">KOSTENLOS STARTEN</a>'
+                '<a class="ct-btn ct-ghost" href="/plans">TARIFE ANSEHEN</a></div></div>')
+    if lang == 'nl':
+        return ('<div class="lg-box lg-mint"><p><strong>Begin gratis met één zoekopdracht.</strong> Geen kaart, geen tijdslimiet, geen limiet op meldingen. De eerste 7 dagen draaien 24/7 met meldingen. '
+                'Stap over op een betaald abonnement als je zoekopdracht ook met gesloten dashboard moet blijven lopen.</p>'
+                '<p class="ct-note">Registreren en betalen gaan voorlopig in het Engels.</p>'
+                '<div class="ct-actions"><a class="ct-btn" href="/signup">GRATIS BEGINNEN</a>'
+                '<a class="ct-btn ct-ghost" href="/plans">ABONNEMENTEN BEKIJKEN</a></div></div>')
     if lang == 'en':
         return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. The first 7 days run 24/7 with alerts. '
                 'Upgrade when you want it to keep watching with your dashboard closed.</p>'
@@ -357,16 +422,174 @@ PLANS_ROWS = {
            ['Kickstart', '<span class="ct-num">14,99&nbsp;&euro;</span>', '2', 'Oui, 24h/24', 'Non'],
            ['Pro', '<span class="ct-num">24,99&nbsp;&euro;</span>', '5', 'Oui, 24h/24', 'Oui'],
            ['Elite', '<span class="ct-num">34,99&nbsp;&euro;</span>', '10', 'Oui, 24h/24', 'Oui']],
+    'de': [['Free', '<span class="ct-num">0&nbsp;&euro;</span>', '1', 'Erste 7 Tage, danach nur bei geöffnetem Dashboard', 'Nein'],
+           ['Kickstart', '<span class="ct-num">14,99&nbsp;&euro;</span>', '2', 'Ja, rund um die Uhr', 'Nein'],
+           ['Pro', '<span class="ct-num">24,99&nbsp;&euro;</span>', '5', 'Ja, rund um die Uhr', 'Ja'],
+           ['Elite', '<span class="ct-num">34,99&nbsp;&euro;</span>', '10', 'Ja, rund um die Uhr', 'Ja']],
+    'nl': [['Free', '<span class="ct-num">&euro;&nbsp;0</span>', '1', 'Eerste 7 dagen, daarna alleen met dashboard open', 'Nee'],
+           ['Kickstart', '<span class="ct-num">&euro;&nbsp;14,99</span>', '2', 'Ja, 24/7', 'Nee'],
+           ['Pro', '<span class="ct-num">&euro;&nbsp;24,99</span>', '5', 'Ja, 24/7', 'Ja'],
+           ['Elite', '<span class="ct-num">&euro;&nbsp;34,99</span>', '10', 'Ja, 24/7', 'Ja']],
 }
 PLANS_HEAD = {'en': ['PLAN', 'PER MONTH, VAT INCL.', 'ACTIVE SEARCHES', 'WATCHES WITH DASHBOARD CLOSED', 'MARKET REPORT'],
-              'fr': ['PLAN', 'PAR MOIS, TVA INCLUSE', 'RECHERCHES ACTIVES', 'SURVEILLE TABLEAU DE BORD FERMÉ', 'MARKET REPORT']}
+              'fr': ['PLAN', 'PAR MOIS, TVA INCLUSE', 'RECHERCHES ACTIVES', 'SURVEILLE TABLEAU DE BORD FERMÉ', 'MARKET REPORT'],
+              'de': ['TARIF', 'PRO MONAT, INKL. MWST.', 'AKTIVE SUCHEN', 'PRÜFT BEI GESCHLOSSENEM DASHBOARD', 'MARKET REPORT'],
+              'nl': ['ABONNEMENT', 'PER MAAND, INCL. BTW', 'ACTIEVE ZOEKOPDRACHTEN', 'CONTROLEERT MET DASHBOARD DICHT', 'MARKET REPORT']}
 
 HELP435 = {'en': 'https://www.vinted.co.uk/help/435-save-your-searches', 'fr': 'https://www.vinted.fr/help/435'}
 HELP433 = {'en': 'https://www.vinted.co.uk/help/433', 'fr': 'https://www.vinted.fr/help/433'}
 
 
+def page_bot_de():
+    faq = [
+        ('Kauft SNYPD Artikel für mich?', 'Nein. SNYPD findet neue Anzeigen und benachrichtigt dich. Du öffnest die Anzeige auf Vinted und kaufst oder machst selbst ein Angebot, über den normalen Vinted-Checkout.'),
+        ('Muss ich SNYPD mein Vinted-Passwort geben?', 'Nein. SNYPD fragt nie nach deinen Vinted-Zugangsdaten und meldet sich nie in deinem Konto an. Für dein SNYPD-Konto brauchst du nur eine E-Mail-Adresse.'),
+        ('Wie oft prüft SNYPD meine Suche?', 'Etwa alle 30 Sekunden. ' + SPEED_MEASURED['de'] + ' Ruhige Suchen werden langsamer geprüft, höchstens alle 5 Minuten. Das Tempo ist in jedem Tarif gleich.'),
+        ('Funktioniert es auf dem iPhone?', 'Ja, sobald SNYPD auf deinem Home-Bildschirm ist: Öffne snypd.store in Safari, tippe auf Teilen und dann auf &bdquo;Zum Home-Bildschirm&ldquo;, und schalte die Benachrichtigungen in der installierten App ein. Apple erlaubt Web-Push nur für Apps auf dem Home-Bildschirm. Auf Android, Windows und Mac funktionieren die Benachrichtigungen direkt im Browser.'),
+        ('Gibt es einen kostenlosen Tarif?', 'Ja. Free enthält eine Suche, ohne Zeitlimit und ohne Karte. ' + TRIAL['de'] + ' Danach prüft Free, solange dein SNYPD-Dashboard geöffnet ist; bezahlte Tarife ab 14,99&nbsp;&euro; im Monat prüfen rund um die Uhr, auch wenn es geschlossen ist.'),
+        ('Mit welchen Vinted-Ländern funktioniert es?', 'Mit jeder Vinted-Seite in Europa und den USA, 26 insgesamt: vinted.de, vinted.at, vinted.fr, vinted.nl, vinted.be, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com und die übrigen. Füge einen Suchlink der Seite ein, auf der du einkaufst; die Preise erscheinen in deren Währung.'),
+    ]
+    body = f"""
+<section id="kurz">
+  <h2>SNYPD in einem Absatz</h2>
+  <div class="lg-box lg-mint"><p>SNYPD ist ein Vinted Bot für Benachrichtigungen, auch Vinted-Monitor genannt, für Reseller. Du fügst einen Vinted-Suchlink mit deinen Filtern ein (Marke, Größe, Preis, Zustand), und SNYPD prüft diese Suche etwa alle 30 Sekunden. Sobald eine neue Anzeige passt, erscheint sie in deinem Dashboard und du bekommst eine Push-Benachrichtigung auf Handy oder Computer. SNYPD fragt nie nach deinem Vinted-Passwort, meldet sich nie in deinem Konto an, kauft nichts und schreibt keinen Verkäufern. Der kostenlose Tarif lässt eine Suche laufen: in den ersten 7 Tagen rund um die Uhr, danach solange dein Dashboard geöffnet ist. Bezahlte Tarife ab 14,99&nbsp;&euro; im Monat überwachen rund um die Uhr.</p></div>
+</section>
+<section id="arten">
+  <h2>Die drei Arten von Vinted Bots</h2>
+  <p>&bdquo;Vinted Bot&ldquo; steht für Tools, die sehr Unterschiedliches tun. Der entscheidende Unterschied: Handeln sie über dein Vinted-Konto?</p>
+  <h3>BENACHRICHTIGUNGS-BOTS ODER VINTED-MONITORE</h3>
+  <p>Sie beobachten deine Suchen und sagen dir Bescheid, wenn etwas Neues passt; Reseller nennen sie auch Monitore. Du kaufst selbst, deshalb müssen sie nichts über dein Vinted-Konto tun. SNYPD, Telvin Bot und Crazed sind Benachrichtigungs-Tools.</p>
+  <h3>AUTOBUY- UND AUTOCOP-BOTS</h3>
+  <p>Sie kaufen oder bestellen für dich. Kaufen auf Vinted braucht ein angemeldetes Konto, also handeln diese Tools über deins; V-Tools zum Beispiel gibt an, dass du deine eigenen Vinted-Konten verbindest. Souk, V-Tools und Resell Reserve verkaufen Autobuy-Funktionen.</p>
+  <h3>SKRIPTE ZUM SELBST-HOSTEN</h3>
+  <p>Open-Source-Projekte auf GitHub, die du selbst betreibst und die meist an Discord oder Telegram posten. Kostenlos, aber du betreibst den Server und reparierst ihn, wenn Vinted etwas ändert.</p>
+  <p>Preise, Benachrichtigungswege und kostenlose Tarife der einzelnen Tools stehen nebeneinander im <a href="{SLUGS['compare']['en']}">Vergleich der Vinted Bots</a> (auf Englisch). Wie ein Monitor Schritt für Schritt funktioniert: <a href="{SLUGS['monitor']['en']}">Was ist ein Vinted-Monitor?</a> (auf Englisch)</p>
+</section>
+<section id="automatisierung">
+  <h2>Vinted-Automatisierung: Käuferseite, nicht Verkäuferseite</h2>
+  <p>&bdquo;Vinted-Automatisierung&ldquo; meint meistens Tools für Verkäufer: Sie stellen deine Artikel neu ein oder schieben sie hoch, schicken Angebote an Leute, die sie favorisiert haben, oder schreiben deine Beschreibungen. Sie arbeiten an deinem eigenen Shop, also handeln sie über dein Vinted-Konto.</p>
+  <p>SNYPD automatisiert nur die Käuferseite: Es beobachtet Suchen und sagt dir, was neu ist. Es fasst weder deinen Shop noch deine Anzeigen noch deine Nachrichten an und meldet sich nie an. Wenn du deine eigenen Anzeigen hochschieben oder neu einstellen willst, ist SNYPD nicht das richtige Tool.</p>
+</section>
+<section id="so-gehts">
+  <h2>So funktioniert SNYPD</h2>
+  <ol>
+    <li>Suche im Browser auf deiner Vinted-Seite und setze deine Filter: Marke, Größe, Preis, Zustand.</li>
+    <li>Kopiere die Adresse aus der Adresszeile. Eine Suchadresse enthält <code>/catalog?</code>.</li>
+    <li>Füge sie in SNYPD ein, gib ihr einen kurzen Namen und schalte sie ein.</li>
+    <li>SNYPD prüft sie etwa alle 30 Sekunden. Neue Treffer landen in deinem Dashboard und, wenn du Benachrichtigungen eingeschaltet hast, auf deinem Handy oder Computer. Mehrere Funde kurz hintereinander kommen als eine Benachrichtigung.</li>
+    <li>Tippe auf die Benachrichtigung. Sie öffnet die Anzeige auf Vinted, wo du kaufst oder ein Angebot machst.</li>
+  </ol>
+  {figure('feed', 'de')}
+</section>
+<section id="tempo">
+  <h2>Wie schnell ist es?</h2>
+  <p>SNYPD prüft jede aktive Suche etwa alle 30 Sekunden. {SPEED_MEASURED['de']} {VINTED_LAG['de']} Suchen, die oft neue Artikel finden, bleiben bei diesem Tempo; Suchen, die ruhig werden, werden langsamer geprüft, bis zu etwa 5 Minuten zwischen zwei Prüfungen, und werden wieder schneller, sobald sie etwas finden. Das Tempo ist in jedem Tarif gleich: Bezahlen bringt mehr Suchen und Überwachung rund um die Uhr, keine schnelleren Prüfungen.</p>
+  <p>Manche Tools werben mit Benachrichtigungen in Millisekunden. SNYPD macht diese Aussage nicht. Was SNYPD verspricht: Eine bezahlte Suche läuft weiter, wenn dein Laptop zu ist und dein Handy in der Tasche steckt, also genau dann, wenn man die meisten Funde verpasst.</p>
+</section>
+<section id="kosten">
+  <h2>Was es kostet</h2>
+  {table(PLANS_HEAD['de'], PLANS_ROWS['de'])}
+  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel unter <a href="{SLUGS['prices']['en']}">Vinted-Preise</a> (auf Englisch). Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
+</section>
+<section id="konto">
+  <h2>Was SNYPD von dir braucht</h2>
+  <p>Eine E-Mail-Adresse für dein SNYPD-Konto. Kein Vinted-Passwort, keine Vinted-Anmeldung, keine Browser-Erweiterung. SNYPD liest öffentliche Anzeigen mit eigenen Systemen: dieselben Suchergebnisse, die jeder auf Vinted ohne Konto öffnen kann.</p>
+  <p>Weil SNYPD sich nie als du anmeldet, passiert nichts davon in deinem Vinted-Konto. Wenn du kaufst, kaufst du über Vinted wie jeder andere Käufer.</p>
+</section>
+<section id="fragen">
+  <h2>Fragen</h2>
+  {faq_html(faq)}
+</section>
+<section id="testen">
+  <h2>Probier es mit einer Suche</h2>
+  {cta('de')}
+</section>"""
+    return page('bot', 'de', 'Vinted Bot: Benachrichtigung bei neuen Anzeigen, ohne Autobuy | SNYPD',
+                'SNYPD ist ein Vinted Bot, der deine Suchen überwacht und dir eine Push-Benachrichtigung schickt, sobald eine passende Anzeige erscheint. Ohne Login, ohne Autobuy.',
+                'VINTED BOT', 'Ein Vinted Bot, der dich benachrichtigt und nie dein Konto anfasst.',
+                'Die meisten Vinted Bots werden mit automatischem Kaufen beworben, also damit, in deinem Namen zu handeln. SNYPD übernimmt den anderen Teil: Es beobachtet deine Vinted-Suchen und sagt dir Bescheid, wenn etwas Neues passt. Du entscheidest und kaufst selbst auf Vinted.',
+                [('kurz', 'In einem Absatz'), ('arten', 'Drei Arten von Bots'), ('automatisierung', 'Automatisierung'), ('so-gehts', 'So funktioniert es'), ('tempo', 'Wie schnell'), ('kosten', 'Kosten'), ('konto', 'Dein Vinted-Konto'), ('fragen', 'Fragen')],
+                body, [faq_ld(faq)])
+
+
+def page_bot_nl():
+    faq = [
+        ('Koopt SNYPD artikelen voor mij?', 'Nee. SNYPD vindt nieuwe advertenties en waarschuwt je. Je opent de advertentie op Vinted en koopt of doet zelf een bod, via de normale betaling van Vinted.'),
+        ('Moet ik SNYPD mijn Vinted-wachtwoord geven?', 'Nee. SNYPD vraagt nooit om je Vinted-inloggegevens en logt nooit in op je account. Je hebt alleen een e-mailadres nodig voor je SNYPD-account.'),
+        ('Hoe vaak controleert SNYPD mijn zoekopdracht?', 'Ongeveer elke 30 seconden. ' + SPEED_MEASURED['nl'] + ' Rustige zoekopdrachten vertragen tot hooguit 5 minuten. De snelheid is op elk abonnement hetzelfde.'),
+        ('Werkt het op een iPhone?', 'Ja, zodra SNYPD op je beginscherm staat: open snypd.store in Safari, tik op Deel en daarna op &ldquo;Zet op beginscherm&rdquo;, en zet de meldingen aan in de geïnstalleerde app. Apple staat webmeldingen alleen toe voor apps op het beginscherm. Op Android, Windows en Mac werken meldingen direct vanuit de browser.'),
+        ('Is er een gratis abonnement?', 'Ja. Free bevat één zoekopdracht, zonder tijdslimiet en zonder kaart. ' + TRIAL['nl'] + ' Daarna controleert Free zolang je SNYPD-dashboard open staat; betaalde abonnementen vanaf &euro;&nbsp;14,99 per maand controleren 24/7, ook als het dicht is.'),
+        ('Met welke Vinted-landen werkt het?', 'Met elke Vinted-site in Europa en de VS, 26 in totaal: vinted.nl, vinted.be, vinted.fr, vinted.de, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com en de rest. Plak een zoeklink van de site waar je koopt; prijzen verschijnen in de munteenheid van die site.'),
+    ]
+    body = f"""
+<section id="samenvatting">
+  <h2>SNYPD in één alinea</h2>
+  <div class="lg-box lg-mint"><p>SNYPD is een Vinted bot voor meldingen, ook wel Vinted monitor genoemd, voor resellers. Je plakt een Vinted-zoeklink met je filters (merk, maat, prijs, staat) en SNYPD controleert die zoekopdracht ongeveer elke 30 seconden. Zodra een nieuwe advertentie past, verschijnt die in je dashboard en krijg je een pushmelding op je telefoon of computer. SNYPD vraagt nooit om je Vinted-wachtwoord, logt nooit in op je account, koopt niets en stuurt geen berichten naar verkopers. Het gratis abonnement laat één zoekopdracht lopen: de eerste 7 dagen 24/7, daarna zolang je dashboard open staat. Betaalde abonnementen vanaf &euro;&nbsp;14,99 per maand houden 24/7 de wacht.</p></div>
+</section>
+<section id="soorten">
+  <h2>De drie soorten Vinted bots</h2>
+  <p>&ldquo;Vinted bot&rdquo; staat voor tools die heel verschillende dingen doen. Het grote verschil: handelen ze via je Vinted-account?</p>
+  <h3>MELDINGSBOTS OF VINTED MONITORS</h3>
+  <p>Ze houden je zoekopdrachten in de gaten en laten je weten wanneer er iets nieuws bij zit; resellers noemen ze ook monitors. Je koopt zelf, dus ze hoeven niets via je Vinted-account te doen. SNYPD, Telvin Bot en Crazed zijn meldingstools.</p>
+  <h3>AUTOBUY- EN AUTOCOP-BOTS</h3>
+  <p>Ze kopen of rekenen af voor jou. Kopen op Vinted vraagt een ingelogd account, dus deze tools handelen via het jouwe; V-Tools zegt bijvoorbeeld dat je je eigen Vinted-accounts koppelt. Souk, V-Tools en Resell Reserve verkopen autobuy-functies.</p>
+  <h3>SCRIPTS OM ZELF TE HOSTEN</h3>
+  <p>Open-sourceprojecten op GitHub die je zelf draait en die meestal naar Discord of Telegram posten. Gratis, maar jij beheert de server en repareert hem als Vinted iets verandert.</p>
+  <p>Prijzen, meldingskanalen en gratis abonnementen van elke tool staan naast elkaar in de <a href="{SLUGS['compare']['en']}">vergelijking van Vinted bots</a> (in het Engels). Hoe een monitor stap voor stap werkt: <a href="{SLUGS['monitor']['en']}">wat is een Vinted monitor?</a> (in het Engels)</p>
+</section>
+<section id="automatisering">
+  <h2>Vinted-automatisering: de kant van de koper, niet van de verkoper</h2>
+  <p>&ldquo;Vinted-automatisering&rdquo; betekent meestal tools voor verkopers: ze plaatsen je artikelen opnieuw of zetten ze bovenaan, sturen aanbiedingen naar mensen die ze als favoriet hebben, of schrijven je beschrijvingen. Ze werken in je eigen winkel, dus ze handelen via je Vinted-account.</p>
+  <p>SNYPD automatiseert alleen de kant van de koper: het houdt zoekopdrachten in de gaten en vertelt je wat nieuw is. Het komt niet aan je winkel, je advertenties of je berichten en logt nooit in. Wil je je eigen advertenties bovenaan zetten of opnieuw plaatsen, dan is SNYPD niet de juiste tool.</p>
+</section>
+<section id="werking">
+  <h2>Zo werkt SNYPD</h2>
+  <ol>
+    <li>Zoek in een browser op je Vinted-site en stel je filters in: merk, maat, prijs, staat.</li>
+    <li>Kopieer het adres uit de adresbalk. Een zoekadres bevat <code>/catalog?</code>.</li>
+    <li>Plak het in SNYPD, geef het een korte naam en zet het aan.</li>
+    <li>SNYPD controleert het ongeveer elke 30 seconden. Nieuwe treffers komen in je dashboard en, als je meldingen hebt aangezet, op je telefoon of computer. Meerdere vondsten kort na elkaar komen binnen als één melding.</li>
+    <li>Tik op de melding. Die opent de advertentie op Vinted, waar je koopt of een bod doet.</li>
+  </ol>
+  {figure('feed', 'nl')}
+</section>
+<section id="snelheid">
+  <h2>Hoe snel is het?</h2>
+  <p>SNYPD controleert elke actieve zoekopdracht ongeveer elke 30 seconden. {SPEED_MEASURED['nl']} {VINTED_LAG['nl']} Zoekopdrachten die vaak nieuwe artikelen vinden, houden dat tempo; zoekopdrachten die rustig worden, worden trager gecontroleerd, tot ongeveer 5 minuten tussen twee controles, en versnellen weer zodra ze iets vinden. Het tempo is op elk abonnement hetzelfde: betalen geeft meer zoekopdrachten en 24/7 bewaking, geen snellere controles.</p>
+  <p>Sommige tools adverteren met meldingen in milliseconden. SNYPD doet die belofte niet. Wat SNYPD wel belooft: een betaalde zoekopdracht blijft lopen als je laptop dicht is en je telefoon in je zak zit, precies wanneer je de meeste vondsten mist.</p>
+</section>
+<section id="kosten">
+  <h2>Wat het kost</h2>
+  {table(PLANS_HEAD['nl'], PLANS_ROWS['nl'])}
+  <p>Maandelijks gefactureerd, altijd opzegbaar. Het Market Report toont de typische vraagprijs van een artikel op Vinted per staat; een voorbeeld op <a href="{SLUGS['prices']['en']}">Vinted-prijzen</a> (in het Engels). Alle details op de <a href="/plans">abonnementenpagina</a> (in het Engels).</p>
+</section>
+<section id="account">
+  <h2>Wat SNYPD van je nodig heeft</h2>
+  <p>Een e-mailadres voor je SNYPD-account. Geen Vinted-wachtwoord, geen Vinted-login en geen browserextensie. SNYPD leest openbare advertenties met eigen systemen: dezelfde zoekresultaten die iedereen op Vinted zonder account kan openen.</p>
+  <p>Omdat SNYPD nooit als jou inlogt, gebeurt niets ervan op je Vinted-account. Als je koopt, koop je via Vinted zoals elke andere koper.</p>
+</section>
+<section id="vragen">
+  <h2>Vragen</h2>
+  {faq_html(faq)}
+</section>
+<section id="proberen">
+  <h2>Probeer het met één zoekopdracht</h2>
+  {cta('nl')}
+</section>"""
+    return page('bot', 'nl', 'Vinted bot: melding bij nieuwe advertenties, zonder autobuy | SNYPD',
+                'SNYPD is een Vinted bot die je zoekopdrachten in de gaten houdt en je een pushmelding stuurt zodra er een passende advertentie verschijnt. Zonder login, zonder autobuy.',
+                'VINTED BOT', 'Een Vinted bot die je waarschuwt en nooit aan je account komt.',
+                'De meeste Vinted bots worden verkocht op automatisch kopen, dus op handelen in jouw naam. SNYPD doet het andere deel van het werk: het houdt je Vinted-zoekopdrachten in de gaten en laat je weten wanneer er iets nieuws bij zit. Jij beslist en koopt zelf op Vinted.',
+                [('samenvatting', 'In één alinea'), ('soorten', 'Drie soorten bots'), ('automatisering', 'Automatisering'), ('werking', 'Zo werkt het'), ('snelheid', 'Hoe snel'), ('kosten', 'Kosten'), ('account', 'Je Vinted-account'), ('vragen', 'Vragen')],
+                body, [faq_ld(faq)])
+
+
 # ------------------------------------------------------------------ page: vinted bot
 def page_bot(lang):
+    if lang == 'de':
+        return page_bot_de()
+    if lang == 'nl':
+        return page_bot_nl()
     if lang == 'en':
         faq = [
             ('Does SNYPD buy items for me?', 'No. SNYPD finds new listings and alerts you. You open the listing on Vinted and buy or make an offer yourself, through Vinted’s normal checkout.'),
@@ -714,6 +937,14 @@ SHOT_TEXT = {
                    'Un vrai Market Report pour « jordan 1 mid », le 2 octobre 2026 : un prix demandé typique de 45 &euro; sur 975 annonces de 880 vendeurs, puis le prix pour chaque état. Interface en anglais.'),
         'hunts': ('Liste des recherches SNYPD, chacune une recherche Vinted sur vinted.be, certaines actives et d’autres en pause',
                   'Les recherches dans SNYPD : chacune est un lien de recherche Vinted avec ses propres filtres, active ou en pause. Capture du 2 octobre 2026, interface en anglais.'),
+    },
+    'de': {
+        'feed': ('SNYPD-Dashboard mit neuen Vinted-Anzeigen: Preis, Preis mit Käuferschutz, Zustand und Fundzeit',
+                 'Der SNYPD-Feed in einer echten Sitzung am 2. Oktober 2026: neue Anzeigen aus einer Suche, jeweils mit Preis, Preis inklusive Vinted-Käuferschutz, Zustand und Fundzeit. Die Fotos sind unscharf, weil sie den Verkäufern gehören. Oberfläche auf Englisch.'),
+    },
+    'nl': {
+        'feed': ('SNYPD-dashboard met nieuwe Vinted-advertenties: prijs, prijs met kopersbescherming, staat en tijdstip van vinden',
+                 'De SNYPD-feed tijdens een echte sessie op 2 oktober 2026: nieuwe advertenties uit één zoekopdracht, elk met prijs, prijs inclusief de kopersbescherming van Vinted, staat en tijdstip van vinden. De foto&rsquo;s zijn vervaagd omdat ze van de verkopers zijn. Interface in het Engels.'),
     },
 }
 
@@ -1810,6 +2041,9 @@ if __name__ == '__main__':
         write(prefix + SLUGS['compare'][lang].rsplit('/', 1)[1] + '.html', page_compare(lang))
         html_out, csv_rows = page_prices(lang)
         write(prefix + SLUGS['prices'][lang].rsplit('/', 1)[1] + '.html', html_out)
+    for lang in ('de', 'nl'):
+        rel = SLUGS['bot'][lang].lstrip('/') + '.html'
+        write(rel if LIVE[lang] else 'ops/seo/preview/' + rel.replace('/', '-'), page_bot(lang))
     write('vinted-deals.html', page_deals('en'))
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):
         write(SLUGS['monitor'][lang].lstrip('/') + '.html', page_monitor(lang))
