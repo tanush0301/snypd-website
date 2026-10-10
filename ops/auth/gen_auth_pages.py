@@ -9,7 +9,7 @@ metadata and the starting view differ. All behaviour lives in
 
 ops/ is in .vercelignore, so this script never deploys.
 """
-import os
+import os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -163,9 +163,9 @@ BODY = """<body>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);">
 {cards}      </div>
       <div style="border:1px solid var(--border);background:var(--bg);padding:18px;display:flex;flex-direction:column;gap:6px;">
-        <span id="au-listings" style="font-family:'Cabinet Grotesk',var(--font);font-weight:900;font-size:32px;line-height:1;letter-spacing:-.03em;">178,102</span>
+        <span id="au-listings" style="font-family:'Cabinet Grotesk',var(--font);font-weight:900;font-size:32px;line-height:1;letter-spacing:-.03em;">{listings}</span>
         <span style="font-size:13px;line-height:1.5;color:var(--text-primary);">Vinted listings matched to users' searches since 17 Sept 2026</span>
-        <span id="au-asof" style="font-size:12px;color:var(--text-muted);">As of 26 Sept 2026</span>
+        <span id="au-asof" style="font-size:12px;color:var(--text-muted);">{asof}</span>
       </div>
     </div>
 
@@ -175,6 +175,20 @@ BODY = """<body>
 </body>
 </html>
 """
+
+
+# The listings figure is written by ops/seo/prepublish.py (COUNTER_PAGES) from public_stats,
+# like the homepage's. Regenerating keeps the figure already in the file, so it can never fall
+# back to an old hard-coded number; a brand-new file gets a dash until prepublish fills it.
+COUNTER_RE = re.compile(r'id="au-listings"[^>]*>([^<]*)<.*?id="au-asof"[^>]*>([^<]*)<', re.S)
+
+
+def current_counter(path):
+    try:
+        m = COUNTER_RE.search(open(path, encoding='utf-8').read())
+    except FileNotFoundError:
+        m = None
+    return (m.group(1), m.group(2)) if m else ('&mdash;', 'As of &mdash;')
 
 
 def build(page, cfg):
@@ -187,12 +201,17 @@ def build(page, cfg):
     head = HEAD.format(title=cfg['title'], desc=cfg['desc'], seo=seo, sb_url=SUPABASE_URL,
                        sb_anon=SUPABASE_ANON, extra=extra)
     cards = ''.join(CARD.format(title=t, img=i, price=p, meta=m) for t, i, p, m in EXAMPLES)
-    return head + BODY.format(cards=cards, page=page)
+    listings, asof = current_counter(os.path.join(ROOT, cfg['file']))
+    return head + BODY.format(cards=cards, page=page, listings=listings, asof=asof)
 
 
 if __name__ == '__main__':
+    only = sys.argv[1:]  # e.g. "signup" to rebuild one page
     for page, cfg in PAGES.items():
+        if only and page not in only:
+            continue
         out = os.path.join(ROOT, cfg['file'])
+        data = build(page, cfg)  # before opening: build() reads the current counter from this file
         with open(out, 'w', encoding='utf-8', newline='\n') as fh:
-            fh.write(build(page, cfg))
+            fh.write(data)
         print('wrote', cfg['file'])

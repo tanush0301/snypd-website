@@ -628,6 +628,10 @@ FR.update({
     'Runs 24/7, dashboard closed': 'Tourne 24h/24, tableau de bord fermé',
     'Runs with your dashboard closed': 'Tourne tableau de bord fermé',
     'Tab open only': 'Onglet ouvert seulement',
+    'First 7 days only': '7 premiers jours seulement',
+    '24/7 for 7 days, then dashboard open': '24h/24 pendant 7 jours, puis tableau de bord ouvert',
+    'Free: 24/7 for the first 7 days after you save your first search, then only while your dashboard is open.':
+        'Free' + NB + ': 24h/24 pendant les 7 premiers jours après ta première recherche enregistrée, puis seulement tant que ton tableau de bord est ouvert.',
     'Check speed': 'Vitesse de vérification',
     'About every 30 s (measured median), up to 5 min on quiet searches. Same on every plan.':
         'Environ toutes les 30 s (médiane mesurée), jusqu’à 5 min sur les recherches calmes. Pareil sur tous les plans.',

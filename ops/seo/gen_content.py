@@ -18,6 +18,8 @@
 #   is the real Market Report output (ops/seo/price_report_batch.py, run inside
 #   the backend container). Never type a price by hand.
 import csv, datetime, html, io, json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import plans  # noqa: E402  (plan facts: ops/seo/data/plans.json)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SITE = 'https://www.snypd.store'
@@ -92,12 +94,12 @@ VINTED_LAG = {
 }
 # Free 24/7 trial (migration 042, backend FREE_TRIAL_DAYS=7, since 7 Oct 2026).
 TRIAL = {
-    'en': 'For the first 7 days after you save your first search, Free runs 24/7 with alerts, like a paid plan.',
-    'fr': 'Pendant les 7 premiers jours après ta première recherche enregistrée, Free tourne 24h/24 avec les alertes, comme un plan payant.',
-    'de': 'In den ersten 7 Tagen nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif.',
-    'nl': 'De eerste 7 dagen nadat je je eerste zoekopdracht opslaat, draait Free 24/7 met meldingen, net als een betaald abonnement.',
-    'it': 'Per i primi 7 giorni dopo aver salvato la tua prima ricerca, Free funziona 24 ore su 24 con le notifiche, come un piano a pagamento.',
-    'es': 'Durante los 7 primeros días después de guardar tu primera búsqueda, Free funciona 24/7 con notificaciones, como un plan de pago.',
+    'en': 'For the first @@trial_days@@ days after you save your first search, Free runs 24/7 with alerts, like a paid plan.',
+    'fr': 'Pendant les @@trial_days@@ premiers jours après ta première recherche enregistrée, Free tourne 24h/24 avec les alertes, comme un plan payant.',
+    'de': 'In den ersten @@trial_days@@ Tagen nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif.',
+    'nl': 'De eerste @@trial_days@@ dagen nadat je je eerste zoekopdracht opslaat, draait Free 24/7 met meldingen, net als een betaald abonnement.',
+    'it': 'Per i primi @@trial_days@@ giorni dopo aver salvato la tua prima ricerca, Free funziona 24 ore su 24 con le notifiche, come un piano a pagamento.',
+    'es': 'Durante los @@trial_days@@ primeros días después de guardar tu primera búsqueda, Free funciona 24/7 con notificaciones, como un plan de pago.',
 }
 
 # slug per language; the key is the page id
@@ -454,37 +456,37 @@ def cta(lang):
                 '<a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>')
     return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les 7 premiers jours tournent 24h/24 avec les alertes. '
             'Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p>'
-            '<p class="ct-note">L’inscription et le paiement sont pour l’instant en anglais.</p>'
+            '<p class="ct-note">Inscription en français ; le paiement (Whop) est en anglais.</p>'
             '<div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a>'
             '<a class="ct-btn ct-ghost" href="/plans">VOIR LES TARIFS</a></div></div>')
 
 
 # ------------------------------------------------------------------ shared facts
 PLANS_ROWS = {
-    'en': [['Free', '<span class="ct-num">&euro;0</span>', '1', 'First 7 days, then only while your dashboard is open', 'No'],
-           ['Kickstart', '<span class="ct-num">&euro;14.99</span>', '2', 'Yes, 24/7', 'No'],
-           ['Pro', '<span class="ct-num">&euro;24.99</span>', '5', 'Yes, 24/7', 'Yes'],
-           ['Elite', '<span class="ct-num">&euro;34.99</span>', '10', 'Yes, 24/7', 'Yes']],
-    'fr': [['Free', '<span class="ct-num">0&nbsp;&euro;</span>', '1', '7 premiers jours, puis tableau de bord ouvert seulement', 'Non'],
-           ['Kickstart', '<span class="ct-num">14,99&nbsp;&euro;</span>', '2', 'Oui, 24h/24', 'Non'],
-           ['Pro', '<span class="ct-num">24,99&nbsp;&euro;</span>', '5', 'Oui, 24h/24', 'Oui'],
-           ['Elite', '<span class="ct-num">34,99&nbsp;&euro;</span>', '10', 'Oui, 24h/24', 'Oui']],
-    'de': [['Free', '<span class="ct-num">0&nbsp;&euro;</span>', '1', 'Erste 7 Tage, danach nur bei geöffnetem Dashboard', 'Nein'],
-           ['Kickstart', '<span class="ct-num">14,99&nbsp;&euro;</span>', '2', 'Ja, rund um die Uhr', 'Nein'],
-           ['Pro', '<span class="ct-num">24,99&nbsp;&euro;</span>', '5', 'Ja, rund um die Uhr', 'Ja'],
-           ['Elite', '<span class="ct-num">34,99&nbsp;&euro;</span>', '10', 'Ja, rund um die Uhr', 'Ja']],
-    'nl': [['Free', '<span class="ct-num">&euro;&nbsp;0</span>', '1', 'Eerste 7 dagen, daarna alleen met dashboard open', 'Nee'],
-           ['Kickstart', '<span class="ct-num">&euro;&nbsp;14,99</span>', '2', 'Ja, 24/7', 'Nee'],
-           ['Pro', '<span class="ct-num">&euro;&nbsp;24,99</span>', '5', 'Ja, 24/7', 'Ja'],
-           ['Elite', '<span class="ct-num">&euro;&nbsp;34,99</span>', '10', 'Ja, 24/7', 'Ja']],
-    'it': [['Free', '<span class="ct-num">0&nbsp;&euro;</span>', '1', 'Primi 7 giorni, poi solo con la dashboard aperta', 'No'],
-           ['Kickstart', '<span class="ct-num">14,99&nbsp;&euro;</span>', '2', 'Sì, 24 ore su 24', 'No'],
-           ['Pro', '<span class="ct-num">24,99&nbsp;&euro;</span>', '5', 'Sì, 24 ore su 24', 'Sì'],
-           ['Elite', '<span class="ct-num">34,99&nbsp;&euro;</span>', '10', 'Sì, 24 ore su 24', 'Sì']],
-    'es': [['Free', '<span class="ct-num">0&nbsp;&euro;</span>', '1', 'Primeros 7 días, luego solo con el panel abierto', 'No'],
-           ['Kickstart', '<span class="ct-num">14,99&nbsp;&euro;</span>', '2', 'Sí, 24/7', 'No'],
-           ['Pro', '<span class="ct-num">24,99&nbsp;&euro;</span>', '5', 'Sí, 24/7', 'Sí'],
-           ['Elite', '<span class="ct-num">34,99&nbsp;&euro;</span>', '10', 'Sí, 24/7', 'Sí']],
+    'en': [['Free', '<span class="ct-num">@@price:free@@</span>', '@@searches:free@@', 'First @@trial_days@@ days, then only while your dashboard is open', 'No'],
+           ['Kickstart', '<span class="ct-num">@@price:kickstart@@</span>', '@@searches:kickstart@@', 'Yes, 24/7', 'No'],
+           ['Pro', '<span class="ct-num">@@price:pro@@</span>', '@@searches:pro@@', 'Yes, 24/7', 'Yes'],
+           ['Elite', '<span class="ct-num">@@price:elite@@</span>', '@@searches:elite@@', 'Yes, 24/7', 'Yes']],
+    'fr': [['Free', '<span class="ct-num">@@price:free@@</span>', '@@searches:free@@', '@@trial_days@@ premiers jours, puis tableau de bord ouvert seulement', 'Non'],
+           ['Kickstart', '<span class="ct-num">@@price:kickstart@@</span>', '@@searches:kickstart@@', 'Oui, 24h/24', 'Non'],
+           ['Pro', '<span class="ct-num">@@price:pro@@</span>', '@@searches:pro@@', 'Oui, 24h/24', 'Oui'],
+           ['Elite', '<span class="ct-num">@@price:elite@@</span>', '@@searches:elite@@', 'Oui, 24h/24', 'Oui']],
+    'de': [['Free', '<span class="ct-num">@@price:free@@</span>', '@@searches:free@@', 'Erste @@trial_days@@ Tage, danach nur bei geöffnetem Dashboard', 'Nein'],
+           ['Kickstart', '<span class="ct-num">@@price:kickstart@@</span>', '@@searches:kickstart@@', 'Ja, rund um die Uhr', 'Nein'],
+           ['Pro', '<span class="ct-num">@@price:pro@@</span>', '@@searches:pro@@', 'Ja, rund um die Uhr', 'Ja'],
+           ['Elite', '<span class="ct-num">@@price:elite@@</span>', '@@searches:elite@@', 'Ja, rund um die Uhr', 'Ja']],
+    'nl': [['Free', '<span class="ct-num">@@price:free@@</span>', '@@searches:free@@', 'Eerste @@trial_days@@ dagen, daarna alleen met dashboard open', 'Nee'],
+           ['Kickstart', '<span class="ct-num">@@price:kickstart@@</span>', '@@searches:kickstart@@', 'Ja, 24/7', 'Nee'],
+           ['Pro', '<span class="ct-num">@@price:pro@@</span>', '@@searches:pro@@', 'Ja, 24/7', 'Ja'],
+           ['Elite', '<span class="ct-num">@@price:elite@@</span>', '@@searches:elite@@', 'Ja, 24/7', 'Ja']],
+    'it': [['Free', '<span class="ct-num">@@price:free@@</span>', '@@searches:free@@', 'Primi @@trial_days@@ giorni, poi solo con la dashboard aperta', 'No'],
+           ['Kickstart', '<span class="ct-num">@@price:kickstart@@</span>', '@@searches:kickstart@@', 'Sì, 24 ore su 24', 'No'],
+           ['Pro', '<span class="ct-num">@@price:pro@@</span>', '@@searches:pro@@', 'Sì, 24 ore su 24', 'Sì'],
+           ['Elite', '<span class="ct-num">@@price:elite@@</span>', '@@searches:elite@@', 'Sì, 24 ore su 24', 'Sì']],
+    'es': [['Free', '<span class="ct-num">@@price:free@@</span>', '@@searches:free@@', 'Primeros @@trial_days@@ días, luego solo con el panel abierto', 'No'],
+           ['Kickstart', '<span class="ct-num">@@price:kickstart@@</span>', '@@searches:kickstart@@', 'Sí, 24/7', 'No'],
+           ['Pro', '<span class="ct-num">@@price:pro@@</span>', '@@searches:pro@@', 'Sí, 24/7', 'Sí'],
+           ['Elite', '<span class="ct-num">@@price:elite@@</span>', '@@searches:elite@@', 'Sí, 24/7', 'Sí']],
 }
 PLANS_HEAD = {'en': ['PLAN', 'PER MONTH, VAT INCL.', 'ACTIVE SEARCHES', 'WATCHES WITH DASHBOARD CLOSED', 'MARKET REPORT'],
               'fr': ['PLAN', 'PAR MOIS, TVA INCLUSE', 'RECHERCHES ACTIVES', 'SURVEILLE TABLEAU DE BORD FERMÉ', 'MARKET REPORT'],
@@ -503,13 +505,13 @@ def page_bot_de():
         ('Muss ich SNYPD mein Vinted-Passwort geben?', 'Nein. SNYPD fragt nie nach deinen Vinted-Zugangsdaten und meldet sich nie in deinem Konto an. Für dein SNYPD-Konto brauchst du nur eine E-Mail-Adresse.'),
         ('Wie oft prüft SNYPD meine Suche?', 'Etwa alle 30 Sekunden. ' + SPEED_MEASURED['de'] + ' Ruhige Suchen werden langsamer geprüft, höchstens alle 5 Minuten. Das Tempo ist in jedem Tarif gleich.'),
         ('Funktioniert es auf dem iPhone?', 'Ja, sobald SNYPD auf deinem Home-Bildschirm ist: Öffne snypd.store in Safari, tippe auf Teilen und dann auf &bdquo;Zum Home-Bildschirm&ldquo;, und schalte die Benachrichtigungen in der installierten App ein. Apple erlaubt Web-Push nur für Apps auf dem Home-Bildschirm. Auf Android, Windows und Mac funktionieren die Benachrichtigungen direkt im Browser.'),
-        ('Gibt es einen kostenlosen Tarif?', 'Ja. Free enthält eine Suche, ohne Zeitlimit und ohne Karte. ' + TRIAL['de'] + ' Danach prüft Free, solange dein SNYPD-Dashboard geöffnet ist; bezahlte Tarife ab 14,99&nbsp;&euro; im Monat prüfen rund um die Uhr, auch wenn es geschlossen ist.'),
+        ('Gibt es einen kostenlosen Tarif?', 'Ja. Free enthält eine Suche, ohne Zeitlimit und ohne Karte. ' + TRIAL['de'] + ' Danach prüft Free, solange dein SNYPD-Dashboard geöffnet ist; bezahlte Tarife ab @@price:kickstart@@ im Monat prüfen rund um die Uhr, auch wenn es geschlossen ist.'),
         ('Mit welchen Vinted-Ländern funktioniert es?', 'Mit jeder Vinted-Seite in Europa und den USA, 26 insgesamt: vinted.de, vinted.at, vinted.fr, vinted.nl, vinted.be, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com und die übrigen. Füge einen Suchlink der Seite ein, auf der du einkaufst; die Preise erscheinen in deren Währung.'),
     ]
     body = f"""
 <section id="kurz">
   <h2>SNYPD in einem Absatz</h2>
-  <div class="lg-box lg-mint"><p>SNYPD ist ein Vinted Bot für Benachrichtigungen, auch Vinted-Monitor genannt, für Reseller. Du fügst einen Vinted-Suchlink mit deinen Filtern ein (Marke, Größe, Preis, Zustand), und SNYPD prüft diese Suche etwa alle 30 Sekunden. Sobald eine neue Anzeige passt, erscheint sie in deinem Dashboard und du bekommst eine Push-Benachrichtigung auf Handy oder Computer. SNYPD fragt nie nach deinem Vinted-Passwort, meldet sich nie in deinem Konto an, kauft nichts und schreibt keinen Verkäufern. Der kostenlose Tarif lässt eine Suche laufen: in den ersten 7 Tagen rund um die Uhr, danach solange dein Dashboard geöffnet ist. Bezahlte Tarife ab 14,99&nbsp;&euro; im Monat überwachen rund um die Uhr.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD ist ein Vinted Bot für Benachrichtigungen, auch Vinted-Monitor genannt, für Reseller. Du fügst einen Vinted-Suchlink mit deinen Filtern ein (Marke, Größe, Preis, Zustand), und SNYPD prüft diese Suche etwa alle 30 Sekunden. Sobald eine neue Anzeige passt, erscheint sie in deinem Dashboard und du bekommst eine Push-Benachrichtigung auf Handy oder Computer. SNYPD fragt nie nach deinem Vinted-Passwort, meldet sich nie in deinem Konto an, kauft nichts und schreibt keinen Verkäufern. Der kostenlose Tarif lässt eine Suche laufen: in den ersten 7 Tagen rund um die Uhr, danach solange dein Dashboard geöffnet ist. Bezahlte Tarife ab @@price:kickstart@@ im Monat überwachen rund um die Uhr.</p></div>
 </section>
 <section id="arten">
   <h2>Die drei Arten von Vinted Bots</h2>
@@ -575,13 +577,13 @@ def page_bot_nl():
         ('Moet ik SNYPD mijn Vinted-wachtwoord geven?', 'Nee. SNYPD vraagt nooit om je Vinted-inloggegevens en logt nooit in op je account. Je hebt alleen een e-mailadres nodig voor je SNYPD-account.'),
         ('Hoe vaak controleert SNYPD mijn zoekopdracht?', 'Ongeveer elke 30 seconden. ' + SPEED_MEASURED['nl'] + ' Rustige zoekopdrachten vertragen tot hooguit 5 minuten. De snelheid is op elk abonnement hetzelfde.'),
         ('Werkt het op een iPhone?', 'Ja, zodra SNYPD op je beginscherm staat: open snypd.store in Safari, tik op Deel en daarna op &ldquo;Zet op beginscherm&rdquo;, en zet de meldingen aan in de geïnstalleerde app. Apple staat webmeldingen alleen toe voor apps op het beginscherm. Op Android, Windows en Mac werken meldingen direct vanuit de browser.'),
-        ('Is er een gratis abonnement?', 'Ja. Free bevat één zoekopdracht, zonder tijdslimiet en zonder kaart. ' + TRIAL['nl'] + ' Daarna controleert Free zolang je SNYPD-dashboard open staat; betaalde abonnementen vanaf &euro;&nbsp;14,99 per maand controleren 24/7, ook als het dicht is.'),
+        ('Is er een gratis abonnement?', 'Ja. Free bevat één zoekopdracht, zonder tijdslimiet en zonder kaart. ' + TRIAL['nl'] + ' Daarna controleert Free zolang je SNYPD-dashboard open staat; betaalde abonnementen vanaf @@price:kickstart@@ per maand controleren 24/7, ook als het dicht is.'),
         ('Met welke Vinted-landen werkt het?', 'Met elke Vinted-site in Europa en de VS, 26 in totaal: vinted.nl, vinted.be, vinted.fr, vinted.de, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com en de rest. Plak een zoeklink van de site waar je koopt; prijzen verschijnen in de munteenheid van die site.'),
     ]
     body = f"""
 <section id="samenvatting">
   <h2>SNYPD in één alinea</h2>
-  <div class="lg-box lg-mint"><p>SNYPD is een Vinted bot voor meldingen, ook wel Vinted monitor genoemd, voor resellers. Je plakt een Vinted-zoeklink met je filters (merk, maat, prijs, staat) en SNYPD controleert die zoekopdracht ongeveer elke 30 seconden. Zodra een nieuwe advertentie past, verschijnt die in je dashboard en krijg je een pushmelding op je telefoon of computer. SNYPD vraagt nooit om je Vinted-wachtwoord, logt nooit in op je account, koopt niets en stuurt geen berichten naar verkopers. Het gratis abonnement laat één zoekopdracht lopen: de eerste 7 dagen 24/7, daarna zolang je dashboard open staat. Betaalde abonnementen vanaf &euro;&nbsp;14,99 per maand houden 24/7 de wacht.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD is een Vinted bot voor meldingen, ook wel Vinted monitor genoemd, voor resellers. Je plakt een Vinted-zoeklink met je filters (merk, maat, prijs, staat) en SNYPD controleert die zoekopdracht ongeveer elke 30 seconden. Zodra een nieuwe advertentie past, verschijnt die in je dashboard en krijg je een pushmelding op je telefoon of computer. SNYPD vraagt nooit om je Vinted-wachtwoord, logt nooit in op je account, koopt niets en stuurt geen berichten naar verkopers. Het gratis abonnement laat één zoekopdracht lopen: de eerste 7 dagen 24/7, daarna zolang je dashboard open staat. Betaalde abonnementen vanaf @@price:kickstart@@ per maand houden 24/7 de wacht.</p></div>
 </section>
 <section id="soorten">
   <h2>De drie soorten Vinted bots</h2>
@@ -647,13 +649,13 @@ def page_bot_it():
         ('Devo dare a SNYPD la mia password di Vinted?', 'No. SNYPD non chiede mai i tuoi dati di accesso a Vinted e non accede mai al tuo account. Per l’account SNYPD ti serve solo un indirizzo email.'),
         ('Ogni quanto SNYPD controlla la mia ricerca?', 'Circa ogni 30 secondi. ' + SPEED_MEASURED['it'] + ' Le ricerche tranquille rallentano, fino a un massimo di 5 minuti. La velocità è la stessa su ogni piano.'),
         ('Funziona su iPhone?', 'Sì, dopo aver aggiunto SNYPD alla schermata Home: apri snypd.store in Safari, tocca Condividi, poi &laquo;Aggiungi alla schermata Home&raquo;, e attiva le notifiche nell’app installata. Apple consente le notifiche web solo alle app sulla schermata Home. Su Android, Windows e Mac le notifiche funzionano direttamente dal browser.'),
-        ('C’è un piano gratuito?', 'Sì. Free include una ricerca, senza limiti di tempo e senza carta. ' + TRIAL['it'] + ' Dopo, controlla finché la tua dashboard SNYPD è aperta; i piani a pagamento da 14,99&nbsp;&euro; al mese controllano 24 ore su 24 anche quando è chiusa.'),
+        ('C’è un piano gratuito?', 'Sì. Free include una ricerca, senza limiti di tempo e senza carta. ' + TRIAL['it'] + ' Dopo, controlla finché la tua dashboard SNYPD è aperta; i piani a pagamento da @@price:kickstart@@ al mese controllano 24 ore su 24 anche quando è chiusa.'),
         ('Con quali paesi Vinted funziona?', 'Con ogni sito Vinted in Europa e negli Stati Uniti, 26 in tutto: vinted.it, vinted.fr, vinted.es, vinted.de, vinted.be, vinted.nl, vinted.pl, vinted.co.uk, vinted.com e gli altri. Incolla un link di ricerca del sito su cui compri; i prezzi appaiono nella valuta di quel sito.'),
     ]
     body = f"""
 <section id="breve">
   <h2>SNYPD in un paragrafo</h2>
-  <div class="lg-box lg-mint"><p>SNYPD è un bot Vinted per le notifiche, chiamato anche monitor Vinted, pensato per i reseller. Incolli un link di ricerca Vinted con i tuoi filtri (marca, taglia, prezzo, condizioni) e SNYPD controlla quella ricerca circa ogni 30 secondi. Appena un nuovo annuncio corrisponde, compare nella tua dashboard e ricevi una notifica push sul telefono o sul computer. SNYPD non chiede mai la tua password di Vinted, non accede mai al tuo account, non compra nulla e non scrive ai venditori. Il piano gratuito tiene attiva una ricerca: 24 ore su 24 nei primi 7 giorni, poi finché la dashboard è aperta. I piani a pagamento, da 14,99&nbsp;&euro; al mese, controllano 24 ore su 24.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD è un bot Vinted per le notifiche, chiamato anche monitor Vinted, pensato per i reseller. Incolli un link di ricerca Vinted con i tuoi filtri (marca, taglia, prezzo, condizioni) e SNYPD controlla quella ricerca circa ogni 30 secondi. Appena un nuovo annuncio corrisponde, compare nella tua dashboard e ricevi una notifica push sul telefono o sul computer. SNYPD non chiede mai la tua password di Vinted, non accede mai al tuo account, non compra nulla e non scrive ai venditori. Il piano gratuito tiene attiva una ricerca: 24 ore su 24 nei primi 7 giorni, poi finché la dashboard è aperta. I piani a pagamento, da @@price:kickstart@@ al mese, controllano 24 ore su 24.</p></div>
 </section>
 <section id="tipi">
   <h2>I tre tipi di bot Vinted</h2>
@@ -719,13 +721,13 @@ def page_bot_es():
         ('¿Tengo que darle a SNYPD mi contraseña de Vinted?', 'No. SNYPD nunca pide tus datos de acceso a Vinted y nunca inicia sesión en tu cuenta. Para tu cuenta de SNYPD solo necesitas un correo electrónico.'),
         ('¿Cada cuánto comprueba SNYPD mi búsqueda?', 'Más o menos cada 30 segundos. ' + SPEED_MEASURED['es'] + ' Las búsquedas tranquilas se ralentizan, hasta 5 minutos como máximo. La velocidad es la misma en todos los planes.'),
         ('¿Funciona en iPhone?', 'Sí, una vez que SNYPD está en tu pantalla de inicio: abre snypd.store en Safari, toca Compartir y luego &laquo;Añadir a pantalla de inicio&raquo;, y activa las notificaciones en la app instalada. Apple solo permite notificaciones web en apps de la pantalla de inicio. En Android, Windows y Mac las notificaciones funcionan directamente desde el navegador.'),
-        ('¿Hay un plan gratuito?', 'Sí. Free incluye una búsqueda, sin límite de tiempo y sin tarjeta. ' + TRIAL['es'] + ' Después, comprueba mientras tu panel de SNYPD esté abierto; los planes de pago desde 14,99&nbsp;&euro; al mes comprueban 24/7 aunque esté cerrado.'),
+        ('¿Hay un plan gratuito?', 'Sí. Free incluye una búsqueda, sin límite de tiempo y sin tarjeta. ' + TRIAL['es'] + ' Después, comprueba mientras tu panel de SNYPD esté abierto; los planes de pago desde @@price:kickstart@@ al mes comprueban 24/7 aunque esté cerrado.'),
         ('¿Con qué países de Vinted funciona?', 'Con todos los sitios de Vinted en Europa y Estados Unidos, 26 en total: vinted.es, vinted.pt, vinted.fr, vinted.it, vinted.de, vinted.be, vinted.nl, vinted.co.uk, vinted.com y los demás. Pega un enlace de búsqueda del sitio en el que compras; los precios aparecen en la moneda de ese sitio.'),
     ]
     body = f"""
 <section id="resumen">
   <h2>SNYPD en un párrafo</h2>
-  <div class="lg-box lg-mint"><p>SNYPD es un bot de Vinted para notificaciones, también llamado monitor de Vinted, pensado para revendedores. Pegas un enlace de búsqueda de Vinted con tus filtros (marca, talla, precio, estado) y SNYPD comprueba esa búsqueda más o menos cada 30 segundos. En cuanto un anuncio nuevo coincide, aparece en tu panel y recibes una notificación push en el móvil o el ordenador. SNYPD nunca pide tu contraseña de Vinted, nunca inicia sesión en tu cuenta, no compra nada y no escribe a los vendedores. El plan gratuito mantiene una búsqueda activa: 24/7 durante los primeros 7 días y, después, mientras tu panel esté abierto. Los planes de pago, desde 14,99&nbsp;&euro; al mes, vigilan 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD es un bot de Vinted para notificaciones, también llamado monitor de Vinted, pensado para revendedores. Pegas un enlace de búsqueda de Vinted con tus filtros (marca, talla, precio, estado) y SNYPD comprueba esa búsqueda más o menos cada 30 segundos. En cuanto un anuncio nuevo coincide, aparece en tu panel y recibes una notificación push en el móvil o el ordenador. SNYPD nunca pide tu contraseña de Vinted, nunca inicia sesión en tu cuenta, no compra nada y no escribe a los vendedores. El plan gratuito mantiene una búsqueda activa: 24/7 durante los primeros 7 días y, después, mientras tu panel esté abierto. Los planes de pago, desde @@price:kickstart@@ al mes, vigilan 24/7.</p></div>
 </section>
 <section id="tipos">
   <h2>Los tres tipos de bots de Vinted</h2>
@@ -801,13 +803,13 @@ def page_bot(lang):
             ('Do I need to give SNYPD my Vinted password?', 'No. SNYPD never asks for your Vinted login and never signs in to your account. You only need an email address for your SNYPD account.'),
             ('How often does SNYPD check my search?', 'About every 30 seconds. ' + SPEED_MEASURED['en'] + ' Searches that go quiet slow down to at most 5 minutes. Speed is the same on every plan.'),
             ('Does it work on iPhone?', 'Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts in the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser.'),
-            ('Is there a free plan?', 'Yes. Free includes one search with no time limit and no card. ' + TRIAL['en'] + ' After that it checks while your SNYPD dashboard is open; paid plans from &euro;14.99 a month keep checking 24/7 with it closed.'),
+            ('Is there a free plan?', 'Yes. Free includes one search with no time limit and no card. ' + TRIAL['en'] + ' After that it checks while your SNYPD dashboard is open; paid plans from @@price:kickstart@@ a month keep checking 24/7 with it closed.'),
             ('Which Vinted countries does it work with?', 'Every Vinted site in Europe and the US, 26 in all: vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com and the rest. Paste a search link from the site you shop on; prices show in that site’s currency.'),
         ]
         body = f"""
 <section id="answer">
   <h2>SNYPD in one paragraph</h2>
-  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search about every 30 seconds. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search, 24/7 for the first 7 days and then while your dashboard is open; paid plans from &euro;14.99 a month keep watching 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search about every 30 seconds. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search, 24/7 for the first 7 days and then while your dashboard is open; paid plans from @@price:kickstart@@ a month keep watching 24/7.</p></div>
 </section>
 <section id="kinds">
   <h2>The three kinds of Vinted bot</h2>
@@ -870,13 +872,13 @@ def page_bot(lang):
         ('Dois-je donner mon mot de passe Vinted ?', 'Non. SNYPD ne demande jamais tes identifiants Vinted et ne se connecte jamais à ton compte. Il te faut seulement une adresse e-mail pour ton compte SNYPD.'),
         ('À quelle fréquence SNYPD vérifie ma recherche ?', 'Environ toutes les 30 secondes. ' + SPEED_MEASURED['fr'] + ' Les recherches calmes ralentissent, jusqu’à 5 minutes au plus. La vitesse est la même pour tous les plans.'),
         ('Est-ce que ça marche sur iPhone ?', 'Oui, une fois SNYPD ajouté à l’écran d’accueil : ouvre snypd.store dans Safari, appuie sur Partager puis Sur l’écran d’accueil, et active les alertes dans l’app installée. Apple n’autorise les notifications web que pour les apps de l’écran d’accueil. Sur Android, Windows et Mac, les alertes marchent directement depuis le navigateur.'),
-        ('Y a-t-il un plan gratuit ?', 'Oui. Le plan Free comprend une recherche, sans limite de durée et sans carte. ' + TRIAL['fr'] + ' Ensuite, il vérifie tant que ton tableau de bord SNYPD est ouvert ; les plans payants, à partir de 14,99&nbsp;&euro; par mois, vérifient 24h/24 même fermé.'),
+        ('Y a-t-il un plan gratuit ?', 'Oui. Le plan Free comprend une recherche, sans limite de durée et sans carte. ' + TRIAL['fr'] + ' Ensuite, il vérifie tant que ton tableau de bord SNYPD est ouvert ; les plans payants, à partir de @@price:kickstart@@ par mois, vérifient 24h/24 même fermé.'),
         ('Avec quels pays Vinted ça fonctionne ?', 'Tous les sites Vinted d’Europe et des États-Unis, 26 au total : vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk et vinted.com, entre autres. Colle un lien de recherche du site où tu achètes ; les prix s’affichent dans la devise de ce site.'),
     ]
     body = f"""
 <section id="resume">
   <h2>SNYPD en un paragraphe</h2>
-  <div class="lg-box lg-mint"><p>SNYPD est un bot d’alertes Vinted pour les revendeurs. Tu colles le lien d’une recherche Vinted avec tes filtres (marque, taille, prix, état) et SNYPD vérifie cette recherche environ toutes les 30 secondes. Quand une nouvelle annonce correspond, elle apparaît dans ton tableau de bord et tu reçois une notification push sur ton téléphone ou ton ordinateur. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’envoie aucun message aux vendeurs. Le plan gratuit fait tourner une recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de 14,99&nbsp;&euro; par mois, surveillent 24h/24.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD est un bot d’alertes Vinted pour les revendeurs. Tu colles le lien d’une recherche Vinted avec tes filtres (marque, taille, prix, état) et SNYPD vérifie cette recherche environ toutes les 30 secondes. Quand une nouvelle annonce correspond, elle apparaît dans ton tableau de bord et tu reçois une notification push sur ton téléphone ou ton ordinateur. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’envoie aucun message aux vendeurs. Le plan gratuit fait tourner une recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:kickstart@@ par mois, surveillent 24h/24.</p></div>
 </section>
 <section id="types">
   <h2>Les trois types de bot Vinted</h2>
@@ -913,7 +915,7 @@ def page_bot(lang):
 <section id="prix">
   <h2>Combien ça coûte</h2>
   {table(PLANS_HEAD['fr'], PLANS_ROWS['fr'])}
-  <p>Facturé chaque mois, résiliable à tout moment. Le Market Report montre le prix demandé typique d’un article sur Vinted selon son état ; un exemple dans <a href="{SLUGS['prices']['fr']}">Prix Vinted</a>. Tous les détails sur <a href="/plans">la page des tarifs</a> (en anglais).</p>
+  <p>Facturé chaque mois, résiliable à tout moment. Le Market Report montre le prix demandé typique d’un article sur Vinted selon son état ; un exemple dans <a href="{SLUGS['prices']['fr']}">Prix Vinted</a>. Tous les détails sur <a href="/plans">la page des tarifs</a>.</p>
 </section>
 <section id="compte">
   <h2>Ce dont SNYPD a besoin</h2>
@@ -974,7 +976,7 @@ def page_notify(lang):
     <li>Paste it into SNYPD and switch it on.</li>
     <li>SNYPD checks it about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. The alert opens the listing on Vinted.</li>
   </ol>
-  <p>SNYPD never asks for your Vinted login. The free plan runs one search: 24/7 for the first 7 days, then while your dashboard is open; paid plans from &euro;14.99 a month keep checking 24/7. More on how it works: <a href="{SLUGS['bot']['en']}">SNYPD, the Vinted alert bot</a>.</p>
+  <p>SNYPD never asks for your Vinted login. The free plan runs one search: 24/7 for the first 7 days, then while your dashboard is open; paid plans from @@price:kickstart@@ a month keep checking 24/7. More on how it works: <a href="{SLUGS['bot']['en']}">SNYPD, the Vinted alert bot</a>.</p>
   {figure('feed', 'en')}
 </section>
 <section id="iphone">
@@ -1026,7 +1028,7 @@ def page_notify(lang):
     <li>Colle-la dans SNYPD et active-la.</li>
     <li>SNYPD la vérifie environ toutes les 30 secondes et envoie une notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li>
   </ol>
-  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de 14,99&nbsp;&euro; par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>.</p>
+  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:kickstart@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>.</p>
   {figure('feed', 'fr')}
 </section>
 <section id="iphone">
@@ -1183,7 +1185,7 @@ COMPETITORS = [
         _c(YES + 'Never: email only', YES + 'Jamais : e-mail seulement'),
         _c(YES + 'Push to phone and computer', YES + 'Push sur téléphone et ordinateur'),
         _c(YES + '14 days, full, after use', YES + '14 jours, intégral, même après usage'),
-        _c('&euro;14.99&ndash;&euro;34.99 <small>VAT incl.</small>', '14,99&ndash;34,99&nbsp;&euro; <small>TVA incluse</small>'),
+        _c('@@price:kickstart@@&ndash;@@price:elite@@ <small>VAT incl.</small>', '@@num:kickstart@@&ndash;@@price:elite@@ <small>TVA incluse</small>'),
         _c(YES + '1 search, no time limit, 24/7 for the first 7 days', YES + '1 recherche, sans limite de durée, 24h/24 les 7 premiers jours')]},
     # souk.to/en + souk.to/en/docs/autobuy ("To use Autobuy, first link your Vinted account from the Souk settings.", re-read 3 Oct 2026)
     {'name': ('Souk', 'Souk'), 'url': 'https://souk.to/en', 'cells': [
@@ -1299,7 +1301,7 @@ def reasons(lang):
     if lang == 'en':
         R = [
             ('Price data is built in',
-             'Pro (&euro;24.99 a month) includes the Market Report: type an item and see its typical Vinted asking price, split by condition. It shows no price at all when the data is too thin or too mixed to trust.',
+             'Pro (@@price:pro@@ a month) includes the Market Report: type an item and see its typical Vinted asking price, split by condition. It shows no price at all when the data is too thin or too mixed to trust.',
              'Of the six other tools here, only Resell Reserve offers price estimates, and only on its &pound;44.99 Ultimate plan. See a sample: <a href="%s">Vinted prices, September 2026</a>.' % SLUGS['prices']['en']),
             ('Your Vinted account stays yours',
              'SNYPD needs an email address and nothing else: no Vinted password, no login, no browser extension. It never buys and never messages sellers. You buy through Vinted&rsquo;s normal checkout.',
@@ -1320,13 +1322,13 @@ def reasons(lang):
              'SNYPD is built by a Belgian sneaker reseller with 150+ sales and 3.8k Instagram followers, and run in the open with resellers in its Discord.',
              'Questions go to a person: <a href="mailto:%s">%s</a> or the <a href="%s">Discord</a>.' % (EMAIL, EMAIL, DISCORD)),
             ('A founding price, for life',
-             'The first 100 accounts, free accounts included, keep Pro at &euro;24.99 a month for life.',
+             'The first 100 accounts, free accounts included, keep Pro at @@founding_price@@ a month for life.',
              'The number of places left is counted live on the <a href="/">homepage</a>.'),
         ]
     else:
         R = [
             ('Les données de prix sont incluses',
-             'Pro (24,99&nbsp;&euro; par mois) inclut le Market Report : tape un article et vois son prix demandé typique sur Vinted, détaillé par état. Il n’affiche aucun prix quand les données sont trop maigres ou trop mélangées pour être fiables.',
+             'Pro (@@price:pro@@ par mois) inclut le Market Report : tape un article et vois son prix demandé typique sur Vinted, détaillé par état. Il n’affiche aucun prix quand les données sont trop maigres ou trop mélangées pour être fiables.',
              'Des six autres outils ici, seul Resell Reserve propose des estimations de prix, et seulement sur son plan Ultimate à 44,99&nbsp;&pound;. Un exemple : <a href="%s">Prix Vinted, septembre 2026</a>.' % SLUGS['prices']['fr']),
             ('Ton compte Vinted reste à toi',
              'SNYPD a besoin d’une adresse e-mail, rien d’autre : pas de mot de passe Vinted, pas de connexion, pas d’extension. Il n’achète jamais et n’écrit jamais aux vendeurs. Tu achètes avec le paiement normal de Vinted.',
@@ -1347,7 +1349,7 @@ def reasons(lang):
              'SNYPD est créé par un revendeur de sneakers belge, avec plus de 150 ventes et 3,8k abonnés Instagram, et développé au grand jour avec des revendeurs sur son Discord.',
              'Tes questions arrivent à une vraie personne : <a href="mailto:%s">%s</a> ou le <a href="%s">Discord</a>.' % (EMAIL, EMAIL, DISCORD)),
             ('Un prix fondateur, à vie',
-             'Les 100 premiers comptes, gratuits compris, gardent Pro à 24,99&nbsp;&euro; par mois à vie.',
+             'Les 100 premiers comptes, gratuits compris, gardent Pro à @@founding_price@@ par mois à vie.',
              'Le nombre de places restantes est affiché en direct sur la <a href="/">page d’accueil</a>.'),
         ]
     cards = ''.join('<div class="rs-card"><span class="rs-num">%02d</span><h3 class="rs-title">%s</h3><p>%s</p><p class="rs-proof">%s</p></div>' % (i + 1, t, b, p)
@@ -1408,7 +1410,7 @@ def page_compare(lang):
   <ul class="fit-list">
     <li><strong>They can buy for you.</strong>Souk, V-Tools and Resell Reserve sell autobuy. Buying on Vinted needs a logged-in account, so those features act through yours. SNYPD never signs in as you, so every purchase stays your decision, made on Vinted.</li>
     <li><strong>They post alerts in Telegram or Discord.</strong>Telvin sends alerts in Telegram, Resell Reserve in Discord, MarktAlert by Telegram, email or webhooks. SNYPD sends push notifications to your phone or computer only: no extra app or server to join, but no Telegram or Discord option.</li>
-    <li><strong>Their first paid plan costs less.</strong>Telvin starts at &euro;4.90 a month and MarktAlert at &euro;6.95. SNYPD&rsquo;s first paid plan, Kickstart, is &euro;14.99 and watches 2 searches 24/7; the Market Report starts with Pro at &euro;24.99.</li>
+    <li><strong>Their first paid plan costs less.</strong>Telvin starts at &euro;4.90 a month and MarktAlert at &euro;6.95. SNYPD&rsquo;s first paid plan, Kickstart, is @@price:kickstart@@ and watches 2 searches 24/7; the Market Report starts with Pro at @@price:pro@@.</li>
   </ul>
 </section>
 <section id="speed">
@@ -1458,7 +1460,7 @@ def page_compare(lang):
   <ul class="fit-list">
     <li><strong>Ils peuvent acheter à ta place.</strong>Souk, V-Tools et Resell Reserve vendent de l’achat automatique. Acheter sur Vinted demande un compte connecté, donc ces fonctions passent par le tien. SNYPD ne se connecte jamais à ta place : chaque achat reste ta décision, sur Vinted.</li>
     <li><strong>Ils envoient les alertes dans Telegram ou Discord.</strong>Telvin alerte dans Telegram, Resell Reserve dans Discord, MarktAlert par Telegram, e-mail ou webhooks. SNYPD envoie uniquement des notifications push sur ton téléphone ou ton ordinateur : pas d’app ni de serveur en plus à rejoindre, mais pas d’option Telegram ou Discord.</li>
-    <li><strong>Leur premier plan payant coûte moins cher.</strong>Telvin commence à 4,90 &euro; par mois et MarktAlert à 6,95 &euro;. Le premier plan payant de SNYPD, Kickstart, coûte 14,99 &euro; et surveille 2 recherches 24h/24 ; le Market Report commence avec Pro à 24,99 &euro;.</li>
+    <li><strong>Leur premier plan payant coûte moins cher.</strong>Telvin commence à 4,90 &euro; par mois et MarktAlert à 6,95 &euro;. Le premier plan payant de SNYPD, Kickstart, coûte @@price:kickstart@@ et surveille 2 recherches 24h/24 ; le Market Report commence avec Pro à @@price:pro@@.</li>
   </ul>
 </section>
 <section id="vitesse">
@@ -1808,7 +1810,7 @@ def page_prices(lang):
 </section>
 <section id="report">
   <h2>Price any item yourself</h2>
-  <p>The Market Report in SNYPD Pro and Elite does this for any search you type, broken down by condition, and refuses to show a number when the data is too thin or too mixed. Pro is &euro;24.99 a month and also watches 5 Vinted searches 24/7. <a href="/plans">See plans</a>.</p>
+  <p>The Market Report in SNYPD Pro and Elite does this for any search you type, broken down by condition, and refuses to show a number when the data is too thin or too mixed. Pro is @@price:pro@@ a month and also watches 5 Vinted searches 24/7. <a href="/plans">See plans</a>.</p>
   {figure('market', 'en')}
   {cta('en')}
 </section>"""
@@ -1864,7 +1866,7 @@ def page_prices(lang):
 </section>
 <section id="market-report">
   <h2>Estime le prix de n’importe quel article</h2>
-  <p>Le Market Report de SNYPD Pro et Elite fait ce calcul pour n’importe quelle recherche, détaillé par état, et refuse d’afficher un chiffre quand les données sont trop maigres ou trop mélangées. Pro coûte 24,99&nbsp;&euro; par mois et surveille aussi 5 recherches Vinted 24h/24. <a href="/plans">Voir les tarifs</a>.</p>
+  <p>Le Market Report de SNYPD Pro et Elite fait ce calcul pour n’importe quelle recherche, détaillé par état, et refuse d’afficher un chiffre quand les données sont trop maigres ou trop mélangées. Pro coûte @@price:pro@@ par mois et surveille aussi 5 recherches Vinted 24h/24. <a href="/plans">Voir les tarifs</a>.</p>
   {figure('market', 'fr')}
   {cta('fr')}
 </section>"""
@@ -1960,7 +1962,7 @@ def page_deals(lang):
 <section id="first">
   <h2>3. Be first: get alerted, don&rsquo;t refresh</h2>
   <p>Everyone watching the same search can see a new listing the moment it appears, so the first to notice it gets the first chance. Vinted&rsquo;s saved searches show a &ldquo;+N&rdquo; counter the next time you open the app; they do not send a notification for each new match (<a href="{SLUGS['notify']['en']}">how Vinted notifications work</a>). To hear about a new match while you are doing something else, you need a tool that watches the search for you.</p>
-  <p>SNYPD checks each search about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. The free plan runs one search, 24/7 for the first 7 days and then while your dashboard is open; paid plans from &euro;14.99 a month keep watching 24/7.</p>
+  <p>SNYPD checks each search about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. The free plan runs one search, 24/7 for the first 7 days and then while your dashboard is open; paid plans from @@price:kickstart@@ a month keep watching 24/7.</p>
   {figure('feed', 'en')}
 </section>
 <section id="check">
@@ -2441,6 +2443,8 @@ def page_notwork(lang):
 def write(rel, text):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    if not rel.endswith('.csv'):
+        text = plans.fill(text, plans.page_lang(text))
     data = text.encode('utf-8')
     if not os.path.isfile(path) or open(path, 'rb').read() != data:
         open(path, 'wb').write(data)

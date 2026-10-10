@@ -192,7 +192,7 @@ def page_item(it, lang):
   <h2>Get an alert for a cheap {esc(name)}</h2>
   <p>SNYPD checks a Vinted search about every 30 seconds and sends new matches to your phone, so you don't have to keep refreshing Vinted. Start the search below with a maximum of {money(lo, 'en')}, the cheapest quarter, and change it any time.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">ALERT ME UNDER {money(lo, 'en')}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['en']}">HOW SNYPD WORKS</a></div>
-  <p class="ct-note">Free: one search, 24/7 for the first 7 days. No card.</p>
+  <p class="ct-note">Free: one search, 24/7 for the first @@trial_days@@ days. No card.</p>
 </section>
 <section id="method">
   <h2>How these numbers are made</h2>
@@ -251,7 +251,7 @@ def page_item(it, lang):
   <h2>Reçois une alerte pour {esc(name)} pas cher</h2>
   <p>SNYPD vérifie une recherche Vinted environ toutes les 30 secondes et envoie les nouvelles annonces sur ton téléphone, sans que tu aies à rafraîchir Vinted. Lance la recherche ci-dessous avec un maximum de {money(lo, 'fr')}, le quart le moins cher, et change-le quand tu veux.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">M’ALERTER SOUS {money(lo, 'fr')}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['fr']}">COMMENT MARCHE SNYPD</a></div>
-  <p class="ct-note">Gratuit{nb}: une recherche, 24h/24 pendant les 7 premiers jours. Sans carte. L’inscription est pour l’instant en anglais.</p>
+  <p class="ct-note">Gratuit{nb}: une recherche, 24h/24 pendant les @@trial_days@@ premiers jours. Sans carte. Inscription en français{nb}; le paiement (Whop) est en anglais.</p>
 </section>
 <section id="methode">
   <h2>D’où viennent ces chiffres</h2>
