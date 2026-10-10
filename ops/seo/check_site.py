@@ -68,6 +68,9 @@ ALLOW = [
      "a competitor's own claim, attributed"),
     ('vinted-bot-comparison.html', r'Which Vinted bot is the fastest\?', 'FAQ question answered "there is no fair way to say"'),
     ('fr/comparatif-bot-vinted.html', r'Quel est le bot Vinted le plus rapide', 'FAQ question answered "impossible de le dire"'),
+    # comparison pages in every language quote these vendor claims, in quotes, attributed, then say they can't be compared
+    ('*', r'Telvin\W{1,3}750 ?ms', "Telvin's own claim, quoted and attributed"),
+    ('*', r'Resell Vault\W{1,3}0\.14 ?ms', "Resell Vault's own claim, quoted and attributed"),
 ]
 
 # 2. Price next to a plan name.
