@@ -71,6 +71,9 @@ ALLOW = [
     # comparison pages in every language quote these vendor claims, in quotes, attributed, then say they can't be compared
     ('*', r'Telvin\W{1,3}750 ?ms', "Telvin's own claim, quoted and attributed"),
     ('*', r'Resell Vault\W{1,3}0\.14 ?ms', "Resell Vault's own claim, quoted and attributed"),
+    # work order 18 step 5 (Tanush OK 10 Oct 2026): the question people type, on its own page only, always answered "No"
+    ('vinted-sold-items.html', r'(?:Can you see|Does Vinted show) (?:sold items and )?sold prices(?: on Vinted)?\?',
+     'the sold-items page asks the searched question and answers "No"'),
 ]
 
 # 2. Price next to a plan name.

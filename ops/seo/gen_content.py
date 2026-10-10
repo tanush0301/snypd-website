@@ -117,6 +117,10 @@ SLUGS = {
     'notwork': {'en': '/vinted-notifications-not-working', 'fr': '/fr/notification-vinted-ne-fonctionne-pas',
                 'de': '/de/vinted-benachrichtigung-funktioniert-nicht', 'nl': '/nl/vinted-meldingen-werken-niet',
                 'it': '/it/notifiche-vinted-non-funzionano', 'es': '/es/notificaciones-vinted-no-funcionan'},
+    # work order 18 step 5; both rendered by gen_price_guide.py (they need the price data)
+    'sold':    {'en': '/vinted-sold-items', 'fr': '/fr/vinted-voir-articles-vendus', 'de': '/de/vinted-verkaufte-artikel-sehen',
+                'it': '/it/vinted-vedere-articoli-venduti', 'es': '/es/vinted-ver-articulos-vendidos'},
+    'checker': {'en': '/vinted-price-checker', 'fr': '/fr/estimer-prix-vinted'},
 }
 
 CSS = r"""
@@ -204,6 +208,20 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-lang > summary { list-style: none; cursor: pointer; }
 .lg-lang > summary::-webkit-details-marker { display: none; }
 .lg-lang > div { position: absolute; left: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
+.pc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 18px; margin: 0 0 18px; }
+.pc label { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.pc input { width: 100%; box-sizing: border-box; min-height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #3A3A40; border-radius: 0; }
+.pc input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+.lg-doc .pc-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-doc .pc-list li { margin: 0; }
+.pc-list button { font: inherit; font-size: 12px; color: #E8EAEB; background: #141416; border: 1px solid #3A3A40; padding: 9px 12px; min-height: 40px; cursor: pointer; text-align: left; }
+.pc-list button:hover, .pc-list button[aria-pressed="true"] { border-color: #00E5A0; color: #FFFFFF; }
+.pc-res { margin-top: 16px; border-top: 1px solid #1D1D20; padding-top: 16px; }
+.pc-res[hidden] { display: none; }
+.lg-doc .pc-res h3 { margin-top: 0; }
+.pc-big { display: block; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; margin: 2px 0 12px; }
+.pc-msg { font-size: 12.5px; color: #8B9094; margin: 10px 0 0; }
+.pc-az { columns: 2 240px; column-gap: 32px; }
 """
 
 UI = {
@@ -211,7 +229,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/vinted-price-guide', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
-               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('/vinted-market-report', 'Vinted market report'), 
+               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'), ('sold', 'Vinted sold items'),('/vinted-market-report', 'Vinted market report'), 
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
@@ -219,7 +237,7 @@ UI = {
                nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('checker', 'Estimer un prix Vinted'), ('sold', 'Articles vendus sur Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
@@ -227,7 +245,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
                login='ANMELDEN', start='LOSLEGEN',
                foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
-               foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('compare', 'Vinted Bots im Vergleich'), ('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
+               foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/vinted-price-guide', 'Vinted-Preise (EN)'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
@@ -243,7 +261,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PREZZI'), (DISCORD, 'DISCORD')],
                login='ACCEDI', start='INIZIA',
                foot_tag='SNYPD &middot; NON AFFILIATO A VINTED', foot_t='Legge solo annunci pubblici.',
-               foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('compare', 'Bot Vinted a confronto'), ('fees', 'Commissioni Vinted (EN)'),
+               foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('compare', 'Bot Vinted a confronto'), ('sold', 'Vedere gli articoli venduti su Vinted'), ('/vinted-price-guide', 'Prezzi Vinted (EN)'),('fees', 'Commissioni Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Supporto (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:snypd@gmail.com">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
                home='Home'),
@@ -251,7 +269,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PRECIOS'), (DISCORD, 'DISCORD')],
                login='ENTRAR', start='EMPEZAR',
                foot_tag='SNYPD &middot; SIN RELACIÓN CON VINTED', foot_t='Solo lee anuncios públicos.',
-               foot=[('bot', 'Bot de Vinted'), ('notify', 'Alertas de Vinted para anuncios nuevos'), ('notwork', 'Notificaciones de Vinted no funcionan'), ('compare', 'Bots de Vinted comparados'), ('fees', 'Comisiones de Vinted (EN)'),
+               foot=[('bot', 'Bot de Vinted'), ('notify', 'Alertas de Vinted para anuncios nuevos'), ('notwork', 'Notificaciones de Vinted no funcionan'), ('compare', 'Bots de Vinted comparados'), ('sold', 'Ver artículos vendidos en Vinted'), ('/vinted-price-guide', 'Precios de Vinted (EN)'),('fees', 'Comisiones de Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Soporte (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:snypd@gmail.com">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
                home='Inicio'),
@@ -268,7 +286,7 @@ def live_langs(key):
     return [l for l in ('en', 'fr', 'de', 'nl', 'it', 'es') if l in SLUGS[key] and LIVE[l] and (key, l) not in HOLD]
 # Last real content change per page (shown as 'Updated' and used as dateModified).
 PAGE_MODIFIED = {'bot': '2026-10-09', 'notify': '2026-10-10', 'compare': '2026-10-10', 'deals': '2026-10-09', 'fees': '2026-10-02',
-                 'monitor': '2026-10-09', 'notwork': '2026-10-09'}
+                 'monitor': '2026-10-09', 'notwork': '2026-10-09', 'sold': '2026-10-10', 'checker': '2026-10-10'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
               'de': _MONTHS['de'], 'nl': _MONTHS['nl'], 'it': _MONTHS['it'], 'es': _MONTHS['es']}
@@ -1620,11 +1638,15 @@ def money(cents, lang):
         s = '{:,}'.format(cents // 100) if whole else '{:,.2f}'.format(cents / 100)
         return '&euro;' + s
     s = '{:,}'.format(cents // 100) if whole else '{:,.2f}'.format(cents / 100)
+    if lang == 'nl':  # Dutch: euro sign first, dot for thousands (same as plans.price)
+        return '&euro;&nbsp;' + s.replace(',', '#').replace('.', ',').replace('#', '.')
     s = s.replace(',', ' ').replace('.', ',')
     return s + '&nbsp;&euro;'
 
 
 def num(n, lang):
+    if lang == 'nl':
+        return '{:,}'.format(n).replace(',', '.')
     return '{:,}'.format(n) if lang == 'en' else '{:,}'.format(n).replace(',', ' ')
 
 
@@ -2261,6 +2283,7 @@ def nl_review_file(pages):
     out = ['# Dutch review: alert page + comparison (work order 18, step 4)', '',
            'Written ' + datetime.date.today().isoformat() + '. These two pages are built but NOT published (gen_content.HOLD).',
            'Read them as a Dutch-speaking reseller would. Reply "NL ok" or list the lines to change.',
+           'Step 5 adds the Dutch price guide to the SAME review: outreach/19b-nl-review-step5.md. One "NL ok" covers both files.',
            'Preview files (open in a browser): ops/seo/preview/' + ', ops/seo/preview/'.join(r.replace('/', '-') for r, _ in pages), '']
     for rel, text in pages:
         main = text.split('<main>', 1)[1].split('</main>', 1)[0]

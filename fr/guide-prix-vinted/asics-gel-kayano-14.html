@@ -111,6 +111,20 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-lang > summary { list-style: none; cursor: pointer; }
 .lg-lang > summary::-webkit-details-marker { display: none; }
 .lg-lang > div { position: absolute; left: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
+.pc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 18px; margin: 0 0 18px; }
+.pc label { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.pc input { width: 100%; box-sizing: border-box; min-height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #3A3A40; border-radius: 0; }
+.pc input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+.lg-doc .pc-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-doc .pc-list li { margin: 0; }
+.pc-list button { font: inherit; font-size: 12px; color: #E8EAEB; background: #141416; border: 1px solid #3A3A40; padding: 9px 12px; min-height: 40px; cursor: pointer; text-align: left; }
+.pc-list button:hover, .pc-list button[aria-pressed="true"] { border-color: #00E5A0; color: #FFFFFF; }
+.pc-res { margin-top: 16px; border-top: 1px solid #1D1D20; padding-top: 16px; }
+.pc-res[hidden] { display: none; }
+.lg-doc .pc-res h3 { margin-top: 0; }
+.pc-big { display: block; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; margin: 2px 0 12px; }
+.pc-msg { font-size: 12.5px; color: #8B9094; margin: 10px 0 0; }
+.pc-az { columns: 2 240px; column-gap: 32px; }
 
 .rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
 @media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -235,7 +249,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 </section>
 <section id="methode">
   <h2>D’où viennent ces chiffres</h2>
-  <p>SNYPD collecte les nouvelles annonces vinted.be pour les recherches de ses utilisateurs. Cette page utilise les 2 902 annonces Asics Gel-Kayano 14 vues du 25 septembre au 9 octobre 2026 : le prix typique est le prix demandé médian, la moitié centrale va du 25e au 75e centile. Ce sont des prix demandés, pas des prix de vente : Vinted ne publie pas le prix auquel les articles se vendent. Les prix peuvent différer sur les autres sites Vinted. Mis à jour chaque mois ; les chiffres sont libres de réutilisation avec un lien vers cette page (<a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>).</p>
+  <p>SNYPD collecte les nouvelles annonces vinted.be pour les recherches de ses utilisateurs. Cette page utilise les 2 902 annonces Asics Gel-Kayano 14 vues du 25 septembre au 9 octobre 2026 : le prix typique est le prix demandé médian, la moitié centrale va du 25e au 75e centile. Ce sont des prix demandés, pas des prix de vente : Vinted ne publie pas le prix auquel les articles se vendent (<a href="/fr/vinted-voir-articles-vendus">peut-on voir les articles vendus sur Vinted ?</a>). Les prix peuvent différer sur les autres sites Vinted. Mis à jour chaque mois ; les chiffres sont libres de réutilisation avec un lien vers cette page (<a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>).</p>
 </section>
 <section id="questions">
   <h2>Questions</h2>
@@ -254,7 +268,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
     <div class="lg-foot-a">
       <small>SNYPD &middot; NON AFFILIÉ À VINTED</small>
       <span class="lg-foot-t">Lit uniquement les annonces publiques.</span>
-      <span class="lg-foot-l"><a href="/fr/bot-vinted">Bot Vinted</a><a href="/fr/monitor-vinted">Monitor Vinted</a><a href="/fr/alertes-recherche-vinted">Alertes Vinted</a><a href="/fr/notification-vinted-ne-fonctionne-pas">Notifications Vinted en panne</a><a href="/fr/comparatif-bot-vinted">Comparatif des bots Vinted</a><a href="/fr/guide-prix-vinted">Guide des prix Vinted</a><a href="/fr/rapport-marche-vinted">Rapport du marché Vinted</a><a href="/fr/frais-vinted">Frais Vinted</a><a href="/faq">FAQ (anglais)</a><a href="/support">Support (anglais)</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+      <span class="lg-foot-l"><a href="/fr/bot-vinted">Bot Vinted</a><a href="/fr/monitor-vinted">Monitor Vinted</a><a href="/fr/alertes-recherche-vinted">Alertes Vinted</a><a href="/fr/notification-vinted-ne-fonctionne-pas">Notifications Vinted en panne</a><a href="/fr/comparatif-bot-vinted">Comparatif des bots Vinted</a><a href="/fr/guide-prix-vinted">Guide des prix Vinted</a><a href="/fr/estimer-prix-vinted">Estimer un prix Vinted</a><a href="/fr/vinted-voir-articles-vendus">Articles vendus sur Vinted</a><a href="/fr/rapport-marche-vinted">Rapport du marché Vinted</a><a href="/fr/frais-vinted">Frais Vinted</a><a href="/faq">FAQ (anglais)</a><a href="/support">Support (anglais)</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
     </div>
     <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a></nav>
   </div>
