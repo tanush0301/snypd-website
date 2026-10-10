@@ -1668,7 +1668,45 @@ def pct(a, b):
     return '%d%%' % round(100.0 * a / b)
 
 
-def page_deals(lang):
+# Weekly "far below typical" counts (work order 18, Step 6). HELD behind a legal gate: written only to
+# ops/seo/preview/ until Tanush confirms in writing in outreach/seo-geo-log.md. Data: ops/seo/steals_batch.py
+# (read-only, backend container; same item matching and typical prices as the price guide); the VPS cron
+# snypd-steals-weekly saves every week to ~/snypd/logs/steals-<week>.json before the 14-day retention.
+STEALS_HELD = True
+STEALS_WEEK = os.path.join(ROOT, 'ops', 'seo', 'data', 'steals-2026-W40.json')
+STEALS_MIN_ROWS = 20  # per item shown, and for the week as a whole
+STEALS_HELP_READ = '10 October 2026'
+
+
+def steals_section(path):
+    d = json.load(open(path, encoding='utf-8'))
+    names = {it['slug']: it['name'] for it in json.load(open(os.path.join(ROOT, 'ops', 'seo', 'price_items.json'), encoding='utf-8'))['items']}
+    ok = [i for i in d['items'] if 'error' not in i and i['eligible'] > 0]
+    below, elig = sum(i['below_rule'] for i in ok), sum(i['eligible'] for i in ok)
+    if below < STEALS_MIN_ROWS:
+        sys.exit('steals: %s has fewer than %d listings under the rule' % (d['week'], STEALS_MIN_ROWS))
+    shown = sorted([i for i in ok if i['below_rule'] >= STEALS_MIN_ROWS], key=lambda i: -i['share_below_pct'])
+    a = datetime.date.fromisoformat(d['from'][:10])
+    b = datetime.date.fromisoformat(d['to'][:10]) - datetime.timedelta(days=1)
+    span = '%d %s to %d %s %d' % (a.day, MONTHS_TXT['en'][a.month - 1], b.day, MONTHS_TXT['en'][b.month - 1], b.year)
+    rows = [['<a href="/vinted-price-guide/%s">%s</a>' % (i['slug'], esc(names.get(i['slug'], i['slug']))),
+             '<span class="ct-num">%s</span>' % num(i['eligible'], 'en'),
+             '<span class="ct-num">%s</span><small>%s%%</small>' % (num(i['below_rule'], 'en'), ('%.1f' % i['share_below_pct']).rstrip('0').rstrip('.')),
+             '<span class="ct-num">%d%%</span>' % round(i['median_pct_under'])] for i in shown]
+    tbl = table(['ITEM', 'NEW LISTINGS', 'AT 60% OF TYPICAL OR LESS', 'MEDIAN DISCOUNT'], rows)
+    return f"""<section id="weekly">
+  <h2>Week of {span}: listings far below the typical price</h2>
+  <p>Every item in the <a href="/vinted-price-guide">Vinted price guide</a>, counted on vinted.be for one week ({span}, Brussels time). A listing counts when its asking price was 60% or less of the typical asking price for the same item in the same condition, the figure the price guide is built on. Kids&rsquo; sizes, lots and bundles, business sellers and conditions without a typical price are left out.</p>
+  <div class="lg-box lg-mint"><p>Across {len(ok)} items, {num(below, 'en')} of {num(elig, 'en')} new listings ({pct(below, elig)}) went up at 60% or less of the typical price for their condition.</p></div>
+  {tbl}
+  <p class="ct-note">Shown: the {len(shown)} items with at least {STEALS_MIN_ROWS} such listings that week. Median discount: half of those listings were further under the typical price, half less. Asking prices, not sold prices: SNYPD can&rsquo;t tell whether these listings sold, or for how much.</p>
+  <h3>BEFORE YOU JUMP ON ONE</h3>
+  <p>A price far below the usual one is a reason to look closer, not proof of a bargain: a different colourway, wear the condition label doesn&rsquo;t show, or a fake can all explain it. Pay only through Vinted. Vinted&rsquo;s help centre: &ldquo;If you make a payment outside of Vinted&rsquo;s system (without using the Buy now button), your purchase won&rsquo;t be protected&rdquo; (<a href="{BUY_SAFE}" rel="noopener">Vinted help: Buying safely</a>, read {STEALS_HELP_READ}). For some eligible items Vinted also sells Item Verification; the listing shows a banner when it is available.</p>
+</section>
+"""
+
+
+def page_deals(lang, steals=None):
     d = json.load(open(DEALS, encoding='utf-8'))
     models = d['models']
     start = datetime.date.fromisoformat(d['window_start'][:10])
@@ -1719,7 +1757,7 @@ def page_deals(lang):
   <p>The pattern differs by model. On {top['name']}, half-price listings are common, so a cheap one proves little on its own: check the size, colourway and wear first. On {rare['name']}, only {num(rare['under50'], 'en')} of {num(rare['n'], 'en')} new listings went up at half price or less, so a big discount there is unusual and worth both speed and a closer look.</p>
   <p class="ct-note">How these numbers are made is under <a href="#method">method and limits</a>. Asking prices, not sold prices.</p>
 </section>
-<section id="price">
+{steals_section(steals) if steals else ''}<section id="price">
   <h2>1. Know the typical price for the exact condition</h2>
   <p>A price only looks low against the right comparison. Condition moves Vinted prices a lot: on {top['name']}, the typical New with tags price is {nwt / good:.1f} times the Good one. Typical asking prices for new {top['name']} listings, {span}:</p>
   {table(['CONDITION', 'TYPICAL ASKING PRICE', 'LISTINGS'], ladder_rows)}
@@ -1777,7 +1815,7 @@ def page_deals(lang):
                 'How to find Vinted deals and steals: real data on how often listings go up far below the typical price, and four steps to see the right one first.',
                 'VINTED DEALS &middot; GUIDE', 'How to find Vinted deals before anyone else',
                 f'Low prices on Vinted are common; good deals that are still the item you want, seen before anyone else, are not. This guide uses {num(sum(m["n"] for m in models), "en")} real vinted.be listings from {span} to show how often deep discounts appear, then the four steps that get you to them first.',
-                [('answer', 'Short answer'), ('data', 'How often'), ('price', 'Know the price'), ('search', 'Search narrow'), ('first', 'Be first'), ('check', 'Check first'), ('method', 'Method'), ('faq', 'Questions')],
+                [('answer', 'Short answer'), ('data', 'How often')] + ([('weekly', 'This week')] if steals else []) + [('price', 'Know the price'), ('search', 'Search narrow'), ('first', 'Be first'), ('check', 'Check first'), ('method', 'Method'), ('faq', 'Questions')],
                 body, [faq_ld(faq)])
 
 
@@ -2365,6 +2403,8 @@ if __name__ == '__main__':
     if held:
         nl_review_file(held)
     write('vinted-deals.html', page_deals('en'))
+    if STEALS_HELD:
+        write('ops/seo/preview/vinted-deals-weekly.html', page_deals('en', STEALS_WEEK))
     write('404.html', page_404())
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):
         write(SLUGS['monitor'][lang].lstrip('/') + '.html', page_monitor(lang))
