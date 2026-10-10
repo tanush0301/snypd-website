@@ -40,7 +40,6 @@ PAGES = [
     ('/vinted-bot',                 'vinted-bot.html',                 None),
     ('/vinted-saved-search-alerts', 'vinted-saved-search-alerts.html', None),
     ('/vinted-bot-comparison',      'vinted-bot-comparison.html',      None),
-    ('/vinted-prices',              'vinted-prices.html',              None),
     ('/vinted-deals',               'vinted-deals.html',               None),
     ('/vinted-fees',                'vinted-fees.html',                None),
     ('/vinted-monitor',             'vinted-monitor.html',             None),

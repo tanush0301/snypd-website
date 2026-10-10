@@ -6,7 +6,9 @@
     { "source": "/sign-in", "destination": "/login", "permanent": true },
     { "source": "/sign-up", "destination": "/signup", "permanent": true },
     { "source": "/pricing", "destination": "/plans", "permanent": true },
-    { "source": "/filters", "destination": "/dashboard", "permanent": true }
+    { "source": "/filters", "destination": "/dashboard", "permanent": true },
+    { "source": "/vinted-prices", "destination": "/vinted-market-report/september-2026", "permanent": true },
+    { "source": "/fr/prix-vinted", "destination": "/fr/rapport-marche-vinted/septembre-2026", "permanent": true }
   ],
   "rewrites": [
     { "source": "/favicon.ico", "destination": "/assets/icons/icon-192.png" }

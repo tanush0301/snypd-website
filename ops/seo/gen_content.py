@@ -6,7 +6,8 @@
 #   python ops/seo/gen_content.py
 #
 # Writes: vinted-bot.html, vinted-saved-search-alerts.html, vinted-bot-comparison.html,
-#         vinted-prices.html, vinted-prices-2026-09.csv and fr/*.html
+#         the other SEO pages and fr/*.html. (The September price page moved to
+#         gen_market_report.py on 10 Oct 2026 as an archived Market Report edition.)
 #
 # RULES FOR EDITING THE COPY
 # - Every product fact must match what SNYPD really does (CLAUDE.md, plans.html's
@@ -14,9 +15,8 @@
 #   alerts, re-list filtering, per-plan speed differences, "allowed by Vinted".
 # - Competitor facts come from each vendor's own website and carry the date they
 #   were checked (CHECKED). Re-check them before changing that date.
-# - Prices on vinted-prices come ONLY from ops/seo/data/price-report-*.json, which
-#   is the real Market Report output (ops/seo/price_report_batch.py, run inside
-#   the backend container). Never type a price by hand.
+# - Prices come ONLY from ops/seo/data/*.json, the real Market Report output (run
+#   inside the backend container). Never type a price by hand.
 import csv, datetime, html, io, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import plans  # noqa: E402  (plan facts: ops/seo/data/plans.json)
@@ -42,8 +42,6 @@ LANG_NAME = {'en': 'English', 'fr': 'Français', 'de': 'Deutsch', 'nl': 'Nederla
 # MARKETS, verified live 2026-10-01). Update together with that list.
 MARKETS_TEXT = {'en': 'every Vinted site in Europe and the US', 'fr': 'tous les sites Vinted d’Europe et des États-Unis',
                 'de': 'jede Vinted-Seite in Europa und den USA', 'nl': 'elke Vinted-site in Europa en de VS'}
-REPORT = os.path.join(ROOT, 'ops', 'seo', 'data', 'price-report-2026-09.json')
-REPORT_CSV = 'vinted-prices-2026-09.csv'
 # How often SNYPD really checks a hunt, measured from the scraper's own log by
 # ops/seo/check_interval.py. The copy says "about every 30 seconds" only while the
 # measured median is 30 s: re-measure (and fix the copy) before changing either.
@@ -108,7 +106,6 @@ SLUGS = {
                 'it': '/it/bot-vinted', 'es': '/es/bot-vinted'},
     'notify':  {'en': '/vinted-saved-search-alerts', 'fr': '/fr/alertes-recherche-vinted'},
     'compare': {'en': '/vinted-bot-comparison',      'fr': '/fr/comparatif-bot-vinted'},
-    'prices':  {'en': '/vinted-prices',              'fr': '/fr/prix-vinted'},
     'deals':   {'en': '/vinted-deals'},  # English only for now (decided 2026-10-02)
     'fees':    {'en': '/vinted-fees',                'fr': '/fr/frais-vinted'},
     'monitor': {'en': '/vinted-monitor',             'fr': '/fr/monitor-vinted'},
@@ -209,7 +206,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/vinted-price-guide', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
-               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('/vinted-market-report', 'Vinted market report'), ('prices', 'Vinted prices (Sept 2026)'),
+               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('/vinted-market-report', 'Vinted market report'), 
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
@@ -217,7 +214,7 @@ UI = {
                nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('prices', 'Prix Vinted (sept. 2026)'), ('fees', 'Frais Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
@@ -260,7 +257,7 @@ def live_langs(key):
     """Published languages of a page, English first."""
     return [l for l in ('en', 'fr', 'de', 'nl', 'it', 'es') if l in SLUGS[key] and LIVE[l]]
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-09', 'notify': '2026-10-09', 'compare': '2026-10-09', 'prices': '2026-10-02', 'deals': '2026-10-09', 'fees': '2026-10-02',
+PAGE_MODIFIED = {'bot': '2026-10-09', 'notify': '2026-10-09', 'compare': '2026-10-09', 'deals': '2026-10-09', 'fees': '2026-10-02',
                  'monitor': '2026-10-09', 'notwork': '2026-10-09'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
@@ -548,7 +545,7 @@ def page_bot_de():
 <section id="kosten">
   <h2>Was es kostet</h2>
   {table(PLANS_HEAD['de'], PLANS_ROWS['de'])}
-  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel unter <a href="{SLUGS['prices']['en']}">Vinted-Preise</a> (auf Englisch). Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
+  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel unter <a href="/vinted-price-guide">Vinted-Preisführer</a> (auf Englisch). Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
 </section>
 <section id="konto">
   <h2>Was SNYPD von dir braucht</h2>
@@ -620,7 +617,7 @@ def page_bot_nl():
 <section id="kosten">
   <h2>Wat het kost</h2>
   {table(PLANS_HEAD['nl'], PLANS_ROWS['nl'])}
-  <p>Maandelijks gefactureerd, altijd opzegbaar. Het Market Report toont de typische vraagprijs van een artikel op Vinted per staat; een voorbeeld op <a href="{SLUGS['prices']['en']}">Vinted-prijzen</a> (in het Engels). Alle details op de <a href="/plans">abonnementenpagina</a> (in het Engels).</p>
+  <p>Maandelijks gefactureerd, altijd opzegbaar. Het Market Report toont de typische vraagprijs van een artikel op Vinted per staat; een voorbeeld op <a href="/vinted-price-guide">Vinted-prijsgids</a> (in het Engels). Alle details op de <a href="/plans">abonnementenpagina</a> (in het Engels).</p>
 </section>
 <section id="account">
   <h2>Wat SNYPD van je nodig heeft</h2>
@@ -692,7 +689,7 @@ def page_bot_it():
 <section id="costi">
   <h2>Quanto costa</h2>
   {table(PLANS_HEAD['it'], PLANS_ROWS['it'])}
-  <p>Fatturazione mensile, disdici quando vuoi. Il Market Report mostra il prezzo richiesto tipico di un articolo su Vinted per condizione; un esempio su <a href="{SLUGS['prices']['en']}">prezzi Vinted</a> (in inglese). Tutti i dettagli nella <a href="/plans">pagina dei piani</a> (in inglese).</p>
+  <p>Fatturazione mensile, disdici quando vuoi. Il Market Report mostra il prezzo richiesto tipico di un articolo su Vinted per condizione; un esempio su <a href="/vinted-price-guide">guida ai prezzi Vinted</a> (in inglese). Tutti i dettagli nella <a href="/plans">pagina dei piani</a> (in inglese).</p>
 </section>
 <section id="account">
   <h2>Cosa ti chiede SNYPD</h2>
@@ -764,7 +761,7 @@ def page_bot_es():
 <section id="precio">
   <h2>Cuánto cuesta</h2>
   {table(PLANS_HEAD['es'], PLANS_ROWS['es'])}
-  <p>Facturación mensual, cancela cuando quieras. El Market Report muestra el precio pedido típico de un artículo en Vinted según su estado; un ejemplo en <a href="{SLUGS['prices']['en']}">precios de Vinted</a> (en inglés). Todos los detalles en la <a href="/plans">página de planes</a> (en inglés).</p>
+  <p>Facturación mensual, cancela cuando quieras. El Market Report muestra el precio pedido típico de un artículo en Vinted según su estado; un ejemplo en <a href="/vinted-price-guide">guía de precios de Vinted</a> (en inglés). Todos los detalles en la <a href="/plans">página de planes</a> (en inglés).</p>
 </section>
 <section id="cuenta">
   <h2>Qué necesita SNYPD de ti</h2>
@@ -846,7 +843,7 @@ def page_bot(lang):
 <section id="pricing">
   <h2>What it costs</h2>
   {table(PLANS_HEAD['en'], PLANS_ROWS['en'])}
-  <p>Billed monthly, cancel any time. The Market Report shows the typical Vinted asking price of an item by condition; see a sample in <a href="{SLUGS['prices']['en']}">Vinted prices</a>. Full details on <a href="/plans">the plans page</a>.</p>
+  <p>Billed monthly, cancel any time. The Market Report shows the typical Vinted asking price of an item by condition; see a sample in <a href="/vinted-price-guide">Vinted price guide</a>. Full details on <a href="/plans">the plans page</a>.</p>
 </section>
 <section id="account">
   <h2>What SNYPD needs from you</h2>
@@ -915,7 +912,7 @@ def page_bot(lang):
 <section id="prix">
   <h2>Combien ça coûte</h2>
   {table(PLANS_HEAD['fr'], PLANS_ROWS['fr'])}
-  <p>Facturé chaque mois, résiliable à tout moment. Le Market Report montre le prix demandé typique d’un article sur Vinted selon son état ; un exemple dans <a href="{SLUGS['prices']['fr']}">Prix Vinted</a>. Tous les détails sur <a href="/plans">la page des tarifs</a>.</p>
+  <p>Facturé chaque mois, résiliable à tout moment. Le Market Report montre le prix demandé typique d’un article sur Vinted selon son état ; un exemple dans <a href="/fr/guide-prix-vinted">Guide des prix Vinted</a>. Tous les détails sur <a href="/plans">la page des tarifs</a>.</p>
 </section>
 <section id="compte">
   <h2>Ce dont SNYPD a besoin</h2>
@@ -1302,7 +1299,7 @@ def reasons(lang):
         R = [
             ('Price data is built in',
              'Pro (@@price:pro@@ a month) includes the Market Report: type an item and see its typical Vinted asking price, split by condition. It shows no price at all when the data is too thin or too mixed to trust.',
-             'Of the six other tools here, only Resell Reserve offers price estimates, and only on its &pound;44.99 Ultimate plan. See a sample: <a href="%s">Vinted prices, September 2026</a>.' % SLUGS['prices']['en']),
+             'Of the six other tools here, only Resell Reserve offers price estimates, and only on its &pound;44.99 Ultimate plan. See a sample: <a href="/vinted-price-guide">Vinted price guide</a>.'),
             ('Your Vinted account stays yours',
              'SNYPD needs an email address and nothing else: no Vinted password, no login, no browser extension. It never buys and never messages sellers. You buy through Vinted&rsquo;s normal checkout.',
              'Autobuy needs your account: Souk&rsquo;s docs say &ldquo;To use Autobuy, first link your Vinted account&rdquo;, and V-Tools&rsquo; plans come with connected Vinted accounts. V-Tools&rsquo; own FAQ on bans: &ldquo;No tool can guarantee zero risk.&rdquo;'),
@@ -1329,7 +1326,7 @@ def reasons(lang):
         R = [
             ('Les données de prix sont incluses',
              'Pro (@@price:pro@@ par mois) inclut le Market Report : tape un article et vois son prix demandé typique sur Vinted, détaillé par état. Il n’affiche aucun prix quand les données sont trop maigres ou trop mélangées pour être fiables.',
-             'Des six autres outils ici, seul Resell Reserve propose des estimations de prix, et seulement sur son plan Ultimate à 44,99&nbsp;&pound;. Un exemple : <a href="%s">Prix Vinted, septembre 2026</a>.' % SLUGS['prices']['fr']),
+             'Des six autres outils ici, seul Resell Reserve propose des estimations de prix, et seulement sur son plan Ultimate à 44,99&nbsp;&pound;. Un exemple : <a href="/fr/guide-prix-vinted">Guide des prix Vinted</a>.'),
             ('Ton compte Vinted reste à toi',
              'SNYPD a besoin d’une adresse e-mail, rien d’autre : pas de mot de passe Vinted, pas de connexion, pas d’extension. Il n’achète jamais et n’écrit jamais aux vendeurs. Tu achètes avec le paiement normal de Vinted.',
              'L’achat automatique passe par ton compte : la doc de Souk dit « To use Autobuy, first link your Vinted account », et les plans de V-Tools incluent des comptes Vinted connectés. La FAQ de V-Tools sur les bannissements : « No tool can guarantee zero risk ».'),
@@ -1683,22 +1680,7 @@ def page_monitor(lang):
                 body, [faq_ld(faq)])
 
 
-# ------------------------------------------------------------------ page: prices
-ITEMS = [  # query as run in the Market Report, display name, group
-    ('jordan 1 mid', 'Air Jordan 1 Mid', 'sneakers'), ('nike dunk low', 'Nike Dunk Low', 'sneakers'),
-    ('nike air force 1', 'Nike Air Force 1', 'sneakers'), ('air max 90', 'Nike Air Max 90', 'sneakers'),
-    ('air max 95', 'Nike Air Max 95', 'sneakers'), ('adidas samba', 'adidas Samba', 'sneakers'),
-    ('adidas gazelle', 'adidas Gazelle', 'sneakers'), ('adidas campus', 'adidas Campus', 'sneakers'),
-    ('new balance 550', 'New Balance 550', 'sneakers'), ('new balance 9060', 'New Balance 9060', 'sneakers'),
-    ('new balance 2002r', 'New Balance 2002R', 'sneakers'), ('salomon xt-6', 'Salomon XT-6', 'sneakers'),
-    ('asics gel kayano', 'ASICS Gel-Kayano', 'sneakers'),
-    ('stone island jumper', 'Stone Island jumper', 'clothing'), ('carhartt detroit jacket', 'Carhartt Detroit jacket', 'clothing'),
-    ('arcteryx beta', 'Arc’teryx Beta', 'clothing'), ('patagonia fleece', 'Patagonia fleece', 'clothing'),
-    ('the north face nuptse', 'The North Face Nuptse', 'clothing'), ('ralph lauren quarter zip', 'Ralph Lauren quarter zip', 'clothing'),
-]
-REFUSED = [('jordan 1 low', 'Air Jordan 1 Low'), ('jordan 4', 'Air Jordan 4'), ('yeezy 350', 'Yeezy 350')]
-
-
+# ------------------------------------------------------------------ money / numbers
 def money(cents, lang):
     whole = cents % 100 == 0
     if lang == 'en':
@@ -1711,172 +1693,6 @@ def money(cents, lang):
 
 def num(n, lang):
     return '{:,}'.format(n) if lang == 'en' else '{:,}'.format(n).replace(',', ' ')
-
-
-def load_report():
-    d = json.load(open(REPORT, encoding='utf-8'))
-    by_q = {r['q']: r for r in d['results']}
-    gen = datetime.datetime.fromisoformat(d['generated_at'].replace('Z', '+00:00'))
-    return by_q, gen
-
-
-def price_rows(lang):
-    by_q, gen = load_report()
-    rows, csv_rows = [], []
-    for q, name, group in ITEMS:
-        r = by_q[q]
-        v = r['view']
-        if not r['ok'] or v.get('display_verdict') != 'ok' or not v.get('show_headline'):
-            sys.exit(f'{q}: not a trustworthy price in the report ({v.get("display_verdict")}); move it to REFUSED')
-        typ, lo, hi = v['typical_cents'], v['range_cents']['low'], v['range_cents']['high']
-        codes = {f['code'] for f in v.get('flags', [])}
-        pct = v.get('outlier_pct')
-        notes = []
-        if 'outliers_high' in codes and pct is not None:
-            notes.append(f'{pct:g}% of listings priced far above the rest (possible fakes or other models).' if lang == 'en' else
-                         f'{str(pct).replace(".", ",")} % des annonces nettement plus chères que les autres (contrefaçons ou autres modèles possibles).')
-        if 'price_skew_high' in codes:
-            notes.append('Prices skew high.' if lang == 'en' else 'Prix tirés vers le haut.')
-        if v['sample_size'] < 100:
-            notes.append('Smaller sample: a rough guide.' if lang == 'en' else 'Échantillon plus petit : ordre de grandeur.')
-        if not notes:
-            notes.append('Consistent prices.' if lang == 'en' else 'Prix homogènes.')
-        note = ' '.join(notes)
-        rows.append([f'{name}<small>{"search" if lang == "en" else "recherche"}: {esc(q)}</small>',
-                     f'<span class="ct-num">{money(typ, lang)}</span>',
-                     f'<span class="ct-num">{money(lo, lang)}&ndash;{money(hi, lang)}</span>',
-                     f'<span class="ct-num">{num(v["sample_size"], lang)}</span><small>{num(v["distinct_sellers"], lang)} {"sellers" if lang == "en" else "vendeurs"}</small>',
-                     note])
-        csv_rows.append([name, q, group, f'{typ/100:.2f}', f'{lo/100:.2f}', f'{hi/100:.2f}', v['sample_size'], v['distinct_sellers'], v.get('confidence'), pct if pct is not None else ''])
-    refused = []
-    for q, name in REFUSED:
-        v = by_q[q]['view']
-        if v.get('show_headline'):
-            sys.exit(f'{q}: now has a price; move it to ITEMS')
-        o = v.get('observed_cents') or {}
-        refused.append((name, q, v['sample_size'], o.get('low'), o.get('high'), v.get('display_verdict')))
-    first = by_q[ITEMS[0][0]]['view']
-    return rows, csv_rows, refused, gen, first
-
-
-def page_prices(lang):
-    rows, csv_rows, refused, gen, first = price_rows(lang)
-    f_typ, f_lo, f_hi = first['typical_cents'], first['range_cents']['low'], first['range_cents']['high']
-    end = gen.date()
-    start = end - datetime.timedelta(days=14)
-    if lang == 'en':
-        head = ['ITEM', 'TYPICAL ASKING PRICE', 'MIDDLE HALF OF PRICES', 'LISTINGS', 'NOTE']
-        ref = ''.join(f'<li><strong>{n}</strong> ({num(c, "en")} listings, {money(lo, "en")} to {money(hi, "en")}): too spread out for one honest price.</li>' for n, q, c, lo, hi, vd in refused)
-        dataset = {'@context': 'https://schema.org', '@type': 'Dataset', 'name': 'Typical Vinted asking prices for resale items, September 2026',
-                   'description': 'Median asking price and interquartile range for 19 sneaker and streetwear searches, from listings SNYPD saw on vinted.be in the 14 days to 28 September 2026. Asking prices, not sold prices.',
-                   'url': SITE + SLUGS['prices']['en'], 'temporalCoverage': f'{start.isoformat()}/{end.isoformat()}', 'isAccessibleForFree': True,
-                   'creator': DATASET_CREATOR, 'license': DATASET_LICENSE, 'inLanguage': 'en', 'variableMeasured': ['median asking price (EUR)', '25th percentile (EUR)', '75th percentile (EUR)', 'number of listings', 'number of sellers'],
-                   'distribution': [{'@type': 'DataDownload', 'encodingFormat': 'text/csv', 'contentUrl': SITE + '/' + REPORT_CSV}]}
-        body = f"""
-<section id="answer">
-  <h2>Short answer</h2>
-  <div class="lg-box lg-mint"><p>These are typical <strong>asking</strong> prices on Vinted, not sold prices: the median price of every listing SNYPD saw on vinted.be for each search in the 14 days to {end.day} September {end.year}, all sizes and conditions together. For example, an Air Jordan 1 Mid was typically listed at {money(f_typ, 'en')}, with the middle half of listings between {money(f_lo, 'en')} and {money(f_hi, 'en')}.</p></div>
-  <p>Looking for what Vinted charges on top of the price? See the <a href="{SLUGS['fees']['en']}">Vinted fee calculator</a>.</p>
-</section>
-<section id="table">
-  <h2>September 2026 prices</h2>
-  <h3>SNEAKERS</h3>
-  {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'sneakers'])}
-  <h3>CLOTHING</h3>
-  {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'clothing'])}
-  <p class="ct-note">Download the numbers: <a href="/{REPORT_CSV}">{REPORT_CSV}</a>. Figures come straight from SNYPD&rsquo;s Market Report, run on {end.day} September {end.year}. Free to reuse with credit to SNYPD (<a href="{DATASET_LICENSE}" rel="license noopener">CC BY 4.0</a>).</p>
-</section>
-<section id="refused">
-  <h2>Searches with no price</h2>
-  <p>The Market Report refuses to give a single price when listings are too spread out: when the 75th-percentile price is more than three times the 25th-percentile price. That usually means one search is catching many different colourways, kids&rsquo; and adult sizes, or fakes. These three got no price this month:</p>
-  <ul>{ref}</ul>
-  <p>A narrower search, such as a specific colourway, usually gets a usable price.</p>
-</section>
-<section id="method">
-  <h2>How these numbers are made</h2>
-  <ul>
-    <li><strong>Source.</strong> Listings SNYPD&rsquo;s systems saw on vinted.be while watching searches, in euros.</li>
-    <li><strong>Window.</strong> Listings seen at least once between {start.day} and {end.day} September {end.year}. SNYPD keeps listing data for 14 days after it last sees a listing.</li>
-    <li><strong>Matching.</strong> A listing counts when its title contains every word of the search. Garment words also match their usual synonyms (jumper, sweater, pull, trui), so a search is not split by language.</li>
-    <li><strong>Typical price</strong> is the median. <strong>Middle half</strong> is the 25th to 75th percentile, so a quarter of listings are cheaper and a quarter dearer.</li>
-    <li><strong>Refusals.</strong> On this page, no price is shown when there are fewer than 8 listings, when prices are too spread out, or when one seller has more than 40% of the listings.</li>
-  </ul>
-  <h3>LIMITS</h3>
-  <ul>
-    <li>Asking prices are what sellers want, not what buyers paid.</li>
-    <li>All conditions and sizes are mixed. The Market Report in Pro and Elite breaks prices down by condition.</li>
-    <li>Fakes are not removed. The notes column flags searches where many listings sit far above the rest.</li>
-  </ul>
-</section>
-<section id="report">
-  <h2>Price any item yourself</h2>
-  <p>The Market Report in SNYPD Pro and Elite does this for any search you type, broken down by condition, and refuses to show a number when the data is too thin or too mixed. Pro is @@price:pro@@ a month and also watches 5 Vinted searches 24/7. <a href="/plans">See plans</a>.</p>
-  {figure('market', 'en')}
-  {cta('en')}
-</section>"""
-        out = page('prices', 'en', 'Vinted Prices, Sept 2026: Typical Asking Prices | SNYPD',
-                   'Typical Vinted asking prices for 19 sneakers and streetwear items in September 2026: median, middle half and number of listings, from real vinted.be listings.',
-                   'VINTED PRICES &middot; SEPTEMBER 2026', 'What sneakers and streetwear are listed for on Vinted',
-                   f'Median asking prices for 19 resale items, from listings SNYPD saw on vinted.be in the 14 days to {end.day} September {end.year}. The number of listings behind each price is in the table. This is the September 2026 edition. Asking prices, not sold prices.',
-                   [('answer', 'Short answer'), ('table', 'September prices'), ('refused', 'No price'), ('method', 'Method and limits'), ('report', 'Price any item')],
-                   body, [dataset])
-        return out, csv_rows
-    head = ['ARTICLE', 'PRIX DEMANDÉ TYPIQUE', 'MOITIÉ CENTRALE DES PRIX', 'ANNONCES', 'REMARQUE']
-    ref = ''.join(f'<li><strong>{n}</strong> ({num(c, "fr")} annonces, de {money(lo, "fr")} à {money(hi, "fr")}) : trop dispersé pour un prix honnête.</li>' for n, q, c, lo, hi, vd in refused)
-    dataset = {'@context': 'https://schema.org', '@type': 'Dataset', 'name': 'Prix demandés typiques sur Vinted pour des articles de revente, septembre 2026',
-               'description': 'Prix demandé médian et écart interquartile pour 19 recherches de sneakers et streetwear, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au 28 septembre 2026. Prix demandés, pas prix de vente.',
-               'url': SITE + SLUGS['prices']['fr'], 'temporalCoverage': f'{start.isoformat()}/{end.isoformat()}', 'isAccessibleForFree': True,
-               'creator': DATASET_CREATOR, 'license': DATASET_LICENSE, 'inLanguage': 'fr',
-               'distribution': [{'@type': 'DataDownload', 'encodingFormat': 'text/csv', 'contentUrl': SITE + '/' + REPORT_CSV}]}
-    body = f"""
-<section id="reponse">
-  <h2>Réponse courte</h2>
-  <div class="lg-box lg-mint"><p>Ce sont des prix <strong>demandés</strong> typiques sur Vinted, pas des prix de vente : le prix médian de toutes les annonces vues par SNYPD sur vinted.be pour chaque recherche, sur les 14 jours au {end.day} septembre {end.year}, toutes tailles et tous états confondus. Par exemple, une Air Jordan 1 Mid était typiquement mise en vente à {money(f_typ, 'fr')}, la moitié centrale des annonces se situant entre {money(f_lo, 'fr')} et {money(f_hi, 'fr')}.</p></div>
-  <p>Tu cherches les frais que Vinted ajoute au prix ? Voir le <a href="{SLUGS['fees']['fr']}">calculateur des frais Vinted</a>.</p>
-</section>
-<section id="tableau">
-  <h2>Les prix de septembre 2026</h2>
-  <h3>SNEAKERS</h3>
-  {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'sneakers'])}
-  <h3>VÊTEMENTS</h3>
-  {table(head, [r for r, (q, n, g) in zip(rows, ITEMS) if g == 'clothing'])}
-  <p class="ct-note">Télécharger les chiffres : <a href="/{REPORT_CSV}">{REPORT_CSV}</a> (en anglais). Les chiffres viennent directement du Market Report de SNYPD, calculé le {end.day} septembre {end.year}. Réutilisation libre en citant SNYPD (<a href="{DATASET_LICENSE}" rel="license noopener">CC BY 4.0</a>).</p>
-</section>
-<section id="sans-prix">
-  <h2>Recherches sans prix</h2>
-  <p>Le Market Report refuse de donner un prix unique quand les annonces sont trop dispersées : quand le prix du 75e centile dépasse trois fois celui du 25e centile. En général, la recherche attrape alors plein de coloris différents, des tailles enfant et adulte, ou des contrefaçons. Ces trois recherches n’ont pas eu de prix ce mois-ci :</p>
-  <ul>{ref}</ul>
-  <p>Une recherche plus précise, par exemple un coloris précis, obtient en général un prix utilisable.</p>
-</section>
-<section id="methode">
-  <h2>Comment ces chiffres sont calculés</h2>
-  <ul>
-    <li><strong>Source.</strong> Les annonces vues par les systèmes de SNYPD sur vinted.be en surveillant des recherches, en euros.</li>
-    <li><strong>Période.</strong> Annonces vues au moins une fois entre le {start.day} et le {end.day} septembre {end.year}. SNYPD garde les données d’une annonce 14 jours après l’avoir vue pour la dernière fois.</li>
-    <li><strong>Correspondance.</strong> Une annonce compte quand son titre contient tous les mots de la recherche. Les mots de vêtements correspondent aussi à leurs synonymes courants (jumper, sweater, pull, trui), pour que la langue ne coupe pas une recherche en deux.</li>
-    <li><strong>Prix typique</strong> : la médiane. <strong>Moitié centrale</strong> : du 25e au 75e centile, donc un quart des annonces est moins cher et un quart plus cher.</li>
-    <li><strong>Refus.</strong> Sur cette page, aucun prix quand il y a moins de 8 annonces, quand les prix sont trop dispersés, ou quand un seul vendeur a plus de 40 % des annonces.</li>
-  </ul>
-  <h3>LIMITES</h3>
-  <ul>
-    <li>Un prix demandé est ce que le vendeur veut, pas ce que l’acheteur a payé.</li>
-    <li>Tous les états et toutes les tailles sont mélangés. Le Market Report de Pro et Elite détaille les prix par état.</li>
-    <li>Les contrefaçons ne sont pas retirées. La colonne Remarque signale les recherches où beaucoup d’annonces sont bien plus chères que les autres.</li>
-  </ul>
-</section>
-<section id="market-report">
-  <h2>Estime le prix de n’importe quel article</h2>
-  <p>Le Market Report de SNYPD Pro et Elite fait ce calcul pour n’importe quelle recherche, détaillé par état, et refuse d’afficher un chiffre quand les données sont trop maigres ou trop mélangées. Pro coûte @@price:pro@@ par mois et surveille aussi 5 recherches Vinted 24h/24. <a href="/plans">Voir les tarifs</a>.</p>
-  {figure('market', 'fr')}
-  {cta('fr')}
-</section>"""
-    out = page('prices', 'fr', 'Prix Vinted septembre 2026 : prix demandés typiques | SNYPD',
-               'Prix demandés typiques sur Vinted pour 19 sneakers et vêtements streetwear, septembre 2026 : médiane, moitié centrale et nombre d’annonces vinted.be.',
-               'PRIX VINTED &middot; SEPTEMBRE 2026', 'À quel prix les sneakers et le streetwear sont mis en vente sur Vinted',
-               f'Prix demandés médians pour 19 articles de revente, d’après les annonces vues par SNYPD sur vinted.be sur les 14 jours au {end.day} septembre {end.year}. Le nombre d’annonces derrière chaque prix est dans le tableau. Édition de septembre 2026. Prix demandés, pas prix de vente.',
-               [('reponse', 'Réponse courte'), ('tableau', 'Prix de septembre'), ('sans-prix', 'Sans prix'), ('methode', 'Méthode et limites'), ('market-report', 'Estimer un article')],
-               body, [dataset])
-    return out, csv_rows
 
 
 # ------------------------------------------------------------------ page: deals guide
@@ -1925,7 +1741,7 @@ def page_deals(lang):
         ('What counts as a steal on Vinted?',
          'A listing priced well below what the same item is usually listed for in the same condition, that is still the item it claims to be. A price alone does not make a steal: for the models in this guide, between %s and %s of new listings went up 30%% or more under the typical price for their condition.' % (lo_pct, hi_pct)),
         ('Where can I see the typical Vinted price of an item?',
-         f'Vinted does not show one on its listings. SNYPD&rsquo;s free <a href="{SLUGS["prices"]["en"]}">Vinted prices</a> page lists typical asking prices for popular sneakers and streetwear, and the Market Report in Pro and Elite prices any search by condition.'),
+         f'Vinted does not show one on its listings. SNYPD&rsquo;s free <a href="/vinted-price-guide">Vinted prices</a> page lists typical asking prices for popular sneakers and streetwear, and the Market Report in Pro and Elite prices any search by condition.'),
         ('Are very cheap Vinted listings fake?',
          'Some are, and a low price is one of the reasons to look closer, but it is not proof. Kids&rsquo; sizes, other colourways, wear the condition label does not show and sellers who want a quick sale also explain low prices. Check the photos, the size and the seller before you buy.'),
         ('Does SNYPD buy deals for me?',
@@ -1948,7 +1764,7 @@ def page_deals(lang):
   <h2>1. Know the typical price for the exact condition</h2>
   <p>A price only looks low against the right comparison. Condition moves Vinted prices a lot: on {top['name']}, the typical New with tags price is {nwt / good:.1f} times the Good one. Typical asking prices for new {top['name']} listings, {span}:</p>
   {table(['CONDITION', 'TYPICAL ASKING PRICE', 'LISTINGS'], ladder_rows)}
-  <p>So the same {money(cap, 'en')} is 30% under the typical price for a Very good pair, but above the typical price for a Good pair ({money(good, 'en')}). For more models, see <a href="{SLUGS['prices']['en']}">Vinted prices</a>. In SNYPD Pro and Elite, the Market Report gives this breakdown for any search you type.</p>
+  <p>So the same {money(cap, 'en')} is 30% under the typical price for a Very good pair, but above the typical price for a Good pair ({money(good, 'en')}). For more models, see the <a href="/vinted-price-guide">Vinted price guide</a>. In SNYPD Pro and Elite, the Market Report gives this breakdown for any search you type.</p>
 </section>
 <section id="search">
   <h2>2. Search narrow, with a price cap</h2>
@@ -1979,7 +1795,7 @@ def page_deals(lang):
   <h2>Method and limits</h2>
   <ul>
     <li><strong>Source.</strong> Listings SNYPD&rsquo;s systems first saw on vinted.be, in euros, from {span}.</li>
-    <li><strong>Matching.</strong> A listing counts for a model when its title contains the model&rsquo;s words (for example &ldquo;dunk&rdquo; and &ldquo;low&rdquo;). This is a simpler match than the Market Report&rsquo;s, so counts differ from <a href="{SLUGS['prices']['en']}">Vinted prices</a>.</li>
+    <li><strong>Matching.</strong> A listing counts for a model when its title contains the model&rsquo;s words (for example &ldquo;dunk&rdquo; and &ldquo;low&rdquo;). This is a simpler match than the Market Report&rsquo;s, so counts differ from the <a href="/vinted-price-guide">Vinted price guide</a>.</li>
     <li><strong>Typical price</strong> is the median first asking price for that model in that condition. Conditions with fewer than 30 listings are left out.</li>
     <li><strong>Under</strong> means a first asking price at or below 70% (or 50%) of that median.</li>
   </ul>
@@ -2143,7 +1959,7 @@ def page_fees(lang):
 </section>
 <section id="resellers">
   <h2>For resellers: count the real buying cost</h2>
-  <p>What you pay for stock is the price, plus the Buyer Protection fee, plus shipping. A &ldquo;cheap&rdquo; &euro;5 item really costs {m2(small + fee_cents(small), 'en')} before shipping. SNYPD&rsquo;s dashboard shows each new listing&rsquo;s price including Buyer Protection, and its Market Report shows the typical asking price for an item&rsquo;s condition, so you can see the margin before you buy. See <a href="{SLUGS['deals']['en']}">how to find Vinted deals</a> and <a href="{SLUGS['prices']['en']}">typical Vinted prices</a>.</p>
+  <p>What you pay for stock is the price, plus the Buyer Protection fee, plus shipping. A &ldquo;cheap&rdquo; &euro;5 item really costs {m2(small + fee_cents(small), 'en')} before shipping. SNYPD&rsquo;s dashboard shows each new listing&rsquo;s price including Buyer Protection, and its Market Report shows the typical asking price for an item&rsquo;s condition, so you can see the margin before you buy. See <a href="{SLUGS['deals']['en']}">how to find Vinted deals</a> and <a href="/vinted-price-guide">typical Vinted prices</a>.</p>
   {figure('feed', 'en')}
 </section>
 <section id="method">
@@ -2213,7 +2029,7 @@ def page_fees(lang):
 </section>
 <section id="revendeurs">
   <h2>Pour les revendeurs : compte le vrai prix d’achat</h2>
-  <p>Ton stock te coûte le prix, plus les frais de protection acheteurs, plus la livraison. Un article « pas cher » à 5&nbsp;&euro; coûte en réalité {m2(small + fee_cents(small), 'fr')} hors livraison. Le tableau de bord SNYPD affiche le prix de chaque nouvelle annonce protection acheteurs incluse, et son Market Report montre le prix demandé typique selon l’état, pour voir ta marge avant d’acheter. Voir aussi <a href="{SLUGS['prices']['fr']}">les prix Vinted typiques</a>.</p>
+  <p>Ton stock te coûte le prix, plus les frais de protection acheteurs, plus la livraison. Un article « pas cher » à 5&nbsp;&euro; coûte en réalité {m2(small + fee_cents(small), 'fr')} hors livraison. Le tableau de bord SNYPD affiche le prix de chaque nouvelle annonce protection acheteurs incluse, et son Market Report montre le prix demandé typique selon l’état, pour voir ta marge avant d’acheter. Voir aussi <a href="/fr/guide-prix-vinted">les prix Vinted typiques</a>.</p>
   {figure('feed', 'fr')}
 </section>
 <section id="methode">
@@ -2457,8 +2273,6 @@ if __name__ == '__main__':
         write(prefix + SLUGS['bot'][lang].rsplit('/', 1)[1] + '.html', page_bot(lang))
         write(prefix + SLUGS['notify'][lang].rsplit('/', 1)[1] + '.html', page_notify(lang))
         write(prefix + SLUGS['compare'][lang].rsplit('/', 1)[1] + '.html', page_compare(lang))
-        html_out, csv_rows = page_prices(lang)
-        write(prefix + SLUGS['prices'][lang].rsplit('/', 1)[1] + '.html', html_out)
     for lang in SLUGS['notwork']:
         rel = SLUGS['notwork'][lang].lstrip('/') + '.html'
         write(rel if LIVE[lang] else 'ops/seo/preview/' + rel.replace('/', '-'), page_notwork(lang))
@@ -2470,9 +2284,3 @@ if __name__ == '__main__':
         write(SLUGS['monitor'][lang].lstrip('/') + '.html', page_monitor(lang))
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):
         write(SLUGS['fees'][lang].lstrip('/') + '.html', page_fees(lang))
-    buf = io.StringIO()
-    w = csv.writer(buf, lineterminator='\n')
-    w.writerow(['item', 'search', 'group', 'typical_asking_eur', 'p25_eur', 'p75_eur', 'listings', 'sellers', 'confidence', 'outlier_high_pct'])
-    w.writerows(csv_rows)
-    buf.write('# Source: SNYPD Market Report (median asking price, not sold price), listings seen on vinted.be in the 14 days to 2026-09-28. https://www.snypd.store/vinted-prices\n')
-    write(REPORT_CSV, buf.getvalue())

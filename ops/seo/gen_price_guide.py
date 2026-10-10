@@ -30,7 +30,8 @@ HUB = {'en': '/vinted-price-guide', 'fr': '/fr/guide-prix-vinted'}
 FEES_CHECKED = gc.FEES_CHECKED
 
 GEN = datetime.datetime.fromisoformat(DATA['generated_at'].replace('Z', '+00:00')).date()
-WIN_FROM = GEN - datetime.timedelta(days=DATA.get('window_days', 14))
+WIN_DAYS = DATA.get('window_days', 14)
+WIN_FROM = GEN - datetime.timedelta(days=WIN_DAYS)
 MONTHS = gc.MONTHS_TXT
 CAT = {'sneakers': {'en': 'Sneakers', 'fr': 'Sneakers'}, 'clothing': {'en': 'Clothing', 'fr': 'Vêtements'},
        'accessories': {'en': 'Bags, watches and jewellery', 'fr': 'Sacs, montres et bijoux'},
@@ -185,7 +186,7 @@ def page_item(it, lang):
 </section>
 <section id="good-price">
   <h2>What is a good price for {esc(name)}?</h2>
-  <p>A quarter of the listings ask {money(lo, 'en')} or less, half ask between {money(lo, 'en')} and {money(hi, 'en')}, and a quarter ask more than {money(hi, 'en')}. Under {money(lo, 'en')} is the cheapest quarter: that is where deals are, and where to look twice at condition and photos.</p>
+  <p>A quarter of the listings ask {money(lo, 'en')} or less, half ask between {money(lo, 'en')} and {money(hi, 'en')}, and a quarter ask more than {money(hi, 'en')}. Under {money(lo, 'en')} is the cheapest quarter. Use it as a filter, not as proof of a bargain: a cheap listing can be more worn, a different colourway, a kids&rsquo; size or a fake, so check the photos and details.</p>
   <p>At the typical {money(typ, 'en')}, the buyer pays {money(typ, 'en')} plus {money(fee, 'en')} Vinted Buyer Protection, so {money(typ + fee, 'en')} before shipping (<a href="{FEE_SRC['fr_list']}" rel="nofollow">Vinted's price list</a>, checked {FEES_CHECKED['en']}). Selling is free for private sellers (<a href="{FEE_SRC['free_en']}" rel="nofollow">Vinted help</a>). Work out any other price with the <a href="{SLUGS['fees']['en']}">Vinted fee calculator</a>.</p>
 </section>
 <section id="alert">
@@ -244,7 +245,7 @@ def page_item(it, lang):
 </section>
 <section id="bon-prix">
   <h2>Quel est un bon prix pour {esc(name)}{nb}?</h2>
-  <p>Un quart des annonces demandent {money(lo, 'fr')} ou moins, la moitié entre {money(lo, 'fr')} et {money(hi, 'fr')}, et un quart plus de {money(hi, 'fr')}. Sous {money(lo, 'fr')}, c’est le quart le moins cher{nb}: c’est là que sont les bonnes affaires, et là qu’il faut regarder deux fois l’état et les photos.</p>
+  <p>Un quart des annonces demandent {money(lo, 'fr')} ou moins, la moitié entre {money(lo, 'fr')} et {money(hi, 'fr')}, et un quart plus de {money(hi, 'fr')}. Sous {money(lo, 'fr')}, c’est le quart le moins cher. Sers-t’en comme filtre, pas comme preuve d’une bonne affaire{nb}: une annonce moins chère peut être plus usée, d’un autre coloris, en taille enfant ou une contrefaçon, alors regarde bien les photos et les détails.</p>
   <p>Au prix typique de {money(typ, 'fr')}, l’acheteur paie {money(typ, 'fr')} plus {money(fee, 'fr')} de protection acheteurs Vinted, soit {money(typ + fee, 'fr')} hors livraison (<a href="{FEE_SRC['fr_list']}" rel="nofollow">grille tarifaire de Vinted</a>, vérifiée le {FEES_CHECKED['fr']}). Vendre est gratuit pour les particuliers (<a href="{FEE_SRC['free_fr']}" rel="nofollow">aide Vinted</a>). Calcule n’importe quel autre prix avec le <a href="{SLUGS['fees']['fr']}">calculateur de frais Vinted</a>.</p>
 </section>
 <section id="alerte">
@@ -276,6 +277,59 @@ def page_item(it, lang):
                    [faq_ld(faq), dataset_ld(it, v, 'fr', url)], parent=('Guide des prix Vinted', HUB['fr']))
 
 
+def method(lang):
+    """What the code does, in words (work order 18, step 3). Keep in step with price_guide_batch.py,
+    backend market_report.py (_derive: confidence) and market_snapshot (migration 023: verdicts)."""
+    skipped = sum(1 for it in ITEMS if it.get('skip'))
+    if lang == 'en':
+        return ('<section id="method"><h2>How these prices are made</h2><ul>'
+                '<li><strong>Sample.</strong> Listings on vinted.be that matched the searches SNYPD users watch, in euros. It is not all of Vinted, '
+                'and the listings are not necessarily from Belgian sellers.</li>'
+                '<li><strong>Matching.</strong> A listing counts for an item when its title contains every word of the item&rsquo;s search; '
+                'common synonyms count too (jumper, sweater, pull).</li>'
+                '<li><strong>Typical price</strong> is the median asking price. <strong>Middle half</strong> runs from the 25th to the 75th percentile: '
+                'a quarter of listings ask less, a quarter ask more.</li>'
+                '<li><strong>Window.</strong> Listings SNYPD saw at least once in the %d days before the update (it deletes listing data %d days after it last sees a listing).</li>'
+                '<li><strong>One listing counts once.</strong> Each Vinted listing id is counted once. A seller who deletes an item and lists it again gets a new id, so it counts again.</li>'
+                '<li><strong>No price</strong> when there are fewer than 8 listings, when the dearest quarter starts at more than 3 times the price where the cheapest quarter ends, '
+                'or when one seller has more than 40%% of the listings.</li>'
+                '<li><strong>Confidence.</strong> High when none of these warnings apply; medium when prices skew to the high side (the trimmed average sits 25%% or more above the median) '
+                'or 5%% or more of listings are priced far above the rest. This guide only publishes items with a clear price, medium or high confidence and at least %d listings.</li>'
+                '<li><strong>Mixed items are left out by hand</strong> even when the numbers pass: a brand name alone, several models in one search, trading cards of many sets (%d searches this month).</li>'
+                '<li><strong>Conditions.</strong> A condition gets its own price only with at least %d listings and a clear price. A missing condition means too little data, not no listings.</li>'
+                '<li><strong>Updates.</strong> Monthly. Each month&rsquo;s numbers are kept as a dated snapshot, and the <a href="/vinted-market-report">Vinted Market Report</a> is built from it.</li>'
+                '<li><strong>Asking prices, not sale prices.</strong> Vinted does not publish what items sell for.</li></ul>'
+                '<h3>NOT HANDLED YET</h3><ul>'
+                '<li>Kids&rsquo; and adult sizes are counted together.</li>'
+                '<li>Bundles and lots are counted as one listing at the bundle price.</li>'
+                '<li>Colourways and variants of one model share one price.</li>'
+                '<li>Fakes are not removed; they only show up as a warning when many listings sit far above the rest.</li></ul></section>'
+                % (WIN_DAYS, WIN_DAYS, MIN_LISTINGS, skipped, MIN_COND))
+    nb = '\u00a0'
+    return ('<section id="methode"><h2>Comment ces prix sont calculés</h2><ul>'
+            '<li><strong>Échantillon.</strong> Les annonces vinted.be qui correspondent aux recherches suivies par les utilisateurs de SNYPD, en euros. Ce n’est pas tout Vinted, '
+            'et les annonces ne viennent pas forcément de vendeurs belges.</li>'
+            '<li><strong>Correspondance.</strong> Une annonce compte pour un article quand son titre contient tous les mots de la recherche de l’article'
+            '%s; les synonymes courants comptent aussi (jumper, sweater, pull).</li>'
+            '<li><strong>Prix typique</strong>%s: le prix demandé médian. <strong>Moitié centrale</strong>%s: du 25e au 75e centile, donc un quart des annonces demandent moins et un quart plus.</li>'
+            '<li><strong>Période.</strong> Les annonces vues au moins une fois par SNYPD dans les %d jours avant la mise à jour (il efface les données d’une annonce %d jours après l’avoir vue pour la dernière fois).</li>'
+            '<li><strong>Une annonce compte une fois.</strong> Chaque identifiant d’annonce Vinted compte une fois. Un vendeur qui supprime un article et le remet en vente obtient un nouvel identifiant, donc il compte à nouveau.</li>'
+            '<li><strong>Pas de prix</strong> quand il y a moins de 8 annonces, quand le quart le plus cher commence à plus de 3 fois le prix où finit le quart le moins cher, '
+            'ou quand un seul vendeur a plus de 40%s%% des annonces.</li>'
+            '<li><strong>Fiabilité.</strong> Élevée quand aucun de ces signaux n’apparaît%s; moyenne quand les prix tirent vers le haut (la moyenne tronquée dépasse la médiane de 25%s%% ou plus) '
+            'ou quand 5%s%% des annonces ou plus sont nettement plus chères que les autres. Ce guide ne publie que les articles avec un prix clair, une fiabilité moyenne ou élevée et au moins %d annonces.</li>'
+            '<li><strong>Les articles mélangés sont écartés à la main</strong> même quand les chiffres passent%s: un nom de marque seul, plusieurs modèles dans une recherche, des cartes de nombreuses séries (%d recherches ce mois-ci).</li>'
+            '<li><strong>États.</strong> Un état n’a son propre prix qu’avec au moins %d annonces et un prix clair. Un état absent veut dire trop peu de données, pas zéro annonce.</li>'
+            '<li><strong>Mises à jour.</strong> Chaque mois. Les chiffres de chaque mois sont gardés dans une copie datée, et le <a href="/fr/rapport-marche-vinted">Rapport du marché Vinted</a> en est tiré.</li>'
+            '<li><strong>Prix demandés, pas prix de vente.</strong> Vinted ne publie pas le prix auquel les articles se vendent.</li></ul>'
+            '<h3>PAS ENCORE PRIS EN COMPTE</h3><ul>'
+            '<li>Les tailles enfant et adulte sont comptées ensemble.</li>'
+            '<li>Les lots sont comptés comme une seule annonce, au prix du lot.</li>'
+            '<li>Les coloris et variantes d’un même modèle partagent un seul prix.</li>'
+            '<li>Les contrefaçons ne sont pas retirées%s; elles n’apparaissent que comme un avertissement quand beaucoup d’annonces sont bien plus chères que les autres.</li></ul></section>'
+            % (nb, nb, nb, WIN_DAYS, WIN_DAYS, nb, nb, nb, nb, MIN_LISTINGS, nb, skipped, MIN_COND, nb))
+
+
 def page_hub(lang):
     cats = ['sneakers', 'clothing', 'accessories', 'collectibles']
     head = {'en': ['ITEM', 'TYPICAL ASKING PRICE', 'MIDDLE HALF', 'LISTINGS'],
@@ -303,7 +357,7 @@ def page_hub(lang):
         desc = 'How much things cost on Vinted: typical asking prices and price ranges by condition for %d popular sneakers, clothes and accessories, from %s vinted.be listings.' % (len(PUB), num(total, 'en'))
         return gc.page('guide', 'en', title, desc, 'VINTED PRICE GUIDE', 'What things cost on Vinted',
                        'Typical asking prices for %d popular items, from %s listings SNYPD saw on vinted.be (%s). Pick an item for prices by condition.' % (len(PUB), num(total, 'en'), win),
-                       [('about', 'About')] + toc + [('alerts', 'Alerts')], intro + ''.join(sections) + tail)
+                       [('about', 'About')] + toc + [('method', 'Method'), ('alerts', 'Alerts')], intro + ''.join(sections) + method('en') + tail)
     intro = ('<section id="about"><h2>Ce qu’est ce guide</h2><div class="lg-box lg-mint"><p>Les prix demandés typiques sur Vinted pour %d articles populaires, à partir de %s annonces vinted.be vues par SNYPD %s. '
              'Chaque page article montre le prix demandé médian, la moitié centrale des annonces et les prix selon l’état. Ce sont des prix demandés, pas des prix de vente%s: Vinted ne publie pas le prix auquel les articles se vendent. '
              'Seuls les articles avec au moins %d annonces et un prix clair sont inclus. Mis à jour chaque mois%s; libre de réutilisation avec un lien (CC BY 4.0). Écart selon l’état et baisses de prix%s: <a href="/fr/rapport-marche-vinted">le rapport mensuel du marché Vinted</a>.</p></div></section>' % (len(PUB), num(total, 'fr'), win, nb, MIN_LISTINGS, nb, nb))
@@ -313,7 +367,7 @@ def page_hub(lang):
     desc = 'Combien coûtent les articles sur Vinted%s: prix demandés typiques et fourchettes selon l’état pour %d sneakers, vêtements et accessoires populaires, à partir de %s annonces vinted.be.' % (nb, len(PUB), num(total, 'fr').replace(' ', nb))
     return gc.page('guide', 'fr', title, desc, 'GUIDE DES PRIX VINTED', 'Combien coûtent les articles sur Vinted',
                    'Les prix demandés typiques de %d articles populaires, à partir de %s annonces vues par SNYPD sur vinted.be (%s). Choisis un article pour voir les prix selon l’état.' % (len(PUB), num(total, 'fr'), win),
-                   [('about', 'En bref')] + toc + [('alertes', 'Alertes')], intro + ''.join(sections) + tail)
+                   [('about', 'En bref')] + toc + [('methode', 'Méthode'), ('alertes', 'Alertes')], intro + ''.join(sections) + method('fr') + tail)
 
 
 def sitemap_pages():
