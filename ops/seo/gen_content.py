@@ -315,12 +315,13 @@ def jsonld(obj):
     return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '</script>'
 
 
-def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None):
-    """parent: optional (name, path) shown between Home and this page in the breadcrumb."""
+def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None, bare=False):
+    """parent: optional (name, path) shown between Home and this page in the breadcrumb.
+    bare: a page with no URL of its own (404.html): noindex, no canonical, hreflang, JSON-LD or date line."""
     u = UI[lang]
-    path = SLUGS[key][lang]
-    url = SITE + path
-    langs = live_langs(key)
+    path = None if bare else SLUGS[key][lang]
+    url = SITE + path if path else ''
+    langs = [lang] if bare else live_langs(key)
     alts = ''
     if len(langs) > 1:
         alts = ''.join('<link rel="alternate" hreflang="%s" href="%s%s">\n' % (l, SITE, SLUGS[key][l]) for l in langs)
@@ -342,7 +343,11 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
     toc_html = ''.join('<a href="#%s">%s</a>' % (a, t) for a, t in (toc or []))
     toc_block = ('<nav class="lg-toc" aria-label="%s"><span>%s</span>%s</nav>' % (u['toc'].title(), u['toc'], toc_html)) if toc else ''
     grid_cls = 'lg-grid' if toc else 'lg-grid lg-wide'
-    ld = [
+    canon = '<meta name="robots" content="noindex">' if bare else '<link rel="canonical" href="%s">' % url
+    og_url = '' if bare else '<meta property="og:url" content="%s">\n' % url
+    meta_line = '' if bare else ('<span class="lg-meta">%s <time datetime="%s">%s</time> &middot; %s</span>'
+                                 % (u['updated'], PAGE_MODIFIED[key], date_txt(PAGE_MODIFIED[key], lang), u['by']))
+    ld = [] if bare else [
         {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
             {'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': it} for i, (n, it) in enumerate(
                 [(u['home'], SITE + '/')] + ([(parent[0], SITE + parent[1])] if parent else []) + [(h1_plain(h1), url)])]},
@@ -358,12 +363,11 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{url}">
+{canon}
 {alts}<meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:type" content="article">
-<meta property="og:url" content="{url}">
-<meta property="og:site_name" content="SNYPD">
+{og_url}<meta property="og:site_name" content="SNYPD">
 <meta property="og:locale" content="{u['locale']}">
 <meta property="og:image" content="{SITE}/assets/og/og-v5.png">
 <meta property="og:image:width" content="1200">
@@ -402,7 +406,7 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
     <div class="lg-wrap lg-head-in">
       <span class="lg-eyebrow">{eyebrow}</span>
       <h1 class="lg-h1">{h1}</h1>
-      <span class="lg-meta">{u['updated']} <time datetime="{PAGE_MODIFIED[key]}">{date_txt(PAGE_MODIFIED[key], lang)}</time> &middot; {u['by']}</span>
+      {meta_line}
       <p class="lg-lead">{lead}</p>
       {head_extra}
     </div>
@@ -2302,6 +2306,29 @@ def nl_review_file(pages):
 
 
 
+def page_404():
+    """404.html: Vercel serves it (status 404) for any path that matches no file. Not in the sitemap,
+    noindex, no canonical or hreflang. Every link is root-relative: the page is served at any depth."""
+    links = [
+        ('/', 'SNYPD homepage', 'what SNYPD does and how to start.'),
+        (SLUGS['bot']['en'], 'Vinted bot', 'how SNYPD watches your Vinted searches and alerts you to new listings.'),
+        ('/vinted-price-guide', 'Vinted price guide', 'typical Vinted asking prices by condition, item by item.'),
+        (SLUGS['checker']['en'], 'Vinted price checker', 'type an item, see its typical asking price on Vinted.'),
+        ('/plans', 'Plans and prices', 'the Free plan and the paid plans side by side.'),
+    ]
+    items = ''.join('<li><a href="%s">%s</a>: %s</li>' % (h, t, d) for h, t, d in links)
+    body = """
+<section id="where">
+  <h2>Where to go from here</h2>
+  <ul>%s</ul>
+  <p lang="fr">En fran\u00e7ais\u00a0: <a href="%s" hreflang="fr">le bot Vinted SNYPD</a> et <a href="/fr/guide-prix-vinted" hreflang="fr">le guide des prix Vinted</a>.</p>
+</section>""" % (items, SLUGS['bot']['fr'])
+    return page('notfound', 'en', 'Page not found | SNYPD',
+                'This page does not exist on snypd.store. Go to the homepage, the Vinted bot guide, the price guide or the price checker.',
+                'ERROR 404', 'This page doesn&rsquo;t exist',
+                'The link may be old or mistyped. These are the pages most people are looking for.', None, body, bare=True)
+
+
 def write(rel, text):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -2338,6 +2365,7 @@ if __name__ == '__main__':
     if held:
         nl_review_file(held)
     write('vinted-deals.html', page_deals('en'))
+    write('404.html', page_404())
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):
         write(SLUGS['monitor'][lang].lstrip('/') + '.html', page_monitor(lang))
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):

@@ -7,8 +7,10 @@ A region is everything between two markers:
     JavaScript  /*plans:NAME*/.../*/plans:NAME*/      (filled with plain characters)
 NAME is a key of TEMPLATES (the same name may appear several times). Templates use the
 tokens of ops/seo/plans.py (@@price:pro@@ ...) or are functions returning finished HTML.
-Two things have no markers because JSON and attributes cannot hold comments: the JSON-LD
-Offer prices and the plan prices in meta descriptions; both are rewritten by plan name.
+Three things have no markers because JSON and attributes cannot hold comments: the JSON-LD
+Offer prices and the plan prices in meta descriptions (both rewritten by plan name), and the
+Organization description in index.html (rewritten from ops/seo/data/brand.json, the only
+copy of the boilerplate on the site; outreach/00-fact-sheet.md quotes it verbatim).
 
 /plans: the comparison table and the FAQ are written into the HTML here (before 10 Oct
 2026 only JavaScript drew them, so AI crawlers that do not run JS never saw them). The
@@ -18,7 +20,7 @@ French, run python ops/i18n/gen_i18n.py and node ops/i18n/test_i18n.js.
 
 Byte-level edits: the pages are UTF-8 with CRLF; nothing outside the regions changes.
 """
-import html, os, re, sys
+import html, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -275,6 +277,20 @@ def meta_prices(content):
     return content
 
 
+BRAND = json.load(open(os.path.join(HERE, 'data', 'brand.json'), encoding='utf-8'))
+_interval = json.load(open(os.path.join(HERE, 'data', 'check-interval.json'), encoding='utf-8'))
+if '30 seconds' in BRAND['boilerplate'] and _interval['median_seconds'] != 30:
+    sys.exit('gen_regions: the boilerplate says "about every 30 seconds" but check-interval.json median is %s s'
+             % _interval['median_seconds'])
+ORG_RE = re.compile(r'("@type": "Organization",\s*"@id": "https://www\.snypd\.store/#org",)((?:\s*"description": "(?:[^"\\]|\\.)*",)?)(\s*"name")')
+
+
+def org_description(m):
+    nl = '\r\n' if '\r\n' in m.group(3) else '\n'
+    indent = m.group(3)[len(nl):m.group(3).index('"')]
+    return m.group(1) + nl + indent + '"description": ' + json.dumps(BRAND['boilerplate'], ensure_ascii=False) + ',' + m.group(3)
+
+
 def run(check=False):
     changed = []
     for name in FILES:
@@ -295,6 +311,7 @@ def run(check=False):
         out = JS_RE.sub(sub_js, out)
         out = LD_RE.sub(lambda m: m.group(1) + offers(m.group(2)) + m.group(3), out)
         out = META_RE.sub(lambda m: m.group(1) + meta_prices(m.group(2)) + m.group(3), out)
+        out = ORG_RE.sub(org_description, out)
         if n[0] == 0:
             sys.exit(f'gen_regions: {name} has no plan regions (markers lost?)')
         if out != text:

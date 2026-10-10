@@ -1,0 +1,5 @@
+{
+ "boilerplate": "SNYPD is a Vinted monitor from Belgium that checks your Vinted searches about every 30 seconds and sends a push alert when a new matching listing appears; it never logs in to your Vinted account and never buys for you.",
+ "checked": "2026-10-10",
+ "note": "Every claim is on outreach/00-fact-sheet.md: about every 30 s = measured median (check-interval.json); push alerts; never logs in; no autobuy. gen_regions.py writes it into the Organization JSON-LD of index.html."
+}

@@ -249,6 +249,16 @@ def main():
                       or os.path.isfile(os.path.join(ROOT, path.lstrip('/'), 'index.html'))):
                 errors.append(f'{rel}: link {h} -> 404')
 
+    # 7. 404.html is served for every unknown path: it must never claim a URL of its own
+    if '404.html' in pages:
+        s404 = pages['404.html']
+        if '<meta name="robots" content="noindex">' not in s404:
+            errors.append('404.html: no robots noindex')
+        if 'rel="canonical"' in s404 or '<link rel="alternate"' in s404 or 'application/ld+json' in s404:
+            errors.append('404.html: has a canonical, hreflang or JSON-LD (it is served at every unknown path)')
+        if '/404' in locs:
+            errors.append('sitemap: /404 must not be listed')
+
     for w in sorted(set(warns)):
         print('W', w)
     for e in sorted(set(errors)):
