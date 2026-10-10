@@ -1,1926 +1,219 @@
-<!DOCTYPE html><html     lang="en"><head><meta charset="utf-8"/><title>SNYPD Support - Help With Your Vinted Alerts</title><meta content="Get help with SNYPD: setting up Vinted searches, push notifications, plans and billing. Email snypd@gmail.com or ask in the SNYPD Discord." name="description"/><meta content="SNYPD Support - Help With Your Vinted Alerts" property="og:title"/><meta content="Get help with SNYPD: setting up Vinted searches, push notifications, plans and billing. Email snypd@gmail.com or ask in the SNYPD Discord." property="og:description"/><meta content="SNYPD Support - Help With Your Vinted Alerts" name="twitter:title"/><meta content="Get help with SNYPD: setting up Vinted searches, push notifications, plans and billing. Email snypd@gmail.com or ask in the SNYPD Discord." name="twitter:description"/><meta content="width=device-width, initial-scale=1" name="viewport"/><style></style><style></style><style></style><!-- 1) Load Supabase UMD + init global client -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script>
-  window.SNYPD = window.SNYPD || {};
-  // Only create once in case other pages run this too
-  if (!SNYPD.supabase) {
-    SNYPD.supabase = supabase.createClient(
-      'https://igbuqanjocfmahlzzupc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
-    );
-  }
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SNYPD support: fix alerts, search links and billing</title>
+<meta name="description" content="Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Email support, reply within 24 hours.">
+<link rel="canonical" href="https://www.snypd.store/support">
+<meta property="og:title" content="SNYPD support: fix alerts, search links and billing">
+<meta property="og:description" content="Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Email support, reply within 24 hours.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.snypd.store/support">
+<meta property="og:site_name" content="SNYPD">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
+<link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<style>
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+html, body { margin: 0; background: #0A0A0B; }
+body { font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; -webkit-font-smoothing: antialiased; }
+a { color: #00E5A0; text-decoration: none; }
+a:hover { color: #57FFC8; }
+a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+::selection { background: #A200FF; color: #FFFFFF; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor { animation: none !important; } }
+.lg-wrap { max-width: 1320px; margin: 0 auto; padding-left: 20px; padding-right: 20px; box-sizing: border-box; }
+.lg-nav { position: sticky; top: 0; z-index: 30; background: rgba(10,10,11,.92); border-bottom: 1px solid #1D1D20; }
+.lg-nav-in { display: flex; align-items: center; gap: 10px 18px; padding-top: 8px; padding-bottom: 8px; }
+.lg-brand { display: flex; align-items: center; gap: 9px; color: #FFFFFF; min-height: 44px; }
+.lg-brand:hover { color: #FFFFFF; }
+.lg-brand img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.lg-brand span { font-size: 15.5px; font-weight: 700; letter-spacing: .02em; }
+.lg-cursor { animation: blink 1.2s step-end infinite; }
+.lg-links { display: flex; gap: 4px; flex: 1; }
+.lg-navlink { font-size: 12px; letter-spacing: .1em; color: #8B9094; padding: 14px 10px; }
+.lg-navlink:hover { color: #FFFFFF; }
+.lg-navlink[aria-current="page"] { color: #FFFFFF; }
+.lg-cta { font-size: 12px; letter-spacing: .1em; color: #FFFFFF; background: #A200FF; padding: 14px 16px; }
+.lg-cta:hover { color: #FFFFFF; filter: brightness(1.18); }
+@media (max-width: 699.98px) { .lg-links { display: none; } .lg-nav-in { justify-content: space-between; } .lg-login { margin-left: auto; } }
+@media (max-width: 459.98px) { .lg-nav-in { gap: 4px; } .lg-navlink { padding: 14px 6px; letter-spacing: .05em; } .lg-cta { padding: 14px 10px; letter-spacing: .05em; } .lg-brand span { font-size: 14px; } }
+.lg-head { border-bottom: 1px solid #1D1D20; }
+.lg-head-in { padding-top: 56px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 14px; }
+.lg-eyebrow { font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+.lg-h1 { margin: 0; max-width: 20ch; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(36px, 6vw, 60px); line-height: .98; letter-spacing: -.04em; color: #FFFFFF; }
+.lg-meta { font-size: 12px; color: #8B9094; }
+.lg-lead { margin: 6px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.7; color: #B8BCBF; }
+.lg-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding-top: 40px; padding-bottom: 72px; align-items: start; }
+@media (max-width: 899.98px) { .lg-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 28px; } }
+.lg-toc { position: sticky; top: 84px; border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 18px; display: flex; flex-direction: column; gap: 2px; }
+@media (max-width: 899.98px) { .lg-toc { position: static; } }
+.lg-toc span { font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.lg-toc a { font-size: 12px; line-height: 1.5; color: #B8BCBF; padding: 5px 0; }
+.lg-toc a:hover { color: #00E5A0; }
+.lg-doc { max-width: 820px; min-width: 0; }
+.lg-wide { grid-template-columns: minmax(0, 1fr); }
+.lg-wide .lg-doc { max-width: 1120px; }
+.lg-doc section { border-top: 1px solid #1D1D20; padding: 30px 0 6px; scroll-margin-top: 80px; }
+.lg-doc section:first-child { border-top: 0; padding-top: 0; }
+.lg-doc h2 { margin: 0 0 14px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(24px, 3.2vw, 30px); line-height: 1.05; letter-spacing: -.03em; color: #FFFFFF; }
+.lg-doc h3 { margin: 22px 0 8px; font-size: 12.5px; font-weight: 400; letter-spacing: .1em; color: #FFFFFF; }
+.lg-doc p, .lg-doc li { font-size: 13px; line-height: 1.75; color: #B8BCBF; }
+.lg-doc p { margin: 0 0 14px; }
+.lg-doc ul, .lg-doc ol { margin: 0 0 14px; padding-left: 20px; }
+.lg-doc li { margin: 0 0 6px; }
+.lg-doc strong { font-weight: 400; color: #FFFFFF; }
+.lg-doc code { font-family: inherit; font-size: 12px; color: #FFFFFF; background: #141416; border: 1px solid #26262A; padding: 1px 5px; overflow-wrap: anywhere; }
+.lg-doc blockquote { margin: 0 0 14px; padding: 12px 16px; border-left: 2px solid #00E5A0; background: #0C0C0D; font-size: 13px; line-height: 1.7; color: #E8EAEB; }
+.lg-doc blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: 11.5px; color: #8B9094; }
+.lg-box { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 12px; }
+.lg-box.lg-mint { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.06); }
+.lg-box p { margin: 0; }
+.ct-scroll { overflow-x: auto; margin: 0 0 18px; border: 1px solid #1D1D20; -webkit-overflow-scrolling: touch; }
+.ct-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.ct-table th, .ct-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.55; color: #B8BCBF; }
+.ct-table thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .1em; color: #8B9094; }
+.ct-table tbody th { font-weight: 400; color: #FFFFFF; min-width: 150px; }
+.ct-table tbody tr { background: #0C0C0D; }
+.ct-table tbody tr.ct-us { background: rgba(162,0,255,.07); }
+.ct-table .ct-num { white-space: nowrap; color: #FFFFFF; }
+.ct-table small { display: block; color: #8B9094; font-size: 11px; }
+.ct-note { font-size: 11.5px !important; color: #8B9094 !important; }
+.ct-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ct-btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; font-size: 12px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; }
+.ct-btn:hover { color: #FFFFFF; filter: brightness(1.18); }
+.ct-btn.ct-ghost { background: #141416; border: 1px solid #3A3A40; }
+.ct-btn.ct-ghost:hover { filter: none; background: #1C1C1F; border-color: #55555C; }
+.lg-foot { border-top: 1px solid #1D1D20; }
+.lg-foot-in { padding-top: 24px; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lg-foot-a { display: flex; flex-direction: column; gap: 6px; }
+.lg-foot small { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.lg-foot-t { font-size: 12px; color: #8B9094; }
+.lg-foot-l { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-top: 4px; }
+.lg-foot-l a, .lg-foot-l button { font-size: 12px; }
+.lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
+.lg-foot-l button:hover { color: #57FFC8; }
+.lg-lang { position: relative; }
+.lg-lang > summary { list-style: none; cursor: pointer; }
+.lg-lang > summary::-webkit-details-marker { display: none; }
+.lg-lang > div { position: absolute; left: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
 
-<!-- 2) Early redirect (optional) -->
-<script>
-  (async () => {
-    try {
-      const { data: { session } } = await SNYPD.supabase.auth.getSession();
-      // Only redirect on pages you want protected (change /dashboard as needed)
-      if (!session && location.pathname.startsWith('/dashboard')) {
-        location.href = '/login';
-      }
-    } catch (e) { console.error(e); }
-  })();
-</script>
-
-
+.rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+@media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
+.rs-card { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.rs-card:first-child, .rs-card:nth-child(2) { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.05); }
+.rs-num { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+.lg-doc .rs-title { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.02em; color: #FFFFFF; }
+.lg-doc .rs-card p { margin: 0; font-size: 12.5px; line-height: 1.7; }
+.lg-doc .rs-card p.rs-proof { padding-top: 9px; border-top: 1px dashed #26262A; font-size: 11.5px; color: #8B9094; }
+.rs-proof a { color: #00E5A0; }
+.ct-yes { color: #00E5A0; }
+.ct-table tbody tr.ct-us th, .ct-table tbody tr.ct-us td { color: #FFFFFF; border-top-color: rgba(0,229,160,.45); }
+.ct-table tbody tr.ct-us th { box-shadow: inset 3px 0 0 #00E5A0; }
+.ct-badge { display: inline-block; margin-left: 6px; padding: 2px 6px; font-size: 10px; letter-spacing: .1em; color: #0A0A0B; background: #00E5A0; vertical-align: 1px; }
+.ct-table tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: #0C0C0D; }
+.ct-table thead th:first-child { position: sticky; left: 0; z-index: 2; background: #121214; }
+.ct-table tbody tr.ct-us th[scope="row"] { background: #160C20; }
+@media (max-width: 699.98px) { .ct-table tbody th { min-width: 118px; } }
+.glance { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.glance li { font-size: 12px; letter-spacing: .04em; color: #FFFFFF; border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 8px 11px; }
+.glance li span { color: #00E5A0; margin-right: 6px; }
+.fit-list { list-style: none; padding: 0 !important; margin: 0 0 18px !important; display: flex; flex-direction: column; gap: 10px; }
+.fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.fit-list li strong { display: block; margin-bottom: 3px; }
+.fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+.lg-fig { margin: 4px 0 20px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.lg-fig picture { display: block; }
+.lg-fig img { display: block; width: 100%; height: auto; }
+.lg-fig figcaption { padding: 10px 14px; border-top: 1px solid #1D1D20; font-size: 11.5px; line-height: 1.6; color: #8B9094; }
+.lg-fig.fig-narrow { max-width: 520px; }
+.fig-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; margin: 0 0 18px; }
+.fig-row .lg-fig { margin: 0; max-width: none; }
+@media (max-width: 759.98px) { .fig-row { grid-template-columns: minmax(0, 1fr); } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ct-duel { margin: 0 0 18px; }
+.ct-duel label { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.ct-duel select { font-family: inherit; font-size: 14px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 46px; }
+.ct-duel table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #1D1D20; }
+.ct-duel th, .ct-duel td { text-align: left; vertical-align: top; padding: 11px 10px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.5; color: #B8BCBF; overflow-wrap: anywhere; }
+.ct-duel thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .08em; color: #8B9094; }
+.ct-duel thead th.d-us { color: #FFFFFF; }
+.ct-duel tbody th { width: 28%; font-weight: 400; font-size: 11px; letter-spacing: .06em; color: #8B9094; }
+.ct-duel td.d-us { color: #FFFFFF; background: rgba(162,0,255,.07); }
+.ct-duel [data-t] { display: none; }
+.ct-duel [data-t].on { display: table-cell; }
+@media (min-width: 700px) { .ct-duel { display: none; } }
+@media (max-width: 699.98px) { .ct-full { display: none; } }
+.fc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.05); padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
+.fc-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 559.98px) { .fc-in { grid-template-columns: minmax(0, 1fr); } }
+.fc label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.fc input, .fc select { font-family: inherit; font-size: 16px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 48px; width: 100%; box-sizing: border-box; }
+.fc input:focus-visible, .fc select:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.fc-out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin: 0; }
+.fc-out div { background: #0C0C0D; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.fc-out dt { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.fc-out dd { margin: 0; font-size: 18px; color: #FFFFFF; }
+.fc-out div.fc-total dd { color: #00E5A0; }
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"Something not working?","item":"https://www.snypd.store/support"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/support#page","url":"https://www.snypd.store/support","name":"SNYPD support: fix alerts, search links and billing","description":"Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Email support, reply within 24 hours.","inLanguage":"en","datePublished":"2026-09-28","dateModified":"2026-10-10","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
 <!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
 <script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-VBC0SXPR6F');
-</script><!-- snypd:seo -->
-<link rel="canonical" href="https://www.snypd.store/support"/>
-<meta property="og:url" content="https://www.snypd.store/support"/>
-<meta property="og:site_name" content="SNYPD"/>
-<meta property="og:locale" content="en_GB"/>
-<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="SNYPD - Vinted monitor and new listing alerts for resellers"/>
-<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-v5.png"/>
-<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
-<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png"/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta property="og:type" content="website"/>
-<!-- Copy Everything Below This Line -->
-<div class="snypd-island-nav-wrapper">
-  <style>
-    .snypd-island-nav-wrapper, .snypd-island-nav-wrapper * {
-      box-sizing: border-box;
-    }
-
-    .snypd-island-nav-wrapper {
-      position: fixed;
-      top: 24px; /* Floating off the top */
-      left: 0;
-      width: 100%;
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      font-family: 'Inter', system-ui, sans-serif;
-      pointer-events: none; /* Allows clicking through the empty space around the navbar */
-    }
-
-    .snypd-island-nav {
-      pointer-events: auto; /* Re-enable clicking on the actual navbar */
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-      padding: 0 8px 0 24px;
-      border-radius: 9999px; /* Pill shape */
-      width: min(900px, calc(100% - 32px));
-      
-      /* Glassmorphism & Heavy Shadows */
-      background: rgba(12, 14, 22, 0.6);
-      backdrop-filter: blur(32px);
-      -webkit-backdrop-filter: blur(32px);
-      
-      /* Multi-layered borders and shadows for Figma quality depth */
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 
-        0 24px 48px -12px rgba(0, 0, 0, 0.5), /* Deep drop shadow */
-        inset 0 1px 1px rgba(255, 255, 255, 0.15), /* Top inner highlight */
-        inset 0 -1px 1px rgba(0, 0, 0, 0.5); /* Bottom inner shadow */
-        
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Left Side: Logo */
-    .snypd-island__brand {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-    }
-
-    .snypd-island__logo {
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 26px; 
-      color: rgb(162, 0, 255);
-      letter-spacing: 16px; 
-      position: relative; 
-      display: inline-block; 
-      font-weight: 500; 
-      margin-right: -16px; 
-      text-transform: uppercase;
-      text-decoration: none;
-    }
-    
-    .snypd-island__logo::after {
-      content: '';
-      position: absolute;
-      left: -6px;
-      right: -6px;
-      top: 50%;
-      height: 2px;
-      background-color: rgb(162, 0, 255);
-      transform: translateY(-50%);
-      pointer-events: none;
-    }
-
-    /* Center: Links */
-    .snypd-island__links {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .snypd-island__link {
-      color: rgba(255, 255, 255, 0.55);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 9999px;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .snypd-island__link:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Right Side: Actions */
-    .snypd-island__actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .snypd-island__login {
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 8px 16px;
-      transition: color 0.2s ease;
-    }
-
-    .snypd-island__login:hover {
-      color: #fff;
-    }
-
-    .snypd-island__btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 48px;
-      padding: 0 28px;
-      border-radius: 9999px;
-      background: linear-gradient(135deg, #a435f0, #7b1fa2);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      overflow: hidden;
-      box-shadow: 
-        0 8px 24px -8px rgba(164, 53, 240, 0.6),
-        inset 0 1px 1px rgba(255, 255, 255, 0.3);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .snypd-island__btn::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, #c471ed, #f64f59);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
-    }
-
-    .snypd-island__btn span {
-      position: relative;
-      z-index: 2;
-    }
-
-    .snypd-island__btn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 
-        0 12px 32px -8px rgba(164, 53, 240, 0.8),
-        inset 0 1px 1px rgba(255, 255, 255, 0.4);
-    }
-
-    .snypd-island__btn:hover::before {
-      opacity: 1;
-    }
-
-    /* Mobile handling */
-    .snypd-island__mobile-btn {
-      display: none;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      color: #fff;
-      cursor: pointer;
-      align-items: center;
-      justify-content: center;
-      margin-right: 8px;
-    }
-
-    /* --- NEW MOBILE MENU STYLES --- */
-    .snypd-mobile-menu {
-      position: absolute;
-      top: 76px; /* Positioned just below the floating navbar */
-      right: 16px;
-      width: 240px;
-      background: rgba(12, 14, 22, 0.95);
-      backdrop-filter: blur(32px);
-      -webkit-backdrop-filter: blur(32px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.5);
-      
-      /* Animation properties */
-      opacity: 0;
-      transform: translateY(-10px) scale(0.95);
-      pointer-events: none;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Class added by JS to show the menu */
-    .snypd-mobile-menu.active {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
-
-    .snypd-mobile__link {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 500;
-      padding: 10px 12px;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
-
-    .snypd-mobile__link:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-    }
-
-    .snypd-mobile__divider {
-      height: 1px;
-      background: rgba(255, 255, 255, 0.1);
-      margin: 4px 0;
-    }
-
-    @media (max-width: 800px) {
-      .snypd-island__links {
-        display: none;
-      }
-      .snypd-island-nav {
-        padding: 0 12px 0 20px;
-        height: 60px;
-      }
-      .snypd-island__login {
-        display: none;
-      }
-      .snypd-island__mobile-btn {
-        display: flex;
-      }
-      .snypd-island__btn {
-        height: 40px;
-        padding: 0 16px;
-      }
-    }
-
-    /* On narrow phones the wordmark's 16px letter-spacing made the brand wide
-       enough to collide with the CTA, clipping the logo mid-letter. Scale the
-       wordmark and the button down together so the pill still fits at 360px. */
-    @media (max-width: 520px) {
-      .snypd-island-nav {
-        padding: 0 8px 0 14px;
-        gap: 10px;
-      }
-      .snypd-island__logo {
-        font-size: 19px;
-        letter-spacing: 9px;
-        margin-right: -9px;
-      }
-      .snypd-island__btn {
-        height: 38px;
-        padding: 0 13px;
-        font-size: 13px;
-      }
-      .snypd-island__btn span {
-        white-space: nowrap;
-      }
-    }
-  </style>
-
-  <nav class="snypd-island-nav">
-    <!-- Brand -->
-    <a href="/" class="snypd-island__brand">
-      <span class="snypd-island__logo">SNYPD</span>
-    </a>
-
-    <!-- Center Links -->
-    <div class="snypd-island__links">
-      <a href="/#how" class="snypd-island__link">How it works</a>
-      <a href="/plans" class="snypd-island__link">Features</a>
-      <a href="/#pricing" class="snypd-island__link">Pricing</a>
-      <a href="/support" class="snypd-island__link">Help</a>
-    </div>
-
-    <!-- Actions -->
-    <div class="snypd-island__actions">
-      <a href="/login" class="snypd-island__login">Log in</a>
-      <a href="/signup" class="snypd-island__btn">
-        <span>Start now for free</span>
-      </a>
-      
-      <!-- Mobile Menu Icon (Now has an ID for JS) -->
-      <button class="snypd-island__mobile-btn" id="snypdMobileToggle" aria-label="Menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-
-    <!-- NEW MOBILE MENU DROPDOWN -->
-    <div class="snypd-mobile-menu" id="snypdMobileMenu">
-      <a href="/#how" class="snypd-mobile__link mobile-menu-link">How it works</a>
-      <a href="/plans" class="snypd-mobile__link mobile-menu-link">Features</a>
-      <a href="/#pricing" class="snypd-mobile__link mobile-menu-link">Pricing</a>
-      <a href="/faq" class="snypd-mobile__link mobile-menu-link">Help</a>
-      <div class="snypd-mobile__divider"></div>
-      <a href="/login" class="snypd-mobile__link mobile-menu-link">Log in</a>
-    </div>
-  </nav>
-
-  <!-- NEW JAVASCRIPT LOGIC -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const toggleBtn = document.getElementById("snypdMobileToggle");
-      const mobileMenu = document.getElementById("snypdMobileMenu");
-      const menuLinks = document.querySelectorAll(".mobile-menu-link");
-
-      // Toggle menu on hamburger click
-      toggleBtn.addEventListener("click", function(e) {
-        e.stopPropagation(); // Prevents click from bubbling to document
-        mobileMenu.classList.toggle("active");
-      });
-
-      // Close menu when clicking outside of it
-      document.addEventListener("click", function(e) {
-        if (!mobileMenu.contains(e.target) && e.target !== toggleBtn) {
-          mobileMenu.classList.remove("active");
-        }
-      });
-      
-      // Close menu when a link inside it is clicked (for anchor links like #pricing)
-      menuLinks.forEach(link => {
-        link.addEventListener("click", () => {
-          mobileMenu.classList.remove("active");
-        });
-      });
-    });
-  </script>
-</div>
-<!-- End Copy --><div>
-<style>
-  /* ==========================================================================
-     1. DESIGN TOKENS & FOUNDATION
-     ========================================================================== */
-  @import url('/assets/fonts/inter.css'); @import url('/assets/fonts/jetbrains-mono.css');
-  
-  :root {
-    /* Obsidian Palette */
-    --c-bg-base: #020202;
-    --c-bg-panel: #0A0A0A;
-    --c-bg-card: #111111;
-    --c-bg-input: #050505;
-    
-    /* Brand Accents */
-    --c-brand: #A200FF;
-    --c-brand-hover: #C455FF;
-    --c-brand-glow: rgba(162, 0, 255, 0.15);
-    --c-brand-dim: rgba(162, 0, 255, 0.05);
-    
-    /* UI States */
-    --c-success: #00FF66;
-    --c-success-glow: rgba(0, 255, 102, 0.15);
-    --c-error: #FF3333;
-    --c-error-glow: rgba(255, 51, 51, 0.15);
-    --c-discord: #5865F2;
-
-    /* Text */
-    --c-text-100: #FFFFFF;
-    --c-text-200: #E5E5E5;
-    --c-text-300: #A3A3A3;
-    --c-text-400: #666666;
-    --c-text-placeholder: #444444;
-
-    /* Borders */
-    --c-border-subtle: #1A1A1A;
-    --c-border-strong: #333333;
-    --c-border-focus: #555555;
-    
-    /* Typography */
-    --font-sans: 'Inter', -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-
-    /* Motion */
-    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
-    --time-fast: 0.2s;
-    --time-med: 0.4s;
-    --time-slow: 0.8s;
-  }
-
-  *, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* The nav is position:fixed at top:24px over a 64px pill, so anything
-     scrolled to by the browser (e.g. tabbing to a focusable) must clear ~88px. */
-  html {
-    scroll-padding-top: 104px;
-  }
-
-  body {
-    background-color: var(--c-bg-base);
-    color: var(--c-text-200);
-    font-family: var(--font-sans);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-
-  ::selection {
-    background: var(--c-brand);
-    color: var(--c-text-100);
-  }
-
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-track { background: var(--c-bg-base); }
-  ::-webkit-scrollbar-thumb { background: var(--c-border-strong); border-radius: 8px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--c-text-400); }
-
-  /* ==========================================================================
-     2. AMBIENT RADAR ENVIRONMENT
-     ========================================================================== */
-  .section-contact {
-    position: relative;
-    padding: 140px 24px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    isolation: isolate;
-  }
-
-  .ambient-radar {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 200vw; height: 200vw;
-    min-width: 1500px; min-height: 1500px;
-    background-image: 
-      radial-gradient(circle, transparent 20%, rgba(255,255,255,0.02) 21%, transparent 22%),
-      radial-gradient(circle, transparent 40%, rgba(255,255,255,0.02) 41%, transparent 42%),
-      radial-gradient(circle, transparent 60%, rgba(255,255,255,0.02) 61%, transparent 62%),
-      radial-gradient(circle, transparent 80%, rgba(255,255,255,0.02) 81%, transparent 82%);
-    z-index: -2;
-    pointer-events: none;
-    animation: rotate-radar 120s linear infinite;
-  }
-
-  @keyframes rotate-radar {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-
-  .ambient-glow {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(162, 0, 255, 0.06), transparent 70%);
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  .wrapper-core {
-    width: 100%;
-    max-width: 1280px;
-    position: relative;
-    z-index: 10;
-  }
-
-  /* ==========================================================================
-     3. HEADER INTRO
-     ========================================================================== */
-  .header-block {
-    text-align: center;
-    max-width: 760px;
-    margin: 0 auto 80px;
-  }
-
-  .badge-tech {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    background: var(--c-bg-card);
-    border: 1px solid var(--c-border-strong);
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--c-text-300);
-    text-transform: uppercase;
-    margin-bottom: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-
-  .badge-tech .dot {
-    width: 6px; height: 6px;
-    background: var(--c-brand);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--c-brand);
-  }
-
-  .title-hero {
-    font-size: clamp(40px, 5vw, 64px);
-    font-weight: 900;
-    line-height: 1.05;
-    color: var(--c-text-100);
-    letter-spacing: -0.03em;
-    margin-bottom: 24px;
-  }
-
-  .title-hero span {
-    color: var(--c-text-400);
-  }
-
-  .desc-intro {
-    font-size: 18px;
-    color: var(--c-text-300);
-    line-height: 1.6;
-  }
-
-  /* ==========================================================================
-     4. SPLIT LAYOUT
-     ========================================================================== */
-  .layout-split {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 60px;
-    align-items: flex-start;
-  }
-
-  /* ==========================================================================
-     5. THE CONTACT TERMINAL (LEFT COL)
-     ========================================================================== */
-  .terminal-panel {
-    background: var(--c-bg-panel);
-    border: 1px solid var(--c-border-subtle);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .terminal-panel::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--c-brand), transparent);
-    opacity: 0.3;
-  }
-
-  .form-header {
-    margin-bottom: 32px;
-  }
-  .form-header h3 {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--c-text-100);
-    letter-spacing: -0.02em;
-  }
-  .form-header p {
-    font-size: 14px;
-    color: var(--c-text-400);
-    margin-top: 8px;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-  .fg-full {
-    grid-column: 1 / -1;
-  }
-
-  /* --- Floating Label Input System --- */
-  .input-group {
-    position: relative;
-    width: 100%;
-  }
-
-  .f-input {
-    width: 100%;
-    background: var(--c-bg-input);
-    border: 1px solid var(--c-border-strong);
-    border-radius: 12px;
-    padding: 24px 16px 10px; /* Space for label */
-    font-family: var(--font-sans);
-    font-size: 15px;
-    color: var(--c-text-100);
-    transition: all var(--time-fast) ease;
-    outline: none;
-  }
-
-  .f-input:hover {
-    border-color: var(--c-border-focus);
-  }
-  .f-input:focus {
-    border-color: var(--c-brand);
-    background: var(--c-bg-base);
-    box-shadow: 0 0 0 4px var(--c-brand-glow);
-  }
-
-  .f-label {
-    position: absolute;
-    left: 16px;
-    top: 18px;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--c-text-400);
-    pointer-events: none;
-    transition: all var(--time-fast) var(--ease-out-expo);
-    transform-origin: left top;
-  }
-
-  /* Trigger floating state when focused OR when not empty */
-  .f-input:focus ~ .f-label,
-  .f-input:not(:placeholder-shown) ~ .f-label {
-    transform: translateY(-10px) scale(0.75);
-    color: var(--c-text-300);
-  }
-  .f-input:focus ~ .f-label {
-    color: var(--c-brand);
-  }
-
-  /* Validation States */
-  .input-group.error .f-input {
-    border-color: var(--c-error);
-    box-shadow: 0 0 0 4px var(--c-error-glow);
-    animation: shake 0.4s ease-in-out;
-  }
-  .input-group.error .f-label {
-    color: var(--c-error) !important;
-  }
-  .input-group.success .f-input {
-    border-color: var(--c-success);
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-  }
-
-  /* Textarea Specific */
-  textarea.f-input {
-    resize: none;
-    min-height: 120px;
-  }
-  .char-counter {
-    position: absolute;
-    bottom: 12px;
-    right: 16px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--c-text-400);
-  }
-
-  /* --- Custom Dropdown Select --- */
-  .custom-select-wrapper {
-    position: relative;
-    user-select: none;
-  }
-  
-  .custom-select-trigger {
-    width: 100%;
-    background: var(--c-bg-input);
-    border: 1px solid var(--c-border-strong);
-    border-radius: 12px;
-    padding: 24px 16px 10px; /* matches .f-input, leaves room for the floating label */
-    font-family: var(--font-sans);
-    font-size: 15px;
-    color: var(--c-text-100);
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    transition: all var(--time-fast) ease;
-  }
-  /* The value is a flex item, so while it is empty it would collapse to 0 and
-     let the 16px chevron define the trigger's height — leaving it visibly
-     shorter than the .f-input fields beside it. */
-  .custom-select-value {
-    min-height: 1.25em;
-    line-height: 1.25;
-  }
-
-  .custom-select-trigger:hover {
-    border-color: var(--c-border-focus);
-  }
-  /* Keyboard focus. Mirrors .f-input:focus. The bare :focus rule is a fallback
-     for engines without :focus-visible (Safari < 15.4), which would otherwise
-     get no indicator at all now that the trigger is tabbable. */
-  .custom-select-trigger:focus {
-    border-color: var(--c-brand);
-    background: var(--c-bg-base);
-    box-shadow: 0 0 0 4px var(--c-brand-glow);
-  }
-  .custom-select-trigger:focus:not(:focus-visible) {
-    background: var(--c-bg-input);
-    box-shadow: none;
-  }
-  .custom-select-wrapper.open .custom-select-trigger {
-    border-color: var(--c-brand);
-    box-shadow: 0 0 0 4px var(--c-brand-glow);
-  }
-  /* Must stay AFTER the .open rule above: both are specificity (0,2,0), so
-     source order decides. Placed earlier, the error styling would silently
-     disappear the moment the panel opens. */
-  .input-group.error .custom-select-trigger {
-    border-color: var(--c-error);
-    box-shadow: 0 0 0 4px var(--c-error-glow);
-    animation: shake 0.4s ease-in-out;
-  }
-
-  /* Floating label — mirrors the .f-input / .f-label system above, but driven
-     by .has-value instead of :not(:placeholder-shown). */
-  .custom-select-wrapper.has-value .f-label,
-  .custom-select-wrapper.open .f-label,
-  .custom-select-trigger:focus-visible ~ .f-label {
-    transform: translateY(-10px) scale(0.75);
-    color: var(--c-text-300);
-  }
-  .custom-select-wrapper.open .f-label,
-  .custom-select-trigger:focus-visible ~ .f-label {
-    color: var(--c-brand);
-  }
-  .input-group.error .custom-select-wrapper .f-label {
-    color: var(--c-error) !important;
-  }
-
-  .chevron-icon {
-    width: 16px; height: 16px;
-    stroke: var(--c-text-400);
-    transition: transform var(--time-fast) ease;
-  }
-  .custom-select-wrapper.open .chevron-icon {
-    transform: rotate(180deg);
-    stroke: var(--c-brand);
-  }
-
-  /* `transition: all` used to animate `visibility` too, which makes the panel's
-     open state depend on the animation clock: in any context that isn't
-     producing frames (backgrounded tab, throttled/headless renderer) the
-     transition sits at currentTime 0 and reports its START value forever, so
-     the panel stays visibility:hidden no matter what the cascade says.
-     Transition parameters come from the after-change style, so the .open rule
-     governs opening (visibility flips instantly) and the base rule governs
-     closing (visibility holds through the 200ms fade-out). */
-  .custom-options {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0; right: 0;
-    background: var(--c-bg-panel);
-    border: 1px solid var(--c-border-strong);
-    border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transform: translateY(-10px);
-    transition: opacity   var(--time-fast) var(--ease-out-expo),
-                transform var(--time-fast) var(--ease-out-expo),
-                visibility 0s linear var(--time-fast);
-    z-index: 100;
-    max-height: 240px;
-    overflow-x: hidden; /* not `overflow: hidden` — still clips the radius */
-    overflow-y: auto;
-  }
-  .custom-select-wrapper.open .custom-options {
-    opacity: 1;
-    visibility: visible;
-    /* pointer-events is never transitioned, so it flips immediately. Without
-       this the fading-out panel keeps swallowing clicks for 200ms. */
-    pointer-events: auto;
-    transform: translateY(0);
-    transition: opacity   var(--time-fast) var(--ease-out-expo),
-                transform var(--time-fast) var(--ease-out-expo),
-                visibility 0s linear 0s;
-  }
-
-  .custom-option {
-    padding: 14px 16px;
-    font-size: 14px;
-    color: var(--c-text-300);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    transition: background 0.2s, color 0.2s;
-  }
-  /* No :hover rule — the highlight is driven from JS (mouseenter sets .active)
-     so the pointer and the keyboard cursor can never highlight two different
-     options at once. */
-  .custom-option.active {
-    background: rgba(162, 0, 255, 0.08);
-    color: var(--c-text-100);
-  }
-  .custom-option.selected {
-    color: var(--c-brand);
-    font-weight: 600;
-  }
-  .custom-option.active.selected {
-    color: var(--c-brand);
-  }
-  .opt-check {
-    width: 16px; height: 16px;
-    flex: none;
-    opacity: 0;
-    stroke: var(--c-brand);
-    transition: opacity var(--time-fast) ease;
-  }
-  .custom-option.selected .opt-check {
-    opacity: 1;
-  }
-
-  /* Media queries add no specificity, so the .open rule must be named
-     explicitly here — targeting .custom-options alone would leave the open
-     animation running. */
-  @media (prefers-reduced-motion: reduce) {
-    .custom-options,
-    .custom-select-wrapper.open .custom-options {
-      transition: none;
-    }
-    .chevron-icon,
-    .opt-check,
-    .custom-option {
-      transition: none;
-    }
-    .input-group.error .f-input,
-    .input-group.error .custom-select-trigger {
-      animation: none;
-    }
-  }
-
-  /* Windows High Contrast strips box-shadow and rgba backgrounds, which is the
-     entire focus/selection language above. Restore real outlines. */
-  @media (forced-colors: active) {
-    .custom-select-trigger:focus-visible {
-      outline: 3px solid Highlight;
-      outline-offset: 2px;
-    }
-    .custom-option.active {
-      outline: 2px solid Highlight;
-      outline-offset: -2px;
-    }
-    .custom-option.selected {
-      font-weight: 700;
-    }
-    .opt-check {
-      stroke: CanvasText;
-    }
-  }
-
-  /* --- Multi-State Submit Button --- */
-  .btn-submit {
-    width: 100%;
-    background: var(--c-text-100);
-    /* was var(--c-bg-pure), which is defined nowhere: the declaration was
-       invalid at computed-value time, so `color` inherited #E5E5E5 onto a
-       #FFFFFF button (~1.1:1). */
-    color: var(--c-bg-base);
-    border: none;
-    border-radius: 12px;
-    padding: 18px;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all var(--time-fast) ease;
-    margin-top: 16px;
-  }
-  
-  .btn-submit:hover {
-    background: #DDDDDD;
-    transform: translateY(-2px);
-  }
-  
-  .btn-submit:active {
-    transform: translateY(0);
-  }
-
-  .btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .btn-submit:disabled:hover {
-    background: var(--c-text-100);
-    transform: none;
-  }
-
-  /* States */
-  .btn-submit .state-loading,
-  .btn-submit .state-success,
-  .btn-submit .state-error {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: var(--c-bg-card);
-    border: 1px solid var(--c-border-strong);
-    color: var(--c-text-100);
-    border-radius: 12px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(100%);
-    transition: all var(--time-fast) var(--ease-out-expo);
-  }
-
-  .btn-submit.is-loading .state-default { opacity: 0; }
-  .btn-submit.is-loading .state-loading {
-    opacity: 1; visibility: visible; transform: translateY(0);
-  }
-  
-  .btn-submit.is-success .state-default { opacity: 0; }
-  .btn-submit.is-success .state-success {
-    opacity: 1; visibility: visible; transform: translateY(0);
-    background: var(--c-success-glow);
-    border-color: var(--c-success);
-    color: var(--c-success);
-  }
-
-  .btn-submit.is-error .state-default { opacity: 0; }
-  .btn-submit.is-error .state-error {
-    opacity: 1; visibility: visible; transform: translateY(0);
-    background: var(--c-error-glow);
-    border-color: var(--c-error);
-    color: var(--c-error);
-  }
-
-  /* Submit outcome announced to screen readers; the button states are purely
-     visual (they animate opacity, not visibility, so they all stay in the
-     accessibility tree and get read as one run-on string). */
-  .form-status {
-    position: absolute;
-    width: 1px; height: 1px;
-    margin: -1px; padding: 0; border: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  /* Loading Spinner */
-  .btn-spinner {
-    width: 16px; height: 16px;
-    border: 2px solid var(--c-text-400);
-    border-top-color: var(--c-text-100);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* --- Discord Widget --- */
-  .discord-widget {
-    margin-top: 32px;
-    color: inherit;
-    text-decoration: none;
-    background: rgba(88, 101, 242, 0.05);
-    border: 1px solid rgba(88, 101, 242, 0.15);
-    border-radius: 16px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all var(--time-fast) ease;
-    cursor: pointer;
-  }
-  .discord-widget:hover {
-    background: rgba(88, 101, 242, 0.1);
-    border-color: rgba(88, 101, 242, 0.3);
-    transform: translateY(-2px);
-  }
-
-  .dw-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .dw-icon {
-    width: 48px; height: 48px;
-    background: rgba(88, 101, 242, 0.1);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--c-discord);
-  }
-  .dw-text h4 {
-    font-size: 15px; font-weight: 700; color: var(--c-text-100);
-    margin-bottom: 4px;
-  }
-  .dw-stats {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--c-text-300);
-  }
-  .dw-stats .live-dot {
-    width: 6px; height: 6px; background: var(--c-success); border-radius: 50%;
-    box-shadow: 0 0 8px var(--c-success);
-  }
-
-  .dw-arrow {
-    color: var(--c-text-400);
-    transition: transform var(--time-fast) ease, color var(--time-fast) ease;
-  }
-  .discord-widget:hover .dw-arrow {
-    transform: translateX(4px);
-    color: var(--c-discord);
-  }
-
-  /* ==========================================================================
-     6. THE KNOWLEDGE BASE (RIGHT COL) - ACCORDION
-     ========================================================================== */
-  .kb-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .kb-header {
-    margin-bottom: 16px;
-  }
-  .kb-header h3 {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--c-text-100);
-    letter-spacing: -0.02em;
-    margin-bottom: 12px;
-  }
-  .kb-header p {
-    font-size: 16px;
-    color: var(--c-text-400);
-    line-height: 1.5;
-  }
-
-  .faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .faq-item {
-    background: var(--c-bg-card);
-    border: 1px solid var(--c-border-subtle);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: border-color var(--time-fast) ease, background var(--time-fast) ease;
-  }
-  
-  .faq-item:hover {
-    border-color: var(--c-border-strong);
-    background: var(--c-bg-panel);
-  }
-  
-  .faq-item.active {
-    border-color: var(--c-brand);
-    background: var(--c-brand-dim);
-  }
-
-  .faq-trigger {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    outline: none;
-  }
-
-  .faq-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--c-text-200);
-    padding-right: 20px;
-    transition: color var(--time-fast) ease;
-  }
-  .faq-item.active .faq-title {
-    color: var(--c-text-100);
-  }
-
-  /* Morphing Plus/Minus Icon */
-  .faq-icon {
-    position: relative;
-    width: 20px; height: 20px;
-    flex-shrink: 0;
-  }
-  .faq-icon::before, .faq-icon::after {
-    content: '';
-    position: absolute;
-    background: var(--c-text-400);
-    border-radius: 2px;
-    transition: all var(--time-med) var(--ease-spring);
-  }
-  .faq-icon::before {
-    top: 9px; left: 0; width: 20px; height: 2px;
-  }
-  .faq-icon::after {
-    top: 0; left: 9px; width: 2px; height: 20px;
-  }
-  
-  .faq-item:hover .faq-icon::before,
-  .faq-item:hover .faq-icon::after {
-    background: var(--c-text-200);
-  }
-
-  .faq-item.active .faq-icon::before {
-    background: var(--c-brand);
-    transform: rotate(180deg);
-  }
-  .faq-item.active .faq-icon::after {
-    background: var(--c-brand);
-    transform: rotate(90deg); /* Morphs to a minus sign */
-  }
-
-  /* Smooth Height Transition Content */
-  .faq-content {
-    height: 0;
-    opacity: 0;
-    visibility: hidden;
-    overflow: hidden;
-    transition: height var(--time-med) var(--ease-spring), opacity var(--time-fast) ease;
-  }
-  .faq-content-inner {
-    padding: 0 24px 24px;
-    font-size: 15px;
-    color: var(--c-text-300);
-    line-height: 1.6;
-  }
-  .faq-content-inner strong {
-    color: var(--c-text-200);
-  }
-
-  /* ==========================================================================
-     7. RESPONSIVE DESIGN
-     ========================================================================== */
-  @media (max-width: 1024px) {
-    .layout-split {
-      grid-template-columns: 1fr;
-      gap: 80px;
-    }
-    .terminal-panel {
-      order: 2; /* Put FAQs first on mobile */
-    }
-    .kb-panel {
-      order: 1;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .section-contact {
-      padding: 100px 16px;
-    }
-    .title-hero {
-      font-size: 36px;
-    }
-    .terminal-panel {
-      padding: 24px;
-    }
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-    .faq-trigger {
-      padding: 20px;
-    }
-    .faq-content-inner {
-      padding: 0 20px 20px;
-    }
-  }
-</style>
-
-
-
-<section class="section-contact">
-  
-  <!-- Ambient Radar Animation -->
-  <div class="ambient-radar"></div>
-  <div class="ambient-glow"></div>
-
-  <div class="wrapper-core">
-    
-    <!-- Intro Header -->
-    <header class="header-block">
-      <div class="badge-tech">
-        <div class="dot"></div> Comm Link Active
-      </div>
-      <h1 class="title-hero">System Offline?<br><span>We've got you.</span></h1>
-      <p class="desc-intro">
-        Whether you need help tuning your filters, managing your subscription, or connecting to the Discord syndicate, our team is monitoring the channels.
-      </p>
-    </header>
-
-    <!-- Split Layout -->
-    <div class="layout-split">
-      
-      <!-- LEFT COL: CONTACT TERMINAL -->
-      <div class="terminal-panel">
-        
-        <div class="form-header">
-          <h3>Open a Ticket</h3>
-          <p>Sending opens an email to snypd@gmail.com in your own mail app.</p>
-        </div>
-
-        <!-- novalidate: interactive constraint validation runs BEFORE the submit
-             event, so without it the browser's own bubble fires on the `required`
-             fields and the custom .error styling below never runs.
-             onsubmit="return false" is kept deliberately as the no-JS safety net:
-             if the script fails to load, a native submit would navigate away and
-             discard whatever the user typed. -->
-        <form id="snypdContactForm" class="form-grid" novalidate onsubmit="return false;">
-          
-          <!-- Name Input -->
-          <div class="input-group" id="grpName">
-            <input type="text" id="pilotName" class="f-input" placeholder=" " required autocomplete="off">
-            <label for="pilotName" class="f-label">Pilot Name</label>
-          </div>
-
-          <!-- Email Input -->
-          <div class="input-group" id="grpEmail">
-            <input type="email" id="pilotEmail" class="f-input" placeholder=" " required autocomplete="off">
-            <label for="pilotEmail" class="f-label">Email Address</label>
-          </div>
-
-          <!-- Custom Dropdown (Topic) -->
-          <div class="input-group fg-full" id="grpTopic">
-            <div class="custom-select-wrapper" id="topicSelect">
-              <div class="custom-select-trigger" id="topicTrigger"
-                   role="combobox" tabindex="0" aria-haspopup="listbox"
-                   aria-expanded="false" aria-controls="topicOptions"
-                   aria-labelledby="topicLabel">
-                <span class="custom-select-value" id="topicTriggerText"></span>
-                <svg class="chevron-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </div>
-              <label class="f-label" id="topicLabel">Query Type</label>
-              <div class="custom-options" id="topicOptions" role="listbox" aria-labelledby="topicLabel">
-                <div class="custom-option" role="option" id="topicOpt-tech" data-value="tech">
-                  <span class="opt-label">Technical & Engine Support</span>
-                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <div class="custom-option" role="option" id="topicOpt-billing" data-value="billing">
-                  <span class="opt-label">Billing & Subscriptions</span>
-                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <div class="custom-option" role="option" id="topicOpt-discord" data-value="discord">
-                  <span class="opt-label">Push Notification Setup</span>
-                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-                <div class="custom-option" role="option" id="topicOpt-bug" data-value="bug">
-                  <span class="opt-label">Report a System Bug</span>
-                  <svg class="opt-check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
-              </div>
-            </div>
-            <!-- Hidden real input for form submission logic. `required` was
-                 removed: hidden inputs are barred from constraint validation,
-                 so it never did anything. The topic is validated in JS. -->
-            <input type="hidden" id="topicValue" name="topic">
-          </div>
-
-          <!-- Message Textarea -->
-          <div class="input-group fg-full">
-            <textarea id="pilotMsg" class="f-input" placeholder=" " required maxlength="500"></textarea>
-            <label for="pilotMsg" class="f-label">Your Transmission...</label>
-            <div class="char-counter"><span id="charCount">0</span>/500</div>
-          </div>
-
-          <!-- Multi-State Submit Button -->
-          <div class="input-group fg-full">
-            <button type="submit" class="btn-submit" id="btnSubmit">
-              
-              <div class="state-default">
-                SEND MESSAGE
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              </div>
-              
-              <div class="state-loading">
-                <div class="btn-spinner"></div>
-                OPENING EMAIL...
-              </div>
-
-              <div class="state-success">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                EMAIL APP OPENED
-              </div>
-
-              <div class="state-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12" y2="16"></line><circle cx="12" cy="12" r="9"></circle></svg>
-                COULD NOT OPEN EMAIL
-              </div>
-
-            </button>
-            <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
-            <p style="margin:10px 0 0;font-size:13px;opacity:.75;">Prefer to write directly? <a href="mailto:snypd@gmail.com" style="color:inherit;text-decoration:underline;">snypd@gmail.com</a></p>
-          </div>
-
-        </form>
-
-        <!-- Discord Widget -->
-        <a class="discord-widget" href="https://discord.gg/gjKD4auXhK" target="_blank" rel="noopener">
-          <div class="dw-info">
-            <div class="dw-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
-            </div>
-            <div class="dw-text">
-              <h4>SNYPD Discord</h4>
-              <div class="dw-stats">Ask the community</div>
-            </div>
-          </div>
-          <svg class="dw-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </a>
-
-      </div>
-
-      <!-- RIGHT COL: KNOWLEDGE BASE (FAQ) -->
-      <div class="kb-panel">
-        
-        <div class="kb-header">
-          <h3>The Knowledge Base</h3>
-          <p>Common questions about the SNYPD engine, automation speeds, and platform security.</p>
-        </div>
-
-        <div class="faq-list">
-          
-          <!-- FAQ 1 -->
-          <div class="faq-item">
-            <button class="faq-trigger" aria-expanded="false">
-              <span class="faq-title">How fast does SNYPD catch Vinted listings?</span>
-              <div class="faq-icon"></div>
-            </button>
-            <div class="faq-content">
-              <div class="faq-content-inner">
-                Our engine polls Vinted continuously and speeds up automatically on searches that are actively finding new items, checking as often as every 30 seconds. When a match is found it lands on your dashboard and triggers a push notification right away.
-              </div>
-            </div>
-          </div>
-
-          <!-- FAQ 2 -->
-          <div class="faq-item">
-            <button class="faq-trigger" aria-expanded="false">
-              <span class="faq-title">Does SNYPD automatically buy the items for me?</span>
-              <div class="faq-icon"></div>
-            </button>
-            <div class="faq-content">
-              <div class="faq-content-inner">
-                No. SNYPD is an alert and discovery engine, not an auto-checkout bot. We alert you to new listings, but you keep <strong>full control</strong> over the purchasing decision, payment processing, and shipping options.
-              </div>
-            </div>
-          </div>
-
-          <!-- FAQ 3 -->
-          <div class="faq-item">
-            <button class="faq-trigger" aria-expanded="false">
-              <span class="faq-title">Do I need to keep the dashboard open?</span>
-              <div class="faq-icon"></div>
-            </button>
-            <div class="faq-content">
-              <div class="faq-content-inner">
-                Depends on your plan. On the <strong>Free</strong> tier, your first 7 days run <strong>24/7</strong> like a paid plan; after that, monitoring runs while your dashboard tab is open, so keep it pinned in the background while you work. On paid tiers, your searches keep running <strong>24/7</strong> even after you close the tab &mdash; enable push notifications once and you'll get a push alert when something matches, dashboard closed or not.
-              </div>
-            </div>
-          </div>
-
-          <!-- FAQ 4 -->
-          <div class="faq-item">
-            <button class="faq-trigger" aria-expanded="false">
-              <span class="faq-title">Will this get my personal Vinted account banned?</span>
-              <div class="faq-icon"></div>
-            </button>
-            <div class="faq-content">
-              <div class="faq-content-inner">
-                SNYPD operates <strong>entirely independently</strong> of your personal Vinted account. We do not use your session tokens to scrape. You only use your personal account to make the final manual purchase &mdash; so nothing about how your account behaves on Vinted changes.
-              </div>
-            </div>
-          </div>
-
-          <!-- FAQ 5 -->
-          <div class="faq-item">
-            <button class="faq-trigger" aria-expanded="false">
-              <span class="faq-title">How do I integrate this with Discord?</span>
-              <div class="faq-icon"></div>
-            </button>
-            <div class="faq-content">
-              <div class="faq-content-inner">
-                SNYPD does not send alerts to Discord. To get alerts on your phone away from your PC, install SNYPD to your home screen and turn on alerts. Paid plans, and Free during its first 7 days, keep checking with the dashboard closed; after that, Free checks only while SNYPD is open.
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  
-
-<!-- ==========================================================================
-     8. ENGINE LOGIC (VANILLA JS)
-     ========================================================================== -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-
-    /* --- A. FAQ Accordion Engine --- */
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    faqItems.forEach(item => {
-      const trigger = item.querySelector('.faq-trigger');
-      const content = item.querySelector('.faq-content');
-      
-      trigger.addEventListener('click', () => {
-        const isActive = item.classList.contains('active');
-        
-        // Close all other accordions for clean UX
-        faqItems.forEach(otherItem => {
-          otherItem.classList.remove('active');
-          otherItem.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
-          otherItem.querySelector('.faq-content').style.height = '0px';
-          otherItem.querySelector('.faq-content').style.opacity = '0';
-          otherItem.querySelector('.faq-content').style.visibility = 'hidden';
-        });
-
-        // Toggle current accordion
-        if (!isActive) {
-          item.classList.add('active');
-          trigger.setAttribute('aria-expanded', 'true');
-          
-          // Calculate height dynamically for smooth spring animation
-          const innerHeight = content.querySelector('.faq-content-inner').offsetHeight;
-          content.style.height = `${innerHeight}px`;
-          content.style.opacity = '1';
-          content.style.visibility = 'visible';
-        }
-      });
-    });
-
-
-    /* --- B. Custom Select Dropdown Engine ---
-       ARIA APG "select-only combobox": focus never leaves the trigger, the
-       listbox is never focusable, and the highlighted option is communicated
-       via aria-activedescendant.
-       Every lookup is scoped to the wrapper on purpose — this page is several
-       concatenated Webflow embeds, so a document-wide `.custom-option` query is
-       a live collision risk. */
-    const selectWrapper = document.getElementById('topicSelect');
-    const selectTrigger = document.getElementById('topicTrigger');
-    const optionsPanel  = document.getElementById('topicOptions');
-    const triggerText   = document.getElementById('topicTriggerText');
-    const grpTopic      = document.getElementById('grpTopic');
-    const options = Array.from(selectWrapper.querySelectorAll('.custom-option'));
-    const hiddenInput = document.getElementById('topicValue');
-    const TRIGGER_PLACEHOLDER = '';
-
-    let activeIndex = -1;
-    let typeahead = '';
-    let typeaheadTimer = null;
-
-    const isOpen = () => selectWrapper.classList.contains('open');
-    const selectedIndex = () => options.findIndex(o => o.classList.contains('selected'));
-
-    // Don't use scrollIntoView(): .terminal-panel is overflow:hidden, which is
-    // still programmatically scrollable, so it would silently shift the whole
-    // form inside its own rounded box with no scrollbar to explain it.
-    function scrollActiveIntoView(el) {
-      if (el.offsetTop < optionsPanel.scrollTop) {
-        optionsPanel.scrollTop = el.offsetTop;
-      } else if (el.offsetTop + el.offsetHeight > optionsPanel.scrollTop + optionsPanel.clientHeight) {
-        optionsPanel.scrollTop = el.offsetTop + el.offsetHeight - optionsPanel.clientHeight;
-      }
-    }
-
-    function setActive(index) {
-      if (!options.length) return;
-      activeIndex = (index + options.length) % options.length;
-      options.forEach((opt, i) => opt.classList.toggle('active', i === activeIndex));
-      const el = options[activeIndex];
-      selectTrigger.setAttribute('aria-activedescendant', el.id);
-      scrollActiveIntoView(el);
-    }
-
-    function openPanel() {
-      if (isOpen()) return;
-      selectWrapper.classList.add('open');
-      selectTrigger.setAttribute('aria-expanded', 'true');
-      // APG: open on the selected option if there is one, else the first.
-      setActive(selectedIndex() >= 0 ? selectedIndex() : 0);
-    }
-
-    function closePanel() {
-      if (!isOpen()) return;
-      selectWrapper.classList.remove('open');
-      selectTrigger.setAttribute('aria-expanded', 'false');
-      selectTrigger.removeAttribute('aria-activedescendant');
-      options.forEach(opt => opt.classList.remove('active'));
-      activeIndex = -1;
-    }
-
-    function selectOption(option) {
-      options.forEach(opt => {
-        const on = opt === option;
-        opt.classList.toggle('selected', on);
-        // APG: mark only the selected option. Setting aria-selected="false" on
-        // the rest makes several screen readers announce "not selected" on
-        // every arrow press.
-        if (on) opt.setAttribute('aria-selected', 'true');
-        else opt.removeAttribute('aria-selected');
-      });
-      triggerText.textContent = option.querySelector('.opt-label').textContent;
-      selectWrapper.classList.add('has-value');
-      hiddenInput.value = option.getAttribute('data-value');
-      clearTopicError();
-    }
-
-    function clearSelection() {
-      options.forEach(opt => {
-        opt.classList.remove('selected', 'active');
-        opt.removeAttribute('aria-selected');
-      });
-      triggerText.textContent = TRIGGER_PLACEHOLDER;
-      selectWrapper.classList.remove('has-value');
-      hiddenInput.value = '';
-      clearTopicError();
-    }
-
-    function clearTopicError() {
-      grpTopic.classList.remove('error');
-      selectTrigger.removeAttribute('aria-invalid');
-    }
-
-    selectTrigger.addEventListener('click', () => {
-      // No stopPropagation: it silently breaks unrelated global click handlers
-      // (this page has another one for the mobile nav). The outside-click
-      // closer below uses a containment check instead.
-      selectTrigger.focus();
-      isOpen() ? closePanel() : openPanel();
-    });
-
-    // Options aren't focusable, so clicking one moves focus to <body>, which
-    // fires focusout BEFORE the option's click and would cancel the selection.
-    // Suppressing mousedown's default keeps focus on the trigger throughout.
-    optionsPanel.addEventListener('mousedown', (e) => e.preventDefault());
-
-    options.forEach((option, i) => {
-      option.addEventListener('click', () => {
-        selectOption(option);
-        closePanel();
-        selectTrigger.focus();
-      });
-      // Pointer highlight is driven through the same .active class as the
-      // keyboard cursor, so the two can never disagree.
-      option.addEventListener('mouseenter', () => { if (isOpen()) setActive(i); });
-    });
-
-    selectTrigger.addEventListener('keydown', (e) => {
-      const open = isOpen();
-
-      switch (e.key) {
-        case 'Enter':
-        case ' ':
-        case 'Spacebar':
-          e.preventDefault(); // Space would scroll the page off a div[tabindex]
-          if (open) {
-            if (activeIndex >= 0) selectOption(options[activeIndex]);
-            closePanel();
-          } else {
-            openPanel();
-          }
-          return;
-
-        case 'ArrowDown':
-          e.preventDefault();
-          if (e.altKey) { openPanel(); return; }
-          if (open) setActive(activeIndex + 1); else openPanel();
-          return;
-
-        case 'ArrowUp':
-          e.preventDefault();
-          if (e.altKey) { closePanel(); return; }
-          if (open) setActive(activeIndex - 1); else openPanel();
-          return;
-
-        case 'Home':
-          e.preventDefault();
-          if (!open) openPanel();
-          setActive(0);
-          return;
-
-        case 'End':
-          e.preventDefault();
-          if (!open) openPanel();
-          setActive(options.length - 1);
-          return;
-
-        case 'Escape':
-          // Only intercept when open, so Escape stays available to anything else.
-          if (open) { e.preventDefault(); closePanel(); }
-          return;
-
-        case 'Tab':
-          // Never preventDefault — focus must be allowed to move on.
-          closePanel();
-          return;
-      }
-
-      // Typeahead. The modifier guard stops Ctrl+R / Cmd+V being swallowed.
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        e.preventDefault();
-        if (!open) openPanel();
-        typeahead += e.key.toLowerCase();
-        clearTimeout(typeaheadTimer);
-        typeaheadTimer = setTimeout(() => { typeahead = ''; }, 500);
-        const match = options.findIndex(
-          o => o.querySelector('.opt-label').textContent.trim().toLowerCase().startsWith(typeahead)
-        );
-        if (match >= 0) setActive(match);
-      }
-    });
-
-    // Close when focus leaves the widget by any route.
-    selectWrapper.addEventListener('focusout', (e) => {
-      if (!selectWrapper.contains(e.relatedTarget)) closePanel();
-    });
-
-    // Capture phase, so this still runs even though other handlers on this page
-    // call stopPropagation() during the bubble phase (e.g. the mobile nav
-    // toggle). pointerdown rather than click matches native menu behaviour.
-    document.addEventListener('pointerdown', (e) => {
-      if (!selectWrapper.contains(e.target)) closePanel();
-    }, true);
-
-
-    /* --- C. Form Validation & Character Counter --- */
-    const emailInput = document.getElementById('pilotEmail');
-    const msgInput = document.getElementById('pilotMsg');
-    const charCount = document.getElementById('charCount');
-    const grpEmail = document.getElementById('grpEmail');
-
-    // Simple Email Regex Validator
-    const validateEmail = (email) => {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    };
-
-    emailInput.addEventListener('blur', () => {
-      if (emailInput.value.length === 0) {
-        grpEmail.classList.remove('error', 'success');
-        return;
-      }
-      if (!validateEmail(emailInput.value)) {
-        grpEmail.classList.add('error');
-        grpEmail.classList.remove('success');
-      } else {
-        grpEmail.classList.remove('error');
-        grpEmail.classList.add('success');
-      }
-    });
-
-    // Remove error state on typing
-    emailInput.addEventListener('input', () => {
-      grpEmail.classList.remove('error');
-    });
-    document.getElementById('pilotName').addEventListener('input', (e) => {
-      if (e.target.value.trim()) e.target.closest('.input-group').classList.remove('error');
-    });
-
-    // Character Counter
-    msgInput.addEventListener('input', () => {
-      charCount.textContent = msgInput.value.length;
-      if (msgInput.value.trim()) msgInput.closest('.input-group').classList.remove('error');
-    });
-
-
-    /* --- D. Multi-State Submit Button Engine --- */
-    const form = document.getElementById('snypdContactForm');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const nameInput = document.getElementById('pilotName');
-    const grpName = document.getElementById('grpName');
-    const formStatus = document.getElementById('formStatus');
-
-    /* ── Support ticket endpoint ──────────────────────────────────────────
-       TODO: set this to the API route once it exists on the backend, e.g.
-             '/api/v1/support-ticket'
-       While it is null the form reports a real failure instead of faking
-       success — this page previously animated "SECURED." and then silently
-       discarded every message. Mirrors the prod-vs-VPS derivation used by
-       HEARTBEAT_URL in dashboard.html.
-       Backend note: sending JSON cross-origin (snypd.store -> api.snypd.store)
-       triggers a CORS preflight, so the route needs OPTIONS handling. */
-    const SUPPORT_TICKET_ROUTE = null;
-    const SUPPORT_TICKET_TIMEOUT_MS = 15000;
-
-    const SUPPORT_TICKET_URL = (() => {
-      if (!SUPPORT_TICKET_ROUTE) return null;
-      const isProd = /(^|\.)snypd\.store$/i.test(location.hostname);
-      if (isProd) return `https://api.snypd.store${SUPPORT_TICKET_ROUTE}`;
-      const scheme = location.protocol === 'https:' ? 'https' : 'http';
-      return `${scheme}://82.165.195.178${SUPPORT_TICKET_ROUTE}`;
-    })();
-
-    let resetTimer = null;
-    let inFlight = false;
-
-    function setButtonState(state) {
-      btnSubmit.classList.remove('is-loading', 'is-success', 'is-error');
-      if (state) btnSubmit.classList.add(state);
-      // These panels animate opacity, not visibility, so without this they all
-      // stay in the accessibility tree and get read as one run-on string.
-      btnSubmit.querySelectorAll('.state-default, .state-loading, .state-success, .state-error')
-        .forEach(el => {
-          const shown = el.classList.contains(state ? `state-${state.replace('is-', '')}` : 'state-default');
-          el.setAttribute('aria-hidden', shown ? 'false' : 'true');
-        });
-    }
-
-    function announce(message) {
-      formStatus.textContent = message;
-    }
-
-    // Any keystroke cancels a pending reset: the 3s timer used to wipe whatever
-    // the user had started typing, and two submits stacked two timers.
-    function cancelPendingReset() {
-      if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
-    }
-    form.addEventListener('input', cancelPendingReset);
-
-    // Centralised so every reset path stays consistent, including a native
-    // reset button if one is ever added.
-    form.addEventListener('reset', () => {
-      clearSelection();
-      charCount.textContent = '0';
-      grpEmail.classList.remove('success', 'error');
-      grpName.classList.remove('error');
-      grpTopic.classList.remove('error');
-    });
-
-    function validateForm() {
-      let firstInvalid = null;
-
-      grpName.classList.toggle('error', !nameInput.value.trim());
-      if (!nameInput.value.trim()) firstInvalid = firstInvalid || nameInput;
-
-      const emailOk = validateEmail(emailInput.value);
-      grpEmail.classList.toggle('error', !emailOk);
-      if (!emailOk) firstInvalid = firstInvalid || emailInput;
-
-      // The topic was never validated before: `required` on a hidden input is
-      // inert, so a ticket could be filed with no category at all.
-      const topicOk = !!hiddenInput.value;
-      grpTopic.classList.toggle('error', !topicOk);
-      selectTrigger.setAttribute('aria-invalid', topicOk ? 'false' : 'true');
-      if (!topicOk) firstInvalid = firstInvalid || selectTrigger;
-
-      const msgOk = !!msgInput.value.trim();
-      msgInput.closest('.input-group').classList.toggle('error', !msgOk);
-      if (!msgOk) firstInvalid = firstInvalid || msgInput;
-
-      return firstInvalid;
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (inFlight) return;
-      cancelPendingReset();
-
-      const firstInvalid = validateForm();
-      if (firstInvalid) {
-        announce('Some fields need attention before this can be sent.');
-        firstInvalid.focus();
-        return;
-      }
-
-      const payload = {
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        topic: hiddenInput.value,
-        message: msgInput.value.trim(),
-      };
-
-      inFlight = true;
-      btnSubmit.disabled = true;
-      setButtonState('is-loading');
-      announce('Sending your message.');
-
-      try {
-        if (!SUPPORT_TICKET_URL) {
-          // No backend route yet (see SUPPORT_TICKET_ROUTE above), so hand the
-          // message to the visitor's own email app instead of reporting a
-          // failure for something they can still do. Same fallback as the
-          // unmerged 4471962 fix, addressed to the inbox the site publishes.
-          const subject = encodeURIComponent('SNYPD support: ' + payload.topic);
-          const body = encodeURIComponent('Name: ' + payload.name + '\nEmail: ' + payload.email + '\n\n' + payload.message);
-          window.location.href = 'mailto:snypd@gmail.com?subject=' + subject + '&body=' + body;
-          setButtonState('is-success');
-          announce('Your email app should open with this message. Press send there, or write to snypd@gmail.com.');
-          return;
-        }
-
-        // Without an abort the button can stay disabled forever on a hung request.
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), SUPPORT_TICKET_TIMEOUT_MS);
-        let res;
-        try {
-          res = await fetch(SUPPORT_TICKET_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: controller.signal,
-          });
-        } finally {
-          clearTimeout(timeout);
-        }
-        if (!res.ok) throw new Error(`Support endpoint returned ${res.status}`);
-
-        setButtonState('is-success');
-        announce('Message sent. We reply within 24 hours.');
-        resetTimer = setTimeout(() => {
-          resetTimer = null;
-          form.reset();
-          setButtonState(null);
-        }, 3000);
-      } catch (err) {
-        console.error('[snypd] support ticket failed:', err);
-        setButtonState('is-error');
-        announce('Your message could not be sent. Please email us or try again.');
-        resetTimer = setTimeout(() => {
-          resetTimer = null;
-          setButtonState(null);
-        }, 4000);
-      } finally {
-        inFlight = false;
-        btnSubmit.disabled = false;
-      }
-    });
-
-    // Establish the initial aria-hidden bookkeeping on the button states.
-    setButtonState(null);
-
-  });
 </script>
-
-
-</div>
-<style>
-  /* The removed testimonial section (2026-09-27) carried the last stylesheet
-     on this page, and its body rule overrode the base colours. Kept so the
-     rest of the page renders exactly as before. */
-  body { background: #050505; color: #F5F5F5; }
-  /* .ambient-radar is a rotating 2560px square inside this section. The
-     testimonials used to sit under its overhang; without them it left ~700px
-     of empty page to scroll into. Clip it to the section it decorates. */
-  .section-contact { overflow: hidden; overflow: clip; }
-</style>
-
-
-</body></html>
-
-
+</head>
+<body>
+<header class="lg-nav">
+  <div class="lg-wrap lg-nav-in">
+    <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
+    <nav class="lg-links" aria-label="Main"><a class="lg-navlink" href="/vinted-bot">VINTED BOT</a><a class="lg-navlink" href="/vinted-price-guide">VINTED PRICES</a><a class="lg-navlink" href="/plans">PRICING</a><a class="lg-navlink" href="https://discord.gg/gjKD4auXhK">DISCORD</a></nav>
+    
+    <a class="lg-navlink lg-login" href="/login">LOG IN</a>
+    <a class="lg-cta" href="/signup">START FREE</a>
+  </div>
+</header>
+<main>
+  <div class="lg-head">
+    <div class="lg-wrap lg-head-in">
+      <span class="lg-eyebrow">SUPPORT</span>
+      <h1 class="lg-h1">Something not working?</h1>
+      <span class="lg-meta">Updated <time datetime="2026-10-10">10 October 2026</time> &middot; By SNYPD, built by a Belgian sneaker reseller</span>
+      <p class="lg-lead">Find your problem below and follow the steps. If that does not fix it, email us: we answer every email within 24 hours.</p>
+      
+    </div>
+  </div>
+  <div class="lg-wrap lg-grid">
+    <nav class="lg-toc" aria-label="On This Page"><span>ON THIS PAGE</span><a href="#person">Reach a person</a><a href="#no-alerts">Alerts are not arriving</a><a href="#missing-listing">A listing I expected did not show up</a><a href="#link-refused">My search link was refused</a><a href="#plan">I paid but my plan did not change</a><a href="#billing">Cancel, refund or change plan</a><a href="#more">Other questions</a></nav>
+    <article class="lg-doc">
+<section id="person"><h2>Reach a person</h2><div class="lg-box lg-mint"><p>Email <a href="mailto:snypd@gmail.com">snypd@gmail.com</a>. We answer every email within 24 hours. Use the email address of your SNYPD account, so we can find it.</p><p>Questions about reselling or how others set up their searches: the <a href="https://discord.gg/gjKD4auXhK">SNYPD Discord</a> community.</p></div><p>Most of the problems below can be fixed in a few steps. Each section has a button that opens an email with the details we need already listed.</p></section><section id="no-alerts"><h2>Alerts are not arriving</h2><ol><li>Check that the search is <strong>Active</strong> in your dashboard and that new matches show up there. If they do, the search works and the problem is the notification.</li><li>Turn alerts on from the dashboard on the device that should ring. On iPhone this only works from the SNYPD app on your Home Screen (Safari &rarr; Share &rarr; Add to Home Screen).</li><li>Check that Focus or Do Not Disturb is off for SNYPD, and that your browser is allowed to show notifications.</li><li>On Free after the first 7 days, searches run only while your dashboard is open. Paid plans keep running with it closed.</li></ol><p><a class="ct-btn ct-ghost" href="mailto:snypd@gmail.com?subject=SNYPD%3A%20Alerts%20not%20arriving&amp;body=Account%20email%3A%0ADevice%20and%20browser%20%28e.g.%20iPhone%20Home%20Screen%20app%2C%20Chrome%20on%20Android%29%3A%0ADo%20matches%20show%20in%20your%20dashboard%3F%20yes%2Fno%3A%0A">EMAIL US ABOUT THIS</a></p></section><section id="missing-listing"><h2>A listing I expected did not show up</h2><ol><li>Open your search link on Vinted and check that the listing matches every filter in it (size, price, condition, country site).</li><li>Vinted itself adds a new listing to its search a few minutes after it is posted, so a very fresh listing can appear a little later.</li><li>Matches stay in your dashboard for about 30 minutes while the listing is up; the push notification is the record of older ones.</li></ol><p><a class="ct-btn ct-ghost" href="mailto:snypd@gmail.com?subject=SNYPD%3A%20Listing%20missing&amp;body=Account%20email%3A%0ALink%20to%20the%20Vinted%20listing%3A%0AWhich%20of%20your%20searches%20should%20have%20found%20it%3A%0AWhen%20you%20saw%20it%20on%20Vinted%20%28time%29%3A%0A">EMAIL US ABOUT THIS</a></p></section><section id="link-refused"><h2>My search link was refused</h2><ol><li>SNYPD keeps every filter in your link. When a link contains something it cannot read, it refuses the link and says which part, rather than running a different search.</li><li>Remove that filter on Vinted, copy the link again from the address bar and paste it.</li></ol><p><a class="ct-btn ct-ghost" href="mailto:snypd@gmail.com?subject=SNYPD%3A%20Search%20link%20refused&amp;body=Account%20email%3A%0AThe%20link%20you%20pasted%3A%0AThe%20message%20SNYPD%20showed%3A%0A">EMAIL US ABOUT THIS</a></p></section><section id="plan"><h2>I paid but my plan did not change</h2><ol><li>Your plan links to your SNYPD account by email: the email used at Whop checkout must be the same as your SNYPD account email.</li><li>Your plan updates automatically after payment, and a check every 15 minutes catches any update that was missed: reload the dashboard. If it still shows Free, email us with your Whop receipt and we link it by hand.</li></ol><p><a class="ct-btn ct-ghost" href="mailto:snypd@gmail.com?subject=SNYPD%3A%20Plan%20not%20updated&amp;body=SNYPD%20account%20email%3A%0AEmail%20used%20at%20Whop%20checkout%3A%0APlan%20bought%3A%0A">EMAIL US ABOUT THIS</a></p></section><section id="billing"><h2>Cancel, refund or change plan</h2><ol><li>Cancel any time in your <a href="https://whop.com/@me/settings/orders/">Whop account</a> (Orders), or Account &rarr; Manage subscription in SNYPD. Your plan runs to the end of the month you paid for.</li><li>Full refund within 14 days of your first payment for a plan: email us from your account email.</li><li>To move between paid plans, manage your subscription in Whop, or email us and we help you switch.</li></ol><p><a class="ct-btn ct-ghost" href="mailto:snypd@gmail.com?subject=SNYPD%3A%20Billing&amp;body=SNYPD%20account%20email%3A%0AWhat%20you%20would%20like%20%28cancel%20%2F%20refund%20%2F%20change%20to%20which%20plan%29%3A%0A">EMAIL US ABOUT THIS</a></p></section><section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. Prices and limits: <a href="/plans">plans</a>.</p></section>
+    </article>
+  </div>
+</main>
+<footer class="lg-foot">
+  <div class="lg-wrap lg-foot-in">
+    <div class="lg-foot-a">
+      <small>SNYPD &middot; NOT AFFILIATED WITH VINTED</small>
+      <span class="lg-foot-t">Reads public listings only.</span>
+      <span class="lg-foot-l"><a href="/vinted-bot">Vinted bot</a><a href="/vinted-monitor">Vinted monitor</a><a href="/vinted-saved-search-alerts">Vinted notifications</a><a href="/vinted-notifications-not-working">Vinted notifications not working</a><a href="/vinted-bot-comparison">Vinted bots compared</a><a href="/vinted-price-guide">Vinted price guide</a><a href="/vinted-market-report">Vinted market report</a><a href="/vinted-prices">Vinted prices (Sept 2026)</a><a href="/vinted-deals">Vinted deals</a><a href="/vinted-fees">Vinted fees</a><a href="/faq">FAQ</a><a href="/support">Support</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+    </div>
+    <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a></nav>
+  </div>
+</footer>
+</body>
+</html>

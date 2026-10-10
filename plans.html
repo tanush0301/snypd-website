@@ -234,16 +234,24 @@
   .whop-embed-box [data-whop-checkout-plan-id]:empty::before { content: "Loading secure checkout..."; display: block; padding: 40px 8px; text-align: center; color: #8B9094; font-size: 13px; }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
+  /* supabase-js loads deferred (it no longer blocks the first paint). Code that needs the
+     client waits for SNYPD.sbReady, which resolves to the client, or null if the library
+     failed to load (then the page simply stays in its signed-out state). */
   window.SNYPD = window.SNYPD || {};
-  if (!SNYPD.supabase) {
-    SNYPD.supabase = supabase.createClient(
-      'https://igbuqanjocfmahlzzupc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
-    );
-  }
+  SNYPD.sbReady = new Promise(function (resolve) {
+    SNYPD.sbInit = function () {
+      try {
+        if (!SNYPD.supabase && window.supabase) SNYPD.supabase = supabase.createClient(
+          'https://igbuqanjocfmahlzzupc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ'
+        );
+      } catch (e) {}
+      resolve(SNYPD.supabase || null);
+    };
+  });
 </script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" onload="SNYPD.sbInit()" onerror="SNYPD.sbInit()"></script>
 
 <!-- Cookie consent: Google Analytics loads only after the visitor agrees. The Whop
      pixel is not declared here: Whop's checkout loader brings its own, and that
@@ -843,7 +851,7 @@
     return PLANS.indexOf(v) !== -1 ? v : null;
   }
   async function loadPlan() {
-    var sb = window.SNYPD && SNYPD.supabase;
+    var sb = await SNYPD.sbReady;
     if (!sb || !sb.auth) return;
     var res = await sb.auth.getSession();
     var user = res && res.data && res.data.session && res.data.session.user;
@@ -903,15 +911,16 @@
   // ----- Listings figure ------------------------------------------------------
   // Same cached figure as the homepage (public_stats, refreshed every 15 min by
   // pg_cron, migration 033). On any failure the line stays hidden.
-  try {
-    SNYPD.supabase.from('public_stats').select('value').eq('key', 'listings_matched').maybeSingle()
+  SNYPD.sbReady.then(function (sb) {
+    if (!sb) return;
+    sb.from('public_stats').select('value').eq('key', 'listings_matched').maybeSingle()
       .then(function (res) {
         var v = res && res.data && res.data.value;
         if (typeof v !== 'number' || v <= 0) return;
         $('proof-n').textContent = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         $('proof').hidden = false;
       }, function () {});
-  } catch (e) {}
+  });
 
   // ----- Founding counter ---------------------------------------------------
   fetch(FOUNDING_ENDPOINT)

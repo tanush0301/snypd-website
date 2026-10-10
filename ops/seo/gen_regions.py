@@ -163,6 +163,49 @@ def faq_html():
                        for q, a in faqs())
 
 
+# ----------------------------------------------------------------- homepage price data
+# A few items from the price guide (ops/seo/data/price-guide.json via gen_price_guide.py) and the
+# latest Market Report edition. Numbers only from those generators; the item list is a choice.
+HOME_ITEMS = ['nike-dunk-low', 'jordan-4', 'ralph-lauren-polo', 'adidas-samba']
+
+
+def home_data():
+    import gen_price_guide as pg
+    import gen_market_report as mr
+    from gen_content import money, num
+    items = [it for slug in HOME_ITEMS for it in pg.PUB if it['slug'] == slug]
+    if len(items) < 3:
+        sys.exit('gen_regions: fewer than 3 homepage items are published in the price guide; edit HOME_ITEMS')
+    total = sum(pg.V[it['slug']]['sample_size'] for it in pg.PUB)
+    ed = mr.EDITIONS[-1]
+    listings = mr.load(ed)[1]['listings']
+    cards = ''.join(
+        '<a href="%s" style="background:#0A0A0B;padding:18px;display:flex;flex-direction:column;gap:8px;color:#E8EAEB;">'
+        '<span style="font-size:12.5px;color:#E8EAEB;">%s</span>'
+        '<span style="font-family:\'Cabinet Grotesk\',\'DM Mono\',sans-serif;font-weight:900;font-size:30px;line-height:1;letter-spacing:-.02em;color:#FFFFFF;">%s</span>'
+        '<span style="font-size:12px;color:#8B9094;line-height:1.5;">middle half %s&ndash;%s &middot; %s listings</span></a>'
+        % (pg.item_url(it, 'en'), html.escape(it['name']), money(pg.V[it['slug']]['typical_cents'], 'en'),
+           money(pg.V[it['slug']]['range_cents']['low'], 'en'), money(pg.V[it['slug']]['range_cents']['high'], 'en'),
+           num(pg.V[it['slug']]['sample_size'], 'en')) for it in items)
+    report = ('<a href="%s/%s" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Vinted Market Report, %s%s &rarr;</a>'
+              % (mr.HUB['en'], ed['slug']['en'], ed['name']['en'], ': %s listings, condition premium, price cuts' % num(listings, 'en')))
+    return (
+        '\r\n  <div style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;flex-direction:column;gap:22px;">\r\n'
+        '    <div style="display:flex;flex-direction:column;gap:12px;max-width:760px;">\r\n'
+        '      <span style="font-size:11px;letter-spacing:.16em;color:#00E5A0;">FREE PRICE DATA</span>\r\n'
+        '      <h2 style="margin:0;font-family:\'Cabinet Grotesk\',\'DM Mono\',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;text-wrap:balance;">'
+        'What things cost on Vinted, from %s listings</h2>\r\n'
+        '      <p style="margin:0;font-size:16px;line-height:1.6;color:#A6ADB1;">Typical asking prices for %d popular items, from vinted.be listings SNYPD saw from %s. '
+        'Asking prices, not sale prices: Vinted does not publish what items sell for.</p>\r\n'
+        '    </div>\r\n'
+        '    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">%s</div>\r\n'
+        '    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;">\r\n'
+        '      <a href="%s" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">All %d items in the Vinted price guide &rarr;</a>\r\n'
+        '      %s\r\n'
+        '    </div>\r\n'
+        '  </div>\r\n  ' % (num(total, 'en'), len(pg.PUB), pg.window('en'), cards, pg.HUB['en'], len(pg.PUB), report))
+
+
 # ----------------------------------------------------------------- templates
 TEMPLATES = {
     # shared
@@ -174,6 +217,8 @@ TEMPLATES = {
     'home-free-line': '@@searches:free@@ search &middot; 24/7 for @@trial_days@@ days, then while your dashboard is open &middot; free Discord',
     'home-kickstart-line': '@@searches:kickstart@@ searches &middot; runs 24/7, even with your dashboard closed',
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
+    'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days. No card.',
+    'home-data': home_data,
     'home-faq-free-q': 'Does it run with my laptop closed?',
     'home-faq-free-a': 'Paid plans, always. Free: 24/7 for the first @@trial_days@@ days after you save your first search, then only while your dashboard is open.',
     'home-faq-speed-a': 'About every @@median_s@@ s (measured median), up to 5 min on quiet searches. Same on every plan. One batched push.',
