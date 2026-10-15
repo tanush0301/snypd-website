@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"test":"node --test confirmation.test.cjs"},"devDependencies":{"jsdom":"26.1.0"}}
