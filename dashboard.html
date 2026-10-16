@@ -2552,6 +2552,17 @@ const HEARTBEAT_URL = (() => {
       for (const k of ['price_from', 'price_to']) {
         if (k in scalars && !(/^\s*([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?\s*$/.test(scalars[k]))) return 'The price in this link is not a plain number. Set the price again on Vinted and copy the link.';
       }
+      // An inverted range can never match anything, and Vinted answers it with
+      // HTTP 400 rather than an empty list: measured 2026-10-16, one saved hunt
+      // with price_from=5 and price_to=2 was refused 400 on every single poll
+      // (50 times in 10 minutes) and that user had received nothing since
+      // 2026-10-14. build_catalogue_request() only checks that each bound is a
+      // non-negative number, so the pair slipped through to Vinted. Refused here
+      // at save time, the same way an unreadable filter already is.
+      if ('price_from' in scalars && 'price_to' in scalars
+          && parseFloat(scalars.price_from) > parseFloat(scalars.price_to)) {
+        return 'This link asks for items from ' + scalars.price_from + ' to ' + scalars.price_to + ', so the lowest price is above the highest and Vinted returns nothing. Fix the price range on Vinted and copy the link again.';
+      }
       return null;
     }
     function paintSiteNote() {

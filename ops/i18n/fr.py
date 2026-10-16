@@ -395,6 +395,8 @@ FR_PATTERNS = [
      'Ce lien définit «' + NB + '$1' + NB + '» deux fois avec des valeurs différentes. Copie-le à nouveau depuis Vinted.'),
     (r'^This link is set to (\w+), but (\S+) lists prices in (\w+), so SNYPD cannot run it\. Switch the currency to (\w+) on Vinted and copy the link again\.$',
      'Ce lien est en $1, mais $2 affiche les prix en $3, donc SNYPD ne peut pas le lancer. Passe la devise en $4 sur Vinted et copie à nouveau le lien.'),
+    (r'^This link asks for items from (.+?) to (.+?), so the lowest price is above the highest and Vinted returns nothing\. Fix the price range on Vinted and copy the link again\.$',
+     'Ce lien demande des articles de $1 à $2, donc le prix le plus bas est au-dessus du prix le plus haut et Vinted ne renvoie rien. Corrige la fourchette de prix sur Vinted et copie à nouveau le lien.'),
     (r'^(\S+) is not a Vinted site SNYPD watches\. SNYPD watches every Vinted site in Europe and the US: search on one of those and paste that link\.$',
      '$1 n’est pas un site Vinted surveillé par SNYPD. SNYPD surveille tous les sites Vinted d’Europe et des États-Unis' + NB + ': lance ta recherche sur l’un d’eux et colle ce lien.'),
     (r'^(\S+) is not a Vinted site SNYPD watches, so this hunt cannot find anything\. Recreate it with a link from a Vinted site in Europe or the US\.$',
