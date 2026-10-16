@@ -1914,6 +1914,13 @@ body {
   <div class="feed-stat"><span class="feed-stat__val" id="fs-holding">&mdash;</span><span class="feed-stat__lbl">Holding</span></div>
 </div>
 <div class="bd">
+<div class="elite-banner" id="alerts-setup-card" style="display:none" aria-labelledby="alerts-setup-title">
+  <div>
+    <div class="elite-banner__title" id="alerts-setup-title">Finish setting up alerts on this device</div>
+    <div class="elite-banner__text">Your hunt is saved. Set up notifications so you can hear about matching listings without watching the feed.</div>
+  </div>
+  <button class="btn btn-prim" id="alerts-setup-resume" type="button">Set up alerts</button>
+</div>
 <div class="elite-banner" id="elite-banner" style="display:none">
   <div>
     <div class="elite-banner__title">Paid plans hunt while you're away</div>
@@ -2814,8 +2821,10 @@ const HEARTBEAT_URL = (() => {
         if (error) throw error;
         // Same E6 event the wizard's skip path already awards - first hunt
         // created, ever, regardless of which entry point did it.
-        const hadHuntBefore = await xpEventExistsEver('first_hunt', null);
-        if (!hadHuntBefore) await awardXP('first_hunt', 20, inserted ? inserted.id : null, {});
+        Promise.resolve().then(async () => {
+          const hadHuntBefore = await xpEventExistsEver('first_hunt', null);
+          if (!hadHuntBefore) await awardXP('first_hunt', 20, inserted ? inserted.id : null, {});
+        }).catch(e => console.error('SNYPD filter sheet: optional XP failed', e));
         nameInput.value = ''; urlInput.value = '';
         if (minPriceInput) minPriceInput.value = String(DEFAULT_MIN_PRICE);
         paintFloorNote();
@@ -2956,31 +2965,50 @@ const HEARTBEAT_URL = (() => {
         .select('id', { count: 'exact', head: true })
         .eq('user_id', uid);
       if (cErr) { console.error('SNYPD wizard: could not check searches', cErr); return; }
-      if ((count || 0) > 0) return;
+      // Existing hunters can resume alert setup after installing the app or
+      // choosing "later". A failed/unknown count must never mean zero hunts.
+      if (!Number.isInteger(count) || count < 0) return;
+      let hasSavedHunt = count > 0;
 
       const overlay = document.getElementById('wiz-overlay');
       const step1 = document.getElementById('wiz-step-1');
       const step2 = document.getElementById('wiz-step-2');
       if (!overlay) return;
-      overlay.style.display = 'flex';
+      if (!hasSavedHunt) overlay.style.display = 'flex';
 
+      let savingHunt = false;
       async function saveSearch(name, url) {
-        const { error } = await sb.from('user_searches').insert({
-          user_id: uid, search_name: name, vinted_url: url, is_active: true
-        });
-        if (error) {
-          console.error('SNYPD wizard: could not save search', error);
-        } else {
-          // E6 onboarding: first hunt created, +20 XP, once per account ever -
-          // this wizard isn't the only place a hunt can be created (/filters
-          // is another), so this checks history rather than assuming.
-          const already = await xpEventExistsEver('first_hunt', null);
-          if (!already) await awardXP('first_hunt', 20, null, {});
+        if (savingHunt) return false;
+        savingHunt = true;
+        const save = document.getElementById('wiz-q-save');
+        const errorBox = document.getElementById('wiz-q-err');
+        if (save) { save.disabled = true; save.textContent = 'Saving...'; }
+        if (errorBox) errorBox.style.display = 'none';
+        try {
+          const { error } = await sb.from('user_searches').insert({
+            user_id: uid, search_name: name, vinted_url: url, is_active: true
+          });
+          if (error) throw error;
+        } catch (e) {
+          console.error('SNYPD wizard: could not save search', e);
+          if (errorBox) {
+            errorBox.textContent = 'Could not save this hunt. Check your connection and try again.';
+            errorBox.style.display = 'block';
+          }
+          return false;
+        } finally {
+          savingHunt = false;
+          if (save) { save.disabled = false; save.textContent = 'Start this hunt'; }
         }
-        // Move to step 2 regardless - a failed save here shouldn't trap a new
-        // user on step 1; they can add a real search from /filters after.
-        step1.style.display = 'none';
-        step2.style.display = '';
+        hasSavedHunt = true;
+        // Optional XP must not delay successful setup or make an accepted
+        // insert look like a failure that the user should repeat.
+        Promise.resolve().then(async () => {
+          if (!await xpEventExistsEver('first_hunt', null)) await awardXP('first_hunt', 20, null, {});
+        }).catch(e => console.error('SNYPD wizard: optional XP failed', e));
+        window.SNYPD.showAlertsStep();
+        window.dispatchEvent(new Event('snypd:hunts-changed'));
+        return true;
       }
 
       document.querySelectorAll('.wiz-preset').forEach(btn => {
@@ -2997,19 +3025,69 @@ const HEARTBEAT_URL = (() => {
         overlay.style.display = 'flex';
         step1.style.display = 'none';
         step2.style.display = '';
+        refreshTrialNote().catch(console.error);
       };
 
-      // Free plan: what happens to this hunt (migration 042 trial: 24/7 for
-      // 7 days from the first saved search, then only while SNYPD is open).
-      const trialNote = document.getElementById('wiz-trial-note');
-      if (trialNote && effectivePlan === 'free') {
-        const started = profile.free_trial_started_at ? Date.parse(profile.free_trial_started_at) : NaN;
-        const left = isNaN(started) ? 7 : Math.ceil((started + 7 * 864e5 - Date.now()) / 864e5);
-        trialNote.textContent = left > 0
-          ? 'Free plan: for the next ' + left + ' day' + (left === 1 ? '' : 's') + ' this hunt runs 24/7, even with SNYPD closed, and alerts reach this device. After that, Free checks only while SNYPD is open.'
-          : 'Free plan: SNYPD checks only while it is open on this device. Paid plans run 24/7.';
-        trialNote.style.display = 'block';
+      const setupCard = document.getElementById('alerts-setup-card');
+      const resumeSetup = document.getElementById('alerts-setup-resume');
+      if (resumeSetup) resumeSetup.addEventListener('click', window.SNYPD.showAlertsStep);
+      let paintVersion = 0;
+      async function paintAlertSetup() {
+        const version = ++paintVersion;
+        if (!setupCard || !hasSavedHunt || !window.SNYPD.alertsStatus) return;
+        const status = await window.SNYPD.alertsStatus();
+        if (version !== paintVersion) return;
+        setupCard.style.display = status.state === 'on' ? 'none' : '';
       }
+      window.addEventListener('snypd:alerts-changed', () => { paintAlertSetup().catch(console.error); });
+      window.addEventListener('snypd:hunts-changed', () => {
+        // The event also fires for pause/delete, so recheck rather than assume
+        // that every event means an insert. This is user-driven, not polling.
+        sb.from('user_searches').select('id', { count: 'exact', head: true }).eq('user_id', uid)
+          .then(result => {
+            if (result.error || !Number.isInteger(result.count)) return;
+            hasSavedHunt = result.count > 0;
+            if (!hasSavedHunt && setupCard) setupCard.style.display = 'none';
+            return paintAlertSetup();
+          }).catch(console.error);
+      });
+      paintAlertSetup().catch(console.error);
+
+      // Re-read the server-stamped trial start after saving a first hunt.
+      // Existing legacy hunts with no timestamp must not be promised 7 new days.
+      const trialNote = document.getElementById('wiz-trial-note');
+      function paintTrialNote() {
+        if (!trialNote || effectivePlan !== 'free') return;
+        const start = Date.parse(profile.free_trial_started_at || '');
+        const left = Number.isFinite(start) && start <= Date.now()
+          ? Math.ceil((start + 7 * 864e5 - Date.now()) / 864e5) : 0;
+        trialNote.textContent = left > 0
+          ? 'Your Free trial runs 24/7. Enable alerts on this device to receive matching listings. After the trial, Free checks while your dashboard is open.'
+          : hasSavedHunt
+            ? 'Free plan: SNYPD checks only while it is open on this device. Paid plans run 24/7.'
+            : 'Your seven-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.';
+        trialNote.style.display = 'block';
+        if (left > 0 && eliteBanner) {
+          const title = eliteBanner.querySelector('.elite-banner__title');
+          const text = eliteBanner.querySelector('.elite-banner__text');
+          if (title) title.textContent = 'Free 24/7 trial: ' + left + (left === 1 ? ' day' : ' days') + ' left';
+          if (text) text.textContent = 'Your hunt keeps running with this tab closed until then. After that, Free only checks while this tab is open; paid plans keep hunting 24/7.';
+        }
+      }
+      async function refreshTrialNote() {
+        if (effectivePlan !== 'free') return;
+        const result = await sb.from('users').select('free_trial_started_at').eq('id', uid).maybeSingle();
+        if (result.error || !result.data) {
+          if (trialNote) {
+            trialNote.textContent = 'Could not check your trial status. Your hunt is saved; try again shortly.';
+            trialNote.style.display = 'block';
+          }
+          return;
+        }
+        profile.free_trial_started_at = result.data.free_trial_started_at;
+        paintTrialNote();
+      }
+      paintTrialNote();
 
       const vq = window.SNYPD.vq;
       const wqWords = document.getElementById('wiz-q-words');
@@ -3048,10 +3126,7 @@ const HEARTBEAT_URL = (() => {
             return;
           }
           wqErr.style.display = 'none';
-          wqSave.disabled = true;
-          wqSave.textContent = 'Saving...';
           await saveSearch(words, vq.build(wqSite.value, words, wqMax ? wqMax.value : '', vq.floorFor(wqSite.value)));
-          window.dispatchEvent(new Event('snypd:hunts-changed'));
         });
         wqWords.addEventListener('keydown', e => { if (e.key === 'Enter') wqSave.click(); });
       }
@@ -3099,16 +3174,11 @@ const HEARTBEAT_URL = (() => {
 
       const enableBtn = document.getElementById('wiz-enable-alerts');
       if (enableBtn) {
-        // Set once the user has been shown a real failure reason, so the
-        // second press means "I have read that, let me in" rather than
-        // retrying the same thing.
-        let alertFailureShown = false;
-
         enableBtn.addEventListener('click', async () => {
           const resultEl = document.getElementById('wiz-alert-result');
 
           const wantsPush = pushToggle && pushToggle.classList.contains('is-on');
-          if (!wantsPush || alertFailureShown) { overlay.style.display = 'none'; return; }
+          if (!wantsPush) { overlay.style.display = 'none'; return; }
 
           // This used to fire a synthetic click at #btn-notify and close the
           // overlay in the same tick, which meant every failure path - push
@@ -3140,8 +3210,7 @@ const HEARTBEAT_URL = (() => {
               + (res && res.state === 'ios-install' ? ' Then log in once more inside the new SNYPD icon and tap Enable alerts. Your hunt keeps running in the meantime.' : '');
             resultEl.style.display = 'block';
           }
-          enableBtn.textContent = 'Continue without alerts';
-          alertFailureShown = true;
+          enableBtn.textContent = 'Try again';
         });
       }
 
@@ -5569,6 +5638,11 @@ const HEARTBEAT_URL = (() => {
   // report the real outcome instead of assuming one.
   var pushState = { ready: false, state: 'pending', message: 'Still setting up alerts.' };
 
+  function setPushState(value) {
+    pushState = value;
+    window.dispatchEvent(new Event('snypd:alerts-changed'));
+  }
+
   function say(msg) {
     if (!note) { return; }
     note.textContent = msg || '';
@@ -5637,12 +5711,12 @@ const HEARTBEAT_URL = (() => {
   async function enable() {
     show('Working...', true);
     try {
-      var perm = await Notification.requestPermission();
+      var perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
       if (perm !== 'granted') {
         show('Enable alerts', false);
         say('Notifications are blocked for this site. Turn them back on in your '
           + 'browser settings for snypd.store, then press the button again.');
-        pushState = { ready: true, state: 'denied', message: '' };
+        setPushState({ ready: true, state: 'denied', message: '' });
         return { ok: false, state: 'denied', message: 'Your browser did not allow notifications. Allow them for snypd.store, then press Enable alerts on the dashboard.' };
       }
 
@@ -5664,9 +5738,8 @@ const HEARTBEAT_URL = (() => {
       if (res.status !== 200) { throw new Error('server refused the subscription'); }
 
       show('Alerts on - turn off', false);
-      say('This device will be alerted when a listing matches, even with the '
-        + 'browser closed.');
-      pushState = { ready: true, state: 'on', message: '' };
+      say('Alerts are set up on this device. Background monitoring depends on your plan or trial.');
+      setPushState({ ready: true, state: 'on', message: '' });
 
       // E6 onboarding: alerts enabled, +10 XP, once per account ever.
       if (window.SNYPD && window.SNYPD.xpEventExistsEver && window.SNYPD.awardXP) {
@@ -5687,10 +5760,11 @@ const HEARTBEAT_URL = (() => {
     try {
       var sub = await currentSub();
       if (sub) {
-        await api('/api/v1/push/unsubscribe', 'POST', { endpoint: sub.endpoint });
+        var removed = await api('/api/v1/push/unsubscribe', 'POST', { endpoint: sub.endpoint });
+        if (removed.status !== 200) throw new Error('unsubscribe not confirmed');
         await sub.unsubscribe();
       }
-      pushState = { ready: true, state: 'off', message: '' };
+      setPushState({ ready: true, state: 'off', message: '' });
       show('Enable alerts', false);
       say('Alerts are off for this device.');
       return { ok: true, state: 'off', message: 'Alerts are off for this device.' };
@@ -5702,7 +5776,7 @@ const HEARTBEAT_URL = (() => {
   }
 
   async function init() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if ((isIOS() && !isStandalone()) || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
       if (isIOS() && !isStandalone()) {
         btn.style.display = '';
         btn.disabled = false;
@@ -5731,18 +5805,18 @@ const HEARTBEAT_URL = (() => {
         btn.textContent = 'Alerts unavailable';
         say('Alerts are not available in this app right now. Try removing SNYPD '
           + 'from your Home Screen and adding it again.');
-        pushState = { ready: false, state: 'unavailable', message: 'Alerts are not available in this app. Remove SNYPD from your Home Screen and add it again.' };
+        setPushState({ ready: false, state: 'unavailable', message: 'Alerts are not available in this app. Remove SNYPD from your Home Screen and add it again.' });
       } else if (isInAppBrowser()) {
-        pushState = { ready: false, state: 'unsupported', message: 'You opened SNYPD inside Instagram or Facebook, which cannot deliver alerts. Tap the ... menu at the top and open this page in Chrome or your phone browser.' };
+        setPushState({ ready: false, state: 'unsupported', message: 'You opened SNYPD inside Instagram or Facebook, which cannot deliver alerts. Tap the ... menu at the top and open this page in Chrome or your phone browser.' });
         say(pushState.message);
         note.classList.add('cta-note');
       } else {
-        pushState = { ready: false, state: 'unsupported', message: 'This browser cannot deliver alerts. Chrome or Edge on desktop can, and so can SNYPD installed to a phone home screen.' };
+        setPushState({ ready: false, state: 'unsupported', message: 'This browser cannot deliver alerts. Chrome or Edge on desktop can, and so can SNYPD installed to a phone home screen.' });
       }
       if (isIOS() && !isStandalone() && isInAppBrowser()) {
-        pushState = { ready: false, state: 'ios-install', message: 'You opened SNYPD inside Instagram or Facebook. Tap the ... menu at the top, open this page in Safari, then tap Share and Add to Home Screen.' };
+        setPushState({ ready: false, state: 'ios-install', message: 'You opened SNYPD inside Instagram or Facebook. Tap the ... menu at the top, open this page in Safari, then tap Share and Add to Home Screen.' });
       } else if (isIOS() && !isStandalone()) {
-        pushState = { ready: false, state: 'ios-install', message: 'On iPhone and iPad, alerts only work once SNYPD is on your Home Screen. Tap Share, then Add to Home Screen, and open SNYPD from that icon. Apple does not let a website do this step for you.' };
+        setPushState({ ready: false, state: 'ios-install', message: 'On iPhone and iPad, alerts only work once SNYPD is on your Home Screen. Tap Share, then Add to Home Screen, and open SNYPD from that icon. Apple does not let a website do this step for you.' });
       }
       return;   // desktop browsers without push: leave the button hidden
     }
@@ -5754,7 +5828,7 @@ const HEARTBEAT_URL = (() => {
       console.error('SNYPD push: service worker registration failed', e);
       show('Alerts unavailable', true);
       say('Could not set up alerts: ' + (e && e.message ? e.message : 'service worker failed to register') + '.');
-      pushState = { ready: false, state: 'unavailable', message: 'Could not set up alerts on this device: ' + (e && e.message ? e.message : 'the service worker failed to register') + '.' };
+      setPushState({ ready: false, state: 'unavailable', message: 'Could not set up alerts on this device: ' + (e && e.message ? e.message : 'the service worker failed to register') + '.' });
       return;
     }
 
@@ -5768,14 +5842,14 @@ const HEARTBEAT_URL = (() => {
         console.error('SNYPD push: /push/status not ready', st);
         show('Alerts unavailable', true);
         say('Alerts are not ready on this account yet (status ' + st.status + '). Try again shortly.');
-        pushState = { ready: false, state: 'unavailable', message: 'Alerts are not ready on this account yet. Try again shortly.' };
+        setPushState({ ready: false, state: 'unavailable', message: 'Alerts are not ready on this account yet. Try again shortly.' });
         return;
       }
     } catch (e) {
       console.error('SNYPD push: /push/status request failed', e);
       show('Alerts unavailable', true);
       say('Could not check alert status: ' + (e && e.message ? e.message : 'unknown error') + '.');
-      pushState = { ready: false, state: 'unavailable', message: 'Could not reach the alert service. Try again shortly.' };
+      setPushState({ ready: false, state: 'unavailable', message: 'Could not reach the alert service. Try again shortly.' });
       return;
     }
 
@@ -5783,23 +5857,31 @@ const HEARTBEAT_URL = (() => {
       show('Alerts blocked', true);
       say('Notifications are blocked for snypd.store in this browser. Re-allow '
         + 'them in your browser settings to use alerts.');
-      pushState = { ready: false, state: 'denied', message: 'Your browser has blocked notifications for snypd.store. Re-allow them in browser settings, then try again.' };
+      setPushState({ ready: false, state: 'denied', message: 'Your browser has blocked notifications for snypd.store. Re-allow them in browser settings, then try again.' });
       return;
     }
 
     var sub = await currentSub();
-    pushState = { ready: true, state: sub ? 'on' : 'off', message: '' };
-    show(sub ? 'Alerts on - turn off' : 'Enable alerts', false);
     if (sub) {
-      // Re-register on every load: subscriptions expire and the server may have
-      // pruned this endpoint after failed deliveries.
-      var json = sub.toJSON();
-      api('/api/v1/push/subscribe', 'POST', {
-        endpoint: json.endpoint, keys: json.keys, user_agent: navigator.userAgent,
-      }).catch(function () {});
-    } else if (isIOS() && !isStandalone()) {
-      say('Tip: add SNYPD to your Home Screen (Share -> Add to Home Screen) so '
-        + 'alerts keep arriving when Safari is closed.');
+      // Browser permission alone cannot prove this endpoint is registered to
+      // the signed-in account. Wait for the server before claiming success.
+      try {
+        var json = sub.toJSON();
+        var registration = await api('/api/v1/push/subscribe', 'POST', {
+          endpoint: json.endpoint, keys: json.keys, user_agent: navigator.userAgent,
+        });
+        if (registration.status !== 200) throw new Error('subscription not confirmed');
+        setPushState({ ready: true, state: 'on', message: '' });
+        show('Alerts on - turn off', false);
+        say('Alerts are set up on this device. Background monitoring depends on your plan or trial.');
+      } catch (e) {
+        setPushState({ ready: true, state: 'error', message: 'Your alert registration could not be confirmed. Try again.' });
+        show('Enable alerts', false);
+        say(pushState.message);
+      }
+    } else {
+      setPushState({ ready: true, state: 'off', message: '' });
+      show('Enable alerts', false);
     }
   }
 
@@ -5816,15 +5898,16 @@ const HEARTBEAT_URL = (() => {
       }
       return;
     }
-    var sub = await currentSub();
-    if (sub) { disable(); } else { enable(); }
+    if (pushState.state === 'on') { window.SNYPD.disableAlerts(); }
+    else { window.SNYPD.enableAlerts(); }
   });
 
   // The push service can rotate a subscription at any time; the worker asks any
   // open tab to redo it, because only the page holds an auth token.
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', function (e) {
-      if (e.data && e.data.type === 'snypd-resubscribe') { enable(); }
+      if (e.data && e.data.type === 'snypd-resubscribe' && 'Notification' in window
+          && Notification.permission === 'granted') { enable(); }
     });
   }
 
@@ -5833,7 +5916,7 @@ const HEARTBEAT_URL = (() => {
   // which is exactly what the synthetic-click approach could not do.
   var initPromise = init().catch(function (e) {
     console.error('SNYPD push: init failed', e);
-    pushState = { ready: false, state: 'error', message: 'Alerts could not be set up on this device.' };
+    setPushState({ ready: false, state: 'error', message: 'Alerts could not be set up on this device.' });
   });
 
   // Same cross-closure bridge pattern the file already uses for awardXP,
@@ -5857,7 +5940,22 @@ const HEARTBEAT_URL = (() => {
   };
 
   window.SNYPD.enableAlerts = async function () {
-    try { await initPromise; } catch (e) { /* already recorded in pushState */ }
+    // Never wait for a network roundtrip and then open the permission prompt:
+    // the browser may have consumed the user's activation by then.
+    if (!pushState.ready && pushState.state === 'pending') {
+      return { ok: false, state: 'pending', message: 'Still setting up alerts. Wait a moment, then try again.' };
+    }
+    if (!pushState.ready && pushState.state !== 'ios-install' && pushState.state !== 'unsupported') {
+      // A failed startup/status check can recover without a page reload.
+      // The next explicit click, after recovery, requests permission.
+      initPromise = init().catch(function () {
+        setPushState({ ready: false, state: 'error', message: 'Could not reach the alert service. Try again shortly.' });
+      });
+      await initPromise;
+      if (pushState.ready && pushState.state !== 'on') {
+        return { ok: false, state: 'off', message: 'Alerts are ready to set up. Tap Try again to allow notifications.' };
+      }
+    }
     if (pushState.state === 'on') {
       return { ok: true, state: 'on', message: 'Alerts are already on for this device.' };
     }

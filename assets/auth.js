@@ -29,6 +29,13 @@
   var RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   var PLAN_NAMES = { pro: 'Pro', kickstart: 'Kickstart', elite: 'Elite' };
   var LAST_EMAIL_KEY = 'snypd_last_email';
+  var VERIFY_EMAIL_KEY = 'snypd_verify_email';
+  function pendingEmail(value) {
+    try {
+      if (value !== undefined) sessionStorage.setItem(VERIFY_EMAIL_KEY, value);
+      return sessionStorage.getItem(VERIFY_EMAIL_KEY) || '';
+    } catch (e) { return ''; }
+  }
   var SLOW_MS = 8000, TIMEOUT_MS = 30000, COOLDOWN = 60;
   /* The sign-up line links /terms and /privacy. Those pages are drafted but
      not published yet (see CLAUDE.md, Session 27), so the line stays hidden
@@ -69,18 +76,19 @@
 
   var S = {
     view: PAGE === 'signup' ? 'signup' : PAGE === 'reset' ? 'reset' : 'login',
-    status: 'idle', email: '', pw: '', pw2: '', show: false, errors: {},
+    status: 'idle', email: '', code: '', pw: '', pw2: '', show: false, errors: {},
     cooldown: 0, founding: null, marketing: false, errText: '', oauth: false, ready: PAGE !== 'reset'
   };
 
   /* ---------- validation (the design's own rules) ---------- */
-  function validate(view, email, pw, pw2) {
+  function validate(view, email, pw, pw2, code) {
     var e = {};
-    if (view === 'login' || view === 'signup' || view === 'forgot') {
+    if (view === 'login' || view === 'signup' || view === 'forgot' || view === 'verify') {
       var m = (email || '').trim();
       if (!m) e.email = 'Enter your email.';
       else if (!RE_EMAIL.test(m)) e.email = 'Enter a full email, like name@example.com.';
     }
+    if (view === 'verify' && !/^\d{6,10}$/.test((code || '').replace(/\s/g, ''))) e.code = 'Enter the code from your latest confirmation email.';
     if (view === 'login' && !pw) e.pw = 'Enter your password.';
     if (view === 'signup' || view === 'reset') {
       if (!pw) e.pw = 'Choose a password (at least 6 characters).';
@@ -131,7 +139,11 @@
     if (extra) for (var k in extra) S[k] = extra[k];
     if (view === 'login' || view === 'signup') {
       var path = '/' + view;
-      if (location.pathname !== path) { try { history.replaceState(null, '', path); } catch (e) {} }
+      if (location.pathname !== path || location.search || location.hash) { try { history.replaceState(null, '', path); } catch (e) {} }
+    }
+    if (view === 'verify') {
+      pendingEmail(S.email);
+      try { history.replaceState(null, '', '/login?verify=1'); } catch (e) {}
     }
     render();
   }
@@ -216,10 +228,10 @@
   function submit() {
     if (S.status === 'loading' || S.status === 'slow' || S.oauth) return;
     var v = S.view, email = (S.email || '').trim();
-    var errors = validate(v, S.email, S.pw, S.pw2);
+    var errors = validate(v, S.email, S.pw, S.pw2, S.code);
     if (Object.keys(errors).length) {
       S.errors = errors; S.status = 'field-errors'; render();
-      focusField(errors.email ? 'email' : errors.pw ? 'pw' : 'pw2');
+      focusField(errors.email ? 'email' : errors.pw ? 'pw' : errors.code ? 'code' : 'pw2');
       return;
     }
     S.email = email;
@@ -229,7 +241,7 @@
         if (!r.error && r.data && r.data.session) { track('login', { method: 'email' }); openDashboard(email); return; }
         var k = classify(r.error);
         if (k === 'wrong-password') { S.status = 'wrong-password'; S.pw = ''; render(); focusField('pw'); return; }
-        if (k === 'not-confirmed') S.status = 'not-confirmed';
+        if (k === 'not-confirmed') { go('verify', { pw: '', code: '', status: 'not-confirmed' }); return; }
         else if (k === 'bad-email') { S.status = 'field-errors'; S.errors = { email: 'Enter a full email, like name@example.com.' }; }
         else fail(k, r.error);
         render();
@@ -251,6 +263,18 @@
         if (k === 'weak-password') { S.status = 'field-errors'; S.errors = { pw: r.error.message || 'Choose a stronger password.' }; render(); focusField('pw'); return; }
         if (k === 'bad-email') { S.status = 'field-errors'; S.errors = { email: 'Enter a full email, like name@example.com.' }; render(); focusField('email'); return; }
         fail(k, r.error); render();
+      });
+    } else if (v === 'verify') {
+      var token = S.code.replace(/\s/g, '');
+      pendingEmail(email);
+      run(function () { return sb.auth.verifyOtp({ email: email, token: token, type: 'email' }); }, function (r) {
+        var session = r.data && r.data.session, user = session && session.user;
+        if (!r.error && user && user.email_confirmed_at && String(user.email || '').toLowerCase() === email.toLowerCase()) {
+          S.code = ''; pendingEmail('');
+          track('email_verified', { method: 'code' });
+          openDashboard(user.email); return;
+        }
+        verificationFailed(r.error);
       });
     } else if (v === 'forgot') {
       run(function () { return sb.auth.resetPasswordForEmail(email, { redirectTo: SITE + '/reset-password' }); }, function (r) {
@@ -278,21 +302,30 @@
     redirectT = setTimeout(toLoginExists, 2500);
   }
 
-  function resendSignup(fromView) {
+  function verificationFailed(err) {
+    var k = classify(err);
+    S.status = k === 'network' || k === 'rate-limit' ? k : 'verification-error';
+    S.code = ''; render();
+  }
+
+  function resendSignup() {
+    if (S.cooldown > 0 || S.status === 'loading' || S.status === 'slow') return;
     var email = (S.email || '').trim();
-    if (!email) return;
+    var errors = validate('forgot', email);
+    if (Object.keys(errors).length) { S.errors = errors; S.status = 'field-errors'; render(); focusField('email'); return; }
+    pendingEmail(email);
     run(function () { return sb.auth.resend({ type: 'signup', email: email, options: { emailRedirectTo: SITE + '/login' } }); }, function (r) {
       var k = classify(r.error);
       if (k === 'network' || k === 'rate-limit') S.status = k;
       else if (r.error) fail(k, r.error);
-      else { S.status = 'resent'; if (fromView === 'verify') startCooldown(); }
+      else { S.status = 'resent'; S.code = ''; startCooldown(); }
       render();
     });
   }
 
   function resend() {
     if (S.cooldown > 0 || S.status === 'loading' || S.status === 'slow') return;
-    if (S.view === 'verify') { resendSignup('verify'); return; }
+    if (S.view === 'verify') { resendSignup(); return; }
     var email = (S.email || '').trim();
     run(function () { return sb.auth.resetPasswordForEmail(email, { redirectTo: SITE + '/reset-password' }); }, function (r) {
       var k = classify(r.error);
@@ -337,6 +370,11 @@
     if (st === 'network') return { tone: 'danger', text: "Couldn't reach SNYPD. Check your connection and try again." };
     if (st === 'rate-limit') return { tone: 'danger', text: 'Too many attempts in a short time. Wait a minute, then try again.' };
     if (st === 'error') return { tone: 'danger', text: S.errText };
+    if (v === 'verify') {
+      if (st === 'verification-error' || st === 'link-expired') return { tone: 'warn', text: 'That confirmation could not be completed. Use the code from your latest email, or request a new email below. Already confirmed? Go back to log in.' };
+      if (st === 'not-confirmed') return { tone: 'info', text: 'Confirm your email to finish signing up. Enter your latest code below, or request a new email.' };
+      if (st === 'resent') return { tone: 'ok', text: 'Confirmation email requested. Use only the latest email; earlier codes may no longer work.' };
+    }
     if (v === 'login') {
       if (st === 'wrong-password') return { tone: 'danger', text: "That email and password don't match. Check both, or reset your password.", label: 'Reset password', act: 'forgot' };
       if (st === 'not-confirmed') return { tone: 'warn', text: 'Confirm your email first. We sent a link to ' + S.email + '.', label: 'Resend confirmation email', act: 'resend-confirm' };
@@ -395,7 +433,7 @@
     }
     if (v === 'forgot') out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Reset your password</h1><span style="' + SUB + '">Enter your account email. We\'ll send a link to set a new password.</span></div>');
     if (v === 'forgot-sent') out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Check your inbox</h1><span style="' + SUB + 'overflow-wrap:anywhere;">If an account exists for <span style="color:var(--text-primary);">' + esc(S.email) + '</span>, we\'ve sent a password reset link.</span></div>');
-    if (v === 'verify') out.push('<div style="' + STACK + '"><span style="font-size:12px;letter-spacing:.14em;color:var(--success);">ACCOUNT CREATED · 1 STEP LEFT</span><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Check your email</h1><span style="' + SUB + 'overflow-wrap:anywhere;">We sent a confirmation link to <span style="color:var(--text-primary);">' + esc(S.email) + '</span>. Open it to finish, then set up your first hunt.</span></div>');
+    if (v === 'verify') out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Confirm your email</h1><span style="' + SUB + '">Enter your account email and the code from your latest SNYPD confirmation email. If an older email only has a link, request a new email below.</span></div>');
     if (v === 'reset') out.push('<h1 style="margin:0 0 4px;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Set a new password</h1>');
     if (v === 'reset-done') {
       out.push('<div style="' + STACK + '"><span style="font-size:12px;letter-spacing:.14em;color:var(--success);">✓ SAVED</span><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Password updated</h1><span style="' + SUB + '">You\'re signed in with your new password.</span></div>');
@@ -418,10 +456,16 @@
       out.push('<div style="display:flex;align-items:center;gap:12px;"><span style="flex:1;height:1px;background:var(--border);"></span><span style="font-size:12px;letter-spacing:.12em;color:var(--text-muted);">OR</span><span style="flex:1;height:1px;background:var(--border);"></span></div>');
     }
 
-    if (isLogin || isSignup || v === 'forgot') {
+    if (isLogin || isSignup || v === 'forgot' || v === 'verify') {
       out.push('<div class="au-fbox" style="display:flex;flex-direction:column;gap:8px;"><label for="' + ID + '-em" style="font-size:12px;letter-spacing:.1em;color:var(--text-secondary);">EMAIL</label>' +
         '<input id="' + ID + '-em" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" data-f="email"' + attr('readonly', busy) + ' aria-invalid="' + (er.email ? 'true' : 'false') + '" aria-describedby="' + ID + '-eme" class="f-in" style="' + INPUT + (er.email ? 'var(--danger)' : 'var(--border)') + ';color:var(--text-primary);font-size:16px;padding:0 14px;outline:none;border-radius:0;">' +
         (er.email ? errSpan(ID + '-eme', er.email) : '') + '</div>');
+    }
+
+    if (v === 'verify') {
+      out.push('<div class="au-fbox" style="display:flex;flex-direction:column;gap:8px;"><label for="' + ID + '-code" style="font-size:12px;letter-spacing:.1em;color:var(--text-secondary);">CONFIRMATION CODE</label>' +
+        '<input id="' + ID + '-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="20" data-f="code"' + attr('readonly', busy) + ' aria-invalid="' + (er.code ? 'true' : 'false') + '" aria-describedby="' + ID + '-codee" class="f-in" style="' + INPUT + (er.code ? 'var(--danger)' : 'var(--border)') + ';color:var(--text-primary);font-size:20px;letter-spacing:.15em;padding:0 14px;outline:none;border-radius:0;">' +
+        (er.code ? errSpan(ID + '-codee', er.code) : '') + '</div>');
     }
 
     if (isLogin || isSignup || v === 'reset') {
@@ -445,8 +489,8 @@
 
     if (isSignup) out.push('<label style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer;"><input type="checkbox" name="marketing" data-f="marketing"' + attr('checked', S.marketing) + attr('disabled', busy) + ' style="width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#00E5A0;cursor:pointer;"><span style="font-size:13px;color:var(--text-secondary);">Email me product updates.</span></label>');
 
-    if (isLogin || isSignup || v === 'forgot' || v === 'reset') {
-      var labels = { login: ['LOG IN', 'LOGGING IN…'], signup: ['CREATE ACCOUNT', 'CREATING ACCOUNT…'], forgot: ['SEND RESET LINK', 'SENDING…'], reset: ['SAVE PASSWORD', 'SAVING…'] }[v];
+    if (isLogin || isSignup || v === 'forgot' || v === 'reset' || v === 'verify') {
+      var labels = { verify: ['CONFIRM EMAIL', 'CONFIRMING…'], login: ['LOG IN', 'LOGGING IN…'], signup: ['CREATE ACCOUNT', 'CREATING ACCOUNT…'], forgot: ['SEND RESET LINK', 'SENDING…'], reset: ['SAVE PASSWORD', 'SAVING…'] }[v];
       out.push('<div style="display:flex;flex-direction:column;gap:10px;"><button type="submit"' + attr('disabled', lock) + ' class="h-brand" style="height:52px;width:100%;background:var(--brand);color:var(--brand-fg);border:none;font-size:13px;letter-spacing:.1em;cursor:' + (busy ? 'progress' : 'pointer') + ';opacity:' + (busy ? 0.7 : 1) + ';">' + (busy ? labels[1] : labels[0]) + '</button>' +
         (st === 'slow' ? '<span role="status" style="font-size:12px;line-height:1.6;color:var(--warning);">Still working. Your connection looks slow; keep this tab open.</span>' : '') +
         (isSignup && LEGAL_LIVE ? '<span style="font-size:12px;line-height:1.6;color:var(--text-muted);">By creating an account you agree to the <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</span>' : '') +
@@ -465,13 +509,13 @@
     if (isLogin) out.push('<span style="font-size:13px;color:var(--text-secondary);">No account? <a href="/signup">Create one free</a></span>');
     if (isSignup) out.push('<span style="font-size:13px;color:var(--text-secondary);">Already have an account? <a href="/login">Log in</a></span>');
     if (v === 'forgot' || v === 'forgot-sent') out.push('<button type="button" data-act="login" style="align-self:flex-start;' + LINKBTN + 'min-height:44px;">← Back to log in</button>');
-    if (v === 'verify') out.push('<span style="font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">Wrong email? <button type="button" data-act="signup" style="' + LINKBTN + 'min-height:44px;">Start again</button></span>');
+    if (v === 'verify') out.push('<button type="button" data-act="login" style="align-self:flex-start;' + LINKBTN + 'min-height:44px;">← Back to log in</button>');
 
     out.push('<span style="font-size:12px;line-height:1.6;color:var(--text-muted);padding-top:16px;border-top:1px solid var(--border);"><span style="color:var(--success);">✓</span> Never asks for your Vinted password - never logs into your account - only reads public listings.</span>');
     return out.join('');
   }
 
-  function fieldEl(f) { return document.getElementById(ID + (f === 'email' ? '-em' : f === 'pw' ? '-pw' : '-pw2')); }
+  function fieldEl(f) { return document.getElementById(ID + (f === 'email' ? '-em' : f === 'pw' ? '-pw' : f === 'code' ? '-code' : '-pw2')); }
   function focusField(f) { setTimeout(function () { var el = fieldEl(f); if (el) { try { el.focus(); } catch (e) {} } }, 0); }
 
   var IN_APP = /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Snapchat/i.test(navigator.userAgent || '');
@@ -484,7 +528,7 @@
     var busy = S.status === 'loading' || S.status === 'slow';
     form.setAttribute('aria-busy', busy ? 'true' : 'false');
     form.innerHTML = tpl();
-    ['email', 'pw', 'pw2'].forEach(function (f) { var el = fieldEl(f); if (el) el.value = S[f] || ''; });
+    ['email', 'pw', 'pw2', 'code'].forEach(function (f) { var el = fieldEl(f); if (el) el.value = S[f] || ''; });
     if (fid) {
       var el = document.getElementById(fid);
       if (el) { try { el.focus({ preventScroll: true }); if (ss != null) el.setSelectionRange(ss, se); } catch (e) {} }
@@ -498,9 +542,9 @@
   /* As-you-type re-check after a failed submit, without rebuilding the
      inputs (a rebuild while typing can drop the phone keyboard). */
   function recheck() {
-    var errors = validate(S.view, S.email, S.pw, S.pw2);
+    var errors = validate(S.view, S.email, S.pw, S.pw2, S.code);
     S.errors = errors;
-    [['email', '-eme'], ['pw', '-pwe'], ['pw2', '-pw2e']].forEach(function (p) {
+    [['email', '-eme'], ['pw', '-pwe'], ['pw2', '-pw2e'], ['code', '-codee']].forEach(function (p) {
       var el = fieldEl(p[0]); if (!el) return;
       var msg = errors[p[0]], box = el.closest('.au-fbox'), span = box && box.querySelector('.au-err');
       el.setAttribute('aria-invalid', msg ? 'true' : 'false');
@@ -522,6 +566,10 @@
     var f = e.target.getAttribute('data-f');
     if (!f || f === 'marketing') return;
     S[f] = e.target.value;
+    if (S.view === 'verify' && f === 'email') {
+      S.code = ''; var codeField = fieldEl('code'); if (codeField) codeField.value = '';
+      pendingEmail(S.email.trim());
+    }
     if (S.status === 'field-errors') recheck();
   });
   form.addEventListener('change', function (e) {
@@ -534,10 +582,10 @@
     if (act === 'google') google();
     else if (act === 'toggle-pw') { S.show = !S.show; render(); }
     else if (act === 'forgot') go('forgot', { pw: '', pw2: '' });
-    else if (act === 'login') go('login');
+    else if (act === 'login') go('login', { code: '', pw: '' });
     else if (act === 'signup') go('signup', { pw: '' });
     else if (act === 'resend') resend();
-    else if (act === 'resend-confirm') resendSignup('login');
+    else if (act === 'resend-confirm') go('verify', { pw: '', code: '' });
     else if (act === 'exists-now') { clearTimeout(redirectT); toLoginExists(); }
   });
 
@@ -602,14 +650,22 @@
     return;
   }
 
-  render();
+  // A verification intent must never fall back to an unrelated cached session.
+  if (qs.get('verify') === '1' && !uErr && !qs.get('token_hash')) {
+    go('verify', { email: pendingEmail(), ready: true });
+    return;
+  }
+  S.ready = false; render();
 
   (async function () {
     if (uErr) {
       cleanUrl(plan && PLAN_NAMES[plan] ? '?plan=' + plan : '');
+      S.ready = true;
+      if (/otp_expired|expired|token.*not.*found|invalid.*link/i.test(uErr.code + ' ' + uErr.text)) {
+        go('verify', { email: pendingEmail(), code: '', status: 'link-expired' }); return;
+      }
       if (S.view !== 'login') go('login');
-      if (/otp_expired|expired/i.test(uErr.code + ' ' + uErr.text)) S.status = 'link-expired';
-      else if (uErr.code === 'access_denied' && !/expired/i.test(uErr.text)) {
+      if (uErr.code === 'access_denied' && !/expired/i.test(uErr.text)) {
         S.status = 'error'; S.errText = 'Google sign-in was cancelled. Try again, or use your email.';
       } else {
         S.status = 'error'; S.errText = "Sign-in didn't complete (" + uErr.text.replace(/\+/g, ' ') + '). Try again, or use your email.';
@@ -618,13 +674,29 @@
       return;
     }
     var th = qs.get('token_hash'), type = qs.get('type');
-    if (th && type) {
-      try { await sb.auth.verifyOtp({ token_hash: th, type: type }); } catch (e) {}
-      cleanUrl();
-    }
-    var oauthReturn = /access_token/.test(location.hash);
     var sess = null;
-    try { var r = await sb.auth.getSession(); sess = r.data && r.data.session; } catch (e) {}
+    if (th) {
+      var result;
+      try {
+        if (!/^(email|signup|magiclink)$/.test(type || '')) throw new Error('Unsupported confirmation type');
+        result = await sb.auth.verifyOtp({ token_hash: th, type: type });
+      } catch (e) { result = { error: e }; }
+      cleanUrl();
+      sess = result.data && result.data.session;
+      if (result.error || !sess || !sess.user || !sess.user.email_confirmed_at) {
+        go('verify', { email: pendingEmail(), ready: true }); verificationFailed(result.error); return;
+      }
+      pendingEmail('');
+    }
+    var oauthReturn = /access_token/.test(hs.toString());
+    if (!th) {
+      try {
+        var r = await sb.auth.getSession();
+        if (r.error) throw r.error;
+        sess = r.data && r.data.session;
+      } catch (e) { S.ready = true; fail(classify(e), e); render(); cleanUrl(); return; }
+    }
+    S.ready = true; render();
     if (location.hash && /access_token|refresh_token/.test(location.hash)) cleanUrl();
     if (sess && sess.user) {
       /* Google sign-ups come back here from Google; count a brand-new account as a sign-up

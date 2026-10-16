@@ -25,6 +25,13 @@ const t = g.window.SNYPD_I18N.t;
 
 const NB = ' ';
 const cases = [
+  ['Finish setting up alerts on this device', 'Termine la configuration des alertes sur cet appareil'],
+  ['Set up alerts', 'Configurer les alertes'],
+  ['Try again', 'Réessayer'],
+  ['Your alert registration could not be confirmed. Try again.', 'La configuration de tes alertes n’a pas pu être confirmée. Réessaie.'],
+  ['Alerts are set up on this device. Background monitoring depends on your plan or trial.', 'Les alertes sont configurées sur cet appareil. La surveillance en arrière-plan dépend de ton plan ou de ton essai.'],
+  ['Could not check your trial status. Your hunt is saved; try again shortly.', 'Impossible de vérifier le statut de ton essai. Ta recherche est enregistrée ; réessaie dans un instant.'],
+  ['Could not save this hunt. Check your connection and try again.', 'Impossible d’enregistrer cette recherche. Vérifie ta connexion et réessaie.'],
   ['Feed', 'Flux'],
   ['Forgot password?', 'Mot de passe oublié' + NB + '?'],
   ['Nike • M • Très bon état • Promoted • Seen 5m ago', 'Nike • M • Très bon état • Sponsorisé • vu il y a 5 min'],

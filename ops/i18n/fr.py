@@ -833,3 +833,20 @@ FR_PATTERNS += [
      '$1' + NB + '% ont baissé leur prix depuis qu’on les surveille, de $2' + NB + '% en médiane.'),
     (r'^(\d+)% have cut their price since we started watching\.$', '$1' + NB + '% ont baissé leur prix depuis qu’on les surveille.'),
 ]
+
+# Recoverable first-hunt and device-alert setup (October 2026).
+FR.update({'Finish setting up alerts on this device': 'Termine la configuration des alertes sur cet appareil', 'Your hunt is saved. Set up notifications so you can hear about matching listings without watching the feed.': 'Ta recherche est enregistrée. Configure les notifications pour être prévenu des annonces correspondantes sans surveiller le flux.', 'Set up alerts': 'Configurer les alertes', 'Alerts are set up on this device. Background monitoring depends on your plan or trial.': 'Les alertes sont configurées sur cet appareil. La surveillance en arrière-plan dépend de ton plan ou de ton essai.', 'Your alert registration could not be confirmed. Try again.': 'La configuration de tes alertes n’a pas pu être confirmée. Réessaie.', 'Still setting up alerts. Wait a moment, then try again.': 'Configuration des alertes en cours. Patiente un instant, puis réessaie.', 'Alerts are ready to set up. Tap Try again to allow notifications.': 'Les alertes sont prêtes à être configurées. Appuie sur Réessayer pour autoriser les notifications.', 'Could not save this hunt. Check your connection and try again.': 'Impossible d’enregistrer cette recherche. Vérifie ta connexion et réessaie.', 'Try again': 'Réessayer'})
+
+FR.update({'Your Free trial runs 24/7. Enable alerts on this device to receive matching listings. After the trial, Free checks while your dashboard is open.': 'Ton essai Free fonctionne 24h/24. Active les alertes sur cet appareil pour recevoir les annonces correspondantes. Après l’essai, Free vérifie les annonces tant que ton tableau de bord est ouvert.', 'Your seven-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.': 'Ton essai de sept jours de surveillance en arrière-plan commence quand tu enregistres ta première recherche. Les alertes doivent être activées sur cet appareil.', 'Could not check your trial status. Your hunt is saved; try again shortly.': 'Impossible de vérifier le statut de ton essai. Ta recherche est enregistrée ; réessaie dans un instant.'})
+# Recoverable signup confirmation (15 October 2026).
+FR.update({
+    'Confirm your email': 'Confirme ton e-mail',
+    'Enter your account email and the code from your latest SNYPD confirmation email. If an older email only has a link, request a new email below.': 'Saisis l’e-mail de ton compte et le code du dernier e-mail de confirmation SNYPD. Si un ancien e-mail contient seulement un lien, demande un nouvel e-mail ci-dessous.',
+    'CONFIRMATION CODE': 'CODE DE CONFIRMATION',
+    'CONFIRM EMAIL': 'CONFIRMER MON E-MAIL',
+    'CONFIRMING…': 'CONFIRMATION…',
+    'Enter the code from your latest confirmation email.': 'Saisis le code de ton dernier e-mail de confirmation.',
+    'That confirmation could not be completed. Use the code from your latest email, or request a new email below. Already confirmed? Go back to log in.': 'La confirmation n’a pas abouti. Utilise le code du dernier e-mail ou demande un nouvel e-mail ci-dessous. Déjà confirmé ? Retourne à la connexion.',
+    'Confirm your email to finish signing up. Enter your latest code below, or request a new email.': 'Confirme ton e-mail pour terminer ton inscription. Saisis ton dernier code ci-dessous ou demande un nouvel e-mail.',
+    'Confirmation email requested. Use only the latest email; earlier codes may no longer work.': 'E-mail de confirmation demandé. Utilise uniquement le dernier e-mail ; les anciens codes peuvent ne plus fonctionner.',
+})
