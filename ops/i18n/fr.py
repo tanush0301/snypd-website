@@ -603,6 +603,7 @@ FR.update({
     'START PRO': 'CHOISIR PRO',
     'START ELITE': 'CHOISIR ELITE',
     'Open dashboard →': 'Ouvrir le tableau de bord →',
+    'Code applied at checkout for Kickstart and Pro:': 'Code appliqué au paiement pour Kickstart et Pro' + NB + ':',
     'Manage subscription →': 'Gérer l’abonnement →',
     'Your plan:': 'Ton plan' + NB + ':',
     'Free stops when you close the tab.': 'Free s’arrête quand tu fermes l’onglet.',

@@ -323,6 +323,9 @@
       <a id="youplan-manage" href="https://whop.com/@me/settings/orders/" hidden>Manage subscription &rarr;</a>
       <a id="youplan-dash" href="/dashboard">Open dashboard &rarr;</a>
     </div>
+    <div class="youplan" id="promo-note" hidden>
+      <span>Code applied at checkout for Kickstart and Pro:</span> <b id="promo-code"></b>
+    </div>
   </section>
 
   <section class="wrap" style="padding-bottom:40px;" aria-label="Plans" data-section="cards" id="plans">
@@ -779,6 +782,25 @@
     var parsed = raw && JSON.parse(raw);
     storedEmail = parsed && parsed.user && parsed.user.email || null;
   } catch (e) {}
+  // Checkout language and promo code (17 Oct 2026). Whop's embed reads
+  // data-whop-checkout-locale and data-whop-checkout-promo-code (both in
+  // js.whop.com/static/checkout/index.js; locale=fr renders a French checkout,
+  // checked 17 Oct). ?promo= comes from the trial-ended email; it is kept in
+  // this browser for 3 days so it survives signing in. Only Kickstart and Pro:
+  // the code is limited to those products in Whop.
+  var LOCALE = window.SNYPD_I18N && SNYPD_I18N.lang === 'fr' ? 'fr' : null;
+  var PROMO_RE = /^[A-Z0-9]{3,20}$/;
+  var PROMO_PLANS = { kickstart: true, pro: true };
+  var promo = null;
+  try { promo = (new URLSearchParams(location.search).get('promo') || '').toUpperCase() || null; } catch (e) {}
+  if (promo && PROMO_RE.test(promo)) {
+    try { localStorage.setItem('snypd_promo', JSON.stringify({ c: promo, t: Date.now() })); } catch (e) {}
+  } else {
+    promo = null;
+    try { var sp = JSON.parse(localStorage.getItem('snypd_promo') || 'null'); if (sp && PROMO_RE.test(sp.c) && Date.now() - sp.t < 3 * 864e5) promo = sp.c; } catch (e) {}
+  }
+  if (promo) { $('promo-code').textContent = promo; $('promo-note').hidden = false; }
+
   var host = $('checkouts');
   Object.keys(WHOP_PLANS).forEach(function (k) {
     if (!WHOP_PLANS[k]) return;
@@ -795,7 +817,9 @@
         '<button type="button" class="whop-embed-close" data-whop-embed-close aria-label="Close checkout">×</button></div>' +
         '<p class="whop-embed-note">Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email snypd@gmail.com.</p>' +
         '<div data-whop-checkout-plan-id="' + WHOP_PLANS[k] + '" data-whop-checkout-theme="dark" data-whop-checkout-theme-accent-color="#A200FF" data-whop-checkout-on-complete="snypdCheckoutComplete"' +
-        (storedEmail ? ' data-whop-checkout-prefill-email="' + esc(storedEmail) + '"' : '') + '></div>' +
+        (storedEmail ? ' data-whop-checkout-prefill-email="' + esc(storedEmail) + '"' : '') +
+        (LOCALE ? ' data-whop-checkout-locale="' + LOCALE + '"' : '') +
+        (promo && PROMO_PLANS[k] ? ' data-whop-checkout-promo-code="' + esc(promo) + '"' : '') + '></div>' +
       '</div>';
     host.appendChild(o);
   });
