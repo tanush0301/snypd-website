@@ -121,7 +121,7 @@
   }).then(function (d) {
     items = d.items || [];
     items.forEach(function (it) {
-      it.hay = ' ' + fold([it.name.en, it.name.fr, it.name.nl, it.brand, it.q, it.cat].join(' ')) + ' ';
+      it.hay = ' ' + fold([it.name.en, it.name.fr, it.name.nl, it.name.de, it.brand, it.q, it.cat].join(' ')) + ' ';
     });
     box.hidden = false;
     input.addEventListener('input', render);
