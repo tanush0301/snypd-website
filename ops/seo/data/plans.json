@@ -1,11 +1,12 @@
 {
-  "_about": "Single source of truth for plan facts on every public page (read by ops/seo/plans.py). Change a fact here, then run python ops/seo/prepublish.py, which regenerates the marked regions of index.html and plans.html and fails on any page that disagrees. Sources: plan_limit_for() (migration 030), PAID_PLANS / ELITE_PLANS and FREE_TRIAL_DAYS=7 in the backend, migration 042, Whop plans, outreach/00-fact-sheet.md. Check speed comes from check-interval.json, not from here.",
-  "checked": "2026-10-10",
+  "_about": "Single source of truth for plan facts on every public page (read by ops/seo/plans.py). Change a fact here, then run python ops/seo/prepublish.py, which regenerates the marked regions of index.html and plans.html and fails on any page that disagrees. Sources: plan_limit_for() (migration 030; any paid plan other than kickstart/pro/elite gets 1, which is Solo), PAID_PLANS / ELITE_PLANS and FREE_TRIAL_DAYS=7 in the backend, migration 042, Whop plans, outreach/00-fact-sheet.md. Check speed comes from check-interval.json, not from here.",
+  "checked": "2026-10-18",
   "currency": "EUR",
   "vat_included": true,
   "billing": "monthly",
   "plans": [
     {"key": "free", "name": "Free", "price": "0", "searches": 1, "always_on": "trial", "push": "trial", "market_report": false, "card": false, "paid_discord": false},
+    {"key": "solo", "name": "Solo", "price": "5.99", "searches": 1, "always_on": true, "push": true, "market_report": false, "card": true, "paid_discord": false},
     {"key": "kickstart", "name": "Kickstart", "price": "14.99", "searches": 2, "always_on": true, "push": true, "market_report": false, "card": true, "paid_discord": true},
     {"key": "pro", "name": "Pro", "price": "24.99", "searches": 5, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true},
     {"key": "elite", "name": "Elite", "price": "34.99", "searches": 10, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true}

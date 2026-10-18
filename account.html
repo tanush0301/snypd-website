@@ -866,6 +866,7 @@
   const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due", "unpaid"]);
   const PLAN_LIMITS = {
     free: 1,
+    solo: 1,
     kickstart: 2,
     pro: 5,
     elite: 10
@@ -910,7 +911,7 @@
   function normalizePlan(raw, subscribed){
     const p = String(raw || "").toLowerCase().trim();
     if (!subscribed) return "free";
-    if (p === "kickstart" || p === "pro" || p === "elite") return p;
+    if (p === "solo" || p === "kickstart" || p === "pro" || p === "elite") return p;
     return "free";
   }
 

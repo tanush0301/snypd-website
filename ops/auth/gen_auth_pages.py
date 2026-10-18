@@ -33,13 +33,13 @@ PAGES = {
 }
 
 PLAN_INTENT = """<script>
-  /* Homepage START KICKSTART / PRO / ELITE link here as /signup?plan=<plan>.
+  /* Homepage START SOLO / KICKSTART / PRO / ELITE link here as /signup?plan=<plan>.
      Remember the choice so the dashboard can send the buyer to that checkout
      once they are signed in (see the plan-intent hook in dashboard.html). */
   (function () {
     try {
       var plan = (new URLSearchParams(location.search).get('plan') || '').toLowerCase();
-      if (plan === 'kickstart' || plan === 'pro' || plan === 'elite') {
+      if (plan === 'solo' || plan === 'kickstart' || plan === 'pro' || plan === 'elite') {
         localStorage.setItem('snypd_plan_intent', JSON.stringify({ plan: plan, ts: Date.now() }));
       }
     } catch (e) {}

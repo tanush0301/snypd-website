@@ -55,6 +55,7 @@ def per_search():
 #                   while the dashboard is open, so it only has something to push then
 #   one alert       existing_current_ads_keys(): once per user per listing id
 #   Market Report   ELITE_PLANS = (pro, elite); per hour / per day limits in plans.json
+#   paid Discord    Whop gives the Discord roles per product; SOLO (18 Oct 2026) has none
 # Removed 10 Oct 2026: "Quiet hours: no pushes overnight" -- users cannot write
 # public.users (RLS: SELECT only), so the dashboard toggle never saves.
 Y, N = ('y', 'Included'), ('n', 'Not included')
@@ -77,6 +78,7 @@ def cmp_groups():
     discord = [Y if P[k]['paid_discord'] else N for k in plans.ORDER]
     card = [T('Yes' if P[k]['card'] else 'No') for k in plans.ORDER]
     paid = [float(P[k]['price']) > 0 for k in plans.ORDER]
+    n = len(plans.ORDER)
     return [
         ('MONITORING', [
             ('Active Vinted searches', 'Pause one any time to free the slot.', sea),
@@ -84,14 +86,14 @@ def cmp_groups():
              'Free: 24/7 for the first %d days after you save your first search, then only while your dashboard is open.' % d,
              [W('First %d days only' % d) if not p else Y for p in paid]),
             ('Check speed', 'About every %d s (measured median), up to 5 min on quiet searches. Same on every plan.' % plans.MEDIAN_S,
-             [T('Same')] * 4),
-            ('Every Vinted site in Europe and the US', '26 sites. Prices in that site’s currency.', [Y] * 4),
+             [T('Same')] * n),
+            ('Every Vinted site in Europe and the US', '26 sites. Prices in that site’s currency.', [Y] * n),
         ]),
         ('ALERTS', [
-            ('Matches in your dashboard', 'Kept about 30 minutes while the listing is up.', [Y] * 4),
+            ('Matches in your dashboard', 'Kept about 30 minutes while the listing is up.', [Y] * n),
             ('Push notifications', 'Phone and desktop. On iPhone, add SNYPD to your Home Screen first.',
              [W('24/7 for %d days, then dashboard open' % d) if not p else T('24/7') for p in paid]),
-            ('One alert per listing', 'The same listing never alerts you twice.', [Y] * 4),
+            ('One alert per listing', 'The same listing never alerts you twice.', [Y] * n),
         ]),
         ('PRICE DATA', [
             ('Market Report price checks',
@@ -99,10 +101,10 @@ def cmp_groups():
             ('Price checks per day', 'Up to %d an hour.' % plans.MR['per_hour'], mr_day),
         ]),
         ('COMMUNITY', [
-            ('Free Discord community', '', [Y] * 4),
+            ('Free Discord community', '', [Y] * n),
             ('Paid Discord channels', '', discord),
             ('Founding member', 'First %d accounts, free included. Keep Pro at %s a month for life.'
-             % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False)), [Y] * 4, 'founding'),
+             % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False)), [Y] * n, 'founding'),
         ]),
         ('BILLING', [
             ('Price per month', 'VAT included.', price),
@@ -115,7 +117,7 @@ def cmp_groups():
 
 
 def cell(c, i):
-    cls = 'pc c%d' % i + (' is-pro' if i == 2 else '')
+    cls = 'pc c%d' % i + (' is-pro' if plans.ORDER[i] == 'pro' else '')
     kind, text = c
     if kind == 'y':
         return '<td class="%s"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">%s</span></td>' % (cls, text)
@@ -129,7 +131,7 @@ def cell(c, i):
 def cmp_html():
     out = []
     for title, rows in cmp_groups():
-        out.append('<tr class="grp"><th scope="colgroup" colspan="5">%s</th></tr>' % title)
+        out.append('<tr class="grp"><th scope="colgroup" colspan="%d">%s</th></tr>' % (len(plans.ORDER) + 1, title))
         for r in rows:
             label, note, cells = r[0], r[1], r[2]
             attr = ' data-founding-row' if len(r) > 3 else ''
@@ -141,13 +143,13 @@ def cmp_html():
 
 # ----------------------------------------------------------------- /plans FAQ
 def faqs():
-    k, pr, el = (plans.price(x, 'en', entities=False) for x in ('kickstart', 'pro', 'elite'))
+    so, k, pr, el = (plans.price(x, 'en', entities=False) for x in ('solo', 'kickstart', 'pro', 'elite'))
     d, r = plans.TRIAL_DAYS, plans.REFUND_DAYS
     return [
         ('Is Free actually free?', 'Yes. No card and no time limit. One search: for the first %d days after you save it, it runs 24/7 with alerts like a paid plan; after that it is checked while your dashboard is open.' % d),
         ('Do paid plans find listings faster?', 'No. Every plan checks about every %d seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.' % plans.MEDIAN_S),
         ('Is there a free trial?', 'Yes. Free runs your first search 24/7 with alerts for %d days, counted from when you save it, with no card. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.' % d),
-        ('Does the price include VAT?', 'Yes. %s, %s and %s a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.' % (k, pr, el)),
+        ('Does the price include VAT?', 'Yes. %s, %s, %s and %s a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.' % (so, k, pr, el)),
         ('How do I pay?', 'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.'),
         ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account.'),
         ('What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'),
@@ -217,6 +219,7 @@ TEMPLATES = {
     'home-pro-searches': '@@searches:pro@@ active Vinted searches',
     'home-pro-change': '@@searches:free@@ &rarr; @@searches:pro@@',
     'home-free-line': '@@searches:free@@ search &middot; 24/7 for @@trial_days@@ days, then while your dashboard is open &middot; free Discord',
+    'home-solo-line': '@@searches:solo@@ search &middot; runs 24/7, even with your dashboard closed',
     'home-kickstart-line': '@@searches:kickstart@@ searches &middot; runs 24/7, even with your dashboard closed',
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
     'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days. No card.',
@@ -230,7 +233,8 @@ TEMPLATES = {
     # plans.html
     'plans-free-searches': '@@searches:free@@ active Vinted search',
     'plans-free-trial': '24/7 for the first @@trial_days@@ days, then while your dashboard is open',
-    'plans-kickstart-searches': '@@searches:kickstart@@ active Vinted searches, not @@searches:free@@',
+    'plans-solo-searches': '@@searches:solo@@ active Vinted search',
+    'plans-kickstart-searches': '@@searches:kickstart@@ active Vinted searches, not @@searches:solo@@',
     'plans-pro-searches': '@@searches:pro@@ active Vinted searches, not @@searches:kickstart@@',
     'plans-elite-searches': '@@searches:elite@@ active Vinted searches, not @@searches:pro@@',
     'plans-elite-per-search': per_search,

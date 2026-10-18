@@ -68,13 +68,13 @@
   gtag('config', 'G-VBC0SXPR6F');
 </script>
 <script>
-  /* Homepage START KICKSTART / PRO / ELITE link here as /signup?plan=<plan>.
+  /* Homepage START SOLO / KICKSTART / PRO / ELITE link here as /signup?plan=<plan>.
      Remember the choice so the dashboard can send the buyer to that checkout
      once they are signed in (see the plan-intent hook in dashboard.html). */
   (function () {
     try {
       var plan = (new URLSearchParams(location.search).get('plan') || '').toLowerCase();
-      if (plan === 'kickstart' || plan === 'pro' || plan === 'elite') {
+      if (plan === 'solo' || plan === 'kickstart' || plan === 'pro' || plan === 'elite') {
         localStorage.setItem('snypd_plan_intent', JSON.stringify({ plan: plan, ts: Date.now() }));
       }
     } catch (e) {}
@@ -137,9 +137,9 @@
           </div>
       </div>
       <div style="border:1px solid var(--border);background:var(--bg);padding:18px;display:flex;flex-direction:column;gap:6px;">
-        <span id="au-listings" style="font-family:'Cabinet Grotesk',var(--font);font-weight:900;font-size:32px;line-height:1;letter-spacing:-.03em;">2,817,335</span>
+        <span id="au-listings" style="font-family:'Cabinet Grotesk',var(--font);font-weight:900;font-size:32px;line-height:1;letter-spacing:-.03em;">3,792,211</span>
         <span style="font-size:13px;line-height:1.5;color:var(--text-primary);">Vinted listings matched to users' searches since 17 Sept 2026</span>
-        <span id="au-asof" style="font-size:12px;color:var(--text-muted);">As of 16 Oct 2026</span>
+        <span id="au-asof" style="font-size:12px;color:var(--text-muted);">As of 18 Oct 2026</span>
       </div>
     </div>
 

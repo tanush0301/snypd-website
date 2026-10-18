@@ -5,10 +5,10 @@
 <script src="/assets/i18n.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SNYPD Pricing - Vinted Bot Plans from Free to &#8364;34.99/month</title>
-<meta name="description" content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month, VAT included. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel any time.">
+<meta name="description" content="Compare SNYPD plans: Free (1 search), Solo &#8364;5.99, Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month, VAT included. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel any time.">
 <link rel="canonical" href="https://www.snypd.store/plans">
 <meta property="og:title" content="SNYPD Pricing - Vinted Bot Plans from Free to &#8364;34.99/month">
-<meta property="og:description" content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month, VAT included. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel any time.">
+<meta property="og:description" content="Compare SNYPD plans: Free (1 search), Solo &#8364;5.99, Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month, VAT included. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel any time.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.snypd.store/plans">
 <meta property="og:site_name" content="SNYPD">
@@ -19,7 +19,7 @@
 <meta property="og:image:alt" content="SNYPD - Vinted monitor and new listing alerts for resellers">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SNYPD Pricing - Vinted Bot Plans from Free to &#8364;34.99/month">
-<meta name="twitter:description" content="Compare SNYPD plans: Free (1 search), Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month, VAT included. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel any time.">
+<meta name="twitter:description" content="Compare SNYPD plans: Free (1 search), Solo &#8364;5.99, Kickstart &#8364;14.99, Pro &#8364;24.99 and Elite &#8364;34.99 a month, VAT included. Paid plans monitor Vinted 24/7 with your dashboard closed. Cancel any time.">
 <meta name="twitter:image" content="https://www.snypd.store/assets/og/og-v5.png">
 <meta name="theme-color" content="#0A0A0B">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
@@ -94,7 +94,7 @@
   .youplan b { font-weight: 400; color: #00E5A0; letter-spacing: .08em; }
 
   /* Plan cards */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(212px, 100%), 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
   .card { background: #0A0A0B; padding: 26px 22px; display: flex; flex-direction: column; gap: 18px; }
   .card--pro { background: #121214; outline: 1px solid #A200FF; outline-offset: -1px; }
   .card__top { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 24px; flex-wrap: wrap; }
@@ -117,8 +117,8 @@
   .card .btn { margin-top: auto; }
   .plus { font-size: 11px; letter-spacing: .06em; color: #8B9094; margin-bottom: -8px; }
   /* Phones: every plan and price at a glance, so none is missed below the fold. */
-  .jump { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #26262A; margin-bottom: 14px; }
-  .jump a { min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; letter-spacing: .06em; color: #8B9094; background: #141416; border-left: 1px solid #26262A; }
+  .jump { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid #26262A; margin-bottom: 14px; }
+  .jump a { min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 9.5px; letter-spacing: .02em; color: #8B9094; background: #141416; border-left: 1px solid #26262A; }
   .jump a:first-child { border-left: 0; }
   .jump a b { font-weight: 400; color: #FFFFFF; font-size: 12px; }
   .jump a.is-pro { background: #1A0F24; color: #FFFFFF; }
@@ -151,8 +151,8 @@
 
   /* Comparison table: a real <table>. On phones one plan column shows at a time
      (picked with the tabs above it); the table semantics stay intact. */
-  .tabs { position: sticky; top: var(--nav-h); z-index: 6; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #26262A; background: #0A0A0B; }
-  .tabs button { min-height: 52px; border: 0; border-left: 1px solid #26262A; background: #141416; color: #8B9094; font-size: 10.5px; letter-spacing: .06em; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+  .tabs { position: sticky; top: var(--nav-h); z-index: 6; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid #26262A; background: #0A0A0B; }
+  .tabs button { min-height: 52px; border: 0; border-left: 1px solid #26262A; background: #141416; color: #8B9094; font-size: 9.5px; letter-spacing: .02em; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
   .tabs button:first-child { border-left: 0; }
   .tabs button[aria-pressed="true"] { background: #A200FF; color: #FFFFFF; }
   .cmp { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #1D1D20; table-layout: fixed; }
@@ -187,10 +187,11 @@
     .cmp td { padding: 14px; text-align: right; width: 42%; }
     .cmp .pc { border-left: 0; }
     .cmp .is-pro { background-color: transparent; }
-    .cmp[data-show="0"] .c1, .cmp[data-show="0"] .c2, .cmp[data-show="0"] .c3,
-    .cmp[data-show="1"] .c0, .cmp[data-show="1"] .c2, .cmp[data-show="1"] .c3,
-    .cmp[data-show="2"] .c0, .cmp[data-show="2"] .c1, .cmp[data-show="2"] .c3,
-    .cmp[data-show="3"] .c0, .cmp[data-show="3"] .c1, .cmp[data-show="3"] .c2 { display: none; }
+    .cmp[data-show="0"] .c1, .cmp[data-show="0"] .c2, .cmp[data-show="0"] .c3, .cmp[data-show="0"] .c4,
+    .cmp[data-show="1"] .c0, .cmp[data-show="1"] .c2, .cmp[data-show="1"] .c3, .cmp[data-show="1"] .c4,
+    .cmp[data-show="2"] .c0, .cmp[data-show="2"] .c1, .cmp[data-show="2"] .c3, .cmp[data-show="2"] .c4,
+    .cmp[data-show="3"] .c0, .cmp[data-show="3"] .c1, .cmp[data-show="3"] .c2, .cmp[data-show="3"] .c4,
+    .cmp[data-show="4"] .c0, .cmp[data-show="4"] .c1, .cmp[data-show="4"] .c2, .cmp[data-show="4"] .c3 { display: none; }
     .cmp tfoot { display: none; }
   }
 
@@ -277,6 +278,8 @@
   "publisher": { "@id": "https://www.snypd.store/#org" },
   "offers": [
     { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans" },
+    { "@type": "Offer", "name": "Solo", "price": "5.99", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans",
+      "priceSpecification": { "@type": "UnitPriceSpecification", "price": "5.99", "priceCurrency": "EUR", "billingDuration": "P1M", "valueAddedTaxIncluded": true } },
     { "@type": "Offer", "name": "Kickstart", "price": "14.99", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans",
       "priceSpecification": { "@type": "UnitPriceSpecification", "price": "14.99", "priceCurrency": "EUR", "billingDuration": "P1M", "valueAddedTaxIncluded": true } },
     { "@type": "Offer", "name": "Pro", "price": "24.99", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans",
@@ -331,6 +334,7 @@
   <section class="wrap" style="padding-bottom:40px;" aria-label="Plans" data-section="cards" id="plans">
     <nav class="jump mob" aria-label="Jump to a plan">
       <a href="#card-free">FREE<b><!--plans:price:free-->&euro;0<!--/plans:price:free--></b></a>
+      <a href="#card-solo">SOLO<b><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--></b></a>
       <a href="#card-kickstart">KICKSTART<b><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--></b></a>
       <a href="#card-pro" class="is-pro">PRO<b><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--></b></a>
       <a href="#card-elite">ELITE<b><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--></b></a>
@@ -355,6 +359,25 @@
         <a class="btn" data-cta="free" href="/signup">START FREE</a>
       </article>
 
+      <article class="card" id="card-solo" data-plan-card="solo" aria-labelledby="n-solo">
+        <div class="card__top">
+          <h2 class="card__name" id="n-solo">SOLO</h2>
+          <span class="tag-cur" data-cur="solo"></span>
+        </div>
+        <div class="price">
+          <span class="price__amt"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--><span class="price__per"> / mo</span></span>
+          <span class="price__sub">VAT incl. &middot; monthly &middot; cancel any time</span>
+        </div>
+        <p class="card__for">Your one search, watched around the clock.</p>
+        <span class="plus">Everything in Free, plus:</span>
+        <ul class="feats">
+          <li><!--plans:plans-solo-searches-->1 active Vinted search<!--/plans:plans-solo-searches--></li>
+          <li>Runs 24/7, dashboard closed</li>
+          <li>Push alerts around the clock</li>
+        </ul>
+        <a class="btn" data-cta="solo" href="/signup?plan=solo">START SOLO</a>
+      </article>
+
       <article class="card" id="card-kickstart" data-plan-card="kickstart" aria-labelledby="n-kickstart">
         <div class="card__top">
           <h2 class="card__name" id="n-kickstart">KICKSTART</h2>
@@ -365,11 +388,9 @@
           <span class="price__sub">VAT incl. &middot; monthly &middot; cancel any time</span>
         </div>
         <p class="card__for">For the one or two items you always hunt.</p>
-        <span class="plus">Everything in Free, plus:</span>
+        <span class="plus">Everything in Solo, plus:</span>
         <ul class="feats">
           <li><!--plans:plans-kickstart-searches-->2 active Vinted searches, not 1<!--/plans:plans-kickstart-searches--></li>
-          <li>Runs 24/7, dashboard closed</li>
-          <li>Push alerts around the clock</li>
           <li>Paid Discord channels</li>
         </ul>
         <a class="btn" data-cta="kickstart" href="/signup?plan=kickstart">START KICKSTART</a>
@@ -460,51 +481,54 @@
       <h2 class="display h2" id="compare-title">Every detail, side by side.</h2>
       <div class="tabs mob" role="group" aria-label="Show plan" id="cmp-tabs">
         <button type="button" data-show="0" aria-pressed="false"><span>FREE</span><span><!--plans:price:free-->&euro;0<!--/plans:price:free--></span></button>
-        <button type="button" data-show="1" aria-pressed="false"><span>KICKSTART</span><span><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--></span></button>
-        <button type="button" data-show="2" aria-pressed="true"><span>PRO</span><span><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--></span></button>
-        <button type="button" data-show="3" aria-pressed="false"><span>ELITE</span><span><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--></span></button>
+        <button type="button" data-show="1" aria-pressed="false"><span>SOLO</span><span><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--></span></button>
+        <button type="button" data-show="2" aria-pressed="false"><span>KICKSTART</span><span><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--></span></button>
+        <button type="button" data-show="3" aria-pressed="true"><span>PRO</span><span><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--></span></button>
+        <button type="button" data-show="4" aria-pressed="false"><span>ELITE</span><span><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--></span></button>
       </div>
-      <table class="cmp" id="cmp" data-show="2">
+      <table class="cmp" id="cmp" data-show="3">
         <caption class="sr">SNYPD plans compared. Prices per month, VAT included.</caption>
-        <colgroup><col class="col-feat"><col><col><col><col></colgroup>
+        <colgroup><col class="col-feat"><col><col><col><col><col></colgroup>
         <thead>
           <tr>
             <th scope="col"><span class="label" style="letter-spacing:.12em;">FEATURE</span></th>
             <th scope="col" class="pc c0"><span class="pn">FREE</span><span class="pp"><!--plans:price:free-->&euro;0<!--/plans:price:free--></span></th>
-            <th scope="col" class="pc c1"><span class="pn">KICKSTART</span><span class="pp"><!--plans:price-mo:kickstart-->&euro;14.99 / mo<!--/plans:price-mo:kickstart--></span></th>
-            <th scope="col" class="pc c2 is-pro"><span class="pn">PRO</span><span class="pp"><!--plans:price-mo:pro-->&euro;24.99 / mo<!--/plans:price-mo:pro--></span></th>
-            <th scope="col" class="pc c3"><span class="pn">ELITE</span><span class="pp"><!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite--></span></th>
+            <th scope="col" class="pc c1"><span class="pn">SOLO</span><span class="pp"><!--plans:price-mo:solo-->&euro;5.99 / mo<!--/plans:price-mo:solo--></span></th>
+            <th scope="col" class="pc c2"><span class="pn">KICKSTART</span><span class="pp"><!--plans:price-mo:kickstart-->&euro;14.99 / mo<!--/plans:price-mo:kickstart--></span></th>
+            <th scope="col" class="pc c3 is-pro"><span class="pn">PRO</span><span class="pp"><!--plans:price-mo:pro-->&euro;24.99 / mo<!--/plans:price-mo:pro--></span></th>
+            <th scope="col" class="pc c4"><span class="pn">ELITE</span><span class="pp"><!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite--></span></th>
           </tr>
         </thead>
-        <tbody id="cmp-body"><!--plans:plans-cmp--><tr class="grp"><th scope="colgroup" colspan="5">MONITORING</th></tr>
-<tr><th scope="row"><span class="fl">Active Vinted searches</span><span class="fn">Pause one any time to free the slot.</span></th><td class="pc c0">1</td><td class="pc c1">2</td><td class="pc c2 is-pro">5</td><td class="pc c3">10</td></tr>
-<tr><th scope="row"><span class="fl">Runs with your dashboard closed</span><span class="fn">Free: 24/7 for the first 7 days after you save your first search, then only while your dashboard is open.</span></th><td class="pc c0"><span class="w">First 7 days only</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr><th scope="row"><span class="fl">Check speed</span><span class="fn">About every 30 s (measured median), up to 5 min on quiet searches. Same on every plan.</span></th><td class="pc c0">Same</td><td class="pc c1">Same</td><td class="pc c2 is-pro">Same</td><td class="pc c3">Same</td></tr>
-<tr><th scope="row"><span class="fl">Every Vinted site in Europe and the US</span><span class="fn">26 sites. Prices in that site&#8217;s currency.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr class="grp"><th scope="colgroup" colspan="5">ALERTS</th></tr>
-<tr><th scope="row"><span class="fl">Matches in your dashboard</span><span class="fn">Kept about 30 minutes while the listing is up.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr><th scope="row"><span class="fl">Push notifications</span><span class="fn">Phone and desktop. On iPhone, add SNYPD to your Home Screen first.</span></th><td class="pc c0"><span class="w">24/7 for 7 days, then dashboard open</span></td><td class="pc c1">24/7</td><td class="pc c2 is-pro">24/7</td><td class="pc c3">24/7</td></tr>
-<tr><th scope="row"><span class="fl">One alert per listing</span><span class="fn">The same listing never alerts you twice.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr class="grp"><th scope="colgroup" colspan="5">PRICE DATA</th></tr>
-<tr><th scope="row"><span class="fl">Market Report price checks</span><span class="fn">Typical asking price and range, split by condition. Shows no price when the data is too thin.</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr><th scope="row"><span class="fl">Price checks per day</span><span class="fn">Up to 20 an hour.</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2 is-pro">100</td><td class="pc c3">100</td></tr>
-<tr class="grp"><th scope="colgroup" colspan="5">COMMUNITY</th></tr>
-<tr><th scope="row"><span class="fl">Free Discord community</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr><th scope="row"><span class="fl">Paid Discord channels</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr data-founding-row><th scope="row"><span class="fl">Founding member</span><span class="fn">First 100 accounts, free included. Keep Pro at &#8364;24.99 a month for life.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr class="grp"><th scope="colgroup" colspan="5">BILLING</th></tr>
-<tr><th scope="row"><span class="fl">Price per month</span><span class="fn">VAT included.</span></th><td class="pc c0">&#8364;0</td><td class="pc c1">&#8364;14.99</td><td class="pc c2 is-pro">&#8364;24.99</td><td class="pc c3">&#8364;34.99</td></tr>
-<tr><th scope="row"><span class="fl">Card needed</span></th><td class="pc c0">No</td><td class="pc c1">Yes</td><td class="pc c2 is-pro">Yes</td><td class="pc c3">Yes</td></tr>
-<tr><th scope="row"><span class="fl">Renews</span><span class="fn">Until you cancel.</span></th><td class="pc c0">&#8212;</td><td class="pc c1">Monthly</td><td class="pc c2 is-pro">Monthly</td><td class="pc c3">Monthly</td></tr>
-<tr><th scope="row"><span class="fl">14-day refund</span><span class="fn">On your first payment for a plan.</span></th><td class="pc c0">&#8212;</td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr><th scope="row"><span class="fl">Cancel any time</span><span class="fn">Access runs to the end of the paid month.</span></th><td class="pc c0">Nothing to cancel</td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr><!--/plans:plans-cmp--></tbody>
+        <tbody id="cmp-body"><!--plans:plans-cmp--><tr class="grp"><th scope="colgroup" colspan="6">MONITORING</th></tr>
+<tr><th scope="row"><span class="fl">Active Vinted searches</span><span class="fn">Pause one any time to free the slot.</span></th><td class="pc c0">1</td><td class="pc c1">1</td><td class="pc c2">2</td><td class="pc c3 is-pro">5</td><td class="pc c4">10</td></tr>
+<tr><th scope="row"><span class="fl">Runs with your dashboard closed</span><span class="fn">Free: 24/7 for the first 7 days after you save your first search, then only while your dashboard is open.</span></th><td class="pc c0"><span class="w">First 7 days only</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr><th scope="row"><span class="fl">Check speed</span><span class="fn">About every 30 s (measured median), up to 5 min on quiet searches. Same on every plan.</span></th><td class="pc c0">Same</td><td class="pc c1">Same</td><td class="pc c2">Same</td><td class="pc c3 is-pro">Same</td><td class="pc c4">Same</td></tr>
+<tr><th scope="row"><span class="fl">Every Vinted site in Europe and the US</span><span class="fn">26 sites. Prices in that site&#8217;s currency.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr class="grp"><th scope="colgroup" colspan="6">ALERTS</th></tr>
+<tr><th scope="row"><span class="fl">Matches in your dashboard</span><span class="fn">Kept about 30 minutes while the listing is up.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr><th scope="row"><span class="fl">Push notifications</span><span class="fn">Phone and desktop. On iPhone, add SNYPD to your Home Screen first.</span></th><td class="pc c0"><span class="w">24/7 for 7 days, then dashboard open</span></td><td class="pc c1">24/7</td><td class="pc c2">24/7</td><td class="pc c3 is-pro">24/7</td><td class="pc c4">24/7</td></tr>
+<tr><th scope="row"><span class="fl">One alert per listing</span><span class="fn">The same listing never alerts you twice.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr class="grp"><th scope="colgroup" colspan="6">PRICE DATA</th></tr>
+<tr><th scope="row"><span class="fl">Market Report price checks</span><span class="fn">Typical asking price and range, split by condition. Shows no price when the data is too thin.</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr><th scope="row"><span class="fl">Price checks per day</span><span class="fn">Up to 20 an hour.</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c3 is-pro">100</td><td class="pc c4">100</td></tr>
+<tr class="grp"><th scope="colgroup" colspan="6">COMMUNITY</th></tr>
+<tr><th scope="row"><span class="fl">Free Discord community</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr><th scope="row"><span class="fl">Paid Discord channels</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr data-founding-row><th scope="row"><span class="fl">Founding member</span><span class="fn">First 100 accounts, free included. Keep Pro at &#8364;24.99 a month for life.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr class="grp"><th scope="colgroup" colspan="6">BILLING</th></tr>
+<tr><th scope="row"><span class="fl">Price per month</span><span class="fn">VAT included.</span></th><td class="pc c0">&#8364;0</td><td class="pc c1">&#8364;5.99</td><td class="pc c2">&#8364;14.99</td><td class="pc c3 is-pro">&#8364;24.99</td><td class="pc c4">&#8364;34.99</td></tr>
+<tr><th scope="row"><span class="fl">Card needed</span></th><td class="pc c0">No</td><td class="pc c1">Yes</td><td class="pc c2">Yes</td><td class="pc c3 is-pro">Yes</td><td class="pc c4">Yes</td></tr>
+<tr><th scope="row"><span class="fl">Renews</span><span class="fn">Until you cancel.</span></th><td class="pc c0">&#8212;</td><td class="pc c1">Monthly</td><td class="pc c2">Monthly</td><td class="pc c3 is-pro">Monthly</td><td class="pc c4">Monthly</td></tr>
+<tr><th scope="row"><span class="fl">14-day refund</span><span class="fn">On your first payment for a plan.</span></th><td class="pc c0">&#8212;</td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr><th scope="row"><span class="fl">Cancel any time</span><span class="fn">Access runs to the end of the paid month.</span></th><td class="pc c0">Nothing to cancel</td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr><!--/plans:plans-cmp--></tbody>
         <tfoot>
           <tr>
             <td></td>
             <td class="c0"><a class="btn" data-cta="free" href="/signup">START FREE</a></td>
-            <td class="c1"><a class="btn" data-cta="kickstart" href="/signup?plan=kickstart">START KICKSTART</a></td>
-            <td class="c2"><a class="btn btn--prim" data-cta="pro" href="/signup?plan=pro">START PRO</a></td>
-            <td class="c3"><a class="btn" data-cta="elite" href="/signup?plan=elite">START ELITE</a></td>
+            <td class="c1"><a class="btn" data-cta="solo" href="/signup?plan=solo">START SOLO</a></td>
+            <td class="c2"><a class="btn" data-cta="kickstart" href="/signup?plan=kickstart">START KICKSTART</a></td>
+            <td class="c3"><a class="btn btn--prim" data-cta="pro" href="/signup?plan=pro">START PRO</a></td>
+            <td class="c4"><a class="btn" data-cta="elite" href="/signup?plan=elite">START ELITE</a></td>
           </tr>
         </tfoot>
       </table>
@@ -535,7 +559,7 @@
       <div class="faq__list" id="faq-list"><!--plans:plans-faq--><details><summary>Is Free actually free?</summary><p>Yes. No card and no time limit. One search: for the first 7 days after you save it, it runs 24/7 with alerts like a paid plan; after that it is checked while your dashboard is open.</p></details>
 <details><summary>Do paid plans find listings faster?</summary><p>No. Every plan checks about every 30 seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.</p></details>
 <details><summary>Is there a free trial?</summary><p>Yes. Free runs your first search 24/7 with alerts for 7 days, counted from when you save it, with no card. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.</p></details>
-<details><summary>Does the price include VAT?</summary><p>Yes. &#8364;14.99, &#8364;24.99 and &#8364;34.99 a month are the full prices, VAT included. Buying for a company? Tick &quot;buying on behalf of a company&quot; at checkout.</p></details>
+<details><summary>Does the price include VAT?</summary><p>Yes. &#8364;5.99, &#8364;14.99, &#8364;24.99 and &#8364;34.99 a month are the full prices, VAT included. Buying for a company? Tick &quot;buying on behalf of a company&quot; at checkout.</p></details>
 <details><summary>How do I pay?</summary><p>By card, or Apple Pay or Google Pay on devices that support them, through Whop&#8217;s secure checkout on this page. SNYPD never sees your card details.</p></details>
 <details><summary>Does my plan renew automatically?</summary><p>Yes, every month, until you cancel. Cancel any time in your Whop account.</p></details>
 <details><summary>What happens when I cancel?</summary><p>Your plan keeps running to the end of the month you paid for, then your account goes back to Free.</p></details>
@@ -602,11 +626,11 @@
   // Prices are VAT-inclusive and must match what Whop charges. A null plan id
   // means there is no live checkout for that plan: the button says so instead
   // of opening a dead checkout.
-  var WHOP_PLANS = { kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG' };
-  var PLANS = ['free', 'kickstart', 'pro', 'elite'];
-  var NAMES = { free: 'FREE', kickstart: 'KICKSTART', pro: 'PRO', elite: 'ELITE' };
-  /*plans:plans-js*/var PRICE = { free: '€0', kickstart: '€14.99', pro: '€24.99', elite: '€34.99' };
-  var SEARCHES = { free: 1, kickstart: 2, pro: 5, elite: 10 };/*/plans:plans-js*/
+  var WHOP_PLANS = { solo: 'plan_zYBunt6RBlsUg', kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG' };
+  var PLANS = ['free', 'solo', 'kickstart', 'pro', 'elite'];
+  var NAMES = { free: 'FREE', solo: 'SOLO', kickstart: 'KICKSTART', pro: 'PRO', elite: 'ELITE' };
+  /*plans:plans-js*/var PRICE = { free: '€0', solo: '€5.99', kickstart: '€14.99', pro: '€24.99', elite: '€34.99' };
+  var SEARCHES = { free: 1, solo: 1, kickstart: 2, pro: 5, elite: 10 };/*/plans:plans-js*/
   var MANAGE = 'https://whop.com/@me/settings/orders/';
   var ACTIVE = ['active', 'trialing', 'past_due', 'unpaid'];
   var DISCORD = 'https://discord.gg/gjKD4auXhK';
@@ -728,11 +752,13 @@
     paintCta(a, k);
   }
   function paintFit() {
-    var rank = Math.max(q.n >= 6 ? 3 : q.n >= 3 ? 2 : q.n >= 2 ? 1 : 0, q.closed ? 1 : 0, q.price ? 2 : 0);
+    // Smallest plan that covers every answer (index into PLANS: 0 free, 1 solo,
+    // 2 kickstart, 3 pro, 4 elite). Market Report starts at Pro.
+    var rank = Math.max(q.n >= 6 ? 4 : q.n >= 3 ? 3 : q.n >= 2 ? 2 : 0, q.closed ? 1 : 0, q.price ? 3 : 0);
     var k = PLANS[rank];
     var reasons = [SEARCHES[k] + ' active search' + (SEARCHES[k] > 1 ? 'es' : '')];
     reasons.push(k === 'free' ? '24/7 for 7 days, then while your dashboard is open' : 'Keeps hunting with the tab closed');
-    if (rank >= 2) reasons.push('Market Report price checks');
+    if (k === 'pro' || k === 'elite') reasons.push('Market Report price checks');
     focusPlan = k;
     $('fit-name').textContent = NAMES[k];
     $('fit-price').textContent = k === 'free' ? '€0' : PRICE[k] + ' / mo';
@@ -769,7 +795,7 @@
     this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
     var m = $('cmp-mcta'); m.setAttribute('data-cta', PLANS[+i]); paintCta(m, PLANS[+i]);
     focusPlan = PLANS[+i]; paintBar();
-    if (m.classList.contains('btn--prim') !== (i === '2')) m.classList.toggle('btn--prim', i === '2');
+    if (m.classList.contains('btn--prim') !== (PLANS[+i] === 'pro')) m.classList.toggle('btn--prim', PLANS[+i] === 'pro');
   });
 
   // ----- Embedded Whop checkout ---------------------------------------------

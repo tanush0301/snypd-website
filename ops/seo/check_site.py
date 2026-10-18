@@ -78,7 +78,7 @@ ALLOW = [
 
 # 2. Price next to a plan name.
 EUR = r'(?:€\s?(\d+(?:[.,]\d{2})?)|(\d+(?:[.,]\d{2})?)\s?€)'
-PRICE_NEAR = re.compile(r'\b(Kickstart|KICKSTART|Pro|PRO|Elite|ELITE)\b(?:\s?\(|[\s:,]| | (?:at|à|kostet|costs?|coûte|cuesta|costa|for|est|ist|is|plan,?|tarif|piano|abonnement)\b){0,4}\s*' + EUR)
+PRICE_NEAR = re.compile(r'\b(Solo|SOLO|Kickstart|KICKSTART|Pro|PRO|Elite|ELITE)\b(?:\s?\(|[\s:,]| | (?:at|à|kostet|costs?|coûte|cuesta|costa|for|est|ist|is|plan,?|tarif|piano|abonnement)\b){0,4}\s*' + EUR)
 
 
 def files():

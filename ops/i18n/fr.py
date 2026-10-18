@@ -362,8 +362,8 @@ _MONTHS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août'
 FR_PATTERNS = [
     # numbers and plans
     (r'^Last check: (.+)$', 'Dernière vérification' + NB + ': $1'),
-    (r'^Plan: (FREE|KICKSTART|PRO|ELITE)$', 'Plan' + NB + ': $1'),
-    (r'^(\d+) OF (\d+) · (FREE|KICKSTART|PRO|ELITE)$', '$1 SUR $2 · $3'),
+    (r'^Plan: (FREE|SOLO|KICKSTART|PRO|ELITE)$', 'Plan' + NB + ': $1'),
+    (r'^(\d+) OF (\d+) · (FREE|SOLO|KICKSTART|PRO|ELITE)$', '$1 SUR $2 · $3'),
     (r'^Founding #(\d+)$', 'Fondateur #$1'),
     (r'^(\d+) new matches$', '$1 nouvelles annonces'),
     (r'^Saved vs median · 1 claims?$', 'Économisé vs médiane · 1 achat'),
@@ -574,7 +574,7 @@ FR.update({
     'Vinted listings matched for SNYPD hunters so far.': 'annonces Vinted trouvées pour les utilisateurs de SNYPD jusqu’ici.',
     'Jump to a plan': 'Aller à un plan',
     'Show plan': 'Voir le plan',
-    'FREE': 'FREE', 'KICKSTART': 'KICKSTART', 'PRO': 'PRO', 'ELITE': 'ELITE',
+    'FREE': 'FREE', 'SOLO': 'SOLO', 'KICKSTART': 'KICKSTART', 'PRO': 'PRO', 'ELITE': 'ELITE',
     'For the one or two items you always hunt.': 'Pour les un ou deux articles que tu cherches toujours.',
     'For hunting many brands, sizes or markets at once.': 'Pour chercher plusieurs marques, tailles ou pays à la fois.',
     'For resellers sourcing every day.': 'Pour les revendeurs qui sourcent tous les jours.',
@@ -715,8 +715,8 @@ FR.update({
     'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.':
         'Par carte, ou avec Apple Pay ou Google Pay sur les appareils compatibles, via le paiement sécurisé de Whop sur cette page. SNYPD ne voit jamais les données de ta carte.',
     'Does the price include VAT?': 'Le prix inclut-il la TVA' + NB + '?',
-    'Yes. €14.99, €24.99 and €34.99 a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.':
-        'Oui. 14,99' + NB + '€, 24,99' + NB + '€ et 34,99' + NB + '€ par mois sont les prix complets, TVA incluse. Tu achètes pour une entreprise' + NB + '? Coche «' + NB + 'buying on behalf of a company' + NB + '» au moment du paiement.',
+    'Yes. €5.99, €14.99, €24.99 and €34.99 a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.':
+        'Oui. 5,99' + NB + '€, 14,99' + NB + '€, 24,99' + NB + '€ et 34,99' + NB + '€ par mois sont les prix complets, TVA incluse. Tu achètes pour une entreprise' + NB + '? Coche «' + NB + 'buying on behalf of a company' + NB + '» au moment du paiement.',
     'Does my plan renew automatically?': 'Mon plan se renouvelle-t-il automatiquement' + NB + '?',
     'Yes, every month, until you cancel. Cancel any time in your Whop account.': 'Oui, chaque mois, jusqu’à ta résiliation. Résilie à tout moment dans ton compte Whop.',
     'What happens when I cancel?': 'Que se passe-t-il quand je résilie' + NB + '?',
@@ -788,7 +788,7 @@ FR.update({
 })
 
 FR_PATTERNS += [
-    (r'^PLAN [-—] (FREE|KICKSTART|PRO|ELITE)$', 'PLAN — $1'),
+    (r'^PLAN [-—] (FREE|SOLO|KICKSTART|PRO|ELITE)$', 'PLAN — $1'),
     (r'^(€[\d.]+) / mo$', '$1 / mois'),
     (r'^(.+) · (€[\d.]+) / MO INCL\. VAT$', '$1 · $2 / MOIS TTC'),
     (r'^· (€[\d.]+) / mo incl\. VAT$', '· $1 / mois TTC'),
@@ -851,3 +851,21 @@ FR.update({
     'Confirm your email to finish signing up. Enter your latest code below, or request a new email.': 'Confirme ton e-mail pour terminer ton inscription. Saisis ton dernier code ci-dessous ou demande un nouvel e-mail.',
     'Confirmation email requested. Use only the latest email; earlier codes may no longer work.': 'E-mail de confirmation demandé. Utilise uniquement le dernier e-mail ; les anciens codes peuvent ne plus fonctionner.',
 })
+
+# Solo plan + trial-ended offer (18 Oct 2026). Offer text approved by Tanush 17 Oct
+# (outreach/21-conversion-plan.md); amounts checked in Whop's checkout 18 Oct.
+FR.update({
+    'Your one search, watched around the clock.': 'Ta recherche, surveillée 24h/24.',
+    'Everything in Solo, plus:': 'Tout Solo, plus' + NB + ':',
+    'START SOLO': 'CHOISIR SOLO',
+    'SOLO checkout': 'Paiement SOLO',
+    'MANAGE SUBSCRIPTION': 'GÉRER L’ABONNEMENT',
+    'CHANGE PLAN IN WHOP': 'CHANGER DE PLAN DANS WHOP',
+    'CANCEL IN WHOP': 'RÉSILIER DANS WHOP',
+    'Your trial ended: 50% off your first month': 'Ton essai est terminé' + NB + ': -50' + NB + '% sur ton premier mois',
+})
+FR_PATTERNS += [
+    (r'^UPGRADE TO (SOLO|KICKSTART|PRO|ELITE)$', 'PASSER À $1'),
+    (r'^Until (.+): Kickstart €7\.49 or Pro €12\.49 for the first month, code SNYPD50 already applied\. Or Solo, €5\.99/month for 1 search 24/7\.$',
+     'Jusqu’au $1' + NB + ': Kickstart 7,49' + NB + '€ ou Pro 12,49' + NB + '€ le premier mois, code SNYPD50 déjà appliqué. Ou Solo, 5,99' + NB + '€/mois pour 1 recherche 24h/24.'),
+]

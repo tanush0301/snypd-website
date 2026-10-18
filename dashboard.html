@@ -14,7 +14,7 @@
      /plans clears user_metadata.plan_intent when it opens the checkout. */
   (function () {
     try {
-      var PLANS = { kickstart: 1, pro: 1, elite: 1 }, WEEK = 7 * 864e5;
+      var PLANS = { solo: 1, kickstart: 1, pro: 1, elite: 1 }, WEEK = 7 * 864e5;
       var local = null;
       try { local = JSON.parse(localStorage.getItem('snypd_plan_intent') || 'null'); } catch (e) {}
       var sessionUser = function () {
@@ -2359,10 +2359,11 @@ const HEARTBEAT_URL = (() => {
 
   // plan + Whop activation check
   const ACTIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid']);
-  const VALID_PLANS = new Set(['free', 'kickstart', 'pro', 'elite']);
+  const VALID_PLANS = new Set(['free', 'solo', 'kickstart', 'pro', 'elite']);
   
   const PLAN_LABELS = {
     free: 'FREE',
+    solo: 'SOLO',
     kickstart: 'KICKSTART',
     pro: 'PRO',
     elite: 'ELITE'
@@ -2442,6 +2443,24 @@ const HEARTBEAT_URL = (() => {
       tTitle.textContent = 'Free 24/7 trial: ' + trialLeft + (trialLeft === 1 ? ' day' : ' days') + ' left';
       tText.textContent = 'Your hunt keeps running with this tab closed until then. After that, Free only checks while this tab is open; paid plans keep hunting 24/7.';
     }
+    // Trial ended (18 Oct 2026): for 72 h after the end, half price on the first
+    // month of Kickstart or Pro (Whop code SNYPD50, limited to those two plans in
+    // Whop; /plans?promo= pre-fills it) and Solo as the cheaper way to stay 24/7.
+    // Same window as the trial_ended email (ops/trial_email.py on the VPS).
+    // Totals checked in Whop's checkout on 18 Oct: 7.49 and 12.49.
+    const trialEnd = Date.parse(profile.free_trial_started_at) + 7 * 864e5;
+    const offerEnd = trialEnd + 3 * 864e5;
+    if (Date.now() >= trialEnd && Date.now() < offerEnd && tTitle && tText) {
+      const fr = !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
+      let until = '';
+      try {
+        until = new Intl.DateTimeFormat(fr ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(offerEnd));
+      } catch (e) { until = new Date(offerEnd).toLocaleString(); }
+      tTitle.textContent = 'Your trial ended: 50% off your first month';
+      tText.textContent = 'Until ' + until + ': Kickstart \u20ac7.49 or Pro \u20ac12.49 for the first month, code SNYPD50 already applied. Or Solo, \u20ac5.99/month for 1 search 24/7.';
+      const offerBtn = eliteBanner.querySelector('a.btn');
+      if (offerBtn) offerBtn.href = '/plans?promo=SNYPD50';
+    }
   }
 
   // Topbar founding badge: mirrors the Profile panel's own badge (below),
@@ -2478,7 +2497,7 @@ const HEARTBEAT_URL = (() => {
   // form of the URL instead, using the exact same derivation filters.html
   // already used, rather than inventing fields that were never captured.
   (function filterSheet() {
-    const FS_LIMIT = { free: 1, kickstart: 2, pro: 5, elite: 10 };
+    const FS_LIMIT = { free: 1, solo: 1, kickstart: 2, pro: 5, elite: 10 };
     const pill = document.getElementById('filter-pill');
     const pillCount = document.getElementById('filter-pill-count');
     const overlay = document.getElementById('filter-sheet-overlay');
