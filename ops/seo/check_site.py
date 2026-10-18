@@ -56,8 +56,11 @@ BANNED = [
     r'\bprix vendus?\b', r'\bEchtzeit\b', r'\bschnellste', r'\bunauff[äa]llig\b', r'\bsofort\b',
     r'\brealtime\b', r'\bsnelste\b', r'\btempo reale\b', r'\bistantane', r'\bpi[ùu] veloce\b',
     r'\btiempo real\b', r'\binstant[áa]ne', r'\bm[áa]s r[áa]pido\b',
+    # Polish + Swedish (18 Oct 2026): instant, real time, fastest, undetectable, safe, allowed by Vinted, sold prices
+    r'\bnatychmiast', r'\bw czasie rzeczywistym\b', r'\bnajszybsz', r'\bniewykrywaln', r'\bbezpieczn', r'dozwolon\w* przez Vinted', r'\bcen\w* sprzedaży\b',
+    r'\bomedelbar', r'\bi realtid\b', r'\bsnabbast', r'\boupptäck', r'\bsäker\b', r'tillåt\w* av Vinted', r'\bförsäljningspris',
 ]
-NEGATION = re.compile(r'(?:\bnot|\bno|\bnever|\bnicht|\bkein\w*|\bniet|\bgeen|\bnon|\bpas d[eu]s?|\bne pas|\bni)\s+(?:\w+\s+){0,2}$', re.I)
+NEGATION = re.compile(r'(?:\bnot|\bno|\bnever|\bnicht|\bkein\w*|\bniet|\bgeen|\bnon|\bpas d[eu]s?|\bne pas|\bni|\bnie|\binte|\binga|\bingen)\s+(?:\w+\s+){0,2}$', re.I)
 # (file or '*', regex that must match the text around the hit, why it is allowed)
 ALLOW = [
     ('affiliate.html', r'Do not promise', 'partner rules list the claims partners must not make'),
