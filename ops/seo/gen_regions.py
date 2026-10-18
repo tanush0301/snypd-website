@@ -214,7 +214,8 @@ def home_data():
 # Built from gen_content's page list, so every guide and every language version gets a link from
 # the homepage (Google's strongest page here; 88 URLs were "discovered, not indexed" on 18 Oct 2026).
 HOME_FOOT_EN = [('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'),
-                ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'),
+                ('notwork', 'Vinted notifications not working'), ('saved', 'Vinted saved searches'),
+                ('pricedrop', 'Vinted price drop alerts'), ('compare', 'Vinted bots compared'),
                 ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'),
                 ('sold', 'Can you see sold items on Vinted?'), ('/vinted-market-report', 'Vinted market report'),
                 ('deals', 'Vinted deals'), ('fees', 'Vinted fees')]

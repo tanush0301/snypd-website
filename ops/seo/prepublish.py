@@ -46,6 +46,8 @@ PAGES = [
     ('/vinted-notifications-not-working', 'vinted-notifications-not-working.html', None),
     ('/vinted-sold-items',          'vinted-sold-items.html',          None),
     ('/vinted-price-checker',       'vinted-price-checker.html',       None),
+    ('/vinted-saved-searches',      'vinted-saved-searches.html',      None),
+    ('/vinted-price-drop-notifications', 'vinted-price-drop-notifications.html', None),
 ]
 # Language versions are added for every language gen_content.LIVE publishes
 # (French, German, ...). Each set gets hreflang alternates in every direction.

@@ -229,7 +229,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/vinted-price-guide', 'VINTED PRICES'), ('/plans', 'PRICING'), (DISCORD, 'DISCORD')],
                login='LOG IN', start='START FREE', switch=('FR', 'fr', 'Version française'),
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
-               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'), ('sold', 'Vinted sold items'),('/vinted-market-report', 'Vinted market report'), 
+               foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('saved', 'Vinted saved searches'), ('pricedrop', 'Vinted price drop alerts'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'), ('sold', 'Vinted sold items'),('/vinted-market-report', 'Vinted market report'), 
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
@@ -237,7 +237,7 @@ UI = {
                nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
-               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('checker', 'Estimer un prix Vinted'), ('sold', 'Articles vendus sur Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
+               foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('saved', 'Recherches enregistrées Vinted'), ('pricedrop', 'Baisse de prix Vinted'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('checker', 'Estimer un prix Vinted'), ('sold', 'Articles vendus sur Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
@@ -245,7 +245,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/de/vinted-preise', 'VINTED-PREISE'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
                login='ANMELDEN', start='LOSLEGEN',
                foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
-               foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/de/vinted-preise', 'Vinted-Preisführer'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
+               foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('saved', 'Gespeicherte Suchen auf Vinted'), ('pricedrop', 'Vinted-Preissenkung'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/de/vinted-preise', 'Vinted-Preisführer'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
@@ -253,7 +253,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/nl/vinted-prijzen', 'VINTED-PRIJZEN'), ('/plans', 'ABONNEMENTEN'), (DISCORD, 'DISCORD')],
                login='INLOGGEN', start='BEGINNEN',
                foot_tag='SNYPD &middot; NIET VERBONDEN AAN VINTED', foot_t='Leest alleen openbare advertenties.',
-               foot=[('bot', 'Vinted bot'), ('notify', 'Vinted-melding bij nieuwe artikelen'), ('notwork', 'Vinted-meldingen werken niet'), ('compare', 'Vinted bots vergeleken'), ('/nl/vinted-prijzen', 'Vinted-prijsgids'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
+               foot=[('bot', 'Vinted bot'), ('notify', 'Vinted-melding bij nieuwe artikelen'), ('notwork', 'Vinted-meldingen werken niet'), ('saved', 'Opgeslagen zoekopdrachten op Vinted'), ('pricedrop', 'Vinted-prijsverlaging'), ('compare', 'Vinted bots vergeleken'), ('/nl/vinted-prijzen', 'Vinted-prijsgids'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
                home='Home'),
@@ -261,7 +261,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PREZZI'), (DISCORD, 'DISCORD')],
                login='ACCEDI', start='INIZIA',
                foot_tag='SNYPD &middot; NON AFFILIATO A VINTED', foot_t='Legge solo annunci pubblici.',
-               foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('compare', 'Bot Vinted a confronto'), ('sold', 'Vedere gli articoli venduti su Vinted'), ('/vinted-price-guide', 'Prezzi Vinted (EN)'),('fees', 'Commissioni Vinted (EN)'),
+               foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('saved', 'Ricerche salvate su Vinted'), ('compare', 'Bot Vinted a confronto'), ('sold', 'Vedere gli articoli venduti su Vinted'), ('/vinted-price-guide', 'Prezzi Vinted (EN)'),('fees', 'Commissioni Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Supporto (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:snypd@gmail.com">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
                home='Home'),
@@ -269,7 +269,7 @@ UI = {
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PRECIOS'), (DISCORD, 'DISCORD')],
                login='ENTRAR', start='EMPEZAR',
                foot_tag='SNYPD &middot; SIN RELACIÓN CON VINTED', foot_t='Solo lee anuncios públicos.',
-               foot=[('bot', 'Bot de Vinted'), ('notify', 'Alertas de Vinted para anuncios nuevos'), ('notwork', 'Notificaciones de Vinted no funcionan'), ('compare', 'Bots de Vinted comparados'), ('sold', 'Ver artículos vendidos en Vinted'), ('/vinted-price-guide', 'Precios de Vinted (EN)'),('fees', 'Comisiones de Vinted (EN)'),
+               foot=[('bot', 'Bot de Vinted'), ('notify', 'Alertas de Vinted para anuncios nuevos'), ('notwork', 'Notificaciones de Vinted no funcionan'), ('saved', 'Búsquedas guardadas en Vinted'), ('compare', 'Bots de Vinted comparados'), ('sold', 'Ver artículos vendidos en Vinted'), ('/vinted-price-guide', 'Precios de Vinted (EN)'),('fees', 'Comisiones de Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Soporte (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:snypd@gmail.com">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
                home='Inicio'),
@@ -2425,6 +2425,33 @@ def write(rel, text):
 import copy_pl_sv as cps  # noqa: E402
 cps.install(globals())
 
+# Help guides (18 Oct 2026): Vinted saved searches (8 languages) and price-drop notifications (4).
+# Copy + sources: copy_guides.py; facts quoted from Vinted's help centre (articles 433, 435, 258).
+import copy_guides as cg  # noqa: E402
+GUIDE_FAQ_H = {'en': 'Questions', 'fr': 'Questions', 'de': 'Fragen', 'nl': 'Vragen', 'it': 'Domande', 'es': 'Preguntas',
+               'pl': 'Pytania', 'sv': 'Frågor'}
+for _k, _g in cg.GUIDES.items():
+    SLUGS[_k] = dict(_g['slugs'])
+    PAGE_MODIFIED[_k] = cg.HELP_READ
+
+
+def page_guide(key, lang):
+    c = cg.GUIDES[key][lang]
+    fmt = {k: href(k, lang) for k in ('bot', 'notify', 'notwork', 'sold', 'saved', 'pricedrop')}
+    for art in ('433', '435', '258'):
+        fmt['h' + art] = cg.HELP.get((art, lang)) or cg.HELP.get((art, 'en'), '')
+    fmt['read'] = date_txt(cg.HELP_READ, lang)
+    F = lambda t: t.format(**fmt)  # noqa: E731
+    faq = [(F(q), F(a)) for q, a in c['faq']]
+    toc = list(c['toc'])
+    if 'faq' not in [i for i, _ in toc]:
+        toc.append(('faq', GUIDE_FAQ_H[lang]))
+    body = ('<section id="answer"><div class="lg-box lg-mint"><p>%s</p></div></section>' % F(c['answer'])
+            + ''.join('<section id="%s"><h2>%s</h2>%s</section>' % (i, F(h), F(t)) for i, h, t in c['sections'])
+            + '<section id="faq"><h2>%s</h2>%s</section>' % (GUIDE_FAQ_H[lang], faq_html(faq))
+            + '<section id="start"><h2>%s</h2>%s</section>' % (F(c['cta_h']), cta(lang)))
+    return page(key, lang, F(c['title']), F(c['desc']), F(c['eyebrow']), F(c['h1']), F(c['lead']), toc, body, [faq_ld(faq)])
+
 
 if __name__ == '__main__':
     for lang in (('en', 'fr') if FR_LIVE else ('en',)):
@@ -2450,6 +2477,9 @@ if __name__ == '__main__':
                 write(rel, text)
     for lang in cps.LANGS:
         write(SLUGS['notify'][lang].lstrip('/') + '.html', page_notify_x(lang))
+    for key in cg.GUIDES:
+        for lang in live_langs(key):
+            write(SLUGS[key][lang].lstrip('/') + '.html', page_guide(key, lang))
     if held:
         nl_review_file(held)
     write('vinted-deals.html', page_deals('en'))

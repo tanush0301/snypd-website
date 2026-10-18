@@ -18,7 +18,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/support</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/cookies</loc>
@@ -75,7 +75,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-fees</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-fees"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/frais-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-fees"/>
@@ -89,7 +89,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-notifications-not-working</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -110,10 +110,32 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-checker</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-checker"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/estimer-prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-checker"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/vinted-saved-searches</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/vinted-price-drop-notifications</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-melding-prijs-verlaagd"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-drop-notifications"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/bot-vinted</loc>
@@ -401,7 +423,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/notifiche-vinted-non-funzionano</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -412,7 +434,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/notificaciones-vinted-no-funcionan</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -467,6 +489,124 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-checker"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/estimer-prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-checker"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/fr/recherches-enregistrees-vinted</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/de/vinted-gespeicherte-suchen</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/vinted-ricerche-salvate</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/es/vinted-busquedas-guardadas</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/pl/vinted-zapisane-wyszukiwania</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/sv/vinted-sparade-sokningar</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/vinted-ricerche-salvate"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/vinted-busquedas-guardadas"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/vinted-zapisane-wyszukiwania"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/vinted-sparade-sokningar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-saved-searches"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/fr/vinted-notification-baisse-de-prix</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-melding-prijs-verlaagd"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-drop-notifications"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-melding-prijs-verlaagd"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-drop-notifications"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/nl/vinted-melding-prijs-verlaagd</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-melding-prijs-verlaagd"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-drop-notifications"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide</loc>
@@ -1874,14 +2014,14 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-market-report</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/rapport-marche-vinted</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report"/>
@@ -1902,7 +2042,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-market-report/september-2026</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/september-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/septembre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/september-2026"/>
