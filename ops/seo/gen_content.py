@@ -488,7 +488,7 @@ def cta(lang):
                 '<a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>')
     return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les 7 premiers jours tournent 24h/24 avec les alertes. '
             'Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p>'
-            '<p class="ct-note">Inscription en français ; le paiement (Whop) est en anglais.</p>'
+            '<p class="ct-note">Inscription et paiement en français.</p>'
             '<div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a>'
             '<a class="ct-btn ct-ghost" href="/plans">VOIR LES TARIFS</a></div></div>')
 

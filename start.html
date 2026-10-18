@@ -100,6 +100,24 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 .lg-foot-l a, .lg-foot-l button { font-size: 12px; }
 .lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
 .lg-foot-l button:hover { color: #57FFC8; }
+.lg-lang { position: relative; }
+.lg-lang > summary { list-style: none; cursor: pointer; }
+.lg-lang > summary::-webkit-details-marker { display: none; }
+.lg-lang > div { position: absolute; left: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
+.pc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 18px; margin: 0 0 18px; }
+.pc label { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.pc input { width: 100%; box-sizing: border-box; min-height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #3A3A40; border-radius: 0; }
+.pc input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+.lg-doc .pc-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-doc .pc-list li { margin: 0; }
+.pc-list button { font: inherit; font-size: 12px; color: #E8EAEB; background: #141416; border: 1px solid #3A3A40; padding: 9px 12px; min-height: 40px; cursor: pointer; text-align: left; }
+.pc-list button:hover, .pc-list button[aria-pressed="true"] { border-color: #00E5A0; color: #FFFFFF; }
+.pc-res { margin-top: 16px; border-top: 1px solid #1D1D20; padding-top: 16px; }
+.pc-res[hidden] { display: none; }
+.lg-doc .pc-res h3 { margin-top: 0; }
+.pc-big { display: block; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; margin: 2px 0 12px; }
+.pc-msg { font-size: 12.5px; color: #8B9094; margin: 10px 0 0; }
+.pc-az { columns: 2 240px; column-gap: 32px; }
 
 .rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
 @media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -203,7 +221,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offs
 </section>
 <section id="plans">
   <h2>Plans</h2>
-  <div class="ct-scroll"><table class="ct-table"><thead><tr><th scope="col">PLAN</th><th scope="col">PER MONTH, VAT INCL.</th><th scope="col">ACTIVE SEARCHES</th><th scope="col">WATCHES WITH DASHBOARD CLOSED</th><th scope="col">MARKET REPORT</th></tr></thead><tbody><tr class="ct-us"><th scope="row">Free</th><td><span class="ct-num">&euro;0</span></td><td>1</td><td>First 7 days, then only while your dashboard is open</td><td>No</td></tr><tr><th scope="row">Kickstart</th><td><span class="ct-num">&euro;14.99</span></td><td>2</td><td>Yes, 24/7</td><td>No</td></tr><tr><th scope="row">Pro</th><td><span class="ct-num">&euro;24.99</span></td><td>5</td><td>Yes, 24/7</td><td>Yes</td></tr><tr><th scope="row">Elite</th><td><span class="ct-num">&euro;34.99</span></td><td>10</td><td>Yes, 24/7</td><td>Yes</td></tr></tbody></table></div>
+  <div class="ct-scroll"><table class="ct-table"><thead><tr><th scope="col">PLAN</th><th scope="col">PER MONTH, VAT INCL.</th><th scope="col">ACTIVE SEARCHES</th><th scope="col">WATCHES WITH DASHBOARD CLOSED</th><th scope="col">MARKET REPORT</th></tr></thead><tbody><tr class="ct-us"><th scope="row">Free</th><td><span class="ct-num">@@price:free@@</span></td><td>@@searches:free@@</td><td>First @@trial_days@@ days, then only while your dashboard is open</td><td>No</td></tr><tr><th scope="row">Solo</th><td><span class="ct-num">@@price:solo@@</span></td><td>@@searches:solo@@</td><td>Yes, 24/7</td><td>No</td></tr><tr><th scope="row">Kickstart</th><td><span class="ct-num">@@price:kickstart@@</span></td><td>@@searches:kickstart@@</td><td>Yes, 24/7</td><td>No</td></tr><tr><th scope="row">Pro</th><td><span class="ct-num">@@price:pro@@</span></td><td>@@searches:pro@@</td><td>Yes, 24/7</td><td>Yes</td></tr><tr><th scope="row">Elite</th><td><span class="ct-num">@@price:elite@@</span></td><td>@@searches:elite@@</td><td>Yes, 24/7</td><td>Yes</td></tr></tbody></table></div>
   <p>Prices include VAT. The free plan needs no card and has no time limit or cap on notifications; it watches your search 24/7 for the first 7 days, then while your dashboard is open. Paid plans keep watching with the dashboard closed. 14-day refund on the first payment of a plan.</p>
   <div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card. The first 7 days run 24/7 with alerts.</p>
     <div class="ct-actions"><a class="ct-btn" href="/signup">START FREE</a><a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>

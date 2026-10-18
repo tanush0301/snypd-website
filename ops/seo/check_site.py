@@ -41,6 +41,7 @@ STALE = [
     (r'There is no trial', 'there is a 7-day trial'),
     (r'[Ii]nscription(?! en français)[^.<]{0,60}en anglais', 'sign-up is in French since 9 Oct 2026 (only Whop checkout is English)'),
     (r'tarifs</a> \(en anglais\)', '/plans is in French for French browsers since 9 Oct 2026'),
+    (r'paiement \(Whop\) est en anglais', 'the Whop checkout is French for French users since 18 Oct 2026 (site 5ad832b)'),
 ]
 PLACEHOLDER_COUNTER = re.compile(r'id="(?:stat-listings|au-listings)"[^>]*>\s*(?:&mdash;|—|-)?\s*<')
 ASOF = re.compile(r'id="(?:stat-listings-asof|au-asof)"[^>]*>([^<]*)<')

@@ -295,7 +295,7 @@ def page_item(it, lang):
   <h2>Reçois une alerte pour {esc(name)} pas cher</h2>
   <p>SNYPD vérifie une recherche Vinted environ toutes les 30 secondes et envoie les nouvelles annonces sur ton téléphone, sans que tu aies à rafraîchir Vinted. Lance la recherche ci-dessous avec un maximum de {money(lo, 'fr')}, le quart le moins cher, et change-le quand tu veux.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">M’ALERTER SOUS {money(lo, 'fr')}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['fr']}">COMMENT MARCHE SNYPD</a></div>
-  <p class="ct-note">Gratuit{nb}: une recherche, 24h/24 pendant les @@trial_days@@ premiers jours. Sans carte. Inscription en français{nb}; le paiement (Whop) est en anglais.</p>
+  <p class="ct-note">Gratuit{nb}: une recherche, 24h/24 pendant les @@trial_days@@ premiers jours. Sans carte. Inscription et paiement en français.</p>
 </section>
 <section id="methode">
   <h2>D’où viennent ces chiffres</h2>
