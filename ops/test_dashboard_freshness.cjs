@@ -86,16 +86,19 @@ assert(card.includes('Uploaded on Vinted at '));
 assert(card.includes('card-badge--new'));
 
 const calls = [];
-const builder = Object.fromEntries(['select', 'eq', 'or', 'order', 'limit'].map(method =>
+// adsQuery(columns, ids): the legacy REST fallback's full-row read (the feed
+// itself is the dashboard_feed RPC since 18 Oct 2026). Hard 30-minute gate on
+// uploaded_at_ts only -- no created_at fallback (fail-closed, see the source).
+const builder = Object.fromEntries(['select', 'in', 'eq', 'gte', 'or', 'order', 'limit'].map(method =>
   [method, (...args) => { calls.push([method, ...args]); return builder; }]));
 context.sb = { from: table => { assert.equal(table, 'current_ads'); return builder; } };
 context.uid = 'test-user';
 context.cutoffIso = minutesAgo(30);
 vm.runInContext(section('      function adsQuery(', '      // is_suspicious'), context);
-context.adsQuery('listing_id');
+context.adsQuery('listing_id', [1, 2]);
+assert(calls.some(c => c[0] === 'in' && c[1] === 'listing_id' && c[2].join() === '1,2'));
 assert(calls.some(c => c[0] === 'eq' && c[1] === 'user_id' && c[2] === 'test-user'));
 assert(calls.some(c => c[0] === 'eq' && c[1] === 'item_box->snypd_filter_contract->>version' && c[2] === '1'));
-assert(calls.some(c => c[0] === 'or' && c[1] ===
-  `uploaded_at_ts.gte.${context.cutoffIso},and(uploaded_at_ts.is.null,created_at.gte.${context.cutoffIso})`));
-assert(calls.some(c => c[0] === 'limit' && c[1] === 80));
+assert(calls.some(c => c[0] === 'gte' && c[1] === 'uploaded_at_ts' && c[2] === context.cutoffIso));
+assert(!calls.some(c => c[0] === 'or'), 'created_at must not let an old upload pass as fresh');
 console.log(`PASS: ${scripts} inline scripts parse; timestamp fallbacks, stale rows, labels, badges, ordering and user-scoped query.`);

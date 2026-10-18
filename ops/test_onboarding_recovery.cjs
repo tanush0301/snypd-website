@@ -44,8 +44,10 @@ function base() {
   g.window = g;
   return { g, el, context: vm.createContext(g), events };
 }
-async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null} = {}) {
-  const f = base(); let inserts = 0, countValue = count;
+async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, boot = null} = {}) {
+  const f = base(); let inserts = 0, countValue = count, countReads = 0;
+  // dashboard_boot snapshot (migration 054): the wizard takes its hunt count from it once.
+  f.g.fromBoot = reader => { assert.equal(reader, 'wizard'); const b = boot; boot = null; return b; };
   f.g.uid = 'test-user'; f.g.profile = {}; f.g.effectivePlan = 'free'; f.g.eliteBanner = null;
   f.g.xpEventExistsEver = async () => { if (xpFails) throw new Error('XP down'); return false; };
   f.g.awardXP = async () => 20;
@@ -54,12 +56,13 @@ async function wizardFixture({count = 0, status = 'off', insertError = null, xpF
   f.g.SNYPD.vq = { fillSites() {}, currencyFor: () => 'EUR', floorFor: () => 30, build: () => 'https://www.vinted.fr/catalog?search_text=carhartt' };
   f.g.sb = { from() { return {
     select() { return this; }, eq() { return this; },
-    then(resolve, reject) { return Promise.resolve({count:countValue,error:null}).then(resolve,reject); },
+    then(resolve, reject) { countReads++; return Promise.resolve({count:countValue,error:null}).then(resolve,reject); },
     maybeSingle() { return Promise.resolve({data:{free_trial_started_at:trialStart},error:null}); },
     async insert() { inserts++; if (pendingInsert) await pendingInsert; if (!insertError) countValue++; return {error: insertError}; },
   }; } };
   await vm.runInContext(wizard, f.context); await tick();
   f.inserts = () => inserts;
+  f.countReads = () => countReads;
   f.setInsertError = value => { insertError = value; };
   f.setStatus = value => { status = value; f.g.dispatchEvent(new f.g.Event('snypd:alerts-changed')); };
   return f;
@@ -127,6 +130,12 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   assert.equal(f.el('wiz-overlay').style.display,'flex');
   assert.equal(f.el('wiz-enable-alerts').textContent,'Try again');
   await f.el('wiz-finish').click(); assert.equal(f.el('wiz-overlay').style.display,'none'); passed++;
+
+  // Boot snapshot: no hunts opens the wizard, one hunt does not; neither reads the count again.
+  f=await wizardFixture({count:5, boot:{searches:[]}});
+  assert.equal(f.el('wiz-overlay').style.display,'flex'); assert.equal(f.countReads(),0); passed++;
+  f=await wizardFixture({count:0, boot:{searches:[{id:'s1',is_active:true}]}});
+  assert.equal(f.el('wiz-overlay').style.display,'none'); assert.equal(f.el('alerts-setup-card').style.display,''); assert.equal(f.countReads(),0); passed++;
 
   f=await wizardFixture({count:null});
   assert.equal(f.el('wiz-overlay').style.display,'none'); assert.equal(f.inserts(),0); passed++;

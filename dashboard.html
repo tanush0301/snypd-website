@@ -2377,10 +2377,34 @@ const HEARTBEAT_URL = (() => {
   // everyone. Try the full select first; fall back to the core fields
   // alone (and log loudly) if that's specifically what's failing.
   const CORE_USER_COLUMNS = 'subscription_plan, sub_status, billing_provider, whop_product_id, whop_manage_url, is_founding_member';
-  let me = await sb.from('users')
-    .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at')
-    .eq('id', uid)
-    .maybeSingle();
+  // Page-load reads in one call (dashboard_boot, migration 054, 18 Oct 2026).
+  // Every REST request writes a ~3 KB Supabase edge log and the Free plan's
+  // log quota is exceeded (CLAUDE.md item 30): a load used to make ~13 reads
+  // (users, user_searches x3, filter_quota, user_claims x3, xp_events x2-4,
+  // user_streak_state, dashboard_feed x2), most with a CORS preflight. Each
+  // reader below takes its piece once, within 60 s of this call, through
+  // fromBoot(); later reads (after a save, claim or award) go to REST as
+  // before, and so does every reader if this call fails.
+  let boot = null;
+  const bootUsed = new Set();
+  try {
+    const b = await sb.rpc('dashboard_boot');
+    if (b.error) throw b.error;
+    if (b.data && Array.isArray(b.data.searches) && Array.isArray(b.data.claims)) boot = { at: Date.now(), data: b.data };
+  } catch (e) {
+    console.error('SNYPD: dashboard_boot RPC failed, using the separate reads', e);
+  }
+  function fromBoot(reader) {
+    if (!boot || bootUsed.has(reader) || Date.now() - boot.at > 60000) return null;
+    bootUsed.add(reader);
+    return boot.data;
+  }
+  let me = boot
+    ? { data: boot.data.profile || null, error: null }
+    : await sb.from('users')
+      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at')
+      .eq('id', uid)
+      .maybeSingle();
   if (me.error) {
     console.error('SNYPD: users query with founding_number failed, retrying without it', me.error);
     me = await sb.from('users')
@@ -2749,10 +2773,10 @@ const HEARTBEAT_URL = (() => {
       try { return new URL(u).searchParams.get('search_text') || 'Vinted search'; } catch (e) { return 'Vinted search'; }
     }
 
-    async function computeQuota() {
+    async function computeQuota(preloaded) {
       let rpcUsed = null, rpcLimit = null;
       try {
-        const r = await sb.rpc('filter_quota');
+        const r = preloaded ? { data: preloaded, error: null } : await sb.rpc('filter_quota');
         if (!r.error && r.data) {
           const d = Array.isArray(r.data) ? r.data[0] : r.data;
           rpcLimit = Number(d.quota_limit ?? d.plan_limit ?? d.filter_limit ?? d.max_filters ?? d.limit ?? d.max_active_filters);
@@ -2805,10 +2829,13 @@ const HEARTBEAT_URL = (() => {
     }
 
     async function reloadHunts() {
-      const { data, error } = await sb.from('user_searches').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+      const b = fromBoot('filter-sheet');
+      const { data, error } = b
+        ? { data: b.searches, error: null }
+        : await sb.from('user_searches').select('*').eq('user_id', uid).order('created_at', { ascending: false });
       if (error) { console.error('SNYPD filter sheet: could not load hunts', error); return; }
       rows = data || [];
-      await computeQuota();
+      await computeQuota(b ? b.quota : null);
       paintMeta();
       renderList();
     }
@@ -2979,10 +3006,13 @@ const HEARTBEAT_URL = (() => {
   // a returning user with at least one search never sees this, no flag needed.
   (async () => {
     try {
-      const { count, error: cErr } = await sb
-        .from('user_searches')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', uid);
+      const b = fromBoot('wizard');
+      const { count, error: cErr } = b
+        ? { count: b.searches.length, error: null }
+        : await sb
+          .from('user_searches')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', uid);
       if (cErr) { console.error('SNYPD wizard: could not check searches', cErr); return; }
       // Existing hunters can resume alert setup after installing the app or
       // choosing "later". A failed/unknown count must never mean zero hunts.
@@ -3426,11 +3456,17 @@ const HEARTBEAT_URL = (() => {
       histList.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
       histEmpty.style.display = 'none';
       try {
-        const { data, error } = await sb
-          .from('user_claims')
-          .select('*')
-          .eq('user_id', uid)
-          .order('claimed_at', { ascending: false });
+        // Claims and their deal-quality bonuses come both from the boot
+        // snapshot or both from REST, never mixed, so a bonus written after
+        // the snapshot cannot be hidden by it.
+        const b = fromBoot('history');
+        const { data, error } = b
+          ? { data: b.claims, error: null }
+          : await sb
+            .from('user_claims')
+            .select('*')
+            .eq('user_id', uid)
+            .order('claimed_at', { ascending: false });
         if (error) throw error;
 
         const rows = data || [];
@@ -3446,12 +3482,15 @@ const HEARTBEAT_URL = (() => {
         if ((effectivePlan === 'elite' || effectivePlan === 'pro') && rows.length) {
           try {
             const ids = rows.map(r => r.id).filter(Boolean);
-            const { data: dqRows, error: dqErr } = await sb
-              .from('xp_events')
-              .select('item_id, xp')
-              .eq('user_id', uid)
-              .eq('event_type', 'deal_quality_bonus')
-              .in('item_id', ids);
+            const idSet = new Set(ids.map(String));
+            const { data: dqRows, error: dqErr } = b
+              ? { data: (b.dq || []).filter(r => idSet.has(String(r.item_id))), error: null }
+              : await sb
+                .from('xp_events')
+                .select('item_id, xp')
+                .eq('user_id', uid)
+                .eq('event_type', 'deal_quality_bonus')
+                .in('item_id', ids);
             if (dqErr) throw dqErr;
             for (const r of (dqRows || [])) dealQualityByItem.set(String(r.item_id), Number(r.xp) || 0);
           } catch (e) {
@@ -4012,10 +4051,15 @@ const HEARTBEAT_URL = (() => {
 
       let tierLabel = null;
       let xpTotal = 0;
+      const b = fromBoot('xp');
       try {
-        const { data: xpRows, error: xpErr } = await sb.from('xp_events').select('xp').eq('user_id', uid);
-        if (xpErr) throw xpErr;
-        xpTotal = (xpRows || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+        if (b) {
+          xpTotal = Number(b.xp_total) || 0;
+        } else {
+          const { data: xpRows, error: xpErr } = await sb.from('xp_events').select('xp').eq('user_id', uid);
+          if (xpErr) throw xpErr;
+          xpTotal = (xpRows || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+        }
         const t = tierFor(xpTotal);
         tierLabel = `${t.name.toUpperCase()} · ${fmtCount(xpTotal)} XP`;
 
@@ -4046,7 +4090,9 @@ const HEARTBEAT_URL = (() => {
         return;
       }
       try {
-        const { data, error } = await sb.from('user_streak_state').select('current_streak').eq('user_id', uid).maybeSingle();
+        const { data, error } = b
+          ? { data: b.streak == null ? null : { current_streak: b.streak }, error: null }
+          : await sb.from('user_streak_state').select('current_streak').eq('user_id', uid).maybeSingle();
         if (error) throw error;
         const streak = data ? Number(data.current_streak) || 0 : 0;
         if (streak > 0) {
@@ -4378,18 +4424,22 @@ const HEARTBEAT_URL = (() => {
       const fsHunts = document.getElementById('fs-hunts');
       if (!fsHunts) return;
       try {
-        const { count, error } = await sb
-          .from('user_searches')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', uid)
-          .eq('is_active', true);
+        const b = fromBoot('hunts-running');
+        const { count, error } = b
+          ? { count: b.searches.filter(s => s.is_active === true).length, error: null }
+          : await sb
+            .from('user_searches')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', uid)
+            .eq('is_active', true);
         if (error) throw error;
         fsHunts.textContent = String(count ?? 0);
       } catch (e) {
         console.error('SNYPD feed stats: could not load hunts count', e);
       }
     }
-    loadClaims();
+    // loadClaims() already runs once on load above (History count); calling
+    // it again here only doubled its reads.
     loadHuntsRunningCount();
     window.addEventListener('snypd:hunts-changed', () => { loadHuntsRunningCount(); });
   })();
@@ -4651,7 +4701,10 @@ const HEARTBEAT_URL = (() => {
     if (claimedIdsSeeded) return;
     claimedIdsSeeded = true;
     try {
-      const { data, error } = await sb.from('user_claims').select('listing_id').eq('user_id', uid).not('listing_id', 'is', null);
+      const b = fromBoot('claimed-ids');
+      const { data, error } = b
+        ? { data: b.claims.filter(r => r.listing_id != null), error: null }
+        : await sb.from('user_claims').select('listing_id').eq('user_id', uid).not('listing_id', 'is', null);
       if (error) throw error;
       for (const r of (data || [])) claimedIds.add(String(r.listing_id));
     } catch (e) {
@@ -5148,6 +5201,10 @@ const HEARTBEAT_URL = (() => {
 
   async function fetchFeedViaRpc() {
     let data = {};
+    // First load: start from the boot snapshot's active hunts, so the first
+    // call already carries their signatures instead of an empty list.
+    const b = fromBoot('feed');
+    if (b) feedSearchSigs = [...new Set(b.searches.filter(s => s.is_active === true).map(s => savedSearchSignature(s.vinted_url)).filter(Boolean))].sort();
     // The RPC filters by the signatures we send and returns the account's
     // current active hunts; when those differ (first load, a hunt saved,
     // paused or deleted here or on another device) ask once more with them.
