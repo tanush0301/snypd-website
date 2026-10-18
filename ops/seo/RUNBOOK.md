@@ -109,11 +109,12 @@ first, then the September archive row; `sitemap_pages()` adds both URLs with hre
 latest `published`; the homepage link (`gen_regions.home_data`) points to November. October is not "archived": it keeps
 its URL and stays in the table. Only September is a special archive (own renderer, `SEPT`, frozen).
 
-**UNCLEAR, decide before generating (Tanush):** `page_edition()` hard-codes, for every edition, EN "This is SNYPD's
-first monthly report; from November it adds the change since the month before" (and the FR twin). No month-over-month
-code exists. Without a change November will claim to be the first report. Options: (a) build the comparison (both
-snapshots are in `data/`) and make the sentence edition-specific; (b) make the sentence say "first" only for
-`EDITIONS[0]` and reword October's promise (a wording fix; October's `Updated` date then moves, by `stamp_modified`).
+**Month on month (built 18 Oct 2026, Tanush's choice):** every edition after the first compares itself with the one
+before: a key-finding line first (rose/fell counts, median change, biggest rise/fall), a 'Change since last month'
+section (typical asking price then/now per item published in both), `previous_typical_asking_eur` + `change_pct` CSV
+columns, and the hub's latest findings lead with it. The 'first monthly report' sentence shows only on the first
+edition. Tested with a synthetic November edition (scratch script, nothing written). Check November's numbers by eye:
+a large median change usually means the mix of listings changed, which the page already says.
 Also UNCLEAR: whether October should get a "newer edition available" line (no code for that today).
 
 Note: every run re-renders ALL editions from their own snapshot, but with the CURRENT `price_items.json` (`skip`, names)

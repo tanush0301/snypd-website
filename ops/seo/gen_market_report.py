@@ -74,6 +74,34 @@ def findings(st, items):
         vg_share=round(100.0 * known['Très bon état'] / tot_known))
 
 
+def previous(ed):
+    i = [e['id'] for e in EDITIONS].index(ed['id'])
+    return EDITIONS[i - 1] if i > 0 else None
+
+
+def changes(ed, items):
+    """Month on month: each item published in this edition AND the one before, typical asking price then and now.
+    Both editions use the same method and 14-day windows, so the change is comparable, but it can also come from a
+    different mix of listings (sizes, colourways, condition), which the page says. None for the first edition."""
+    pe = previous(ed)
+    if not pe:
+        return None
+    _, pst, pitems = load(pe)
+    prev = {x['it']['slug']: x for x in pitems}
+    rows = [(x, prev[x['it']['slug']], round(100.0 * (x['typ'] - prev[x['it']['slug']]['typ']) / prev[x['it']['slug']]['typ'], 1))
+            for x in items if x['it']['slug'] in prev]
+    if not rows:
+        return None
+    ch = [c for _, _, c in rows]
+    rows.sort(key=lambda r: -r[2])
+    return dict(ed=pe, st=pst, rows=rows, median=round(median(ch), 1), up=sum(c > 0 for c in ch), down=sum(c < 0 for c in ch),
+                rise=rows[0] if rows[0][2] > 0 else None, fall=rows[-1] if rows[-1][2] < 0 else None)
+
+
+def sgn(v, lang):
+    return ('+' if v > 0 else '') + pct(v, lang)
+
+
 def nm(x, lang):
     return x['it'].get('name_fr', x['it']['name']) if lang == 'fr' else x['it']['name']
 
@@ -94,18 +122,43 @@ def csv_path(ed):
 def write_csv(ed, items, st):
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator='\n')
+    mom = changes(ed, items)
+    prev = {x['it']['slug']: (px['typ'], c) for x, px, c in mom['rows']} if mom else {}
     w.writerow(['item', 'search', 'category', 'typical_asking_eur', 'p25_eur', 'p75_eur', 'listings', 'sellers',
-                'new_with_tags_typical_eur', 'very_good_typical_eur'])
+                'new_with_tags_typical_eur', 'very_good_typical_eur'] + (['previous_typical_asking_eur', 'change_pct'] if mom else []))
     for x in items:
+        p = prev.get(x['it']['slug'])
         w.writerow([x['it']['name'], x['it']['query'], x['it']['cat'], x['typ'] / 100, x['lo'] / 100, x['hi'] / 100, x['n'], x['sellers'],
-                    (x['nwt'] / 100) if x['nwt'] else '', (x['vg'] / 100) if x['vg'] else ''])
+                    (x['nwt'] / 100) if x['nwt'] else '', (x['vg'] / 100) if x['vg'] else '']
+                   + (([p[0] / 100, p[1]] if p else ['', '']) if mom else []))
     buf.write('# Source: SNYPD Vinted Market Report %s, %s/vinted-market-report/%s. Asking prices (median, 25th and 75th percentile) of vinted.be listings that matched SNYPD users\' searches, %s to %s. Not sale prices. CC BY 4.0.\n'
               % (ed['name']['en'], SITE, ed['slug']['en'], st['window_start'][:10], st['window_end'][:10]))
     write(csv_path(ed), buf.getvalue())
 
 
-def key_points(st, items, f, lang):
-    """The edition's key findings (also shown on the hub for the latest edition)."""
+def mom_point(m, lang):
+    big = []
+    if lang == 'en':
+        if m['rise']:
+            big.append('biggest rise %s (%s)' % (esc(nm(m['rise'][0], 'en')), sgn(m['rise'][2], 'en')))
+        if m['fall']:
+            big.append('biggest fall %s (%s)' % (esc(nm(m['fall'][0], 'en')), sgn(m['fall'][2], 'en')))
+        return ('Since %s, the typical asking price rose for <strong>%d</strong> and fell for <strong>%d</strong> of the %d items in both reports; median change <strong>%s</strong>%s.'
+                % (m['ed']['name']['en'], m['up'], m['down'], len(m['rows']), sgn(m['median'], 'en'), (': ' + ', '.join(big)) if big else ''))
+    if m['rise']:
+        big.append('plus forte hausse' + NB + ': %s (%s)' % (esc(nm(m['rise'][0], 'fr')), sgn(m['rise'][2], 'fr')))
+    if m['fall']:
+        big.append('plus forte baisse' + NB + ': %s (%s)' % (esc(nm(m['fall'][0], 'fr')), sgn(m['fall'][2], 'fr')))
+    return ('Depuis %s, le prix demandé typique a augmenté pour <strong>%d</strong> et baissé pour <strong>%d</strong> des %d articles présents dans les deux rapports%s; évolution médiane <strong>%s</strong>%s.'
+            % (m['ed']['name']['fr'], m['up'], m['down'], len(m['rows']), NB, sgn(m['median'], 'fr'), (' (' + ', '.join(big) + ')') if big else ''))
+
+
+def key_points(st, items, f, lang, mom=None):
+    """The edition's key findings (also shown on the hub for the latest edition); the month-on-month line first."""
+    return ([mom_point(mom, lang)] if mom else []) + _key_points(st, items, f, lang)
+
+
+def _key_points(st, items, f, lang):
     sp = f['spread']
     if lang == 'en':
         return [
@@ -129,6 +182,7 @@ def key_points(st, items, f, lang):
 def page_edition(ed, lang):
     g, st, items = load(ed)
     f = findings(st, items)
+    mom = changes(ed, items)
     key = 'mr:' + ed['id']
     url = SLUGS[key][lang]
     win = '%s %s %s' % (d_txt(st['window_start'], lang), 'to' if lang == 'en' else 'au', d_txt(st['window_end'], lang))
@@ -150,15 +204,35 @@ def page_edition(ed, lang):
                  for x, p in sorted(f['prem'], key=lambda t: -t[1])]
     cond_rows = [[COND_NAME[k][lang], num(f['known'][k], lang), pct(round(100.0 * f['known'][k] / f['tot_known']), lang)] for k in COND_ORDER]
     sp = f['spread']
+    mom_html, mom_toc = '', []
+    if mom:
+        pe = mom['ed']
+        pe_url = SLUGS['mr:' + pe['id']][lang]
+        mom_rows = [['<a href="%s">%s</a>' % (pg.item_url(x['it'], lang), esc(nm(x, lang))), money(px['typ'], lang), money(x['typ'], lang), sgn(c, lang)]
+                    for x, px, c in mom['rows']]
+        if lang == 'en':
+            mom_toc = [('change', 'Since last month')]
+            mom_html = ('<section id="change"><h2>Change since last month</h2>'
+                        '<p>Typical asking price of the %d items published in both this report and the <a href="%s">%s report</a>, highest rise first. '
+                        'Both use the same method and a 14-day window. A change can also come from a different mix of listings (sizes, colourways, condition), '
+                        'so treat one month as a signal, not a trend.</p>%s</section>'
+                        % (len(mom['rows']), pe_url, pe['name']['en'], table(['ITEM', pe['name']['en'].upper(), ed['name']['en'].upper(), 'CHANGE'], mom_rows)))
+        else:
+            mom_toc = [('evolution', 'Depuis le mois dernier')]
+            mom_html = ('<section id="evolution"><h2>Évolution depuis le mois dernier</h2>'
+                        '<p>Prix demandé typique des %d articles publiés à la fois dans ce rapport et dans le <a href="%s">rapport %s</a>, plus forte hausse en premier. '
+                        'Les deux utilisent la même méthode et une fenêtre de 14 jours. Une évolution peut aussi venir d’un autre mélange d’annonces (tailles, coloris, état) : '
+                        'un mois donne un signal, pas une tendance.</p>%s</section>'
+                        % (len(mom['rows']), pe_url, ('d’' if pe['name']['fr'][0] in 'aeiouéh' else 'de ') + pe['name']['fr'], table(['ARTICLE', pe['name']['fr'].upper(), ed['name']['fr'].upper(), 'ÉVOLUTION'], mom_rows)))
     if lang == 'en':
-        k = key_points(st, items, f, lang)
+        k = key_points(st, items, f, lang, mom)
         cite = 'Source: SNYPD Vinted Market Report, %s (%s). Asking prices on vinted.be, %s.' % (ed['name']['en'], cite_url, win)
         body = f"""
 <section id="findings">
   <h2>Key findings</h2>
   <div class="lg-box lg-mint"><ol>{''.join('<li>%s</li>' % s for s in k)}</ol></div>
-  <p>Based on {num(st['listings'], 'en')} vinted.be listings from {num(st['sellers'], 'en')} sellers, {win}. This is SNYPD&rsquo;s first monthly report; from November it adds the change since the month before.</p>
-</section>
+  <p>Based on {num(st['listings'], 'en')} vinted.be listings from {num(st['sellers'], 'en')} sellers, {win}.{'' if mom else ' This is SNYPD&rsquo;s first monthly report; from November it adds the change since the month before.'}</p>
+</section>{mom_html}
 <section id="prices">
   <h2>Typical asking prices of {len(items)} popular items</h2>
   <p>The typical price is the median asking price; a listing below the &ldquo;cheapest quarter&rdquo; price is cheaper than three in four listings of that item. Each item links to its page in the <a href="{pg.HUB['en']}">Vinted price guide</a>, with prices by condition.</p>
@@ -196,17 +270,17 @@ def page_edition(ed, lang):
         desc = 'Vinted asking prices in %s: %d items, condition premium, price cuts and condition mix, from %s vinted.be listings. Free data (CC BY 4.0).' % (ed['name']['en'], len(items), num(st['listings'], 'en'))
         h1 = 'Vinted Market Report: %s' % ed['name']['en']
         lead = 'What %s vinted.be listings from %s sellers say about Vinted asking prices, %s.' % (num(st['listings'], 'en'), num(st['sellers'], 'en'), win)
-        toc = [('findings', 'Key findings'), ('prices', 'Prices'), ('condition', 'Condition'), ('cuts', 'Price cuts'), ('mix', 'Condition mix'), ('method', 'Method'), ('cite', 'Use the data')]
+        toc = [('findings', 'Key findings')] + mom_toc + [('prices', 'Prices'), ('condition', 'Condition'), ('cuts', 'Price cuts'), ('mix', 'Condition mix'), ('method', 'Method'), ('cite', 'Use the data')]
         parent = ('Vinted Market Report', HUB['en'])
     else:
-        k = key_points(st, items, f, lang)
+        k = key_points(st, items, f, lang, mom)
         cite = 'Source%s: SNYPD, Rapport du marché Vinted, %s (%s). Prix demandés sur vinted.be, %s.' % (NB, ed['name']['fr'], cite_url, win)
         body = f"""
 <section id="resultats">
   <h2>Résultats clés</h2>
   <div class="lg-box lg-mint"><ol>{''.join('<li>%s</li>' % s for s in k)}</ol></div>
-  <p>À partir de {num(st['listings'], 'fr')} annonces vinted.be de {num(st['sellers'], 'fr')} vendeurs, {win}. C’est le premier rapport mensuel de SNYPD{NB}; dès novembre, il ajoute l’évolution depuis le mois précédent.</p>
-</section>
+  <p>À partir de {num(st['listings'], 'fr')} annonces vinted.be de {num(st['sellers'], 'fr')} vendeurs, {win}.{'' if mom else ' C’est le premier rapport mensuel de SNYPD' + NB + '; dès novembre, il ajoute l’évolution depuis le mois précédent.'}</p>
+</section>{mom_html}
 <section id="prix">
   <h2>Prix demandés typiques de {len(items)} articles populaires</h2>
   <p>Le prix typique est le prix demandé médian{NB}; une annonce sous le prix du «{NB}quart le moins cher{NB}» est moins chère que trois annonces sur quatre de cet article. Chaque article renvoie à sa page du <a href="{pg.HUB['fr']}">guide des prix Vinted</a>, avec les prix selon l’état.</p>
@@ -244,7 +318,7 @@ def page_edition(ed, lang):
         desc = 'Les prix demandés sur Vinted en %s%s: %d articles, écart neuf/occasion, baisses de prix et répartition par état, à partir de %s annonces vinted.be. Données libres (CC BY 4.0).' % (ed['name']['fr'], NB, len(items), num(st['listings'], 'fr').replace(' ', NB))
         h1 = 'Rapport du marché Vinted%s: %s' % (NB, ed['name']['fr'])
         lead = 'Ce que disent %s annonces vinted.be de %s vendeurs sur les prix demandés sur Vinted, %s.' % (num(st['listings'], 'fr'), num(st['sellers'], 'fr'), win)
-        toc = [('resultats', 'Résultats clés'), ('prix', 'Prix'), ('etat', 'État'), ('baisses', 'Baisses de prix'), ('repartition', 'Répartition'), ('methode', 'Méthode'), ('citer', 'Utiliser les données')]
+        toc = [('resultats', 'Résultats clés')] + mom_toc + [('prix', 'Prix'), ('etat', 'État'), ('baisses', 'Baisses de prix'), ('repartition', 'Répartition'), ('methode', 'Méthode'), ('citer', 'Utiliser les données')]
         parent = ('Rapport du marché Vinted', HUB['fr'])
     ds = {'@context': 'https://schema.org', '@type': 'Dataset',
           'name': ('Vinted Market Report %s (vinted.be asking prices)' % ed['name']['en']) if lang == 'en' else ('Rapport du marché Vinted %s (prix demandés vinted.be)' % ed['name']['fr']),
@@ -263,7 +337,7 @@ def page_hub(lang):
     g, st, items = load(ed)
     f = findings(st, items)
     latest = SLUGS['mr:' + ed['id']][lang]
-    pts = key_points(st, items, f, lang)[:3]
+    pts = key_points(st, items, f, lang, changes(ed, items))[:3]
     rows = []
     for e in reversed(EDITIONS):
         _, est, eitems = load(e)
