@@ -210,8 +210,31 @@ def home_data():
         '  </div>\r\n  ' % (num(total, 'en'), len(pg.PUB), pg.window('en'), cards, pg.HUB['en'], len(pg.PUB), report))
 
 
+# ----------------------------------------------------------------- homepage footer links
+# Built from gen_content's page list, so every guide and every language version gets a link from
+# the homepage (Google's strongest page here; 88 URLs were "discovered, not indexed" on 18 Oct 2026).
+HOME_FOOT_EN = [('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'),
+                ('notwork', 'Vinted notifications not working'), ('compare', 'Vinted bots compared'),
+                ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'),
+                ('sold', 'Can you see sold items on Vinted?'), ('/vinted-market-report', 'Vinted market report'),
+                ('deals', 'Vinted deals'), ('fees', 'Vinted fees')]
+
+
+def home_foot_links():
+    import gen_content as gc
+    a = '<a href="%s"%s style="font-size:12px;">%s</a>'
+    out = [a % (gc.href(k, 'en'), '', t) for k, t in HOME_FOOT_EN]
+    for lang in gc.live_langs('bot'):
+        if lang == 'en':
+            continue
+        name = gc.UI[lang]['foot'][0][1]  # the language's own name for its bot page
+        out.append(a % (gc.SLUGS['bot'][lang], ' hreflang="%s" lang="%s"' % (lang, lang), '%s (%s)' % (name, lang.upper())))
+    return ''.join(out)
+
+
 # ----------------------------------------------------------------- templates
 TEMPLATES = {
+    'home-foot-links': home_foot_links,
     # shared
     **{'price:%s' % k: '@@price:%s@@' % k for k in plans.ORDER},
     **{'price-mo:%s' % k: '@@price:%s@@ / mo' % k for k in plans.ORDER},
