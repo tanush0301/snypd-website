@@ -2938,7 +2938,9 @@ const HEARTBEAT_URL = (() => {
         const { error } = await sb.from('user_searches').update({ is_active: next }).eq('id', id).eq('user_id', uid);
         if (error) console.error('SNYPD filter sheet: could not toggle hunt', error);
         await reloadHunts();
-        await loadAds();
+        // Its listeners refresh the feed (loadAds), the "hunts running" stat
+        // and the alerts-setup card; a failed write changed nothing.
+        if (!error) window.dispatchEvent(new Event('snypd:hunts-changed'));
         return;
       }
       if (e.target.closest('[data-fs-showall]')) {
@@ -2954,7 +2956,7 @@ const HEARTBEAT_URL = (() => {
         const { error } = await sb.from('user_searches').delete().eq('id', id).eq('user_id', uid);
         if (error) console.error('SNYPD filter sheet: could not delete hunt', error);
         await reloadHunts();
-        await loadAds();
+        if (!error) window.dispatchEvent(new Event('snypd:hunts-changed'));
       }
     });
 
