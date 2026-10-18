@@ -179,6 +179,14 @@
     return out;
   }
 
+  /* Entry page (from=fr.bot-vinted, set by assets/consent.js on links to /signup,
+     /login and /plans): the SNYPD page this visitor started on. Address only. */
+  function entryPage(src) {
+    var v = null;
+    try { v = (src || new URLSearchParams(location.search)).get('from'); } catch (e) {}
+    return v && /^[a-z0-9.-]{1,80}$/.test(v) ? v : null;
+  }
+
   /* Whop partner code (a=<Whop username>) from a partner's link: from the address
      (assets/consent.js keeps it on links), else from this browser (snypd_aff, only
      stored with marketing consent, 30 days). Saved with the account so /plans can
@@ -210,6 +218,8 @@
     if (S.marketing) data.marketing_opt_in_at = new Date().toISOString();
     var hi = huntIntent();
     if (hi) data.entry_hunt = hi;
+    var ep = entryPage();
+    if (ep) data.entry_page = ep;
     var ref = lsGet('snypd_ref');
     if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;
     try {
@@ -344,6 +354,8 @@
     var back = new URLSearchParams(campaignTags());
     var aff = partnerCode();
     if (aff) back.set('a', aff);
+    var ep = entryPage();
+    if (ep) back.set('from', ep);
     var backQs = back.toString();
     Promise.resolve().then(function () {
       return sb.auth.signInWithOAuth({
@@ -708,6 +720,8 @@
         var md = sess.user.user_metadata || {}, add = md.utm_source ? {} : campaignTags(qs), retAff = qs.get('a');
         var hi = huntIntent();
         if (hi && !md.entry_hunt) add.entry_hunt = hi;
+        var retEp = entryPage(qs);
+        if (retEp && !md.entry_page) add.entry_page = retEp;
         if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;
         if (Object.keys(add).length) { try { await sb.auth.updateUser({ data: add }); } catch (e) {} }
       }

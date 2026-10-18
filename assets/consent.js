@@ -396,7 +396,15 @@
     var v = q.get(k);
     if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) tags.push([k, v]);
   });
-  if (!tags.length) return;
+  /* Entry page: the SNYPD page a visitor started on ("fr.bot-vinted", "home"), carried
+     only on links to /signup, /login and /plans so sign-ups can be counted per page
+     (auth.js saves it as entry_page). From the address only, never stored. */
+  var from = q.get('from'), FROM_OK = /^[a-z0-9.-]{1,80}$/;
+  if (!(from && FROM_OK.test(from))) {
+    from = location.pathname.replace(/^\/+|\/+$/g, '').replace(/\.html$/, '').replace(/\//g, '.') || 'home';
+    if (!FROM_OK.test(from) || /^(signup|login|reset-password|dashboard|account|admin|plans)$/.test(from)) from = null;
+  }
+  if (!tags.length && !from) return;
   var aff = q.get('a');
   if (aff && /^[A-Za-z0-9_.-]{1,60}$/.test(aff) && window.SNYPDConsent) {
     SNYPDConsent.whenGranted('marketing', function () {
@@ -409,6 +417,7 @@
       try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
       if (u.origin !== location.origin || u.pathname === location.pathname) return;
       tags.forEach(function (t) { if (!u.searchParams.has(t[0])) u.searchParams.set(t[0], t[1]); });
+      if (from && /^\/(signup|login|plans)$/.test(u.pathname) && !u.searchParams.has('from')) u.searchParams.set('from', from);
       a.setAttribute('href', u.pathname + u.search + u.hash);
     });
   }

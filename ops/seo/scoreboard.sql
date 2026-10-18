@@ -9,6 +9,7 @@ u as (
          au.raw_app_meta_data->>'provider' as provider,
          au.raw_user_meta_data->>'entry_hunt' as entry_hunt,
          au.raw_user_meta_data->>'ui_lang' as ui_lang,
+         au.raw_user_meta_data->>'entry_page' as entry_page,  -- page the visitor started on (consent.js from=, since 18 Oct 2026)
          case when au.created_at >= p.cur_start then 'this_week' else 'last_week' end as wk
   from auth.users au, params p
   where au.created_at >= p.prev_start
@@ -27,6 +28,7 @@ select
   (select json_agg(t) from (select wk, src, provider, count(*) n from u group by 1, 2, 3 order by 1 desc, 4 desc) t) as by_source,
   (select json_agg(t) from (select coalesce(fs.host, '(no search)') host, count(*) n
      from u left join first_search fs on fs.user_id = u.id where u.wk = 'this_week' group by 1 order by 2 desc) t) as first_search_site_this_week,
+  (select json_agg(t) from (select coalesce(entry_page, '(not set)') entry_page, count(*) n from u where wk = 'this_week' group by 1 order by 2 desc) t) as entry_page_this_week,
   (select json_agg(t) from (select coalesce(ui_lang, '(not set)') ui_lang, count(*) n from u where wk = 'this_week' group by 1) t) as ui_lang_this_week,
   (select json_agg(t) from (select coalesce(subscription_plan, '?') plan, count(*) n from public.users group by 1 order by 2 desc) t) as plans_now,
   (select count(*) from public.push_subscriptions) as push_subscriptions_total;

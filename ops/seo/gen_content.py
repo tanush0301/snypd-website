@@ -17,7 +17,7 @@
 #   were checked (CHECKED). Re-check them before changing that date.
 # - Prices come ONLY from ops/seo/data/*.json, the real Market Report output (run
 #   inside the backend container). Never type a price by hand.
-import csv, datetime, html, io, json, os, sys
+import csv, datetime, html, io, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import plans  # noqa: E402  (plan facts: ops/seo/data/plans.json)
 import compare_data as cd  # noqa: E402  (competitor facts in six languages, COMPARE_CHECKED)
@@ -250,10 +250,10 @@ UI = {
                legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
     'nl': dict(locale='nl_NL', toc='OP DEZE PAGINA', updated='Bijgewerkt op', by='Door SNYPD, gemaakt door een Belgische sneakerreseller',
-               nav=[('bot', 'VINTED BOT'), ('/plans', 'PRIJZEN'), (DISCORD, 'DISCORD')],
+               nav=[('bot', 'VINTED BOT'), ('/nl/vinted-prijzen', 'VINTED-PRIJZEN'), ('/plans', 'ABONNEMENTEN'), (DISCORD, 'DISCORD')],
                login='INLOGGEN', start='BEGINNEN',
                foot_tag='SNYPD &middot; NIET VERBONDEN AAN VINTED', foot_t='Leest alleen openbare advertenties.',
-               foot=[('bot', 'Vinted bot'), ('notify', 'Vinted-melding bij nieuwe artikelen'), ('notwork', 'Vinted-meldingen werken niet'), ('compare', 'Vinted bots vergeleken'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
+               foot=[('bot', 'Vinted bot'), ('notify', 'Vinted-melding bij nieuwe artikelen'), ('notwork', 'Vinted-meldingen werken niet'), ('compare', 'Vinted bots vergeleken'), ('/nl/vinted-prijzen', 'Vinted-prijsgids'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
                home='Home'),
@@ -278,15 +278,18 @@ UI = {
 
 # (page, language) pairs written to ops/seo/preview/ only, until Tanush approves the copy.
 # 10 Oct 2026: the Dutch alert + comparison pages (review file: outreach/19-nl-review-step4.md).
-HOLD = {('notify', 'nl'), ('compare', 'nl')}
+# 18 Oct 2026: Dutch released (Tanush: "publish now"); the set stays for future held pages.
+HOLD = set()
 
 
 def live_langs(key):
     """Published languages of a page, English first."""
-    return [l for l in ('en', 'fr', 'de', 'nl', 'it', 'es') if l in SLUGS[key] and LIVE[l] and (key, l) not in HOLD]
+    return [l for l in ('en', 'fr', 'de', 'nl', 'it', 'es', 'pl', 'sv') if l in SLUGS[key] and LIVE[l] and (key, l) not in HOLD]
 # Last real content change per page (shown as 'Updated' and used as dateModified).
-PAGE_MODIFIED = {'bot': '2026-10-09', 'notify': '2026-10-10', 'compare': '2026-10-10', 'deals': '2026-10-09', 'fees': '2026-10-02',
-                 'monitor': '2026-10-09', 'notwork': '2026-10-09', 'sold': '2026-10-10', 'checker': '2026-10-10'}
+# A floor only: write() moves the date to the day the page's <main> text really changes (stamp_modified).
+# bot/notify/compare/monitor/deals: Solo plan copy, 18 Oct 2026 (site 0af4fbb).
+PAGE_MODIFIED = {'bot': '2026-10-18', 'notify': '2026-10-18', 'compare': '2026-10-18', 'deals': '2026-10-18', 'fees': '2026-10-02',
+                 'monitor': '2026-10-18', 'notwork': '2026-10-09', 'sold': '2026-10-10', 'checker': '2026-10-10'}
 MONTHS_TXT = {'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
               'fr': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
               'de': _MONTHS['de'], 'nl': _MONTHS['nl'], 'it': _MONTHS['it'], 'es': _MONTHS['es']}
@@ -457,6 +460,8 @@ def faq_html(pairs):
 
 
 def cta(lang):
+    if lang in cps.CTA:
+        return cps.CTA[lang]
     if lang == 'it':
         return ('<div class="lg-box lg-mint"><p><strong>Inizia gratis con una ricerca.</strong> Nessuna carta, nessun limite di tempo, nessun limite di notifiche. I primi 7 giorni funziona 24 ore su 24 con le notifiche. '
                 'Passa a un piano a pagamento quando vuoi che la ricerca continui anche con la dashboard chiusa.</p>'
@@ -825,6 +830,8 @@ def page_bot_es():
 
 # ------------------------------------------------------------------ page: vinted bot
 def page_bot(lang):
+    if lang in cps.LANGS:
+        return cps.page_bot_pl_sv(lang)
     if lang == 'de':
         return page_bot_de()
     if lang == 'nl':
@@ -2373,15 +2380,50 @@ def page_404():
                 'The link may be old or mistyped. These are the pages most people are looking for.', None, body, bare=True)
 
 
+_TIME_RE = re.compile(r'(<span class="lg-meta">[^<]*<time datetime=")(\d{4}-\d{2}-\d{2})(">)([^<]*)(</time>)')
+_PAGE_DM_RE = re.compile(r'("@type":"WebPage"[^<]*?"dateModified":")(\d{4}-\d{2}-\d{2})(")')
+
+
+def _main_text(t):
+    m = re.search(r'<main>.*</main>', t, re.S)
+    return _TIME_RE.sub('', m.group(0)) if m else t
+
+
+def stamp_modified(path, text):
+    """The 'Updated' line and the WebPage dateModified follow the page's real content: when
+    <main> is byte-identical to the file on disk the later of the two dates is kept, otherwise it
+    becomes today. Nav, footer and <head> changes never move it (no fake freshness)."""
+    m = _TIME_RE.search(text)
+    if not m:
+        return text
+    old = open(path, encoding='utf-8').read() if os.path.isfile(path) else None
+    om = _TIME_RE.search(old) if old else None
+    if om and _main_text(old) == _main_text(text):
+        iso = max(om.group(2), m.group(2))
+    else:
+        iso = max(datetime.date.today().isoformat(), m.group(2))
+    if iso == m.group(2):
+        return text
+    lang = re.search(r'<html lang="([a-z]+)"', text).group(1)
+    text = _TIME_RE.sub(lambda x: x.group(1) + iso + x.group(3) + date_txt(iso, lang) + x.group(5), text, count=1)
+    return _PAGE_DM_RE.sub(lambda x: x.group(1) + iso + x.group(3), text, count=1)
+
+
 def write(rel, text):
     path = os.path.join(ROOT, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     if not rel.endswith('.csv'):
         text = plans.fill(text, plans.page_lang(text))
+        text = stamp_modified(path, text)
     data = text.encode('utf-8')
     if not os.path.isfile(path) or open(path, 'rb').read() != data:
         open(path, 'wb').write(data)
     print('wrote', rel, len(data), 'bytes')
+
+
+# Polish + Swedish (bot page and alert hub): copy and wiring in copy_pl_sv.py.
+import copy_pl_sv as cps  # noqa: E402
+cps.install(globals())
 
 
 if __name__ == '__main__':
@@ -2393,7 +2435,7 @@ if __name__ == '__main__':
     for lang in SLUGS['notwork']:
         rel = SLUGS['notwork'][lang].lstrip('/') + '.html'
         write(rel if LIVE[lang] else 'ops/seo/preview/' + rel.replace('/', '-'), page_notwork(lang))
-    for lang in ('de', 'nl', 'it', 'es'):
+    for lang in ('de', 'nl', 'it', 'es', 'pl', 'sv'):
         rel = SLUGS['bot'][lang].lstrip('/') + '.html'
         write(rel if LIVE[lang] else 'ops/seo/preview/' + rel.replace('/', '-'), page_bot(lang))
     held = []
@@ -2406,6 +2448,8 @@ if __name__ == '__main__':
                 held.append((rel, text))
             else:
                 write(rel, text)
+    for lang in cps.LANGS:
+        write(SLUGS['notify'][lang].lstrip('/') + '.html', page_notify_x(lang))
     if held:
         nl_review_file(held)
     write('vinted-deals.html', page_deals('en'))

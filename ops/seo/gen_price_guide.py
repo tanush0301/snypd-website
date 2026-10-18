@@ -30,7 +30,7 @@ LANGS = ('en', 'fr', 'nl')
 HUB = {'en': '/vinted-price-guide', 'fr': '/fr/guide-prix-vinted', 'nl': '/nl/vinted-prijzen'}
 # Dutch is built but held (gc.HOLD) until Tanush says "NL ok": written to ops/seo/preview/, kept out of
 # the sitemap, hreflang, footers and price-index.json. Review text: outreach/19b-nl-review-step5.md.
-NL_HELD = True
+NL_HELD = False  # Tanush: "publish now", 18 Oct 2026
 INDEX = 'assets/data/price-index.json'  # public by design (Tanush OK 10 Oct): only what the pages show
 FEES_CHECKED = dict(gc.FEES_CHECKED, nl=gc.date_txt('2026-10-02', 'nl'))
 
@@ -159,13 +159,13 @@ def cond_compare(v, lang):
     if diff == 0:
         return {'en': '<p>%s and very good listings ask about the same.</p>' % nl,
                 'fr': '<p>Les annonces « %s » et « Très bon état » demandent à peu près le même prix.</p>' % nl,
-                'nl': '<p>Advertenties “%s” en “Zeer goed” vragen ongeveer hetzelfde.</p>' % nl}[lang]
+                'nl': '<p>Advertenties in staat “%s” en “Zeer goed” vragen ongeveer hetzelfde.</p>' % nl}[lang]
     more = diff > 0
     return {'en': '<p>%s listings ask about %d%% %s than very good ones (%s against %s).</p>'
                   % (nl, abs(diff), 'more' if more else 'less', money(new['typical_cents'], 'en'), money(used['typical_cents'], 'en')),
             'fr': '<p>Les annonces «&nbsp;%s&nbsp;» demandent environ %d&nbsp;%% %s que celles en «&nbsp;Très bon état&nbsp;» (%s contre %s).</p>'
                   % (nl, abs(diff), 'de plus' if more else 'de moins', money(new['typical_cents'], 'fr'), money(used['typical_cents'], 'fr')),
-            'nl': '<p>Advertenties “%s” vragen ongeveer %d%% %s dan advertenties “Zeer goed” (%s tegenover %s).</p>'
+            'nl': '<p>Advertenties in staat “%s” vragen ongeveer %d%% %s dan advertenties in staat “Zeer goed” (%s tegenover %s).</p>'
                   % (nl, abs(diff), 'meer' if more else 'minder', money(new['typical_cents'], 'nl'), money(used['typical_cents'], 'nl'))}[lang]
 
 
@@ -455,7 +455,7 @@ def page_item_nl(it, v, name, url, rows, fee, win):
 </section>
 <section id="goede-prijs">
   <h2>Wat is een goede prijs voor {esc(name)}?</h2>
-  <p>Een kwart van de advertenties vraagt {m(lo)} of minder, de helft tussen {m(lo)} en {m(hi)}, en een kwart meer dan {m(hi)}. Onder {m(lo)} zit je in het goedkoopste kwart. Gebruik dat als filter, niet als bewijs van een koopje: een goedkopere advertentie kan meer gedragen zijn, een andere kleur, een kindermaat of namaak, dus kijk goed naar de foto&rsquo;s en de details.</p>
+  <p>Een kwart van de advertenties vraagt {m(lo)} of minder, de helft tussen {m(lo)} en {m(hi)}, en een kwart meer dan {m(hi)}. Onder {m(lo)} zit je in het goedkoopste kwart. Gebruik dat als filter, niet als bewijs van een koopje: het artikel kan meer gedragen zijn, een andere kleur hebben, een kindermaat of namaak zijn, dus kijk goed naar de foto&rsquo;s en de details.</p>
   <p>Bij de typische {m(typ)} betaalt de koper {m(typ)} plus {m(fee)} Kopersbescherming van Vinted, dus {m(typ + fee)} zonder verzending (<a href="{FEE_SRC['fr_list']}" rel="nofollow">prijslijst van Vinted</a>, gecontroleerd op {FEES_CHECKED['nl']}). Verkopen is gratis voor particulieren (<a href="{FEE_SRC['free_en']}" rel="nofollow">Vinted-hulp</a>). Reken elke andere prijs uit met de <a href="{SLUGS['fees']['en']}">Vinted-kostencalculator</a> (Engels).</p>
 </section>
 <section id="melding">
