@@ -242,10 +242,10 @@ UI = {
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
     'de': dict(locale='de_DE', toc='AUF DIESER SEITE', updated='Aktualisiert am', by='Von SNYPD, gebaut von einem belgischen Sneaker-Reseller',
-               nav=[('bot', 'VINTED BOT'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
+               nav=[('bot', 'VINTED BOT'), ('/de/vinted-preise', 'VINTED-PREISE'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
                login='ANMELDEN', start='LOSLEGEN',
                foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
-               foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/vinted-price-guide', 'Vinted-Preise (EN)'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
+               foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/de/vinted-preise', 'Vinted-Preisführer'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
@@ -589,7 +589,7 @@ def page_bot_de():
 <section id="kosten">
   <h2>Was es kostet</h2>
   {table(PLANS_HEAD['de'], PLANS_ROWS['de'])}
-  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel unter <a href="/vinted-price-guide">Vinted-Preisführer</a> (auf Englisch). Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
+  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel im <a href="/de/vinted-preise">Vinted-Preisführer</a>. Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
 </section>
 <section id="konto">
   <h2>Was SNYPD von dir braucht</h2>

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Vinted price guide: one page per item (ops/seo/price_items.json) plus a hub, in English and
-# French, built only from SNYPD's own Market Report output (ops/seo/data/price-guide.json, made
+# Vinted price guide: one page per item (ops/seo/price_items.json) plus a hub, in English,
+# French, Dutch and German, built only from SNYPD's own Market Report output (ops/seo/data/price-guide.json, made
 # by ops/seo/price_guide_batch.py inside the backend container).
 #
 #   python ops/seo/gen_price_guide.py          (then python ops/seo/prepublish.py)
@@ -26,29 +26,37 @@ ITEMS = json.load(open(os.path.join(ROOT, 'ops', 'seo', 'price_items.json'), enc
 DATA = json.load(open(os.path.join(ROOT, 'ops', 'seo', 'data', 'price-guide.json'), encoding='utf-8'))
 MIN_LISTINGS = 100
 MIN_COND = 10
-LANGS = ('en', 'fr', 'nl')
-HUB = {'en': '/vinted-price-guide', 'fr': '/fr/guide-prix-vinted', 'nl': '/nl/vinted-prijzen'}
+LANGS = ('en', 'fr', 'nl', 'de')
+HUB = {'en': '/vinted-price-guide', 'fr': '/fr/guide-prix-vinted', 'nl': '/nl/vinted-prijzen', 'de': '/de/vinted-preise'}
 # Dutch is built but held (gc.HOLD) until Tanush says "NL ok": written to ops/seo/preview/, kept out of
 # the sitemap, hreflang, footers and price-index.json. Review text: outreach/19b-nl-review-step5.md.
 NL_HELD = False  # Tanush: "publish now", 18 Oct 2026
 INDEX = 'assets/data/price-index.json'  # public by design (Tanush OK 10 Oct): only what the pages show
-FEES_CHECKED = dict(gc.FEES_CHECKED, nl=gc.date_txt('2026-10-02', 'nl'))
+FEES_CHECKED = dict(gc.FEES_CHECKED, nl=gc.date_txt('2026-10-02', 'nl'), de=gc.date_txt('2026-10-02', 'de'))
 
 GEN = datetime.datetime.fromisoformat(DATA['generated_at'].replace('Z', '+00:00')).date()
 WIN_DAYS = DATA.get('window_days', 14)
 WIN_FROM = GEN - datetime.timedelta(days=WIN_DAYS)
 MONTHS = gc.MONTHS_TXT
-CAT = {'sneakers': {'en': 'Sneakers', 'fr': 'Sneakers', 'nl': 'Sneakers'}, 'clothing': {'en': 'Clothing', 'fr': 'Vêtements', 'nl': 'Kleding'},
-       'accessories': {'en': 'Bags, watches and jewellery', 'fr': 'Sacs, montres et bijoux', 'nl': 'Tassen, horloges en sieraden'},
-       'collectibles': {'en': 'Collectibles', 'fr': 'Objets de collection', 'nl': 'Verzamelobjecten'}}
-COND = {'New, with tag': {'en': 'New with tags', 'fr': 'Neuf avec étiquette', 'nl': 'Nieuw met label'},
-        'New, no tag': {'en': 'New without tags', 'fr': 'Neuf sans étiquette', 'nl': 'Nieuw zonder label'},
-        'Very good': {'en': 'Very good', 'fr': 'Très bon état', 'nl': 'Zeer goed'},
-        'Good': {'en': 'Good', 'fr': 'Bon état', 'nl': 'Goed'},
-        'Satisfactory': {'en': 'Satisfactory', 'fr': 'Satisfaisant', 'nl': 'Redelijk'}}
+CAT = {'sneakers': {'en': 'Sneakers', 'fr': 'Sneakers', 'nl': 'Sneakers', 'de': 'Sneaker'},
+       'clothing': {'en': 'Clothing', 'fr': 'Vêtements', 'nl': 'Kleding', 'de': 'Kleidung'},
+       'accessories': {'en': 'Bags, watches and jewellery', 'fr': 'Sacs, montres et bijoux', 'nl': 'Tassen, horloges en sieraden', 'de': 'Taschen, Uhren und Schmuck'},
+       'collectibles': {'en': 'Collectibles', 'fr': 'Objets de collection', 'nl': 'Verzamelobjecten', 'de': 'Sammlerstücke'}}
+# German: Vinted's own labels, read 18 Oct 2026 on vinted.de (catalogue filters: "Neu, mit Etikett", "Sehr gut", "Gut",
+# "Zufriedenstellend"; listing form: "Neu, ohne Etikett").
+COND = {'New, with tag': {'en': 'New with tags', 'fr': 'Neuf avec étiquette', 'nl': 'Nieuw met label', 'de': 'Neu, mit Etikett'},
+        'New, no tag': {'en': 'New without tags', 'fr': 'Neuf sans étiquette', 'nl': 'Nieuw zonder label', 'de': 'Neu, ohne Etikett'},
+        'Very good': {'en': 'Very good', 'fr': 'Très bon état', 'nl': 'Zeer goed', 'de': 'Sehr gut'},
+        'Good': {'en': 'Good', 'fr': 'Bon état', 'nl': 'Goed', 'de': 'Gut'},
+        'Satisfactory': {'en': 'Satisfactory', 'fr': 'Satisfaisant', 'nl': 'Redelijk', 'de': 'Zufriedenstellend'}}
 # Dutch item names where the English one is not what a Dutch speaker types (Tanush reviews them).
 NAME_NL = {'ralph-lauren-jumper': 'Ralph Lauren trui', 'ralph-lauren-shirt': 'Ralph Lauren hemd',
            'carhartt-detroit-jacket': 'Carhartt Detroit jas', 'pandora-bracelet': 'Pandora armband'}
+# German: the same four, plus nouns German capitalises (Polo, Fleece, Hoodie). Brand and model names unchanged.
+NAME_DE = {'ralph-lauren-jumper': 'Ralph Lauren Pullover', 'ralph-lauren-shirt': 'Ralph Lauren Hemd',
+           'carhartt-detroit-jacket': 'Carhartt Detroit Jacke', 'pandora-bracelet': 'Pandora Armband',
+           'ralph-lauren-polo': 'Ralph Lauren Polo', 'ralph-lauren-quarter-zip': 'Ralph Lauren Quarter Zip',
+           'patagonia-fleece': 'Patagonia Fleece', 'columbia-fleece': 'Columbia Fleece', 'stussy-hoodie': 'Stüssy Hoodie'}
 
 
 def plain_eur(cents, lang):
@@ -82,6 +90,8 @@ def iname(it, lang):
         return it.get('name_fr', it['name'])
     if lang == 'nl':
         return NAME_NL.get(it['slug'], it['name'])
+    if lang == 'de':
+        return NAME_DE.get(it['slug'], it['name'])
     return it['name']
 
 
@@ -142,7 +152,7 @@ def cond_rows(v, lang):
             rows.append([label, num(n, lang), money(c['typical_cents'], lang), '%s &ndash; %s' % (money(r['low'], lang), money(r['high'], lang))])
         else:
             rows.append([label, num(n, lang), '&ndash;', {'en': 'too spread out for one price', 'fr': 'prix trop dispersés pour un chiffre',
-                                                           'nl': 'te verspreid voor één prijs'}[lang]])
+                                                           'nl': 'te verspreid voor één prijs', 'de': 'zu weit gestreut für einen Preis'}[lang]])
     return rows
 
 
@@ -159,23 +169,28 @@ def cond_compare(v, lang):
     if diff == 0:
         return {'en': '<p>%s and very good listings ask about the same.</p>' % nl,
                 'fr': '<p>Les annonces « %s » et « Très bon état » demandent à peu près le même prix.</p>' % nl,
-                'nl': '<p>Advertenties in staat “%s” en “Zeer goed” vragen ongeveer hetzelfde.</p>' % nl}[lang]
+                'nl': '<p>Advertenties in staat “%s” en “Zeer goed” vragen ongeveer hetzelfde.</p>' % nl,
+                'de': '<p>Angebote im Zustand „%s“ und „Sehr gut“ verlangen ungefähr gleich viel.</p>' % nl}[lang]
     more = diff > 0
     return {'en': '<p>%s listings ask about %d%% %s than very good ones (%s against %s).</p>'
                   % (nl, abs(diff), 'more' if more else 'less', money(new['typical_cents'], 'en'), money(used['typical_cents'], 'en')),
             'fr': '<p>Les annonces «&nbsp;%s&nbsp;» demandent environ %d&nbsp;%% %s que celles en «&nbsp;Très bon état&nbsp;» (%s contre %s).</p>'
                   % (nl, abs(diff), 'de plus' if more else 'de moins', money(new['typical_cents'], 'fr'), money(used['typical_cents'], 'fr')),
             'nl': '<p>Advertenties in staat “%s” vragen ongeveer %d%% %s dan advertenties in staat “Zeer goed” (%s tegenover %s).</p>'
-                  % (nl, abs(diff), 'meer' if more else 'minder', money(new['typical_cents'], 'nl'), money(used['typical_cents'], 'nl'))}[lang]
+                  % (nl, abs(diff), 'meer' if more else 'minder', money(new['typical_cents'], 'nl'), money(used['typical_cents'], 'nl')),
+            'de': '<p>Angebote im Zustand „%s“ verlangen etwa %d&nbsp;%% %s als Angebote im Zustand „Sehr gut“ (%s gegenüber %s).</p>'
+                  % (nl, abs(diff), 'mehr' if more else 'weniger', money(new['typical_cents'], 'de'), money(used['typical_cents'], 'de'))}[lang]
 
 
 def dataset_ld(it, v, lang, url):
     name = {'en': '%s asking prices on Vinted (vinted.be, %s)' % (it['name'], window('en')),
             'fr': 'Prix demandés pour %s sur Vinted (vinted.be, %s)' % (it['name'], window('fr')),
-            'nl': 'Vraagprijzen voor %s op Vinted (vinted.be, %s)' % (iname(it, 'nl'), window('nl'))}[lang]
+            'nl': 'Vraagprijzen voor %s op Vinted (vinted.be, %s)' % (iname(it, 'nl'), window('nl')),
+            'de': 'Verlangte Preise für %s auf Vinted (vinted.be, %s)' % (iname(it, 'de'), window('de'))}[lang]
     desc = {'en': 'Median and 25th-75th percentile asking price of %s listings on vinted.be that matched SNYPD users\' searches, overall and by condition. Asking prices, not sale prices.' % it['name'],
             'fr': 'Prix demandé médian et 25e-75e centile des annonces %s sur vinted.be correspondant aux recherches des utilisateurs de SNYPD, au total et par état. Prix demandés, pas prix de vente.' % it['name'],
-            'nl': 'Mediane vraagprijs en 25e-75e percentiel van advertenties voor %s op vinted.be die overeenkwamen met de zoekopdrachten van SNYPD-gebruikers, in totaal en per staat. Vraagprijzen, geen verkoopprijzen.' % iname(it, 'nl')}[lang]
+            'nl': 'Mediane vraagprijs en 25e-75e percentiel van advertenties voor %s op vinted.be die overeenkwamen met de zoekopdrachten van SNYPD-gebruikers, in totaal en per staat. Vraagprijzen, geen verkoopprijzen.' % iname(it, 'nl'),
+            'de': 'Median und 25. bis 75. Perzentil der verlangten Preise von Angeboten für %s auf vinted.be, die zu den Suchen von SNYPD-Nutzern passten, insgesamt und nach Zustand. Verlangte Preise, keine Verkaufspreise.' % iname(it, 'de')}[lang]
     return {'@context': 'https://schema.org', '@type': 'Dataset', 'name': name, 'description': desc, 'url': SITE + url,
             'creator': DATASET_CREATOR, 'license': DATASET_LICENSE, 'inLanguage': lang, 'isAccessibleForFree': True,
             'temporalCoverage': '%s/%s' % (WIN_FROM.isoformat(), GEN.isoformat()), 'spatialCoverage': 'Belgium',
@@ -259,6 +274,8 @@ def page_item(it, lang):
                        [faq_ld(faq), dataset_ld(it, v, 'en', url)], parent=('Vinted price guide', HUB['en']))
     if lang == 'nl':
         return page_item_nl(it, v, name, url, rows, fee, win)
+    if lang == 'de':
+        return page_item_de(it, v, name, url, rows, fee, win)
     # ---------------------------------------------------------------- French
     nb = ' '
     faq = [
@@ -326,6 +343,8 @@ def method(lang):
     skipped = sum(1 for it in ITEMS if it.get('skip'))
     if lang == 'nl':
         return method_nl(skipped)
+    if lang == 'de':
+        return method_de(skipped)
     if lang == 'en':
         return ('<section id="method"><h2>How these prices are made</h2><ul>'
                 '<li><strong>Sample.</strong> Listings on vinted.be that matched the searches SNYPD users watch, in euros. It is not all of Vinted, '
@@ -381,7 +400,8 @@ def page_hub(lang):
     cats = ['sneakers', 'clothing', 'accessories', 'collectibles']
     head = {'en': ['ITEM', 'TYPICAL ASKING PRICE', 'MIDDLE HALF', 'LISTINGS'],
             'fr': ['ARTICLE', 'PRIX DEMANDÉ TYPIQUE', 'MOITIÉ CENTRALE', 'ANNONCES'],
-            'nl': ['ARTIKEL', 'TYPISCHE VRAAGPRIJS', 'MIDDELSTE HELFT', 'ADVERTENTIES']}[lang]
+            'nl': ['ARTIKEL', 'TYPISCHE VRAAGPRIJS', 'MIDDELSTE HELFT', 'ADVERTENTIES'],
+            'de': ['ARTIKEL', 'TYPISCHER VERLANGTER PREIS', 'MITTLERE HÄLFTE', 'ANGEBOTE']}[lang]
     sections, toc = [], []
     for c in cats:
         its = [it for it in PUB if it['cat'] == c]
@@ -396,6 +416,8 @@ def page_hub(lang):
     win = window(lang)
     if lang == 'nl':
         return page_hub_nl(sections, toc, total, win)
+    if lang == 'de':
+        return page_hub_de(sections, toc, total, win)
     nb = ' '
     if lang == 'en':
         intro = ('<section id="about"><h2>What this guide is</h2>' + checker_box('en') + '<div class="lg-box lg-mint"><p>Typical Vinted asking prices for %d popular items, from %s vinted.be listings that SNYPD saw %s. '
@@ -527,6 +549,114 @@ def page_hub_nl(sections, toc, total, win):
                    [('about', 'Wat dit is')] + toc + [('methode', 'Methode'), ('meldingen', 'Meldingen')], intro + ''.join(sections) + method('nl') + tail)
 
 
+# ---------------------------------------------------------------- German
+def page_item_de(it, v, name, url, rows, fee, win):
+    typ, lo, hi = v['typical_cents'], v['range_cents']['low'], v['range_cents']['high']
+    n, sellers, out_pct = v['sample_size'], v.get('distinct_sellers') or 0, v.get('outlier_pct')
+
+    def m(c):
+        return money(c, 'de')
+    faq = [
+        ('Was kostet %s auf Vinted?' % name,
+         'Der typische verlangte Preis auf vinted.be liegt bei %s (Median aus %s Angeboten, %s). Die Hälfte der Angebote verlangt zwischen %s und %s.' % (m(typ), num(n, 'de'), win, m(lo), m(hi))),
+        ('Ist das der Preis, zu dem %s auf Vinted verkauft wird?' % name,
+         'Nein. Das sind verlangte Preise, also das, was Verkäufer dafür haben wollen. Vinted veröffentlicht nicht, zu welchem Preis ein Artikel am Ende verkauft wurde, und Käufer können ein Gebot unter dem verlangten Preis machen.'),
+        ('Was ist ein guter Preis für %s auf Vinted?' % name,
+         'Unter %s bist du im günstigsten Viertel der %s Angebote, die SNYPD gesehen hat. Schau dir Zustand und Fotos genau an: Die günstigsten Angebote sind oft die am stärksten getragenen.' % (m(lo), num(n, 'de'))),
+    ]
+    outl = ('<li><strong>Ausreißer:</strong> %s&nbsp;%% der Angebote verlangten deutlich mehr als der Rest; der Median berücksichtigt sie nicht.</li>'
+            % str(out_pct).replace('.', ',')) if out_pct and out_pct >= 5 else ''
+    body = f"""
+<section id="ueberblick">
+  <h2>{esc(name)} auf Vinted im Überblick</h2>
+  <div class="lg-box lg-mint"><ul>
+    <li><strong>Typischer verlangter Preis (Median):</strong> {m(typ)}</li>
+    <li><strong>Mittlere Hälfte der Angebote:</strong> {m(lo)} &ndash; {m(hi)}</li>
+    <li><strong>Angebote:</strong> {num(n, 'de')} von {num(sellers, 'de')} verschiedenen Verkäufern</li>
+    <li><strong>Wo und wann:</strong> vinted.be, {win}</li>{outl}
+  </ul></div>
+</section>
+<section id="zustand">
+  <h2>Preis für {esc(name)} nach Zustand</h2>
+  {table(['ZUSTAND', 'ANGEBOTE', 'TYPISCHER VERLANGTER PREIS', 'MITTLERE HÄLFTE'], rows)}
+  {cond_compare(v, 'de')}
+  <p>Den Zustand gibt der Verkäufer selbst auf Vinted an.</p>
+</section>
+<section id="guter-preis">
+  <h2>Was ist ein guter Preis für {esc(name)}?</h2>
+  <p>Ein Viertel der Angebote verlangt {m(lo)} oder weniger, die Hälfte zwischen {m(lo)} und {m(hi)} und ein Viertel mehr als {m(hi)}. Unter {m(lo)} bist du im günstigsten Viertel. Nutz das als Filter, nicht als Beweis für ein Schnäppchen: Ein günstiges Angebot kann stärker getragen sein, eine andere Farbe haben, eine Kindergröße oder eine Fälschung sein, also schau dir Fotos und Details genau an.</p>
+  <p>Beim typischen Preis von {m(typ)} zahlt der Käufer {m(typ)} plus {m(fee)} Käuferschutz von Vinted, also {m(typ + fee)} ohne Versand (<a href="{FEE_SRC['fr_list']}" rel="nofollow">Preisliste von Vinted</a>, geprüft am {FEES_CHECKED['de']}). Verkaufen ist für Privatpersonen kostenlos (<a href="{FEE_SRC['free_en']}" rel="nofollow">Vinted-Hilfe</a>). Jeden anderen Preis rechnest du mit dem <a href="{SLUGS['fees']['en']}">Vinted-Gebührenrechner</a> aus (auf Englisch).</p>
+</section>
+<section id="benachrichtigung">
+  <h2>Benachrichtigung bei günstigen Angeboten für {esc(name)}</h2>
+  <p>SNYPD prüft eine Vinted-Suche etwa alle 30 Sekunden und schickt neue Treffer auf dein Handy, damit du Vinted nicht ständig neu laden musst. Starte die Suche unten mit einem Höchstpreis von {m(lo)}, dem günstigsten Viertel, und änder ihn, wann du willst.</p>
+  <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">BENACHRICHTIGE MICH UNTER {m(lo)}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['de']}">SO FUNKTIONIERT SNYPD</a></div>
+  <p class="ct-note">Kostenlos: eine Suche, rund um die Uhr in den ersten @@trial_days@@ Tagen. Keine Karte. Anmeldung und Bezahlung sind vorerst auf Englisch.</p>
+</section>
+<section id="methode">
+  <h2>So entstehen diese Zahlen</h2>
+  <p>SNYPD sammelt neue Angebote auf vinted.be für die Suchen seiner Nutzer. Diese Seite nutzt die {num(n, 'de')} Angebote für {esc(name)}, die es im Zeitraum {win} gesehen hat: Der typische Preis ist der Median der verlangten Preise, die mittlere Hälfte reicht vom 25. bis zum 75. Perzentil. Das sind verlangte Preise, keine Verkaufspreise: Vinted veröffentlicht nicht, zu welchem Preis Artikel verkauft werden (<a href="{SLUGS['sold']['de']}">Kann man bei Vinted verkaufte Artikel sehen?</a>). Auf anderen Vinted-Seiten können die Preise abweichen. Monatlich aktualisiert; du darfst die Zahlen mit einem Link auf diese Seite frei weiterverwenden (<a href="{DATASET_LICENSE}" rel="license">CC BY 4.0</a>).</p>
+</section>
+<section id="fragen">
+  <h2>Fragen</h2>
+  {faq_html(faq)}
+</section>
+<section id="mehr">
+  <h2>Weitere Vinted-Preise</h2>
+  {related(it, 'de')}
+  <p>Alle Artikel: <a href="{HUB['de']}">der Vinted-Preisführer</a>.</p>
+</section>"""
+    title = '%s Preis auf Vinted: %s typisch (%s) | SNYPD' % (name, plain_eur(typ, 'de'), month_year('de'))
+    desc = ('Was %s auf Vinted kostet: typischer verlangter Preis %s, die Hälfte von %s Angeboten zwischen %s und %s, nach Zustand. vinted.be, %s.'
+            % (name, plain_eur(typ, 'de'), num(n, 'de'), plain_eur(lo, 'de'), plain_eur(hi, 'de'), win))
+    lead = ('Der typische verlangte Preis für %s auf Vinted liegt bei <strong>%s</strong>. Die Hälfte der %s Angebote, die SNYPD auf vinted.be gesehen hat (%s), verlangte zwischen %s und %s. Das sind verlangte Preise von %s Verkäufern, keine Verkaufspreise.'
+            % (esc(name), m(typ), num(n, 'de'), win, m(lo), m(hi), num(sellers, 'de')))
+    toc = [('ueberblick', 'Überblick'), ('zustand', 'Nach Zustand'), ('guter-preis', 'Guter Preis'), ('benachrichtigung', 'Benachrichtigung'), ('methode', 'Methode'), ('fragen', 'Fragen')]
+    return gc.page('pg:' + it['slug'], 'de', title, desc, 'VINTED-PREISFÜHRER', 'Was %s auf Vinted kostet' % esc(name), lead, toc, body,
+                   [faq_ld(faq), dataset_ld(it, v, 'de', url)], parent=('Vinted-Preisführer', HUB['de']))
+
+
+def method_de(skipped):
+    return ('<section id="methode"><h2>Wie diese Preise berechnet werden</h2><ul>'
+            '<li><strong>Stichprobe.</strong> Angebote auf vinted.be, die zu den Suchen passten, die SNYPD-Nutzer beobachten, in Euro. Das ist nicht ganz Vinted, '
+            'und die Angebote stammen nicht unbedingt von Verkäufern aus Belgien.</li>'
+            '<li><strong>Zuordnung.</strong> Ein Angebot zählt für einen Artikel, wenn sein Titel jedes Wort der Suche des Artikels enthält; '
+            'gängige Synonyme zählen auch (jumper, sweater, pull).</li>'
+            '<li><strong>Typischer Preis</strong> ist der Median der verlangten Preise. <strong>Mittlere Hälfte</strong> reicht vom 25. bis zum 75. Perzentil: '
+            'Ein Viertel der Angebote verlangt weniger, ein Viertel mehr.</li>'
+            '<li><strong>Zeitraum.</strong> Angebote, die SNYPD in den %d Tagen vor der Aktualisierung mindestens einmal gesehen hat (es löscht die Daten eines Angebots %d Tage, nachdem es das Angebot zuletzt gesehen hat).</li>'
+            '<li><strong>Ein Angebot zählt einmal.</strong> Jede Vinted-Angebotsnummer zählt einmal. Löscht ein Verkäufer einen Artikel und stellt ihn neu ein, bekommt er eine neue Nummer und zählt erneut.</li>'
+            '<li><strong>Kein Preis</strong> bei weniger als 8 Angeboten, wenn das teuerste Viertel bei mehr als dem Dreifachen des Preises beginnt, an dem das günstigste Viertel endet, '
+            'oder wenn ein einzelner Verkäufer mehr als 40&nbsp;%% der Angebote hat.</li>'
+            '<li><strong>Verlässlichkeit.</strong> Hoch, wenn keines dieser Warnsignale zutrifft; mittel, wenn die Preise nach oben ziehen (der getrimmte Mittelwert liegt 25&nbsp;%% oder mehr über dem Median) '
+            'oder wenn 5&nbsp;%% oder mehr der Angebote deutlich teurer sind als der Rest. Dieser Preisführer veröffentlicht nur Artikel mit klarem Preis, mittlerer oder hoher Verlässlichkeit und mindestens %d Angeboten.</li>'
+            '<li><strong>Gemischte Artikel lassen wir von Hand weg</strong>, auch wenn die Zahlen passen: ein Markenname allein, mehrere Modelle in einer Suche, Sammelkarten aus vielen Serien (%d Suchen in diesem Monat).</li>'
+            '<li><strong>Zustand.</strong> Ein Zustand bekommt nur mit mindestens %d Angeboten und einem klaren Preis einen eigenen Preis. Fehlt ein Zustand, gibt es zu wenig Daten, nicht null Angebote.</li>'
+            '<li><strong>Aktualisierung.</strong> Monatlich. Die Zahlen jedes Monats werden als datierte Momentaufnahme aufbewahrt, und daraus entsteht der <a href="/vinted-market-report">Vinted Market Report</a> (auf Englisch).</li>'
+            '<li><strong>Verlangte Preise, keine Verkaufspreise.</strong> Vinted veröffentlicht nicht, zu welchem Preis Artikel verkauft werden '
+            '(<a href="%s">Kann man bei Vinted verkaufte Artikel sehen?</a>).</li></ul>'
+            '<h3>NOCH NICHT BERÜCKSICHTIGT</h3><ul>'
+            '<li>Kinder- und Erwachsenengrößen werden zusammen gezählt.</li>'
+            '<li>Bundles und Pakete zählen als ein Angebot, zum Preis des Pakets.</li>'
+            '<li>Farben und Varianten eines Modells teilen sich einen Preis.</li>'
+            '<li>Fälschungen werden nicht entfernt; sie zeigen sich nur als Warnung, wenn viele Angebote weit über dem Rest liegen.</li></ul></section>'
+            % (WIN_DAYS, WIN_DAYS, MIN_LISTINGS, skipped, MIN_COND, SLUGS['sold']['de']))
+
+
+def page_hub_de(sections, toc, total, win):
+    intro = ('<section id="about"><h2>Was dieser Preisführer ist</h2>' + checker_box('de') + '<div class="lg-box lg-mint"><p>Typische verlangte Preise auf Vinted für %d beliebte Artikel, aus %s Angeboten auf vinted.be, die SNYPD im Zeitraum %s gesehen hat. '
+             'Jede Artikelseite zeigt den Median der verlangten Preise, die mittlere Hälfte der Angebote und die Preise nach Zustand. Das sind verlangte Preise, keine Verkaufspreise: Vinted veröffentlicht nicht, zu welchem Preis Artikel verkauft werden. '
+             'Dabei sind nur Artikel mit mindestens %d Angeboten und einem klaren Preis. Monatlich aktualisiert; mit einem Link frei weiterverwendbar (CC BY 4.0). Trends, Preisunterschiede nach Zustand und Preissenkungen: <a href="/vinted-market-report">der monatliche Vinted Market Report</a> (auf Englisch).</p></div></section>'
+             % (len(PUB), num(total, 'de'), win, MIN_LISTINGS))
+    tail = ('<section id="benachrichtigungen"><h2>Deinen Preis gefunden?</h2><p>Ein guter Preis hilft nur, wenn du das Angebot als Erster siehst. SNYPD prüft deine Vinted-Suche etwa alle 30 Sekunden und schickt neue Treffer auf dein Handy. '
+            'Auf jeder Artikelseite gibt es einen Button, der diese Suche mit dem Preis des günstigsten Viertels als Höchstpreis startet.</p>%s</section>' % gc.cta('de'))
+    title = 'Vinted-Preise: typische Preise für %d Artikel (%s) | SNYPD' % (len(PUB), month_year('de'))
+    desc = 'Was Artikel auf Vinted kosten: typische verlangte Preise und Preisspannen nach Zustand für %d beliebte Sneaker, Kleidungsstücke und Accessoires, aus %s Angeboten auf vinted.be.' % (len(PUB), num(total, 'de'))
+    return gc.page('guide', 'de', title, desc, 'VINTED-PREISFÜHRER', 'Was Artikel auf Vinted kosten',
+                   'Typische verlangte Preise für %d beliebte Artikel, aus %s Angeboten, die SNYPD auf vinted.be gesehen hat (%s). Wähl einen Artikel für die Preise nach Zustand.' % (len(PUB), num(total, 'de'), win),
+                   [('about', 'Überblick')] + toc + [('methode', 'Methode'), ('benachrichtigungen', 'Benachrichtigungen')], intro + ''.join(sections) + method('de') + tail)
+
+
 # ---------------------------------------------------------------- price checker (work order 18, step 5)
 # Words for assets/price-checker.js. {p}, {q}, {n} are filled in by the script; money is formatted there.
 PC_TXT = {
@@ -542,6 +672,10 @@ PC_TXT = {
                listings='Advertenties:', page='PRIJZEN PER STAAT', alert='MELD ME ONDER {p}', note='Vraagprijzen, geen verkoopprijzen.',
                none='Geen artikel gevonden voor “{q}”. De zoekfunctie kent {n} artikelen: probeer een merk zoals Nike, Ralph Lauren of Carhartt.',
                many='{n} artikelen gevonden. Kies er een:'),
+    'de': dict(label='GIB EINEN ARTIKEL EIN', ph='z.\u00a0B. Samba, Nuptse, Longchamp', typical='Typischer verlangter Preis', middle='Mittlere Hälfte der Angebote:',
+               listings='Angebote:', page='PREISE NACH ZUSTAND', alert='BENACHRICHTIGE MICH UNTER {p}', note='Verlangte Preise, keine Verkaufspreise.',
+               none='Kein Artikel passt zu „{q}“. Die Suche kennt {n} Artikel: Probier eine Marke wie Nike, Ralph Lauren oder Carhartt.',
+               many='{n} Artikel passen. Wähl einen aus:'),
 }
 
 
@@ -682,11 +816,12 @@ def examples():
 def page_sold(lang):
     c = copy_sold.COPY[lang]
     qs = copy_sold.QUOTES[lang]
-    gl = lang if lang in ('en', 'fr') else 'en'  # the price guide and checker exist in EN and FR
+    gl = lang if lang in SLUGS['checker'] else 'en'  # the checker exists in EN and FR
+    hl = lang if lang in HUB and is_live('guide', lang) else 'en'  # the guide hub: EN, FR, NL, DE
     total = sum(V[it['slug']]['sample_size'] for it in PUB)
     read = gc.date_txt(copy_sold.HELP_READ, lang)
     f = dict(items=len(PUB), listings=num(total, lang), window=window(lang), days=WIN_DAYS, read=read,
-             guide=HUB[gl], checker=SLUGS['checker'][gl], method=HUB[gl] + ('#methode' if gl == 'fr' else '#method'))
+             guide=HUB[hl], checker=SLUGS['checker'][gl], method=HUB[hl] + ('#method' if hl == 'en' else '#methode'))
 
     def F(s):
         return s.format(**f)
@@ -698,7 +833,7 @@ def page_sold(lang):
         return ('<blockquote>%s%s%s<cite>%s, <a href="%s%d" rel="nofollow">%s</a> (%s %d)</cite></blockquote>'
                 % (oq, esc(quotes[i]), cq, c['cite'], base, aid, esc(title), c['article'], aid))
     ids = [a for a, _ in c['toc']]
-    rows = [['<a href="%s">%s</a>' % (item_url(it, gl), esc(iname(it, gl))), money(V[it['slug']]['typical_cents'], lang),
+    rows = [['<a href="%s">%s</a>' % (item_url(it, hl), esc(iname(it, hl))), money(V[it['slug']]['typical_cents'], lang),
              '%s &ndash; %s' % (money(V[it['slug']]['range_cents']['low'], lang), money(V[it['slug']]['range_cents']['high'], lang)),
              num(V[it['slug']]['sample_size'], lang)] for it in examples()]
     faq = [(q, F(a)) for q, a in c['faq']]
@@ -749,7 +884,8 @@ def page_sold(lang):
   <ul>{sources}</ul>
   <p>{F(c['sources_data'])}</p>
 </section>"""
-    parent = {'en': ('Vinted price guide', HUB['en']), 'fr': ('Guide des prix Vinted', HUB['fr'])}.get(lang)
+    parent = {'en': ('Vinted price guide', HUB['en']), 'fr': ('Guide des prix Vinted', HUB['fr']),
+              'de': ('Vinted-Preisführer', HUB['de'])}.get(lang)
     return gc.page('sold', lang, F(c['title']), F(c['desc']), c['eyebrow'], esc(c['h1']), F(c['lead']), c['toc'], body,
                    [faq_ld(faq)], parent=parent)
 
