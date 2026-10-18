@@ -750,7 +750,7 @@ def page_sold(lang):
   <p>{F(c['sources_data'])}</p>
 </section>"""
     parent = {'en': ('Vinted price guide', HUB['en']), 'fr': ('Guide des prix Vinted', HUB['fr'])}.get(lang)
-    return gc.page('sold', lang, c['title'], c['desc'], c['eyebrow'], esc(c['h1']), F(c['lead']), c['toc'], body,
+    return gc.page('sold', lang, F(c['title']), F(c['desc']), c['eyebrow'], esc(c['h1']), F(c['lead']), c['toc'], body,
                    [faq_ld(faq)], parent=parent)
 
 

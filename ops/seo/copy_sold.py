@@ -59,8 +59,8 @@ NB = ' '
 
 COPY = {
     'en': dict(
-        title='Can you see sold prices on Vinted? No: what Vinted shows instead | SNYPD',
-        desc='Vinted has no search for sold items and no record of what an item sold for. What Vinted’s help centre says it shows, and how to check a price with asking prices instead.',
+        title='Can you see sold items on Vinted? What you can see (2026) | SNYPD',
+        desc='What Vinted’s help centre says you can and can’t see about sold items, why a listed price isn’t always the price paid, and typical asking prices for {items} popular items.',
         eyebrow='VINTED PRICES', h1='Can you see sold items and sold prices on Vinted?',
         lead='No. Vinted has no search for sold items and no record of what an item sold for: its help centre describes neither. Below: what Vinted says it shows, quoted from its help centre, why the price on a listing is not always the price paid, and how to check a price with asking prices instead.',
         toc=[('answer', 'Short answer'), ('shows', 'What Vinted shows'), ('paid', 'Listed vs paid price'), ('asking', 'Asking prices'),
@@ -96,8 +96,8 @@ COPY = {
         sources_data='Price data: SNYPD Vinted price guide, vinted.be, {window} (<a href="{method}">method</a>).',
     ),
     'fr': dict(
-        title='Peut-on voir les articles vendus sur Vinted' + NB + '? Non' + NB + ': ce que Vinted montre | SNYPD',
-        desc='Vinted n’a pas de recherche d’articles vendus ni d’historique des prix de vente. Ce que l’aide Vinted dit afficher, et comment estimer un prix avec les prix demandés.',
+        title='Voir les articles vendus sur Vinted' + NB + ': ce qu’on peut voir (2026) | SNYPD',
+        desc='Ce que l’aide Vinted permet de voir (ou pas) sur les articles vendus, pourquoi le prix affiché n’est pas toujours le prix payé, et les prix demandés typiques de {items} articles.',
         eyebrow='PRIX VINTED', h1='Peut-on voir les articles vendus et leur prix sur Vinted' + NB + '?',
         lead='Non. Vinted n’a pas de recherche d’articles vendus ni de trace du prix auquel un article a été vendu' + NB + ': son centre d’aide ne décrit ni l’un ni l’autre. Ci-dessous' + NB + ': ce que Vinted dit afficher, cité depuis son centre d’aide, pourquoi le prix d’une annonce n’est pas toujours le prix payé, et comment estimer un prix avec les prix demandés.',
         toc=[('reponse', 'En bref'), ('affiche', 'Ce que Vinted montre'), ('paye', 'Prix affiché ou payé'), ('demandes', 'Prix demandés'),
@@ -133,8 +133,8 @@ COPY = {
         sources_data='Données de prix' + NB + ': guide des prix Vinted de SNYPD, vinted.be, {window} (<a href="{method}">méthode</a>).',
     ),
     'de': dict(
-        title='Kann man bei Vinted verkaufte Artikel sehen? Nein: was Vinted zeigt | SNYPD',
-        desc='Vinted hat keine Suche nach verkauften Artikeln und keine Übersicht der Verkaufspreise. Was die Vinted-Hilfe dazu sagt und wie du einen Preis über verlangte Preise prüfst.',
+        title='Verkaufte Artikel bei Vinted sehen: was möglich ist (2026) | SNYPD',
+        desc='Was du laut Vinted-Hilfe über verkaufte Artikel sehen kannst und was nicht, warum der angezeigte Preis nicht immer der bezahlte ist, und wie du einen Preis prüfst.',
         eyebrow='VINTED-PREISE', h1='Kann man bei Vinted verkaufte Artikel und ihre Preise sehen?',
         lead='Nein. Vinted hat keine Suche nach verkauften Artikeln und keinen Nachweis, zu welchem Preis ein Artikel verkauft wurde: Die Vinted-Hilfe beschreibt weder das eine noch das andere. Hier steht, was Vinted laut seiner eigenen Hilfe zeigt, warum der Preis in einem Angebot nicht immer der bezahlte Preis ist und wie du einen Preis stattdessen über verlangte Preise prüfst.',
         toc=[('antwort', 'Kurze Antwort'), ('zeigt', 'Was Vinted zeigt'), ('bezahlt', 'Angezeigter vs. bezahlter Preis'), ('preise', 'Verlangte Preise'),
@@ -170,8 +170,8 @@ COPY = {
         sources_data='Preisdaten: SNYPD-Preisführer für Vinted, vinted.be, {window} (<a href="{method}">Methode</a>, auf Englisch).',
     ),
     'it': dict(
-        title='Si possono vedere gli articoli venduti su Vinted? No: cosa mostra Vinted | SNYPD',
-        desc='Vinted non ha una ricerca degli articoli venduti né uno storico dei prezzi di vendita. Cosa dice il centro assistenza di Vinted e come valutare un prezzo con i prezzi richiesti.',
+        title='Vedere gli articoli venduti su Vinted: cosa si può vedere (2026) | SNYPD',
+        desc='Cosa si può vedere degli articoli venduti secondo l’assistenza Vinted, perché il prezzo in annuncio non è sempre quello pagato, e come valutare un prezzo.',
         eyebrow='PREZZI VINTED', h1='Si possono vedere gli articoli venduti e i loro prezzi su Vinted?',
         lead='No. Vinted non ha una ricerca degli articoli venduti né una traccia del prezzo a cui un articolo è stato venduto: il suo centro assistenza non descrive né l’una né l’altra. Qui sotto: cosa Vinted dice di mostrare, citato dal suo centro assistenza, perché il prezzo di un annuncio non è sempre il prezzo pagato e come valutare un prezzo con i prezzi richiesti.',
         toc=[('risposta', 'In breve'), ('mostra', 'Cosa mostra Vinted'), ('pagato', 'Prezzo esposto o pagato'), ('richiesti', 'Prezzi richiesti'),
@@ -207,8 +207,8 @@ COPY = {
         sources_data='Dati sui prezzi: guida ai prezzi Vinted di SNYPD, vinted.be, {window} (<a href="{method}">metodo</a>, in inglese).',
     ),
     'es': dict(
-        title='¿Se pueden ver los artículos vendidos en Vinted? No: lo que muestra Vinted | SNYPD',
-        desc='Vinted no tiene búsqueda de artículos vendidos ni historial de precios de venta. Lo que dice el centro de ayuda de Vinted y cómo valorar un precio con los precios pedidos.',
+        title='Ver artículos vendidos en Vinted: qué se puede ver (2026) | SNYPD',
+        desc='Qué se puede ver de los artículos vendidos según la ayuda de Vinted, por qué el precio del anuncio no siempre es el pagado y cómo valorar un precio.',
         eyebrow='PRECIOS DE VINTED', h1='¿Se pueden ver los artículos vendidos y sus precios en Vinted?',
         lead='No. Vinted no tiene una búsqueda de artículos vendidos ni un registro del precio al que se vendió un artículo: su centro de ayuda no describe ninguna de las dos cosas. Aquí tienes lo que Vinted dice que muestra, citado de su centro de ayuda, por qué el precio de un anuncio no siempre es el precio pagado y cómo valorar un precio con los precios pedidos.',
         toc=[('respuesta', 'Respuesta corta'), ('muestra', 'Lo que muestra Vinted'), ('pagado', 'Precio anunciado o pagado'), ('pedidos', 'Precios pedidos'),
