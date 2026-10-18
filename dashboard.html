@@ -5135,13 +5135,45 @@ const HEARTBEAT_URL = (() => {
     });
   }
 
-  async function loadAds() {
-    setLoading(true);
-    try {
-      console.log('Dashboard user_id:', uid);
+  // One refresh = one dashboard_feed RPC (migration 052, 18 Oct 2026). Every
+  // REST request writes a ~3 KB Supabase edge log and the Free plan's log
+  // quota is exceeded (CLAUDE.md item 30); the REST path below made ~5 GET
+  // requests per 20 s tick, most with a fresh CORS preflight because their
+  // URLs changed every time. The RPC is a POST to one fixed URL, so the
+  // browser keeps one preflight for an hour. If it fails (function missing, a
+  // bug), the REST path runs instead for 10 minutes: the feed must never go
+  // dark over this. Both return the same shape.
+  let feedSearchSigs = [];
+  let feedRpcOffUntil = 0;
 
-      await seedClaimedIds();
+  async function fetchFeedViaRpc() {
+    let data = {};
+    // The RPC filters by the signatures we send and returns the account's
+    // current active hunts; when those differ (first load, a hunt saved,
+    // paused or deleted here or on another device) ask once more with them.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const res = await sb.rpc('dashboard_feed', { p_searches: feedSearchSigs, p_limit: feedVisibleLimit });
+      if (res.error) throw res.error;
+      data = res.data || {};
+      const urls = Array.isArray(data.hunts) ? data.hunts : [];
+      const sigs = [...new Set(urls.map(savedSearchSignature).filter(Boolean))].sort();
+      const changed = sigs.length !== feedSearchSigs.length || sigs.some((s, i) => s !== feedSearchSigs[i]);
+      feedSearchSigs = sigs;
+      if (!changed) break;
+    }
+    const lastMs = data.last_match_ts ? Date.parse(data.last_match_ts) : NaN;
+    return {
+      huntCount: Array.isArray(data.hunts) ? data.hunts.length : 0,
+      activeSearches: new Set(feedSearchSigs),
+      eligibleCount: Number(data.count) || 0,
+      rows: Array.isArray(data.rows) ? data.rows : [],
+      firstSeen: Array.isArray(data.first_seen) ? data.first_seen : [],
+      newestFetchedAt: data.newest_fetched_at || null,
+      lastMatchTs: Number.isFinite(lastMs) ? new Date(lastMs).toISOString() : null
+    };
+  }
 
+  async function fetchFeedLegacy() {
       const cutoffIso = new Date(Date.now() - DASHBOARD_MAX_AGE_MIN * 60 * 1000).toISOString();
       const { data: activeHunts, error: huntsError } = await sb.from('user_searches')
         .select('vinted_url').eq('user_id', uid).eq('is_active', true);
@@ -5204,7 +5236,6 @@ const HEARTBEAT_URL = (() => {
         .filter(r => matchesActiveSearch(r, activeSearches))
         .filter(isFreshListing)
         .sort(sortNewestUploadedFirst);
-      feedEligibleCount = eligible.length;
       const wantedIds = eligible.slice(0, feedVisibleLimit).map(r => r.listing_id);
 
       function adsQuery(columns, ids) {
@@ -5251,24 +5282,14 @@ const HEARTBEAT_URL = (() => {
       }
       if (error) throw error;
 
-      // Promoted listings are no longer filtered out (2026-10-08): Vinted
-      // shows them in its own results; cardHTML labels them "Promoted".
       const rows = (data || [])
         .filter(r => matchesActiveSearch(r, activeSearches))
         .filter(isFreshListing)
         .sort(sortNewestUploadedFirst);
 
-      console.log('Dashboard rows:', rows.map(r => ({
-        id: r.listing_id,
-        uploaded_at_ts: r.uploaded_at_ts,
-        uploaded_ts: r.uploaded_ts,
-        fetched_at: r.fetched_at,
-        src: r.content_source,
-        promoted: r.promoted
-      })));
-
       // DROP badge support - best-effort, never lets a lookup failure block
-      // the feed itself from rendering.
+      // the feed itself from rendering. null = leave the known prices alone.
+      let firstSeen = null;
       try {
         const ids = rows.map(r => r.listing_id).filter(Boolean);
         if (ids.length) {
@@ -5278,11 +5299,7 @@ const HEARTBEAT_URL = (() => {
             .eq('user_id', uid)
             .in('listing_id', ids);
           if (fsErr) throw fsErr;
-          firstSeenPriceByListing.clear();
-          for (const fr of (fsRows || [])) {
-            const { amount } = derivePrice({ price: fr.first_seen_price });
-            if (amount != null) firstSeenPriceByListing.set(String(fr.listing_id), Number(amount));
-          }
+          firstSeen = fsRows || [];
         }
       } catch (e) {
         console.error('SNYPD: could not load first-seen prices', e);
@@ -5312,7 +5329,82 @@ const HEARTBEAT_URL = (() => {
         }
       }
 
-      renderRows(rows, lastMatchTs);
+      let newestFetchedAt = null;
+      if (running) {
+        try {
+          const { data: newest } = await sb
+            .from('current_ads')
+            .select('fetched_at')
+            .eq('user_id', uid)
+            .eq('item_box->snypd_filter_contract->>version', '1')
+            .not('fetched_at', 'is', null)
+            .order('fetched_at', { ascending: false })
+            .limit(1);
+          newestFetchedAt = newest && newest[0] ? newest[0].fetched_at : null;
+        } catch (e) {
+          // This probe is advisory only - never let it decide "offline".
+          console.warn('SNYPD: could not check scraper freshness', e);
+        }
+      }
+
+      return {
+        huntCount: (activeHunts || []).length,
+        activeSearches,
+        eligibleCount: eligible.length,
+        rows,
+        firstSeen,
+        newestFetchedAt,
+        lastMatchTs
+      };
+  }
+
+  async function loadAds() {
+    setLoading(true);
+    try {
+      console.log('Dashboard user_id:', uid);
+
+      await seedClaimedIds();
+
+      let feed = null;
+      if (Date.now() >= feedRpcOffUntil) {
+        try {
+          feed = await fetchFeedViaRpc();
+        } catch (e) {
+          feedRpcOffUntil = Date.now() + 10 * 60 * 1000;
+          console.error('SNYPD: dashboard_feed RPC failed, using the REST path for 10 min', e);
+        }
+      }
+      if (!feed) feed = await fetchFeedLegacy();
+
+      hasActiveHunts = feed.huntCount > 0;
+      feedEligibleCount = feed.eligibleCount;
+      const activeSearches = feed.activeSearches;
+
+      // Promoted listings are no longer filtered out (2026-10-08): Vinted
+      // shows them in its own results; cardHTML labels them "Promoted".
+      const rows = feed.rows
+        .filter(r => matchesActiveSearch(r, activeSearches))
+        .filter(isFreshListing)
+        .sort(sortNewestUploadedFirst);
+
+      console.log('Dashboard rows:', rows.map(r => ({
+        id: r.listing_id,
+        uploaded_at_ts: r.uploaded_at_ts,
+        uploaded_ts: r.uploaded_ts,
+        fetched_at: r.fetched_at,
+        src: r.content_source,
+        promoted: r.promoted
+      })));
+
+      if (feed.firstSeen && rows.length) {
+        firstSeenPriceByListing.clear();
+        for (const fr of feed.firstSeen) {
+          const { amount } = derivePrice({ price: fr.first_seen_price });
+          if (amount != null) firstSeenPriceByListing.set(String(fr.listing_id), Number(amount));
+        }
+      }
+
+      renderRows(rows, rows.length ? null : feed.lastMatchTs);
       paintFeedMore();
       // lastSuccessfulSync is this branch's - the offline banner's "Last
       // sync HH:MM - N min ago" line reads it, so it must keep being set.
@@ -5327,22 +5419,9 @@ const HEARTBEAT_URL = (() => {
       // account with no rows yet is "nothing found", never "Vinted is down".
       let vintedStale = false;
       if (running) {
-        try {
-          const { data: newest } = await sb
-            .from('current_ads')
-            .select('fetched_at')
-            .eq('user_id', uid)
-            .eq('item_box->snypd_filter_contract->>version', '1')
-            .not('fetched_at', 'is', null)
-            .order('fetched_at', { ascending: false })
-            .limit(1);
-          const lastFetched = newest && newest[0] ? Date.parse(newest[0].fetched_at) : NaN;
-          if (Number.isFinite(lastFetched)) {
-            vintedStale = (Date.now() - lastFetched) > VINTED_STALE_MIN * 60 * 1000;
-          }
-        } catch (e) {
-          // This probe is advisory only - never let it decide "offline".
-          console.warn('SNYPD: could not check scraper freshness', e);
+        const lastFetched = feed.newestFetchedAt ? Date.parse(feed.newestFetchedAt) : NaN;
+        if (Number.isFinite(lastFetched)) {
+          vintedStale = (Date.now() - lastFetched) > VINTED_STALE_MIN * 60 * 1000;
         }
       }
       setSyncState(vintedStale ? 'vinted_unreachable' : 'ok');
@@ -5508,7 +5587,13 @@ const HEARTBEAT_URL = (() => {
     hbTimer = setInterval(sendHeartbeat, 30000);
 
     await loadAds();
-    adsTimer = setInterval(loadAds, Math.max(5, SUPABASE_ADS_FETCH_INTERVALL) * 1000);
+    // A hidden tab shows nothing, so it asks Supabase for nothing (each
+    // request is a logged edge request, item 30); the heartbeat above keeps
+    // running, and the visibilitychange handler below refreshes the feed the
+    // moment the tab is visible again.
+    adsTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') loadAds();
+    }, Math.max(5, SUPABASE_ADS_FETCH_INTERVALL) * 1000);
   }
 
   async function stop(statusLabel = 'stopped') {
@@ -5578,8 +5663,10 @@ const HEARTBEAT_URL = (() => {
       hiddenSince = Date.now(); // start grace timer
     }
   });
-  window.addEventListener('pageshow', () => {
-    if (!manualPaused && document.visibilityState === 'visible') {
+  // Only a page restored from the back/forward cache needs this; on a normal
+  // load start() below already loads the feed (this used to load it twice).
+  window.addEventListener('pageshow', (ev) => {
+    if (ev.persisted && !manualPaused && document.visibilityState === 'visible') {
       touchActivity();
       loadAds().catch(console.error);
     }
