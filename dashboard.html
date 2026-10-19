@@ -725,7 +725,7 @@ body {
   display: inline-block; vertical-align: -1px;
 }
 @media (prefers-reduced-motion: reduce) { .feed-spinner { animation: none; } }
-/* The drag gesture Tanush asked for alongside the FEED-tap refresh - the tap
+/* The drag gesture the owner asked for alongside the FEED-tap refresh - the tap
    reaches a user who thinks to look at the tab bar, a pull reaches the one who
    is already at the top of the list and just drags. Height-driven, not
    transform-driven: a translated overlay would sit on top of the first card
@@ -1112,7 +1112,7 @@ body {
    --panel, under even the 3:1 UI minimum. The ONLY rule that raised it was
    :hover, which never fires on a touch device - so on a desktop it looked
    fine the instant the mouse went near it, and on a real phone it was
-   permanently unreadable. Tanush reported it as "not fully visible ... which
+   permanently unreadable. The owner reported it as "not fully visible ... which
    makes it broken"; the click itself was working the whole time (verified:
    Holding 2 -> 1). Full --text-muted is 4.97:1 and passes AA. The underline
    makes it read as an action without a fill or a border, so it stays a
@@ -4233,7 +4233,7 @@ const HEARTBEAT_URL = (() => {
     });
 
     /* A tap on FEED means "give me what's new". Scrolling back to the top is
-       half the ask - the other half of Tanush's complaint was having to scroll
+       half the ask - the other half of the owner's complaint was having to scroll
        up after reading down a long list.
        Refetches on EVERY feed tap, whether or not the feed was already open:
        switchView deliberately has no 'feed' branch (it loads for history,
@@ -4380,7 +4380,7 @@ const HEARTBEAT_URL = (() => {
         const tab = e.target.closest('.bottombar-tab');
         if (!tab) return;
         // The phone nav gets the same refresh-on-FEED-tap as the top row; this
-        // is the one Tanush is actually tapping on a mobile device.
+        // is the one the owner is actually tapping on a mobile device.
         switchView(tab.dataset.view);
         if (tab.dataset.view === 'feed') feedTapped();
       });
@@ -5185,7 +5185,7 @@ const HEARTBEAT_URL = (() => {
     list.classList.toggle('loading', !!flag);
   }
 
-  /* Tapping FEED refreshes the feed. Tanush's own words: with a lot of ads you
+  /* Tapping FEED refreshes the feed. The owner's own words: with a lot of ads you
      scroll down, and then you want new ones without hunting for a control.
      Bridged onto window.SNYPD because switchView and the tab handlers live in
      a different closure - same pattern as awardXP/marketCheck. No first-paint
