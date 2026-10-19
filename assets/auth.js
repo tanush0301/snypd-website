@@ -215,7 +215,12 @@
     for (var k in tags) data[k] = tags[k];
     var aff = partnerCode();
     if (aff) data.whop_aff = aff;
-    if (S.marketing) data.marketing_opt_in_at = new Date().toISOString();
+    if (S.marketing) {
+      data.marketing_opt_in_at = new Date().toISOString();
+      data.marketing_opt_in_source = 'signup';
+      // Same wording/version as the dashboard card and /account (19 Oct 2026).
+      data.marketing_opt_in_text = 'v2 2026-10-19: Product updates, Vinted tips and occasional offers';
+    }
     var hi = huntIntent();
     if (hi) data.entry_hunt = hi;
     var ep = entryPage();
@@ -499,7 +504,7 @@
         (er.pw2 ? errSpan(ID + '-pw2e', er.pw2) : '') + '</div>');
     }
 
-    if (isSignup) out.push('<label style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer;"><input type="checkbox" name="marketing" data-f="marketing"' + attr('checked', S.marketing) + attr('disabled', busy) + ' style="width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#00E5A0;cursor:pointer;"><span style="font-size:13px;color:var(--text-secondary);">Email me product updates.</span></label>');
+    if (isSignup) out.push('<label style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer;"><input type="checkbox" name="marketing" data-f="marketing"' + attr('checked', S.marketing) + attr('disabled', busy) + ' style="width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#00E5A0;cursor:pointer;"><span style="font-size:13px;color:var(--text-secondary);">Email me product updates, Vinted tips and occasional offers.</span></label>');
 
     if (isLogin || isSignup || v === 'forgot' || v === 'reset' || v === 'verify') {
       var labels = { verify: ['CONFIRM EMAIL', 'CONFIRMING…'], login: ['LOG IN', 'LOGGING IN…'], signup: ['CREATE ACCOUNT', 'CREATING ACCOUNT…'], forgot: ['SEND RESET LINK', 'SENDING…'], reset: ['SAVE PASSWORD', 'SAVING…'] }[v];

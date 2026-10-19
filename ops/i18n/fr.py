@@ -54,7 +54,7 @@ FR = {
     'Hide password': 'Masquer le mot de passe',
     'SHOW': 'AFFICHER',
     'HIDE': 'MASQUER',
-    'Email me product updates.': 'Envoie-moi les nouveautés du produit par e-mail.',
+    'Email me product updates, Vinted tips and occasional offers.': 'Envoie-moi par e-mail les nouveautés du produit, des astuces Vinted et des offres ponctuelles.',
     'LOG IN': 'SE CONNECTER',
     'LOGGING IN…': 'CONNEXION…',
     'CREATE ACCOUNT': 'CRÉER MON COMPTE',
@@ -869,3 +869,18 @@ FR_PATTERNS += [
     (r'^Until (.+): Kickstart €7\.49 or Pro €12\.49 for the first month, code SNYPD50 already applied\. Or Solo, €5\.99/month for 1 search 24/7\.$',
      'Jusqu’au $1' + NB + ': Kickstart 7,49' + NB + '€ ou Pro 12,49' + NB + '€ le premier mois, code SNYPD50 déjà appliqué. Ou Solo, 5,99' + NB + '€/mois pour 1 recherche 24h/24.'),
 ]
+
+# ====================================================================== marketing-email consent (19 Oct 2026)
+FR.update({
+    'Get SNYPD news by email?': 'Recevoir les nouvelles de SNYPD par e-mail' + NB + '?',
+    'Product updates, Vinted tips and occasional offers. Unsubscribe in one click, or change it any time on your Account page.':
+        'Nouveautés du produit, astuces Vinted et offres ponctuelles. Désabonne-toi en un clic, ou change d’avis quand tu veux sur ta page Compte.',
+    'Yes, email me': 'Oui, écris-moi',
+    'No thanks': 'Non merci',
+    "Couldn't save your choice. Try again.": 'Impossible d’enregistrer ton choix. Réessaie.',
+    'Email updates': 'Nouvelles par e-mail',
+    'Product updates, Vinted tips and occasional offers': 'Nouveautés du produit, astuces Vinted et offres ponctuelles',
+    "Couldn't save your email preference. Try again.": 'Impossible d’enregistrer ta préférence e-mail. Réessaie.',
+    'Email updates on.': 'Nouvelles par e-mail activées.',
+    'Email updates off. It can take up to an hour to apply.': 'Nouvelles par e-mail désactivées. La prise en compte peut prendre jusqu’à une heure.',
+})

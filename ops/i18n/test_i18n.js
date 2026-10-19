@@ -25,6 +25,9 @@ const t = g.window.SNYPD_I18N.t;
 
 const NB = ' ';
 const cases = [
+  ['Get SNYPD news by email?', 'Recevoir les nouvelles de SNYPD par e-mail' + NB + '?'],
+  ['Yes, email me', 'Oui, écris-moi'],
+  ['Email me product updates, Vinted tips and occasional offers.', 'Envoie-moi par e-mail les nouveautés du produit, des astuces Vinted et des offres ponctuelles.'],
   ['Finish setting up alerts on this device', 'Termine la configuration des alertes sur cet appareil'],
   ['Set up alerts', 'Configurer les alertes'],
   ['Try again', 'Réessayer'],

@@ -108,6 +108,13 @@
   var NO_HUNTS = params.get('hunts') === '0';
 
   var UID = 'qa-user-0000-0000-0000-000000000001';
+  var QA_META = {};
+  try { QA_META = JSON.parse(params.get('meta') || '{}'); } catch (e) {}
+  window.__qa_auth_updates = [];
+  function qaUser() {
+    return { id: UID, email: 'qa-test@example.com', created_at: new Date(Date.now() - 40 * 86400000).toISOString(),
+      user_metadata: JSON.parse(JSON.stringify(QA_META)) };
+  }
 
   var DB = {
     users: [
@@ -366,17 +373,29 @@
   var fakeClient = {
     auth: {
       getSession: function () {
+        // ?nosession=1: logged out (sign-up / login pages).
+        if (params.get('nosession') === '1') return Promise.resolve({ data: { session: null }, error: null });
         return Promise.resolve({
           data: {
             session: {
               access_token: 'qa-fake-token',
-              user: { id: UID, email: 'qa-test@example.com', created_at: new Date(now - 40 * 86400000).toISOString() },
+              user: qaUser(),
             },
           },
           error: null,
         });
       },
       signOut: function () { return Promise.resolve({ error: null }); },
+      // ?meta=<json> seeds user_metadata (e.g. {} = no marketing choice yet). getUser reads the
+      // live copy; updateUser merges like Supabase Auth and logs to window.__qa_auth_updates;
+      // ?update_fail=1 makes updateUser return an error.
+      getUser: function () { return Promise.resolve({ data: { user: qaUser() }, error: null }); },
+      updateUser: function (attrs) {
+        window.__qa_auth_updates.push(JSON.parse(JSON.stringify(attrs)));
+        if (params.get('update_fail') === '1') return Promise.resolve({ data: null, error: { message: 'QA mock: update failed' } });
+        Object.assign(QA_META, (attrs && attrs.data) || {});
+        return Promise.resolve({ data: { user: qaUser() }, error: null });
+      },
     },
     from: function (table) { return makeBuilder(table); },
     rpc: function () { return Promise.resolve({ data: null, error: { message: 'QA mock: rpc not implemented, falls back to plan table' } }); },

@@ -1184,6 +1184,7 @@ body {
 }
 .elite-banner__title { font-size: 15px; color: var(--text-primary); margin-bottom: 4px; }
 .elite-banner__text { font-size: 11.5px; color: var(--text-muted); }
+.email-optin__actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* Offline / can't-reach-backend state - amber per Ledger 2e: this is a
    "cached, still recoverable" state (Vinted unreachable, hunts still saved),
@@ -1921,6 +1922,19 @@ body {
   </div>
   <button class="btn btn-prim" id="alerts-setup-resume" type="button">Set up alerts</button>
 </div>
+<!-- Marketing-email consent, asked once (19 Oct 2026). Shown only to accounts with no
+     recorded choice: Google sign-ups never see the sign-up checkbox, and accounts from
+     before 7 Oct predate it. Logic: emailOptinCard() after the auth block. -->
+<div class="elite-banner" id="email-optin-card" style="display:none" aria-labelledby="email-optin-title">
+  <div>
+    <div class="elite-banner__title" id="email-optin-title">Get SNYPD news by email?</div>
+    <div class="elite-banner__text" id="email-optin-text">Product updates, Vinted tips and occasional offers. Unsubscribe in one click, or change it any time on your Account page.</div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="email-optin-yes" type="button">Yes, email me</button>
+    <button class="btn btn-ghost" id="email-optin-no" type="button">No thanks</button>
+  </div>
+</div>
 <div class="elite-banner" id="elite-banner" style="display:none">
   <div>
     <div class="elite-banner__title">Paid plans hunt while you're away</div>
@@ -2213,6 +2227,44 @@ const HEARTBEAT_URL = (() => {
     window.SNYPD_I18N.onChange = (l) => sb.auth.updateUser({ data: { ui_lang: l } }).catch(() => {});
     window.SNYPD_I18N.fromUser(session.user);
   }
+
+  // Marketing-email consent card (19 Oct 2026). Either answer is saved to user_metadata,
+  // so the card never returns; resend-contacts-sync (Supabase cron) mirrors it to Resend
+  // hourly. The same wording/version is used by the sign-up checkbox and /account.
+  (async function emailOptinCard() {
+    const card = document.getElementById('email-optin-card');
+    if (!card) return;
+    const OPTIN_TEXT = 'v2 2026-10-19: Product updates, Vinted tips and occasional offers';
+    const hasChoice = (u) => !!(u && u.user_metadata &&
+      Object.prototype.hasOwnProperty.call(u.user_metadata, 'marketing_opt_in'));
+    if (hasChoice(session.user)) return;
+    // The cached session can predate an answer given on another device.
+    try {
+      const { data, error } = await sb.auth.getUser();
+      if (error || !data || !data.user || hasChoice(data.user)) return;
+    } catch (e) { return; }
+    const yes = document.getElementById('email-optin-yes');
+    const no = document.getElementById('email-optin-no');
+    const text = document.getElementById('email-optin-text');
+    card.style.display = '';
+    async function answer(optIn) {
+      yes.disabled = no.disabled = true;
+      const now = new Date().toISOString();
+      const data = optIn
+        ? { marketing_opt_in: true, marketing_opt_in_at: now, marketing_opt_in_source: 'dashboard_card', marketing_opt_in_text: OPTIN_TEXT }
+        : { marketing_opt_in: false, marketing_opt_out_at: now, marketing_opt_in_source: 'dashboard_card' };
+      let failed = false;
+      try { const r = await sb.auth.updateUser({ data }); failed = !!(r && r.error); } catch (e) { failed = true; }
+      if (failed) {
+        yes.disabled = no.disabled = false;
+        text.textContent = "Couldn't save your choice. Try again.";
+        return;
+      }
+      card.style.display = 'none';
+    }
+    yes.addEventListener('click', () => answer(true));
+    no.addEventListener('click', () => answer(false));
+  })();
 
   // ----------------- XP (Streak/XP/Tier Specification v1, sections 2 & 5) -----------------
   // Client-inserted, same trust model migration 024 already accepts for every

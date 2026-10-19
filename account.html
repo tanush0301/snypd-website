@@ -805,6 +805,12 @@
 <div class="k">Renews on</div>
 <div class="v" data-snypd="renews">—</div>
 </div>
+<!-- Marketing-email consent toggle (19 Oct 2026): withdrawing must be as easy as
+     agreeing. Mirrored to Resend hourly by resend-contacts-sync. -->
+<div class="row">
+<div class="k">Email updates</div>
+<div class="v" style="white-space:normal;overflow:visible;"><label style="display:inline-flex;align-items:flex-start;gap:10px;cursor:pointer;line-height:1.4;"><input type="checkbox" id="mkt-optin" disabled style="width:18px;height:18px;margin:0;accent-color:#00E5A0;cursor:pointer;"><span>Product updates, Vinted tips and occasional offers</span></label><span id="mkt-optin-status" role="status" style="display:block;margin-top:6px;font-size:12px;color:#8A8A8A;"></span></div>
+</div>
 </div>
 <div class="notice" data-snypd="notice"></div>
 <div class="actions">
@@ -1011,6 +1017,35 @@
 
     setText("userline", email);
     setText("email", email);
+
+    // Marketing-email consent toggle. Same wording/version as the dashboard card and the
+    // sign-up checkbox. Read fresh from the server: the cached session can be stale.
+    (async () => {
+      const box = document.getElementById("mkt-optin");
+      if (!box) return;
+      const OPTIN_TEXT = "v2 2026-10-19: Product updates, Vinted tips and occasional offers";
+      try {
+        const { data } = await sb.auth.getUser();
+        const meta = (data && data.user && data.user.user_metadata) || {};
+        box.checked = meta.marketing_opt_in === true;
+        box.disabled = false;
+      } catch (e) { return; }
+      box.addEventListener("change", async () => {
+        const optIn = box.checked;
+        box.disabled = true;
+        const now = new Date().toISOString();
+        const patch = optIn
+          ? { marketing_opt_in: true, marketing_opt_in_at: now, marketing_opt_in_source: "account_page", marketing_opt_in_text: OPTIN_TEXT }
+          : { marketing_opt_in: false, marketing_opt_out_at: now, marketing_opt_in_source: "account_page" };
+        let failed = false;
+        try { const r = await sb.auth.updateUser({ data: patch }); failed = !!(r && r.error); } catch (e) { failed = true; }
+        if (failed) box.checked = !optIn;
+        document.getElementById("mkt-optin-status").textContent = failed
+          ? "Couldn't save your email preference. Try again."
+          : optIn ? "Email updates on." : "Email updates off. It can take up to an hour to apply.";
+        box.disabled = false;
+      });
+    })();
 
     const { data, error } = await sb
       .from("users")
