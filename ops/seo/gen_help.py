@@ -60,8 +60,8 @@ FAQ = [
          'Active searches per plan: Free @@searches:free@@, Solo @@searches:solo@@, Kickstart @@searches:kickstart@@, Pro @@searches:pro@@, Elite @@searches:elite@@. '
          'Pause any search to free its slot.'),
         ('Is there a free plan or a trial?',
-         'Yes. Free has no time limit and needs no card. Your first search runs 24/7 with alerts for @@trial_days@@ days from when you save it; '
-         'after that, Free checks it while your dashboard is open.'),
+         'Yes. Free has no time limit and needs no card. Your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h) from when you save it. '
+         'If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free checks it while your dashboard is open.'),
         ('What do the paid plans cost?',
          'Solo @@price:solo@@, Kickstart @@price:kickstart@@, Pro @@price:pro@@ and Elite @@price:elite@@ a month, VAT included. Paid plans keep checking 24/7 with your dashboard closed. '
          'Billed monthly through Whop; cancel any time. <a href="/plans">Compare plans</a>.'),

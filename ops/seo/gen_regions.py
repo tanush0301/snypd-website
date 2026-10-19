@@ -48,8 +48,8 @@ def per_search():
 # ----------------------------------------------------------------- /plans comparison table
 # Every row is checked against the product (the reason is next to each fact):
 #   searches        plan_limit_for() (migration 030)
-#   24/7            always-on is PAID_PLANS-gated; Free gets it for FREE_TRIAL_DAYS from the
-#                   first saved search (migration 042, helpers.in_free_trial)
+#   24/7            always-on is PAID_PLANS-gated; Free gets it for the trial length from the
+#                   first saved search (migration 042, helpers.in_free_trial; plans.json free_trial)
 #   check speed     adaptive polling, one global floor/ceiling, no tier (check-interval.json)
 #   push            push.py has no tier gate; Free only polls 24/7 during the trial, then
 #                   while the dashboard is open, so it only has something to push then
@@ -144,11 +144,11 @@ def cmp_html():
 # ----------------------------------------------------------------- /plans FAQ
 def faqs():
     so, k, pr, el = (plans.price(x, 'en', entities=False) for x in ('solo', 'kickstart', 'pro', 'elite'))
-    d, r = plans.TRIAL_DAYS, plans.REFUND_DAYS
+    d, r, h, x = plans.TRIAL_DAYS, plans.REFUND_DAYS, plans.TRIAL_HOURS, plans.TRIAL_EXT_DAYS
     return [
         ('Is Free actually free?', 'Yes. No card and no time limit. One search: for the first %d days after you save it, it runs 24/7 with alerts like a paid plan; after that it is checked while your dashboard is open.' % d),
         ('Do paid plans find listings faster?', 'No. Every plan checks about every %d seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.' % plans.MEDIAN_S),
-        ('Is there a free trial?', 'Yes. Free runs your first search 24/7 with alerts for %d days, counted from when you save it, with no card. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.' % d),
+        ('Is there a free trial?', 'Yes. Free runs your first search 24/7 with alerts for %d days (%d h), counted from when you save it, with no card. If it finds nothing in that time, we add %d more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.' % (d, h, x)),
         ('Does the price include VAT?', 'Yes. %s, %s, %s and %s a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.' % (so, k, pr, el)),
         ('How do I pay?', 'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.'),
         ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account.'),
@@ -246,7 +246,7 @@ TEMPLATES = {
     'home-solo-line': '@@searches:solo@@ search &middot; runs 24/7, even with your dashboard closed',
     'home-kickstart-line': '@@searches:kickstart@@ searches &middot; runs 24/7, even with your dashboard closed',
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
-    'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days. No card.',
+    'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). No card.',
     'home-data': home_data,
     'home-faq-free-q': 'Does it run with my laptop closed?',
     'home-faq-free-a': 'Paid plans, always. Free: 24/7 for the first @@trial_days@@ days after you save your first search, then only while your dashboard is open.',

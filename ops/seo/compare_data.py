@@ -74,9 +74,9 @@ COMPETITORS = [
         L('@@price:solo@@&ndash;@@price:elite@@ <small>VAT incl.</small>', '@@num:solo@@&ndash;@@price:elite@@ <small>TVA incluse</small>',
           '@@num:solo@@&ndash;@@price:elite@@ <small>inkl. MwSt.</small>', '@@price:solo@@&ndash;@@num:elite@@ <small>incl. btw</small>',
           '@@num:solo@@&ndash;@@price:elite@@ <small>IVA incl.</small>', '@@num:solo@@&ndash;@@price:elite@@ <small>IVA incl.</small>'),
-        {k: YES + v for k, v in L('1 search, no time limit, 24/7 for the first 7 days', '1 recherche, sans limite de durée, 24h/24 les 7 premiers jours',
-                                  '1 Suche, ohne Zeitlimit, die ersten 7 Tage rund um die Uhr', '1 zoekopdracht, zonder tijdslimiet, de eerste 7 dagen 24/7',
-                                  '1 ricerca, senza limiti di tempo, 24 ore su 24 i primi 7 giorni', '1 búsqueda, sin límite de tiempo, 24/7 los primeros 7 días').items()}]},
+        {k: YES + v for k, v in L('1 search, no time limit, 24/7 for the first @@trial_days@@ days', '1 recherche, sans limite de durée, 24h/24 les @@trial_days@@ premiers jours',
+                                  '1 Suche, ohne Zeitlimit, die ersten @@trial_days@@ Tage rund um die Uhr', '1 zoekopdracht, zonder tijdslimiet, de eerste @@trial_days@@ dagen 24/7',
+                                  '1 ricerca, senza limiti di tempo, 24 ore su 24 i primi @@trial_days@@ giorni', '1 búsqueda, sin límite de tiempo, 24/7 los primeros @@trial_days@@ días').items()}]},
     # souk.to/en + /en/docs/autobuy ("To use Autobuy, first link your Vinted account from the Souk settings.")
     {'name': 'Souk', 'url': 'https://souk.to/en', 'kind': 'autobuy', 'cells': [
         ALERTS_AUTOBUY, NOT_SITE,
@@ -326,9 +326,9 @@ ALERT_WAYS = [
               'Ogni nuovo annuncio del link di ricerca Vinted che incolli, con tutti i filtri', 'Cada anuncio nuevo del enlace de búsqueda de Vinted que pegues, con todos los filtros'),
      'how': L('Push to phone and computer, no app store', 'Push sur téléphone et ordinateur, sans store', 'Push auf Handy und Computer, ohne App-Store', 'Push op telefoon en computer, zonder app store',
               'Push su telefono e computer, senza app store', 'Push en móvil y ordenador, sin tienda de apps'),
-     'cost': L('Free: 1 search, 24/7 for 7 days; paid from @@price:solo@@ / month', 'Gratuit : 1 recherche, 24h/24 pendant 7 jours ; payant dès @@price:solo@@ / mois',
-               'Gratis: 1 Suche, 7 Tage rund um die Uhr; bezahlt ab @@price:solo@@ / Monat', 'Gratis: 1 zoekopdracht, 7 dagen 24/7; betaald vanaf @@price:solo@@ / maand',
-               'Gratis: 1 ricerca, 24 ore su 24 per 7 giorni; a pagamento da @@price:solo@@ / mese', 'Gratis: 1 búsqueda, 24/7 durante 7 días; de pago desde @@price:solo@@ / mes')},
+     'cost': L('Free: 1 search, 24/7 for @@trial_days@@ days; paid from @@price:solo@@ / month', 'Gratuit : 1 recherche, 24h/24 pendant @@trial_days@@ jours ; payant dès @@price:solo@@ / mois',
+               'Gratis: 1 Suche, @@trial_days@@ Tage rund um die Uhr; bezahlt ab @@price:solo@@ / Monat', 'Gratis: 1 zoekopdracht, @@trial_days@@ dagen 24/7; betaald vanaf @@price:solo@@ / maand',
+               'Gratis: 1 ricerca, 24 ore su 24 per @@trial_days@@ giorni; a pagamento da @@price:solo@@ / mese', 'Gratis: 1 búsqueda, 24/7 durante @@trial_days@@ días; de pago desde @@price:solo@@ / mes')},
 ]
 ALERT_WAYS_HEAD = {
     'en': ['WAY', 'WHAT YOU GET', 'HOW IT REACHES YOU', 'COST', 'SOURCE'],

@@ -23,6 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, 'ops', 'seo'))
 from gen_content import CSS, COMPARE_CSS, PLANS_HEAD, PLANS_ROWS, SITE, EMAIL, esc, figure, table  # noqa: E402
+import plans  # noqa: E402  (ops/seo/plans.py: fills @@trial_days@@, @@price:...@@ and the other plan tokens)
 
 NB = ' '
 
@@ -31,7 +32,7 @@ T = {
         path='/start', out='start.html',
         title='SNYPD - Push alerts for new Vinted listings',
         desc=('Paste a Vinted search link with your filters. SNYPD checks it about every 30 seconds '
-              'and sends a push notification when a new listing matches. Free plan: 1 search, no card, 24/7 for the first 7 days.'),
+              'and sends a push notification when a new listing matches. Free plan: 1 search, no card, 24/7 for the first @@trial_days@@ days.'),
         steps=[
             ('Copy your search', 'On Vinted, set your filters (brand, size, price, condition) and copy the link from the address bar.'),
             ('Paste it into SNYPD', 'Every filter in the link is kept. A link SNYPD cannot read in full is refused, not trimmed.'),
@@ -45,14 +46,14 @@ T = {
         ],
         h_how='How it works', h_never='What SNYPD never does', h_where='Where it works', h_plans='Plans', h_who='Who runs SNYPD',
         where='Every Vinted site in Europe and the US: 26 sites. Alerts arrive on your phone or computer. On iPhone they work after you add SNYPD to your Home Screen, because Apple only allows web push there.',
-        plans_note='Prices include VAT. The free plan needs no card and has no time limit or cap on notifications; it watches your search 24/7 for the first 7 days, then while your dashboard is open. Paid plans keep watching with the dashboard closed. 14-day refund on the first payment of a plan.',
-        box='<strong>Start with one search, free.</strong> No card. The first 7 days run 24/7 with alerts.',
+        plans_note='Prices include VAT. The free plan needs no card and has no time limit or cap on notifications; it watches your search 24/7 for the first @@trial_days@@ days (@@trial_hours@@ h), and if it finds nothing in that time we add @@trial_ext_days@@ more days once; after that, it watches while your dashboard is open. Paid plans keep watching with the dashboard closed. 14-day refund on the first payment of a plan.',
+        box='<strong>Start with one search, free.</strong> No card. The first @@trial_days@@ days run 24/7 with alerts.',
         start='START FREE', nav_cta='START FREE', see_plans='SEE PLANS', how_btn='HOW IT WORKS', login='LOG IN',
-        who1='Built by a Belgian sneaker reseller. Operator: Tanush Khandelwal, Belgium. Contact: ',
+        who1='Built by a Belgian sneaker reseller. Contact: ',  # no owner name outside /privacy + /terms (19 Oct 2026)
         who2='SNYPD is independent and not affiliated with or endorsed by Vinted.',
         eyebrow='FOR VINTED BUYERS AND RESELLERS',
         h1='A push alert when a new listing matches your Vinted search',
-        lead='Paste a Vinted search link with your filters. SNYPD checks it about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. Free plan: 1 search, no card, 24/7 for the first 7 days.',
+        lead='Paste a Vinted search link with your filters. SNYPD checks it about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. Free plan: 1 search, no card, 24/7 for the first @@trial_days@@ days.',
         foot='SNYPD &middot; NOT AFFILIATED WITH VINTED',
         legal=('Privacy', 'Terms', 'Contact', 'Cookies', 'Cookie settings'),
     ),
@@ -60,7 +61,7 @@ T = {
         path='/fr/start', out=os.path.join('fr', 'start.html'),
         title='SNYPD - Alertes push pour les nouvelles annonces Vinted',
         desc=('Colle le lien d’une recherche Vinted avec tes filtres. SNYPD la vérifie environ toutes les 30 secondes '
-              'et envoie une notification push quand une nouvelle annonce correspond. Plan gratuit' + NB + ': 1 recherche, sans carte, 24h/24 les 7 premiers jours.'),
+              'et envoie une notification push quand une nouvelle annonce correspond. Plan gratuit' + NB + ': 1 recherche, sans carte, 24h/24 les @@trial_days@@ premiers jours.'),
         steps=[
             ('Copie ta recherche', 'Sur Vinted, règle tes filtres (marque, taille, prix, état) et copie le lien dans la barre d’adresse.'),
             ('Colle-la dans SNYPD', 'Tous les filtres du lien sont conservés. Un lien que SNYPD ne peut pas lire en entier est refusé, pas tronqué.'),
@@ -76,16 +77,17 @@ T = {
         where=('Tous les sites Vinted d’Europe et des États-Unis' + NB + ': 26 sites. Les alertes arrivent sur ton téléphone ou ton ordinateur. '
                'Sur iPhone, elles fonctionnent une fois SNYPD ajouté à ton écran d’accueil, car Apple n’autorise les notifications web push que là.'),
         plans_note=('Prix TVA incluse. Le plan gratuit ne demande pas de carte et n’a ni limite de durée ni plafond de notifications' + NB + '; '
-                    'il surveille ta recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert. Les plans payants continuent de surveiller tableau de bord fermé. '
+                    'il surveille ta recherche 24h/24 pendant les @@trial_days@@ premiers jours (@@trial_hours@@' + NB + 'h), et s’il ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois' + NB + '; '
+                    'ensuite, il la surveille tant que ton tableau de bord est ouvert. Les plans payants continuent de surveiller tableau de bord fermé. '
                     'Remboursement sous 14 jours sur le premier paiement d’un plan.'),
-        box='<strong>Commence avec une recherche, gratuitement.</strong> Sans carte. Les 7 premiers jours tournent 24h/24 avec les alertes.',
+        box='<strong>Commence avec une recherche, gratuitement.</strong> Sans carte. Les @@trial_days@@ premiers jours tournent 24h/24 avec les alertes.',
         start='COMMENCER GRATUITEMENT', nav_cta='COMMENCER', see_plans='VOIR LES PLANS', how_btn='COMMENT ÇA MARCHE', login='CONNEXION',
-        who1='Créé par un revendeur de sneakers belge. Exploitant' + NB + ': Tanush Khandelwal, Belgique. Contact' + NB + ': ',
+        who1='Créé par un revendeur de sneakers belge. Contact' + NB + ': ',
         who2='SNYPD est indépendant, sans lien avec Vinted et non approuvé par Vinted.',
         eyebrow='POUR LES ACHETEURS ET REVENDEURS VINTED',
         h1='Une notification push quand une nouvelle annonce correspond à ta recherche Vinted',
         lead=('Colle le lien d’une recherche Vinted avec tes filtres. SNYPD la vérifie environ toutes les 30 secondes et envoie une '
-              'notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. Plan gratuit' + NB + ': 1 recherche, sans carte, 24h/24 les 7 premiers jours.'),
+              'notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. Plan gratuit' + NB + ': 1 recherche, sans carte, 24h/24 les @@trial_days@@ premiers jours.'),
         foot='SNYPD &middot; NON AFFILIÉ À VINTED',
         legal=('Confidentialité', 'Conditions', 'Contact', 'Cookies', 'Paramètres des cookies'),
     ),
@@ -190,7 +192,7 @@ def build(lang):
 
 
 for lang in ('en', 'fr'):
-    html_out = build(lang)
+    html_out = plans.fill(build(lang), lang)
     path = os.path.join(ROOT, T[lang]['out'])
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(html_out)

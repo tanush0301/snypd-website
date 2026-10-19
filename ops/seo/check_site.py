@@ -3,8 +3,9 @@
 
 Fails (exit 1) on anything that would put a wrong or broken fact in front of a visitor or
 a crawler:
-  1. stale plan wording, in any language (the Free plan before the 7-day trial, French
-     "sign-up is in English" notes, placeholder counters, a counter "As of" date that is old)
+  1. stale plan wording, in any language (the Free plan before the trial, the old 7-day trial
+     length (3 days = 72 h since 20 Oct 2026), French "sign-up is in English" notes, unfilled
+     @@plan tokens@@, placeholder counters, a counter "As of" date that is old)
   2. a plan price next to a plan name that is not the price in ops/seo/data/plans.json
      (visible text, meta tags, JSON-LD Offers)
   3. banned claims from outreach/00-fact-sheet.md ("instant", "real-time", "fastest",
@@ -31,18 +32,35 @@ COUNTER_MAX_AGE_DAYS = 7
 
 # 1. Stale wording. Searched in the page source with entities decoded (scripts included:
 #    the homepage walkthrough and the /plans table live in JS or come from it).
+_TRIAL = 'Free runs 24/7 for the first %d days' % plans.TRIAL_DAYS
 STALE = [
-    (r'laptop open', 'Free runs 24/7 for the first 7 days: "laptop open" is wrong'),
-    (r'Tab open only', 'Free runs 24/7 for the first 7 days'),
-    (r'On Free, yes', 'Free runs 24/7 for the first 7 days'),
-    (r'Free stops when you do', 'Free runs 24/7 for the first 7 days'),
-    (r"(?<!trial, )Free only watches while the dashboard is open", 'say "after the 7-day trial"'),
-    (r'Free: one search, dashboard open', 'Free runs 24/7 for the first 7 days'),
-    (r'There is no trial', 'there is a 7-day trial'),
+    (r'laptop open', _TRIAL + ': "laptop open" is wrong'),
+    (r'Tab open only', _TRIAL),
+    (r'On Free, yes', _TRIAL),
+    (r'Free stops when you do', _TRIAL),
+    (r"(?<!trial, )Free only watches while the dashboard is open", 'say "after the %d-day trial"' % plans.TRIAL_DAYS),
+    (r'Free: one search, dashboard open', _TRIAL),
+    (r'There is no trial', 'there is a %d-day trial' % plans.TRIAL_DAYS),
     (r'[Ii]nscription(?! en français)[^.<]{0,60}en anglais', 'sign-up is in French since 9 Oct 2026 (only Whop checkout is English)'),
     (r'tarifs</a> \(en anglais\)', '/plans is in French for French browsers since 9 Oct 2026'),
     (r'paiement \(Whop\) est en anglais', 'the Whop checkout is French for French users since 18 Oct 2026 (site 5ad832b)'),
 ]
+# The Free trial was 7 days until 19 Oct 2026; new trials are plans.json free_trial (3 days = 72 h, +2 days once
+# when the hunt found nothing). SNYPD's own wording in the 8 site languages. Competitors' "7-day trial with a
+# code" / "7-day trial, no card" (Monitorius, CopMarket on the comparison pages) are their facts and are not
+# matched; /terms says "keep their original length of 7 days" on purpose (trials started before 20 Oct 2026).
+OLD_TRIAL = re.compile(r'(?i)\b(?:first|for) 7 days\b|\bseven[- ]day\b|\b7-day trial\b(?!,? (?:with a code|no card))'
+                       r'|\b7 premiers jours\b|\bpendant 7 jours\b|\bsept jours\b'
+                       r'|\bersten 7 Tage|\b7 Tage rund um die Uhr'
+                       r'|\beerste 7 dagen\b|\b7 dagen 24/7'
+                       r'|\bprimi 7 giorni\b|\bper 7 giorni\b'
+                       r'|\bprimeros 7 d[ií]as|\bdurante 7 d[ií]as'
+                       r'|\bpierwsze 7 dni\b|\b7 dni 24/7'
+                       r'|\bf[öo]rsta 7 dagarna|\bi 7 dagar\b')
+# Old trial wording that another change owns (19 Oct 2026): reported as a warning, not an error, so this release
+# can go out. (file, exact text around the hit). Remove each line once that change lands.
+OLD_TRIAL_PENDING = []  # (file, context) pairs allowed to keep old trial wording for now; empty since 19 Oct 2026
+UNFILLED_TOKEN = re.compile(r'@@(?:price|num|searches):[a-z]+@@|@@(?:trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|founding_price)@@')
 PLACEHOLDER_COUNTER = re.compile(r'id="(?:stat-listings|au-listings)"[^>]*>\s*(?:&mdash;|—|-)?\s*<')
 ASOF = re.compile(r'id="(?:stat-listings-asof|au-asof)"[^>]*>([^<]*)<')
 MONTHS = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'June': 6, 'July': 7, 'Aug': 8, 'Sept': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
@@ -129,6 +147,14 @@ def main():
         for pat, why in STALE:
             for m in re.finditer(pat, dec):
                 errors.append(f'{rel}: stale "{m.group(0)}" ({why})')
+        for m in OLD_TRIAL.finditer(dec):
+            around = dec[max(0, m.start() - 80):m.end() + 80]
+            pending = any(f == rel and t in around for f, t in OLD_TRIAL_PENDING)
+            (warns if pending else errors).append(
+                f'{rel}: old trial length "{m.group(0)}" (Free trial is {plans.TRIAL_DAYS} days = {plans.TRIAL_HOURS} h since 20 Oct 2026)'
+                + (' [owned by another change]' if pending else ''))
+        for m in UNFILLED_TOKEN.finditer(src):
+            errors.append(f'{rel}: unfilled plan token {m.group(0)} (the generator must call plans.fill)')
         if PLACEHOLDER_COUNTER.search(src):
             (errors if rel in COUNTER_PAGES else warns).append(f'{rel}: listings counter has no figure (run prepublish.py)')
         for m in ASOF.finditer(src):

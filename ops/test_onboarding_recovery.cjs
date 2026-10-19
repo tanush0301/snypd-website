@@ -13,6 +13,8 @@ function section(start, end) {
   return html.slice(a, b);
 }
 const wizard = section('  // ----------------- FIRST-RUN WIZARD', '  // ----------------- HISTORY');
+// Trial-end helpers (migration 061) live with the banner code; the wizard calls them.
+const trialHelpers = section('  function trialEndMs(p) {', '  const uiFr = ');
 const push = section('/* Web push registration.', '</script>');
 const tick = () => new Promise(resolve => setImmediate(resolve));
 class Element {
@@ -44,7 +46,7 @@ function base() {
   g.window = g;
   return { g, el, context: vm.createContext(g), events };
 }
-async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, boot = null} = {}) {
+async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, trialEnds = null, boot = null} = {}) {
   const f = base(); let inserts = 0, countValue = count, countReads = 0;
   // dashboard_boot snapshot (migration 054): the wizard takes its hunt count from it once.
   f.g.fromBoot = reader => { assert.equal(reader, 'wizard'); const b = boot; boot = null; return b; };
@@ -57,9 +59,10 @@ async function wizardFixture({count = 0, status = 'off', insertError = null, xpF
   f.g.sb = { from() { return {
     select() { return this; }, eq() { return this; },
     then(resolve, reject) { countReads++; return Promise.resolve({count:countValue,error:null}).then(resolve,reject); },
-    maybeSingle() { return Promise.resolve({data:{free_trial_started_at:trialStart},error:null}); },
+    maybeSingle() { return Promise.resolve({data:{free_trial_started_at:trialStart, trial_ends_at:trialEnds},error:null}); },
     async insert() { inserts++; if (pendingInsert) await pendingInsert; if (!insertError) countValue++; return {error: insertError}; },
   }; } };
+  vm.runInContext(trialHelpers, f.context); f.g.paintTrialValue = async () => {};
   await vm.runInContext(wizard, f.context); await tick();
   f.inserts = () => inserts;
   f.countReads = () => countReads;
@@ -149,6 +152,15 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   await f.el('wiz-q-save').click(); await tick();
   assert(f.el('wiz-trial-note').textContent.includes('Your Free trial runs 24/7'));
   assert(f.el('wiz-trial-note').textContent.includes('Enable alerts on this device')); passed++;
+
+  // 061: a 72 h trial that already ended is not promised 24/7 (trial_ends_at wins over start + 7 days).
+  f=await wizardFixture({trialStart:new Date(Date.now()-4*864e5).toISOString(), trialEnds:new Date(Date.now()-864e5).toISOString()});
+  f.el('wiz-q-words').value='nike'; await f.el('wiz-q-save').click(); await tick();
+  assert(!f.el('wiz-trial-note').textContent.includes('Your Free trial runs 24/7')); passed++;
+  // ...and one still running (extended or not) is.
+  f=await wizardFixture({trialStart:new Date(Date.now()-4*864e5).toISOString(), trialEnds:new Date(Date.now()+864e5).toISOString()});
+  f.el('wiz-q-words').value='nike'; await f.el('wiz-q-save').click(); await tick();
+  assert(f.el('wiz-trial-note').textContent.includes('Your Free trial runs 24/7')); passed++;
 
   // Browser subscription + rejected server registration must not say "on".
   f=await pushFixture({registerStatus:503});

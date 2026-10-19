@@ -12,6 +12,8 @@ ops/ is in .vercelignore, so this script never deploys.
 import os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(ROOT, 'ops', 'seo'))
+import plans  # noqa: E402  (trial length from ops/seo/data/plans.json)
 
 SUPABASE_URL = 'https://igbuqanjocfmahlzzupc.supabase.co'
 SUPABASE_ANON = ('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2Nm'
@@ -26,7 +28,7 @@ PAGES = {
                   index=False),
     'signup': dict(file='signup.html', title='Sign up free - SNYPD Vinted Monitor',
                    desc='Create a free SNYPD account: one Vinted search free with no time limit, 24/7 for the first '
-                        '7 days. Get a push alert when a new Vinted listing matches your filters.',
+                        '%d days. Get a push alert when a new Vinted listing matches your filters.' % plans.TRIAL_DAYS,
                    index=True),
     'reset': dict(file='reset-password.html', title='Set a new password - SNYPD',
                   desc='Set a new password for your SNYPD account.', index=False),

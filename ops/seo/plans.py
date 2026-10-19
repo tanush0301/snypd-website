@@ -6,7 +6,9 @@ using the page's own <html lang>, so a price change is one edit in plans.json:
     @@price:kickstart@@   formatted price with the euro sign   (en EUR14.99, fr 14,99 EUR, nl EUR 14,99)
     @@num:kickstart@@     the number only, in the page's format (en 14.99, fr 14,99)
     @@searches:pro@@      active searches (5)
-    @@trial_days@@        Free 24/7 trial length (7)
+    @@trial_days@@        Free 24/7 trial length in days (3)
+    @@trial_hours@@       the same in hours (72)
+    @@trial_ext_days@@    days added once when the first hunt found nothing in the trial (2)
     @@refund_days@@       refund window (14)
     @@median_s@@          measured median check gap in seconds (30)
     @@mr_hour@@ @@mr_day@@ Market Report price checks per hour / per day (20 / 100)
@@ -23,6 +25,10 @@ SPEED = json.load(open(os.path.join(HERE, 'data', 'check-interval.json'), encodi
 PLANS = {p['key']: p for p in DATA['plans']}
 ORDER = [p['key'] for p in DATA['plans']]
 TRIAL_DAYS = DATA['free_trial']['days']
+TRIAL_HOURS = DATA['free_trial']['hours']
+TRIAL_EXT_DAYS = DATA['free_trial']['extension']['days']
+if TRIAL_HOURS != 24 * TRIAL_DAYS:
+    raise ValueError('plans.json: free_trial.hours must be 24 x free_trial.days')
 REFUND_DAYS = DATA['refund']['days']
 MEDIAN_S = SPEED['median_seconds']
 MR = DATA['market_report']
@@ -49,7 +55,7 @@ def price(key, lang, entities=True):
     return n + nb + eur
 
 
-TOKEN = re.compile(r'@@(price|num|searches):([a-z]+)@@|@@(trial_days|refund_days|median_s|mr_hour|mr_day|founding_price)@@')
+TOKEN = re.compile(r'@@(price|num|searches):([a-z]+)@@|@@(trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|founding_price)@@')
 
 
 LD_BLOCK = re.compile(r'(<script type="application/ld\+json">)(.*?)(</script>)', re.S)
@@ -70,7 +76,8 @@ def _fill(text, lang, entities):
         if m.group(3) == 'founding_price':
             return price('founding', lang, entities)
         if m.group(3):
-            return str({'trial_days': TRIAL_DAYS, 'refund_days': REFUND_DAYS, 'median_s': MEDIAN_S,
+            return str({'trial_days': TRIAL_DAYS, 'trial_hours': TRIAL_HOURS, 'trial_ext_days': TRIAL_EXT_DAYS,
+                        'refund_days': REFUND_DAYS, 'median_s': MEDIAN_S,
                         'mr_hour': MR['per_hour'], 'mr_day': MR['per_day']}[m.group(3)])
         kind, key = m.group(1), m.group(2)
         if key not in PLANS:

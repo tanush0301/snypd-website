@@ -589,7 +589,7 @@ FR.update({
     '10 active Vinted searches, not 5': '10 recherches Vinted actives, au lieu de 5',
     '5 active searches': '5 recherches actives',
     '€3.50 per search a month, the lowest of any plan': '3,50' + NB + '€ par recherche et par mois, le plus bas de tous les plans',
-    '24/7 for the first 7 days, then while your dashboard is open': '24h/24 les 7 premiers jours, puis tant que ton tableau de bord est ouvert',
+    '24/7 for the first 3 days, then while your dashboard is open': '24h/24 les 3 premiers jours, puis tant que ton tableau de bord est ouvert',
     'Keep hunting with the tab closed': 'Continue de chercher onglet fermé',
     'Keeps hunting with the tab closed': 'Continue de chercher onglet fermé',
     'Push alerts around the clock': 'Alertes push 24h/24',
@@ -631,10 +631,10 @@ FR.update({
     'Runs 24/7, dashboard closed': 'Tourne 24h/24, tableau de bord fermé',
     'Runs with your dashboard closed': 'Tourne tableau de bord fermé',
     'Tab open only': 'Onglet ouvert seulement',
-    'First 7 days only': '7 premiers jours seulement',
-    '24/7 for 7 days, then dashboard open': '24h/24 pendant 7 jours, puis tableau de bord ouvert',
-    'Free: 24/7 for the first 7 days after you save your first search, then only while your dashboard is open.':
-        'Free' + NB + ': 24h/24 pendant les 7 premiers jours après ta première recherche enregistrée, puis seulement tant que ton tableau de bord est ouvert.',
+    'First 3 days only': '3 premiers jours seulement',
+    '24/7 for 3 days, then dashboard open': '24h/24 pendant 3 jours, puis tableau de bord ouvert',
+    'Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.':
+        'Free' + NB + ': 24h/24 pendant les 3 premiers jours après ta première recherche enregistrée, puis seulement tant que ton tableau de bord est ouvert.',
     'Check speed': 'Vitesse de vérification',
     'About every 30 s (measured median), up to 5 min on quiet searches. Same on every plan.':
         'Environ toutes les 30 s (médiane mesurée), jusqu’à 5 min sur les recherches calmes. Pareil sur tous les plans.',
@@ -701,11 +701,11 @@ FR.update({
     'FAQ': 'FAQ',
     'Plan questions.': 'Questions sur les plans.',
     'Is Free actually free?': 'Free est vraiment gratuit' + NB + '?',
-    'Yes. No card and no time limit. One search: for the first 7 days after you save it, it runs 24/7 with alerts like a paid plan; after that it is checked while your dashboard is open.':
-        'Oui. Sans carte et sans limite de durée. Une recherche' + NB + ': pendant les 7 premiers jours après l’avoir enregistrée, elle tourne 24h/24 avec les alertes comme un plan payant' + NB + '; ensuite elle est vérifiée tant que ton tableau de bord est ouvert.',
+    'Yes. No card and no time limit. One search: for the first 3 days after you save it, it runs 24/7 with alerts like a paid plan; after that it is checked while your dashboard is open.':
+        'Oui. Sans carte et sans limite de durée. Une recherche' + NB + ': pendant les 3 premiers jours après l’avoir enregistrée, elle tourne 24h/24 avec les alertes comme un plan payant' + NB + '; ensuite elle est vérifiée tant que ton tableau de bord est ouvert.',
     'Is there a free trial?': 'Y a-t-il un essai gratuit' + NB + '?',
-    'Yes. Free runs your first search 24/7 with alerts for 7 days, counted from when you save it, with no card. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.':
-        'Oui. Free fait tourner ta première recherche 24h/24 avec les alertes pendant 7 jours, à compter de son enregistrement, sans carte. Ensuite, Free garde cette recherche aussi longtemps que tu veux, vérifiée tant que ton tableau de bord est ouvert.',
+    'Yes. Free runs your first search 24/7 with alerts for 3 days (72 h), counted from when you save it, with no card. If it finds nothing in that time, we add 2 more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.':
+        'Oui. Free fait tourner ta première recherche 24h/24 avec les alertes pendant 3 jours (72' + NB + 'h), à compter de son enregistrement, sans carte. Si elle ne trouve rien pendant ce temps, on ajoute 2 jours de plus, une seule fois. Ensuite, Free garde cette recherche aussi longtemps que tu veux, vérifiée tant que ton tableau de bord est ouvert.',
     'Do paid plans find listings faster?': 'Les plans payants trouvent-ils les annonces plus vite' + NB + '?',
     'No. Every plan checks about every 30 seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.':
         'Non. Tous les plans vérifient environ toutes les 30 secondes (médiane mesurée), jusqu’à 5 minutes sur les recherches calmes. Les plans payants ajoutent des recherches et continuent de vérifier tableau de bord fermé.',
@@ -838,7 +838,7 @@ FR_PATTERNS += [
 # Recoverable first-hunt and device-alert setup (October 2026).
 FR.update({'Finish setting up alerts on this device': 'Termine la configuration des alertes sur cet appareil', 'Your hunt is saved. Set up notifications so you can hear about matching listings without watching the feed.': 'Ta recherche est enregistrée. Configure les notifications pour être prévenu des annonces correspondantes sans surveiller le flux.', 'Set up alerts': 'Configurer les alertes', 'Alerts are set up on this device. Background monitoring depends on your plan or trial.': 'Les alertes sont configurées sur cet appareil. La surveillance en arrière-plan dépend de ton plan ou de ton essai.', 'Your alert registration could not be confirmed. Try again.': 'La configuration de tes alertes n’a pas pu être confirmée. Réessaie.', 'Still setting up alerts. Wait a moment, then try again.': 'Configuration des alertes en cours. Patiente un instant, puis réessaie.', 'Alerts are ready to set up. Tap Try again to allow notifications.': 'Les alertes sont prêtes à être configurées. Appuie sur Réessayer pour autoriser les notifications.', 'Could not save this hunt. Check your connection and try again.': 'Impossible d’enregistrer cette recherche. Vérifie ta connexion et réessaie.', 'Try again': 'Réessayer'})
 
-FR.update({'Your Free trial runs 24/7. Enable alerts on this device to receive matching listings. After the trial, Free checks while your dashboard is open.': 'Ton essai Free fonctionne 24h/24. Active les alertes sur cet appareil pour recevoir les annonces correspondantes. Après l’essai, Free vérifie les annonces tant que ton tableau de bord est ouvert.', 'Your seven-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.': 'Ton essai de sept jours de surveillance en arrière-plan commence quand tu enregistres ta première recherche. Les alertes doivent être activées sur cet appareil.', 'Could not check your trial status. Your hunt is saved; try again shortly.': 'Impossible de vérifier le statut de ton essai. Ta recherche est enregistrée ; réessaie dans un instant.'})
+FR.update({'Your Free trial runs 24/7. Enable alerts on this device to receive matching listings. After the trial, Free checks while your dashboard is open.': 'Ton essai Free fonctionne 24h/24. Active les alertes sur cet appareil pour recevoir les annonces correspondantes. Après l’essai, Free vérifie les annonces tant que ton tableau de bord est ouvert.', 'Your seven-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.': 'Ton essai de sept jours de surveillance en arrière-plan commence quand tu enregistres ta première recherche. Les alertes doivent être activées sur cet appareil.', 'Your 3-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.': 'Ton essai de 3 jours de surveillance en arrière-plan commence quand tu enregistres ta première recherche. Les alertes doivent être activées sur cet appareil.', 'Could not check your trial status. Your hunt is saved; try again shortly.': 'Impossible de vérifier le statut de ton essai. Ta recherche est enregistrée ; réessaie dans un instant.'})
 # Recoverable signup confirmation (15 October 2026).
 FR.update({
     'Confirm your email': 'Confirme ton e-mail',
@@ -884,3 +884,39 @@ FR.update({
     'Email updates on.': 'Nouvelles par e-mail activées.',
     'Email updates off. It can take up to an hour to apply.': 'Nouvelles par e-mail désactivées. La prise en compte peut prendre jusqu’à une heure.',
 })
+
+# ====================================================================== conversion Phase 0 (19 Oct 2026, migration 061)
+# Dashboard: trial in hours under 2 days, what the hunt caught (my_trial_stats), paused state, plan after the first
+# hunt, activation after checkout, "LIVE WHILE OPEN" for a Free hunt after the trial.
+FR.update({
+    'Your hunt is paused in the background': 'Ta recherche est en pause en arrière-plan',
+    'Free only checks while this tab is open. Solo keeps one search running 24/7 for €5.99/month.':
+        'Free ne vérifie que lorsque cet onglet est ouvert. Solo garde une recherche active 24h/24 pour 5,99' + NB + '€/mois.',
+    'We added 2 days because your hunt found nothing in 3 days. Widen it: fewer filters or a higher max price.':
+        'Nous avons ajouté 2 jours, car ta recherche n’a rien trouvé en 3 jours. Élargis-la' + NB + ': moins de filtres ou un prix max plus haut.',
+    'Your hunt has not matched a new listing yet. A wider search (fewer filters, a higher max price) finds more.':
+        'Ta recherche n’a encore trouvé aucune nouvelle annonce. Une recherche plus large (moins de filtres, un prix max plus haut) en trouve plus.',
+    'Your hunt has not matched a new listing yet. If it finds nothing in 3 days, we add 2 more days, once.':
+        'Ta recherche n’a encore trouvé aucune nouvelle annonce. Si elle ne trouve rien en 3 jours, nous ajoutons 2 jours, une fois.',
+    'Your hunt is live. Keep it running after the trial': 'Ta recherche est lancée. Garde-la active après l’essai',
+    'Activating your plan...': 'Activation de ton plan…',
+    'Payment received. Your plan usually switches on within a minute; this page checks every 5 seconds.':
+        'Paiement reçu. Ton plan s’active en général en moins d’une minute' + NB + '; cette page vérifie toutes les 5 secondes.',
+    'Still waiting for Whop. Check that you paid with your SNYPD account email. If your plan is not on within 15 minutes, use the Support page and we will link it by hand.':
+        'Toujours en attente de Whop. Vérifie que tu as payé avec l’e-mail de ton compte SNYPD. Si ton plan n’est pas actif dans 15 minutes, passe par la page Support et nous le relierons à la main.',
+    'LIVE WHILE OPEN': 'ACTIVE ONGLET OUVERT',
+    '24/7 for 3 days, then while your dashboard is open': '24h/24 pendant 3 jours, puis tant que ton tableau de bord est ouvert',
+})
+FR_PATTERNS += [
+    (r'^Free 24/7 trial: (\d+) h left$', 'Essai Free 24h/24' + NB + ': encore $1' + NB + 'h'),
+    (r'^Your hunt has matched 1 new listing since (.+)\.$', 'Ta recherche a trouvé 1 nouvelle annonce depuis le $1.'),
+    (r'^Your hunt has matched (.+) new listings since (.+)\.$', 'Ta recherche a trouvé $1 nouvelles annonces depuis le $2.'),
+    (r'^(.+) new listings matched your hunt since your trial ended, while it was paused\. Cheapest: (.+)\.$',
+     '$1 nouvelles annonces correspondaient à ta recherche depuis la fin de l’essai, pendant sa pause. La moins chère' + NB + ': $2.'),
+    (r'^(.+) new listings matched your hunt since your trial ended, while it was paused\.$',
+     '$1 nouvelles annonces correspondaient à ta recherche depuis la fin de l’essai, pendant sa pause.'),
+    (r'^During your trial, your hunt matched (.+) new listings\.$', 'Pendant ton essai, ta recherche a trouvé $1 nouvelles annonces.'),
+    (r'^You picked (Solo|Kickstart|Pro|Elite) at sign-up\. Start it now and your hunt keeps running 24/7 when the trial ends\.$',
+     'Tu as choisi $1 à l’inscription. Démarre-le maintenant et ta recherche reste active 24h/24 à la fin de l’essai.'),
+    (r'^Start (Solo|Kickstart|Pro|Elite)$', 'Démarrer $1'),
+]

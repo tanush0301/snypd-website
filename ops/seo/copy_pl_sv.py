@@ -34,8 +34,8 @@ VINTED_LAG = {
     'sv': 'Så ofta tittar SNYPD, inte så snabbt en annons når dig: Vinted visar själv en ny annons i sökningen några minuter efter att den lagts upp, för alla verktyg.',
 }
 TRIAL = {
-    'pl': 'Przez pierwsze @@trial_days@@ dni od zapisania pierwszego wyszukiwania plan Free działa 24/7 z powiadomieniami, jak plan płatny.',
-    'sv': 'Under de första @@trial_days@@ dagarna efter att du sparat din första sökning körs Free dygnet runt med notiser, som ett betalt abonnemang.',
+    'pl': 'Przez pierwsze @@trial_days@@ dni (@@trial_hours@@ godziny) od zapisania pierwszego wyszukiwania plan Free działa 24/7 z powiadomieniami, jak plan płatny. Jeśli w tym czasie wyszukiwanie niczego nie znajdzie, jednorazowo dodajemy @@trial_ext_days@@ dni.',
+    'sv': 'Under de första @@trial_days@@ dagarna (@@trial_hours@@ timmar) efter att du sparat din första sökning körs Free dygnet runt med notiser, som ett betalt abonnemang. Hittar sökningen inget under den tiden får du @@trial_ext_days@@ dagar till, en gång.',
 }
 
 
@@ -147,7 +147,7 @@ WAY_CELLS = {
     'SNYPD': dict(
         get={'pl': 'Każde nowe ogłoszenie z wklejonego linku wyszukiwania Vinted, ze wszystkimi filtrami', 'sv': 'Varje ny annons för söklänken från Vinted som du klistrar in, med alla filter'},
         how={'pl': 'Push na telefon i komputer, bez sklepu z aplikacjami', 'sv': 'Push till mobil och dator, ingen appbutik'},
-        cost={'pl': 'Za darmo: 1 wyszukiwanie, 7 dni 24/7; płatnie od @@price:solo@@ / mies.', 'sv': 'Gratis: 1 sökning, dygnet runt i 7 dagar; betalt från @@price:solo@@ / mån.'}),
+        cost={'pl': 'Za darmo: 1 wyszukiwanie, @@trial_days@@ dni 24/7; płatnie od @@price:solo@@ / mies.', 'sv': 'Gratis: 1 sökning, dygnet runt i @@trial_days@@ dagar; betalt från @@price:solo@@ / mån.'}),
 }
 
 PUSH = {
@@ -195,11 +195,11 @@ NOTIFY = {
         alerts_intro='Resellerzy tracą najlepsze okazje zwykle między dwoma spojrzeniami na licznik. Narzędzie do alertów sprawdza wyszukiwanie za ciebie i daje znać, gdy tylko pojawi się coś nowego i pasującego. W SNYPD to to samo wyszukiwanie, które masz na Vinted:',
         steps=['Otwórz wyszukiwanie na Vinted w przeglądarce, z filtrami (marka, rozmiar, cena, stan).', 'Skopiuj adres z paska przeglądarki. Zawiera <code>/catalog?</code>.',
                'Wklej go do SNYPD i włącz wyszukiwanie.', 'SNYPD sprawdza je mniej więcej co 30 sekund i wysyła push na telefon albo komputer, gdy tylko pojawi się nowe pasujące ogłoszenie. Powiadomienie otwiera ogłoszenie na Vinted.'],
-        after='SNYPD nigdy nie prosi o hasło do Vinted, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy sprawdza jedno wyszukiwanie: przez pierwsze 7 dni 24/7, potem gdy masz otwarty panel; plany płatne od @@price:solo@@ miesięcznie sprawdzają 24/7. Więcej: <a href="{bot}">SNYPD, bot Vinted do powiadomień</a>.',
+        after='SNYPD nigdy nie prosi o hasło do Vinted, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy sprawdza jedno wyszukiwanie: przez pierwsze @@trial_days@@ dni 24/7, potem gdy masz otwarty panel; plany płatne od @@price:solo@@ miesięcznie sprawdzają 24/7. Więcej: <a href="{bot}">SNYPD, bot Vinted do powiadomień</a>.',
         faq=[('Czy Vinted powiadamia mnie o nowych przedmiotach z zapisanego wyszukiwania?',
               'Według pomocy Vinted nie przez push: widzisz licznik „+N” przy następnym otwarciu paska wyszukiwania. Vinted opisuje powiadomienia o obserwowanych użytkownikach, polubionych przedmiotach, wiadomościach i opiniach.'),
              ('Czy jest darmowy sposób?',
-              'Tak, z ograniczeniami. Według ich własnych stron, sprawdzonych {date}: SNYPD Free sprawdza 1 wyszukiwanie bez limitu czasu, przez pierwsze 7 dni 24/7, a potem gdy panel jest otwarty; Vinotify ma darmowy plan z 1 wyszukiwaniem sprawdzanym raz dziennie; Telvin Bot daje 1 alert na słowo kluczowe ze 100 powiadomieniami na Telegramie.'),
+              'Tak, z ograniczeniami. Według ich własnych stron, sprawdzonych {date}: SNYPD Free sprawdza 1 wyszukiwanie bez limitu czasu, przez pierwsze @@trial_days@@ dni 24/7, a potem gdy panel jest otwarty; Vinotify ma darmowy plan z 1 wyszukiwaniem sprawdzanym raz dziennie; Telvin Bot daje 1 alert na słowo kluczowe ze 100 powiadomieniami na Telegramie.'),
              ('Czy potrzebuję aplikacji ze sklepu?',
               'Do SNYPD nie: działa w przeglądarce i wysyła powiadomienia web. Na iPhonie dodajesz SNYPD raz do ekranu początkowego, bo tylko tak Apple pozwala na powiadomienia web.'),
              ('Dlaczego nie dostaję powiadomień z Vinted?',
@@ -225,11 +225,11 @@ NOTIFY = {
         alerts_intro='Den som säljer vidare missar oftast de bästa fynden mellan två kontroller av räknaren. Ett bevakningsverktyg kontrollerar sökningen åt dig och säger till så fort något nytt matchar. Med SNYPD är det samma sökning som du har på Vinted:',
         steps=['Öppna sökningen på Vinted i webbläsaren, med dina filter (märke, storlek, pris, skick).', 'Kopiera adressen i adressfältet. Den innehåller <code>/catalog?</code>.',
                'Klistra in den i SNYPD och slå på sökningen.', 'SNYPD kontrollerar den ungefär var 30:e sekund och skickar en push till mobilen eller datorn så fort en ny annons matchar. Notisen öppnar annonsen på Vinted.'],
-        after='SNYPD frågar aldrig efter ditt Vinted-lösenord, köper ingenting och skriver inte till säljare. Gratisplanen kontrollerar en sökning: dygnet runt de första 7 dagarna, sedan medan din panel är öppen; betalda abonnemang från @@price:solo@@ i månaden kontrollerar dygnet runt. Mer: <a href="{bot}">SNYPD, Vinted boten för bevakning</a>.',
+        after='SNYPD frågar aldrig efter ditt Vinted-lösenord, köper ingenting och skriver inte till säljare. Gratisplanen kontrollerar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan medan din panel är öppen; betalda abonnemang från @@price:solo@@ i månaden kontrollerar dygnet runt. Mer: <a href="{bot}">SNYPD, Vinted boten för bevakning</a>.',
         faq=[('Meddelar Vinted mig om nya artiklar i en sparad sökning?',
               'Enligt Vinteds hjälp inte med en push: du ser en räknare ”+N” nästa gång du öppnar sökfältet. Vinted beskriver notiser för medlemmar du följer, favoritmarkerade artiklar, meddelanden och omdömen.'),
              ('Finns det ett gratis sätt?',
-              'Ja, med begränsningar. Enligt deras egna webbplatser, kontrollerade {date}: SNYPD Free kontrollerar 1 sökning utan tidsgräns, dygnet runt de första 7 dagarna och sedan medan panelen är öppen; Vinotify har en gratisplan med 1 sökning som kontrolleras en gång om dagen; Telvin Bot ger 1 sökordsbevakning med 100 notiser i Telegram.'),
+              'Ja, med begränsningar. Enligt deras egna webbplatser, kontrollerade {date}: SNYPD Free kontrollerar 1 sökning utan tidsgräns, dygnet runt de första @@trial_days@@ dagarna och sedan medan panelen är öppen; Vinotify har en gratisplan med 1 sökning som kontrolleras en gång om dagen; Telvin Bot ger 1 sökordsbevakning med 100 notiser i Telegram.'),
              ('Behöver jag en app från appbutiken?',
               'Inte för SNYPD: det fungerar i webbläsaren och skickar webbnotiser. På iPhone lägger du till SNYPD på hemskärmen en gång, eftersom Apple bara tillåter webbnotiser så.'),
              ('Varför får jag inga notiser från Vinted?',
@@ -255,7 +255,7 @@ def _bot_copy(lang):
         body = f"""
 <section id="podsumowanie">
   <h2>SNYPD w jednym akapicie</h2>
-  <div class="lg-box lg-mint"><p>SNYPD to bot Vinted do powiadomień, nazywany też monitorem Vinted, dla resellerów. Wklejasz link do wyszukiwania na Vinted ze swoimi filtrami (marka, rozmiar, cena, stan), a SNYPD sprawdza to wyszukiwanie mniej więcej co 30 sekund. Gdy pojawi się nowe pasujące ogłoszenie, trafia do twojego panelu, a ty dostajesz powiadomienie push na telefon albo komputer. SNYPD nigdy nie prosi o hasło do Vinted, nigdy nie loguje się na twoje konto, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy obsługuje jedno wyszukiwanie: 24/7 przez pierwsze 7 dni, potem tak długo, jak masz otwarty panel. Plany płatne, od @@price:solo@@ miesięcznie, pilnują 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD to bot Vinted do powiadomień, nazywany też monitorem Vinted, dla resellerów. Wklejasz link do wyszukiwania na Vinted ze swoimi filtrami (marka, rozmiar, cena, stan), a SNYPD sprawdza to wyszukiwanie mniej więcej co 30 sekund. Gdy pojawi się nowe pasujące ogłoszenie, trafia do twojego panelu, a ty dostajesz powiadomienie push na telefon albo komputer. SNYPD nigdy nie prosi o hasło do Vinted, nigdy nie loguje się na twoje konto, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy obsługuje jedno wyszukiwanie: 24/7 przez pierwsze @@trial_days@@ dni, potem tak długo, jak masz otwarty panel. Plany płatne, od @@price:solo@@ miesięcznie, pilnują 24/7.</p></div>
 </section>
 <section id="rodzaje">
   <h2>Trzy rodzaje botów Vinted</h2>
@@ -325,7 +325,7 @@ def _bot_copy(lang):
     body = f"""
 <section id="sammanfattning">
   <h2>SNYPD i ett stycke</h2>
-  <div class="lg-box lg-mint"><p>SNYPD är en Vinted bot för bevakning, även kallad Vinted monitor, för dig som köper för att sälja vidare. Du klistrar in en söklänk från Vinted med dina filter (märke, storlek, pris, skick) och SNYPD kontrollerar sökningen ungefär var 30:e sekund. När en ny annons matchar dyker den upp i din panel och du får en pushnotis i mobilen eller datorn. SNYPD frågar aldrig efter ditt Vinted-lösenord, loggar aldrig in på ditt konto, köper ingenting och skriver inte till säljare. Gratisplanen bevakar en sökning: dygnet runt de första 7 dagarna, sedan så länge din panel är öppen. Betalda abonnemang, från @@price:solo@@ i månaden, bevakar dygnet runt.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD är en Vinted bot för bevakning, även kallad Vinted monitor, för dig som köper för att sälja vidare. Du klistrar in en söklänk från Vinted med dina filter (märke, storlek, pris, skick) och SNYPD kontrollerar sökningen ungefär var 30:e sekund. När en ny annons matchar dyker den upp i din panel och du får en pushnotis i mobilen eller datorn. SNYPD frågar aldrig efter ditt Vinted-lösenord, loggar aldrig in på ditt konto, köper ingenting och skriver inte till säljare. Gratisplanen bevakar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan så länge din panel är öppen. Betalda abonnemang, från @@price:solo@@ i månaden, bevakar dygnet runt.</p></div>
 </section>
 <section id="typer">
   <h2>Tre sorters Vinted botar</h2>

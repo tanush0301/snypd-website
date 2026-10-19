@@ -37,7 +37,12 @@
         localStorage.removeItem('snypd_plan_intent');
         if (plan) {
           localStorage.setItem('snypd_plan_intent_done', u.id);
-          location.replace('/plans?checkout=' + plan);
+          /* Conversion plan Phase 0.7 (19 Oct 2026): a brand-new account used to
+             land in checkout before its first hunt, so the trial never started.
+             The main script now sends an account that already has a hunt
+             straight to checkout, and shows everyone else the plan in the
+             banner once their first hunt is saved. */
+          localStorage.setItem('snypd_checkout_after_hunt', JSON.stringify({ plan: plan, ts: Date.now() }));
         }
         return true;
       };
@@ -1184,6 +1189,8 @@ body {
 }
 .elite-banner__title { font-size: 15px; color: var(--text-primary); margin-bottom: 4px; }
 .elite-banner__text { font-size: 11.5px; color: var(--text-muted); }
+/* What the user's own hunt caught (migration 061 my_trial_stats): the reason to keep it running. */
+.elite-banner__value { font-size: 13px; color: var(--text-primary); margin-top: 6px; }
 .email-optin__actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* Offline / can't-reach-backend state - amber per Ledger 2e: this is a
@@ -1939,6 +1946,7 @@ body {
   <div>
     <div class="elite-banner__title">Paid plans hunt while you're away</div>
     <div class="elite-banner__text">Free only checks while this tab is open. Paid plans keep hunting 24/7, tab closed or not.</div>
+    <div class="elite-banner__value" id="trial-value" style="display:none"></div>
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
 </div>
@@ -2454,7 +2462,7 @@ const HEARTBEAT_URL = (() => {
   let me = boot
     ? { data: boot.data.profile || null, error: null }
     : await sb.from('users')
-      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at')
+      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at, trial_ends_at, trial_extended_at')
       .eq('id', uid)
       .maybeSingle();
   if (me.error) {
@@ -2509,14 +2517,32 @@ const HEARTBEAT_URL = (() => {
   const eliteBanner = document.getElementById('elite-banner');
   // All paid plans run 24/7 (PAID_PLANS-gated), so this is a Free-only nudge.
   if (eliteBanner) eliteBanner.style.display = (effectivePlan === 'free') ? '' : 'none';
-  // Free 24/7 trial (migration 042: 7 days from the first saved search). During
-  // it, "Free only checks while this tab is open" would be false.
+  // Trial end (migration 061, 20 Oct 2026): users.trial_ends_at. New trials are
+  // 72 h (+48 h once if the hunt found nothing); every trial that started
+  // before 061 is start + 7 days, which is also the fallback when the column
+  // is empty. The backend (helpers.in_free_trial) reads the same column.
+  function trialEndMs(p) {
+    const e = Date.parse((p && p.trial_ends_at) || '');
+    if (Number.isFinite(e)) return e;
+    const s = Date.parse((p && p.free_trial_started_at) || '');
+    return Number.isFinite(s) ? s + 7 * 864e5 : NaN;
+  }
+  function trialLeftTitle(ms) {
+    if (ms < 2 * 864e5) {
+      const h = Math.max(1, Math.ceil(ms / 36e5));
+      return 'Free 24/7 trial: ' + h + ' h left';
+    }
+    const d = Math.ceil(ms / 864e5);
+    return 'Free 24/7 trial: ' + d + (d === 1 ? ' day' : ' days') + ' left';
+  }
+  const uiFr = () => !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
+  // Free 24/7 trial. During it, "Free only checks while this tab is open" would be false.
   if (eliteBanner && effectivePlan === 'free' && profile.free_trial_started_at) {
-    const trialLeft = Math.ceil((Date.parse(profile.free_trial_started_at) + 7 * 864e5 - Date.now()) / 864e5);
+    const trialLeftMs = trialEndMs(profile) - Date.now();
     const tTitle = eliteBanner.querySelector('.elite-banner__title');
     const tText = eliteBanner.querySelector('.elite-banner__text');
-    if (trialLeft > 0 && tTitle && tText) {
-      tTitle.textContent = 'Free 24/7 trial: ' + trialLeft + (trialLeft === 1 ? ' day' : ' days') + ' left';
+    if (trialLeftMs > 0 && tTitle && tText) {
+      tTitle.textContent = trialLeftTitle(trialLeftMs);
       tText.textContent = 'Your hunt keeps running with this tab closed until then. After that, Free only checks while this tab is open; paid plans keep hunting 24/7.';
     }
     // Trial ended (18 Oct 2026): for 72 h after the end, half price on the first
@@ -2524,8 +2550,13 @@ const HEARTBEAT_URL = (() => {
     // Whop; /plans?promo= pre-fills it) and Solo as the cheaper way to stay 24/7.
     // Same window as the trial_ended email (ops/trial_email.py on the VPS).
     // Totals checked in Whop's checkout on 18 Oct: 7.49 and 12.49.
-    const trialEnd = Date.parse(profile.free_trial_started_at) + 7 * 864e5;
+    const trialEnd = trialEndMs(profile);
     const offerEnd = trialEnd + 3 * 864e5;
+    // After the 72 h offer: say plainly that the hunt is paused in the background.
+    if (Date.now() >= offerEnd && tTitle && tText) {
+      tTitle.textContent = 'Your hunt is paused in the background';
+      tText.textContent = 'Free only checks while this tab is open. Solo keeps one search running 24/7 for \u20ac5.99/month.';
+    }
     if (Date.now() >= trialEnd && Date.now() < offerEnd && tTitle && tText) {
       const fr = !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
       let until = '';
@@ -2538,6 +2569,127 @@ const HEARTBEAT_URL = (() => {
       if (offerBtn) offerBtn.href = '/plans?promo=SNYPD50';
     }
   }
+
+  // What this account's hunt caught (migration 061 my_trial_stats): during the
+  // trial, after it, and while the hunt is paused (ops/paused_counter.py counts,
+  // it never stores listings). One small RPC after the page is up; on any error
+  // the banner simply stays as it is.
+  async function paintTrialValue() {
+    const el = document.getElementById('trial-value');
+    if (!el || !eliteBanner || effectivePlan !== 'free' || !profile.free_trial_started_at) return;
+    let st = null;
+    try {
+      const r = await sb.rpc('my_trial_stats');
+      if (!r.error) st = r.data;
+    } catch (e) { console.error('SNYPD: my_trial_stats failed', e); }
+    if (!st || !st.trial_started_at) return;
+    const fr = uiFr();
+    const nf = new Intl.NumberFormat(fr ? 'fr-FR' : 'en-GB');
+    const day = (iso) => {
+      try { return new Intl.DateTimeFormat(fr ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(iso)); }
+      catch (e) { return new Date(iso).toDateString(); }
+    };
+    const end = Date.parse(st.trial_ends_at), start = Date.parse(st.trial_started_at);
+    const legacy = end - start >= 6 * 864e5;
+    const found = Number(st.found_trial) || 0;
+    let line = '';
+    if (Date.now() < end) {
+      if (st.extended) line = 'We added 2 days because your hunt found nothing in 3 days. Widen it: fewer filters or a higher max price.';
+      // French short dates end in a period ("dim. 18 oct."): don't add a second one.
+      else if (found === 1) line = 'Your hunt has matched 1 new listing since ' + day(st.counted_since).replace(/\.$/, '') + '.';
+      else if (found > 1) line = 'Your hunt has matched ' + nf.format(found) + ' new listings since ' + day(st.counted_since).replace(/\.$/, '') + '.';
+      else line = legacy
+        ? 'Your hunt has not matched a new listing yet. A wider search (fewer filters, a higher max price) finds more.'
+        : 'Your hunt has not matched a new listing yet. If it finds nothing in 3 days, we add 2 more days, once.';
+    } else {
+      const p = st.paused;
+      const n = p ? Number(p.new_count) || 0 : 0;
+      if (n > 0) {
+        line = nf.format(n) + (p.capped ? '+' : '') + ' new listings matched your hunt since your trial ended, while it was paused.';
+        const c = p.cheapest;
+        const amount = c && Number(c.price);
+        if (Number.isFinite(amount) && amount >= 0) {
+          let price = '';
+          try { price = new Intl.NumberFormat(fr ? 'fr-FR' : 'en-GB', { style: 'currency', currency: c.currency || 'EUR' }).format(amount); }
+          catch (e) { price = amount + ' ' + (c.currency || ''); }
+          line += ' Cheapest: ' + price + '.';
+        }
+      } else if (found > 1) {
+        line = 'During your trial, your hunt matched ' + nf.format(found) + ' new listings.';
+      }
+    }
+    if (line && !window.SNYPD_ACTIVATING) { el.textContent = line; el.style.display = ''; }
+  }
+  paintTrialValue().catch(console.error);
+
+  // Plan chosen at sign-up (head script, Phase 0.7): an account that already has
+  // a hunt goes to checkout now, as before; a new one sees the plan here once
+  // its first hunt is saved, so the trial starts first.
+  (async function planAfterHunt() {
+    let intent = null;
+    try { intent = JSON.parse(localStorage.getItem('snypd_checkout_after_hunt') || 'null'); } catch (e) {}
+    const PLAN_NAMES = { solo: 'Solo', kickstart: 'Kickstart', pro: 'Pro', elite: 'Elite' };
+    // Never re-open checkout for someone just back from paying (?activated, webhook may still be on its way).
+    if (!intent || !PLAN_NAMES[intent.plan] || Date.now() - (intent.ts || 0) > 7 * 864e5 || effectivePlan !== 'free'
+        || new URLSearchParams(location.search).has('activated')) {
+      localStorage.removeItem('snypd_checkout_after_hunt');
+      return;
+    }
+    const huntCount = async () => {
+      const b = boot && boot.data && Array.isArray(boot.data.searches) ? boot.data.searches.length : null;
+      if (b) return b;
+      const r = await sb.from('user_searches').select('id', { count: 'exact', head: true }).eq('user_id', uid);
+      return r.error ? 0 : (r.count || 0);
+    };
+    const go = () => { localStorage.removeItem('snypd_checkout_after_hunt'); location.replace('/plans?checkout=' + intent.plan); };
+    if (await huntCount() > 0) { go(); return; }
+    window.addEventListener('snypd:hunts-changed', function paint() {
+      window.removeEventListener('snypd:hunts-changed', paint);
+      if (!eliteBanner || window.SNYPD_ACTIVATING) return;
+      window.SNYPD_PLAN_PROMPT = true;  // the trial-note refresh after this save must not overwrite it
+      const t = eliteBanner.querySelector('.elite-banner__title');
+      const x = eliteBanner.querySelector('.elite-banner__text');
+      const a = eliteBanner.querySelector('a.btn');
+      if (t) t.textContent = 'Your hunt is live. Keep it running after the trial';
+      if (x) x.textContent = 'You picked ' + PLAN_NAMES[intent.plan] + ' at sign-up. Start it now and your hunt keeps running 24/7 when the trial ends.';
+      if (a) {
+        a.textContent = 'Start ' + PLAN_NAMES[intent.plan];
+        a.href = '/plans?checkout=' + intent.plan;
+        a.addEventListener('click', () => localStorage.removeItem('snypd_checkout_after_hunt'));
+      }
+      eliteBanner.style.display = '';
+    });
+  })().catch(console.error);
+
+  // Back from a Whop checkout (/plans sends ?activated=<plan>). The webhook can
+  // land a few seconds after the redirect: say so, and re-read the plan instead
+  // of showing "Plan: FREE" to someone who just paid.
+  (function activationWatch() {
+    const q = new URLSearchParams(location.search);
+    if (!q.has('activated') || effectivePlan !== 'free' || !eliteBanner) return;
+    window.SNYPD_ACTIVATING = true;  // the trial note/value painters below leave the banner alone
+    const t = eliteBanner.querySelector('.elite-banner__title');
+    const x = eliteBanner.querySelector('.elite-banner__text');
+    const a = eliteBanner.querySelector('a.btn');
+    const v = document.getElementById('trial-value');
+    if (v) v.style.display = 'none';
+    if (a) a.style.display = 'none';
+    if (t) t.textContent = 'Activating your plan...';
+    if (x) x.textContent = 'Payment received. Your plan usually switches on within a minute; this page checks every 5 seconds.';
+    eliteBanner.style.display = '';
+    const started = Date.now();
+    const timer = setInterval(async () => {
+      const r = await sb.from('users').select('subscription_plan, sub_status').eq('id', uid).maybeSingle();
+      const plan = r.data && String(r.data.subscription_plan || '').toLowerCase();
+      if (plan && plan !== 'free' && ACTIVE_STATUSES.has(String(r.data.sub_status || '').toLowerCase())) {
+        clearInterval(timer);
+        location.replace('/dashboard');
+      } else if (Date.now() - started > 120000) {
+        clearInterval(timer);
+        if (x) x.textContent = 'Still waiting for Whop. Check that you paid with your SNYPD account email. If your plan is not on within 15 minutes, use the Support page and we will link it by hand.';
+      }
+    }, 5000);
+  })();
 
   // Topbar founding badge: mirrors the Profile panel's own badge (below),
   // but populated here unconditionally on load rather than only when the
@@ -2853,6 +3005,9 @@ const HEARTBEAT_URL = (() => {
         listEl.innerHTML = '<div class="fs-row" style="border-left-color:transparent"><span class="fs-row__name" style="color:var(--text-muted)">No hunts yet. Add one below.</span></div>';
         return;
       }
+      // After the trial a Free hunt only runs while this tab is open (backend
+      // helpers.in_free_trial); "LIVE" would say it is still watched in the background.
+      const tabOnly = effectivePlan === 'free' && !(trialEndMs(profile) > Date.now());
       listEl.innerHTML = rows.map(r => {
         const live = r.is_active === true;
         return `
@@ -2861,7 +3016,7 @@ const HEARTBEAT_URL = (() => {
               <span class="fs-row__name" data-i18n-skip>${escFs(r.search_name || nameFromUrl(r.vinted_url))}</span>
               <span class="fs-row__status">
                 <span class="fs-row__dot"></span>
-                <span class="fs-row__status-text">${live ? 'LIVE' : 'PAUSED'}</span>
+                <span class="fs-row__status-text">${live ? (tabOnly ? 'LIVE WHILE OPEN' : 'LIVE') : 'PAUSED'}</span>
               </span>
             </div>
             <div class="fs-row__url">${escFs(shortUrl(r.vinted_url))}</div>
@@ -3162,24 +3317,24 @@ const HEARTBEAT_URL = (() => {
       function paintTrialNote() {
         if (!trialNote || effectivePlan !== 'free') return;
         const start = Date.parse(profile.free_trial_started_at || '');
-        const left = Number.isFinite(start) && start <= Date.now()
-          ? Math.ceil((start + 7 * 864e5 - Date.now()) / 864e5) : 0;
+        const leftMs = Number.isFinite(start) && start <= Date.now() ? trialEndMs(profile) - Date.now() : 0;
+        const left = leftMs > 0 ? leftMs : 0;
         trialNote.textContent = left > 0
           ? 'Your Free trial runs 24/7. Enable alerts on this device to receive matching listings. After the trial, Free checks while your dashboard is open.'
           : hasSavedHunt
             ? 'Free plan: SNYPD checks only while it is open on this device. Paid plans run 24/7.'
-            : 'Your seven-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.';
+            : 'Your 3-day background-monitoring trial starts when you save your first hunt. Alerts must be enabled on this device.';
         trialNote.style.display = 'block';
-        if (left > 0 && eliteBanner) {
+        if (left > 0 && eliteBanner && !window.SNYPD_ACTIVATING && !window.SNYPD_PLAN_PROMPT) {
           const title = eliteBanner.querySelector('.elite-banner__title');
           const text = eliteBanner.querySelector('.elite-banner__text');
-          if (title) title.textContent = 'Free 24/7 trial: ' + left + (left === 1 ? ' day' : ' days') + ' left';
+          if (title) title.textContent = trialLeftTitle(left);
           if (text) text.textContent = 'Your hunt keeps running with this tab closed until then. After that, Free only checks while this tab is open; paid plans keep hunting 24/7.';
         }
       }
       async function refreshTrialNote() {
         if (effectivePlan !== 'free') return;
-        const result = await sb.from('users').select('free_trial_started_at').eq('id', uid).maybeSingle();
+        const result = await sb.from('users').select('free_trial_started_at, trial_ends_at, trial_extended_at').eq('id', uid).maybeSingle();
         if (result.error || !result.data) {
           if (trialNote) {
             trialNote.textContent = 'Could not check your trial status. Your hunt is saved; try again shortly.';
@@ -3188,7 +3343,10 @@ const HEARTBEAT_URL = (() => {
           return;
         }
         profile.free_trial_started_at = result.data.free_trial_started_at;
+        profile.trial_ends_at = result.data.trial_ends_at;
+        profile.trial_extended_at = result.data.trial_extended_at;
         paintTrialNote();
+        paintTrialValue().catch(console.error);
       }
       paintTrialNote();
 

@@ -93,14 +93,16 @@ VINTED_LAG = {
     'it': 'Questa è la frequenza con cui SNYPD controlla, non il tempo che un annuncio impiega a raggiungerti: Vinted stesso mostra un nuovo annuncio nella sua ricerca qualche minuto dopo la pubblicazione, per qualsiasi strumento.',
     'es': 'Es la frecuencia con la que SNYPD mira, no lo que tarda un artículo en llegarte: el propio Vinted muestra un anuncio nuevo en su búsqueda unos minutos después de publicarse, para cualquier herramienta.',
 }
-# Free 24/7 trial (migration 042, backend FREE_TRIAL_DAYS=7, since 7 Oct 2026).
+# Free 24/7 trial (migration 042, since 7 Oct 2026; 3 days = 72 h + one 2-day extension when the hunt found
+# nothing, for trials from 20 Oct 2026, owner-approved 19 Oct 2026; earlier trials keep 7 days, said only in /terms).
+# Numbers are plans.py tokens. These sentences are the detailed explanation (bot page FAQ "Is there a free plan?").
 TRIAL = {
-    'en': 'For the first @@trial_days@@ days after you save your first search, Free runs 24/7 with alerts, like a paid plan.',
-    'fr': 'Pendant les @@trial_days@@ premiers jours après ta première recherche enregistrée, Free tourne 24h/24 avec les alertes, comme un plan payant.',
-    'de': 'In den ersten @@trial_days@@ Tagen nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif.',
-    'nl': 'De eerste @@trial_days@@ dagen nadat je je eerste zoekopdracht opslaat, draait Free 24/7 met meldingen, net als een betaald abonnement.',
-    'it': 'Per i primi @@trial_days@@ giorni dopo aver salvato la tua prima ricerca, Free funziona 24 ore su 24 con le notifiche, come un piano a pagamento.',
-    'es': 'Durante los @@trial_days@@ primeros días después de guardar tu primera búsqueda, Free funciona 24/7 con notificaciones, como un plan de pago.',
+    'en': 'For the first @@trial_days@@ days (@@trial_hours@@ h) after you save your first search, Free runs 24/7 with alerts, like a paid plan. If it finds nothing in that time, we add @@trial_ext_days@@ more days once.',
+    'fr': 'Pendant les @@trial_days@@ premiers jours (@@trial_hours@@\xa0h) après ta première recherche enregistrée, Free tourne 24h/24 avec les alertes, comme un plan payant. Si ta recherche ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois.',
+    'de': 'In den ersten @@trial_days@@ Tagen (@@trial_hours@@ Stunden) nach deiner ersten gespeicherten Suche läuft Free rund um die Uhr mit Benachrichtigungen, wie ein bezahlter Tarif. Findet deine Suche in dieser Zeit nichts, geben wir einmalig @@trial_ext_days@@ Tage dazu.',
+    'nl': 'De eerste @@trial_days@@ dagen (@@trial_hours@@ uur) nadat je je eerste zoekopdracht opslaat, draait Free 24/7 met meldingen, net als een betaald abonnement. Vindt je zoekopdracht in die tijd niets, dan krijg je er eenmalig @@trial_ext_days@@ dagen bij.',
+    'it': 'Per i primi @@trial_days@@ giorni (@@trial_hours@@ ore) dopo aver salvato la tua prima ricerca, Free funziona 24 ore su 24 con le notifiche, come un piano a pagamento. Se in quel periodo la ricerca non trova nulla, aggiungiamo @@trial_ext_days@@ giorni, una sola volta.',
+    'es': 'Durante los @@trial_days@@ primeros días (@@trial_hours@@ horas) después de guardar tu primera búsqueda, Free funciona 24/7 con notificaciones, como un plan de pago. Si en ese tiempo tu búsqueda no encuentra nada, añadimos @@trial_ext_days@@ días más, una sola vez.',
 }
 
 # slug per language; the key is the page id
@@ -463,35 +465,35 @@ def cta(lang):
     if lang in cps.CTA:
         return cps.CTA[lang]
     if lang == 'it':
-        return ('<div class="lg-box lg-mint"><p><strong>Inizia gratis con una ricerca.</strong> Nessuna carta, nessun limite di tempo, nessun limite di notifiche. I primi 7 giorni funziona 24 ore su 24 con le notifiche. '
+        return ('<div class="lg-box lg-mint"><p><strong>Inizia gratis con una ricerca.</strong> Nessuna carta, nessun limite di tempo, nessun limite di notifiche. I primi @@trial_days@@ giorni funziona 24 ore su 24 con le notifiche. '
                 'Passa a un piano a pagamento quando vuoi che la ricerca continui anche con la dashboard chiusa.</p>'
                 '<p class="ct-note">Per ora registrazione e pagamento sono in inglese.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">INIZIA GRATIS</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">VEDI I PIANI</a></div></div>')
     if lang == 'es':
-        return ('<div class="lg-box lg-mint"><p><strong>Empieza gratis con una búsqueda.</strong> Sin tarjeta, sin límite de tiempo, sin límite de notificaciones. Los primeros 7 días funciona 24/7 con notificaciones. '
+        return ('<div class="lg-box lg-mint"><p><strong>Empieza gratis con una búsqueda.</strong> Sin tarjeta, sin límite de tiempo, sin límite de notificaciones. Los primeros @@trial_days@@ días funciona 24/7 con notificaciones. '
                 'Pásate a un plan de pago cuando quieras que la búsqueda siga funcionando con el panel cerrado.</p>'
                 '<p class="ct-note">De momento, el registro y el pago están en inglés.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">EMPEZAR GRATIS</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">VER PLANES</a></div></div>')
     if lang == 'de':
-        return ('<div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten 7 Tage laufen rund um die Uhr mit Benachrichtigungen. '
+        return ('<div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten @@trial_days@@ Tage laufen rund um die Uhr mit Benachrichtigungen. '
                 'Wechsle zu einem bezahlten Tarif, wenn deine Suche auch bei geschlossenem Dashboard weiterlaufen soll.</p>'
                 '<p class="ct-note">Anmeldung und Bezahlung sind vorerst auf Englisch.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">KOSTENLOS STARTEN</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">TARIFE ANSEHEN</a></div></div>')
     if lang == 'nl':
-        return ('<div class="lg-box lg-mint"><p><strong>Begin gratis met één zoekopdracht.</strong> Geen kaart, geen tijdslimiet, geen limiet op meldingen. De eerste 7 dagen draaien 24/7 met meldingen. '
+        return ('<div class="lg-box lg-mint"><p><strong>Begin gratis met één zoekopdracht.</strong> Geen kaart, geen tijdslimiet, geen limiet op meldingen. De eerste @@trial_days@@ dagen draaien 24/7 met meldingen. '
                 'Stap over op een betaald abonnement als je zoekopdracht ook met gesloten dashboard moet blijven lopen.</p>'
                 '<p class="ct-note">Registreren en betalen gaan voorlopig in het Engels.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">GRATIS BEGINNEN</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">ABONNEMENTEN BEKIJKEN</a></div></div>')
     if lang == 'en':
-        return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. The first 7 days run 24/7 with alerts. '
+        return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. The first @@trial_days@@ days run 24/7 with alerts. '
                 'Upgrade when you want it to keep watching with your dashboard closed.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">START FREE</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>')
-    return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les 7 premiers jours tournent 24h/24 avec les alertes. '
+    return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les @@trial_days@@ premiers jours tournent 24h/24 avec les alertes. '
             'Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p>'
             '<p class="ct-note">Inscription et paiement en français.</p>'
             '<div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a>'
@@ -552,7 +554,7 @@ def page_bot_de():
     body = f"""
 <section id="kurz">
   <h2>SNYPD in einem Absatz</h2>
-  <div class="lg-box lg-mint"><p>SNYPD ist ein Vinted Bot für Benachrichtigungen, auch Vinted-Monitor genannt, für Reseller. Du fügst einen Vinted-Suchlink mit deinen Filtern ein (Marke, Größe, Preis, Zustand), und SNYPD prüft diese Suche etwa alle 30 Sekunden. Sobald eine neue Anzeige passt, erscheint sie in deinem Dashboard und du bekommst eine Push-Benachrichtigung auf Handy oder Computer. SNYPD fragt nie nach deinem Vinted-Passwort, meldet sich nie in deinem Konto an, kauft nichts und schreibt keinen Verkäufern. Der kostenlose Tarif lässt eine Suche laufen: in den ersten 7 Tagen rund um die Uhr, danach solange dein Dashboard geöffnet ist. Bezahlte Tarife ab @@price:solo@@ im Monat überwachen rund um die Uhr.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD ist ein Vinted Bot für Benachrichtigungen, auch Vinted-Monitor genannt, für Reseller. Du fügst einen Vinted-Suchlink mit deinen Filtern ein (Marke, Größe, Preis, Zustand), und SNYPD prüft diese Suche etwa alle 30 Sekunden. Sobald eine neue Anzeige passt, erscheint sie in deinem Dashboard und du bekommst eine Push-Benachrichtigung auf Handy oder Computer. SNYPD fragt nie nach deinem Vinted-Passwort, meldet sich nie in deinem Konto an, kauft nichts und schreibt keinen Verkäufern. Der kostenlose Tarif lässt eine Suche laufen: in den ersten @@trial_days@@ Tagen rund um die Uhr, danach solange dein Dashboard geöffnet ist. Bezahlte Tarife ab @@price:solo@@ im Monat überwachen rund um die Uhr.</p></div>
 </section>
 <section id="arten">
   <h2>Die drei Arten von Vinted Bots</h2>
@@ -624,7 +626,7 @@ def page_bot_nl():
     body = f"""
 <section id="samenvatting">
   <h2>SNYPD in één alinea</h2>
-  <div class="lg-box lg-mint"><p>SNYPD is een Vinted bot voor meldingen, ook wel Vinted monitor genoemd, voor resellers. Je plakt een Vinted-zoeklink met je filters (merk, maat, prijs, staat) en SNYPD controleert die zoekopdracht ongeveer elke 30 seconden. Zodra een nieuwe advertentie past, verschijnt die in je dashboard en krijg je een pushmelding op je telefoon of computer. SNYPD vraagt nooit om je Vinted-wachtwoord, logt nooit in op je account, koopt niets en stuurt geen berichten naar verkopers. Het gratis abonnement laat één zoekopdracht lopen: de eerste 7 dagen 24/7, daarna zolang je dashboard open staat. Betaalde abonnementen vanaf @@price:solo@@ per maand houden 24/7 de wacht.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD is een Vinted bot voor meldingen, ook wel Vinted monitor genoemd, voor resellers. Je plakt een Vinted-zoeklink met je filters (merk, maat, prijs, staat) en SNYPD controleert die zoekopdracht ongeveer elke 30 seconden. Zodra een nieuwe advertentie past, verschijnt die in je dashboard en krijg je een pushmelding op je telefoon of computer. SNYPD vraagt nooit om je Vinted-wachtwoord, logt nooit in op je account, koopt niets en stuurt geen berichten naar verkopers. Het gratis abonnement laat één zoekopdracht lopen: de eerste @@trial_days@@ dagen 24/7, daarna zolang je dashboard open staat. Betaalde abonnementen vanaf @@price:solo@@ per maand houden 24/7 de wacht.</p></div>
 </section>
 <section id="soorten">
   <h2>De drie soorten Vinted bots</h2>
@@ -696,7 +698,7 @@ def page_bot_it():
     body = f"""
 <section id="breve">
   <h2>SNYPD in un paragrafo</h2>
-  <div class="lg-box lg-mint"><p>SNYPD è un bot Vinted per le notifiche, chiamato anche monitor Vinted, pensato per i reseller. Incolli un link di ricerca Vinted con i tuoi filtri (marca, taglia, prezzo, condizioni) e SNYPD controlla quella ricerca circa ogni 30 secondi. Appena un nuovo annuncio corrisponde, compare nella tua dashboard e ricevi una notifica push sul telefono o sul computer. SNYPD non chiede mai la tua password di Vinted, non accede mai al tuo account, non compra nulla e non scrive ai venditori. Il piano gratuito tiene attiva una ricerca: 24 ore su 24 nei primi 7 giorni, poi finché la dashboard è aperta. I piani a pagamento, da @@price:solo@@ al mese, controllano 24 ore su 24.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD è un bot Vinted per le notifiche, chiamato anche monitor Vinted, pensato per i reseller. Incolli un link di ricerca Vinted con i tuoi filtri (marca, taglia, prezzo, condizioni) e SNYPD controlla quella ricerca circa ogni 30 secondi. Appena un nuovo annuncio corrisponde, compare nella tua dashboard e ricevi una notifica push sul telefono o sul computer. SNYPD non chiede mai la tua password di Vinted, non accede mai al tuo account, non compra nulla e non scrive ai venditori. Il piano gratuito tiene attiva una ricerca: 24 ore su 24 nei primi @@trial_days@@ giorni, poi finché la dashboard è aperta. I piani a pagamento, da @@price:solo@@ al mese, controllano 24 ore su 24.</p></div>
 </section>
 <section id="tipi">
   <h2>I tre tipi di bot Vinted</h2>
@@ -768,7 +770,7 @@ def page_bot_es():
     body = f"""
 <section id="resumen">
   <h2>SNYPD en un párrafo</h2>
-  <div class="lg-box lg-mint"><p>SNYPD es un bot de Vinted para notificaciones, también llamado monitor de Vinted, pensado para revendedores. Pegas un enlace de búsqueda de Vinted con tus filtros (marca, talla, precio, estado) y SNYPD comprueba esa búsqueda más o menos cada 30 segundos. En cuanto un anuncio nuevo coincide, aparece en tu panel y recibes una notificación push en el móvil o el ordenador. SNYPD nunca pide tu contraseña de Vinted, nunca inicia sesión en tu cuenta, no compra nada y no escribe a los vendedores. El plan gratuito mantiene una búsqueda activa: 24/7 durante los primeros 7 días y, después, mientras tu panel esté abierto. Los planes de pago, desde @@price:solo@@ al mes, vigilan 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD es un bot de Vinted para notificaciones, también llamado monitor de Vinted, pensado para revendedores. Pegas un enlace de búsqueda de Vinted con tus filtros (marca, talla, precio, estado) y SNYPD comprueba esa búsqueda más o menos cada 30 segundos. En cuanto un anuncio nuevo coincide, aparece en tu panel y recibes una notificación push en el móvil o el ordenador. SNYPD nunca pide tu contraseña de Vinted, nunca inicia sesión en tu cuenta, no compra nada y no escribe a los vendedores. El plan gratuito mantiene una búsqueda activa: 24/7 durante los primeros @@trial_days@@ días y, después, mientras tu panel esté abierto. Los planes de pago, desde @@price:solo@@ al mes, vigilan 24/7.</p></div>
 </section>
 <section id="tipos">
   <h2>Los tres tipos de bots de Vinted</h2>
@@ -852,7 +854,7 @@ def page_bot(lang):
         body = f"""
 <section id="answer">
   <h2>SNYPD in one paragraph</h2>
-  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search about every 30 seconds. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search, 24/7 for the first 7 days and then while your dashboard is open; paid plans from @@price:solo@@ a month keep watching 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search about every 30 seconds. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search, 24/7 for the first @@trial_days@@ days and then while your dashboard is open; paid plans from @@price:solo@@ a month keep watching 24/7.</p></div>
 </section>
 <section id="kinds">
   <h2>The three kinds of Vinted bot</h2>
@@ -921,7 +923,7 @@ def page_bot(lang):
     body = f"""
 <section id="resume">
   <h2>SNYPD en un paragraphe</h2>
-  <div class="lg-box lg-mint"><p>SNYPD est un bot d’alertes Vinted pour les revendeurs. Tu colles le lien d’une recherche Vinted avec tes filtres (marque, taille, prix, état) et SNYPD vérifie cette recherche environ toutes les 30 secondes. Quand une nouvelle annonce correspond, elle apparaît dans ton tableau de bord et tu reçois une notification push sur ton téléphone ou ton ordinateur. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’envoie aucun message aux vendeurs. Le plan gratuit fait tourner une recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, surveillent 24h/24.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD est un bot d’alertes Vinted pour les revendeurs. Tu colles le lien d’une recherche Vinted avec tes filtres (marque, taille, prix, état) et SNYPD vérifie cette recherche environ toutes les 30 secondes. Quand une nouvelle annonce correspond, elle apparaît dans ton tableau de bord et tu reçois une notification push sur ton téléphone ou ton ordinateur. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’envoie aucun message aux vendeurs. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, surveillent 24h/24.</p></div>
 </section>
 <section id="types">
   <h2>Les trois types de bot Vinted</h2>
@@ -1020,7 +1022,7 @@ def page_notify(lang):
     <li>Paste it into SNYPD and switch it on.</li>
     <li>SNYPD checks it about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. The alert opens the listing on Vinted.</li>
   </ol>
-  <p>SNYPD never asks for your Vinted login. The free plan runs one search: 24/7 for the first 7 days, then while your dashboard is open; paid plans from @@price:solo@@ a month keep checking 24/7. More on how it works: <a href="{SLUGS['bot']['en']}">SNYPD, the Vinted alert bot</a>.</p>
+  <p>SNYPD never asks for your Vinted login. The free plan runs one search: 24/7 for the first @@trial_days@@ days, then while your dashboard is open; paid plans from @@price:solo@@ a month keep checking 24/7. More on how it works: <a href="{SLUGS['bot']['en']}">SNYPD, the Vinted alert bot</a>.</p>
   {figure('feed', 'en')}
 </section>
 {push_setup('en')}
@@ -1070,7 +1072,7 @@ def page_notify(lang):
     <li>Colle-la dans SNYPD et active-la.</li>
     <li>SNYPD la vérifie environ toutes les 30 secondes et envoie une notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li>
   </ol>
-  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>.</p>
+  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>.</p>
   {figure('feed', 'fr')}
 </section>
 {push_setup('fr')}
@@ -1331,7 +1333,7 @@ COMPARE_FAQ = {
         ('Can a Vinted bot get my account banned?',
          'Vinted&rsquo;s terms prohibit bots and scraping programs, so no tool can promise there is no risk. V-Tools&rsquo; own FAQ says: &ldquo;No tool can guarantee zero risk.&rdquo; What differs is what happens on your account: autobuy tools act through your logged-in Vinted account, while SNYPD never signs in as you, so nothing it does happens on your account.'),
         ('Is there a free Vinted bot?',
-         'Yes, with limits. According to each tool&rsquo;s own site, checked on %s: SNYPD Free runs 1 search with no time limit, 24/7 for the first 7 days and then while your dashboard is open; Vinotify&rsquo;s free plan checks 1 search once a day; Telvin&rsquo;s free plan covers 1 keyword alert and 100 notifications; Crazed is free with 3 alerts and 30 items a day; MarktAlert&rsquo;s free plan has 2 alerts checked every 15 minutes; DealFindr&rsquo;s has 3 searches checked hourly, with alerts 30 minutes late. InstantAlert, Monitorius and CopMarket offer short trials. Open-source scripts such as Vinted Scanner are free if you run them yourself.' % COMPARE_CHECKED['en']),
+         'Yes, with limits. According to each tool&rsquo;s own site, checked on %s: SNYPD Free runs 1 search with no time limit, 24/7 for the first @@trial_days@@ days and then while your dashboard is open; Vinotify&rsquo;s free plan checks 1 search once a day; Telvin&rsquo;s free plan covers 1 keyword alert and 100 notifications; Crazed is free with 3 alerts and 30 items a day; MarktAlert&rsquo;s free plan has 2 alerts checked every 15 minutes; DealFindr&rsquo;s has 3 searches checked hourly, with alerts 30 minutes late. InstantAlert, Monitorius and CopMarket offer short trials. Open-source scripts such as Vinted Scanner are free if you run them yourself.' % COMPARE_CHECKED['en']),
         ('Which Vinted bot is the fastest?',
          'There is no fair way to say. Each vendor measures its own speed in its own way (see <a href="#speed">what about speed?</a>). SNYPD checks each search about every 30 seconds on every plan, and keeps paid searches running 24/7. ' + SPEED_MEASURED['en'] + ''),
     ],
@@ -1343,7 +1345,7 @@ COMPARE_FAQ = {
         ('Un bot Vinted peut-il faire bannir mon compte\xa0?',
          'Les conditions de Vinted interdisent les bots et les programmes de scraping, donc aucun outil ne peut promettre zéro risque. La FAQ de V-Tools le dit elle-même\xa0: «\xa0No tool can guarantee zero risk\xa0». Ce qui change, c’est ce qui se passe sur ton compte\xa0: les outils d’achat automatique agissent via ton compte Vinted connecté, alors que SNYPD ne se connecte jamais à ta place, donc rien de ce qu’il fait ne se passe sur ton compte.'),
         ('Existe-t-il un bot Vinted gratuit\xa0?',
-         'Oui, avec des limites. D’après le site de chaque outil, vérifié le %s\xa0: SNYPD Free fait tourner 1 recherche sans limite de durée, 24h/24 pendant les 7 premiers jours puis tant que ton tableau de bord est ouvert\xa0; le plan gratuit de Vinotify vérifie 1 recherche une fois par jour\xa0; celui de Telvin couvre 1 alerte mot-clé et 100 notifications\xa0; Crazed est gratuit avec 3 alertes et 30 articles par jour\xa0; le plan gratuit de MarktAlert a 2 alertes vérifiées toutes les 15 minutes\xa0; celui de DealFindr 3 recherches vérifiées toutes les heures, avec 30 minutes de retard. InstantAlert, Monitorius et CopMarket proposent des essais courts. Les scripts open source comme Vinted Scanner sont gratuits si tu les fais tourner toi-même.' % COMPARE_CHECKED['fr']),
+         'Oui, avec des limites. D’après le site de chaque outil, vérifié le %s\xa0: SNYPD Free fait tourner 1 recherche sans limite de durée, 24h/24 pendant les @@trial_days@@ premiers jours puis tant que ton tableau de bord est ouvert\xa0; le plan gratuit de Vinotify vérifie 1 recherche une fois par jour\xa0; celui de Telvin couvre 1 alerte mot-clé et 100 notifications\xa0; Crazed est gratuit avec 3 alertes et 30 articles par jour\xa0; le plan gratuit de MarktAlert a 2 alertes vérifiées toutes les 15 minutes\xa0; celui de DealFindr 3 recherches vérifiées toutes les heures, avec 30 minutes de retard. InstantAlert, Monitorius et CopMarket proposent des essais courts. Les scripts open source comme Vinted Scanner sont gratuits si tu les fais tourner toi-même.' % COMPARE_CHECKED['fr']),
         ('Quel est le bot Vinted le plus rapide\xa0?',
          'Impossible de le dire honnêtement. Chaque éditeur mesure sa vitesse à sa façon (voir <a href="#vitesse">et la vitesse\xa0?</a>). SNYPD vérifie chaque recherche environ toutes les 30 secondes sur tous les plans, et les recherches payantes tournent 24h/24. ' + SPEED_MEASURED['fr'] + ''),
     ],
@@ -1480,7 +1482,7 @@ def page_monitor(lang):
             ('What is the difference between a Vinted monitor and a Vinted bot?',
              '&ldquo;Vinted bot&rdquo; is the wider word: it covers monitors, autobuy bots and seller tools. A monitor is the kind that only watches searches and alerts you. Resellers often use the two words for the same thing, which is why most monitors also call themselves bots.'),
             ('Is there a free Vinted monitor?',
-             'Yes, with limits. SNYPD Free runs one search with no time limit: 24/7 for the first 7 days, then while your dashboard is open. Other tools list free plans too; their limits are side by side in <a href="%s">Vinted bots compared</a>.' % SLUGS['compare']['en']),
+             'Yes, with limits. SNYPD Free runs one search with no time limit: 24/7 for the first @@trial_days@@ days, then while your dashboard is open. Other tools list free plans too; their limits are side by side in <a href="%s">Vinted bots compared</a>.' % SLUGS['compare']['en']),
             ('How fast is a Vinted monitor?',
              'It depends on how often the tool checks. SNYPD checks each search about every 30 seconds on every plan. ' + SPEED_MEASURED['en'] + ' Some vendors advertise milliseconds; those are their own figures, measured their own way.'),
             ('Do I need Discord or Telegram?',
@@ -1531,7 +1533,7 @@ def page_monitor(lang):
   <ul class="fit-list">
     <li><strong>Does it ask for your Vinted login?</strong>A monitor only reads search results, so it has no reason to. Tools that buy for you do need it.</li>
     <li><strong>Does it keep every filter?</strong>Pasting a Vinted search link keeps all of them: brand, size, price, condition, colour, material. A tool&rsquo;s own form may offer fewer.</li>
-    <li><strong>Does it keep watching when you are not there?</strong>On SNYPD&rsquo;s free plan, a search runs 24/7 for the first 7 days, then while your dashboard is open; paid plans keep it running 24/7.</li>
+    <li><strong>Does it keep watching when you are not there?</strong>On SNYPD&rsquo;s free plan, a search runs 24/7 for the first @@trial_days@@ days, then while your dashboard is open; paid plans keep it running 24/7.</li>
     <li><strong>Does it cover your Vinted country?</strong>Each Vinted site has its own listings and currency.</li>
     <li><strong>Can you test it before paying?</strong>Look for a free plan or a refund you can actually use after trying it.</li>
   </ul>
@@ -1565,7 +1567,7 @@ def page_monitor(lang):
         ('Quelle différence entre un monitor Vinted et un bot Vinted ?',
          '« Bot Vinted » est le mot le plus large : il couvre les monitors, les bots d’achat automatique et les outils pour vendeurs. Un monitor est le type qui surveille seulement des recherches et t’alerte. Les revendeurs emploient souvent les deux mots pour la même chose, c’est pourquoi la plupart des monitors se présentent aussi comme des bots.'),
         ('Existe-t-il un monitor Vinted gratuit ?',
-         'Oui, avec des limites. SNYPD Free fait tourner une recherche sans limite de durée, 24h/24 pendant les 7 premiers jours puis tant que ton tableau de bord est ouvert. D’autres outils proposent aussi un plan gratuit ; leurs limites sont côte à côte dans le <a href="%s">comparatif des bots Vinted</a>.' % SLUGS['compare']['fr']),
+         'Oui, avec des limites. SNYPD Free fait tourner une recherche sans limite de durée, 24h/24 pendant les @@trial_days@@ premiers jours puis tant que ton tableau de bord est ouvert. D’autres outils proposent aussi un plan gratuit ; leurs limites sont côte à côte dans le <a href="%s">comparatif des bots Vinted</a>.' % SLUGS['compare']['fr']),
         ('Un monitor Vinted, c’est rapide ?',
          'Ça dépend de la fréquence de vérification de l’outil. SNYPD vérifie chaque recherche environ toutes les 30 secondes, sur tous les plans. ' + SPEED_MEASURED['fr'] + ' Certains éditeurs annoncent des millisecondes ; ce sont leurs propres chiffres, mesurés à leur façon.'),
         ('Faut-il Discord ou Telegram ?',
@@ -1616,7 +1618,7 @@ def page_monitor(lang):
   <ul class="fit-list">
     <li><strong>Il demande tes identifiants Vinted ?</strong>Un monitor lit seulement des résultats de recherche, il n’en a donc pas besoin. Les outils qui achètent à ta place, si.</li>
     <li><strong>Il garde tous tes filtres ?</strong>Coller un lien de recherche Vinted les garde tous : marque, taille, prix, état, couleur, matière. Le formulaire d’un outil peut en proposer moins.</li>
-    <li><strong>Il continue quand tu n’es pas là ?</strong>Avec le plan gratuit de SNYPD, une recherche tourne 24h/24 pendant les 7 premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants la font tourner 24h/24.</li>
+    <li><strong>Il continue quand tu n’es pas là ?</strong>Avec le plan gratuit de SNYPD, une recherche tourne 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants la font tourner 24h/24.</li>
     <li><strong>Il couvre ton pays Vinted ?</strong>Chaque site Vinted a ses propres annonces et sa devise.</li>
     <li><strong>Tu peux l’essayer avant de payer ?</strong>Cherche un plan gratuit ou un remboursement utilisable après l’avoir essayé.</li>
   </ul>
@@ -1788,7 +1790,7 @@ def page_deals(lang, steals=None):
 <section id="first">
   <h2>3. Be first: get alerted, don&rsquo;t refresh</h2>
   <p>Everyone watching the same search can see a new listing the moment it appears, so the first to notice it gets the first chance. Vinted&rsquo;s saved searches show a &ldquo;+N&rdquo; counter the next time you open the app; they do not send a notification for each new match (<a href="{SLUGS['notify']['en']}">how Vinted notifications work</a>). To hear about a new match while you are doing something else, you need a tool that watches the search for you.</p>
-  <p>SNYPD checks each search about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. The free plan runs one search, 24/7 for the first 7 days and then while your dashboard is open; paid plans from @@price:solo@@ a month keep watching 24/7.</p>
+  <p>SNYPD checks each search about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. The free plan runs one search, 24/7 for the first @@trial_days@@ days and then while your dashboard is open; paid plans from @@price:solo@@ a month keep watching 24/7.</p>
   {figure('feed', 'en')}
 </section>
 <section id="check">
@@ -2098,7 +2100,7 @@ NOTWORK = {
         faq=[('Why doesn&rsquo;t Vinted notify me about my saved search?', 'Because Vinted&rsquo;s saved searches only show a counter (a number with a plus) in the search bar the next time you open it. New listings in a saved search are not among the push notifications Vinted lists in its help centre.'),
              ('Does Vinted send push notifications for new items?', 'Only for members you follow: when someone you follow lists a new item. Not for new listings that match a saved search.'),
              ('How do I turn Vinted notifications back on?', 'In the app: profile, Settings, Push notifications. Then check your phone&rsquo;s settings for Vinted and the daily limit under Other notifications.'),
-             ('How do I get notified when a new item is listed on Vinted?', 'Use a tool that watches the search for you. SNYPD checks a Vinted search about every 30 seconds and sends a push for each new match; the first search is free, 24/7 for the first 7 days.')]),
+             ('How do I get notified when a new item is listed on Vinted?', 'Use a tool that watches the search for you. SNYPD checks a Vinted search about every 30 seconds and sends a push for each new match; the first search is free, 24/7 for the first @@trial_days@@ days.')]),
     'fr': dict(
         title='Notifications Vinted qui ne marchent pas : pourquoi, et la solution | SNYPD',
         desc='Les recherches sauvegardées Vinted n’envoient pas de notification pour chaque nouvelle annonce : Vinted affiche seulement un compteur « + ». Ce que Vinted notifie, les réglages à vérifier, et comment être alerté à chaque annonce.',
@@ -2123,7 +2125,7 @@ NOTWORK = {
         faq=[('Pourquoi Vinted ne me prévient pas pour ma recherche sauvegardée ?', 'Parce que les recherches sauvegardées de Vinted affichent seulement un compteur (un nombre suivi d’un plus) dans la barre de recherche la prochaine fois que tu l’ouvres. Les nouvelles annonces d’une recherche sauvegardée ne figurent pas parmi les notifications push listées dans le centre d’aide de Vinted.'),
              ('Vinted envoie-t-il des notifications pour les nouveaux articles ?', 'Seulement pour les membres que tu suis : quand un membre que tu suis met en ligne un article. Pas pour les nouvelles annonces qui correspondent à une recherche sauvegardée.'),
              ('Comment réactiver les notifications Vinted ?', 'Dans l’app : profil, Paramètres, Notifications (Mobile). Vérifie ensuite les réglages de ton téléphone pour Vinted et la limite quotidienne dans Notifications secondaires.'),
-             ('Comment être prévenu dès qu’un article est mis en ligne sur Vinted ?', 'Avec un outil qui surveille la recherche pour toi. SNYPD vérifie une recherche Vinted environ toutes les 30 secondes et envoie une notification push pour chaque nouvelle annonce ; la première recherche est gratuite, 24h/24 pendant les 7 premiers jours.')]),
+             ('Comment être prévenu dès qu’un article est mis en ligne sur Vinted ?', 'Avec un outil qui surveille la recherche pour toi. SNYPD vérifie une recherche Vinted environ toutes les 30 secondes et envoie une notification push pour chaque nouvelle annonce ; la première recherche est gratuite, 24h/24 pendant les @@trial_days@@ premiers jours.')]),
     'de': dict(
         title='Vinted-Benachrichtigung funktioniert nicht? Der Grund und die Lösung | SNYPD',
         desc='Gespeicherte Suchen bei Vinted schicken keine Push-Benachrichtigung für jede neue Anzeige: Vinted zeigt nur einen „+“-Zähler in der Suche. Wofür Vinted benachrichtigt, welche Einstellungen du prüfen solltest und wie du bei jeder neuen Anzeige Bescheid bekommst.',
@@ -2148,7 +2150,7 @@ NOTWORK = {
         faq=[('Warum benachrichtigt mich Vinted nicht über meine gespeicherte Suche?', 'Weil gespeicherte Suchen bei Vinted nur einen Zähler (eine Zahl mit Pluszeichen) im Suchfeld zeigen, wenn du es das nächste Mal öffnest. Neue Anzeigen in einer gespeicherten Suche gehören nicht zu den Push-Benachrichtigungen, die Vinted in seinem Hilfe-Center aufzählt.'),
              ('Schickt Vinted Benachrichtigungen für neue Artikel?', 'Nur für Mitglieder, denen du folgst: wenn jemand, dem du folgst, einen neuen Artikel hochlädt. Nicht für neue Anzeigen, die zu einer gespeicherten Suche passen.'),
              ('Wie schalte ich Vinted-Benachrichtigungen wieder ein?', 'In der App: Mein Profil, Meine Einstellungen, Push-Benachrichtigungen. Prüfe danach die Handy-Einstellungen für Vinted und das Tageslimit unter Andere Benachrichtigungen.'),
-             ('Wie werde ich benachrichtigt, wenn ein neuer Artikel bei Vinted eingestellt wird?', 'Mit einem Tool, das die Suche für dich beobachtet. SNYPD prüft eine Vinted-Suche etwa alle 30 Sekunden und schickt für jeden neuen Treffer eine Push-Benachrichtigung; die erste Suche ist kostenlos, in den ersten 7 Tagen rund um die Uhr.')]),
+             ('Wie werde ich benachrichtigt, wenn ein neuer Artikel bei Vinted eingestellt wird?', 'Mit einem Tool, das die Suche für dich beobachtet. SNYPD prüft eine Vinted-Suche etwa alle 30 Sekunden und schickt für jeden neuen Treffer eine Push-Benachrichtigung; die erste Suche ist kostenlos, in den ersten @@trial_days@@ Tagen rund um die Uhr.')]),
     'nl': dict(
         title='Vinted-meldingen werken niet? Waarom, en de oplossing | SNYPD',
         desc='Bewaarde zoekopdrachten op Vinted sturen geen pushmelding voor elke nieuwe advertentie: Vinted toont alleen een "+"-teller in de zoekbalk. Waarvoor Vinted wel meldingen stuurt, welke instellingen je checkt en hoe je bij elke nieuwe advertentie een melding krijgt.',
@@ -2173,7 +2175,7 @@ NOTWORK = {
         faq=[('Waarom krijg ik geen melding van Vinted voor mijn bewaarde zoekopdracht?', 'Omdat bewaarde zoekopdrachten op Vinted alleen een teller (een getal met een plusteken) in de zoekbalk tonen als je die de volgende keer opent. Nieuwe advertenties in een bewaarde zoekopdracht horen niet bij de pushmeldingen die Vinted in zijn helpcentrum noemt.'),
              ('Stuurt Vinted meldingen voor nieuwe artikelen?', 'Alleen voor leden die je volgt: als iemand die je volgt een nieuw artikel uploadt. Niet voor nieuwe advertenties die bij een bewaarde zoekopdracht passen.'),
              ('Hoe zet ik Vinted-meldingen weer aan?', 'In de app: profiel, Mijn instellingen, Pushmeldingen. Check daarna de instellingen van je telefoon voor Vinted en de daglimiet onder Minder belangrijke notificaties.'),
-             ('Hoe krijg ik een melding als er een nieuw artikel op Vinted komt?', 'Met een tool die de zoekopdracht voor je in de gaten houdt. SNYPD controleert een Vinted-zoekopdracht ongeveer elke 30 seconden en stuurt voor elke nieuwe treffer een pushmelding; de eerste zoekopdracht is gratis, de eerste 7 dagen 24/7.')]),
+             ('Hoe krijg ik een melding als er een nieuw artikel op Vinted komt?', 'Met een tool die de zoekopdracht voor je in de gaten houdt. SNYPD controleert een Vinted-zoekopdracht ongeveer elke 30 seconden en stuurt voor elke nieuwe treffer een pushmelding; de eerste zoekopdracht is gratis, de eerste @@trial_days@@ dagen 24/7.')]),
     'it': dict(
         title='Notifiche Vinted che non funzionano? Il motivo e la soluzione | SNYPD',
         desc='Le ricerche salvate su Vinted non inviano una notifica per ogni nuovo annuncio: Vinted mostra solo un contatore "+" nella barra di ricerca. Per cosa Vinted invia notifiche, le impostazioni da controllare e come ricevere un avviso per ogni nuovo annuncio.',
@@ -2198,7 +2200,7 @@ NOTWORK = {
         faq=[('Perché Vinted non mi avvisa per la mia ricerca salvata?', 'Perché le ricerche salvate di Vinted mostrano solo un contatore (un numero con il segno più) nella barra di ricerca la volta successiva che la apri. I nuovi annunci di una ricerca salvata non sono tra le notifiche push elencate nel centro assistenza di Vinted.'),
              ('Vinted invia notifiche per i nuovi articoli?', 'Solo per gli utenti che segui: quando qualcuno che segui carica un nuovo articolo. Non per i nuovi annunci che corrispondono a una ricerca salvata.'),
              ('Come riattivo le notifiche di Vinted?', 'Nell&rsquo;app: profilo, Impostazioni, Notifiche push. Poi controlla le impostazioni del telefono per Vinted e il limite giornaliero in Altre notifiche.'),
-             ('Come ricevo un avviso quando viene pubblicato un nuovo articolo su Vinted?', 'Con uno strumento che controlla la ricerca per te. SNYPD controlla una ricerca Vinted circa ogni 30 secondi e invia una notifica push per ogni nuovo annuncio; la prima ricerca è gratis, 24 ore su 24 per i primi 7 giorni.')]),
+             ('Come ricevo un avviso quando viene pubblicato un nuovo articolo su Vinted?', 'Con uno strumento che controlla la ricerca per te. SNYPD controlla una ricerca Vinted circa ogni 30 secondi e invia una notifica push per ogni nuovo annuncio; la prima ricerca è gratis, 24 ore su 24 per i primi @@trial_days@@ giorni.')]),
     'es': dict(
         title='¿Las notificaciones de Vinted no funcionan? Por qué, y la solución | SNYPD',
         desc='Las búsquedas guardadas de Vinted no envían una notificación por cada anuncio nuevo: Vinted solo muestra un contador "+" en la barra de búsqueda. Para qué envía notificaciones Vinted, qué ajustes revisar y cómo recibir un aviso con cada anuncio nuevo.',

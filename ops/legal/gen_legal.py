@@ -288,8 +288,12 @@ if LIVE:
         'Terms of service', 'The agreement between you and SNYPD when you create an account or buy a plan.',
         TERMS_TOC, terms_body(EMAIL, DISCORD))
 
+sys.path.insert(0, os.path.join(REPO, 'ops', 'seo'))
+import plans  # noqa: E402  (fills the @@trial_days@@-style tokens in the terms from ops/seo/data/plans.json)
+
 for name, html in files.items():
     assert '{' not in html.split('<style>')[0], name
+    html = plans.fill(html, 'en')
     with open(os.path.join(REPO, name), 'w', encoding='utf-8', newline='\n') as f:
         f.write(html)
     print('wrote', name, len(html.encode('utf-8')), 'bytes')

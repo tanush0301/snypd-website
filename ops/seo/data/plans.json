@@ -1,6 +1,6 @@
 {
-  "_about": "Single source of truth for plan facts on every public page (read by ops/seo/plans.py). Change a fact here, then run python ops/seo/prepublish.py, which regenerates the marked regions of index.html and plans.html and fails on any page that disagrees. Sources: plan_limit_for() (migration 030; any paid plan other than kickstart/pro/elite gets 1, which is Solo), PAID_PLANS / ELITE_PLANS and FREE_TRIAL_DAYS=7 in the backend, migration 042, Whop plans, outreach/00-fact-sheet.md. Check speed comes from check-interval.json, not from here.",
-  "checked": "2026-10-18",
+  "_about": "Single source of truth for plan facts on every public page (read by ops/seo/plans.py). Change a fact here, then run python ops/seo/prepublish.py, which regenerates the marked regions of index.html and plans.html and fails on any page that disagrees. Sources: plan_limit_for() (migration 030; any paid plan other than kickstart/pro/elite gets 1, which is Solo), PAID_PLANS / ELITE_PLANS and the Free trial length in the backend (migration 042; 3 days = 72 h for trials that start on or after 20 Oct 2026, owner-approved 19 Oct 2026, plus one 2-day extension when the first hunt found nothing; trials started before 20 Oct 2026 keep 7 days and that is stated only in /terms), Whop plans, outreach/00-fact-sheet.md. Check speed comes from check-interval.json, not from here.",
+  "checked": "2026-10-19",
   "currency": "EUR",
   "vat_included": true,
   "billing": "monthly",
@@ -12,7 +12,9 @@
     {"key": "elite", "name": "Elite", "price": "34.99", "searches": 10, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true}
   ],
   "free_trial": {
-    "days": 7,
+    "days": 3,
+    "hours": 72,
+    "extension": {"days": 2, "when": "the hunt found nothing in the first 3 days", "once": true},
     "starts": "first saved search",
     "during": "24/7 with push alerts, like a paid plan",
     "after": "checked only while the dashboard is open",
