@@ -663,7 +663,7 @@
   // ops/seo/data/plans.json (passes) through gen_regions. A placeholder id
   // (plan_PENDING_...) counts as "no live checkout" here, and check_site.py
   // refuses a release while it is there.
-  var WHOP_PLANS = { solo: 'plan_zYBunt6RBlsUg', kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG', /*plans:plans-whop-pass*/pass: 'plan_PENDING_PASS'/*/plans:plans-whop-pass*/ };
+  var WHOP_PLANS = { solo: 'plan_zYBunt6RBlsUg', kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG', /*plans:plans-whop-pass*/pass: 'plan_zLbAN08OXSJYo'/*/plans:plans-whop-pass*/ };
   Object.keys(WHOP_PLANS).forEach(function (k) { if (/^plan_PENDING/.test(WHOP_PLANS[k] || '')) WHOP_PLANS[k] = null; });
   var PLANS = ['free', 'solo', 'kickstart', 'pro', 'elite'];
   var ALL = PLANS.concat(['pass']);
