@@ -151,7 +151,8 @@ def faqs():
         ('Is there a free trial?', 'Yes. Free runs your first search 24/7 with alerts for %d days (%d h), counted from when you save it, with no card. If it finds nothing in that time, we add %d more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.' % (d, h, x)),
         ('Does the price include VAT?', 'Yes. %s, %s, %s and %s a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.' % (so, k, pr, el)),
         ('How do I pay?', 'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.'),
-        ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account.'),
+        ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after %d days.' % plans.PASS_DAYS),
+        ('Can I pay once, without a subscription?', pass_faq()),
         ('What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'),
         ('Can I get a refund?', 'Yes. Email snypd@gmail.com within %d days of your first payment for a plan and we refund that payment in full.' % r),
         ('Can I change plan later?', 'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email snypd@gmail.com and we will help you switch.'),
@@ -159,6 +160,23 @@ def faqs():
          % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False))),
         ('Do you need my Vinted login?', 'Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.'),
     ]
+
+
+def pass_faq():
+    hp = plans.PASSES['pass']
+    return ('Yes: the Hunt Pass. One payment of %s, VAT included, and 1 Vinted search is watched 24/7 with push alerts for %d days, '
+            'like Solo. Then it simply ends: no renewal, no subscription, nothing to cancel. It suits hunting one specific item, '
+            'like a console or a jacket in your size. Full refund within %d days of the payment. For ongoing hunting, Solo is %s a month.'
+            % (plans.price('pass', 'en', entities=False), hp['days'], plans.REFUND_DAYS, plans.price('solo', 'en', entities=False)))
+
+
+# ----------------------------------------------------------------- /plans Hunt Pass note under the table
+# The 5-column monthly table stays as it is; the one-time pass gets its own line right under it.
+def pass_cmp():
+    return ('<p class="cmp-pass"><span class="cmp-pass__h">%s</span> <span>%s</span></p>' % (
+        esc('HUNT PASS · %s ONCE' % plans.price('pass', 'en', entities=False)),
+        esc('Everything in the Solo column for %d days, paid once, VAT included. No renewal, nothing to cancel. '
+            'Full refund within %d days of the payment.' % (plans.PASSES['pass']['days'], plans.REFUND_DAYS))))
 
 
 def faq_html():
@@ -237,13 +255,14 @@ def home_foot_links():
 TEMPLATES = {
     'home-foot-links': home_foot_links,
     # shared
-    **{'price:%s' % k: '@@price:%s@@' % k for k in plans.ORDER},
+    **{'price:%s' % k: '@@price:%s@@' % k for k in list(plans.ORDER) + list(plans.PASSES)},
     **{'price-mo:%s' % k: '@@price:%s@@ / mo' % k for k in plans.ORDER},
     # index.html
     'home-pro-searches': '@@searches:pro@@ active Vinted searches',
     'home-pro-change': '@@searches:free@@ &rarr; @@searches:pro@@',
     'home-free-line': '@@searches:free@@ search &middot; 24/7 for @@trial_days@@ days, then while your dashboard is open &middot; free Discord',
     'home-solo-line': '@@searches:solo@@ search &middot; runs 24/7, even with your dashboard closed',
+    'home-pass-line': '@@searches:pass@@ search &middot; 24/7 for @@pass_days@@ days &middot; paid once, no subscription',
     'home-kickstart-line': '@@searches:kickstart@@ searches &middot; runs 24/7, even with your dashboard closed',
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
     'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). No card.',
@@ -263,13 +282,21 @@ TEMPLATES = {
     'plans-elite-searches': '@@searches:elite@@ active Vinted searches, not @@searches:pro@@',
     'plans-elite-per-search': per_search,
     'plans-pro-mr-day': 'Up to @@mr_day@@ price checks a day',
-    'plans-under': 'Paid plans renew every month until you cancel. Cancel any time. Full refund within @@refund_days@@ days of your first payment.',
+    'plans-under': 'Paid plans renew every month until you cancel. Cancel any time. Full refund within @@refund_days@@ days of your first payment. The Hunt Pass is paid once and does not renew.',
+    'plans-pass-for': 'One item to find? Pay once and hunt it for @@pass_days@@ days.',
+    'plans-pass-plus': 'Same as Solo, for @@pass_days@@ days:',
+    'plans-pass-end': 'Ends after @@pass_days@@ days: no renewal, nothing to cancel',
+    'plans-pass-cmp': pass_cmp,
+    'plans-fit-pass': 'One item, no subscription? Hunt Pass: @@price:pass@@ once, @@pass_days@@ days &rarr;',
     'plans-refund-h': '@@refund_days@@-DAY REFUND',
     'plans-refund-p': ' within @@refund_days@@ days of your first payment for a plan and we refund it in full.',
     'plans-cmp': cmp_html,
     'plans-faq': faq_html,
-    'plans-js': ("var PRICE = { " + ", ".join("%s: '@@price:%s@@'" % (k, k) for k in plans.ORDER) + " };\r\n"
-                 "  var SEARCHES = { " + ", ".join("%s: @@searches:%s@@" % (k, k) for k in plans.ORDER) + " };"),
+    'plans-js': ("var PRICE = { " + ", ".join("%s: '@@price:%s@@'" % (k, k) for k in list(plans.ORDER) + list(plans.PASSES)) + " };\r\n"
+                 "  var SEARCHES = { " + ", ".join("%s: @@searches:%s@@" % (k, k) for k in list(plans.ORDER) + list(plans.PASSES)) + " };\r\n"
+                 "  var PASS_DAYS = @@pass_days@@;"),
+    # inside WHOP_PLANS: the Hunt Pass's Whop plan id comes from plans.json, typed nowhere else
+    'plans-whop-pass': "pass: '@@whop:pass@@'",
 }
 FILES = ['index.html', 'plans.html']
 
@@ -288,7 +315,7 @@ def render(name, plain):
 
 def offers(ld):
     """Set every schema.org Offer's prices (price + priceSpecification) to plans.json."""
-    by_name = {p['name']: p['price'] for p in plans.DATA['plans']}
+    by_name = {p['name']: p['price'] for p in plans.DATA['plans'] + plans.DATA.get('passes', [])}
     parts = re.split(r'(?=\{ "@type": "Offer")', ld)
     for i, part in enumerate(parts):
         m = re.match(r'\{ "@type": "Offer", "name": "([^"]+)"', part)
@@ -299,7 +326,7 @@ def offers(ld):
 
 def meta_prices(content):
     """'Kickstart &#8364;14.99' style mentions in meta descriptions."""
-    for p in plans.DATA['plans']:
+    for p in plans.DATA['plans'] + plans.DATA.get('passes', []):
         if float(p['price']) > 0:
             content = re.sub(r'(\b%s (?:&#8364;|&euro;|€))[0-9.]+' % p['name'], lambda x: x.group(1) + p['price'], content)
     return content

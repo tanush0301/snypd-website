@@ -920,3 +920,65 @@ FR_PATTERNS += [
      'Tu as choisi $1 à l’inscription. Démarre-le maintenant et ta recherche reste active 24h/24 à la fin de l’essai.'),
     (r'^Start (Solo|Kickstart|Pro|Elite)$', 'Démarrer $1'),
 ]
+
+# ===== Phase 1 site (Hunt Pass, Solo offer)
+# /plans (20 Oct 2026): the Hunt Pass (FR name "Pass 30 jours", owner-approved), EUR 3.99 once, 1 search 24/7 for
+# 30 days, no renewal; the trial-ended code now also covers Solo. Texts with a price are PATTERNS (the price comes
+# from plans.json and money() turns "€3.99" into "3,99 €"); texts with 30 / 14 days are exact keys (re-check after a
+# change to plans.json passes[].days or refund.days).
+FR.update({
+    'Code applied at checkout for Solo, Kickstart and Pro:': 'Code appliqué au paiement pour Solo, Kickstart et Pro' + NB + ':',
+    'HUNT PASS': 'PASS 30 JOURS',
+    'PASS': 'PASS',
+    'NO SUBSCRIPTION': 'SANS ABONNEMENT',
+    'once': 'en une fois',
+    'VAT incl. · one-time payment · nothing to cancel': 'TVA incl. · paiement unique · rien à résilier',
+    'One item to find? Pay once and hunt it for 30 days.': 'Un seul article à trouver' + NB + '? Paie une fois et cherche-le pendant 30 jours.',
+    'Same as Solo, for 30 days:': 'Comme Solo, pendant 30 jours' + NB + ':',
+    'Ends after 30 days: no renewal, nothing to cancel': 'S’arrête après 30 jours' + NB + ': pas de renouvellement, rien à résilier',
+    'GET HUNT PASS': 'PRENDRE LE PASS 30 JOURS',
+    'INCLUDED IN YOUR PLAN': 'INCLUS DANS TON PLAN',
+    'HUNT PASS checkout': 'Paiement PASS 30 JOURS',
+    'Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment. The Hunt Pass is paid once and does not renew.':
+        'Les plans payants se renouvellent chaque mois jusqu’à ta résiliation. Résiliable à tout moment. Remboursement intégral dans les 14 jours suivant ton premier paiement. Le Pass 30 jours se paie une seule fois et ne se renouvelle pas.',
+    'Everything in the Solo column for 30 days, paid once, VAT included. No renewal, nothing to cancel. Full refund within 14 days of the payment.':
+        'Tout ce que contient la colonne Solo, pendant 30 jours, payé une seule fois, TVA incluse. Pas de renouvellement, rien à résilier. Remboursement intégral dans les 14 jours suivant le paiement.',
+    'Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after 30 days.':
+        'Oui, chaque mois, jusqu’à ta résiliation. Résilie à tout moment dans ton compte Whop. Seule exception' + NB + ': le Pass 30 jours se paie une seule fois et s’arrête après 30 jours.',
+    'Can I pay once, without a subscription?': 'Puis-je payer une seule fois, sans abonnement' + NB + '?',
+    'One payment. 1 search watched 24/7 for 30 days, then it ends: no renewal, nothing to cancel. Full refund within 14 days of the payment: email snypd@gmail.com.':
+        'Un seul paiement. 1 recherche surveillée 24h/24 pendant 30 jours, puis elle s’arrête' + NB + ': pas de renouvellement, rien à résilier. Remboursement intégral dans les 14 jours suivant le paiement' + NB + ': écris à snypd@gmail.com.',
+})
+FR_PATTERNS += [
+    (r'^One item, no subscription\? Hunt Pass: (€[\d.]+) once, (\d+) days →$',
+     'Un seul article, sans abonnement' + NB + '? Pass 30 jours' + NB + ': $1 en une fois, $2 jours →'),
+    (r'^HUNT PASS · (€[\d.]+) ONCE$', 'PASS 30 JOURS · $1 EN UNE FOIS'),
+    (r'^HUNT PASS · (€[\d.]+) ONCE INCL\. VAT$', 'PASS 30 JOURS · $1 EN UNE FOIS TTC'),
+    (r'^Yes: the Hunt Pass\. One payment of (€[\d.]+), VAT included, and 1 Vinted search is watched 24/7 with push alerts for (\d+) days, like Solo\. Then it simply ends: no renewal, no subscription, nothing to cancel\. It suits hunting one specific item, like a console or a jacket in your size\. Full refund within (\d+) days of the payment\. For ongoing hunting, Solo is (€[\d.]+) a month\.$',
+     'Oui' + NB + ': le Pass 30 jours. Un seul paiement de $1, TVA incluse, et 1 recherche Vinted est surveillée 24h/24 avec alertes push pendant $2 jours, comme avec Solo. '
+     'Ensuite, il s’arrête tout simplement' + NB + ': pas de renouvellement, pas d’abonnement, rien à résilier. Idéal pour chercher un article précis, comme une console ou une veste à ta taille. '
+     'Remboursement intégral dans les $3 jours suivant le paiement. Pour chercher en continu, Solo coûte $4 par mois.'),
+]
+
+# ===== Phase 1 dashboard (Hunt Pass holder, STAY50 offer incl. Solo, broad-hunt notice), 20 Oct 2026
+FR.update({
+    'Free only checks while this tab is open. Solo keeps one search running 24/7 for €5.99/month, or €3.99 once for a 30-day Hunt Pass.':
+        'Free ne vérifie que lorsque cet onglet est ouvert. Solo garde une recherche active 24h/24 pour 5,99' + NB + '€/mois, ou le Pass 30 jours pour 3,99' + NB + '€ en une fois.',
+    'After that your hunt only runs while this tab is open. Keep it 24/7: another 30-day pass for €3.99, or Solo at €5.99/month.':
+        'Ensuite, ta recherche ne tourne que lorsque cet onglet est ouvert. Garde-la 24h/24' + NB + ': un nouveau Pass 30 jours pour 3,99' + NB + '€, ou Solo à 5,99' + NB + '€/mois.',
+    'Renew': 'Renouveler',
+    'This hunt is very broad': 'Cette recherche est très large',
+    'Edit hunt': 'Modifier la recherche',
+    'Keep it': 'La garder',
+    'Plan: HUNT PASS': 'Plan' + NB + ': PASS 30 JOURS',
+    'Start Hunt Pass': 'Prendre le Pass 30 jours',
+})
+FR_PATTERNS += [
+    (r'^Until (.+): Solo €2\.99, Kickstart €7\.49 or Pro €12\.49 for the first month, code ([A-Z0-9]+) already applied\. Or a 30-day Hunt Pass, €3\.99 once\.$',
+     'Jusqu’au $1' + NB + ': Solo 2,99' + NB + '€, Kickstart 7,49' + NB + '€ ou Pro 12,49' + NB + '€ le premier mois, code $2 déjà appliqué. Ou le Pass 30 jours, 3,99' + NB + '€ en une fois.'),
+    (r'^Your Hunt Pass ends on (.+)$', 'Ton Pass 30 jours se termine le $1'),
+    (r'^About (\d+) new listings an hour match "(.+)": more than anyone can open, so alerts become noise\. On Vinted, add a size or a max price, copy the link and paste it into this hunt\.$',
+     'Environ $1 nouvelles annonces par heure correspondent à «' + NB + '$2' + NB + '»' + NB + ': plus que personne ne peut en ouvrir, et les alertes deviennent du bruit. Sur Vinted, ajoute une taille ou un prix max, copie le lien et colle-le dans cette recherche.'),
+    (r'^You picked Hunt Pass at sign-up\. Start it now and your hunt keeps running 24/7 when the trial ends\.$',
+     'Tu as choisi le Pass 30 jours à l’inscription. Prends-le maintenant et ta recherche reste active 24h/24 à la fin de l’essai.'),
+]

@@ -16,6 +16,8 @@ a crawler:
   6. internal links to pages that do not exist or that redirect (.html, trailing slash,
      vercel.json redirects, the apex domain)
   7. JSON-LD that does not parse
+  8. a page that offers the Hunt Pass checkout while plans.json still has the placeholder Whop
+     plan id (plan_PENDING_PASS): fill in the real id before release
 Warnings (W) are printed but do not fail. ops/ is in .vercelignore: never deploys.
 """
 import datetime, html, json, os, re, subprocess, sys
@@ -60,7 +62,7 @@ OLD_TRIAL = re.compile(r'(?i)\b(?:first|for) 7 days\b|\bseven[- ]day\b|\b7-day t
 # Old trial wording that another change owns (19 Oct 2026): reported as a warning, not an error, so this release
 # can go out. (file, exact text around the hit). Remove each line once that change lands.
 OLD_TRIAL_PENDING = []  # (file, context) pairs allowed to keep old trial wording for now; empty since 19 Oct 2026
-UNFILLED_TOKEN = re.compile(r'@@(?:price|num|searches):[a-z]+@@|@@(?:trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|founding_price)@@')
+UNFILLED_TOKEN = re.compile(r'@@(?:price|num|searches|whop):[a-z]+@@|@@(?:trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|founding_price|pass_days)@@')
 PLACEHOLDER_COUNTER = re.compile(r'id="(?:stat-listings|au-listings)"[^>]*>\s*(?:&mdash;|—|-)?\s*<')
 ASOF = re.compile(r'id="(?:stat-listings-asof|au-asof)"[^>]*>([^<]*)<')
 MONTHS = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'June': 6, 'July': 7, 'Aug': 8, 'Sept': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
@@ -100,7 +102,7 @@ ALLOW = [
 
 # 2. Price next to a plan name.
 EUR = r'(?:€\s?(\d+(?:[.,]\d{2})?)|(\d+(?:[.,]\d{2})?)\s?€)'
-PRICE_NEAR = re.compile(r'\b(Solo|SOLO|Kickstart|KICKSTART|Pro|PRO|Elite|ELITE)\b(?:\s?\(|[\s:,]| | (?:at|à|kostet|costs?|coûte|cuesta|costa|for|est|ist|is|plan,?|tarif|piano|abonnement)\b){0,4}\s*' + EUR)
+PRICE_NEAR = re.compile(r'\b(Solo|SOLO|Kickstart|KICKSTART|Pro|PRO|Elite|ELITE|Hunt Pass|HUNT PASS|Pass 30 jours|PASS 30 JOURS)\b(?:\s?\(|[\s:,]| | (?:at|à|kostet|costs?|coûte|cuesta|costa|for|est|ist|is|plan,?|tarif|piano|abonnement)\b){0,4}\s*' + EUR)
 
 
 def files():
@@ -137,7 +139,9 @@ def norm_price(s):
 def main():
     errors, warns = [], []
     pages = {rel: open(os.path.join(ROOT, rel), encoding='utf-8-sig').read() for rel in files()}
-    expected = {p['name'].lower(): p['price'] for p in plans.DATA['plans']}
+    expected = {p['name'].lower(): p['price'] for p in plans.DATA['plans'] + plans.DATA.get('passes', [])}
+    expected['pass 30 jours'] = plans.PASSES['pass']['price']  # the Hunt Pass's French name
+    pass_id = plans.PASSES['pass']['whop_plan_id']
     founding = plans.DATA['founding']['price']
     today = datetime.date.today()
 
@@ -155,6 +159,10 @@ def main():
                 + (' [owned by another change]' if pending else ''))
         for m in UNFILLED_TOKEN.finditer(src):
             errors.append(f'{rel}: unfilled plan token {m.group(0)} (the generator must call plans.fill)')
+        # 8. Hunt Pass checkout without a real Whop plan id
+        if plans.PASS_PENDING_ID in src or (pass_id == plans.PASS_PENDING_ID and 'data-cta="pass"' in src):
+            errors.append(f'{rel}: Hunt Pass Whop plan id not set (plans.json passes[pass].whop_plan_id is '
+                          f'"{pass_id}"; put the real Whop plan id there, then run prepublish.py)')
         if PLACEHOLDER_COUNTER.search(src):
             (errors if rel in COUNTER_PAGES else warns).append(f'{rel}: listings counter has no figure (run prepublish.py)')
         for m in ASOF.finditer(src):

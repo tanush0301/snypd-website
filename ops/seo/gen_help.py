@@ -65,6 +65,10 @@ FAQ = [
         ('What do the paid plans cost?',
          'Solo @@price:solo@@, Kickstart @@price:kickstart@@, Pro @@price:pro@@ and Elite @@price:elite@@ a month, VAT included. Paid plans keep checking 24/7 with your dashboard closed. '
          'Billed monthly through Whop; cancel any time. <a href="/plans">Compare plans</a>.'),
+        ('Can I pay once, without a subscription?',
+         'Yes: the Hunt Pass. One payment of @@price:pass@@, VAT included, and 1 Vinted search is watched 24/7 with push alerts for @@pass_days@@ days, like Solo. '
+         'Then it simply ends: no renewal, no subscription, nothing to cancel. It suits hunting one specific item, like a console or a jacket in your size. '
+         'Full refund within @@refund_days@@ days of the payment. For ongoing hunting, Solo is @@price:solo@@ a month.'),
         ('Can I get a refund?',
          'Yes. Email <a href="mailto:' + EMAIL + '">' + EMAIL + '</a> within @@refund_days@@ days of your first payment for a plan and we refund it in full.'),
         ('What is the Market Report?',

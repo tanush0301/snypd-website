@@ -591,7 +591,7 @@ def page_bot_de():
 <section id="kosten">
   <h2>Was es kostet</h2>
   {table(PLANS_HEAD['de'], PLANS_ROWS['de'])}
-  <p>Monatliche Abrechnung, jederzeit kündbar. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel im <a href="/de/vinted-preise">Vinted-Preisführer</a>. Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
+  <p>Monatliche Abrechnung, jederzeit kündbar. Oder für einen einzelnen Artikel ohne Abo: der @@pass_days@@-Tage-Pass, @@price:pass@@ einmalig für 1 Suche über @@pass_days@@ Tage, danach endet er von selbst. Der Market Report zeigt den typischen Angebotspreis eines Artikels auf Vinted nach Zustand; ein Beispiel im <a href="/de/vinted-preise">Vinted-Preisführer</a>. Alle Details auf der <a href="/plans">Tarifseite</a> (auf Englisch).</p>
 </section>
 <section id="konto">
   <h2>Was SNYPD von dir braucht</h2>
@@ -663,7 +663,7 @@ def page_bot_nl():
 <section id="kosten">
   <h2>Wat het kost</h2>
   {table(PLANS_HEAD['nl'], PLANS_ROWS['nl'])}
-  <p>Maandelijks gefactureerd, altijd opzegbaar. Het Market Report toont de typische vraagprijs van een artikel op Vinted per staat; een voorbeeld op <a href="/vinted-price-guide">Vinted-prijsgids</a> (in het Engels). Alle details op de <a href="/plans">abonnementenpagina</a> (in het Engels).</p>
+  <p>Maandelijks gefactureerd, altijd opzegbaar. Of, voor één artikel en zonder abonnement: de @@pass_days@@-dagenpas, @@price:pass@@ eenmalig voor 1 zoekopdracht gedurende @@pass_days@@ dagen, daarna stopt hij vanzelf. Het Market Report toont de typische vraagprijs van een artikel op Vinted per staat; een voorbeeld op <a href="/vinted-price-guide">Vinted-prijsgids</a> (in het Engels). Alle details op de <a href="/plans">abonnementenpagina</a> (in het Engels).</p>
 </section>
 <section id="account">
   <h2>Wat SNYPD van je nodig heeft</h2>
@@ -735,7 +735,7 @@ def page_bot_it():
 <section id="costi">
   <h2>Quanto costa</h2>
   {table(PLANS_HEAD['it'], PLANS_ROWS['it'])}
-  <p>Fatturazione mensile, disdici quando vuoi. Il Market Report mostra il prezzo richiesto tipico di un articolo su Vinted per condizione; un esempio su <a href="/vinted-price-guide">guida ai prezzi Vinted</a> (in inglese). Tutti i dettagli nella <a href="/plans">pagina dei piani</a> (in inglese).</p>
+  <p>Fatturazione mensile, disdici quando vuoi. Oppure, per un solo articolo e senza abbonamento: il pass di @@pass_days@@ giorni, @@price:pass@@ una tantum per 1 ricerca per @@pass_days@@ giorni, poi finisce da solo. Il Market Report mostra il prezzo richiesto tipico di un articolo su Vinted per condizione; un esempio su <a href="/vinted-price-guide">guida ai prezzi Vinted</a> (in inglese). Tutti i dettagli nella <a href="/plans">pagina dei piani</a> (in inglese).</p>
 </section>
 <section id="account">
   <h2>Cosa ti chiede SNYPD</h2>
@@ -807,7 +807,7 @@ def page_bot_es():
 <section id="precio">
   <h2>Cuánto cuesta</h2>
   {table(PLANS_HEAD['es'], PLANS_ROWS['es'])}
-  <p>Facturación mensual, cancela cuando quieras. El Market Report muestra el precio pedido típico de un artículo en Vinted según su estado; un ejemplo en <a href="/vinted-price-guide">guía de precios de Vinted</a> (en inglés). Todos los detalles en la <a href="/plans">página de planes</a> (en inglés).</p>
+  <p>Facturación mensual, cancela cuando quieras. O, para un solo artículo y sin suscripción: el pase de @@pass_days@@ días, @@price:pass@@ en un único pago por 1 búsqueda durante @@pass_days@@ días; después termina solo. El Market Report muestra el precio pedido típico de un artículo en Vinted según su estado; un ejemplo en <a href="/vinted-price-guide">guía de precios de Vinted</a> (en inglés). Todos los detalles en la <a href="/plans">página de planes</a> (en inglés).</p>
 </section>
 <section id="cuenta">
   <h2>Qué necesita SNYPD de ti</h2>
@@ -891,7 +891,7 @@ def page_bot(lang):
 <section id="pricing">
   <h2>What it costs</h2>
   {table(PLANS_HEAD['en'], PLANS_ROWS['en'])}
-  <p>Billed monthly, cancel any time. The Market Report shows the typical Vinted asking price of an item by condition; see a sample in <a href="/vinted-price-guide">Vinted price guide</a>. Full details on <a href="/plans">the plans page</a>.</p>
+  <p>Billed monthly, cancel any time. Or, for one item and no subscription: the Hunt Pass, @@price:pass@@ once for 1 search over @@pass_days@@ days, then it simply ends. The Market Report shows the typical Vinted asking price of an item by condition; see a sample in <a href="/vinted-price-guide">Vinted price guide</a>. Full details on <a href="/plans">the plans page</a>.</p>
 </section>
 <section id="account">
   <h2>What SNYPD needs from you</h2>
@@ -960,7 +960,7 @@ def page_bot(lang):
 <section id="prix">
   <h2>Combien ça coûte</h2>
   {table(PLANS_HEAD['fr'], PLANS_ROWS['fr'])}
-  <p>Facturé chaque mois, résiliable à tout moment. Le Market Report montre le prix demandé typique d’un article sur Vinted selon son état ; un exemple dans <a href="/fr/guide-prix-vinted">Guide des prix Vinted</a>. Tous les détails sur <a href="/plans">la page des tarifs</a>.</p>
+  <p>Facturé chaque mois, résiliable à tout moment. Ou, pour un seul article et sans abonnement, le Pass 30 jours&nbsp;: @@price:pass@@ en une fois pour 1 recherche pendant @@pass_days@@ jours, puis il s’arrête tout seul. Le Market Report montre le prix demandé typique d’un article sur Vinted selon son état ; un exemple dans <a href="/fr/guide-prix-vinted">Guide des prix Vinted</a>. Tous les détails sur <a href="/plans">la page des tarifs</a>.</p>
 </section>
 <section id="compte">
   <h2>Ce dont SNYPD a besoin</h2>
@@ -1377,7 +1377,7 @@ def page_compare(lang):
   <ul class="fit-list">
     <li><strong>They can buy for you.</strong>Souk, V-Tools, Resell Reserve, Resell Vault, VINTI, VintageLab and CopMarket (Pro) sell autobuy. Buying on Vinted needs a logged-in account, so those features act through yours. SNYPD never signs in as you, so every purchase stays your decision, made on Vinted.</li>
     <li><strong>They alert you in Telegram, Discord or their own app.</strong>Telvin sends alerts in Telegram; Resell Reserve, Resell Vault, Monitorius and VintageLab in Discord; InstantAlert, Vinotify and DealFindr in their own apps; MarktAlert by Telegram, email or webhooks. SNYPD sends push notifications to your phone or computer only: nothing to install, but no Telegram or Discord option.</li>
-    <li><strong>Their first paid plan costs less.</strong>Vinotify starts at &euro;2.99 a month, Telvin at &euro;4.90, InstantAlert and DealFindr at &euro;4.99. SNYPD&rsquo;s first paid plan, Solo, is @@price:solo@@ and watches 1 search 24/7; the Market Report starts with Pro at @@price:pro@@.</li>
+    <li><strong>Their first paid plan costs less.</strong>Vinotify starts at &euro;2.99 a month, Telvin at &euro;4.90, InstantAlert and DealFindr at &euro;4.99. SNYPD&rsquo;s first paid plan, Solo, is @@price:solo@@ and watches 1 search 24/7; the Market Report starts with Pro at @@price:pro@@. Without a subscription, the Hunt Pass is @@price:pass@@ once for 1 search over @@pass_days@@ days.</li>
   </ul>
 </section>
 <section id="speed">
@@ -1427,7 +1427,7 @@ def page_compare(lang):
   <ul class="fit-list">
     <li><strong>Ils peuvent acheter à ta place.</strong>Souk, V-Tools, Resell Reserve, Resell Vault, VINTI, VintageLab et CopMarket (Pro) vendent de l’achat automatique. Acheter sur Vinted demande un compte connecté, donc ces fonctions passent par le tien. SNYPD ne se connecte jamais à ta place : chaque achat reste ta décision, sur Vinted.</li>
     <li><strong>Ils alertent dans Telegram, Discord ou leur propre app.</strong>Telvin alerte dans Telegram ; Resell Reserve, Resell Vault, Monitorius et VintageLab dans Discord ; InstantAlert, Vinotify et DealFindr dans leur app ; MarktAlert par Telegram, e-mail ou webhooks. SNYPD envoie uniquement des notifications push sur ton téléphone ou ton ordinateur : rien à installer, mais pas d’option Telegram ou Discord.</li>
-    <li><strong>Leur premier plan payant coûte moins cher.</strong>Vinotify commence à 2,99&nbsp;&euro; par mois, Telvin à 4,90&nbsp;&euro;, InstantAlert et DealFindr à 4,99&nbsp;&euro;. Le premier plan payant de SNYPD, Solo, coûte @@price:solo@@ et surveille 1 recherche 24h/24 ; le Market Report commence avec Pro à @@price:pro@@.</li>
+    <li><strong>Leur premier plan payant coûte moins cher.</strong>Vinotify commence à 2,99&nbsp;&euro; par mois, Telvin à 4,90&nbsp;&euro;, InstantAlert et DealFindr à 4,99&nbsp;&euro;. Le premier plan payant de SNYPD, Solo, coûte @@price:solo@@ et surveille 1 recherche 24h/24 ; le Market Report commence avec Pro à @@price:pro@@. Sans abonnement, le Pass 30 jours coûte @@price:pass@@ en une fois pour 1 recherche pendant @@pass_days@@ jours.</li>
   </ul>
 </section>
 <section id="vitesse">

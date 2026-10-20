@@ -41,7 +41,7 @@ PLAN_INTENT = """<script>
   (function () {
     try {
       var plan = (new URLSearchParams(location.search).get('plan') || '').toLowerCase();
-      if (plan === 'solo' || plan === 'kickstart' || plan === 'pro' || plan === 'elite') {
+      if (plan === 'solo' || plan === 'kickstart' || plan === 'pro' || plan === 'elite' || plan === 'pass') {
         localStorage.setItem('snypd_plan_intent', JSON.stringify({ plan: plan, ts: Date.now() }));
       }
     } catch (e) {}

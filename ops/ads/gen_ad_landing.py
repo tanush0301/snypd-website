@@ -46,7 +46,7 @@ T = {
         ],
         h_how='How it works', h_never='What SNYPD never does', h_where='Where it works', h_plans='Plans', h_who='Who runs SNYPD',
         where='Every Vinted site in Europe and the US: 26 sites. Alerts arrive on your phone or computer. On iPhone they work after you add SNYPD to your Home Screen, because Apple only allows web push there.',
-        plans_note='Prices include VAT. The free plan needs no card and has no time limit or cap on notifications; it watches your search 24/7 for the first @@trial_days@@ days (@@trial_hours@@ h), and if it finds nothing in that time we add @@trial_ext_days@@ more days once; after that, it watches while your dashboard is open. Paid plans keep watching with the dashboard closed. 14-day refund on the first payment of a plan.',
+        plans_note='Prices include VAT. The free plan needs no card and has no time limit or cap on notifications; it watches your search 24/7 for the first @@trial_days@@ days (@@trial_hours@@ h), and if it finds nothing in that time we add @@trial_ext_days@@ more days once; after that, it watches while your dashboard is open. Paid plans keep watching with the dashboard closed. For one item without a subscription, the Hunt Pass is @@price:pass@@ once: 1 search, 24/7, for @@pass_days@@ days, then it ends. 14-day refund on the first payment of a plan or pass.',
         box='<strong>Start with one search, free.</strong> No card. The first @@trial_days@@ days run 24/7 with alerts.',
         start='START FREE', nav_cta='START FREE', see_plans='SEE PLANS', how_btn='HOW IT WORKS', login='LOG IN',
         who1='Built by a Belgian sneaker reseller. Contact: ',  # no owner name outside /privacy + /terms (19 Oct 2026)
@@ -79,7 +79,8 @@ T = {
         plans_note=('Prix TVA incluse. Le plan gratuit ne demande pas de carte et n’a ni limite de durée ni plafond de notifications' + NB + '; '
                     'il surveille ta recherche 24h/24 pendant les @@trial_days@@ premiers jours (@@trial_hours@@' + NB + 'h), et s’il ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois' + NB + '; '
                     'ensuite, il la surveille tant que ton tableau de bord est ouvert. Les plans payants continuent de surveiller tableau de bord fermé. '
-                    'Remboursement sous 14 jours sur le premier paiement d’un plan.'),
+                    'Pour un seul article sans abonnement, le Pass 30 jours coûte @@price:pass@@ en une fois' + NB + ': 1 recherche, 24h/24, pendant @@pass_days@@ jours, puis il s’arrête. '
+                    'Remboursement sous 14 jours sur le premier paiement d’un plan ou d’un pass.'),
         box='<strong>Commence avec une recherche, gratuitement.</strong> Sans carte. Les @@trial_days@@ premiers jours tournent 24h/24 avec les alertes.',
         start='COMMENCER GRATUITEMENT', nav_cta='COMMENCER', see_plans='VOIR LES PLANS', how_btn='COMMENT ÇA MARCHE', login='CONNEXION',
         who1='Créé par un revendeur de sneakers belge. Contact' + NB + ': ',

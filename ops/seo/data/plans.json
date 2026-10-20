@@ -11,6 +11,10 @@
     {"key": "pro", "name": "Pro", "price": "24.99", "searches": 5, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true},
     {"key": "elite", "name": "Elite", "price": "34.99", "searches": 10, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true}
   ],
+  "_passes": "One-time passes (owner-approved 20 Oct 2026): paid once, VAT included, run for 'days' from the purchase, then end. No renewal, nothing to cancel. The 14-day refund applies to the payment. Kept out of 'plans' so the monthly tables stay 5 columns. whop_plan_id 'plan_PENDING_PASS' = no Whop plan yet: check_site.py fails every page that offers its checkout until the real id is here.",
+  "passes": [
+    {"key": "pass", "name": "Hunt Pass", "price": "3.99", "days": 30, "searches": 1, "always_on": true, "push": true, "market_report": false, "card": true, "paid_discord": false, "renews": false, "whop_plan_id": "plan_PENDING_PASS"}
+  ],
   "free_trial": {
     "days": 3,
     "hours": 72,

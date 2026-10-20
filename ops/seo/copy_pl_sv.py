@@ -147,7 +147,8 @@ WAY_CELLS = {
     'SNYPD': dict(
         get={'pl': 'Każde nowe ogłoszenie z wklejonego linku wyszukiwania Vinted, ze wszystkimi filtrami', 'sv': 'Varje ny annons för söklänken från Vinted som du klistrar in, med alla filter'},
         how={'pl': 'Push na telefon i komputer, bez sklepu z aplikacjami', 'sv': 'Push till mobil och dator, ingen appbutik'},
-        cost={'pl': 'Za darmo: 1 wyszukiwanie, @@trial_days@@ dni 24/7; płatnie od @@price:solo@@ / mies.', 'sv': 'Gratis: 1 sökning, dygnet runt i @@trial_days@@ dagar; betalt från @@price:solo@@ / mån.'}),
+        cost={'pl': 'Za darmo: 1 wyszukiwanie, @@trial_days@@ dni 24/7; płatnie od @@price:solo@@ / mies. lub @@price:pass@@ jednorazowo za @@pass_days@@ dni',
+              'sv': 'Gratis: 1 sökning, dygnet runt i @@trial_days@@ dagar; betalt från @@price:solo@@ / mån. eller @@price:pass@@ en gång för @@pass_days@@ dagar'}),
 }
 
 PUSH = {
@@ -292,7 +293,7 @@ def _bot_copy(lang):
 <section id="cena">
   <h2>Ile to kosztuje</h2>
   {G['table'](PLANS_HEAD['pl'], PLANS_ROWS['pl'])}
-  <p>Płatność co miesiąc, rezygnujesz, kiedy chcesz. Ceny w euro, z VAT. Market Report pokazuje typową cenę, jakiej sprzedający żądają za przedmiot na Vinted, według stanu; przykład w <a href="/vinted-price-guide">przewodniku po cenach Vinted</a> (po angielsku). Wszystkie szczegóły na <a href="/plans">stronie planów</a> (po angielsku).</p>
+  <p>Płatność co miesiąc, rezygnujesz, kiedy chcesz. Albo, gdy szukasz jednej rzeczy i nie chcesz subskrypcji: karnet na @@pass_days@@ dni, @@price:pass@@ jednorazowo za 1 wyszukiwanie przez @@pass_days@@ dni, potem sam wygasa. Ceny w euro, z VAT. Market Report pokazuje typową cenę, jakiej sprzedający żądają za przedmiot na Vinted, według stanu; przykład w <a href="/vinted-price-guide">przewodniku po cenach Vinted</a> (po angielsku). Wszystkie szczegóły na <a href="/plans">stronie planów</a> (po angielsku).</p>
 </section>
 <section id="konto">
   <h2>Czego SNYPD od ciebie potrzebuje</h2>
@@ -362,7 +363,7 @@ def _bot_copy(lang):
 <section id="pris">
   <h2>Vad det kostar</h2>
   {G['table'](PLANS_HEAD['sv'], PLANS_ROWS['sv'])}
-  <p>Betalning varje månad, avsluta när du vill. Priserna är i euro inklusive moms. Market Report visar det typiska begärda priset för en artikel på Vinted per skick; ett exempel i <a href="/vinted-price-guide">prisguiden för Vinted</a> (på engelska). Alla detaljer på <a href="/plans">abonnemangssidan</a> (på engelska).</p>
+  <p>Betalning varje månad, avsluta när du vill. Eller, för en enda pryl utan abonnemang: @@pass_days@@-dagarspasset, @@price:pass@@ en gång för 1 sökning i @@pass_days@@ dagar, sedan tar det slut av sig självt. Priserna är i euro inklusive moms. Market Report visar det typiska begärda priset för en artikel på Vinted per skick; ett exempel i <a href="/vinted-price-guide">prisguiden för Vinted</a> (på engelska). Alla detaljer på <a href="/plans">abonnemangssidan</a> (på engelska).</p>
 </section>
 <section id="konto">
   <h2>Vad SNYPD behöver från dig</h2>

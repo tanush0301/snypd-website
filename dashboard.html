@@ -14,7 +14,7 @@
      /plans clears user_metadata.plan_intent when it opens the checkout. */
   (function () {
     try {
-      var PLANS = { solo: 1, kickstart: 1, pro: 1, elite: 1 }, WEEK = 7 * 864e5;
+      var PLANS = { solo: 1, kickstart: 1, pro: 1, elite: 1, pass: 1 }, WEEK = 7 * 864e5;
       var local = null;
       try { local = JSON.parse(localStorage.getItem('snypd_plan_intent') || 'null'); } catch (e) {}
       var sessionUser = function () {
@@ -1950,6 +1950,16 @@ body {
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
 </div>
+<div class="elite-banner" id="broad-hunt" style="display:none">
+  <div>
+    <div class="elite-banner__title">This hunt is very broad</div>
+    <div class="elite-banner__text" id="broad-hunt-text"></div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="broad-hunt-edit" type="button">Edit hunt</button>
+    <button class="btn btn-ghost" id="broad-hunt-keep" type="button">Keep it</button>
+  </div>
+</div>
 <!-- README §5.6 is explicit that these are two different failures with two
      different screens: Vinted unreachable (amber, cached feed still shown,
      dimmed) and the SNYPD backend being down (red, no cached grid at all,
@@ -2462,7 +2472,7 @@ const HEARTBEAT_URL = (() => {
   let me = boot
     ? { data: boot.data.profile || null, error: null }
     : await sb.from('users')
-      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at, trial_ends_at, trial_extended_at')
+      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at, trial_ends_at, trial_extended_at, pass_expires_at')
       .eq('id', uid)
       .maybeSingle();
   if (me.error) {
@@ -2555,7 +2565,7 @@ const HEARTBEAT_URL = (() => {
     // After the 72 h offer: say plainly that the hunt is paused in the background.
     if (Date.now() >= offerEnd && tTitle && tText) {
       tTitle.textContent = 'Your hunt is paused in the background';
-      tText.textContent = 'Free only checks while this tab is open. Solo keeps one search running 24/7 for \u20ac5.99/month.';
+      tText.textContent = 'Free only checks while this tab is open. Solo keeps one search running 24/7 for \u20ac5.99/month, or \u20ac3.99 once for a 30-day Hunt Pass.';
     }
     if (Date.now() >= trialEnd && Date.now() < offerEnd && tTitle && tText) {
       const fr = !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
@@ -2564,9 +2574,14 @@ const HEARTBEAT_URL = (() => {
         until = new Intl.DateTimeFormat(fr ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(offerEnd));
       } catch (e) { until = new Date(offerEnd).toLocaleString(); }
       tTitle.textContent = 'Your trial ended: 50% off your first month';
-      tText.textContent = 'Until ' + until + ': Kickstart \u20ac7.49 or Pro \u20ac12.49 for the first month, code SNYPD50 already applied. Or Solo, \u20ac5.99/month for 1 search 24/7.';
+      // Phase 1 (20 Oct 2026): Whop cannot widen an existing code (its API only toggles a code's status), so the
+      // offer moves to a new 50%-first-month code covering Solo, Kickstart and Pro (OFFER_CODE). SNYPD50 stays
+      // active for the links already sent. Solo's total is checked in Whop's checkout before release. The pass
+      // is the no-subscription alternative.
+      const OFFER_CODE = 'STAY50';
+      tText.textContent = 'Until ' + until + ': Solo \u20ac2.99, Kickstart \u20ac7.49 or Pro \u20ac12.49 for the first month, code ' + OFFER_CODE + ' already applied. Or a 30-day Hunt Pass, \u20ac3.99 once.';
       const offerBtn = eliteBanner.querySelector('a.btn');
-      if (offerBtn) offerBtn.href = '/plans?promo=SNYPD50';
+      if (offerBtn) offerBtn.href = '/plans?promo=' + OFFER_CODE;
     }
   }
 
@@ -2622,13 +2637,34 @@ const HEARTBEAT_URL = (() => {
   }
   paintTrialValue().catch(console.error);
 
+  // Hunt Pass (migration 063): a one-time Whop plan of the SOLO product, so the account is plan 'solo' with an end
+  // in users.pass_expires_at (Postgres switches it to free at that time). Name it, and from 5 days before the end
+  // say when it ends and how to keep the hunt running.
+  const passEndMs = Date.parse(profile.pass_expires_at || '');
+  const onPass = effectivePlan === 'solo' && Number.isFinite(passEndMs) && passEndMs > Date.now();
+  if (onPass) {
+    if (passEndMs - Date.now() < 5 * 864e5 && eliteBanner) {
+      let endTxt = '';
+      try {
+        endTxt = new Intl.DateTimeFormat(uiFr() ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(passEndMs)).replace(/\.$/, '');
+      } catch (e) { endTxt = new Date(passEndMs).toDateString(); }
+      const t = eliteBanner.querySelector('.elite-banner__title');
+      const x = eliteBanner.querySelector('.elite-banner__text');
+      const a = eliteBanner.querySelector('a.btn');
+      if (t) t.textContent = 'Your Hunt Pass ends on ' + endTxt;
+      if (x) x.textContent = 'After that your hunt only runs while this tab is open. Keep it 24/7: another 30-day pass for \u20ac3.99, or Solo at \u20ac5.99/month.';
+      if (a) { a.textContent = 'Renew'; a.href = '/plans?checkout=pass'; }
+      eliteBanner.style.display = '';
+    }
+  }
+
   // Plan chosen at sign-up (head script, Phase 0.7): an account that already has
   // a hunt goes to checkout now, as before; a new one sees the plan here once
   // its first hunt is saved, so the trial starts first.
   (async function planAfterHunt() {
     let intent = null;
     try { intent = JSON.parse(localStorage.getItem('snypd_checkout_after_hunt') || 'null'); } catch (e) {}
-    const PLAN_NAMES = { solo: 'Solo', kickstart: 'Kickstart', pro: 'Pro', elite: 'Elite' };
+    const PLAN_NAMES = { solo: 'Solo', kickstart: 'Kickstart', pro: 'Pro', elite: 'Elite', pass: 'Hunt Pass' };
     // Never re-open checkout for someone just back from paying (?activated, webhook may still be on its way).
     if (!intent || !PLAN_NAMES[intent.plan] || Date.now() - (intent.ts || 0) > 7 * 864e5 || effectivePlan !== 'free'
         || new URLSearchParams(location.search).has('activated')) {
@@ -3201,7 +3237,10 @@ const HEARTBEAT_URL = (() => {
   if (activationGate) activationGate.classList.add('is-hidden');
   if (dashboardPanel) dashboardPanel.classList.remove('is-hidden');
   
-  set('plan-banner', `Plan: ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`);
+  // A Hunt Pass holder (migration 063) is plan 'solo' with an end date: name the pass, not Solo.
+  const passEndTop = Date.parse(profile.pass_expires_at || '');
+  set('plan-banner', (effectivePlan === 'solo' && Number.isFinite(passEndTop) && passEndTop > Date.now())
+    ? 'Plan: HUNT PASS' : `Plan: ${PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase()}`);
 
   // Sidebar plan pill - was hardcoded "PLAN - ELITE" for every user regardless
   // of real plan. Wire it to the same effectivePlan already resolved above.
@@ -4126,7 +4165,9 @@ const HEARTBEAT_URL = (() => {
         const d = new Date(joinedAt);
         set('prof-joined', d.toLocaleDateString(undefined, { year: 'numeric', month: 'long' }));
       }
-      const planLabel = PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase();
+      const passEnd = Date.parse(profile.pass_expires_at || '');
+      const planLabel = (effectivePlan === 'solo' && Number.isFinite(passEnd) && passEnd > Date.now())
+        ? 'HUNT PASS' : (PLAN_LABELS[effectivePlan] || effectivePlan.toUpperCase());
       set('prof-plan', `Plan: ${planLabel}`);
       set('prof-plan-detail', planLabel);
 
@@ -5432,6 +5473,7 @@ const HEARTBEAT_URL = (() => {
     }
     const lastMs = data.last_match_ts ? Date.parse(data.last_match_ts) : NaN;
     return {
+      huntUrls: Array.isArray(data.hunts) ? data.hunts : [],
       huntCount: Array.isArray(data.hunts) ? data.hunts.length : 0,
       activeSearches: new Set(feedSearchSigs),
       eligibleCount: Number(data.count) || 0,
@@ -5617,6 +5659,7 @@ const HEARTBEAT_URL = (() => {
       }
 
       return {
+        huntUrls: (activeHunts || []).map(h => h.vinted_url),
         huntCount: (activeHunts || []).length,
         activeSearches,
         eligibleCount: eligible.length,
@@ -5626,6 +5669,67 @@ const HEARTBEAT_URL = (() => {
         lastMatchTs
       };
   }
+
+  // Broad hunts (Phase 1, 20 Oct 2026). Some hunts ("ralph lauren", no size) match thousands of listings a day:
+  // alerts turn into noise and people mute them. The feed already holds what the hunt matched in the last 30 min
+  // (eligibleCount, all hunts) and a sample of rows with each row's hunt signature, so the rate per hunt is
+  // estimated here without any extra request. Threshold ~1,200/day, in step with the trial emails' "very broad"
+  // (> 1,000 in 24 h). Shown once per hunt per device; "Keep it" remembers the choice.
+  const BROAD_PER_30MIN = 25;
+  let broadSig = null;
+  function huntLabel(u) {
+    try {
+      const url = new URL(u);
+      const q = (url.searchParams.get('search_text') || '').trim();
+      return q || url.hostname.replace(/^www\./, '');
+    } catch (e) { return 'this hunt'; }
+  }
+  function noteBroadHunt(feed) {
+    const card = document.getElementById('broad-hunt');
+    const text = document.getElementById('broad-hunt-text');
+    if (!card || !text || !feed || !Array.isArray(feed.rows) || !feed.rows.length) return;
+    if (!(feed.eligibleCount >= BROAD_PER_30MIN)) return;
+    const counts = new Map();
+    for (const r of feed.rows) {
+      const sig = r.item_box && r.item_box.snypd_filter_contract && r.item_box.snypd_filter_contract.search;
+      if (sig && feed.activeSearches.has(sig)) counts.set(sig, (counts.get(sig) || 0) + 1);
+    }
+    let seen = 0;
+    for (const n of counts.values()) seen += n;
+    if (!seen) return;
+    let top = null, topN = 0;
+    for (const [sig, n] of counts) {
+      const est = Math.round(feed.eligibleCount * n / seen);
+      if (est > topN) { top = sig; topN = est; }
+    }
+    if (!top || topN < BROAD_PER_30MIN) return;
+    let kept = {};
+    try { kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {}; } catch (e) {}
+    if (kept[top]) return;
+    const url = (feed.huntUrls || []).find(h => savedSearchSignature(h) === top);
+    broadSig = top;
+    text.textContent = 'About ' + (topN * 2) + ' new listings an hour match "' + (url ? huntLabel(url) : 'this hunt')
+      + '": more than anyone can open, so alerts become noise. On Vinted, add a size or a max price, copy the link and paste it into this hunt.';
+    card.style.display = '';
+  }
+  (function wireBroadHunt() {
+    const edit = document.getElementById('broad-hunt-edit');
+    const keep = document.getElementById('broad-hunt-keep');
+    const card = document.getElementById('broad-hunt');
+    if (edit) edit.addEventListener('click', () => {
+      const pill = document.getElementById('filter-pill');
+      if (pill) pill.click();
+      if (card) card.style.display = 'none';
+    });
+    if (keep) keep.addEventListener('click', () => {
+      try {
+        const kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {};
+        if (broadSig) kept[broadSig] = Date.now();
+        localStorage.setItem('snypd_broad_ok', JSON.stringify(kept));
+      } catch (e) {}
+      if (card) card.style.display = 'none';
+    });
+  })();
 
   async function loadAds() {
     setLoading(true);
@@ -5647,6 +5751,7 @@ const HEARTBEAT_URL = (() => {
 
       hasActiveHunts = feed.huntCount > 0;
       feedEligibleCount = feed.eligibleCount;
+      try { noteBroadHunt(feed); } catch (e) { console.error('SNYPD: broad-hunt check failed', e); }
       const activeSearches = feed.activeSearches;
 
       // Promoted listings are no longer filtered out (2026-10-08): Vinted

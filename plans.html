@@ -103,6 +103,7 @@
   .card__tags { display: flex; gap: 6px; align-items: center; }
   .tag-cur { font-size: 11px; letter-spacing: .1em; color: #00E5A0; }
   .tag-pro { font-size: 10.5px; letter-spacing: .1em; color: #FFFFFF; background: #A200FF; padding: 4px 7px; }
+  .tag-once { font-size: 10.5px; letter-spacing: .1em; color: #00E5A0; border: 1px solid rgba(0,229,160,.38); padding: 3px 6px; }
   .price { display: flex; flex-direction: column; gap: 6px; }
   .price__amt { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 48px; line-height: 1; letter-spacing: -.04em; color: #FFFFFF; }
   .price__per { font-family: 'DM Mono', monospace; font-weight: 400; font-size: 12.5px; letter-spacing: 0; color: #8B9094; white-space: nowrap; }
@@ -117,7 +118,7 @@
   .card .btn { margin-top: auto; }
   .plus { font-size: 11px; letter-spacing: .06em; color: #8B9094; margin-bottom: -8px; }
   /* Phones: every plan and price at a glance, so none is missed below the fold. */
-  .jump { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid #26262A; margin-bottom: 14px; }
+  .jump { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid #26262A; margin-bottom: 14px; }
   .jump a { min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 9.5px; letter-spacing: .02em; color: #8B9094; background: #141416; border-left: 1px solid #26262A; }
   .jump a:first-child { border-left: 0; }
   .jump a b { font-weight: 400; color: #FFFFFF; font-size: 12px; }
@@ -148,6 +149,9 @@
   .fit__name { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 52px; line-height: 1; letter-spacing: -.04em; color: #FFFFFF; }
   .fit .feats { border-top: 0; padding-top: 0; gap: 9px; }
   .fit .btn { margin-top: auto; min-height: 52px; }
+  .fit__alt { font-size: 12px; line-height: 1.5; color: #00E5A0; border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 12px 14px; }
+  .cmp-pass { margin: 14px 0 0; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; border: 1px solid #1D1D20; padding: 14px 16px; font-size: 12px; line-height: 1.55; color: #A6ADB1; }
+  .cmp-pass__h { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
 
   /* Comparison table: a real <table>. On phones one plan column shows at a time
      (picked with the tabs above it); the table semantics stay intact. */
@@ -285,7 +289,9 @@
     { "@type": "Offer", "name": "Pro", "price": "24.99", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans",
       "priceSpecification": { "@type": "UnitPriceSpecification", "price": "24.99", "priceCurrency": "EUR", "billingDuration": "P1M", "valueAddedTaxIncluded": true } },
     { "@type": "Offer", "name": "Elite", "price": "34.99", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans",
-      "priceSpecification": { "@type": "UnitPriceSpecification", "price": "34.99", "priceCurrency": "EUR", "billingDuration": "P1M", "valueAddedTaxIncluded": true } }
+      "priceSpecification": { "@type": "UnitPriceSpecification", "price": "34.99", "priceCurrency": "EUR", "billingDuration": "P1M", "valueAddedTaxIncluded": true } },
+    { "@type": "Offer", "name": "Hunt Pass", "price": "3.99", "priceCurrency": "EUR", "url": "https://www.snypd.store/plans",
+      "priceSpecification": { "@type": "PriceSpecification", "price": "3.99", "priceCurrency": "EUR", "valueAddedTaxIncluded": true } }
   ]
 }
 </script>
@@ -327,7 +333,7 @@
       <a id="youplan-dash" href="/dashboard">Open dashboard &rarr;</a>
     </div>
     <div class="youplan" id="promo-note" hidden>
-      <span>Code applied at checkout for Kickstart and Pro:</span> <b id="promo-code"></b>
+      <span>Code applied at checkout for Solo, Kickstart and Pro:</span> <b id="promo-code"></b>
     </div>
   </section>
 
@@ -335,6 +341,7 @@
     <nav class="jump mob" aria-label="Jump to a plan">
       <a href="#card-free">FREE<b><!--plans:price:free-->&euro;0<!--/plans:price:free--></b></a>
       <a href="#card-solo">SOLO<b><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--></b></a>
+      <a href="#card-pass">PASS<b><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--></b></a>
       <a href="#card-kickstart">KICKSTART<b><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--></b></a>
       <a href="#card-pro" class="is-pro">PRO<b><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--></b></a>
       <a href="#card-elite">ELITE<b><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--></b></a>
@@ -376,6 +383,29 @@
           <li>Push alerts around the clock</li>
         </ul>
         <a class="btn" data-cta="solo" href="/signup?plan=solo">START SOLO</a>
+      </article>
+
+      <article class="card" id="card-pass" data-plan-card="pass" aria-labelledby="n-pass">
+        <div class="card__top">
+          <h2 class="card__name" id="n-pass">HUNT PASS</h2>
+          <span class="card__tags">
+            <span class="tag-cur" data-cur="pass"></span>
+            <span class="tag-once">NO SUBSCRIPTION</span>
+          </span>
+        </div>
+        <div class="price">
+          <span class="price__amt"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--><span class="price__per"> once</span></span>
+          <span class="price__sub">VAT incl. &middot; one-time payment &middot; nothing to cancel</span>
+        </div>
+        <p class="card__for"><!--plans:plans-pass-for-->One item to find? Pay once and hunt it for 30 days.<!--/plans:plans-pass-for--></p>
+        <span class="plus"><!--plans:plans-pass-plus-->Same as Solo, for 30 days:<!--/plans:plans-pass-plus--></span>
+        <ul class="feats">
+          <li>1 active Vinted search</li>
+          <li>Runs 24/7, dashboard closed</li>
+          <li>Push alerts around the clock</li>
+          <li><!--plans:plans-pass-end-->Ends after 30 days: no renewal, nothing to cancel<!--/plans:plans-pass-end--></li>
+        </ul>
+        <a class="btn" data-cta="pass" href="/signup?plan=pass">GET HUNT PASS</a>
       </article>
 
       <article class="card" id="card-kickstart" data-plan-card="kickstart" aria-labelledby="n-kickstart">
@@ -437,7 +467,7 @@
       </article>
     </div>
     <div class="under">
-      <span class="muted"><!--plans:plans-under-->Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment.<!--/plans:plans-under--></span>
+      <span class="muted"><!--plans:plans-under-->Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment. The Hunt Pass is paid once and does not renew.<!--/plans:plans-under--></span>
       <span style="color:#00E5A0;letter-spacing:.06em;" id="founding-line">FIRST 100 ACCOUNTS KEEP PRO PRICING FOR LIFE</span>
     </div>
     <p class="proof" id="proof" hidden><b id="proof-n"></b> Vinted listings matched for SNYPD hunters so far.</p>
@@ -471,6 +501,7 @@
           <span style="font-size:15px;color:#E8EAEB;" id="fit-price"><!--plans:price-mo:pro-->&euro;24.99 / mo<!--/plans:price-mo:pro--></span>
         </div>
         <ul class="feats" id="fit-reasons"></ul>
+        <a class="fit__alt" id="fit-alt" href="#card-pass" hidden><!--plans:plans-fit-pass-->One item, no subscription? Hunt Pass: &euro;3.99 once, 30 days &rarr;<!--/plans:plans-fit-pass--></a>
         <a class="btn btn--prim" id="fit-cta" data-cta-fit href="/signup?plan=pro">START PRO</a>
       </div>
     </div>
@@ -533,6 +564,7 @@
         </tfoot>
       </table>
       <a class="btn btn--prim mob" id="cmp-mcta" data-cta="pro" href="/signup?plan=pro">START PRO</a>
+      <!--plans:plans-pass-cmp--><p class="cmp-pass"><span class="cmp-pass__h">HUNT PASS &#183; &#8364;3.99 ONCE</span> <span>Everything in the Solo column for 30 days, paid once, VAT included. No renewal, nothing to cancel. Full refund within 14 days of the payment.</span></p><!--/plans:plans-pass-cmp-->
     </div>
   </section>
 
@@ -561,7 +593,8 @@
 <details><summary>Is there a free trial?</summary><p>Yes. Free runs your first search 24/7 with alerts for 3 days (72 h), counted from when you save it, with no card. If it finds nothing in that time, we add 2 more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.</p></details>
 <details><summary>Does the price include VAT?</summary><p>Yes. &#8364;5.99, &#8364;14.99, &#8364;24.99 and &#8364;34.99 a month are the full prices, VAT included. Buying for a company? Tick &quot;buying on behalf of a company&quot; at checkout.</p></details>
 <details><summary>How do I pay?</summary><p>By card, or Apple Pay or Google Pay on devices that support them, through Whop&#8217;s secure checkout on this page. SNYPD never sees your card details.</p></details>
-<details><summary>Does my plan renew automatically?</summary><p>Yes, every month, until you cancel. Cancel any time in your Whop account.</p></details>
+<details><summary>Does my plan renew automatically?</summary><p>Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after 30 days.</p></details>
+<details><summary>Can I pay once, without a subscription?</summary><p>Yes: the Hunt Pass. One payment of &#8364;3.99, VAT included, and 1 Vinted search is watched 24/7 with push alerts for 30 days, like Solo. Then it simply ends: no renewal, no subscription, nothing to cancel. It suits hunting one specific item, like a console or a jacket in your size. Full refund within 14 days of the payment. For ongoing hunting, Solo is &#8364;5.99 a month.</p></details>
 <details><summary>What happens when I cancel?</summary><p>Your plan keeps running to the end of the month you paid for, then your account goes back to Free.</p></details>
 <details><summary>Can I get a refund?</summary><p>Yes. Email <a href="mailto:snypd@gmail.com">snypd@gmail.com</a> within 14 days of your first payment for a plan and we refund that payment in full.</p></details>
 <details><summary>Can I change plan later?</summary><p>Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email <a href="mailto:snypd@gmail.com">snypd@gmail.com</a> and we will help you switch.</p></details>
@@ -626,11 +659,18 @@
   // Prices are VAT-inclusive and must match what Whop charges. A null plan id
   // means there is no live checkout for that plan: the button says so instead
   // of opening a dead checkout.
-  var WHOP_PLANS = { solo: 'plan_zYBunt6RBlsUg', kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG' };
+  // The Hunt Pass (one-time, 30 days) is not one of PLANS: its id comes from
+  // ops/seo/data/plans.json (passes) through gen_regions. A placeholder id
+  // (plan_PENDING_...) counts as "no live checkout" here, and check_site.py
+  // refuses a release while it is there.
+  var WHOP_PLANS = { solo: 'plan_zYBunt6RBlsUg', kickstart: 'plan_LCcdSUUjdPzkm', pro: 'plan_AMgmgP4AEPcOB', elite: 'plan_NyA2CkiHNzymG', /*plans:plans-whop-pass*/pass: 'plan_PENDING_PASS'/*/plans:plans-whop-pass*/ };
+  Object.keys(WHOP_PLANS).forEach(function (k) { if (/^plan_PENDING/.test(WHOP_PLANS[k] || '')) WHOP_PLANS[k] = null; });
   var PLANS = ['free', 'solo', 'kickstart', 'pro', 'elite'];
-  var NAMES = { free: 'FREE', solo: 'SOLO', kickstart: 'KICKSTART', pro: 'PRO', elite: 'ELITE' };
-  /*plans:plans-js*/var PRICE = { free: '€0', solo: '€5.99', kickstart: '€14.99', pro: '€24.99', elite: '€34.99' };
-  var SEARCHES = { free: 1, solo: 1, kickstart: 2, pro: 5, elite: 10 };/*/plans:plans-js*/
+  var ALL = PLANS.concat(['pass']);
+  var NAMES = { free: 'FREE', solo: 'SOLO', kickstart: 'KICKSTART', pro: 'PRO', elite: 'ELITE', pass: 'HUNT PASS' };
+  /*plans:plans-js*/var PRICE = { free: '€0', solo: '€5.99', kickstart: '€14.99', pro: '€24.99', elite: '€34.99', pass: '€3.99' };
+  var SEARCHES = { free: 1, solo: 1, kickstart: 2, pro: 5, elite: 10, pass: 1 };
+  var PASS_DAYS = 30;/*/plans:plans-js*/
   var MANAGE = 'https://whop.com/@me/settings/orders/';
   var ACTIVE = ['active', 'trialing', 'past_due', 'unpaid'];
   var DISCORD = 'https://discord.gg/gjKD4auXhK';
@@ -690,12 +730,20 @@
 
   function ctaFor(k) {
     if (!auth.signedIn) {
+      if (k === 'pass') return { label: 'GET HUNT PASS', href: '/signup?plan=pass', act: 'signup' };
       return { label: k === 'free' ? 'START FREE' : 'START ' + NAMES[k], href: k === 'free' ? '/signup' : '/signup?plan=' + k, act: 'signup' };
     }
     var p = auth.plan || 'free';
-    if (k === p) return k === 'free' ? { label: 'OPEN DASHBOARD', href: '/dashboard', act: 'dashboard' } : { label: 'MANAGE SUBSCRIPTION', href: auth.manageUrl, act: 'manage' };
-    if (k === 'free') return { label: 'CANCEL IN WHOP', href: auth.manageUrl, act: 'manage' };
-    if (p === 'free') {
+    // Hunt Pass: one payment, nothing renews, so nothing to manage or cancel.
+    if (k === p && (k === 'free' || k === 'pass')) return { label: 'OPEN DASHBOARD', href: '/dashboard', act: 'dashboard' };
+    if (k === p) return { label: 'MANAGE SUBSCRIPTION', href: auth.manageUrl, act: 'manage' };
+    if (k === 'free') return p === 'pass' ? { label: 'OPEN DASHBOARD', href: '/dashboard', act: 'dashboard' } : { label: 'CANCEL IN WHOP', href: auth.manageUrl, act: 'manage' };
+    if (k === 'pass') {
+      if (p !== 'free') return { label: 'INCLUDED IN YOUR PLAN', href: null, act: 'none' };
+      if (!WHOP_PLANS.pass) return { label: 'CHECKOUT BACK SOON', href: null, act: 'none' };
+      return { label: 'GET HUNT PASS', href: 'https://whop.com/checkout/' + WHOP_PLANS.pass, act: 'checkout' };
+    }
+    if (p === 'free' || p === 'pass') {
       if (!WHOP_PLANS[k]) return { label: 'CHECKOUT BACK SOON', href: null, act: 'none' };
       return { label: 'UPGRADE TO ' + NAMES[k], href: 'https://whop.com/checkout/' + WHOP_PLANS[k], act: 'checkout' };
     }
@@ -718,14 +766,14 @@
       else d.removeAttribute('data-whop-checkout-affiliate-code');
     });
     document.querySelectorAll('[data-cta]').forEach(function (a) { paintCta(a, a.getAttribute('data-cta')); });
-    PLANS.forEach(function (k) {
+    ALL.forEach(function (k) {
       var tag = document.querySelector('[data-cur="' + k + '"]');
       if (tag) tag.textContent = auth.signedIn && (auth.plan || 'free') === k ? 'CURRENT' : '';
     });
     if (auth.signedIn) {
       $('youplan').hidden = false;
       $('youplan-name').textContent = NAMES[auth.plan || 'free'];
-      var paid = auth.plan && auth.plan !== 'free';
+      var paid = auth.plan && auth.plan !== 'free' && auth.plan !== 'pass';
       $('youplan-manage').hidden = !paid;
       $('youplan-manage').href = auth.manageUrl;
       document.querySelectorAll('[data-auth-link]').forEach(function (a) { a.textContent = 'ACCOUNT'; a.href = '/account'; });
@@ -759,6 +807,8 @@
     var reasons = [SEARCHES[k] + ' active search' + (SEARCHES[k] > 1 ? 'es' : '')];
     reasons.push(k === 'free' ? '24/7 for 3 days, then while your dashboard is open' : 'Keeps hunting with the tab closed');
     if (k === 'pro' || k === 'elite') reasons.push('Market Report price checks');
+    // One thing to hunt and no price checks: the Hunt Pass is the no-subscription option.
+    $('fit-alt').hidden = !(q.n === 1 && !q.price);
     focusPlan = k;
     $('fit-name').textContent = NAMES[k];
     $('fit-price').textContent = k === 'free' ? '€0' : PRICE[k] + ' / mo';
@@ -812,11 +862,11 @@
   // data-whop-checkout-locale and data-whop-checkout-promo-code (both in
   // js.whop.com/static/checkout/index.js; locale=fr renders a French checkout,
   // checked 17 Oct). ?promo= comes from the trial-ended email; it is kept in
-  // this browser for 3 days so it survives signing in. Only Kickstart and Pro:
-  // the code is limited to those products in Whop.
+  // this browser for 3 days so it survives signing in. Only Solo, Kickstart and
+  // Pro (Phase 1, 20 Oct 2026: the code covers Solo too); never the Hunt Pass.
   var LOCALE = window.SNYPD_I18N && SNYPD_I18N.lang === 'fr' ? 'fr' : null;
   var PROMO_RE = /^[A-Z0-9]{3,20}$/;
-  var PROMO_PLANS = { kickstart: true, pro: true };
+  var PROMO_PLANS = { solo: true, kickstart: true, pro: true };
   var promo = null;
   try { promo = (new URLSearchParams(location.search).get('promo') || '').toUpperCase() || null; } catch (e) {}
   if (promo && PROMO_RE.test(promo)) {
@@ -837,11 +887,14 @@
     o.setAttribute('role', 'dialog');
     o.setAttribute('aria-modal', 'true');
     o.setAttribute('aria-label', NAMES[k] + ' checkout');
+    var once = k === 'pass';
     o.innerHTML =
       '<div class="whop-embed-box">' +
-        '<div class="whop-embed-head"><span>' + NAMES[k] + ' · ' + PRICE[k] + ' / MO INCL. VAT</span>' +
+        '<div class="whop-embed-head"><span>' + NAMES[k] + ' · ' + PRICE[k] + (once ? ' ONCE INCL. VAT' : ' / MO INCL. VAT') + '</span>' +
         '<button type="button" class="whop-embed-close" data-whop-embed-close aria-label="Close checkout">×</button></div>' +
-        '<p class="whop-embed-note">Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email snypd@gmail.com.</p>' +
+        '<p class="whop-embed-note">' + (once
+          ? 'One payment. 1 search watched 24/7 for ' + PASS_DAYS + ' days, then it ends: no renewal, nothing to cancel. Full refund within 14 days of the payment: email snypd@gmail.com.'
+          : 'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email snypd@gmail.com.') + '</p>' +
         '<div data-whop-checkout-plan-id="' + WHOP_PLANS[k] + '" data-whop-checkout-theme="dark" data-whop-checkout-theme-accent-color="#A200FF" data-whop-checkout-on-complete="snypdCheckoutComplete"' +
         (storedEmail ? ' data-whop-checkout-prefill-email="' + esc(storedEmail) + '"' : '') +
         (LOCALE ? ' data-whop-checkout-locale="' + LOCALE + '"' : '') +
@@ -898,7 +951,7 @@
   function norm(p) {
     var v = String(p || '').trim().toLowerCase();
     if (v === 'starter' || v === 'kickoff') return 'kickstart';
-    return PLANS.indexOf(v) !== -1 ? v : null;
+    return ALL.indexOf(v) !== -1 ? v : null;
   }
   async function loadPlan() {
     var sb = await SNYPD.sbReady;
@@ -912,7 +965,9 @@
     var savedAff = md.whop_aff && AFF_RE.test(md.whop_aff) ? md.whop_aff : null;
     if (!affFromUrl && savedAff) aff = savedAff;
     if (aff && !savedAff && sb.auth.updateUser) sb.auth.updateUser({ data: { whop_aff: aff } }).catch(function () {});
-    var pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id').eq('id', user.id).maybeSingle();
+    // pass_expires_at (migration 063): a Hunt Pass holder is plan 'solo' with an end date; show them as 'pass'.
+    var pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id, pass_expires_at').eq('id', user.id).maybeSingle();
+    if (pr && pr.error) pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id').eq('id', user.id).maybeSingle();
     var row = pr && pr.data;
     if (row) {
       var p = norm(row.subscription_plan) || 'free';
@@ -920,6 +975,8 @@
       // with an active status AND a Whop product id; otherwise this page shows Free.
       var paidOk = ACTIVE.indexOf(String(row.sub_status || '').toLowerCase()) !== -1 && !!String(row.whop_product_id || '').trim();
       auth.plan = p !== 'free' && !paidOk ? 'free' : p;
+      var passEnd = Date.parse(row.pass_expires_at || '');
+      if (auth.plan === 'solo' && isFinite(passEnd) && passEnd > Date.now()) auth.plan = 'pass';
       if (row.whop_manage_url) auth.manageUrl = row.whop_manage_url;
     }
   }
