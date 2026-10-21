@@ -11,7 +11,11 @@
     { "source": "/fr/prix-vinted", "destination": "/fr/rapport-marche-vinted/septembre-2026", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/favicon.ico", "destination": "/assets/icons/icon-192.png" }
+    { "source": "/favicon.ico", "destination": "/assets/icons/icon-192.png" },
+    {
+      "source": "/.well-known/apple-developer-merchantid-domain-association",
+      "destination": "https://whop.com/.well-known/apple-platform-integrator/apple-developer-merchantid-domain-association"
+    }
   ],
   "headers": [
     {
