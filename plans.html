@@ -236,7 +236,7 @@
     .whop-embed-box { max-width: none; max-height: none; height: 100%; border: 0; padding: 52px 16px calc(16px + env(safe-area-inset-bottom)); }
     .whop-embed-head { position: sticky; top: -52px; margin: -52px -16px 0; background: #0F1113; z-index: 1; border-bottom: 1px solid #1D1D20; }
   }
-  .whop-embed-box [data-whop-checkout-plan-id]:empty::before { content: "Loading secure checkout..."; display: block; padding: 40px 8px; text-align: center; color: #8B9094; font-size: 13px; }
+  .whop-embed-loading { padding: 40px 8px; text-align: center; color: #8B9094; font-size: 13px; }
 </style>
 
 <script>
@@ -331,6 +331,9 @@
       <span>Your plan: <b id="youplan-name">FREE</b></span>
       <a id="youplan-manage" href="https://whop.com/@me/settings/orders/" hidden>Manage subscription &rarr;</a>
       <a id="youplan-dash" href="/dashboard">Open dashboard &rarr;</a>
+    </div>
+    <div class="youplan" id="pay-retry" hidden>
+      <span>Payment not completed. You were not charged. You can try again below.</span>
     </div>
     <div class="youplan" id="promo-note" hidden>
       <span>Code applied at checkout for Solo, Kickstart and Pro:</span> <b id="promo-code"></b>
@@ -637,10 +640,10 @@
 </footer>
 
 <!-- Embedded Whop checkout overlays are built by the script below from
-     WHOP_PLANS, one static div per paid plan (docs.whop.com/payments/checkout-embed
-     documents only a fixed data-whop-checkout-plan-id per div). They exist before
-     Whop's loader is fetched, and the loader is fetched only when a buyer opens
-     one, so its tracking script never runs on a plain visit. -->
+     WHOP_PLANS, one per paid plan. The checkout inside is Whop Elements
+     (docs.whop.com/elements/latest/checkout), which replaced the legacy
+     js.whop.com loader in Oct 2026. elements.js is fetched only when a buyer
+     opens a checkout, so nothing from Whop runs on a plain visit. -->
 <div id="checkouts"></div>
 
 <div class="sbar-space mob"></div>
@@ -705,8 +708,8 @@
   // Whop partner code (a=<Whop username>, from a partner's link): this address
   // first, then the account (user_metadata.whop_aff, saved at sign-up, set in
   // loadPlan), then this browser (snypd_aff, marketing consent only, 30 days).
-  // Passed to Whop's checkout (?a= / data-whop-checkout-affiliate-code, both
-  // read by Whop) so the partner is credited.
+  // Passed to Whop's checkout (?a= on the hosted link, affiliateCode on the
+  // embedded one) so the partner is credited.
   var AFF_RE = /^[A-Za-z0-9_.-]{1,60}$/;
   var aff = null, affFromUrl = false;
   try { aff = new URLSearchParams(location.search).get('a'); affFromUrl = !!aff; } catch (e) {}
@@ -761,10 +764,6 @@
   }
 
   function paintAll() {
-    document.querySelectorAll('[data-whop-checkout-plan-id]').forEach(function (d) {
-      if (aff) d.setAttribute('data-whop-checkout-affiliate-code', aff);
-      else d.removeAttribute('data-whop-checkout-affiliate-code');
-    });
     document.querySelectorAll('[data-cta]').forEach(function (a) { paintCta(a, a.getAttribute('data-cta')); });
     ALL.forEach(function (k) {
       var tag = document.querySelector('[data-cur="' + k + '"]');
@@ -852,16 +851,14 @@
   var storedEmail = null;
   try {
     // Synchronous read of supabase-js's own persisted session (key
-    // sb-<project-ref>-auth-token). Whop's loader reads the prefill attribute
-    // once, at mount, so it has to be on the div before the loader runs.
+    // sb-<project-ref>-auth-token). Passed as buyerEmail and locked: access is
+    // linked by the checkout email, so it must be the SNYPD account's.
     var raw = localStorage.getItem('sb-igbuqanjocfmahlzzupc-auth-token');
     var parsed = raw && JSON.parse(raw);
     storedEmail = parsed && parsed.user && parsed.user.email || null;
   } catch (e) {}
-  // Checkout language and promo code (17 Oct 2026). Whop's embed reads
-  // data-whop-checkout-locale and data-whop-checkout-promo-code (both in
-  // js.whop.com/static/checkout/index.js; locale=fr renders a French checkout,
-  // checked 17 Oct). ?promo= comes from the trial-ended email; it is kept in
+  // Checkout language and promo code (17 Oct 2026; Whop Elements options
+  // locale and promoCode since 21 Oct). ?promo= comes from the trial-ended email; it is kept in
   // this browser for 3 days so it survives signing in. Only Solo, Kickstart and
   // Pro (Phase 1, 20 Oct 2026: the code covers Solo too); never the Hunt Pass.
   var LOCALE = window.SNYPD_I18N && SNYPD_I18N.lang === 'fr' ? 'fr' : null;
@@ -895,29 +892,70 @@
         '<p class="whop-embed-note">' + (once
           ? 'One payment. 1 search watched 24/7 for ' + PASS_DAYS + ' days, then it ends: no renewal, nothing to cancel. Full refund within 14 days of the payment: email snypd@gmail.com.'
           : 'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email snypd@gmail.com.') + '</p>' +
-        '<div data-whop-checkout-plan-id="' + WHOP_PLANS[k] + '" data-whop-checkout-theme="dark" data-whop-checkout-theme-accent-color="#A200FF" data-whop-checkout-on-complete="snypdCheckoutComplete"' +
-        (storedEmail ? ' data-whop-checkout-prefill-email="' + esc(storedEmail) + '"' : '') +
-        (LOCALE ? ' data-whop-checkout-locale="' + LOCALE + '"' : '') +
-        (promo && PROMO_PLANS[k] ? ' data-whop-checkout-promo-code="' + esc(promo) + '"' : '') + '></div>' +
+        '<p class="whop-embed-loading" data-whop-loading>Loading secure checkout...</p>' +
+        '<div data-whop-mount="' + k + '"></div>' +
       '</div>';
     host.appendChild(o);
   });
 
-  var loaderRequested = false, lastFocus = null;
-  function openCheckout(k) {
+  // Whop Elements (vanilla script tag, docs.whop.com/elements/latest). Needs no
+  // API key: the plan id prices the order. Fulfilment stays the webhook. If the
+  // script cannot load or mount, the buyer goes to the hosted whop.com checkout
+  // (the button's own href), so a Whop outage never strands a sale on a spinner.
+  var ELEMENTS_SRC = 'https://cdn.whop.com/elements/amber/elements.js';
+  var elementsP = null, mounted = {}, lastFocus = null;
+  function loadElements() {
+    if (elementsP) return elementsP;
+    elementsP = new Promise(function (resolve, reject) {
+      if (typeof window.WhopElements === 'function') return resolve(window.WhopElements);
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = ELEMENTS_SRC;
+      s.setAttribute('data-whop-elements', '');
+      var t = setTimeout(function () { reject(new Error('timeout')); }, 15000);
+      s.onload = function () { clearTimeout(t); typeof window.WhopElements === 'function' ? resolve(window.WhopElements) : reject(new Error('no WhopElements')); };
+      s.onerror = function () { clearTimeout(t); reject(new Error('load')); };
+      document.head.appendChild(s);
+    });
+    elementsP.catch(function () { elementsP = null; });  // retry on the next open
+    return elementsP;
+  }
+  function mountCheckout(k, o) {
+    if (mounted[k]) return Promise.resolve();
+    return loadElements().then(function (WhopElements) {
+      if (mounted[k]) return;
+      var loading = o.querySelector('[data-whop-loading]');
+      var opts = {
+        plan: WHOP_PLANS[k],
+        locale: LOCALE || 'en',
+        appearance: { theme: { appearance: 'dark', accentColor: 'purple' } },
+        // Back here after an off-site step (3-D Secure, bank page) or a finished
+        // payment; checkoutReturn() below reads ?status.
+        returnUrl: location.origin + '/plans?checkout=' + k,
+        onLoadingChange: function (busy) { if (loading) loading.hidden = !busy; },
+        onComplete: function (c) {
+          if (c && c.result === 'payment') track('plans_checkout_complete', { plan: k });
+        }
+      };
+      if (promo && PROMO_PLANS[k]) opts.promoCode = promo;
+      if (aff) opts.affiliateCode = aff;
+      var handle = WhopElements().checkout.create(opts);
+      var el = handle.create('checkout', storedEmail ? { buyerEmail: storedEmail, lockBuyerEmail: true } : {});
+      el.mount(o.querySelector('[data-whop-mount="' + k + '"]'));
+      mounted[k] = handle;
+    });
+  }
+  function openCheckout(k, fallbackHref) {
     var o = document.querySelector('[data-whop-embed-overlay="' + k + '"]');
     if (!o) return false;
     lastFocus = document.activeElement;
     o.hidden = false;
     document.body.style.overflow = 'hidden';
     o.querySelector('[data-whop-embed-close]').focus();
-    if (!loaderRequested) {
-      loaderRequested = true;
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://js.whop.com/static/checkout/loader.js';
-      document.head.appendChild(s);
-    }
+    mountCheckout(k, o).catch(function (err) {
+      track('plans_checkout_fallback', { plan: k, reason: String(err && err.message || err).slice(0, 60) });
+      if (fallbackHref) location.href = fallbackHref;
+    });
     track('plans_checkout_open', { plan: k });
     return true;
   }
@@ -932,10 +970,24 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && document.querySelector('[data-whop-embed-overlay]:not([hidden])')) closeCheckouts();
   });
-  // Whop calls this when an embedded checkout completes. The webhook that sets
-  // the plan runs on Whop's side, so send the buyer to the dashboard, whose own
-  // load re-checks the plan.
-  window.snypdCheckoutComplete = function () { closeCheckouts(); window.location.href = '/dashboard?activated=1'; };
+  // Back from the embedded checkout (returnUrl above). Whop appends
+  // ?payment=pay_...&status=succeeded|failed|canceled. Paid (or still
+  // processing): the dashboard, whose own load waits for the webhook's plan.
+  // Not paid: say so and reopen the same checkout.
+  (function checkoutReturn() {
+    var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var k = q.get('checkout');
+    if (!k || !WHOP_PLANS[k] || !q.has('status')) return;
+    var st = q.get('status');
+    track('plans_checkout_return', { plan: k, status: st });
+    if (st === 'failed' || st === 'canceled') {
+      try { history.replaceState(null, '', '/plans'); } catch (e) {}
+      $('pay-retry').hidden = false;
+      openCheckout(k, withAff('https://whop.com/checkout/' + WHOP_PLANS[k]));
+      return;
+    }
+    location.replace('/dashboard?activated=' + encodeURIComponent(k));
+  })();
 
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('[data-act]');
@@ -944,7 +996,7 @@
     var sec = a.closest('[data-section]');
     track('plans_cta_click', { plan: k, action: act, section: sec ? sec.getAttribute('data-section') : 'page' });
     if (act === 'none') { e.preventDefault(); return; }
-    if (act === 'checkout' && openCheckout(k)) e.preventDefault();
+    if (act === 'checkout' && openCheckout(k, a.href)) e.preventDefault();
   });
 
   // ----- Load the signed-in plan --------------------------------------------

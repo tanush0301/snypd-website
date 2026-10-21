@@ -734,6 +734,9 @@ FR.update({
         'Les plans payants se renouvellent chaque mois jusqu’à ta résiliation. Résiliable à tout moment. Remboursement intégral dans les 14 jours suivant ton premier paiement.',
     'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email snypd@gmail.com.':
         'Se renouvelle chaque mois jusqu’à ta résiliation. Résilie à tout moment dans ton compte Whop. Remboursement intégral dans les 14 jours suivant ton premier paiement' + NB + ': écris à snypd@gmail.com.',
+    'Loading secure checkout...': 'Chargement du paiement sécurisé…',
+    'Payment not completed. You were not charged. You can try again below.':
+        'Paiement non abouti. Tu n’as pas été débité. Tu peux réessayer ci-dessous.',
     'Something else?': 'Autre chose' + NB + '?',
     ', the': ', le',
     'or the': 'ou la',
