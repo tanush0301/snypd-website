@@ -44,7 +44,8 @@ self.addEventListener('push', (event) => {
 });
 
 /* UI language for the few fixed words the backend puts in a push (backend
- * push.py: "New find", "N new finds", "& N more", "New listing"). A service
+ * push.py: "New find", "N new finds", "& N more", "New listing", and the calm
+ * summary "N new matches - <hunt>" / "From <price>. Tap to see them."). A service
  * worker cannot read localStorage, so /assets/i18n.js stores the language the
  * visitor uses in cache storage ('snypd-prefs', '/__ui_lang'); without it the
  * browser language decides. Any failure here falls back to English text: the
@@ -64,7 +65,11 @@ function toFrench(s) {
     .replace(/^(\d+) new finds$/, '$1 nouvelles trouvailles')
     .replace(/ & (\d+) more$/, ' et $1 de plus')
     .replace(/(^|\u2014 )New listing\b/, '$1Nouvelle annonce')
-    .replace(/^A new listing matched your search\.$/, 'Une nouvelle annonce correspond \u00e0 ta recherche.');
+    .replace(/^A new listing matched your search\.$/, 'Une nouvelle annonce correspond \u00e0 ta recherche.')
+    .replace(/^1 new match - /, '1 nouvelle annonce - ')
+    .replace(/^(\d+) new matches - /, '$1 nouvelles annonces - ')
+    .replace(/^From (.+)\. Tap to see them\.$/, 'D\u00e8s $1. Touche pour les voir.')
+    .replace(/^Tap to see them\.$/, 'Touche pour les voir.');
 }
 
 async function show(data) {

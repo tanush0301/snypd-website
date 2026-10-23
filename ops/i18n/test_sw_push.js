@@ -36,6 +36,13 @@ async function fire(payload, { stored, navLang, cachesBroken }) {
     [two, { navLang: 'en-GB' }, '2 new finds', two.body],
     [two, { cachesBroken: true, navLang: 'en-US' }, '2 new finds', two.body],
     [{}, { stored: 'fr' }, 'SNYPD', 'Une nouvelle annonce correspond à ta recherche.'],
+    // Calm summary (push.py _build_calm_payload); the hunt name is the user's own text.
+    [{ title: '12 new matches - jordan 1', body: 'From 45.0 EUR. Tap to see them.' }, { stored: 'fr' },
+      '12 nouvelles annonces - jordan 1', 'Dès 45.0 EUR. Touche pour les voir.'],
+    [{ title: '1 new match - New listing hunt', body: 'Tap to see them.' }, { stored: 'fr' },
+      '1 nouvelle annonce - New listing hunt', 'Touche pour les voir.'],
+    [{ title: '12 new matches - jordan 1', body: 'From 45.0 EUR. Tap to see them.' }, { stored: 'en' },
+      '12 new matches - jordan 1', 'From 45.0 EUR. Tap to see them.'],
   ];
   let bad = 0;
   for (const [payload, env, wantT, wantB] of cases) {

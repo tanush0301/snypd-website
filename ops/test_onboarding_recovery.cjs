@@ -27,6 +27,8 @@ class Element {
   }
   addEventListener(type, cb) { (this.listeners[type] ||= []).push(cb); }
   setAttribute(k, v) { this.attrs[k] = v; }
+  getAttribute(k) { return this.attrs[k]; }
+  querySelectorAll() { return []; }
   focus() {}
   async click() { if (!this.disabled) for (const cb of this.listeners.click || []) await cb({}); }
 }
@@ -46,7 +48,7 @@ function base() {
   g.window = g;
   return { g, el, context: vm.createContext(g), events };
 }
-async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, trialEnds = null, boot = null} = {}) {
+async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, trialEnds = null, boot = null, insertedRow = {id: 'h1'}} = {}) {
   const f = base(); let inserts = 0, countValue = count, countReads = 0;
   // dashboard_boot snapshot (migration 054): the wizard takes its hunt count from it once.
   f.g.fromBoot = reader => { assert.equal(reader, 'wizard'); const b = boot; boot = null; return b; };
@@ -60,7 +62,10 @@ async function wizardFixture({count = 0, status = 'off', insertError = null, xpF
     select() { return this; }, eq() { return this; },
     then(resolve, reject) { countReads++; return Promise.resolve({count:countValue,error:null}).then(resolve,reject); },
     maybeSingle() { return Promise.resolve({data:{free_trial_started_at:trialStart, trial_ends_at:trialEnds},error:null}); },
-    async insert() { inserts++; if (pendingInsert) await pendingInsert; if (!insertError) countValue++; return {error: insertError}; },
+    // Like supabase-js: insert() is a chainable builder (.select('*').single()) that runs once when awaited.
+    insert() { let run = null; const b = { select() { return b; }, single() { return b; },
+      then(resolve, reject) { run ||= (async () => { inserts++; if (pendingInsert) await pendingInsert; if (!insertError) countValue++;
+        return {data: insertError ? null : insertedRow, error: insertError}; })(); return run.then(resolve, reject); } }; return b; },
   }; } };
   vm.runInContext(trialHelpers, f.context); f.g.paintTrialValue = async () => {};
   await vm.runInContext(wizard, f.context); await tick();
@@ -107,6 +112,17 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   assert.equal(f.el('wiz-q-err').style.display, 'block');
   f.setInsertError(null); await f.el('wiz-q-save').click();
   assert.equal(f.el('wiz-step-2').style.display, ''); assert.equal(f.inserts(),2); passed++;
+
+  // Calm mode (migration 064): a saved row that has push_mode gets the alert-style step
+  // before alerts, with Continue disabled until a style is picked. A row without it
+  // (column missing) goes straight to alerts, which every case above covers.
+  f = await wizardFixture({insertedRow: {id: 'h1', push_mode: 'every', push_calm_minutes: 15}});
+  f.el('wiz-step-1').style.display = ''; f.el('wiz-q-words').value = 'carhartt';
+  await f.el('wiz-q-save').click();
+  assert.equal(f.el('wiz-step-mode').style.display, ''); assert.equal(f.el('wiz-step-2').style.display, 'none');
+  assert.equal(f.el('wiz-step-mode').dataset.huntId, 'h1'); assert.equal(f.el('wiz-mode-next').disabled, true);
+  await f.el('wiz-mode-next').click();
+  assert.equal(f.el('wiz-step-2').style.display, 'none'); assert.equal(f.inserts(), 1); passed++;
 
   // Existing hunters get a visible resume action without an automatic modal.
   f = await wizardFixture({count:1});

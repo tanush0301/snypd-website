@@ -229,8 +229,8 @@
       { user_id: UID, listing_id: 1002, first_seen_price: { amount: 95, currency_code: 'EUR' } },
     ],
     user_searches: [
-      { id: 'search-1', user_id: UID, search_name: 'Jordan 1 Travis Scott', vinted_url: 'https://www.vinted.be/catalog?search_text=jordan%20travis%20scott', is_active: true, created_at: new Date(now - 5 * 86400000).toISOString() },
-      { id: 'search-2', user_id: UID, search_name: 'Off-White', vinted_url: 'https://www.vinted.be/catalog?search_text=off%20white', is_active: false, created_at: new Date(now - 4 * 86400000).toISOString() },
+      { id: 'search-1', user_id: UID, search_name: 'Jordan 1 Travis Scott', vinted_url: 'https://www.vinted.be/catalog?search_text=jordan%20travis%20scott', is_active: true, push_mode: 'every', push_calm_minutes: 15, created_at: new Date(now - 5 * 86400000).toISOString() },
+      { id: 'search-2', user_id: UID, search_name: 'Off-White', vinted_url: 'https://www.vinted.be/catalog?search_text=off%20white', is_active: false, push_mode: 'calm', push_calm_minutes: 30, created_at: new Date(now - 4 * 86400000).toISOString() },
     ],
     user_claims: [
       // Holding, < 45 days -> single full-width MARK SOLD.
@@ -322,13 +322,22 @@
     function execute() {
       var rows = DB[table] || (DB[table] = []);
 
+      // Column defaults + CHECKs that the real DB has (migrations 043, 064), so
+      // the page sees the same row shape after an insert as in production.
+      var badPush = function (r) {
+        return (r.push_mode !== undefined && ['every', 'calm'].indexOf(r.push_mode) < 0) ||
+          (r.push_calm_minutes !== undefined && [15, 30].indexOf(r.push_calm_minutes) < 0);
+      };
+      if (table === 'user_searches' && (op === 'insert' || op === 'update') && badPush(payload || {})) {
+        return { data: null, error: { code: '23514', message: 'new row violates check constraint (push_mode / push_calm_minutes)' } };
+      }
       if (op === 'insert') {
         var toInsert = Array.isArray(payload) ? payload : [payload];
         var inserted = toInsert.map(function (r) {
           var withDefaults = Object.assign({
             id: 'qa-' + table + '-' + Math.random().toString(36).slice(2, 10),
             created_at: new Date().toISOString(),
-          }, r);
+          }, table === 'user_searches' ? { show_all_results: true, push_mode: 'every', push_calm_minutes: 15 } : {}, r);
           rows.push(withDefaults);
           return withDefaults;
         });

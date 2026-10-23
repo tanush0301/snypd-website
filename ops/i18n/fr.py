@@ -985,3 +985,32 @@ FR_PATTERNS += [
     (r'^You picked Hunt Pass at sign-up\. Start it now and your hunt keeps running 24/7 when the trial ends\.$',
      'Tu as choisi le Pass 30 jours à l’inscription. Prends-le maintenant et ta recherche reste active 24h/24 à la fin de l’essai.'),
 ]
+
+# ===== Calm mode (migration 064, 23 Oct 2026): per-hunt alert style in the first-hunt wizard (new step 2 of 3)
+# and in the Filters sheet. "Every match" = today's behaviour; "Calm" = first find at once, then at most one
+# summary per 15 or 30 min (backend push.py; the push text itself is translated in sw.js).
+FR.update({
+    'Step 1 of 3': 'Étape 1 sur 3',
+    'Step 2 / 3': 'Étape 2 / 3',
+    'Step 3 / 3': 'Étape 3 / 3',
+    'How should we alert you?': 'Comment veux-tu être prévenu' + NB + '?',
+    'We still check this hunt every 30 s to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.':
+        'On vérifie toujours ta recherche toutes les 30 s à 5 min. Ce choix règle seulement la fréquence des notifications. Tu peux le changer à tout moment dans Filtres.',
+    'Alert style': 'Type d’alerte',
+    'Every match': 'Chaque annonce',
+    'Be first on every new listing. Best for resellers.': 'Sois le premier sur chaque nouvelle annonce. Idéal pour les revendeurs.',
+    'Calm': 'Calme',
+    'The first find right away, then at most one summary every 15 or 30 min.':
+        'La première trouvaille tout de suite, puis au plus un résumé toutes les 15 ou 30 min.',
+    'Summary every': 'Résumé toutes les',
+    'Continue': 'Continuer',
+    'Could not save this choice. Try again; your hunt is already running.':
+        'Impossible d’enregistrer ce choix. Réessaie' + NB + '; ta recherche tourne déjà.',
+    'ALERTS': 'ALERTES',
+    'Alerts for this hunt': 'Alertes pour cette recherche',
+})
+FR_PATTERNS += [
+    (r'^Calm - (\d+) min$', 'Calme - $1 min'),
+    (r'^Calm: the first find right away, then at most one summary every (\d+) min\.$',
+     'Calme' + NB + ': la première trouvaille tout de suite, puis au plus un résumé toutes les $1 min.'),
+]

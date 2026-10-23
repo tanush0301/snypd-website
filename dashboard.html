@@ -1619,6 +1619,31 @@ body {
     }
     .wiz-preset:hover { border-color: var(--brand); background: rgba(162,0,255,0.05); }
     .wiz-preset.is-picked { border-color: var(--success); background: rgba(0,229,160,0.06); opacity: 0.6; pointer-events: none; }
+    /* Calm mode (migration 064, 23 Oct 2026): per-hunt alert style, asked in the
+       wizard after the first hunt and changeable per hunt in Filters. */
+    /* Own class, not .wiz-preset: the wizard saves a preset hunt on every .wiz-preset click. */
+    .wiz-mode {
+      display: flex; flex-direction: column; gap: 4px;
+      text-align: left; width: 100%; padding: 14px 16px;
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: 0; cursor: pointer; transition: all 0.2s var(--smooth);
+      font-family: var(--font);
+    }
+    .wiz-mode:hover { border-color: var(--brand); background: rgba(162,0,255,0.05); }
+    .wiz-mode[aria-checked="true"] { border-color: var(--success); background: rgba(0,229,160,0.06); }
+    .wiz-mode__title { font-size: 14px; color: var(--text-primary); }
+    .wiz-mode__note { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+    .wiz-calm-min { display: flex; gap: 8px; margin: -12px 0 20px; }
+    .wiz-calm-min button {
+      flex: 1 1 0; padding: 10px 0; background: none; border: 1px solid var(--border); border-radius: 0;
+      color: var(--text-muted); font-family: var(--font); font-size: 12px; cursor: pointer;
+    }
+    .wiz-calm-min button[aria-pressed="true"] { border-color: var(--success); color: var(--text-primary); }
+    .fs-row__mode { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted); }
+    .fs-row__mode select {
+      background: var(--field, #191C1E); border: 1px solid var(--border); color: var(--text-primary);
+      font-family: var(--font); font-size: 16px; padding: 4px 6px; border-radius: 0;
+    }
 
     /* Wizard step 2 alert rows (Ledger 2b) */
     .wiz-alert-rows { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
@@ -1774,7 +1799,7 @@ body {
 <div class="wiz-overlay" id="wiz-overlay">
   <div class="wiz-modal">
     <div class="wiz-step" id="wiz-step-1">
-      <div class="wiz-eyebrow">Step 1 of 2</div>
+      <div class="wiz-eyebrow">Step 1 of 3</div>
       <h2 class="wiz-title">What are you hunting?</h2>
       <p class="wiz-sub">Type what you want. SNYPD runs that search on Vinted for you, no link needed. You can add more from Filters anytime.</p>
       <div class="wiz-quick">
@@ -1791,12 +1816,39 @@ body {
         <button class="btn btn-ghost" id="wiz-build-own" type="button">I have a Vinted link</button>
       </div>
     </div>
+    <div class="wiz-step" id="wiz-step-mode" style="display:none">
+      <div class="wiz-progress">
+        <span class="wiz-eyebrow" style="margin:0">Step 2 / 3</span>
+        <span class="wiz-progress__rule"></span>
+        <span class="wiz-progress__bar"></span>
+      </div>
+      <h2 class="wiz-title">How should we alert you?</h2>
+      <p class="wiz-sub">We still check this hunt every 30 s to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.</p>
+      <div class="wiz-presets" role="radiogroup" aria-label="Alert style">
+        <button type="button" class="wiz-mode" data-mode="every" role="radio" aria-checked="false">
+          <span class="wiz-mode__title">Every match</span>
+          <span class="wiz-mode__note">Be first on every new listing. Best for resellers.</span>
+        </button>
+        <button type="button" class="wiz-mode" data-mode="calm" role="radio" aria-checked="false">
+          <span class="wiz-mode__title">Calm</span>
+          <span class="wiz-mode__note">The first find right away, then at most one summary every 15 or 30 min.</span>
+        </button>
+      </div>
+      <div class="wiz-calm-min" id="wiz-calm-min" role="group" aria-label="Summary every" style="display:none">
+        <button type="button" data-calm-min="15" aria-pressed="true">15 min</button>
+        <button type="button" data-calm-min="30" aria-pressed="false">30 min</button>
+      </div>
+      <p class="wiz-quick__err" id="wiz-mode-err" role="status" style="display:none"></p>
+      <div class="wiz-actions">
+        <button class="btn btn-prim" id="wiz-mode-next" type="button" disabled>Continue</button>
+      </div>
+    </div>
     <div class="wiz-step" id="wiz-step-2" style="display:none">
       <!-- README §5.3.1: the step label sits on a progress row - label, a
            1px rule filling the space, then a short mint bar. Only the label
            existed before. -->
       <div class="wiz-progress">
-        <span class="wiz-eyebrow" style="margin:0">Step 2 / 2</span>
+        <span class="wiz-eyebrow" style="margin:0">Step 3 / 3</span>
         <span class="wiz-progress__rule"></span>
         <span class="wiz-progress__bar"></span>
       </div>
@@ -3061,6 +3113,12 @@ const HEARTBEAT_URL = (() => {
             <p class="fs-floor__note" role="note">${r.show_all_results
               ? 'Showing everything Vinted returns, including listings that only mention your words in the description.'
               : 'Showing listings with every word of your search in the title or brand. Vinted also returns listings that only mention it in the description.'}</p>
+            ${('push_mode' in r) ? `<label class="fs-row__mode"><span>ALERTS</span>
+              <select data-fs-mode aria-label="Alerts for this hunt">
+                <option value="every"${r.push_mode === 'calm' ? '' : ' selected'}>Every match</option>
+                ${[15, 30].map(m => `<option value="calm:${m}"${r.push_mode === 'calm' && Number(r.push_calm_minutes) === m ? ' selected' : ''}>Calm - ${m} min</option>`).join('')}
+              </select></label>
+              ${r.push_mode === 'calm' ? `<p class="fs-floor__note" role="note">Calm: the first find right away, then at most one summary every ${Number(r.push_calm_minutes) || 15} min.</p>` : ''}` : ''}
             <div class="fs-row__actions">
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
               <button type="button" data-fs-showall aria-pressed="${r.show_all_results ? 'true' : 'false'}">${r.show_all_results ? 'TITLE MATCH ONLY' : 'SHOW ALL VINTED RESULTS'}</button>
@@ -3106,7 +3164,7 @@ const HEARTBEAT_URL = (() => {
       try {
         const { data: inserted, error } = await sb.from('user_searches')
           .insert({ user_id: uid, search_name: name || nameFromUrl(url), vinted_url: applyPriceFloor(url), is_active: true })
-          .select('id').single();
+          .select('*').single();
         if (error) throw error;
         // Same E6 event the wizard's skip path already awards - first hunt
         // created, ever, regardless of which entry point did it.
@@ -3122,7 +3180,10 @@ const HEARTBEAT_URL = (() => {
         window.dispatchEvent(new Event('snypd:hunts-changed'));
         // First hunt from the sheet ("I have a Vinted link"): that path used to
         // skip the alerts step entirely, so nobody was ever asked.
-        if (wasFirst && window.SNYPD && typeof window.SNYPD.showAlertsStep === 'function') {
+        if (wasFirst && window.SNYPD && typeof window.SNYPD.showModeStep === 'function') {
+          closeSheet();
+          window.SNYPD.showModeStep(inserted);
+        } else if (wasFirst && window.SNYPD && typeof window.SNYPD.showAlertsStep === 'function') {
           closeSheet();
           window.SNYPD.showAlertsStep();
         }
@@ -3203,6 +3264,21 @@ const HEARTBEAT_URL = (() => {
       }
     });
 
+    // Calm mode (migration 064). Read by backend push.py within a minute.
+    listEl.addEventListener('change', async (e) => {
+      const sel = e.target.closest('[data-fs-mode]');
+      const row = sel && sel.closest('.fs-row');
+      if (!row || !row.dataset.id) return;
+      const parts = String(sel.value).split(':');
+      const patch = parts[0] === 'calm'
+        ? { push_mode: 'calm', push_calm_minutes: Number(parts[1]) || 15 }
+        : { push_mode: 'every' };
+      sel.disabled = true;
+      const { error } = await sb.from('user_searches').update(patch).eq('id', row.dataset.id).eq('user_id', uid);
+      if (error) console.error('SNYPD filter sheet: could not change alert mode', error);
+      await reloadHunts();
+    });
+
     // Populate the pill's own count on load, not just when the sheet opens -
     // same "don't hide state behind a click" reasoning as the topbar streak.
     reloadHunts();
@@ -3274,6 +3350,7 @@ const HEARTBEAT_URL = (() => {
       if (!hasSavedHunt) overlay.style.display = 'flex';
 
       let savingHunt = false;
+      let savedRow = null;
       async function saveSearch(name, url) {
         if (savingHunt) return false;
         savingHunt = true;
@@ -3282,10 +3359,11 @@ const HEARTBEAT_URL = (() => {
         if (save) { save.disabled = true; save.textContent = 'Saving...'; }
         if (errorBox) errorBox.style.display = 'none';
         try {
-          const { error } = await sb.from('user_searches').insert({
+          const { data: insertedRow, error } = await sb.from('user_searches').insert({
             user_id: uid, search_name: name, vinted_url: url, is_active: true
-          });
+          }).select('*').single();
           if (error) throw error;
+          savedRow = insertedRow;
         } catch (e) {
           console.error('SNYPD wizard: could not save search', e);
           if (errorBox) {
@@ -3303,7 +3381,7 @@ const HEARTBEAT_URL = (() => {
         Promise.resolve().then(async () => {
           if (!await xpEventExistsEver('first_hunt', null)) await awardXP('first_hunt', 20, null, {});
         }).catch(e => console.error('SNYPD wizard: optional XP failed', e));
-        window.SNYPD.showAlertsStep();
+        window.SNYPD.showModeStep(savedRow);
         window.dispatchEvent(new Event('snypd:hunts-changed'));
         return true;
       }
@@ -3324,6 +3402,52 @@ const HEARTBEAT_URL = (() => {
         step2.style.display = '';
         refreshTrialNote().catch(console.error);
       };
+
+      // Calm mode (migration 064): asked once, for the first hunt, before the
+      // alerts step. A row without push_mode means the column is not there
+      // (migration not run or rolled back): skip straight to alerts.
+      const stepMode = document.getElementById('wiz-step-mode');
+      const modeNext = document.getElementById('wiz-mode-next');
+      const modeErr = document.getElementById('wiz-mode-err');
+      const minRow = document.getElementById('wiz-calm-min');
+      let pickedMode = null;
+      let pickedMinutes = 15;
+      function paintMode() {
+        if (!stepMode) return;
+        stepMode.querySelectorAll('.wiz-mode').forEach(b => b.setAttribute('aria-checked', b.dataset.mode === pickedMode ? 'true' : 'false'));
+        stepMode.querySelectorAll('[data-calm-min]').forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.calmMin) === pickedMinutes ? 'true' : 'false'));
+        if (minRow) minRow.style.display = pickedMode === 'calm' ? '' : 'none';
+        if (modeNext) modeNext.disabled = !pickedMode;
+      }
+      window.SNYPD.showModeStep = (row) => {
+        if (!stepMode || !row || !row.id || !('push_mode' in row)) { window.SNYPD.showAlertsStep(); return; }
+        stepMode.dataset.huntId = String(row.id);
+        overlay.style.display = 'flex';
+        step1.style.display = 'none';
+        step2.style.display = 'none';
+        stepMode.style.display = '';
+        paintMode();
+      };
+      if (stepMode) {
+        stepMode.querySelectorAll('.wiz-mode').forEach(b => b.addEventListener('click', () => { pickedMode = b.dataset.mode; paintMode(); }));
+        stepMode.querySelectorAll('[data-calm-min]').forEach(b => b.addEventListener('click', () => { pickedMinutes = Number(b.dataset.calmMin) || 15; paintMode(); }));
+      }
+      if (modeNext) modeNext.addEventListener('click', async () => {
+        if (!pickedMode || !stepMode.dataset.huntId) return;
+        modeNext.disabled = true;
+        if (modeErr) modeErr.style.display = 'none';
+        const { error } = await sb.from('user_searches')
+          .update({ push_mode: pickedMode, push_calm_minutes: pickedMinutes })
+          .eq('id', stepMode.dataset.huntId).eq('user_id', uid);
+        if (error) {
+          console.error('SNYPD wizard: could not save alert mode', error);
+          if (modeErr) { modeErr.textContent = 'Could not save this choice. Try again; your hunt is already running.'; modeErr.style.display = 'block'; }
+          modeNext.disabled = false;
+          return;
+        }
+        stepMode.style.display = 'none';
+        window.SNYPD.showAlertsStep();
+      });
 
       const setupCard = document.getElementById('alerts-setup-card');
       const resumeSetup = document.getElementById('alerts-setup-resume');
