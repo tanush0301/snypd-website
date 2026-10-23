@@ -134,7 +134,7 @@ def cmp_html():
         out.append('<tr class="grp"><th scope="colgroup" colspan="%d">%s</th></tr>' % (len(plans.ORDER) + 1, title))
         for r in rows:
             label, note, cells = r[0], r[1], r[2]
-            attr = ' data-founding-row' if len(r) > 3 else ''
+            attr = ' data-founding-row hidden' if len(r) > 3 else ''
             out.append('<tr%s><th scope="row"><span class="fl">%s</span>%s</th>%s</tr>' % (
                 attr, esc(label), '<span class="fn">%s</span>' % esc(note) if note else '',
                 ''.join(cell(c, i) for i, c in enumerate(cells))))
@@ -379,3 +379,4 @@ def run(check=False):
 
 if __name__ == '__main__':
     sys.exit(1 if run(check='--check' in sys.argv) and '--check' in sys.argv else 0)
+

@@ -1808,7 +1808,9 @@ body {
           <select id="wiz-q-site" aria-label="Which Vinted country"></select>
           <input type="number" id="wiz-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
         </div>
-        <p class="wiz-quick__note" id="wiz-q-note">Like Vinted's own search, this includes listings that mention your words only in the description. Starts at about EUR30 to skip cheap fast fashion; change it later in Filters.</p>
+        <label class="wiz-quick__note" for="wiz-q-min"><span>Minimum price (optional)</span> · <span id="wiz-q-min-currency">EUR</span></label>
+        <input type="number" class="vq-input" id="wiz-q-min" min="0" step="1" inputmode="numeric" value="30" aria-describedby="wiz-q-note" />
+        <p class="wiz-quick__note" id="wiz-q-note">Lower or clear the minimum to include cheaper items. Like Vinted's search, matches can include words in the description.</p>
         <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
       </div>
       <div class="wiz-actions">
@@ -3518,15 +3520,24 @@ const HEARTBEAT_URL = (() => {
       const wqWords = document.getElementById('wiz-q-words');
       const wqSite = document.getElementById('wiz-q-site');
       const wqMax = document.getElementById('wiz-q-max');
+      const wqMin = document.getElementById('wiz-q-min');
       const wqSave = document.getElementById('wiz-q-save');
       const wqErr = document.getElementById('wiz-q-err');
       const wqNote = document.getElementById('wiz-q-note');
       if (vq && wqWords && wqSite && wqSave) {
         vq.fillSites(wqSite);
+        let minEdited = false;
+        if (wqMin) wqMin.addEventListener('input', () => { minEdited = true; });
         const paintWqNote = () => {
           const cur = vq.currencyFor(wqSite.value);
+          const minCurrency = document.getElementById('wiz-q-min-currency');
+          if (minCurrency) minCurrency.textContent = cur;
           if (wqMax) wqMax.placeholder = 'Max ' + cur;
-          if (wqNote) wqNote.textContent = 'Like Vinted\'s own search, this includes listings that mention your words only in the description. Starts at ' + cur + ' ' + vq.floorFor(wqSite.value) + ' to skip cheap fast fashion; change it later in Filters.';
+          if (wqMin) {
+            wqMin.placeholder = 'Min ' + cur;
+            if (!minEdited) wqMin.value = String(vq.floorFor(wqSite.value));
+          }
+          if (wqNote) wqNote.textContent = 'Lower or clear the minimum to include cheaper items. Like Vinted\'s search, matches can include words in the description.';
         };
         wqSite.addEventListener('change', paintWqNote);
         paintWqNote();
@@ -3538,7 +3549,10 @@ const HEARTBEAT_URL = (() => {
           const hi = JSON.parse(localStorage.getItem('snypd_hunt_intent') || 'null');
           if (hi && typeof hi.q === 'string' && hi.q.trim() && Date.now() - Number(hi.t) < 864e5) {
             wqWords.value = hi.q.trim().slice(0, 80);
-            if (wqMax && Number(hi.max) > 0) wqMax.value = String(Math.round(Number(hi.max)));
+            if (wqMax && Number(hi.max) > 0) {
+              wqMax.value = String(Math.round(Number(hi.max)));
+              if (wqMin && Number(wqMin.value) >= Number(wqMax.value)) { wqMin.value = ''; minEdited = true; }
+            }
           }
           localStorage.removeItem('snypd_hunt_intent');
         } catch (e) {}
@@ -3550,8 +3564,25 @@ const HEARTBEAT_URL = (() => {
             wqWords.focus();
             return;
           }
+          const minText = wqMin ? wqMin.value.trim() : '';
+          const maxText = wqMax ? wqMax.value.trim() : '';
+          const min = minText === '' ? null : Number(minText);
+          const max = maxText === '' ? null : Number(maxText);
+          if ((wqMin && wqMin.validity && wqMin.validity.badInput) || (wqMax && wqMax.validity && wqMax.validity.badInput)
+            || (min !== null && (!Number.isFinite(min) || min < 0))
+            || (max !== null && (!Number.isFinite(max) || max <= 0))) {
+            wqErr.textContent = 'Use a minimum of zero or more and a maximum above zero, or leave them blank.';
+            wqErr.style.display = 'block';
+            return;
+          }
+          if (min !== null && max !== null && min >= max) {
+            wqErr.textContent = 'Minimum price must be below maximum price. Lower or clear the minimum.';
+            wqErr.style.display = 'block';
+            if (wqMin) wqMin.focus();
+            return;
+          }
           wqErr.style.display = 'none';
-          await saveSearch(words, vq.build(wqSite.value, words, wqMax ? wqMax.value : '', vq.floorFor(wqSite.value)));
+          await saveSearch(words, vq.build(wqSite.value, words, maxText, min));
         });
         wqWords.addEventListener('keydown', e => { if (e.key === 'Enter') wqSave.click(); });
       }
@@ -7006,3 +7037,4 @@ const HEARTBEAT_URL = (() => {
 </script>
 </body>
 </html>
+

@@ -57,7 +57,10 @@ async function wizardFixture({count = 0, status = 'off', insertError = null, xpF
   f.g.awardXP = async () => 20;
   f.g.SNYPD.alertsStatus = async () => ({state: status});
   f.g.SNYPD.enableAlerts = async () => ({ok: false, state: 'error', message: 'Retry safely'});
-  f.g.SNYPD.vq = { fillSites() {}, currencyFor: () => 'EUR', floorFor: () => 30, build: () => 'https://www.vinted.fr/catalog?search_text=carhartt' };
+  const built = [];
+  f.built = built;
+  f.g.SNYPD.vq = { fillSites() {}, currencyFor: site => site === 'vinted.co.uk' ? 'GBP' : 'EUR', floorFor: site => site === 'vinted.co.uk' ? 25 : 30,
+    build: (...args) => { built.push(args); return 'https://www.vinted.fr/catalog?search_text=carhartt'; } };
   f.g.sb = { from() { return {
     select() { return this; }, eq() { return this; },
     then(resolve, reject) { countReads++; return Promise.resolve({count:countValue,error:null}).then(resolve,reject); },
@@ -209,5 +212,30 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   assert.equal(f.metrics().permissionCalls,0);
   assert.equal((await f.g.SNYPD.enableAlerts()).ok,true); passed++;
 
+  // First-hunt minimum is visible, editable and actually used by the save path.
+  for (const [minimum, maximum, expected] of [['5','20',5],['','20',null],['0','20',0],['30','',30]]) {
+    f=await wizardFixture(); f.el('wiz-q-words').value='jacket';
+    assert.equal(f.el('wiz-q-min').value,'30');
+    f.el('wiz-q-min').value=minimum; f.el('wiz-q-max').value=maximum;
+    await f.el('wiz-q-save').click();
+    assert.equal(f.inserts(),1); assert.equal(f.built[0][3],expected); passed++;
+  }
+  // Invalid ranges never reach the database; the user can correct and retry.
+  for (const [minimum, maximum] of [['30','20'],['20','20'],['-1','20'],['5','0'],['5','-2'],['NaN','20']]) {
+    f=await wizardFixture(); f.el('wiz-q-words').value='jacket';
+    f.el('wiz-q-min').value=minimum; f.el('wiz-q-max').value=maximum;
+    await f.el('wiz-q-save').click();
+    assert.equal(f.inserts(),0); assert.equal(f.el('wiz-q-err').style.display,'block');
+    f.el('wiz-q-min').value='5'; f.el('wiz-q-max').value='20';
+    await f.el('wiz-q-save').click(); assert.equal(f.inserts(),1); passed++;
+  }
+  f=await wizardFixture(); f.el('wiz-q-site').value='vinted.co.uk';
+  for (const cb of f.el('wiz-q-site').listeners.change) cb();
+  assert.equal(f.el('wiz-q-min').value,'25'); assert.equal(f.el('wiz-q-min-currency').textContent,'GBP');
+  f.el('wiz-q-min').value='5'; for (const cb of f.el('wiz-q-min').listeners.input) cb();
+  f.el('wiz-q-site').value='vinted.fr'; for (const cb of f.el('wiz-q-site').listeners.change) cb();
+  assert.equal(f.el('wiz-q-min').value,'5'); assert.equal(f.el('wiz-q-min-currency').textContent,'EUR'); passed++;
+
   console.log(`PASS: ${passed} onboarding/push recovery scenarios; no production requests.`);
 })().catch(error=>{console.error(error);process.exitCode=1;});
+

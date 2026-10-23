@@ -1047,3 +1047,13 @@ FR_PATTERNS += [
     (r'^· (€[\d.]+) once incl\. VAT$', '· $1 en une fois TTC'),
     (r'^Still hunting after (\d+) days\? Solo: (€[\d.]+) / mo →$', 'Encore en chasse après $1 jours' + NB + '? Solo' + NB + ': $2 / mois →'),
 ]
+
+
+# First-hunt price controls, 23 October 2026.
+FR.update({
+    'Minimum price (optional)': 'Prix minimum (facultatif)',
+    "Lower or clear the minimum to include cheaper items. Like Vinted's search, matches can include words in the description.": 'Baisse ou efface le minimum pour inclure les articles moins chers. Comme sur Vinted, les résultats peuvent contenir les mots dans la description.',
+    'Use a minimum of zero or more and a maximum above zero, or leave them blank.': 'Indique un minimum de zéro ou plus et un maximum supérieur à zéro, ou laisse les champs vides.',
+    'Minimum price must be below maximum price. Lower or clear the minimum.': 'Le prix minimum doit être inférieur au maximum. Baisse ou efface le minimum.',
+})
+FR_PATTERNS += [(r'^Min ([A-Z]{3})$', 'Min $1')]

@@ -347,6 +347,50 @@
     </div>
   </section>
 
+  <section class="band band--alt" aria-labelledby="chooser-title" data-section="chooser">
+    <div class="wrap sec chooser">
+      <div class="chooser__q">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <h2 class="display h2" id="chooser-title">Not sure? Start with your goal.</h2>
+          <span style="font-size:12.5px;" class="muted">We'll point at the smallest plan that fits.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <span class="label" id="q-goal-l" style="letter-spacing:.12em;">WHAT ARE YOU HUNTING FOR?</span>
+          <div class="goals" role="group" aria-labelledby="q-goal-l" id="q-goal">
+            <button type="button" data-goal="one" aria-pressed="false"><b>ONE ITEM, THEN DONE</b><span>A console, a jacket in your size: find it and stop.</span></button>
+            <button type="button" data-goal="watch" aria-pressed="false"><b>ONE SEARCH, ONGOING</b><span>Keep watching the same search, month after month.</span></button>
+            <button type="button" data-goal="resell" aria-pressed="false"><b>STOCK TO RESELL</b><span>Several searches to source items you sell on.</span></button>
+          </div>
+        </div>
+        <div id="q-resell" style="display:flex;flex-direction:column;gap:10px;" hidden>
+          <span class="label" id="q-searches" style="letter-spacing:.12em;">HOW MANY SEARCHES?</span>
+          <div class="seg seg--3" role="group" aria-labelledby="q-searches" id="q-n">
+            <button type="button" data-n="2" aria-pressed="false">2</button>
+            <button type="button" data-n="5" aria-pressed="false">3&ndash;5</button>
+            <button type="button" data-n="10" aria-pressed="false">6&ndash;10</button>
+          </div>
+          <div class="toggles">
+            <button type="button" id="q-price" aria-pressed="false"><span>Check typical prices before buying</span><span class="yn" aria-hidden="true">NO</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="fit" aria-live="polite">
+        <span class="label">YOUR FIT</span>
+        <p class="muted" id="fit-empty" style="margin:0;font-size:12.5px;line-height:1.6;">Pick what you're hunting for and we'll show the plan that fits.</p>
+        <div id="fit-body" style="display:flex;flex-direction:column;gap:16px;flex:1;" hidden>
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+            <span class="fit__name" id="fit-name"></span>
+            <span style="font-size:15px;color:#E8EAEB;" id="fit-price"></span>
+          </div>
+          <ul class="feats" id="fit-reasons"></ul>
+          <a class="fit__alt" id="fit-alt" href="#card-pass" hidden><!--plans:plans-fit-pass-->One item, no subscription? Hunt Pass: &euro;3.99 once, 30 days &rarr;<!--/plans:plans-fit-pass--></a>
+          <a class="fit__alt" id="fit-alt-solo" href="#card-solo" hidden></a>
+          <a class="btn btn--prim" id="fit-cta" data-cta-fit href="/signup">START FREE</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="wrap" style="padding-bottom:40px;" aria-label="Plans" data-section="cards" id="plans">
     <nav class="jump mob" aria-label="Jump to a plan">
       <a href="#card-free">FREE<b><!--plans:price:free-->&euro;0<!--/plans:price:free--></b></a>
@@ -478,54 +522,12 @@
     </div>
     <div class="under">
       <span class="muted"><!--plans:plans-under-->Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment. The Hunt Pass is paid once and does not renew.<!--/plans:plans-under--></span>
-      <span style="color:#00E5A0;letter-spacing:.06em;" id="founding-line">FIRST 100 ACCOUNTS KEEP PRO PRICING FOR LIFE</span>
+      <span style="color:#00E5A0;letter-spacing:.06em;" id="founding-line" hidden></span>
     </div>
     <p class="proof" id="proof" hidden><b id="proof-n"></b> Vinted listings matched for SNYPD hunters so far.</p>
   </section>
 
-  <section class="band band--alt" aria-labelledby="chooser-title" data-section="chooser">
-    <div class="wrap sec chooser">
-      <div class="chooser__q">
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <h2 class="display h2" id="chooser-title">Not sure? Start with your goal.</h2>
-          <span style="font-size:12.5px;" class="muted">We'll point at the smallest plan that fits.</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <span class="label" id="q-goal-l" style="letter-spacing:.12em;">WHAT ARE YOU HUNTING FOR?</span>
-          <div class="goals" role="group" aria-labelledby="q-goal-l" id="q-goal">
-            <button type="button" data-goal="one" aria-pressed="false"><b>ONE ITEM, THEN DONE</b><span>A console, a jacket in your size: find it and stop.</span></button>
-            <button type="button" data-goal="watch" aria-pressed="false"><b>ONE SEARCH, ONGOING</b><span>Keep watching the same search, month after month.</span></button>
-            <button type="button" data-goal="resell" aria-pressed="false"><b>STOCK TO RESELL</b><span>Several searches to source items you sell on.</span></button>
-          </div>
-        </div>
-        <div id="q-resell" style="display:flex;flex-direction:column;gap:10px;" hidden>
-          <span class="label" id="q-searches" style="letter-spacing:.12em;">HOW MANY SEARCHES?</span>
-          <div class="seg seg--3" role="group" aria-labelledby="q-searches" id="q-n">
-            <button type="button" data-n="2" aria-pressed="false">2</button>
-            <button type="button" data-n="5" aria-pressed="false">3&ndash;5</button>
-            <button type="button" data-n="10" aria-pressed="false">6&ndash;10</button>
-          </div>
-          <div class="toggles">
-            <button type="button" id="q-price" aria-pressed="false"><span>Check typical prices before buying</span><span class="yn" aria-hidden="true">NO</span></button>
-          </div>
-        </div>
-      </div>
-      <div class="fit" aria-live="polite">
-        <span class="label">YOUR FIT</span>
-        <p class="muted" id="fit-empty" style="margin:0;font-size:12.5px;line-height:1.6;">Pick what you're hunting for and we'll show the plan that fits.</p>
-        <div id="fit-body" style="display:flex;flex-direction:column;gap:16px;flex:1;" hidden>
-          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
-            <span class="fit__name" id="fit-name"></span>
-            <span style="font-size:15px;color:#E8EAEB;" id="fit-price"></span>
-          </div>
-          <ul class="feats" id="fit-reasons"></ul>
-          <a class="fit__alt" id="fit-alt" href="#card-pass" hidden><!--plans:plans-fit-pass-->One item, no subscription? Hunt Pass: &euro;3.99 once, 30 days &rarr;<!--/plans:plans-fit-pass--></a>
-          <a class="fit__alt" id="fit-alt-solo" href="#card-solo" hidden></a>
-          <a class="btn btn--prim" id="fit-cta" data-cta-fit href="/signup">START FREE</a>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <section class="band" id="compare" aria-labelledby="compare-title" data-section="compare">
     <div class="wrap sec">
@@ -565,7 +567,7 @@
 <tr class="grp"><th scope="colgroup" colspan="6">COMMUNITY</th></tr>
 <tr><th scope="row"><span class="fl">Free Discord community</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr><th scope="row"><span class="fl">Paid Discord channels</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr data-founding-row><th scope="row"><span class="fl">Founding member</span><span class="fn">First 100 accounts, free included. Keep Pro at &#8364;24.99 a month for life.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
+<tr data-founding-row hidden><th scope="row"><span class="fl">Founding member</span><span class="fn">First 100 accounts, free included. Keep Pro at &#8364;24.99 a month for life.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr class="grp"><th scope="colgroup" colspan="6">BILLING</th></tr>
 <tr><th scope="row"><span class="fl">Price per month</span><span class="fn">VAT included.</span></th><td class="pc c0">&#8364;0</td><td class="pc c1">&#8364;5.99</td><td class="pc c2">&#8364;14.99</td><td class="pc c3 is-pro">&#8364;24.99</td><td class="pc c4">&#8364;34.99</td></tr>
 <tr><th scope="row"><span class="fl">Card needed</span></th><td class="pc c0">No</td><td class="pc c1">Yes</td><td class="pc c2">Yes</td><td class="pc c3 is-pro">Yes</td><td class="pc c4">Yes</td></tr>
@@ -1120,10 +1122,12 @@
   fetch(FOUNDING_ENDPOINT)
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
-      if (!d || typeof d.remaining !== 'number') return;
-      var left = Math.max(0, d.remaining);
+      if (!d || !Number.isInteger(d.remaining) || d.remaining < 0 || d.remaining > 100) return;
+      var left = d.remaining;
       if (left > 0) {
         $('founding-line').textContent = 'FOUNDING · ' + left + ' OF 100 SPOTS LEFT · PRO PRICING FOR LIFE';
+        $('founding-line').hidden = false;
+        var row = document.querySelector('[data-founding-row]'); if (row) row.hidden = false;
       } else {
         // The offer is gone: stop advertising it.
         $('founding-line').textContent = '';
@@ -1135,3 +1139,4 @@
 </script>
 </body>
 </html>
+
