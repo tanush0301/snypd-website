@@ -141,6 +141,13 @@
   .seg button { min-height: 48px; border: 0; border-left: 1px solid #26262A; background: #141416; color: #8B9094; font-size: 12.5px; letter-spacing: .04em; cursor: pointer; }
   .seg button:first-child { border-left: 0; }
   .seg button[aria-pressed="true"] { background: #A200FF; color: #FFFFFF; }
+  .seg--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .goals { display: flex; flex-direction: column; gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .goals button { min-height: 64px; background: #121214; border: 0; padding: 12px 15px; display: flex; flex-direction: column; justify-content: center; gap: 4px; cursor: pointer; text-align: left; color: #E8EAEB; }
+  .goals b { font-weight: 400; font-size: 12.5px; letter-spacing: .08em; }
+  .goals span { font-size: 12px; line-height: 1.45; color: #8B9094; }
+  .goals button[aria-pressed="true"] { background: #A200FF; color: #FFFFFF; }
+  .goals button[aria-pressed="true"] span { color: #F1E3FF; }
   .toggles { display: flex; flex-direction: column; gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
   .toggles button { min-height: 56px; background: #121214; border: 0; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; text-align: left; font-size: 12.5px; color: #E8EAEB; }
   .yn { font-size: 11px; letter-spacing: .1em; color: #8B9094; border: 1px solid #8B9094; padding: 4px 8px; min-width: 38px; text-align: center; }
@@ -480,32 +487,42 @@
     <div class="wrap sec chooser">
       <div class="chooser__q">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <h2 class="display h2" id="chooser-title">Not sure? Three taps.</h2>
+          <h2 class="display h2" id="chooser-title">Not sure? Start with your goal.</h2>
           <span style="font-size:12.5px;" class="muted">We'll point at the smallest plan that fits.</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <span class="label" id="q-searches" style="letter-spacing:.12em;">HOW MANY THINGS DO YOU HUNT?</span>
-          <div class="seg" role="group" aria-labelledby="q-searches" id="q-n">
-            <button type="button" data-n="1" aria-pressed="false">1</button>
-            <button type="button" data-n="2" aria-pressed="true">2</button>
+          <span class="label" id="q-goal-l" style="letter-spacing:.12em;">WHAT ARE YOU HUNTING FOR?</span>
+          <div class="goals" role="group" aria-labelledby="q-goal-l" id="q-goal">
+            <button type="button" data-goal="one" aria-pressed="false"><b>ONE ITEM, THEN DONE</b><span>A console, a jacket in your size: find it and stop.</span></button>
+            <button type="button" data-goal="watch" aria-pressed="false"><b>ONE SEARCH, ONGOING</b><span>Keep watching the same search, month after month.</span></button>
+            <button type="button" data-goal="resell" aria-pressed="false"><b>STOCK TO RESELL</b><span>Several searches to source items you sell on.</span></button>
+          </div>
+        </div>
+        <div id="q-resell" style="display:flex;flex-direction:column;gap:10px;" hidden>
+          <span class="label" id="q-searches" style="letter-spacing:.12em;">HOW MANY SEARCHES?</span>
+          <div class="seg seg--3" role="group" aria-labelledby="q-searches" id="q-n">
+            <button type="button" data-n="2" aria-pressed="false">2</button>
             <button type="button" data-n="5" aria-pressed="false">3&ndash;5</button>
             <button type="button" data-n="10" aria-pressed="false">6&ndash;10</button>
           </div>
-        </div>
-        <div class="toggles">
-          <button type="button" id="q-closed" aria-pressed="true"><span>Keep hunting with the tab closed</span><span class="yn" aria-hidden="true">YES</span></button>
-          <button type="button" id="q-price" aria-pressed="true"><span>Check typical prices before buying</span><span class="yn" aria-hidden="true">YES</span></button>
+          <div class="toggles">
+            <button type="button" id="q-price" aria-pressed="false"><span>Check typical prices before buying</span><span class="yn" aria-hidden="true">NO</span></button>
+          </div>
         </div>
       </div>
       <div class="fit" aria-live="polite">
         <span class="label">YOUR FIT</span>
-        <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
-          <span class="fit__name" id="fit-name">PRO</span>
-          <span style="font-size:15px;color:#E8EAEB;" id="fit-price"><!--plans:price-mo:pro-->&euro;24.99 / mo<!--/plans:price-mo:pro--></span>
+        <p class="muted" id="fit-empty" style="margin:0;font-size:12.5px;line-height:1.6;">Pick what you're hunting for and we'll show the plan that fits.</p>
+        <div id="fit-body" style="display:flex;flex-direction:column;gap:16px;flex:1;" hidden>
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+            <span class="fit__name" id="fit-name"></span>
+            <span style="font-size:15px;color:#E8EAEB;" id="fit-price"></span>
+          </div>
+          <ul class="feats" id="fit-reasons"></ul>
+          <a class="fit__alt" id="fit-alt" href="#card-pass" hidden><!--plans:plans-fit-pass-->One item, no subscription? Hunt Pass: &euro;3.99 once, 30 days &rarr;<!--/plans:plans-fit-pass--></a>
+          <a class="fit__alt" id="fit-alt-solo" href="#card-solo" hidden></a>
+          <a class="btn btn--prim" id="fit-cta" data-cta-fit href="/signup">START FREE</a>
         </div>
-        <ul class="feats" id="fit-reasons"></ul>
-        <a class="fit__alt" id="fit-alt" href="#card-pass" hidden><!--plans:plans-fit-pass-->One item, no subscription? Hunt Pass: &euro;3.99 once, 30 days &rarr;<!--/plans:plans-fit-pass--></a>
-        <a class="btn btn--prim" id="fit-cta" data-cta-fit href="/signup?plan=pro">START PRO</a>
       </div>
     </div>
   </section>
@@ -788,29 +805,42 @@
   }
 
   // ----- Plan chooser -------------------------------------------------------
-  var q = { n: 2, closed: true, price: true };
-  var focusPlan = 'pro';
+  // Nothing is preselected (23 Oct 2026): the visitor says what they hunt for
+  // first. One item -> Hunt Pass, one search ongoing -> Solo, reselling ->
+  // Kickstart and up by number of searches, Pro+ only if they want price checks.
+  // Until a goal is picked the sticky bar shows Free, the step everyone takes first.
+  var q = { goal: null, n: 0, price: false };
+  var focusPlan = 'free';
   function paintBar() {
     var k = focusPlan;
-    $('sbar-txt').innerHTML = '<b>' + NAMES[k] + '</b> · ' + (k === 'free' ? '€0, no card' : PRICE[k] + ' / mo incl. VAT');
+    $('sbar-txt').innerHTML = '<b>' + NAMES[k] + '</b> · ' + (k === 'free' ? '€0, no card' : k === 'pass' ? PRICE[k] + ' once incl. VAT' : PRICE[k] + ' / mo incl. VAT');
     var a = $('sbar-cta');
     a.setAttribute('data-cta', k);
     a.classList.toggle('btn--prim', true);
     paintCta(a, k);
   }
   function paintFit() {
-    // Smallest plan that covers every answer (index into PLANS: 0 free, 1 solo,
-    // 2 kickstart, 3 pro, 4 elite). Market Report starts at Pro.
-    var rank = Math.max(q.n >= 6 ? 4 : q.n >= 3 ? 3 : q.n >= 2 ? 2 : 0, q.closed ? 1 : 0, q.price ? 3 : 0);
-    var k = PLANS[rank];
-    var reasons = [SEARCHES[k] + ' active search' + (SEARCHES[k] > 1 ? 'es' : '')];
-    reasons.push(k === 'free' ? '24/7 for 3 days, then while your dashboard is open' : 'Keeps hunting with the tab closed');
+    $('fit-empty').hidden = !!q.goal;
+    $('fit-body').hidden = !q.goal;
+    if (!q.goal) { paintBar(); return; }
+    var k;
+    if (q.goal === 'one') k = 'pass';
+    else if (q.goal === 'watch') k = 'solo';
+    // Reselling: smallest plan with enough searches (2 until they pick a count);
+    // Market Report starts at Pro.
+    else k = PLANS[Math.max(q.n >= 6 ? 4 : q.n >= 3 ? 3 : 2, q.price ? 3 : 0)];
+    var reasons = [SEARCHES[k] + ' active search' + (SEARCHES[k] > 1 ? 'es' : ''), 'Keeps hunting with the tab closed'];
+    if (k === 'pass') reasons.push('Ends after ' + PASS_DAYS + ' days: no renewal, nothing to cancel');
+    if (k === 'solo') reasons.push('Renews monthly, cancel any time');
     if (k === 'pro' || k === 'elite') reasons.push('Market Report price checks');
-    // One thing to hunt and no price checks: the Hunt Pass is the no-subscription option.
-    $('fit-alt').hidden = !(q.n === 1 && !q.price);
+    // The other single-search option, so nobody overpays or under-buys.
+    $('fit-alt').hidden = !(k === 'solo' && WHOP_PLANS.pass);
+    var alt = $('fit-alt-solo');
+    alt.textContent = 'Still hunting after ' + PASS_DAYS + ' days? Solo: ' + PRICE.solo + ' / mo →';
+    alt.hidden = k !== 'pass';
     focusPlan = k;
     $('fit-name').textContent = NAMES[k];
-    $('fit-price').textContent = k === 'free' ? '€0' : PRICE[k] + ' / mo';
+    $('fit-price').textContent = k === 'pass' ? PRICE[k] + ' once' : PRICE[k] + ' / mo';
     $('fit-reasons').innerHTML = reasons.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
     var fit = $('fit-cta');
     fit.setAttribute('data-cta', k);
@@ -820,20 +850,25 @@
     }
     paintBar();
   }
+  $('q-goal').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    q.goal = b.getAttribute('data-goal');
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    $('q-resell').hidden = q.goal !== 'resell';
+    paintFit();
+    track('plan_fit_goal', { goal: q.goal, plan: focusPlan });
+  });
   $('q-n').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     q.n = +b.getAttribute('data-n');
     this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
     paintFit();
   });
-  ['closed', 'price'].forEach(function (key) {
-    var b = $('q-' + key);
-    b.addEventListener('click', function () {
-      q[key] = !q[key];
-      b.setAttribute('aria-pressed', q[key] ? 'true' : 'false');
-      b.querySelector('.yn').textContent = q[key] ? 'YES' : 'NO';
-      paintFit();
-    });
+  $('q-price').addEventListener('click', function () {
+    q.price = !q.price;
+    this.setAttribute('aria-pressed', q.price ? 'true' : 'false');
+    this.querySelector('.yn').textContent = q.price ? 'YES' : 'NO';
+    paintFit();
   });
 
   // ----- Mobile comparison tabs --------------------------------------------

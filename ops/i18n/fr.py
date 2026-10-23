@@ -616,9 +616,9 @@ FR.update({
     'Card needed': 'Carte nécessaire',
     # fit quiz
     'YOUR FIT': 'TON PLAN',
-    'Not sure? Three taps.': 'Tu hésites' + NB + '? Trois clics.',
+    'Not sure? Start with your goal.': 'Tu hésites' + NB + '? Commence par ton objectif.',
     "We'll point at the smallest plan that fits.": 'On t’indique le plus petit plan qui convient.',
-    'HOW MANY THINGS DO YOU HUNT?': 'COMBIEN D’ARTICLES CHERCHES-TU' + NB + '?',
+    'HOW MANY SEARCHES?': 'COMBIEN DE RECHERCHES' + NB + '?',
     'Try SNYPD on one real search.': 'Essaie SNYPD sur une vraie recherche.',
     'Pause one any time to free the slot.': 'Mets-en une en pause à tout moment pour libérer la place.',
     # comparison table
@@ -1024,4 +1024,26 @@ FR.update({
 FR_PATTERNS += [
     (r'^Done: "(.+)" now sends at most one summary every 15 min\. Change it anytime in Filters\.$',
      'C’est fait' + NB + ': «' + NB + '$1' + NB + '» envoie désormais au plus un résumé toutes les 15 min. Tu peux le changer à tout moment dans Filtres.'),
+]
+
+# ===== /plans chooser by goal (23 Oct 2026): nothing preselected; one item -> Hunt Pass, one search ongoing -> Solo,
+# reselling -> Kickstart and up (count of searches + optional price checks).
+FR.update({
+    'WHAT ARE YOU HUNTING FOR?': 'QUE CHERCHES-TU' + NB + '?',
+    'ONE ITEM, THEN DONE': 'UN ARTICLE, PUIS C’EST FINI',
+    'A console, a jacket in your size: find it and stop.': 'Une console, une veste à ta taille' + NB + ': tu la trouves, tu arrêtes.',
+    'ONE SEARCH, ONGOING': 'UNE RECHERCHE, EN CONTINU',
+    'Keep watching the same search, month after month.': 'Surveiller la même recherche, mois après mois.',
+    'STOCK TO RESELL': 'DU STOCK À REVENDRE',
+    'Several searches to source items you sell on.': 'Plusieurs recherches pour trouver des articles à revendre.',
+    "Pick what you're hunting for and we'll show the plan that fits.": 'Choisis ce que tu cherches et on t’indique le plan qui convient.',
+    '1 active search': '1 recherche active',
+    'Renews monthly, cancel any time': 'Renouvelé chaque mois, résiliable à tout moment',
+    'NO': 'NON',
+})
+FR_PATTERNS += [
+    (r'^(\d+) active searches$', '$1 recherches actives'),
+    (r'^(€[\d.]+) once$', '$1 en une fois'),
+    (r'^· (€[\d.]+) once incl\. VAT$', '· $1 en une fois TTC'),
+    (r'^Still hunting after (\d+) days\? Solo: (€[\d.]+) / mo →$', 'Encore en chasse après $1 jours' + NB + '? Solo' + NB + ': $2 / mois →'),
 ]
