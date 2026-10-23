@@ -1014,3 +1014,14 @@ FR_PATTERNS += [
     (r'^Calm: the first find right away, then at most one summary every (\d+) min\.$',
      'Calme' + NB + ': la première trouvaille tout de suite, puis au plus un résumé toutes les $1 min.'),
 ]
+
+# ===== Broad-hunt notice: Switch to Calm (23 Oct 2026). Sets that hunt to Calm / 15 min (migration 064).
+FR.update({
+    'Switch to Calm': 'Passer en Calme',
+    'Could not switch this hunt. Try again, or change it in Filters.':
+        'Impossible de changer cette recherche. Réessaie, ou change-la dans Filtres.',
+})
+FR_PATTERNS += [
+    (r'^Done: "(.+)" now sends at most one summary every 15 min\. Change it anytime in Filters\.$',
+     'C’est fait' + NB + ': «' + NB + '$1' + NB + '» envoie désormais au plus un résumé toutes les 15 min. Tu peux le changer à tout moment dans Filtres.'),
+]

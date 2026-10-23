@@ -2008,7 +2008,8 @@ body {
     <div class="elite-banner__text" id="broad-hunt-text"></div>
   </div>
   <div class="email-optin__actions">
-    <button class="btn btn-prim" id="broad-hunt-edit" type="button">Edit hunt</button>
+    <button class="btn btn-prim" id="broad-hunt-calm" type="button" style="display:none">Switch to Calm</button>
+    <button class="btn btn-ghost" id="broad-hunt-edit" type="button">Edit hunt</button>
     <button class="btn btn-ghost" id="broad-hunt-keep" type="button">Keep it</button>
   </div>
 </div>
@@ -5801,6 +5802,17 @@ const HEARTBEAT_URL = (() => {
   // (> 1,000 in 24 h). Shown once per hunt per device; "Keep it" remembers the choice.
   const BROAD_PER_30MIN = 25;
   let broadSig = null;
+  let broadHunt = null;
+  // Calm mode (migration 064) solves the noise without narrowing the hunt, so the card offers it and never shows
+  // for a hunt that is already calm. One read of the user's hunts, only when the card would show.
+  let broadModes = null;
+  async function huntModes() {
+    if (broadModes) return broadModes;
+    const { data, error } = await sb.from('user_searches').select('*').eq('user_id', uid);
+    if (error) throw error;
+    broadModes = data || [];
+    return broadModes;
+  }
   function huntLabel(u) {
     try {
       const url = new URL(u);
@@ -5808,7 +5820,7 @@ const HEARTBEAT_URL = (() => {
       return q || url.hostname.replace(/^www\./, '');
     } catch (e) { return 'this hunt'; }
   }
-  function noteBroadHunt(feed) {
+  async function noteBroadHunt(feed) {
     const card = document.getElementById('broad-hunt');
     const text = document.getElementById('broad-hunt-text');
     if (!card || !text || !feed || !Array.isArray(feed.rows) || !feed.rows.length) return;
@@ -5831,15 +5843,48 @@ const HEARTBEAT_URL = (() => {
     try { kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {}; } catch (e) {}
     if (kept[top]) return;
     const url = (feed.huntUrls || []).find(h => savedSearchSignature(h) === top);
+    let row = null;
+    try {
+      row = (await huntModes()).find(h => h.is_active === true && savedSearchSignature(h.vinted_url) === top) || null;
+    } catch (e) { console.error('SNYPD: broad-hunt mode lookup failed', e); }
+    if (row && row.push_mode === 'calm') return;
     broadSig = top;
+    broadHunt = row && ('push_mode' in row) ? row : null;
     text.textContent = 'About ' + (topN * 2) + ' new listings an hour match "' + (url ? huntLabel(url) : 'this hunt')
       + '": more than anyone can open, so alerts become noise. On Vinted, add a size or a max price, copy the link and paste it into this hunt.';
+    const calmBtn = document.getElementById('broad-hunt-calm');
+    if (calmBtn) { calmBtn.style.display = broadHunt ? '' : 'none'; calmBtn.disabled = false; }
     card.style.display = '';
   }
   (function wireBroadHunt() {
     const edit = document.getElementById('broad-hunt-edit');
     const keep = document.getElementById('broad-hunt-keep');
     const card = document.getElementById('broad-hunt');
+    const calm = document.getElementById('broad-hunt-calm');
+    const text = document.getElementById('broad-hunt-text');
+    if (calm) calm.addEventListener('click', async () => {
+      if (!broadHunt) return;
+      calm.disabled = true;
+      const { error } = await sb.from('user_searches')
+        .update({ push_mode: 'calm', push_calm_minutes: 15 })
+        .eq('id', broadHunt.id).eq('user_id', uid);
+      if (error) {
+        console.error('SNYPD: could not switch broad hunt to calm', error);
+        if (text) text.textContent = 'Could not switch this hunt. Try again, or change it in Filters.';
+        calm.disabled = false;
+        return;
+      }
+      broadHunt.push_mode = 'calm';
+      broadHunt.push_calm_minutes = 15;
+      try {
+        const kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {};
+        if (broadSig) kept[broadSig] = Date.now();
+        localStorage.setItem('snypd_broad_ok', JSON.stringify(kept));
+      } catch (e) {}
+      if (text) text.textContent = 'Done: "' + huntLabel(broadHunt.vinted_url) + '" now sends at most one summary every 15 min. Change it anytime in Filters.';
+      [calm, edit, keep].forEach(b => { if (b) b.style.display = 'none'; });
+      setTimeout(() => { if (card) card.style.display = 'none'; }, 8000);
+    });
     if (edit) edit.addEventListener('click', () => {
       const pill = document.getElementById('filter-pill');
       if (pill) pill.click();
@@ -5875,7 +5920,7 @@ const HEARTBEAT_URL = (() => {
 
       hasActiveHunts = feed.huntCount > 0;
       feedEligibleCount = feed.eligibleCount;
-      try { noteBroadHunt(feed); } catch (e) { console.error('SNYPD: broad-hunt check failed', e); }
+      noteBroadHunt(feed).catch(e => console.error('SNYPD: broad-hunt check failed', e));
       const activeSearches = feed.activeSearches;
 
       // Promoted listings are no longer filtered out (2026-10-08): Vinted

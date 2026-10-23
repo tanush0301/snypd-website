@@ -271,6 +271,30 @@
 
   if (NO_HUNTS) { DB.user_searches = []; DB.user_claims = []; DB.xp_events = []; }
 
+  // ?broad=1: 40 fresh listings stamped for the active seeded hunt (search-1), enough for the dashboard's
+  // "This hunt is very broad" card (>= 25 matches in 30 min). The stamp mirrors dashboard savedSearchSignature();
+  // the literal 'item_box->...->>version' key lets matchRow() pass the feed's JSON-path filter.
+  // ?seedcalm=1: the active seeded hunt starts on Calm / 15 (a calm hunt never gets the broad card).
+  if (params.get('seedcalm') === '1' && DB.user_searches[0]) {
+    DB.user_searches[0].push_mode = 'calm'; DB.user_searches[0].push_calm_minutes = 15;
+  }
+  if (params.get('broad') === '1' && DB.user_searches[0]) {
+    var u = new URL(DB.user_searches[0].vinted_url);
+    var pairs = Array.from(u.searchParams).filter(function (p) { return ['page', 'per_page', 'order', 'time', 'search_id'].indexOf(p[0]) < 0 && p[1]; }).sort();
+    var sig = JSON.stringify([u.hostname.toLowerCase(), u.pathname.replace(/\/+$/, '') || '/', pairs]);
+    for (var i = 0; i < 40; i++) {
+      var t = now - (i % 25 + 1) * min;
+      DB.current_ads.push({
+        listing_id: 5000 + i, user_id: UID, title: 'Broad QA listing ' + i,
+        price: { amount: 20 + i, currency_code: 'EUR' }, brand_title: 'Jordan', size_title: '42', status: 'Good',
+        url: 'https://www.vinted.be/items/' + (5000 + i), content_source: 'search', image_url: '',
+        item_box: { snypd_filter_contract: { version: 1, search: sig } }, 'item_box->snypd_filter_contract->>version': '1',
+        fetched_at: new Date(t).toISOString(), created_at: new Date(t).toISOString(),
+        uploaded_ts: Math.floor(t / 1000), uploaded_at_ts: new Date(t).toISOString(), is_visible: true, promoted: false,
+      });
+    }
+  }
+
   function matchRow(row, filters) {
     return filters.every(function (f) {
       var val = row[f.col];
