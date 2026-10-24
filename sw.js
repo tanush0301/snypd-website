@@ -75,8 +75,10 @@ function toFrench(s) {
 async function show(data) {
   let title = data.title || 'SNYPD';
   let body = data.body || 'A new listing matched your search.';
+  let lang = 'en';
   try {
-    if ((await uiLang()) === 'fr') { title = toFrench(title); body = toFrench(body); }
+    lang = await uiLang();
+    if (lang === 'fr') { title = toFrench(title); body = toFrench(body); }
   } catch (e) {}
   const options = {
     body: body,
@@ -88,7 +90,7 @@ async function show(data) {
     renotify: true,
     requireInteraction: false,
     timestamp: data.ts ? data.ts * 1000 : Date.now(),
-    data: { url: data.url || DEFAULT_URL },
+    data: { url: data.url || DEFAULT_URL, lang: lang },
   };
   // Android Chrome and Windows Chrome/Edge render this as the big preview
   // photo. iOS Safari and any macOS browser (via the OS's own Notification
@@ -102,33 +104,70 @@ async function show(data) {
   return self.registration.showNotification(title, options);
 }
 
+// Keep this allowlist aligned with open-vinted.html and the dashboard.
+function isVintedListing(url) {
+  return url.protocol === 'https:' && !url.username && !url.password && !url.port &&
+    /^(www\.)?vinted\.(be|fr|nl|de|it|es|pt|at|lu|ie|co\.uk|com|pl|cz|sk|lt|lv|ee|fi|se|dk|hu|ro|hr|si|gr)$/.test(url.hostname) &&
+    /^\/items\/[0-9]+(?:-[^/]+)?\/?$/.test(url.pathname);
+}
+
+function notificationTarget(raw) {
+  try {
+    if (typeof raw !== 'string' || !raw.trim()) throw new Error('Missing URL');
+    const url = new URL(raw, self.location.origin);
+    if (url.protocol === 'https:' && !url.username && !url.password &&
+        (url.origin === self.location.origin || isVintedListing(url))) return url;
+  } catch (_) {}
+  return new URL(DEFAULT_URL, self.location.origin);
+}
+
+function listingHandoff(target, lang) {
+  const url = new URL('/open-vinted.html', self.location.origin);
+  url.hash = new URLSearchParams({ url: target.href, lang: lang === 'fr' ? 'fr' : 'en' }).toString();
+  return url;
+}
+
+async function openInternalTarget(target) {
+  let list = [];
+  try { list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true }); }
+  catch (_) { /* A failed lookup must not swallow the notification destination. */ }
+  for (const client of list) {
+    try {
+      if (new URL(client.url).origin !== self.location.origin || !client.navigate || !client.focus) continue;
+      const navigated = await client.navigate(target.href);
+      if (!navigated) continue;
+      return await navigated.focus();
+    } catch (_) { /* Closed/stale clients are retried in a fresh window below. */ }
+  }
+  if (self.clients.openWindow) return self.clients.openWindow(target.href);
+}
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const target = (event.notification.data && event.notification.data.url) || DEFAULT_URL;
-
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      // Prefer focusing a tab that is already open over opening a second one.
-      for (const client of list) {
-        if ('focus' in client) {
-          try {
-            if (client.url && new URL(client.url).origin === self.location.origin) {
-              client.focus();
-              if ('navigate' in client && target.startsWith('/')) {
-                return client.navigate(target);
-              }
-              return;
-            }
-          } catch (e) {
-            /* a client with an unparseable URL is not worth failing over */
-          }
-        }
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(target);
-      }
-    })
-  );
+  const data = event.notification.data || {};
+  const target = notificationTarget(data.url);
+  if (isVintedListing(target)) {
+    // A direct, user-tapped link works from the iPhone dashboard. A service
+    // worker opening a URL is a different path and can land in the browser.
+    // Use one explicit link tap on iOS; never simulate a click or guess a scheme.
+    const nav = self.navigator || {};
+    const lang = data.lang || String(nav.language || 'en').slice(0, 2).toLowerCase();
+    const handoff = listingHandoff(target, lang);
+    if (/iPad|iPhone|iPod|Macintosh.*Mobile\//i.test(nav.userAgent || '')) {
+      event.waitUntil(openInternalTarget(handoff));
+    } else {
+      // Do not focus a SNYPD tab and return: that discarded external URLs.
+      // Start the external open during the click, before any client lookup.
+      event.waitUntil((async () => {
+        try {
+          if (self.clients.openWindow) return await self.clients.openWindow(target.href);
+        } catch (_) { /* Keep the actual listing available if navigation fails. */ }
+        return openInternalTarget(handoff);
+      })());
+    }
+    return;
+  }
+  event.waitUntil(openInternalTarget(target));
 });
 
 // Push services rotate subscriptions without warning. When that happens the
