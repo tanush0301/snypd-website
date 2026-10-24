@@ -27,7 +27,7 @@
   var SITE = PROD ? 'https://www.snypd.store' : location.origin;
   var FOUNDING_URL = 'https://api.snypd.store/api/v1/founding-members';
   var RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  var PLAN_NAMES = { solo: 'Solo', pro: 'Pro', kickstart: 'Kickstart', elite: 'Elite' };
+  var PLAN_NAMES = { solo: 'Solo', pro: 'Pro', kickstart: 'Kickstart', elite: 'Elite', pass: 'HUNT PASS' };
   var LAST_EMAIL_KEY = 'snypd_last_email';
   var VERIFY_EMAIL_KEY = 'snypd_verify_email';
   function pendingEmail(value) {
@@ -750,3 +750,4 @@
     });
   } catch (e) {}
 })();
+

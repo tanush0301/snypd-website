@@ -40,4 +40,8 @@ for (const [href,expected] of [
     document:{documentElement:{getAttribute:()=> 'fr',hasAttribute:()=>false},readyState:'complete',querySelectorAll:()=>[a]}});
   assert.equal(actual,expected); checks++;
 }
+const auth = fs.readFileSync(path.join(root, 'assets/auth.js'), 'utf8');
+const planNames = {};
+vm.runInNewContext(auth.match(/var PLAN_NAMES = [^;]+;/)[0], planNames);
+assert.equal(planNames.PLAN_NAMES.pass, 'HUNT PASS'); checks++;
 console.log(`PASS: ${checks} growth navigation checks.`);
