@@ -772,12 +772,30 @@
     return { label: 'CHANGE PLAN IN WHOP', href: auth.manageUrl, act: 'manage' };
   }
 
+  // These CTAs are repainted after consent.js decorates the original links.
+  // Preserve the same validated entry/campaign context on every repaint.
+  function signupContext(href) {
+    var u = new URL(href, location.origin);
+    if (u.origin !== location.origin || u.pathname !== '/signup') return href;
+    var q = new URLSearchParams(location.search);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'a'].forEach(function (key) {
+      var value = q.get(key);
+      if (value && /^[A-Za-z0-9_.-]{1,60}$/.test(value) && !u.searchParams.has(key)) u.searchParams.set(key, value);
+    });
+    var from = q.get('from');
+    if (from && /^[a-z0-9.-]{1,80}$/.test(from) && !u.searchParams.has('from')) u.searchParams.set('from', from);
+    var lang = window.SNYPD_I18N && window.SNYPD_I18N.lang;
+    if ((lang === 'fr' || lang === 'en') && !u.searchParams.has('lang')) u.searchParams.set('lang', lang);
+    return u.pathname + u.search + u.hash;
+  }
+
   function paintCta(a, k) {
     var c = ctaFor(k);
     a.textContent = c.label;
     a.setAttribute('data-act', c.act);
     a.setAttribute('data-plan', k);
     var h = c.href && (c.act === 'checkout' || c.act === 'signup') ? withAff(c.href) : c.href;
+    if (h && c.act === 'signup') h = signupContext(h);
     if (h) { a.href = h; a.removeAttribute('aria-disabled'); }
     else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); a.setAttribute('role', 'link'); }
   }
@@ -1139,4 +1157,5 @@
 </script>
 </body>
 </html>
+
 

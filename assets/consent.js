@@ -366,8 +366,8 @@
   });
 })();
 
-/* Not about consent: a visitor reading a French page who goes on to sign up or log
-   in gets the app in French (?lang=fr; /assets/i18n.js keeps that choice). */
+/* Not about consent: a visitor reading a French page who goes on to pricing,
+   sign-up or login gets the app in French (?lang=fr keeps that choice). */
 (function () {
   var h = document.documentElement;
   if (!/^fr/.test(h.getAttribute('lang') || '') || h.hasAttribute('data-i18n-app')) return;
@@ -375,7 +375,7 @@
     [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
       var u;
       try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
-      if (u.origin !== location.origin || !/^\/(signup|login|dashboard)$/.test(u.pathname) || u.searchParams.has('lang')) return;
+      if (u.origin !== location.origin || !/^\/(signup|login|dashboard|plans)$/.test(u.pathname) || u.searchParams.has('lang')) return;
       u.searchParams.set('lang', 'fr');
       a.setAttribute('href', u.pathname + u.search + u.hash);
     });
@@ -450,3 +450,4 @@
   s.src = '/_vercel/insights/script.js';
   (document.head || document.documentElement).appendChild(s);
 })();
+
