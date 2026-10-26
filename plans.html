@@ -1100,7 +1100,7 @@
     var sb = SNYPD.supabase;
     if (sb && sb.auth && sb.auth.updateUser) sb.auth.updateUser({ data: { plan_intent: null } }).catch(function () {});
     if (auth.plan !== 'free') return;
-    openCheckout(want);
+    openCheckout(want, withAff('https://whop.com/checkout/' + WHOP_PLANS[want]));
   }
 
   paintAll();
@@ -1157,5 +1157,3 @@
 </script>
 </body>
 </html>
-
-

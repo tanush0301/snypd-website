@@ -21,6 +21,21 @@ FR = {
     '← BACK TO SITE': '← RETOUR AU SITE',
     'Create your free account': 'Crée ton compte gratuit',
     'Free plan, no card.': 'Plan gratuit, sans carte.',
+    'SELECTED OFFER': 'OFFRE CHOISIE',
+    '€3.99 once · 30 days · no automatic renewal': '3,99' + NB + '€ en une fois · 30 jours · sans renouvellement automatique',
+    '€5.99/month · renews monthly until you cancel': '5,99' + NB + '€/mois · renouvelé chaque mois jusqu’à résiliation',
+    '€14.99/month · renews monthly until you cancel': '14,99' + NB + '€/mois · renouvelé chaque mois jusqu’à résiliation',
+    '€24.99/month · renews monthly until you cancel': '24,99' + NB + '€/mois · renouvelé chaque mois jusqu’à résiliation',
+    '€34.99/month · renews monthly until you cancel': '34,99' + NB + '€/mois · renouvelé chaque mois jusqu’à résiliation',
+    'Account first, then your hunt and secure checkout. Creating your account does not take a payment.':
+        'D’abord le compte, puis ta recherche et le paiement sécurisé. La création du compte n’entraîne aucun paiement.',
+    'Switch to Solo for €5.99/month, or buy another €3.99 Pass after this one expires. Until then, your current Pass keeps running.':
+        'Passe à Solo pour 5,99' + NB + '€/mois, ou achète un autre Pass à 3,99' + NB + '€ après son expiration. D’ici là, ton Pass actuel reste actif.',
+    'See options': 'Voir les options',
+    'Hunt Pass: €3.99 once for 30 days, with no automatic renewal. Paid access starts when your payment is activated.':
+        'Pass 30 jours' + NB + ': 3,99' + NB + '€ en une fois pour 30 jours, sans renouvellement automatique. L’accès payant commence à l’activation de ton paiement.',
+    'Solo: €5.99/month, renewed monthly until you cancel. Paid access starts when your payment is activated.':
+        'Solo' + NB + ': 5,99' + NB + '€/mois, renouvelé chaque mois jusqu’à résiliation. L’accès payant commence à l’activation de ton paiement.',
     'all 100 founding spots claimed': 'les 100 places fondateur sont prises',
     'You picked': 'Tu as choisi',
     '. You start on Free; upgrade in one click from the dashboard.': '. Tu commences en Free' + NB + '; passe au plan payant en un clic depuis le tableau de bord.',

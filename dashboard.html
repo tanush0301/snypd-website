@@ -2707,8 +2707,8 @@ const HEARTBEAT_URL = (() => {
       const x = eliteBanner.querySelector('.elite-banner__text');
       const a = eliteBanner.querySelector('a.btn');
       if (t) t.textContent = 'Your Hunt Pass ends on ' + endTxt;
-      if (x) x.textContent = 'After that your hunt only runs while this tab is open. Keep it 24/7: another 30-day pass for \u20ac3.99, or Solo at \u20ac5.99/month.';
-      if (a) { a.textContent = 'Renew'; a.href = '/plans?checkout=pass'; }
+      if (x) x.textContent = 'Switch to Solo for \u20ac5.99/month, or buy another \u20ac3.99 Pass after this one expires. Until then, your current Pass keeps running.';
+      if (a) { a.textContent = 'See options'; a.href = '/plans#card-solo'; }
       eliteBanner.style.display = '';
     }
   }
@@ -2742,7 +2742,11 @@ const HEARTBEAT_URL = (() => {
       const x = eliteBanner.querySelector('.elite-banner__text');
       const a = eliteBanner.querySelector('a.btn');
       if (t) t.textContent = 'Your hunt is live. Keep it running after the trial';
-      if (x) x.textContent = 'You picked ' + PLAN_NAMES[intent.plan] + ' at sign-up. Start it now and your hunt keeps running 24/7 when the trial ends.';
+      if (x) x.textContent = intent.plan === 'pass'
+        ? 'Hunt Pass: \u20ac3.99 once for 30 days, with no automatic renewal. Paid access starts when your payment is activated.'
+        : intent.plan === 'solo'
+          ? 'Solo: \u20ac5.99/month, renewed monthly until you cancel. Paid access starts when your payment is activated.'
+          : 'You picked ' + PLAN_NAMES[intent.plan] + ' at sign-up. Start it now and your hunt keeps running 24/7 when the trial ends.';
       if (a) {
         a.textContent = 'Start ' + PLAN_NAMES[intent.plan];
         a.href = '/plans?checkout=' + intent.plan;
@@ -7037,4 +7041,3 @@ const HEARTBEAT_URL = (() => {
 </script>
 </body>
 </html>
-

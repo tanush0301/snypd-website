@@ -28,6 +28,13 @@
   var FOUNDING_URL = 'https://api.snypd.store/api/v1/founding-members';
   var RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   var PLAN_NAMES = { solo: 'Solo', pro: 'Pro', kickstart: 'Kickstart', elite: 'Elite', pass: 'HUNT PASS' };
+  var PLAN_TERMS = {
+    pass: '€3.99 once · 30 days · no automatic renewal',
+    solo: '€5.99/month · renews monthly until you cancel',
+    kickstart: '€14.99/month · renews monthly until you cancel',
+    pro: '€24.99/month · renews monthly until you cancel',
+    elite: '€34.99/month · renews monthly until you cancel'
+  };
   var LAST_EMAIL_KEY = 'snypd_last_email';
   var VERIFY_EMAIL_KEY = 'snypd_verify_email';
   function pendingEmail(value) {
@@ -65,6 +72,15 @@
   var qs = new URLSearchParams((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.search) || location.search);
   var hs = new URLSearchParams(((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.hash) || location.hash).replace(/^#/, ''));
   var plan = (qs.get('plan') || '').toLowerCase();
+  // The existing dashboard flow consumes this choice after sign-in. Show the
+  // same valid, recent choice when signup's "Log in" link drops the query.
+  if (!PLAN_NAMES[plan] && PAGE === 'login') {
+    try {
+      var savedPlan = JSON.parse(lsGet('snypd_plan_intent') || 'null');
+      if (savedPlan && PLAN_NAMES[savedPlan.plan] && Date.now() - Number(savedPlan.ts) >= 0
+          && Date.now() - Number(savedPlan.ts) < 7 * 864e5) plan = savedPlan.plan;
+    } catch (e) {}
+  }
 
   /* A price-guide page's "alert me" button (/signup?hunt=<words>&max=<EUR>): kept for a
      day so the dashboard's first-hunt wizard opens with this search filled in
@@ -446,7 +462,9 @@
         founding = '<div style="display:flex;align-items:center;gap:8px;">' + pulse + '<span style="font-size:12px;letter-spacing:.06em;color:var(--text-secondary);">FOUNDING · ' + (f > 0 ? f + ' of the first 100 spots left' : 'all 100 founding spots claimed') + '</span></div>';
       }
       out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);text-wrap:balance;">Create your free account</h1><span style="font-size:13px;color:var(--text-secondary);">Free plan, no card.</span>' + founding + '</div>');
-      if (PLAN_NAMES[plan]) out.push('<div style="border:1px solid var(--border-hover);background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text-secondary);">You picked <span style="color:var(--text-primary);">' + PLAN_NAMES[plan] + '</span>. You start on Free; upgrade in one click from the dashboard.</div>');
+    }
+    if ((isSignup || isLogin || v === 'verify') && PLAN_NAMES[plan]) {
+      out.push('<div data-selected-offer style="border:1px solid var(--border-hover);background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text-secondary);"><div style="font-size:10px;letter-spacing:.12em;color:var(--success);">SELECTED OFFER</div><div style="margin-top:4px;color:var(--text-primary);">' + PLAN_NAMES[plan] + '</div><div>' + PLAN_TERMS[plan] + '</div><div style="margin-top:8px;">Account first, then your hunt and secure checkout. Creating your account does not take a payment.</div></div>');
     }
     if (v === 'forgot') out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Reset your password</h1><span style="' + SUB + '">Enter your account email. We\'ll send a link to set a new password.</span></div>');
     if (v === 'forgot-sent') out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);">Check your inbox</h1><span style="' + SUB + 'overflow-wrap:anywhere;">If an account exists for <span style="color:var(--text-primary);">' + esc(S.email) + '</span>, we\'ve sent a password reset link.</span></div>');
@@ -750,4 +768,3 @@
     });
   } catch (e) {}
 })();
-
