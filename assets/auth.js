@@ -93,8 +93,15 @@
   var S = {
     view: PAGE === 'signup' ? 'signup' : PAGE === 'reset' ? 'reset' : 'login',
     status: 'idle', email: '', code: '', pw: '', pw2: '', show: false, errors: {},
-    cooldown: 0, founding: null, marketing: false, errText: '', oauth: false, ready: PAGE !== 'reset'
+    cooldown: 0, founding: null, marketing: false, heard: '', errText: '', oauth: false, ready: PAGE !== 'reset'
   };
+
+  /* "How did you find SNYPD?" on /signup (optional, 27 Oct 2026): AI assistants
+     like Claude add no utm tag to their links, so this is the only way to count them.
+     Saved as user_metadata.heard_from (the slug). */
+  var HEARD = [['chatgpt', 'ChatGPT'], ['claude', 'Claude'], ['other_ai', 'Another AI assistant'], ['google', 'Google search'],
+    ['tiktok', 'TikTok'], ['instagram', 'Instagram'], ['reddit', 'Reddit'], ['youtube', 'YouTube'], ['friend', 'A friend'], ['other', 'Somewhere else']];
+  function heardOk(v) { return HEARD.some(function (h) { return h[0] === v; }) ? v : null; }
 
   /* ---------- validation (the design's own rules) ---------- */
   function validate(view, email, pw, pw2, code) {
@@ -241,6 +248,7 @@
     if (hi) data.entry_hunt = hi;
     var ep = entryPage();
     if (ep) data.entry_page = ep;
+    if (heardOk(S.heard)) data.heard_from = S.heard;
     var ref = lsGet('snypd_ref');
     if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;
     try {
@@ -377,6 +385,7 @@
     if (aff) back.set('a', aff);
     var ep = entryPage();
     if (ep) back.set('from', ep);
+    if (heardOk(S.heard)) back.set('heard', S.heard);
     var backQs = back.toString();
     Promise.resolve().then(function () {
       return sb.auth.signInWithOAuth({
@@ -480,6 +489,13 @@
     }
 
     out.push(bannerHTML(banner()));
+
+    if (isSignup) {
+      out.push('<div class="au-fbox" style="display:flex;flex-direction:column;gap:8px;"><label for="' + ID + '-heard" style="font-size:12px;letter-spacing:.1em;color:var(--text-secondary);"><span>HOW DID YOU FIND SNYPD?</span> <span style="color:var(--text-muted);letter-spacing:0;">(optional)</span></label>' +
+        '<select id="' + ID + '-heard" name="heard" data-f="heard"' + attr('disabled', lock) + ' class="f-in" style="' + INPUT + 'var(--border);color:' + (S.heard ? 'var(--text-primary)' : 'var(--text-muted)') + ';font-size:16px;padding:0 14px;outline:none;border-radius:0;cursor:pointer;">' +
+        '<option value="">Choose one</option>' + HEARD.map(function (h) { return '<option value="' + h[0] + '"' + attr('selected', S.heard === h[0]) + '>' + h[1] + '</option>'; }).join('') +
+        '</select></div>');
+    }
 
     /* Instagram/Facebook/TikTok open links in their own in-app browser, and Google
        refuses sign-in there (disallowed_useragent). Most SNYPD visitors arrive from
@@ -599,7 +615,7 @@
   form.addEventListener('submit', function (e) { e.preventDefault(); submit(); });
   form.addEventListener('input', function (e) {
     var f = e.target.getAttribute('data-f');
-    if (!f || f === 'marketing') return;
+    if (!f || f === 'marketing' || f === 'heard') return;
     S[f] = e.target.value;
     if (S.view === 'verify' && f === 'email') {
       S.code = ''; var codeField = fieldEl('code'); if (codeField) codeField.value = '';
@@ -609,6 +625,7 @@
   });
   form.addEventListener('change', function (e) {
     if (e.target.getAttribute('data-f') === 'marketing') S.marketing = e.target.checked;
+    if (e.target.getAttribute('data-f') === 'heard') { S.heard = heardOk(e.target.value) || ''; e.target.style.color = S.heard ? 'var(--text-primary)' : 'var(--text-muted)'; }
   });
   form.addEventListener('click', function (e) {
     var b = e.target.closest('[data-act]');
@@ -745,6 +762,8 @@
         if (hi && !md.entry_hunt) add.entry_hunt = hi;
         var retEp = entryPage(qs);
         if (retEp && !md.entry_page) add.entry_page = retEp;
+        var retHeard = heardOk(qs.get('heard'));
+        if (retHeard && !md.heard_from) add.heard_from = retHeard;
         if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;
         if (Object.keys(add).length) { try { await sb.auth.updateUser({ data: add }); } catch (e) {} }
       }
