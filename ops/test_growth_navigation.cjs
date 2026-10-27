@@ -34,10 +34,30 @@ for (const [href,expected] of [
   ['https://outside.example/plans','https://outside.example/plans'],
   ['/signup','/signup?lang=fr'],
 ]) {
-  let actual=href;
+  let actual=href; const on={};
   const a={getAttribute:()=>actual,setAttribute:(k,v)=>{actual=v;}};
   vm.runInNewContext(decorate,{URL,location:{href:'https://www.snypd.store/fr/bot-vinted',origin:'https://www.snypd.store'},
-    document:{documentElement:{getAttribute:()=> 'fr',hasAttribute:()=>false},readyState:'complete',querySelectorAll:()=>[a]}});
+    document:{documentElement:{getAttribute:()=> 'fr',hasAttribute:()=>false},readyState:'complete',querySelectorAll:()=>[a],
+      addEventListener:(t,f)=>{on[t]=f;}}});
+  assert.equal(actual,href,'href must stay clean until the link is used'); checks++;
+  for (const t of ['pointerdown','focusin','click']) assert.equal(typeof on[t],'function');
+  on.pointerdown({target:{closest:()=>a}}); on.click({target:{closest:()=>a}});
+  assert.equal(actual,expected); checks++;
+}
+const tagStart=end, tagEnd=consent.indexOf('/* Not about consent: Vercel Web Analytics',tagStart);
+const tagging=consent.slice(tagStart,tagEnd);
+for (const [search,pathname,href,expected] of [
+  ['?utm_source=chatgpt.com&a=partner','/vinted-bot','/signup','/signup?utm_source=chatgpt.com&a=partner&from=vinted-bot'],
+  ['','/fr/bot-vinted','/plans#card-pass','/plans?from=fr.bot-vinted#card-pass'],
+  ['','/vinted-bot','/faq','/faq'],
+  ['?from=fr.guide-prix-vinted','/signup','/login','/login?from=fr.guide-prix-vinted'],
+]) {
+  let actual=href; const on={};
+  const a={getAttribute:()=>actual,setAttribute:(k,v)=>{actual=v;}};
+  vm.runInNewContext(tagging,{URL,URLSearchParams,window:{},location:{search,pathname,href:'https://www.snypd.store'+pathname+search,origin:'https://www.snypd.store'},
+    document:{readyState:'complete',querySelectorAll:()=>[a],addEventListener:(t,f)=>{on[t]=f;}}});
+  assert.equal(actual,href,'href must stay clean until the link is used'); checks++;
+  on.focusin({target:{closest:()=>a}});
   assert.equal(actual,expected); checks++;
 }
 const auth = fs.readFileSync(path.join(root, 'assets/auth.js'), 'utf8');

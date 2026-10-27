@@ -367,21 +367,25 @@
 })();
 
 /* Not about consent: a visitor reading a French page who goes on to pricing,
-   sign-up or login gets the app in French (?lang=fr keeps that choice). */
+   sign-up or login gets the app in French (?lang=fr keeps that choice).
+   Links are tagged when used (pointer down, keyboard focus, click), not on page
+   load: search engines then see one clean /signup, /login, /plans link instead of
+   a ?lang=/?from= variant per page (Google had indexed some, Oct 2026). */
 (function () {
   var h = document.documentElement;
   if (!/^fr/.test(h.getAttribute('lang') || '') || h.hasAttribute('data-i18n-app')) return;
-  function decorate() {
-    [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
-      var u;
-      try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
-      if (u.origin !== location.origin || !/^\/(signup|login|dashboard|plans)$/.test(u.pathname) || u.searchParams.has('lang')) return;
-      u.searchParams.set('lang', 'fr');
-      a.setAttribute('href', u.pathname + u.search + u.hash);
-    });
+  function decorate(a) {
+    var u;
+    try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
+    if (u.origin !== location.origin || !/^\/(signup|login|dashboard|plans)$/.test(u.pathname) || u.searchParams.has('lang')) return;
+    u.searchParams.set('lang', 'fr');
+    a.setAttribute('href', u.pathname + u.search + u.hash);
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
-  else decorate();
+  function onUse(e) {
+    var a = e.target && e.target.closest && e.target.closest('a[href]');
+    if (a) decorate(a);
+  }
+  ['pointerdown', 'focusin', 'click'].forEach(function (t) { document.addEventListener(t, onUse, true); });
 })();
 
 /* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) and a Whop
@@ -411,18 +415,20 @@
       try { localStorage.setItem('snypd_aff', JSON.stringify({ a: aff, t: Date.now() })); } catch (e) {}
     });
   }
-  function decorate() {
-    [].forEach.call(document.querySelectorAll('a[href]'), function (a) {
-      var u;
-      try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
-      if (u.origin !== location.origin || u.pathname === location.pathname) return;
-      tags.forEach(function (t) { if (!u.searchParams.has(t[0])) u.searchParams.set(t[0], t[1]); });
-      if (from && /^\/(signup|login|plans)$/.test(u.pathname) && !u.searchParams.has('from')) u.searchParams.set('from', from);
-      a.setAttribute('href', u.pathname + u.search + u.hash);
-    });
+  /* Tagged when used, not on page load (same reason as the French links above). */
+  function decorate(a) {
+    var u;
+    try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
+    if (u.origin !== location.origin || u.pathname === location.pathname) return;
+    tags.forEach(function (t) { if (!u.searchParams.has(t[0])) u.searchParams.set(t[0], t[1]); });
+    if (from && /^\/(signup|login|plans)$/.test(u.pathname) && !u.searchParams.has('from')) u.searchParams.set('from', from);
+    a.setAttribute('href', u.pathname + u.search + u.hash);
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
-  else decorate();
+  function onUse(e) {
+    var a = e.target && e.target.closest && e.target.closest('a[href]');
+    if (a) decorate(a);
+  }
+  ['pointerdown', 'focusin', 'click'].forEach(function (t) { document.addEventListener(t, onUse, true); });
 })();
 
 /* Not about consent: Vercel Web Analytics counts page views without cookies and
