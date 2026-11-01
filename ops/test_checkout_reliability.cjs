@@ -82,6 +82,7 @@ async function journey(responses, options = {}) {
   // The actual fallback preserves visible account and offer instructions, without
   // leaking the email into a URL or silently leaving the page.
   const fallbackCode = section('  function checkoutText(text) {','  function openCheckout(k, fallbackHref) {');
+  const mountCode = section('  function mountCheckout(k, o) {','  function checkoutText(text) {');
   for (const plan of ['solo','pass']) {
     const loading={hidden:true,textContent:''}, mount={hidden:false};
     let link=null, appends=0;
@@ -101,7 +102,24 @@ async function journey(responses, options = {}) {
     assert.equal(loading.textContent.includes('STAY50'),plan==='solo');
     assert.equal(link.href,'https://whop.com/checkout/plan_test?a=partner');
     assert(!link.href.includes('test@example.invalid'));
-    assert.equal(link.textContent,'CONTINUE TO WHOP'); checks++;
+    assert.equal(link.textContent,'CONTINUE TO WHOP');
+    link.hidden=true;
+    g.showHostedFallback(plan,link.href,overlay);
+    assert.equal(link.hidden,false);
+    let creates=0, mounts=0;
+    Object.assign(g,{mounted:{},WHOP_PLANS:{[plan]:'plan_test'},LOCALE:null,aff:null,
+      location:{origin:'https://www.snypd.store'},Promise,
+      loadElements:()=>Promise.resolve(()=>({checkout:{create(){
+        creates++;
+        return {create(){return {mount(target){assert.equal(target,mount);mounts++;}};}};
+      }}}))});
+    vm.runInNewContext(mountCode,g);
+    await g.mountCheckout(plan,overlay);
+    assert.equal(mount.hidden,false);assert.equal(link.hidden,true);
+    assert.equal(loading.textContent,'Loading secure checkout...');
+    await g.mountCheckout(plan,overlay);
+    assert.equal(creates,1);assert.equal(mounts,1);checks++;
+
   }
   const open = section('  function openCheckout(k, fallbackHref) {','  function closeCheckouts()');
   for (const auth of [{signedIn:false,plan:null},{signedIn:true,plan:null},{signedIn:true,plan:'free'}]) {
