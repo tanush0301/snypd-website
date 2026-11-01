@@ -958,8 +958,8 @@
 
   // Whop Elements (vanilla script tag, docs.whop.com/elements/latest). Needs no
   // API key: the plan id prices the order. Fulfilment stays the webhook. If the
-  // script cannot load or mount, the buyer goes to the hosted whop.com checkout
-  // (the button's own href), so a Whop outage never strands a sale on a spinner.
+  // script cannot load or mount, offer an explicit hosted checkout continuation
+  // with the account-email and promo instructions visible before leaving.
   var ELEMENTS_SRC = 'https://cdn.whop.com/elements/amber/elements.js';
   var elementsP = null, mounted = {}, lastFocus = null;
   function loadElements() {
@@ -983,6 +983,11 @@
     return loadElements().then(function (WhopElements) {
       if (mounted[k]) return;
       var loading = o.querySelector('[data-whop-loading]');
+      if (loading) { loading.hidden = false; loading.textContent = 'Loading secure checkout...'; }
+      var mount = o.querySelector('[data-whop-mount="' + k + '"]');
+      if (mount) mount.hidden = false;
+      var fallback = o.querySelector('[data-hosted-fallback]');
+      if (fallback) fallback.hidden = true;
       var opts = {
         plan: WHOP_PLANS[k],
         locale: LOCALE || 'en',
@@ -1024,7 +1029,7 @@
       link.setAttribute('data-hosted-fallback', '');
       overlay.querySelector('.whop-embed-box').appendChild(link);
     }
-    if (link) { link.href = href; link.textContent = checkoutText('CONTINUE TO WHOP'); }
+    if (link) { link.hidden = false; link.href = href; link.textContent = checkoutText('CONTINUE TO WHOP'); }
   }
   function openCheckout(k, fallbackHref) {
     if (!auth.signedIn || !auth.plan || !storedEmail) return false;
