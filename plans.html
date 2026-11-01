@@ -618,8 +618,8 @@
 <details><summary>Does my plan renew automatically?</summary><p>Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after 30 days.</p></details>
 <details><summary>Can I pay once, without a subscription?</summary><p>Yes: the Hunt Pass. One payment of &#8364;3.99, VAT included, and 1 Vinted search is watched 24/7 with push alerts for 30 days, like Solo. Then it simply ends: no renewal, no subscription, nothing to cancel. It suits hunting one specific item, like a console or a jacket in your size. Full refund within 14 days of the payment. For ongoing hunting, Solo is &#8364;5.99 a month.</p></details>
 <details><summary>What happens when I cancel?</summary><p>Your plan keeps running to the end of the month you paid for, then your account goes back to Free.</p></details>
-<details><summary>Can I get a refund?</summary><p>Yes. Email <a href="mailto:snypd@gmail.com">snypd@gmail.com</a> within 14 days of your first payment for a plan and we refund that payment in full.</p></details>
-<details><summary>Can I change plan later?</summary><p>Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email <a href="mailto:snypd@gmail.com">snypd@gmail.com</a> and we will help you switch.</p></details>
+<details><summary>Can I get a refund?</summary><p>Yes. Email <a href="mailto:help@snypd.store">help@snypd.store</a> within 14 days of your first payment for a plan and we refund that payment in full.</p></details>
+<details><summary>Can I change plan later?</summary><p>Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email <a href="mailto:help@snypd.store">help@snypd.store</a> and we will help you switch.</p></details>
 <details><summary>What is a founding member?</summary><p>The first 100 SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at &#8364;24.99 a month for as long as their account exists.</p></details>
 <details><summary>Do you need my Vinted login?</summary><p>Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.</p></details><!--/plans:plans-faq--></div>
     </div>
@@ -723,7 +723,7 @@
   setNavH();
 
   // ----- Signed-in state ----------------------------------------------------
-  var auth = { signedIn: false, plan: null, manageUrl: MANAGE };
+  var auth = { signedIn: false, plan: null, planError: false, manageUrl: MANAGE };
   // Whop partner code (a=<Whop username>, from a partner's link): this address
   // first, then the account (user_metadata.whop_aff, saved at sign-up, set in
   // loadPlan), then this browser (snypd_aff, marketing consent only, 30 days).
@@ -751,6 +751,9 @@
   }
 
   function ctaFor(k) {
+    // A failed read is unknown, never evidence of Free access.
+    if (auth.planError) return { label: 'RELOAD TO CHECK PLAN', href: location.pathname + location.search, act: 'retry' };
+    if (auth.signedIn && !auth.plan) return { label: 'CHECKING YOUR PLAN', href: null, act: 'none' };
     if (!auth.signedIn) {
       if (k === 'pass') return { label: 'GET HUNT PASS', href: '/signup?plan=pass', act: 'signup' };
       return { label: k === 'free' ? 'START FREE' : 'START ' + NAMES[k], href: k === 'free' ? '/signup' : '/signup?plan=' + k, act: 'signup' };
@@ -804,11 +807,11 @@
     document.querySelectorAll('[data-cta]').forEach(function (a) { paintCta(a, a.getAttribute('data-cta')); });
     ALL.forEach(function (k) {
       var tag = document.querySelector('[data-cur="' + k + '"]');
-      if (tag) tag.textContent = auth.signedIn && (auth.plan || 'free') === k ? 'CURRENT' : '';
+      if (tag) tag.textContent = auth.signedIn && auth.plan === k ? 'CURRENT' : '';
     });
     if (auth.signedIn) {
       $('youplan').hidden = false;
-      $('youplan-name').textContent = NAMES[auth.plan || 'free'];
+      $('youplan-name').textContent = NAMES[auth.plan] || (auth.planError ? 'PLAN UNAVAILABLE' : 'CHECKING YOUR PLAN');
       var paid = auth.plan && auth.plan !== 'free' && auth.plan !== 'pass';
       $('youplan-manage').hidden = !paid;
       $('youplan-manage').href = auth.manageUrl;
@@ -1000,7 +1003,31 @@
       mounted[k] = handle;
     });
   }
+  function checkoutText(text) {
+    return window.SNYPD_I18N ? window.SNYPD_I18N.t(text) : text;
+  }
+  function showHostedFallback(k, href, overlay) {
+    // Hosted checkout cannot enforce the embedded email lock. Make the handoff
+    // explicit; never put the account email into a URL or invent Whop parameters.
+    var loading = overlay.querySelector('[data-whop-loading]');
+    if (loading) {
+      loading.hidden = false;
+      loading.textContent = checkoutText('Checkout could not load here. Continue on Whop using your SNYPD account email: ') + storedEmail + '.';
+      if (promo && PROMO_PLANS[k]) loading.textContent += checkoutText(' Enter promo code ') + promo + checkoutText(' and check the total before paying.');
+    }
+    var mount = overlay.querySelector('[data-whop-mount="' + k + '"]');
+    if (mount) mount.hidden = true;
+    var link = overlay.querySelector('[data-hosted-fallback]');
+    if (!link && href) {
+      link = document.createElement('a');
+      link.className = 'btn btn--prim';
+      link.setAttribute('data-hosted-fallback', '');
+      overlay.querySelector('.whop-embed-box').appendChild(link);
+    }
+    if (link) { link.href = href; link.textContent = checkoutText('CONTINUE TO WHOP'); }
+  }
   function openCheckout(k, fallbackHref) {
+    if (!auth.signedIn || !auth.plan || !storedEmail) return false;
     var o = document.querySelector('[data-whop-embed-overlay="' + k + '"]');
     if (!o) return false;
     lastFocus = document.activeElement;
@@ -1009,7 +1036,7 @@
     o.querySelector('[data-whop-embed-close]').focus();
     mountCheckout(k, o).catch(function (err) {
       track('plans_checkout_fallback', { plan: k, reason: String(err && err.message || err).slice(0, 60) });
-      if (fallbackHref) location.href = fallbackHref;
+      showHostedFallback(k, fallbackHref, o);
     });
     track('plans_checkout_open', { plan: k });
     return true;
@@ -1036,9 +1063,8 @@
     var st = q.get('status');
     track('plans_checkout_return', { plan: k, status: st });
     if (st === 'failed' || st === 'canceled') {
-      try { history.replaceState(null, '', '/plans'); } catch (e) {}
       $('pay-retry').hidden = false;
-      openCheckout(k, withAff('https://whop.com/checkout/' + WHOP_PLANS[k]));
+      // loadPlan/openRequested below decides whether another checkout is appropriate.
       return;
     }
     location.replace('/dashboard?activated=' + encodeURIComponent(k));
@@ -1062,12 +1088,15 @@
   }
   async function loadPlan() {
     var sb = await SNYPD.sbReady;
-    if (!sb || !sb.auth) return;
+    if (!sb || !sb.auth) throw new Error('Account service unavailable');
     var res = await sb.auth.getSession();
+    if (res && res.error) throw res.error;
     var user = res && res.data && res.data.session && res.data.session.user;
     if (!user) return;
     auth.signedIn = true;
-    auth.plan = 'free';
+    auth.plan = null;
+    if (!user.email) throw new Error('Account email unavailable');
+    storedEmail = user.email;
     var md = user.user_metadata || {};
     var savedAff = md.whop_aff && AFF_RE.test(md.whop_aff) ? md.whop_aff : null;
     if (!affFromUrl && savedAff) aff = savedAff;
@@ -1075,9 +1104,11 @@
     // pass_expires_at (migration 063): a Hunt Pass holder is plan 'solo' with an end date; show them as 'pass'.
     var pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id, pass_expires_at').eq('id', user.id).maybeSingle();
     if (pr && pr.error) pr = await sb.from('users').select('subscription_plan, sub_status, whop_manage_url, whop_product_id').eq('id', user.id).maybeSingle();
-    var row = pr && pr.data;
+    if (!pr || pr.error || !pr.data) throw new Error('Could not confirm current plan');
+    var row = pr.data;
     if (row) {
-      var p = norm(row.subscription_plan) || 'free';
+      var p = norm(row.subscription_plan);
+      if (!p) throw new Error('Unrecognized current plan');
       // Same rule as dashboard.html's isActivePaidPlan: a paid plan counts only
       // with an active status AND a Whop product id; otherwise this page shows Free.
       var paidOk = ACTIVE.indexOf(String(row.sub_status || '').toLowerCase()) !== -1 && !!String(row.whop_product_id || '').trim();
@@ -1095,8 +1126,9 @@
     var want = null;
     try { want = norm(new URLSearchParams(location.search).get('checkout')); } catch (e) {}
     if (!want || want === 'free') return;
+    // Preserve the checkout request for a reload if the profile could not be read.
+    if (!auth.signedIn || !auth.plan) return;
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
-    if (!auth.signedIn) return;
     var sb = SNYPD.supabase;
     if (sb && sb.auth && sb.auth.updateUser) sb.auth.updateUser({ data: { plan_intent: null } }).catch(function () {});
     if (auth.plan !== 'free') return;
@@ -1104,7 +1136,7 @@
   }
 
   paintAll();
-  loadPlan().catch(function () {}).then(function () { paintAll(); openRequested(); });
+  loadPlan().catch(function () { auth.plan = null; auth.planError = true; }).then(function () { paintAll(); openRequested(); });
 
   // ----- Phone sticky bar -----------------------------------------------------
   // Shown once the plan cards have scrolled away, hidden again at the final
