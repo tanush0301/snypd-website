@@ -62,6 +62,7 @@ jobs:
       - name: Cohort calculations and generated site checks
         run: |
           python3 ops/test_growth_report.py
+          python3 ops/seo/test_gen_regions.py
           python3 ops/seo/gen_regions.py --check
           python3 ops/seo/check_site.py
       - name: Install locked authentication test dependencies
