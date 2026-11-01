@@ -154,8 +154,8 @@ def faqs():
         ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after %d days.' % plans.PASS_DAYS),
         ('Can I pay once, without a subscription?', pass_faq()),
         ('What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'),
-        ('Can I get a refund?', 'Yes. Email snypd@gmail.com within %d days of your first payment for a plan and we refund that payment in full.' % r),
-        ('Can I change plan later?', 'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email snypd@gmail.com and we will help you switch.'),
+        ('Can I get a refund?', 'Yes. Email help@snypd.store within %d days of your first payment for a plan and we refund that payment in full.' % r),
+        ('Can I change plan later?', 'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email help@snypd.store and we will help you switch.'),
         ('What is a founding member?', 'The first %d SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at %s a month for as long as their account exists.'
          % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False))),
         ('Do you need my Vinted login?', 'Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.'),
@@ -180,8 +180,8 @@ def pass_cmp():
 
 
 def faq_html():
-    mail = '<a href="mailto:snypd@gmail.com">snypd@gmail.com</a>'
-    return '\r\n'.join('<details><summary>%s</summary><p>%s</p></details>' % (esc(q), esc(a).replace('snypd@gmail.com', mail, 1))
+    mail = '<a href="mailto:help@snypd.store">help@snypd.store</a>'
+    return '\r\n'.join('<details><summary>%s</summary><p>%s</p></details>' % (esc(q), esc(a).replace('help@snypd.store', mail, 1))
                        for q, a in faqs())
 
 
@@ -379,4 +379,3 @@ def run(check=False):
 
 if __name__ == '__main__':
     sys.exit(1 if run(check='--check' in sys.argv) and '--check' in sys.argv else 0)
-
