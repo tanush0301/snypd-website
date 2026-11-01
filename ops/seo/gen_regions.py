@@ -20,7 +20,7 @@ French, run python ops/i18n/gen_i18n.py and node ops/i18n/test_i18n.js.
 
 Byte-level edits: the pages are UTF-8 with CRLF; nothing outside the regions changes.
 """
-import html, json, os, re, sys
+import difflib, html, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -154,8 +154,8 @@ def faqs():
         ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after %d days.' % plans.PASS_DAYS),
         ('Can I pay once, without a subscription?', pass_faq()),
         ('What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'),
-        ('Can I get a refund?', 'Yes. Email snypd@gmail.com within %d days of your first payment for a plan and we refund that payment in full.' % r),
-        ('Can I change plan later?', 'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email snypd@gmail.com and we will help you switch.'),
+        ('Can I get a refund?', 'Yes. Email help@snypd.store within %d days of your first payment for a plan and we refund that payment in full.' % r),
+        ('Can I change plan later?', 'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email help@snypd.store and we will help you switch.'),
         ('What is a founding member?', 'The first %d SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at %s a month for as long as their account exists.'
          % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False))),
         ('Do you need my Vinted login?', 'Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.'),
@@ -180,8 +180,8 @@ def pass_cmp():
 
 
 def faq_html():
-    mail = '<a href="mailto:snypd@gmail.com">snypd@gmail.com</a>'
-    return '\r\n'.join('<details><summary>%s</summary><p>%s</p></details>' % (esc(q), esc(a).replace('snypd@gmail.com', mail, 1))
+    mail = '<a href="mailto:help@snypd.store">help@snypd.store</a>'
+    return '\r\n'.join('<details><summary>%s</summary><p>%s</p></details>' % (esc(q), esc(a).replace('help@snypd.store', mail, 1))
                        for q, a in faqs())
 
 
@@ -313,6 +313,13 @@ def render(name, plain):
     return t() if callable(t) else plans.fill(t, 'en', plain=plain)
 
 
+def render_region(m, plain):
+    """Preserve each region's existing line endings when inserting generated text."""
+    newline = '\r\n' if '\r\n' in m.group(3) else '\n'
+    content = render(m.group(2), plain).replace('\r\n', '\n').replace('\n', newline)
+    return m.group(1) + content + m.group(4)
+
+
 def offers(ld):
     """Set every schema.org Offer's prices (price + priceSpecification) to plans.json."""
     by_name = {p['name']: p['price'] for p in plans.DATA['plans'] + plans.DATA.get('passes', [])}
@@ -356,11 +363,11 @@ def run(check=False):
 
         def sub_html(m):
             n[0] += 1
-            return m.group(1) + render(m.group(2), False) + m.group(4)
+            return render_region(m, False)
 
         def sub_js(m):
             n[0] += 1
-            return m.group(1) + render(m.group(2), True) + m.group(4)
+            return render_region(m, True)
 
         out = HTML_RE.sub(sub_html, text)
         out = JS_RE.sub(sub_js, out)
@@ -371,6 +378,11 @@ def run(check=False):
             sys.exit(f'gen_regions: {name} has no plan regions (markers lost?)')
         if out != text:
             changed.append(name)
+            if check:
+                for line in difflib.unified_diff(text.splitlines(), out.splitlines(), fromfile=name, tofile=name + " (generated)", lineterm=""):
+                    print(line)
+                if text.splitlines() == out.splitlines():
+                    print(f"{name}: generated content matches; line endings differ")
             if not check:
                 open(path, 'wb').write(out.encode('utf-8'))
         print(f'regions {name}: {n[0]} regions, {"changed" if out != text else "unchanged"}')
@@ -379,4 +391,3 @@ def run(check=False):
 
 if __name__ == '__main__':
     sys.exit(1 if run(check='--check' in sys.argv) and '--check' in sys.argv else 0)
-

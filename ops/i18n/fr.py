@@ -755,8 +755,8 @@ FR.update({
         'Les 100 premiers comptes SNYPD, comptes gratuits compris. Si le prix de Pro augmente un jour, les membres fondateurs peuvent garder Pro à 24,99' + NB + '€ par mois aussi longtemps que leur compte existe.',
     'Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment.':
         'Les plans payants se renouvellent chaque mois jusqu’à ta résiliation. Résiliable à tout moment. Remboursement intégral dans les 14 jours suivant ton premier paiement.',
-    'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email snypd@gmail.com.':
-        'Se renouvelle chaque mois jusqu’à ta résiliation. Résilie à tout moment dans ton compte Whop. Remboursement intégral dans les 14 jours suivant ton premier paiement' + NB + ': écris à snypd@gmail.com.',
+    'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email help@snypd.store.':
+        'Se renouvelle chaque mois jusqu’à ta résiliation. Résilie à tout moment dans ton compte Whop. Remboursement intégral dans les 14 jours suivant ton premier paiement' + NB + ': écris à help@snypd.store.',
     'Loading secure checkout...': 'Chargement du paiement sécurisé…',
     'Payment not completed. You were not charged. You can try again below.':
         'Paiement non abouti. Tu n’as pas été débité. Tu peux réessayer ci-dessous.',
@@ -972,8 +972,8 @@ FR.update({
     'Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after 30 days.':
         'Oui, chaque mois, jusqu’à ta résiliation. Résilie à tout moment dans ton compte Whop. Seule exception' + NB + ': le Pass 30 jours se paie une seule fois et s’arrête après 30 jours.',
     'Can I pay once, without a subscription?': 'Puis-je payer une seule fois, sans abonnement' + NB + '?',
-    'One payment. 1 search watched 24/7 for 30 days, then it ends: no renewal, nothing to cancel. Full refund within 14 days of the payment: email snypd@gmail.com.':
-        'Un seul paiement. 1 recherche surveillée 24h/24 pendant 30 jours, puis elle s’arrête' + NB + ': pas de renouvellement, rien à résilier. Remboursement intégral dans les 14 jours suivant le paiement' + NB + ': écris à snypd@gmail.com.',
+    'One payment. 1 search watched 24/7 for 30 days, then it ends: no renewal, nothing to cancel. Full refund within 14 days of the payment: email help@snypd.store.':
+        'Un seul paiement. 1 recherche surveillée 24h/24 pendant 30 jours, puis elle s’arrête' + NB + ': pas de renouvellement, rien à résilier. Remboursement intégral dans les 14 jours suivant le paiement' + NB + ': écris à help@snypd.store.',
 })
 FR_PATTERNS += [
     (r'^One item, no subscription\? Hunt Pass: (€[\d.]+) once, (\d+) days →$',
@@ -1080,3 +1080,14 @@ FR.update({
     'Minimum price must be below maximum price. Lower or clear the minimum.': 'Le prix minimum doit être inférieur au maximum. Baisse ou efface le minimum.',
 })
 FR_PATTERNS += [(r'^Min ([A-Z]{3})$', 'Min $1')]
+
+# Checkout recovery: keep these keys aligned with plans.html.
+FR.update({
+    "RELOAD TO CHECK PLAN": "RECHARGER POUR VÉRIFIER LE PLAN",
+    "CHECKING YOUR PLAN": "VÉRIFICATION DE TON PLAN",
+    "PLAN UNAVAILABLE": "PLAN INDISPONIBLE",
+    "Checkout could not load here. Continue on Whop using your SNYPD account email:": "Le paiement n’a pas pu charger ici. Continue sur Whop avec l’e-mail de ton compte SNYPD :",
+    "Enter promo code": "Saisis le code promo",
+    "and check the total before paying.": "et vérifie le total avant de payer.",
+    "CONTINUE TO WHOP": "CONTINUER SUR WHOP"
+})

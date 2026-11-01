@@ -52,16 +52,18 @@ const openCheckout=between(plans,'  function openCheckout(k, fallbackHref) {',' 
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{
   for (const [want,id] of [['pass','plan_zLbAN08OXSJYo'],['solo','plan_zYBunt6RBlsUg']]) {
-    let clicked=false;
-    const scope={URLSearchParams,auth:{signedIn:true,plan:'free'},WHOP_PLANS:{[want]:id},
+    let clicked=false, fallbackHref=null;
+    const scope={URLSearchParams,auth:{signedIn:true,plan:'free'},storedEmail:'test@example.invalid',WHOP_PLANS:{[want]:id},
       norm:p=>p===want?p:null,location:{search:'?checkout='+want,pathname:'/plans',hash:'',href:''},
       history:{replaceState(){}},SNYPD:{},track(){},withAff:url=>url+'?a=partner',
       document:{activeElement:{},body:{style:{}},querySelector:()=>({hidden:true,querySelector:()=>({focus(){clicked=true;}})})},
+      showHostedFallback:(_plan,href)=>{fallbackHref=href;},
       mountCheckout:()=>Promise.reject(Error('script unavailable'))};
     vm.runInNewContext(openCheckout+openRequested+'\nopenRequested();',scope);
     await tick();
     assert(clicked);
-    assert.equal(scope.location.href,'https://whop.com/checkout/'+id+'?a=partner');checks++;
+    assert.equal(scope.location.href,'');
+    assert.equal(fallbackHref,'https://whop.com/checkout/'+id+'?a=partner');checks++;
   }
   // Never open another paid checkout automatically over an active paid plan.
   for (const plan of ['pass','solo','kickstart','pro','elite']) {
