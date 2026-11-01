@@ -22,6 +22,8 @@ DATA = os.path.join(ROOT, 'ops', 'seo', 'data')
 EDITIONS = [
     {'id': '2026-10', 'published': '2026-10-09', 'guide': 'price-guide-2026-10-09.json', 'stats': 'market-report-2026-10.json',
      'slug': {'en': 'october-2026', 'fr': 'octobre-2026'}, 'name': {'en': 'October 2026', 'fr': 'octobre 2026'}},
+    {'id': '2026-11', 'published': '2026-11-01', 'guide': 'price-guide-2026-11-01.json', 'stats': 'market-report-2026-11.json',
+     'slug': {'en': 'november-2026', 'fr': 'novembre-2026'}, 'name': {'en': 'November 2026', 'fr': 'novembre 2026'}},
 ]
 HUB = {'en': '/vinted-market-report', 'fr': '/fr/rapport-marche-vinted'}
 LANGS = ('en', 'fr')

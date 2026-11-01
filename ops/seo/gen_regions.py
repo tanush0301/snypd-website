@@ -188,7 +188,7 @@ def faq_html():
 # ----------------------------------------------------------------- homepage price data
 # A few items from the price guide (ops/seo/data/price-guide.json via gen_price_guide.py) and the
 # latest Market Report edition. Numbers only from those generators; the item list is a choice.
-HOME_ITEMS = ['nike-dunk-low', 'jordan-4', 'ralph-lauren-polo', 'adidas-samba']
+HOME_ITEMS = ['nike-dunk-low', 'jordan-1-mid', 'ralph-lauren-quarter-zip', 'adidas-samba']
 
 
 def home_data():
