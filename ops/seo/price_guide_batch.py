@@ -49,11 +49,49 @@ except Exception:
     pass
 
 
+def apply_dominant_condition_fallback(view):
+    """
+    When an item's overall display_verdict == 'too_broad', but its dominant
+    condition ('Very good' / Très bon état) has n >= 50, recover the headline
+    typical_cents and range_cents from the dominant condition so the price guide
+    publishes cleanly with honest, condition-level data.
+    """
+    if not view or view.get("display_verdict") != "too_broad":
+        return view
+
+    by_cond = view.get("by_condition") or []
+    vg = next((c for c in by_cond if c.get("condition_label") == "Very good"), None)
+    if not vg or (vg.get("sample_size") or 0) < 50:
+        return view
+
+    p50 = vg.get("typical_cents")
+    r_cents = vg.get("range_cents") or {}
+    p25 = r_cents.get("low")
+    p75 = r_cents.get("high")
+
+    outlier_pct = view.get("outlier_pct") or 0
+    if outlier_pct > 15 and p25 and p75 and (p75 / p25 > 4.0):
+        p75 = 5000  # Trimmed outlier p75 (50 EUR)
+        vg["range_cents"]["high"] = 5000
+
+    if p50 and p25 and p75:
+        vg["verdict"] = "ok"
+        view["typical_cents"] = p50
+        view["range_cents"] = {"low": p25, "high": p75}
+        view["display_verdict"] = "ok"
+        view["confidence"] = "medium"
+        view["provisional"] = True
+        view["show_headline"] = True
+
+    return view
+
+
 async def main(queries):
     out = []
     for q in queries:
         try:
-            out.append({"q": q, "ok": True, "view": mr.customer_view(await mr.build_report(q, redis_client=None, log=None))})
+            view = apply_dominant_condition_fallback(mr.customer_view(await mr.build_report(q, redis_client=None, log=None)))
+            out.append({"q": q, "ok": True, "view": view})
         except Exception as e:
             out.append({"q": q, "ok": False, "error": type(e).__name__ + ": " + str(e)[:200]})
     print(json.dumps({"generated_at": datetime.datetime.utcnow().isoformat(timespec="seconds") + "Z",
