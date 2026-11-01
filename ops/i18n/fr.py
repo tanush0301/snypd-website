@@ -1080,3 +1080,14 @@ FR.update({
     'Minimum price must be below maximum price. Lower or clear the minimum.': 'Le prix minimum doit être inférieur au maximum. Baisse ou efface le minimum.',
 })
 FR_PATTERNS += [(r'^Min ([A-Z]{3})$', 'Min $1')]
+
+# Checkout recovery: keep these keys aligned with plans.html.
+FR.update({
+    "RELOAD TO CHECK PLAN": "RECHARGER POUR VÉRIFIER LE PLAN",
+    "CHECKING YOUR PLAN": "VÉRIFICATION DE TON PLAN",
+    "PLAN UNAVAILABLE": "PLAN INDISPONIBLE",
+    "Checkout could not load here. Continue on Whop using your SNYPD account email:": "Le paiement n’a pas pu charger ici. Continue sur Whop avec l’e-mail de ton compte SNYPD :",
+    "Enter promo code": "Saisis le code promo",
+    "and check the total before paying.": "et vérifie le total avant de payer.",
+    "CONTINUE TO WHOP": "CONTINUER SUR WHOP"
+})
