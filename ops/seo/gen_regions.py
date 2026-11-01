@@ -20,7 +20,7 @@ French, run python ops/i18n/gen_i18n.py and node ops/i18n/test_i18n.js.
 
 Byte-level edits: the pages are UTF-8 with CRLF; nothing outside the regions changes.
 """
-import html, json, os, re, sys
+import difflib, html, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -371,6 +371,11 @@ def run(check=False):
             sys.exit(f'gen_regions: {name} has no plan regions (markers lost?)')
         if out != text:
             changed.append(name)
+            if check:
+                for line in difflib.unified_diff(text.splitlines(), out.splitlines(), fromfile=name, tofile=name + " (generated)", lineterm=""):
+                    print(line)
+                if text.splitlines() == out.splitlines():
+                    print(f"{name}: generated content matches; line endings differ")
             if not check:
                 open(path, 'wb').write(out.encode('utf-8'))
         print(f'regions {name}: {n[0]} regions, {"changed" if out != text else "unchanged"}')
