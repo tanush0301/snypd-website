@@ -313,6 +313,13 @@ def render(name, plain):
     return t() if callable(t) else plans.fill(t, 'en', plain=plain)
 
 
+def render_region(m, plain):
+    """Preserve each region's existing line endings when inserting generated text."""
+    newline = '\r\n' if '\r\n' in m.group(3) else '\n'
+    content = render(m.group(2), plain).replace('\r\n', '\n').replace('\n', newline)
+    return m.group(1) + content + m.group(4)
+
+
 def offers(ld):
     """Set every schema.org Offer's prices (price + priceSpecification) to plans.json."""
     by_name = {p['name']: p['price'] for p in plans.DATA['plans'] + plans.DATA.get('passes', [])}
@@ -356,11 +363,11 @@ def run(check=False):
 
         def sub_html(m):
             n[0] += 1
-            return m.group(1) + render(m.group(2), False) + m.group(4)
+            return render_region(m, False)
 
         def sub_js(m):
             n[0] += 1
-            return m.group(1) + render(m.group(2), True) + m.group(4)
+            return render_region(m, True)
 
         out = HTML_RE.sub(sub_html, text)
         out = JS_RE.sub(sub_js, out)
