@@ -308,6 +308,27 @@
     });
   }
 
+  // ---- Stock (migrations 065-068): an in-memory port of the RPCs with the same names, arguments, CHECKs and error codes ----
+  // Needs <script src="stock_engine.js"></script> BEFORE this file (copy ops/stock_engine.js next to the page). Without it Stock RPCs fall through.
+  //   ?stock=off|admin|all   runtime_config.stock_mode (default all; admin = visible only to the elite QA user)
+  //   ?stock_seed=acceptance loads the frozen design dataset (215 items, 580 history rows): copy ops/stock/acceptance-fixture.json next to the page
+  //   ?stock_today=YYYY-MM-DD fixes the engine's "today" (the dataset's own today is 2026-10-27)
+  //   ?stock_paid=0          a Free account (25 held items); default follows ?plan=
+  // Feed claims in this mock's user_claims are mirrored into Stock like trigger 067 does (insert / update / delete).
+  var STOCK = null, stockReady = Promise.resolve();
+  if (window.SnypdStockEngine) {
+    STOCK = window.SnypdStockEngine.createEngine({
+      uid: UID, mode: params.get('stock') || 'all', admin: PLAN === 'elite', paid: params.get('stock_paid') ? params.get('stock_paid') !== '0' : PLAN !== 'free',
+      searches: DB.user_searches || [], today: params.get('stock_today') ? function () { return params.get('stock_today'); } : null
+    });
+    window.__qaStock = STOCK;
+    var seedClaims = function () { (DB.user_claims || []).forEach(function (c) { try { STOCK.mirrorClaim(c); } catch (e) { console.warn('QA stock claim mirror failed', e); } }); };
+    if (params.get('stock_seed') === 'acceptance') {
+      stockReady = fetch('acceptance-fixture.json').then(function (r) { return r.json(); }).then(function (fx) { STOCK.loadFixture(fx); seedClaims(); })
+        .catch(function (e) { window.__qaErrors.push('QA stock seed failed: ' + e); });
+    } else seedClaims();
+  }
+
   function makeBuilder(table) {
     var filters = [];
     var order = [];
@@ -365,18 +386,24 @@
           rows.push(withDefaults);
           return withDefaults;
         });
+        if (STOCK && table === 'user_claims') inserted.forEach(function (c) { try { STOCK.mirrorClaim(c); } catch (e) { console.warn('QA stock claim mirror failed', e); } });
         if (singleMode) return { data: inserted[0], error: null };
         return { data: inserted, error: null };
       }
 
       if (op === 'update') {
         var matched = rows.filter(function (r) { return matchRow(r, filters); });
-        matched.forEach(function (r) { Object.assign(r, payload); });
+        matched.forEach(function (r) {
+          var oldPrice = r.bought_price_cents;
+          Object.assign(r, payload);
+          if (STOCK && table === 'user_claims') { try { STOCK.mirrorClaimUpdate(r, oldPrice); } catch (e) { console.warn('QA stock claim mirror failed', e); } }
+        });
         return { data: matched, error: null };
       }
 
       if (op === 'delete') {
         var toRemove = rows.filter(function (r) { return matchRow(r, filters); });
+        if (STOCK && table === 'user_claims') toRemove.forEach(function (c) { STOCK.mirrorClaimDelete(c.id); });
         DB[table] = rows.filter(function (r) { return !matchRow(r, filters); });
         return { data: toRemove, error: null };
       }
@@ -431,7 +458,11 @@
       },
     },
     from: function (table) { return makeBuilder(table); },
-    rpc: function () { return Promise.resolve({ data: null, error: { message: 'QA mock: rpc not implemented, falls back to plan table' } }); },
+    rpc: function (name, args) {
+      // Stock RPCs (migrations 065-068) -> the in-memory port, see ops/stock_engine.js. Everything else keeps the old "not implemented" answer.
+      if (STOCK && /^stock_/.test(name)) return stockReady.then(function () { return STOCK.rpc(name, args); });
+      return Promise.resolve({ data: null, error: { message: 'QA mock: rpc not implemented, falls back to plan table' } });
+    },
   };
 
   window.supabase = { createClient: function () { return fakeClient; } };
