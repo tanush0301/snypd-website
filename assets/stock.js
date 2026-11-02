@@ -140,38 +140,49 @@
     var h = '';
     if (o.err) h += '<div class="st-err">' + esc(errMsg(o.err)) + ' <button type="button" class="st-btn st-ghost" data-act="ov-retry">' + esc(T('err.retry')) + '</button></div>';
     if (S.boot.currency_source === 'default') h += '<p class="st-note">' + esc(T('ov.cur', { cur: S.cur })) + ' <button type="button" class="st-linkb" data-act="settings">' + esc(T('ov.cur.change')) + '</button></p>';
-    // Stock now
-    var oldDays = o.data.old_after_days || S.boot.old_after_days || C.CAPS.oldAfterDefault;
-    h += '<section class="st-card" aria-labelledby="st-h-now"><h2 class="st-h2" id="st-h-now">' + esc(T('ov.now')) + '</h2>' +
-      '<div class="st-heroline"><span class="st-hero" id="st-hero-held">' + esc(String(v.held.count)) + '</span><span class="st-herolbl">' + esc(T('ov.held')) + '</span></div>' +
-      '<p class="st-split">' + esc(T('ov.split', { a: v.held.inStock, b: v.held.listed, c: v.held.reserved })) + '</p>' +
-      '<div class="st-pair"><div class="st-stat"><span class="st-lbl">' + esc(T('ov.cash')) + '</span><b class="st-big" id="st-cash">' + esc(M(v.held.cashCents)) + '</b>' + (v.held.noCost ? '<small>' + esc(T('ov.cash.nocost', { n: v.held.noCost })) + '</small>' : '') + '</div>' +
-      '<div class="st-stat"><span class="st-lbl">' + esc(T('ov.old', { d: oldDays })) + '</span>' +
-      (v.held.old ? '<b class="st-big" id="st-old">' + esc(T('ov.old.some', { n: v.held.old, cost: M(v.held.oldCostCents) })) + '</b><button type="button" class="st-btn st-ghost" data-act="see-old">' + esc(T('ov.old.see')) + '</button>' : '<b class="st-big st-dim" id="st-old">' + esc(T('ov.old.none')) + '</b>') + '</div></div></section>';
-    // The numbers
-    h += '<section class="st-card" aria-labelledby="st-h-num"><div class="st-sechd"><h2 class="st-h2" id="st-h-num">' + esc(T('ov.numbers', { period: T('per.' + perKey(o.days)) })) + '</h2>' +
-      '<div class="st-chips" role="group" aria-label="' + esc(T('per.label')) + '">' + PERIODS.map(function (d) { return '<button type="button" class="st-chip" data-act="period" data-days="' + perKey(d) + '" aria-pressed="' + (d === o.days ? 'true' : 'false') + '">' + esc(T('per.btn.' + perKey(d))) + '</button>'; }).join('') + '</div></div>' +
-      '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : '') + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(MS(v.netCents))) + '</span><span class="st-herolbl">' + esc(T('ov.net')) + '</span></div>' +
-      (v.deltaNetCents != null && o.days != null ? '<p class="st-split" id="st-delta">' + esc(T('ov.delta', { amount: MS(v.deltaNetCents), n: o.days })) + '</p>' : '') +
-      (v.hasEvents ? '' : '<p class="st-split">' + esc(T('ov.net.empty')) + '</p>') +
-      '<div class="st-grid">' +
-      cell(T('ov.rev'), v.revenueCents == null ? '--' : M(v.revenueCents), null, 'st-c-rev') +
-      cell(T('ov.sales'), String(v.sold), v.partial ? T('ov.sales.partial', { a: v.withCost, b: v.sold }) : null, 'st-c-sales') +
-      cell(T('ov.avg'), v.avgProfitCents == null ? '--' : MS(v.avgProfitCents), null, 'st-c-avg') +
-      cell(T('ov.days'), v.daysToSell == null ? '--' : T('ov.days.v', { n: Math.round(v.daysToSell) }), null, 'st-c-days') +
-      cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') +
-      cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div>' +
-      (v.partial ? '<p class="st-hint">' + esc(T('ov.partial.note', { a: v.withCost, b: v.sold })) + '</p>' : '') + '</section>';
-    // Today lanes
-    var L = o.lanes || {};
-    h += '<section class="st-card" aria-labelledby="st-h-lanes"><h2 class="st-h2" id="st-h-lanes">' + esc(T('ov.lanes')) + '</h2><div class="st-lanes">' +
-      ['reprice', 'list', 'follow', 'hold'].map(function (k) {
-        var ln = L[k] || { count: 0, items: [] };
+    var oldDays = o.data.old_after_days || S.boot.old_after_days || C.CAPS.oldAfterDefault, pk = perKey(o.days), L = o.lanes || {};
+    var ARROW_UP = String.fromCharCode(0x25b2), ARROW_DN = String.fromCharCode(0x25bc);
+    // Today: three lanes worth a minute (the design's count) + Holding, each row with its own action
+    var LANES = [['reprice', 'lane.meta.listed', [['reprice', 'lane.btn.reprice']]], ['list', 'lane.meta.stock', [['list', 'act.list']]], ['follow', 'lane.meta.reserved', [['sold', 'act.sold'], ['active', 'act.active']]], ['hold', 'lane.meta.stock', [['list', 'act.list']]]];
+    var worth = ['reprice', 'list', 'follow'].reduce(function (n, k) { return n + ((L[k] && L[k].count) || 0); }, 0);
+    h += '<section class="st-sec" aria-labelledby="st-h-lanes"><div class="st-sechd"><h2 class="st-h2" id="st-h-lanes">' + esc(T('ov.lanes')) + '</h2>' +
+      (o.lanes ? '<span class="st-secsub" id="st-lanes-sub">' + esc(T('ov.lanes.sub', { n: worth, date: todayLabel() })) + '</span>' : '') + '</div><div class="st-lanes">' +
+      LANES.map(function (ld) {
+        var k = ld[0], ln = L[k] || { count: 0, items: [] };
         return '<div class="st-lane" id="st-lane-' + k + '"><div class="st-lane-hd"><span>' + esc(T('lane.' + k)) + '</span><b>' + esc(String(ln.count)) + '</b></div><p class="st-d">' + esc(T('lane.' + k + '.d')) + '</p>' +
-          (ln.count ? ln.items.map(function (it) { return '<button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(T('age.days', { n: it.days })) + '</span></button>'; }).join('') +
-            (ln.count > ln.items.length ? '<p class="st-d">' + esc(T('lane.more', { n: ln.count - ln.items.length })) + '</p>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
+          (ln.count ? ln.items.map(function (it) {
+            return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="st-tile2" aria-hidden="true">' + esc(initials(it.title)) + '</span><span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(T(ld[1], { d: it.days })) + '</span></span></button>' +
+              '<div class="st-lane-acts">' + ld[2].map(function (a, i) { return '<button type="button" class="st-btn ' + (i ? 'st-tert' : 'st-ghost') + '" data-act="lane-act" data-do="' + a[0] + '" data-id="' + esc(it.id) + '">' + esc(T(a[1])) + '</button>'; }).join('') + '</div></div>';
+          }).join('') + (ln.count > ln.items.length ? '<p class="st-d st-more">' + esc(T('lane.more', { n: ln.count - ln.items.length })) + '</p>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
       }).join('') + '</div></section>';
+    // Stock now: today's snapshot, not affected by the period
+    h += '<section class="st-sec" aria-labelledby="st-h-now"><div class="st-sechd"><h2 class="st-h2" id="st-h-now">' + esc(T('ov.now')) + '</h2><span class="st-secsub">' + esc(T('ov.snapshot')) + '</span></div><div class="st-strip">' +
+      '<div class="st-t3"><span class="st-lbl">' + esc(T('ov.t.stock')) + '</span><b class="st-big" id="st-hero-held">' + esc(String(v.held.count)) + '</b><small>' + esc(T('ov.held')) + '</small><small>' + esc(T('ov.split', { a: v.held.inStock, b: v.held.listed, c: v.held.reserved })) + '</small></div>' +
+      '<div class="st-t3"><span class="st-lbl">' + esc(T('ov.cash')) + '</span><b class="st-big" id="st-cash">' + esc(M(v.held.cashCents)) + '</b><small>' + esc(T('ov.cash.cap')) + '</small>' + (v.held.noCost ? '<small>' + esc(T('ov.cash.nocost', { n: v.held.noCost })) + '</small>' : '') + '</div>' +
+      '<div class="st-t3"><span class="st-lbl">' + esc(T('ov.stale', { d: oldDays })) + '</span><b class="st-big' + (v.held.old ? ' st-warnv' : ' st-dim') + '" id="st-old">' + esc(String(v.held.old)) + '</b>' +
+      (v.held.old ? '<small id="st-old-sub">' + esc(T('ov.old.cost', { cost: M(v.held.oldCostCents) })) + '</small><button type="button" class="st-btn st-ghost" data-act="see-old">' + esc(T('ov.old.see')) + '</button>' : '<small id="st-old-sub">' + esc(T('ov.old.none')) + '</small>') + '</div></div></section>';
+    // The numbers
+    var pct = (v.deltaNetCents != null && v.prevNetCents) ? v.deltaNetCents / Math.abs(v.prevNetCents) : null, dir = v.deltaNetCents == null ? 0 : (v.deltaNetCents > 0 ? 1 : (v.deltaNetCents < 0 ? -1 : 0));
+    var pctTxt = pct == null ? null : (pct < 0 ? C.MINUS : '+') + (Math.abs(pct) * 100).toFixed(1).replace('.', lang === 'fr' ? ',' : '.') + (lang === 'fr' ? String.fromCharCode(0xa0) + '%' : '%');
+    var deltaP = { amount: v.deltaNetCents == null ? '' : MS(v.deltaNetCents), pct: pctTxt, prev: v.prevNetCents == null ? '' : M(v.prevNetCents), n: o.days };
+    h += '<section class="st-sec" aria-labelledby="st-h-num"><div class="st-sechd"><h2 class="st-h2" id="st-h-num">' + esc(T('ov.numbers')) + '</h2><span class="st-secsub" id="st-num-sub">' + esc(T('per.' + pk) + (o.days != null ? ' \u00b7 ' + T('ov.vs', { n: o.days }) : '')) + '</span>' +
+      '<div class="st-chips" role="group" aria-label="' + esc(T('per.label')) + '">' + PERIODS.map(function (d) { return '<button type="button" class="st-chip" data-act="period" data-days="' + perKey(d) + '" aria-pressed="' + (d === o.days ? 'true' : 'false') + '">' + esc(T('per.btn.' + perKey(d))) + '</button>'; }).join('') + '</div></div>' +
+      '<div class="st-numgrid"><div class="st-herocard"><span class="st-lbl">' + esc(T('ov.net') + ' \u00b7 ' + T('per.' + pk)) + '</span>' +
+      '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : '') + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(M(v.netCents))) + '</span></div>' +
+      (v.deltaNetCents != null && o.days != null ? '<p class="st-delta" id="st-delta">' + (dir ? '<span class="' + (dir > 0 ? 'st-pos' : 'st-neg') + '">' + (dir > 0 ? ARROW_UP : ARROW_DN) + '</span> ' : '') + esc(T(pctTxt == null ? 'ov.delta.nopct' : 'ov.delta', deltaP)) + '</p>' : '') +
+      (v.hasEvents ? '' : '<p class="st-split">' + esc(T('ov.net.empty')) + '</p>') +
+      (v.partial ? '<p class="st-hint" id="st-partial">' + esc(T('ov.partial.note', { a: v.withCost, b: v.sold, c: v.sold - v.withCost })) + '</p>' : '') + '</div>' +
+      cell(T('ov.rev'), v.revenueCents == null ? '--' : M(v.revenueCents), v.sold === 1 ? T('ov.sales.n1') : T('ov.sales.n', { n: v.sold }), 'st-c-rev') +
+      cell(T('ov.sold'), String(v.sold), T('per.' + pk), 'st-c-sales') +
+      cell(T('ov.avg'), v.avgProfitCents == null ? '--' : M(v.avgProfitCents), v.sold ? T('ov.avg.cap', { a: v.withCost, b: v.sold }) : null, 'st-c-avg') +
+      cell(T('ov.days'), v.daysToSell == null ? '--' : T('ov.days.v', { n: Math.round(v.daysToSell) }), T('ov.days.cap'), 'st-c-days') + '</div>' +
+      '<div class="st-numsub">' + cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') + cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div></section>';
     el.innerHTML = h;
+  }
+  function initials(title) { return String(title || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '--'; }
+  function todayLabel() {
+    var p = today().split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]);
+    try { return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(d); } catch (e) { return today(); }
   }
   function cell(label, value, sub, id) { return '<div class="st-cell" id="' + id + '"><span class="st-lbl">' + esc(label) + '</span><b>' + esc(value) + '</b>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</div>'; }
   var WALL = 'CH RL NI AR LE SI PA ST CA AD SA TN AC BA MO PR DR YE LO HU WO GU RA KA OF SU JO NB CP AS VA DI BU MA TO FI HE KO LA ME NO OB PE QU RI SE TI UM VE WA XO YO ZA AB BE CO DE EL FO GA'.split(' ');
@@ -229,6 +240,11 @@
     var go = function (row) { if (!row) return; S.pinned[id] = row; S.opener = $('[data-id="' + id + '"]'); openDetail(id); };
     if (known) { go(known); return; }
     S.api.itemById(id).then(go).catch(function (e) { showBar(errMsg(e), false); });
+  }
+  function laneAct(a, id, opener) {
+    var go = function (row) { if (!row) return; S.pinned[id] = row; S.opener = opener || null; runDetailAction(a, id); };
+    var known = findRow(id);
+    if (known) go(known); else S.api.itemById(id).then(function (row) { go(row); }).catch(function (e) { showBar(errMsg(e), false); });
   }
   function currencyName(code) {
     try { return code + ' - ' + new Intl.DisplayNames([lang === 'fr' ? 'fr' : 'en'], { type: 'currency' }).of(code); } catch (e) { return code; }
@@ -372,6 +388,7 @@
       case 'ov-retry': loadOverview(); break;
       case 'see-old': S.f = { status: null, q: '', condition: '', category: '', deleted: false, old: true }; if ($('#st-q')) $('#st-q').value = ''; if ($('#st-cond')) $('#st-cond').value = ''; if ($('#st-cat')) $('#st-cat').value = ''; S.itemsLoaded = true; showView('items'); load(true); break;
       case 'lane-open': openLane(id); break;
+      case 'lane-act': laneAct(el.getAttribute('data-do'), id, el); break;
       case 'persona': answerPersona(el.getAttribute('data-p')); break;
       case 'pq-skip': setSkipped(); renderOverview(); showBar(T('pq.skipped'), false); break;
       case 'hide-tab': hideTab(); break;

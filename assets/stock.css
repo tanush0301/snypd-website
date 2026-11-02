@@ -157,7 +157,38 @@ select.st-in { padding-right: 8px; }
 .st-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--st-line); border: 1px solid var(--st-line); margin-top: 18px; }
 .st-cell { background: var(--st-bg); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .st-cell b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.st-lanes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.st-lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; }
+.st-sec { margin: 0 0 40px; }
+.st-sec .st-sechd { justify-content: flex-start; align-items: baseline; gap: 14px; }
+.st-sec .st-sechd .st-chips { margin-left: auto; }
+.st-sec .st-h2 { font-size: 22px; letter-spacing: 0; text-transform: none; color: var(--st-text); font-weight: 600; }
+.st-secsub { font-size: 12px; color: var(--st-text2); }
+.st-lane { padding: 0; gap: 0; background: var(--st-bg); }
+.st-lane-hd { padding: 14px 16px 0; color: var(--st-text); }
+.st-lane > .st-d { padding: 4px 16px 12px; }
+.st-lane > .st-d.st-more { padding: 12px 16px; border-top: 1px solid var(--st-line); }
+.st-lane-row { border-top: 1px solid var(--st-line); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.st-lane-row .st-lane-it { border: 0; padding: 0; gap: 12px; align-items: center; justify-content: flex-start; min-width: 0; }
+.st-tile2 { flex: none; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--st-line); background: var(--st-hd); font-size: 11px; letter-spacing: .06em; color: var(--st-muted); }
+.st-lane-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.st-lane-tx .a { font-size: 12px; }
+.st-lane-acts { display: flex; gap: 8px; flex-wrap: wrap; padding-left: 48px; }
+.st-lane-acts .st-btn { height: 32px; padding: 0 12px; font-size: 11px; }
+.st-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--st-line); background: var(--st-bg); }
+.st-t3 { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 20px 24px; min-width: 0; }
+.st-t3 + .st-t3 { border-left: 1px solid var(--st-line); }
+.st-t3 small { font-size: 12px; color: var(--st-muted); }
+.st-t3 .st-big { font-size: 28px; }
+.st-warnv { color: var(--st-warn); }
+.st-numgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); gap: 12px; }
+.st-herocard { grid-row: 1 / span 2; border: 1px solid var(--st-line); background: var(--st-bg); padding: 24px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.st-herocard .st-hero { font-size: clamp(44px, 6vw, 72px); font-weight: 900; letter-spacing: -.03em; }
+.st-delta { margin: 0; font-size: 13px; color: var(--st-text2); }
+.st-numgrid > .st-cell, .st-numsub > .st-cell { border: 1px solid var(--st-line); padding: 18px 20px; }
+.st-numgrid > .st-cell b { font-size: 24px; }
+.st-numsub { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.st-numsub > .st-cell { padding: 12px 16px; flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+.st-numsub > .st-cell b { font-size: 16px; }
 .st-lane { border: 1px solid var(--st-line); padding: 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .st-lane-hd { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
 .st-lane-hd b { font-size: 20px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
@@ -205,6 +236,14 @@ select.st-in { padding-right: 8px; }
   .st-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .st-lanes { grid-template-columns: minmax(0, 1fr); }
   .st-first { padding: 24px 16px; margin: 0; max-width: none; }
+  .st-strip { grid-template-columns: 1fr; }
+  .st-t3 + .st-t3 { border-left: 0; border-top: 1px solid var(--st-line); }
+  .st-numgrid { grid-template-columns: 1fr 1fr; }
+  .st-herocard { grid-row: auto; grid-column: 1 / -1; }
+  .st-numgrid > .st-cell { padding: 14px 16px; }
+  .st-numgrid > .st-cell b { font-size: 20px; overflow-wrap: normal; }
+  .st-sec .st-sechd .st-chips { margin-left: 0; }
+  .st-lane-acts { padding-left: 0; }
   .st-wall { display: none; }
   .st-navr { width: 100%; flex-wrap: wrap; gap: 8px 12px; padding: 8px 0 12px; }
   .st-navr .st-meter { flex: 1 1 100%; }

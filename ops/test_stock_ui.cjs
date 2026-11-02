@@ -214,7 +214,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
 
   // ---- 5. step 5: Overview, Today lanes, first run, persona, settings, History swap, claims mirror
   const tc = (p, sel) => p.$eval(sel, e => e.textContent.trim());
-  const waitOv = p => p.waitForSelector('#stock-panel #st-over .st-card, #stock-panel #st-over .st-first', { timeout: 8000 });
+  const waitOv = p => p.waitForSelector('#stock-panel #st-over .st-sec, #stock-panel #st-over .st-first', { timeout: 8000 });
   const fmt = (cents, cur, lng, signed) => `window.SnypdStock.formatMoney(${cents}, '${cur || 'EUR'}', '${lng || 'en'}'${signed ? ', { signed: true }' : ''})`;
   const money = (p, cents, cur, lng, signed) => p.evaluate(`${fmt(cents, cur, lng, signed)}`);
   const clickBy = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) throw new Error('no ' + s); e.click(); }, sel);
@@ -229,22 +229,25 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(await tabVis(pg, '.bottombar-tab[data-view="history"]'), false, 'History tab is replaced while Stock is on (phone bar)');
   await pg.click('#view-tab-stock'); await waitOv(pg);
   eq(await tc(pg, '#st-hero-held'), '58', 'Overview: 58 items held');
-  { const sp = await pg.$eval('#st-over .st-split', e => e.textContent); ok(/18 in stock .* 36 listed .* 4 reserved/.test(sp), 'Overview: 18 / 36 / 4, got: ' + sp); }
+  { const sp = await pg.$eval('#st-over .st-t3:first-child small:last-child', e => e.textContent); ok(/18 in stock .* 36 listed .* 4 reserved/.test(sp), 'Overview: 18 / 36 / 4, got: ' + sp); }
   eq(await tc(pg, '#st-cash'), '€1,124.50', 'Overview: cash tied up EUR 1,124.50');
-  eq(await tc(pg, '#st-old'), '12 items, €318.00 at cost', 'Overview: 12 old items, EUR 318.00');
-  eq(await tc(pg, '#st-hero-net'), await money(pg, 61240, 'EUR', 'en', true), 'Overview 30 days: net profit EUR 612.40');
+  eq([await tc(pg, '#st-old'), await tc(pg, '#st-old-sub')], ['12', '€318.00 at cost'], 'Overview: 12 old items, EUR 318.00 at cost');
+  eq(await tc(pg, '#st-hero-net'), await money(pg, 61240, 'EUR', 'en'), 'Overview 30 days: net profit EUR 612.40 (unsigned hero, as in the design)');
   eq(await tc(pg, '#st-c-rev b'), await money(pg, 184600), 'Overview 30 days: revenue EUR 1,846.00');
-  eq([await tc(pg, '#st-c-sales b'), await tc(pg, '#st-c-sales small')], ['31', '29 of 31 with a cost'], 'Overview 30 days: 31 sales, 29 of 31 with a cost (never a silent partial)');
-  eq(await tc(pg, '#st-c-avg b'), await money(pg, 2112, 'EUR', 'en', true), 'Overview 30 days: average EUR 21.12');
-  eq(await tc(pg, '#st-c-days b'), '18 days', 'Overview 30 days: 18 days to sell');
-  eq(await tc(pg, '#st-delta'), (await money(pg, 6280, 'EUR', 'en', true)) + ' vs the 30 days before', 'Overview: +EUR 62.80 against the 30 days before (549.60)');
+  eq([await tc(pg, '#st-c-sales b'), await tc(pg, '#st-c-sales small'), await tc(pg, '#st-c-rev small')], ['31', 'last 30 days', '31 sales'], 'Overview 30 days: ITEMS SOLD 31 / last 30 days, REVENUE caption 31 sales');
+  eq(await tc(pg, '#st-c-avg small'), '29 of 31 have a cost', 'Overview 30 days: 29 of 31 have a cost (never a silent partial)');
+  eq(await tc(pg, '#st-partial'), '29 of 31 sold items have a cost, 2 left out until you add one', 'Overview: the design sentence under the hero number');
+  eq(await tc(pg, '#st-c-avg b'), await money(pg, 2112, 'EUR', 'en'), 'Overview 30 days: average EUR 21.12');
+  eq([await tc(pg, '#st-c-days b'), await tc(pg, '#st-c-days small')], ['18d', 'bought to sold'], 'Overview 30 days: 18d, bought to sold');
+  eq(await tc(pg, '#st-delta'), String.fromCharCode(0x25b2) + ' ' + (await money(pg, 6280, 'EUR', 'en', true)) + ' (+11.4%) vs ' + (await money(pg, 54960, 'EUR', 'en')) + ', the 30 days before', 'Overview: the design delta line, +EUR 62.80 (+11.4%) vs 549.60');
+  eq(await tc(pg, '#st-num-sub'), 'last 30 days \u00b7 vs the 30 days before', 'The numbers sub-line');
   const periodNet = async d => { await clickBy(pg, '#st-over [data-act="period"][data-days="' + d + '"]'); await pg.waitForFunction(x => document.querySelector('#st-over [data-act="period"][aria-pressed="true"]').getAttribute('data-days') === x, {}, d); await wait5(250); return tc(pg, '#st-hero-net'); };
-  eq(await periodNet('7'), await money(pg, 15200, 'EUR', 'en', true), '7 days: EUR 152.00');
-  eq(await tc(pg, '#st-delta'), (await money(pg, -1220, 'EUR', 'en', true)) + ' vs the 7 days before', '7 days: against 164.20 the 7 days before');
-  eq(await periodNet('90'), await money(pg, 154560, 'EUR', 'en', true), '90 days: EUR 1,545.60');
-  eq(await periodNet('all'), await money(pg, 290770, 'EUR', 'en', true), 'all time: EUR 2,907.70');
+  eq(await periodNet('7'), await money(pg, 15200, 'EUR', 'en'), '7 days: EUR 152.00');
+  eq(await tc(pg, '#st-delta'), String.fromCharCode(0x25bc) + ' ' + (await money(pg, -1220, 'EUR', 'en', true)) + ' (' + String.fromCharCode(0x2212) + '7.4%) vs ' + (await money(pg, 16420, 'EUR', 'en')) + ', the 7 days before', '7 days: down arrow, against 164.20 the 7 days before');
+  eq(await periodNet('90'), await money(pg, 154560, 'EUR', 'en'), '90 days: EUR 1,545.60');
+  eq(await periodNet('all'), await money(pg, 290770, 'EUR', 'en'), 'all time: EUR 2,907.70');
   eq(await pg.$('#st-delta'), null, 'all time has no "before" period, so no delta line');
-  eq(await pg.evaluate(() => document.querySelector('#st-h-num').textContent), 'The numbers · all time', 'heading follows the period');
+  eq(await tc(pg, '#st-num-sub'), 'all time', 'the sub-line follows the period');
   await periodNet('30');
   // the Today lanes against the lane rules computed independently from the items
   const lanes = await pg.evaluate(() => {
@@ -262,6 +265,12 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(lanes.dom, lanes.want, 'Today lanes: the four counts follow the lane rules: ' + JSON.stringify(lanes.want));
   ok(lanes.want.reprice + lanes.want.list + lanes.want.follow + lanes.want.hold > 0, 'the dataset has something in the lanes');
   eq(lanes.empties, [], 'an empty lane says so in words');
+  eq(await tc(pg, '#st-lanes-sub'), (lanes.want.reprice + lanes.want.list + lanes.want.follow) + ' things worth a minute \u00b7 Tue 27 Oct', 'Today sub-line: the three design lanes counted, with the date');
+  { const rows = await pg.$$eval('#st-lane-reprice .st-lane-row', r => r.map(x => x.innerText.replace(/\n+/g, ' | ')));
+    ok(rows.length > 0 && rows.every(x => /listed \d+d/.test(x) && /REPRICE/i.test(x)), 'lane rows carry the design meta line and a Reprice action: ' + rows[0]);
+    const fr0 = await pg.$eval('#st-lane-follow .st-lane-row', x => x.innerText.replace(/\n+/g, ' | ')); ok(/reserved \d+d/.test(fr0) && /MARK SOLD/i.test(fr0) && /BACK TO ACTIVE/i.test(fr0), 'follow-up rows: Mark sold + Back to active: ' + fr0);
+    await clickBy(pg, '#st-lane-reprice [data-act="lane-act"][data-do="reprice"]'); await pg.waitForSelector('.st-sheet #sf-newprice, .st-sheet input', { timeout: 5000 });
+    ok(/Lower the price/i.test(await tc(pg, '.st-sheet')), 'a lane Reprice button opens the reprice sheet for that item'); await pg.keyboard.press('Escape'); await wait5(300); }
   // a lane item opens its own detail without the Items list having been loaded
   const laneKey = ['list', 'reprice', 'follow', 'hold'].find(k => lanes.want[k] > 0);
   const laneTitle = await pg.$eval('#st-lane-' + laneKey + ' .st-lane-it .t', e => e.textContent);
@@ -291,8 +300,8 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(await sums(), sumBefore, 'no stored amount changed: nothing is converted');
   ok(/Currency set to GBP\. Your amounts kept their numbers\./.test(await tc(pg, '#st-undo-root')), 'toast says the amounts kept their numbers');
   const old60 = await pg.evaluate(() => { const t0 = Date.UTC(2026, 9, 27); return window.__qaStock.state.items.filter(i => !i.deleted_at && ['stock', 'listed', 'reserved', 'returned'].includes(i.status) && Math.round((t0 - Date.parse((i.returned_on || i.bought_on) + 'T00:00:00Z')) / 86400000) >= 60).length; });
-  ok(old60 > 0 && new RegExp('^' + old60 + ' items, ').test(await tc(pg, '#st-old')), 'the old count follows the new threshold: ' + old60 + ' items, got ' + await tc(pg, '#st-old'));
-  ok(/Old stock \(60\+ days\)/.test(await pg.$eval('#st-over', e => e.textContent)), 'the old label says 60+ days');
+  eq(+(await tc(pg, '#st-old')), old60, 'the stale count follows the new threshold: ' + old60);
+  ok(/Stale 60d\+/.test(await pg.$eval('#st-over', e => e.textContent)), 'the stale label says 60d+');
   eq(await pg.evaluate(() => window.__qaErrors.length), 0, 'no window errors in the mock (5a, 5b)');
 
   // 5c. hiding the tab brings History back; Profile brings Stock back; a tapped History link lands on Stock while it replaces History
