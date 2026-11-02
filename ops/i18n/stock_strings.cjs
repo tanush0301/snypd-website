@@ -7,7 +7,7 @@ const fr = o => { for (const k of Object.keys(o)) o[k] = o[k].replace(/ ([?!:;])
 const en = {
   'tab': 'Stock',
   'title': 'Stock',
-  'add': 'Add item',
+  'add': '+ Add item',
   'search': 'Search title or brand',
   'search.aria': 'Search your stock',
   'all': 'All',
@@ -124,7 +124,7 @@ const en = {
 const frTable = fr({
   'tab': 'Stock',
   'title': 'Stock',
-  'add': 'Ajouter un article',
+  'add': '+ Ajouter un article',
   'search': 'Chercher un titre ou une marque',
   'search.aria': 'Chercher dans ton stock',
   'all': 'Tous',

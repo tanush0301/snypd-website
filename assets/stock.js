@@ -82,15 +82,17 @@
     var statuses = [['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')]];
     S.panel.innerHTML =
       '<div class="st-wrap">' +
-      '<div class="st-head"><h1 class="st-title">' + esc(T('title')) + '</h1><button type="button" class="st-btn st-tert" data-act="settings">' + esc(T('set.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div>' +
-      '<div id="st-meter"></div>' +
-      '<div class="st-nav" role="group" aria-label="' + esc(T('title')) + '"><button type="button" class="st-navb" data-act="view" data-view="overview" aria-pressed="true">' + esc(T('nav.overview')) + '</button><button type="button" class="st-navb" data-act="view" data-view="items" aria-pressed="false">' + esc(T('nav.items')) + '</button></div>' +
+      '<h1 class="st-sr">' + esc(T('title')) + '</h1>' +
+      '<div class="st-navrow"><div class="st-nav" role="group" aria-label="' + esc(T('title')) + '"><button type="button" class="st-navb" data-act="view" data-view="overview" aria-pressed="true">' + esc(T('nav.overview')) + '</button><button type="button" class="st-navb" data-act="view" data-view="items" aria-pressed="false">' + esc(T('nav.items')) + ' <span id="st-navn"></span></button></div>' +
+      '<div class="st-navr"><div id="st-meter"></div><button type="button" class="st-btn st-tert" data-act="settings">' + esc(T('set.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div></div>' +
+      '<div id="st-capmsg"></div>' +
       '<div id="st-over"></div><div id="st-items" style="display:none">' +
       '<div class="st-tools">' +
       '<input class="st-in st-search" type="search" id="st-q" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('search.aria')) + '" autocomplete="off">' +
       '<select class="st-in" id="st-cond" aria-label="' + esc(T('filter.condition')) + '">' + option('', T('filter.condition') + ': ' + T('filter.any'), true) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c)); }).join('') + '</select>' +
       '<select class="st-in" id="st-cat" aria-label="' + esc(T('filter.category')) + '">' + option('', T('filter.category') + ': ' + T('filter.any'), true) + (S.cats || []).filter(function (c) { return !c.hidden; }).map(function (c) { return option(c.key, catName(c.key)); }).join('') + '</select>' +
       '<button type="button" class="st-btn st-tert" data-act="deleted" id="st-del" aria-pressed="false">' + esc(T('deleted.show')) + '</button>' +
+      '<button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="export" id="st-export">' + esc(T('exp.btn')) + '</button>' +
       '<span class="st-count" id="st-count" aria-live="polite"></span></div>' +
       '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === '' ? 'true' : 'false') + '">' + esc(s[1]) + '</button>'; }).join('') + '</div>' +
       '<div id="st-body"></div></div></div><div id="st-ov"></div><div id="st-undo-root"></div>';
@@ -102,10 +104,11 @@
   }
   function renderMeter() {
     var el = $('#st-meter'); if (!el) return;
-    var m = C.freeCapState(S.boot);
-    if (!m.limited) { el.innerHTML = ''; return; }
-    el.innerHTML = '<div class="st-meter' + (m.warn ? ' warn' : '') + '"><div class="st-meter-txt">' + esc(T('meter', { held: m.held, cap: m.cap })) + '</div><div class="st-meter-bar"><div class="st-meter-fill" style="width:' + Math.min(100, Math.round(m.held / m.cap * 100)) + '%"></div></div>' +
-      (m.atCap ? '<p>' + esc(T('meter.limit', { cap: m.cap })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></p>' : '') + '</div>';
+    var m = C.freeCapState(S.boot), n = $('#st-navn'), cm = $('#st-capmsg');
+    if (n) n.textContent = String(m.held);
+    if (!m.limited) { el.innerHTML = ''; if (cm) cm.innerHTML = ''; return; }
+    el.innerHTML = '<div class="st-meter' + (m.warn ? ' warn' : '') + '"><span class="st-meter-txt">' + esc(T('meter.label')) + ' <b>' + m.held + ' / ' + m.cap + '</b></span><span class="st-meter-bar"><span class="st-meter-fill" style="width:' + Math.min(100, Math.round(m.held / m.cap * 100)) + '%"></span></span></div>';
+    if (cm) cm.innerHTML = m.atCap ? '<p class="st-note">' + esc(T('meter.limit', { cap: m.cap })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></p>' : '';
   }
 
   // ------------------------------------------------------------------ overview + Today lanes + first run + settings (step 5)
@@ -171,14 +174,18 @@
     el.innerHTML = h;
   }
   function cell(label, value, sub, id) { return '<div class="st-cell" id="' + id + '"><span class="st-lbl">' + esc(label) + '</span><b>' + esc(value) + '</b>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</div>'; }
+  var WALL = 'CH RL NI AR LE SI PA ST CA AD SA TN AC BA MO PR DR YE LO HU WO GU RA KA OF SU JO NB CP AS VA DI BU MA TO FI HE KO LA ME NO OB PE QU RI SE TI UM VE WA XO YO ZA AB BE CO DE EL FO GA'.split(' ');
   function firstRunHtml() {
     var persona = S.boot.persona, m = C.freeCapState(S.boot), h;
     if (persona === 'buy') {   // buyers get the light card: one action, and a way to hide the tab
       return '<div class="st-first" id="st-first-light"><h2>' + esc(T('fr.buy.title')) + '</h2><p>' + esc(T('fr.buy.body')) + '</p><div class="st-firstb"><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('fr.add')) + '</button> <button type="button" class="st-btn st-ghost" data-act="hide-tab">' + esc(T('fr.buy.hide')) + '</button></div></div>';
     }
-    h = '<div class="st-first" id="st-first"><div class="st-kicker">' + esc(T('fr.kicker')) + '</div><h2>' + esc(T('fr.title')) + '</h2><p>' + esc(T('fr.body')) + '</p>' +
-      '<div class="st-firstb"><button type="button" class="st-btn st-prim" data-act="import">' + esc(T('imp.btn')) + '</button> <button type="button" class="st-btn st-ghost" data-act="add">' + esc(T('fr.add')) + '</button></div>' +
-      (m.limited ? '<p class="st-hint">' + esc(T('fr.free', { cap: m.cap })) + '</p>' : '') + '</div>';
+    var tiles = WALL.map(function (s) { return '<span class="st-tile">' + s + '</span>'; }).join('');
+    h = '<div class="st-firstwrap"><div class="st-wall" aria-hidden="true">' + tiles + '</div><div class="st-first" id="st-first"><div class="st-kicker">' + esc(T('fr.kicker')) + '</div><h2>' + esc(T('fr.title')) + '</h2><p>' + esc(T('fr.body')) + '</p>' +
+      '<div class="st-firstb"><button type="button" class="st-btn st-prim" data-act="import">' + esc(T('fr.import')) + '</button></div>' +
+      '<p class="st-hint st-formats">' + esc(T('fr.formats')) + '</p><p class="st-hint"><button type="button" class="st-link" data-act="template">' + esc(T('fr.template')) + '</button></p>' +
+      '<div class="st-firstadd"><button type="button" class="st-btn st-ghost" data-act="add">' + esc(T('fr.add')) + '</button><span>' + esc(T('fr.addhint')) + '</span></div>' +
+      '<p class="st-hint st-foot">' + esc(m.limited ? T('fr.free', { cap: m.cap }) : T('fr.paid')) + '</p></div></div>';
     if (!persona && !skipped()) {
       h += '<div class="st-pq" id="st-pq" role="group" aria-label="' + esc(T('pq.title')) + '"><span class="st-lbl">' + esc(T('pq.title')) + '</span><div class="st-seg">' +
         C.PERSONAS.map(function (p) { return '<button type="button" class="st-segb" data-act="persona" data-p="' + p + '" aria-pressed="false"><b>' + esc(T('pq.' + p)) + '</b><span>' + esc(T('pq.' + p + '.d')) + '</span></button>'; }).join('') +
@@ -186,6 +193,30 @@
     }
     return h;
   }
+  // ------------------------------------------------------------------ export + template download (step 2)
+  function downloadFile(text, name) {
+    var url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' })), a = document.createElement('a');
+    a.href = url; a.download = name; a.rel = 'noopener'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+  function exportItems(btn) {
+    if (S.exporting) return; S.exporting = true; if (btn) btn.disabled = true;
+    var rows = [], cursor = null, pages = 0;
+    function next() {
+      return S.api.itemsPage({}, 200, cursor).then(function (p) {
+        rows = rows.concat(p.rows || []); pages++;
+        if (!p.next_cursor || pages >= 40) return rows; cursor = p.next_cursor; return next();
+      });
+    }
+    showBar(T('exp.busy'), false);
+    next().then(function () {
+      if (!rows.length) { showBar(T('exp.none'), false); return; }
+      var name = 'snypd-stock-' + C.localToday() + '.csv';
+      downloadFile(C.exportCsv(rows, { lang: lang, labels: { status: function (k) { return T('status.' + k); }, cond: function (k) { return T('cond.' + k); }, cat: catName, plat: function (k) { return T('plat.' + k); } } }), name);
+      showBar(T('exp.done', { n: rows.length, file: name }), false);
+    }).catch(function () { showBar(T('exp.err'), false); }).then(function () { S.exporting = false; if (btn) btn.disabled = false; });
+  }
+
   function answerPersona(p) {
     S.api.saveSettings({ persona: p }).then(function () { S.boot.persona = p; renderOverview(); showBar(T('pq.saved', { a: T('pq.' + p) }), false); }).catch(function (e) { showBar(errMsg(e), false); });
   }
@@ -314,6 +345,8 @@
     switch (act) {
       case 'add': S.opener = el; openSheet('add'); break;
       case 'import': S.opener = el; openImport(); break;
+      case 'template': downloadFile(C.templateCsv(lang), lang === 'fr' ? 'snypd-modele-revendeur.csv' : 'snypd-reseller-template.csv'); break;
+      case 'export': exportItems(el); break;
       case 'im-pick': { var fi = $('#im-file'); if (fi) fi.click(); break; }
       case 'im-go': imRun(false); break;
       case 'im-resume': imRun(true); break;

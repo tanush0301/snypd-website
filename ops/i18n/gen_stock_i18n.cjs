@@ -6,7 +6,7 @@ const path = require('node:path');
 const { en, fr } = require('./stock_strings.cjs');
 
 const problems = [];
-const same = new Set(['tab', 'title', 'plat.vinted', 'plat.ebay', 'plat.depop', 'plat.vestiaire', 'plat.marktplaats', 'plat.facebook', 'h.at', 'detail.cost', 'f.source', 'f.notes', 'f.date', 'h.via', 'imp.cols.none']);
+const same = new Set(['tab', 'title', 'plat.vinted', 'plat.ebay', 'plat.depop', 'plat.vestiaire', 'plat.marktplaats', 'plat.facebook', 'h.at', 'detail.cost', 'f.source', 'f.notes', 'f.date', 'h.via', 'imp.cols.none', 'exp.btn']);
 const ph = s => (s.match(/\{[a-z]+\}/g) || []).sort().join(',');
 for (const k of Object.keys(en)) {
   if (!(k in fr)) { problems.push('missing French: ' + k); continue; }

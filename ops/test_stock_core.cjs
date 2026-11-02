@@ -508,6 +508,42 @@ test('F qa_mock.js wiring: the Stock RPCs and the claims hooks are present, and 
   assert.equal((fs.readFileSync(path.join(__dirname, '..', 'assets', 'stock-core.js'), 'utf8').match(/[^\x20-\x7e\r\n]/g) || []).length, 0, 'stock-core.js must stay pure ASCII');
 });
 
+test('X CSV export + template: formula guard on text cells only, missing stays empty, FR = semicolon + decimal comma, the importer reads the headers back', () => {
+  const Imp = require('../assets/stock-import.js'), BOM = String.fromCharCode(0xfeff);
+  const rows = [
+    { title: '=SUM(A1)', brand: '+1', size: '-2', status: 'sold', condition: 'good', category: 'tops', buy_cents: 1000, extra_cents: 150, bought_on: '2026-10-01', src: '@hunt', platform: 'vinted', list_cents: 3000, sold_cents: 2500, sold_on: '2026-10-09', ship_paid_cents: 0, fee_cents: 0, notes: 'say "hi"\nsecond line; ok' },
+    { title: 'Loss, jacket', status: 'sold', buy_cents: 5000, sold_cents: 4500, bought_on: '2026-10-02', sold_on: '2026-10-03' },
+    { title: 'No cost', status: 'stock', buy_cents: null, extra_cents: null, bought_on: '2026-10-04' }
+  ];
+  const en = core.exportCsv(rows, { lang: 'en', labels: { status: k => k.toUpperCase() } }), fr = core.exportCsv(rows, { lang: 'fr' });
+  assert.equal(en.charAt(0), BOM, 'BOM');
+  const lines = en.slice(1).split('\r\n');
+  assert.equal(lines[0], core.EXPORT_HEAD.en.join(','), 'header row');
+  assert(lines[1].startsWith("'=SUM(A1),'+1,'-2,SOLD,"), 'text cells starting with = + - are guarded: ' + lines[1]);
+  assert(lines[1].includes(",'@hunt,"), 'a leading @ is guarded too');
+  assert(en.includes('"say ""hi""\nsecond line; ok"'), 'quotes doubled, newline kept inside quotes');
+  assert(lines[1].includes(',10.00,1.50,2026-10-01,') && lines[1].includes(',25.00,2026-10-09,13.50,'), 'amounts are plain numbers with a point; profit = sold - cost incl. extra: ' + lines[1]);
+  assert(lines[2].startsWith('"Loss, jacket",,,SOLD,'), 'a comma inside a value is quoted: ' + lines[2]);
+  assert(lines[2].includes(',-5.00,'), 'a negative profit is a number, never guarded: ' + lines[2]);
+  assert(lines[3].startsWith('No cost,,,STOCK,,,,,2026-10-04,'), 'missing amounts stay empty, never 0: ' + lines[3]);
+  assert(!/NaN|undefined|null/.test(en), 'no NaN/undefined/null in the file');
+  const frl = fr.slice(1).split('\r\n');
+  assert(frl[0].includes(';') && !frl[0].includes(',') && frl[0].startsWith('Article;Marque;Taille;Statut;'), 'French header uses semicolons');
+  assert(frl[1].includes(';10,00;1,50;2026-10-01;'), 'French amounts use a decimal comma: ' + frl[1]);
+  assert(frl[2].startsWith('Loss, jacket;'), 'a comma needs no quotes when the separator is a semicolon: ' + frl[2]);
+  assert.equal(core.exportCsv([], { lang: 'en' }), BOM + core.EXPORT_HEAD.en.join(',') + '\r\n', 'no rows: header only');
+  // what the file says in its header must be readable by our own importer
+  const want = { 'Item': 'title', 'Brand': 'brand', 'Size': 'size', 'Condition': 'condition', 'Category': 'category', 'Buy price': 'buy', 'Extra costs': 'extra', 'Date bought': 'bought', 'Source': 'source', 'Platform': 'platform', 'List price': 'list', 'Sold price': 'sold', 'Date sold': 'soldon', 'Notes': 'notes', 'Status': null, 'Profit': null };
+  for (const m of Imp.mapHeaders(core.EXPORT_HEAD.en)) assert.equal(m.field, want[m.header], 'import reads the export header ' + m.header);
+  // the template: 17 columns, every one recognised by the importer, in both languages
+  for (const lang of ['en', 'fr']) {
+    const tpl = core.templateCsv(lang); assert.equal(tpl.charAt(0), BOM);
+    const head = Imp.parseCsv(tpl)[0] || Imp.parseCsv(tpl).rows[0];
+    const m = Imp.mapHeaders(head), fields = m.map(x => x.field);
+    assert.equal(head.length, 17, lang + ' template has 17 columns');
+    assert(fields.every(Boolean) && new Set(fields).size === 17, lang + ' template: all 17 columns recognised by the importer, none twice: ' + fields.join(','));
+  }
+});
 run().then(() => {
   const total = passed + failures.length;
   if (failures.length) {

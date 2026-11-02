@@ -113,14 +113,24 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   await act('deleted'); ok(/UI flow item edited/.test(await firstRow()), 'it is in Recently deleted'); await act('restore'); await act('deleted'); eq(await rows(), 1, 'restored');
   await act('add'); await page.keyboard.press('Escape'); await wait(200); eq(await page.$('.st-sheet'), null, 'Escape closes the sheet');
   eq(await page.evaluate(() => window.__qaErrors.length), 0, 'no window errors in the mock');
+  // ---- 2b. export (step 2): every non-deleted item, design column set, a missing value stays empty
+  await page.evaluate(() => { window.__dl = []; const o = URL.createObjectURL.bind(URL); URL.createObjectURL = b => { window.__dl.push(b); return o(b); }; });
+  await act('export'); await wait(1500);
+  const csvr = await page.evaluate(async () => { const b = window.__dl[0]; if (!b) return null; const u = new Uint8Array(await b.arrayBuffer()); return { bom: u[0] === 0xef && u[1] === 0xbb && u[2] === 0xbf, text: await b.text() }; }), csv = csvr.text;
+  const expectN = await page.evaluate(() => window.__qaStock.state.items.filter(i => !i.deleted_at).length);
+  ok(!!csv && csvr.bom && /^Item,Brand,Size,Status,Condition,Category,Buy price,Extra costs,Date bought,Source,Platform,List price,Sold price,Date sold,Profit,Notes\r\n/.test(csv), 'export: header row, UTF-8 BOM');
+  eq(csv.trim().split('\r\n').length - 1, expectN, 'export: one row per non-deleted item (' + expectN + ')');
+  ok(/,Sold,/.test(csv) && !/NaN|undefined|null/.test(csv), 'export: sold rows present, no NaN/undefined/null');
+  ok(/Exported \d+ items to snypd-stock-\d{4}-\d{2}-\d{2}\.csv/.test(await text('.st-undo')), 'export: result line: ' + await text('.st-undo'));
+
   await page.close();
 
   // ---- 3. French, Free account over the cap, phone width
   page = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&lang=fr', { width: 390, height: 844, isMobile: true, hasTouch: true });
   await page.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
   await page.click('#bottombar-tab-stock'); await openItems(page); await page.waitForSelector('#stock-panel .st-row', { timeout: 8000 });
-  ok(/ajouter un article/i.test(await page.$eval('#stock-panel .st-head', e => e.innerText)), 'French title row');
-  ok(/articles sur 25/.test(await text('.st-meter')) && /Voir les plans/.test(await text('.st-meter')), 'French cap meter: ' + await text('.st-meter'));
+  ok(/ajouter un article/i.test(await page.$eval('#stock-panel .st-navrow', e => e.innerText)), 'French title row');
+  ok(/tes articles\s+\d+ \/ 25/i.test(await text('.st-meter')) && /Voir les plans/.test(await text('#st-capmsg')), 'French cap meter: ' + await text('.st-meter') + ' / ' + await text('#st-capmsg'));
   const geo = await page.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth, over: [...document.querySelectorAll('#stock-panel .st-row')].filter(r => r.scrollWidth > r.clientWidth + 1).length,
     small: [...document.querySelectorAll('#stock-panel .st-btn, #stock-panel .st-chip, #stock-panel .st-in')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 43.5).length }));
   eq([geo.sw <= geo.vw, geo.over, geo.small], [true, 0, 0], 'no horizontal overflow, no row overflow, every control >= 44 px at 390: ' + JSON.stringify(geo));
@@ -143,7 +153,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   page = await open('plan=elite&stock=all&stock_today=2026-11-02&lang=en');
   page.on('dialog', d => d.accept());
   await page.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
-  await page.click('#view-tab-stock'); await openItems(page); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await page.click('#view-tab-stock'); await openItems(page); await page.waitForSelector('#stock-panel .st-navrow', { timeout: 8000 });
   await upload(page, path.join(imp, 'template-fr.xlsx'));
   let txt = await sheetText(page);
   ok(/template-fr\.xlsx/.test(txt) && /3 rows make 5 items/.test(txt), 'review: ' + txt.slice(0, 200));
@@ -183,7 +193,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   page = await open('plan=free&stock=all&stock_today=2026-11-02&lang=en');
   page.on('dialog', d => d.accept());
   await page.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
-  await page.click('#view-tab-stock'); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await page.click('#view-tab-stock'); await page.waitForSelector('#stock-panel .st-navrow', { timeout: 8000 });
   await upload(page, tmp('thirty.csv', 'Item,Buy price\n' + Array.from({ length: 30 }, (_, i) => 'Thing ' + i + ',5').join('\n') + '\n'));
   const heldBefore = await page.evaluate(() => window.__qaStock.state.items.filter(i => ['stock', 'listed', 'reserved', 'returned'].includes(i.status) && !i.deleted_at).length), fits = 25 - heldBefore;
   txt = await sheetText(page); ok(new RegExp('The Free plan holds 25 items: ' + fits + ' of your held items fit and ' + (30 - fits) + ' would be left out').test(txt), 'cap preview before importing: ' + txt.slice(0, 260));
@@ -195,7 +205,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   // French review on a phone
   page = await open('plan=elite&stock=all&stock_today=2026-11-02&lang=fr', { width: 390, height: 844, isMobile: true, hasTouch: true });
   await page.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
-  await page.click('#bottombar-tab-stock'); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await page.click('#bottombar-tab-stock'); await page.waitForSelector('#stock-panel .st-navrow', { timeout: 8000 });
   await upload(page, tmp('mix.csv', 'Article;Prix d\'achat\nA;12,50 £\nB;5 $\n'));
   txt = await sheetText(page); ok(/Les montants sont lus en EUR/.test(txt) && /mélange des symboles de devise \(2 montants\)/.test(txt) && /importer 2 articles/i.test(txt), 'French review: ' + txt.slice(0, 260));
   const g2 = await page.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth, sheetSW: document.querySelector('.st-sheet').scrollWidth, sheetCW: document.querySelector('.st-sheet').clientWidth }));
@@ -313,9 +323,18 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   pg = await open('plan=free&stock=all&stock_claims=0&lang=en');
   await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
   await pg.click('#view-tab-stock'); await waitOv(pg);
-  ok(/Start with the stock you already have/i.test(await tc(pg, '#st-first h2')), 'first run: headline');
+  ok(/Your stock is already in a spreadsheet\. Bring it in\./.test(await tc(pg, '#st-first h2')), 'first run: headline from the design');
   eq([!!(await pg.$('#st-first [data-act="import"]')), !!(await pg.$('#st-first [data-act="add"]')), (await pg.$$('#st-pq .st-segb')).length], [true, true, 3], 'first run: Import, Add one item, three persona choices');
-  ok(/Free for your first 25 held items\. No card\./.test(await tc(pg, '#st-first')), 'a Free account sees the 25-item line');
+  ok(/Free holds up to 25 items\. Exporting your data is free on every plan\./.test(await tc(pg, '#st-first')), 'a Free account sees the design footer line');
+  // step 2: design first run (wall, copy, template), sub-nav with count + meter
+  eq((await pg.$$('.st-wall .st-tile')).length, 60, 'first run: decorative wall of 60 tiles');
+  const frTxt = await tc(pg, '#st-first');
+  ok(/IMPORT FROM A SPREADSHEET/i.test(frTxt) && /\.xlsx, \.csv\. In Google Sheets use File > Download > CSV\./.test(frTxt) && /Download our template/.test(frTxt) && /Item name, price paid, date, source\./.test(frTxt) && /STOCK . GET STARTED/i.test(frTxt), 'first run: every line of the design card: ' + frTxt);
+  eq([await tc(pg, '#st-navn'), /Your items\s+0 \/ 25/i.test(await tc(pg, '.st-navrow .st-meter')), !!(await pg.$('.st-navrow [data-view="analytics"]'))], ['0', true, false], 'sub-nav: ITEMS 0, YOUR ITEMS 0 / 25 on the right, no Analytics/Reports tab yet');
+  await pg.evaluate(() => { window.__dl = []; const o = URL.createObjectURL.bind(URL); URL.createObjectURL = b => { window.__dl.push(b); return o(b); }; });
+  await clickBy(pg, '#st-first [data-act="template"]'); await wait5(300);
+  const tplr = await pg.evaluate(async () => { const b = window.__dl[0]; if (!b) return null; const u = new Uint8Array(await b.arrayBuffer()); return { bom: u[0] === 0xef && u[1] === 0xbb && u[2] === 0xbf, text: await b.text() }; }), tpl = tplr.text;
+  ok(tplr.bom && /^Item,Brand,Size,Condition,Category,Quantity,Bought,Buy price,Extra costs,Source,Platform,List price,Sold price,Sold date,Fees,Shipping paid,Notes\r\n$/.test(tpl), 'template CSV: 17 headers, BOM, nothing else: ' + JSON.stringify(tpl));
   await clickBy(pg, '#st-pq [data-p="resell"]'); await pg.waitForFunction(() => !document.querySelector('#st-pq'), { timeout: 5000 });
   eq(await pg.evaluate(() => window.__qaStock.state.settings.persona), 'resell', 'answering writes the persona once');
   ok(!!(await pg.$('#st-first')) && !(await pg.$('#st-first-light')), 'Resell keeps the import-first screen');
@@ -354,8 +373,8 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
   await pg.click('#view-tab-stock'); await waitOv(pg);
   const frText = await pg.$eval('#st-over', e => e.innerText);
-  ok(/Commence par le stock que tu as déjà/i.test(frText) && /Importer/i.test(frText) && /Ajouter un article/i.test(frText) && /Gratuit pour tes 25 premiers articles/i.test(frText), 'French first run: ' + frText.replace(/\n+/g, ' | ').slice(0, 260));
-  ok(!/Start with|Import your|Add one|Resell|I mainly|Skip|Free for/i.test(frText), 'French first run has no English left');
+  ok(/Ton stock est déjà dans un tableur\. Importe-le\./.test(frText) && /Importer un tableur/i.test(frText) && /Télécharge notre modèle/.test(frText) && /\+ Ajouter un article/i.test(frText) && /Gratuit\s: jusqu.à 25 articles\. Exporter tes données est gratuit avec toutes les formules\./.test(frText) && /Tes articles\s+0 \/ 25/i.test(await pg.$eval('.st-navrow', e => e.innerText)), 'French first run (design pairs): ' + frText.replace(/\n+/g, ' | ').slice(-420));
+  ok(!/Start with|Import your|Add one|Resell|I mainly|Skip|Free for|Download our|Your items/i.test(frText), 'French first run has no English left');
   await pg.close();
 
   // 5f. a claim made in the Feed lands in Stock with its own note

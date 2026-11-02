@@ -226,7 +226,43 @@
     return api;
   }
 
+  // ------------------------------------------------------------------ export (CSV) + template (step 2)
+  // UTF-8 with a BOM so Excel keeps the accents; French = semicolon + decimal comma (Excel in FR/BE), English = comma + decimal point. Dates are ISO
+  // (YYYY-MM-DD), which the importer reads back. Amounts are plain numbers in the account currency (no symbol), a missing value stays empty (never 0).
+  // Text cells that begin with = + - @ (or a tab / CR) get a leading apostrophe so a spreadsheet never runs them as a formula.
+  const U = String.fromCharCode;
+  const fx = s => s.replace(/~e/g, U(0xe9)).replace(/~E/g, U(0xc9)).replace(/~'/g, U(0x2019));
+  const EXPORT_HEAD = {
+    en: ['Item', 'Brand', 'Size', 'Status', 'Condition', 'Category', 'Buy price', 'Extra costs', 'Date bought', 'Source', 'Platform', 'List price', 'Sold price', 'Date sold', 'Profit', 'Notes'],
+    fr: ['Article', 'Marque', 'Taille', 'Statut', '~Etat', 'Cat~egorie', "Prix d~'achat", 'Frais en plus', "Date d~'achat", 'Source', 'Plateforme', 'Prix affich~e', 'Prix de vente', 'Date de vente', 'B~en~efice', 'Notes'].map(fx)
+  };
+  const TEMPLATE_HEAD = {
+    en: ['Item', 'Brand', 'Size', 'Condition', 'Category', 'Quantity', 'Bought', 'Buy price', 'Extra costs', 'Source', 'Platform', 'List price', 'Sold price', 'Sold date', 'Fees', 'Shipping paid', 'Notes'],
+    fr: ['Article', 'Marque', 'Taille', '~Etat', 'Cat~egorie', 'Quantit~e', "Date d~'achat", "Prix d~'achat", 'Frais en plus', 'Source', 'Plateforme', 'Prix affich~e', 'Prix de vente', 'Date de vente', 'Frais', 'Envoi pay~e', 'Notes'].map(fx)
+  };
+  function csvCell(v, isText, sep) {
+    let s = v == null ? '' : String(v);
+    if (isText && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    if (s.indexOf(sep) >= 0 || /["\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  // o.labels = { status(key), cond(key), cat(key), plat(key) } -> display text; falls back to the stored key
+  function exportCsv(rows, o) {
+    const lang = o && o.lang === 'fr' ? 'fr' : 'en', L = (o && o.labels) || {}, sep = lang === 'fr' ? ';' : ',', dec = lang === 'fr' ? ',' : '.';
+    const lab = (fn, k) => (k == null || k === '' ? '' : (fn ? fn(k) : k));
+    const amt = c => (c == null ? '' : (c / 100).toFixed(2).replace('.', dec));
+    const lines = [EXPORT_HEAD[lang].join(sep)];
+    for (const it of rows) {
+      const cells = [[it.title, 1], [it.brand, 1], [it.size, 1], [lab(L.status, it.status), 1], [lab(L.cond, it.condition), 1], [lab(L.cat, it.category), 1],
+        [amt(it.buy_cents)], [amt(it.extra_cents)], [it.bought_on || ''], [it.src, 1], [lab(L.plat, it.platform), 1], [amt(it.list_cents)], [amt(it.sold_cents)], [it.sold_on || ''],
+        [amt(saleProfitCents(it))], [it.notes, 1]];
+      lines.push(cells.map(c => csvCell(c[0], c[1], sep)).join(sep));
+    }
+    return U(0xfeff) + lines.join('\r\n') + '\r\n';
+  }
+  function templateCsv(lang) { const l = lang === 'fr' ? 'fr' : 'en'; return U(0xfeff) + TEMPLATE_HEAD[l].join(l === 'fr' ? ';' : ',') + '\r\n'; }
+
   return { STATUSES, HELD, PLATFORMS, CONDITIONS, WRITE_OFF_REASONS, SRC_TYPES, CURRENCIES, PERSONAS, PERIODS, DEFAULT_CATEGORY_KEYS, CAPS, LOCALES, MINUS, CODE_KIND,
     formatMoney, moneyLabel, parseMoneyInput, localToday, daysBetween, isHeld, costCents, ageDays, isOld, saleProfitCents, viewOverview, freeCapState,
-    StockError, parseError, createApi };
+    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD };
 });

@@ -24,6 +24,9 @@ const MUTATIONS = [
   ['import: shared strings looked up off by one', 'assets/stock-import.js', "val = v ? (sst[+v[1]] || '') : '';", "val = v ? (sst[+v[1] + 1] || '') : '';", 'ops/test_stock_import.cjs'],
   ['import: sold rows without a price and a date counted as stock', 'assets/stock-import.js', 'if (p.sold_cents != null || soldOn)', 'if (p.sold_cents != null)', 'ops/test_stock_import.cjs'],
   ['import: Free-cap preview lets sold rows consume slots', 'assets/stock-import.js', "r.payload.status !== 'sold' && r.payload.quantity", 'r.payload.quantity', 'ops/test_stock_import.cjs'],
+  ['export: the formula guard is removed from text cells', 'assets/stock-core.js', "if (isText && /^[=+\\-@\\t\\r]/.test(s)) s = \"'\" + s;", ''],
+  ['export: a missing amount is written as 0.00', 'assets/stock-core.js', "(c == null ? '' : (c / 100)", "(c == null ? '0.00' : (c / 100)"],
+  ['export: French file uses a decimal point', 'assets/stock-core.js', "dec = lang === 'fr' ? ',' : '.';", "dec = '.';"],
   ['import: an unrecognised condition is silently accepted as empty without listing it', 'assets/stock-import.js', '(unrec[craw] = unrec[craw] || []).push(n);', '', 'ops/test_stock_import.cjs']
 ];
 
