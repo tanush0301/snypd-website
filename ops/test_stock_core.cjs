@@ -46,7 +46,7 @@ const money = (c, lang) => core.formatMoney(c, 'EUR', lang || 'en');
 let sql = null;
 try {
   const dir = path.join(BACKEND, 'ops', 'migrations');
-  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8') };
+  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8'), t070: fs.readFileSync(path.join(dir, '070_stock_counts.sql'), 'utf8') };
 } catch (e) { sql = null; }
 const listIn = (text, col) => { const m = new RegExp('\\b' + col + '\\s+text[^,]*?check\\s*\\(\\s*' + col + '\\s+in\\s*\\(([^)]*)\\)\\s*\\)').exec(text); assert(m, 'no CHECK list for column ' + col); return [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]); };
 if (sql) {
@@ -91,11 +91,11 @@ if (sql) {
   });
   test('C RPC argument names and required arguments in the engine == the SQL function signatures; stock-core calls only those', () => {
     const sigs = {};
-    for (const m of (sql.t066 + sql.t069).matchAll(/create or replace function public\.(stock_[a-z_]+)\(([^)]*)\)\s*returns/g)) {
+    for (const m of (sql.t066 + sql.t069 + sql.t070).matchAll(/create or replace function public\.(stock_[a-z_]+)\(([^)]*)\)\s*returns/g)) {
       sigs[m[1]] = m[2].split(',').map(s => s.trim()).filter(Boolean).map(s => ({ name: s.split(/\s+/)[0], required: !/\bdefault\b/i.test(s) }));
     }
     const publicNames = Object.keys(Engine.SIGNATURES);
-    assert.equal(publicNames.length, 16);
+    assert.equal(publicNames.length, 17);
     for (const n of publicNames) {
       assert(sigs[n], 'SQL has no function ' + n);
       assert.deepEqual(Engine.SIGNATURES[n], sigs[n].map(a => a.name), 'argument names of ' + n);
@@ -107,8 +107,8 @@ if (sql) {
     const api = core.createApi(spy, { today: () => '2026-10-27' });
     return Promise.all([api.boot(), api.overview(30), api.lanes(), api.itemsPage({}, 10, null), api.addItems({ title: 'x' }, 1), api.importRows('i', []), api.undoImport('i'), api.setStatus('1', 'listed', { platform: 'vinted', listCents: 1, on: '2026-01-01' }),
       api.markSold('1', { soldCents: 1, on: '2026-01-01', platform: 'vinted', feeCents: 1, shipPaidCents: 1 }), api.markReturned('1', { on: '2026-01-01', refundCents: 1, refundFee: true, returnShipCents: 1, to: 'stock', reason: null }),
-      api.writeOff('1', 'lost', '2026-01-01'), api.editItem('1', {}), api.deleteItem('1'), api.restoreItem('1'), api.undo(), api.overviewSeries(30)].map(p => p.catch(() => null))).then(() => {
-      assert.equal(seen.length, 16);
+      api.writeOff('1', 'lost', '2026-01-01'), api.editItem('1', {}), api.deleteItem('1'), api.restoreItem('1'), api.undo(), api.overviewSeries(30), api.counts()].map(p => p.catch(() => null))).then(() => {
+      assert.equal(seen.length, 17);
       for (const [name, keys] of seen) {
         assert(sigs[name], 'api calls unknown function ' + name);
         for (const k of keys) assert(sigs[name].some(a => a.name === k), `${name} sent undeclared argument ${k}`);
@@ -284,6 +284,14 @@ test('L hand-worked charts (== SQL test C4): a sale that is returned, a sale, a 
   assert.deepEqual(s7.by_platform, [{ platform: 'depop', net: 600, sold: 1 }, { platform: '', net: -500, sold: 0 }, { platform: 'ebay', net: -1500, sold: -1 }]);
   await api.undo();
   const su = await api.overviewSeries(30, '2026-10-27'); assert.equal(su.by_platform.reduce((n, x) => n + x.net, 0), 200); assert(!su.by_platform.some(x => x.platform === 'depop'));
+});
+test('A migration 070 in the engine: the chip counts equal the list totals and the design numbers (== SQL test D2)', async () => {
+  const a = account({ uid: 'A' }); a.eng.loadFixture(fx);
+  const c = await a.api.counts('2026-10-27'), tot = async f => (await a.api.itemsPage(Object.assign({ today: '2026-10-27' }, f), 1, null)).total;
+  assert.deepEqual([c.in_stock, c.listed, c.reserved, c.sold, c.old, c.held], [18, 36, 4, 153, 12, 58]);
+  assert.deepEqual([c.all, c.in_stock, c.listed, c.reserved, c.sold, c.returned, c.written_off, c.old],
+    [await tot({}), await tot({ status: ['stock', 'returned'] }), await tot({ status: ['listed'] }), await tot({ status: ['reserved'] }), await tot({ status: ['sold'] }), await tot({ status: ['returned'] }), await tot({ status: ['written_off'] }), await tot({ old: true })]);
+  assert.equal(c.in_stock + c.listed + c.reserved + c.sold + c.written_off, c.all, 'the statuses partition the items');
 });
 test('A empty account: boot, overview and view are quiet (no events, "--" numbers)', async () => {
   const { api } = account({ uid: 'N' });

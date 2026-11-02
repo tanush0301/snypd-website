@@ -35,7 +35,7 @@
     ['electronics', 'Electronics', 60], ['home', 'Home', 70], ['collect', 'Collectibles and games', 80], ['other', 'Other', 90]];
   // Allowed argument names per function (PostgREST refuses a call whose argument set it cannot match).
   const SIGNATURES = {
-    stock_boot: [], stock_overview: ['p_days', 'p_today'], stock_overview_series: ['p_days', 'p_today'], stock_lanes: ['p_today'], stock_items_page: ['p_filters', 'p_limit', 'p_cursor'],
+    stock_boot: [], stock_overview: ['p_days', 'p_today'], stock_overview_series: ['p_days', 'p_today'], stock_counts: ['p_today'], stock_lanes: ['p_today'], stock_items_page: ['p_filters', 'p_limit', 'p_cursor'],
     stock_add_items: ['p_item', 'p_quantity'], stock_import_rows: ['p_import_id', 'p_rows'], stock_undo_import: ['p_import_id'],
     stock_set_status: ['p_id', 'p_to', 'p_platform', 'p_list_cents', 'p_on'], stock_mark_sold: ['p_id', 'p_sold_cents', 'p_sold_on', 'p_platform', 'p_fee_cents', 'p_ship_paid_cents'],
     stock_mark_returned: ['p_id', 'p_returned_on', 'p_refund_cents', 'p_refund_fee', 'p_return_ship_cents', 'p_to', 'p_reason'],
@@ -278,6 +278,13 @@
       const by = Array.from(new Set(w.map(e => e.platform))).map(p => { const ev = w.filter(e => e.platform === p); return { platform: p, net: net(ev), sold: sold(ev) }; })
         .sort((x, y) => y.net - x.net || (x.platform < y.platform ? -1 : (x.platform > y.platform ? 1 : 0)));
       return { today: t, days, daily, by_platform: by };
+    };
+    // == stock_counts (migration 070): per-status counts of the caller's non-deleted items
+    R.stock_counts = function (a) {
+      gate();
+      const t = checkDate(parseDate(a.p_today)) || today(), L = live(), old = oldAfter(), c = s => L.filter(i => i.status === s).length, h = heldItems();
+      return { today: t, all: L.length, in_stock: L.filter(i => i.status === 'stock' || i.status === 'returned').length, listed: c('listed'), reserved: c('reserved'), sold: c('sold'),
+        returned: c('returned'), written_off: c('written_off'), held: h.length, old: h.filter(i => ageOf(i, t) >= old).length };
     };
     R.stock_items_page = function (a) {
       gate();

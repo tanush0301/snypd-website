@@ -79,7 +79,7 @@
     }).catch(function (e) { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.load')) + ' <button class="st-btn st-ghost" data-act="reopen">' + esc(T('err.retry')) + '</button></div></div>'; S.panel.onclick = function (ev) { if (ev.target.closest('[data-act="reopen"]')) { var p = S.panel, c = S.client; S = null; open({ client: c, panel: p }); } }; console.error('SNYPD Stock boot failed', e); });
   }
   function shell() {
-    var statuses = [['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')]];
+    var statuses = [['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')], ['old', T('tag.stale')]];
     S.panel.innerHTML =
       '<div class="st-wrap">' +
       '<h1 class="st-sr">' + esc(T('title')) + '</h1>' +
@@ -96,7 +96,7 @@
       '<button type="button" class="st-btn st-tert" data-act="deleted" id="st-del" aria-pressed="false">' + esc(T('deleted.show')) + '</button>' +
       '<button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="export" id="st-export">' + esc(T('exp.btn')) + '</button>' +
       '<span class="st-count" id="st-count" aria-live="polite"></span></div>' +
-      '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === '' ? 'true' : 'false') + '">' + esc(s[1]) + '</button>'; }).join('') + '</div>' +
+      '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === '' ? 'true' : 'false') + '">' + esc(s[1]) + ' <span class="st-cn"></span></button>'; }).join('') + '</div>' +
       '<div id="st-body"></div></div></div><div id="st-ov"></div><div id="st-undo-root"></div>';
     S.panel.onclick = onClick; S.panel.onkeydown = onKey; S.panel.onchange = onChange;
     $('#st-q').oninput = function () { clearTimeout(S.searchTimer); var v = this.value; S.searchTimer = setTimeout(function () { S.f.q = v.trim(); load(true); }, 250); };
@@ -105,11 +105,18 @@
     $('#st-plat').onchange = function () { S.f.platform = this.value; load(true); };
     renderMeter();
   }
+  var CHIP_KEY = { '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
+  function renderChipCounts() {
+    Array.prototype.forEach.call(S.panel.querySelectorAll('#st-chips .st-chip'), function (b) { var n = b.querySelector('.st-cn'); if (n) n.textContent = S.counts ? String(S.counts[CHIP_KEY[b.getAttribute('data-status')]]) : ''; });
+  }
+  function loadCounts() {   // migration 070; any failure only leaves the numbers off
+    return S.api.counts(today()).then(function (c) { S.counts = c; renderChipCounts(); renderMeter(); }).catch(function () { S.counts = null; });
+  }
   function renderMeter() {
     var el = $('#st-meter'); if (!el) return;
     var m = C.freeCapState(S.boot), n = $('#st-navn'), cm = $('#st-capmsg'), sub = $('#st-itemssub');
     if (n) n.textContent = String(m.held);
-    if (sub && S.boot.counts) sub.textContent = T('it.sub', { held: S.boot.counts.held, rows: S.boot.counts.items });
+    if (sub && S.boot.counts) sub.textContent = S.counts ? T('it.sub3', { held: S.boot.counts.held, sold: S.counts.sold, rows: S.boot.counts.items }) : T('it.sub', { held: S.boot.counts.held, rows: S.boot.counts.items });
     if (!m.limited) { el.innerHTML = ''; if (cm) cm.innerHTML = ''; return; }
     el.innerHTML = '<div class="st-meter' + (m.warn ? ' warn' : '') + '"><span class="st-meter-txt">' + esc(T('meter.label')) + ' <b>' + m.held + ' / ' + m.cap + '</b></span><span class="st-meter-bar"><span class="st-meter-fill" style="width:' + Math.min(100, Math.round(m.held / m.cap * 100)) + '%"></span></span></div>';
     if (cm) cm.innerHTML = m.atCap ? '<p class="st-note">' + esc(T('meter.limit', { cap: m.cap })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></p>' : '';
@@ -126,7 +133,7 @@
     over.style.display = v === 'overview' ? '' : 'none'; items.style.display = v === 'items' ? '' : 'none';
     Array.prototype.forEach.call(S.panel.querySelectorAll('.st-navb'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false'); });
     if (v === 'overview') { if (!S.ov.data || S.ov.stale) loadOverview(); else renderOverview(); }
-    else if (!S.itemsLoaded) { S.itemsLoaded = true; load(true); } else if (S.ov.stale) refresh();
+    else if (!S.itemsLoaded) { S.itemsLoaded = true; load(true); loadCounts(); } else if (S.ov.stale) refresh();
   }
   function loadOverview() {
     var o = S.ov, req = ++o.req; o.loading = true; o.err = null; renderOverview();
@@ -360,7 +367,7 @@
     return Promise.all([S.api.itemsPage(apiFilters(), n, null), S.api.boot().catch(function () { return null; })]).then(function (r) {
       if (req !== S.req) return;
       S.rows = r[0].rows; S.next = r[0].next_cursor; S.total = r[0].total; if (r[1] && r[1].mode !== 'off') { S.boot = r[1]; S.cur = r[1].currency || S.cur; S.cats = r[1].categories || S.cats; }
-      renderMeter(); renderBody();
+      renderMeter(); renderBody(); if (S.itemsLoaded) loadCounts();
       if (S.view === 'overview') loadOverview(); else S.ov.stale = true;
     });
   }
@@ -372,7 +379,8 @@
     var cnt = $('#st-count'), del = $('#st-del');
     if (del) { del.setAttribute('aria-pressed', S.f.deleted ? 'true' : 'false'); del.textContent = S.f.deleted ? T('deleted.back') : T('deleted.show'); }
     $('#st-chips').style.display = S.f.deleted ? 'none' : '';
-    Array.prototype.forEach.call(S.panel.querySelectorAll('.st-chip'), function (b) { var st = b.getAttribute('data-status'); b.setAttribute('aria-pressed', ((S.f.status || []).join(',') === (st === 'stock' ? 'stock,returned' : st) || (!S.f.status && st === '')) ? 'true' : 'false'); });
+    Array.prototype.forEach.call(S.panel.querySelectorAll('.st-chip'), function (b) { var st = b.getAttribute('data-status'); b.setAttribute('aria-pressed', (st === 'old' ? !!S.f.old : (!S.f.old && ((S.f.status || []).join(',') === (st === 'stock' ? 'stock,returned' : st) || (!S.f.status && st === '')))) ? 'true' : 'false'); });
+    renderChipCounts();
     if (cnt) cnt.textContent = '';
     var h = '';
     if (S.err) h += '<div class="st-err">' + esc(errMsg(S.err)) + ' <button type="button" class="st-btn st-ghost" data-act="retry">' + esc(T('err.retry')) + '</button></div>';
@@ -426,7 +434,7 @@
       case 'im-resume': imRun(true); break;
       case 'im-undo': imUndo(); break;
       case 'im-again': openImport(); break;
-      case 'chip': { var st = el.getAttribute('data-status'); S.f.status = st === '' ? null : (st === 'stock' ? ['stock', 'returned'] : [st]); load(true); break; }
+      case 'chip': { var st = el.getAttribute('data-status'); S.f.old = st === 'old'; S.f.status = (st === '' || st === 'old') ? null : (st === 'stock' ? ['stock', 'returned'] : [st]); load(true); break; }
       case 'deleted': S.f.deleted = !S.f.deleted; S.f.status = null; load(true); break;
       case 'clear': S.f = { status: null, q: '', condition: '', category: '', platform: '', deleted: false, old: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; $('#st-plat').value = ''; load(true); break;
       case 'more': load(false); break;

@@ -79,14 +79,21 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
 
   eq(await rows(), 50, 'first page is 50 rows');
   ok(/^Showing 50 of 21[58]$/.test(await text('#st-showing')), 'footer line (design): ' + await text('#st-showing'));
-  ok(/^\d+ held \u00b7 21[58] rows$/.test(await text('#st-itemssub')), 'Items title line: N held . N rows: ' + await text('#st-itemssub'));
+  ok(/^\d+ held \u00b7 (\d+ sold \u00b7 )?21[58] rows$/.test(await text('#st-itemssub')), 'Items title line: N held . (N sold .) N rows: ' + await text('#st-itemssub'));
   eq(await page.$$eval('.st-th > span', s => s.map(x => x.textContent)), ['Item', 'Status', 'Platform', 'Bought', 'Days in stock', 'Price or profit'], 'table columns (design Ca)');
   { const tiles = await page.$$eval('.st-row .st-tile2', e => e.length); ok(tiles === 50, 'an initials tile on every row (' + tiles + ')'); }
   await setv('#st-q', 'Detroit jacket'); await wait(700); { const stale = await page.$$eval('.st-row .st-tag.stale', e => e.length), amber = await page.$$eval('.st-row .c-age.st-warnv', e => e.length); ok(stale > 0 && stale === amber, 'old held items carry the STALE tag and an amber day count (' + stale + ')'); }
   await setv('#st-q', ''); await wait(600);
   await setv('#st-plat', 'depop'); await wait(600); { const pl = await page.$$eval('#stock-panel .st-row .c-plat', e => e.map(x => x.textContent)); ok(pl.length > 0 && pl.every(x => x === 'Depop'), 'platform filter: only Depop rows (' + pl.length + ')'); }
   await setv('#st-plat', ''); await wait(500);
-  eq(await page.$$eval('#st-chips .st-chip', c => c.length), 7, '7 status chips');
+  eq(await page.$$eval('#st-chips .st-chip', c => c.length), 8, '8 chips: All, In stock, Listed, Reserved, Sold, Returned, Written off, Stale');
+  await wait(500);
+  { const chips = await page.$$eval('#st-chips .st-chip', c => c.map(x => x.textContent.replace(/\s+/g, ' ').trim())), want = await page.evaluate(() => { const it = window.__qaStock.state.items.filter(i => !i.deleted_at), n = s => it.filter(i => i.status === s).length; return { all: it.length, sold: n('sold'), listed: n('listed') }; });
+    ok(chips[0] === 'All ' + want.all && chips[2] === 'Listed ' + want.listed && chips[4] === 'Sold ' + want.sold && /^Stale \d+$/.test(chips[7]), 'chips carry their counts (design Ca): ' + chips.join(' | '));
+    const sub = await text('#st-itemssub'); ok(new RegExp('^\\d+ held \\u00b7 ' + want.sold + ' sold \\u00b7 ' + want.all + ' rows$').test(sub), 'title line with the sold count: ' + sub); }
+  await page.evaluate(() => document.querySelector('#st-chips [data-status="old"]').click()); await wait(600);
+  { const st = await page.$$eval('#stock-panel .st-row .st-tag.stale', e => e.length), rows0 = await rows(); ok(rows0 > 0 && st === rows0, 'Stale chip: only old held items (' + rows0 + ' rows, all tagged STALE)'); }
+  await page.evaluate(() => document.querySelector('#st-chips [data-status=""]').click()); await wait(500);
   await page.evaluate(() => document.querySelector('#st-chips [data-status="sold"]').click()); await wait(500);
   ok((await page.$$eval('#stock-panel .st-row .st-tag', t => t.every(x => /sold/i.test(x.className)))), 'Sold chip shows only sold items');
   await page.evaluate(() => document.querySelector('#st-chips [data-status=""]').click()); await wait(400);

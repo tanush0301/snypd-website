@@ -27,6 +27,7 @@ const MUTATIONS = [
   ['series: write-offs are left out of the daily and platform net', 'ops/stock_engine.js', "- sum(ev.filter(e => e.t === 'wo'), e => e.cost);", ';'],
   ['series: a return is booked under no platform', 'ops/stock_engine.js', 'platform: lastSalePlatform(h), d: h.at,', "platform: '', d: h.at,"],
   ['lanes: the row loses its cost', 'ops/stock_engine.js', 'cost_cents: x.i.buy_cents == null ? null : x.i.buy_cents + x.i.extra_cents, drops', 'cost_cents: null, drops'],
+  ['counts: In stock forgets the returned items', 'ops/stock_engine.js', "in_stock: L.filter(i => i.status === 'stock' || i.status === 'returned').length", "in_stock: L.filter(i => i.status === 'stock').length"],
   ['export: the formula guard is removed from text cells', 'assets/stock-core.js', "if (isText && /^[=+\\-@\\t\\r]/.test(s)) s = \"'\" + s;", ''],
   ['export: a missing amount is written as 0.00', 'assets/stock-core.js', "(c == null ? '' : (c / 100)", "(c == null ? '0.00' : (c / 100)"],
   ['export: French file uses a decimal point', 'assets/stock-core.js', "dec = lang === 'fr' ? ',' : '.';", "dec = '.';"],
