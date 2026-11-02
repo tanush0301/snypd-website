@@ -16,7 +16,7 @@
   var msg = box.querySelector('.pc-msg');
   var items = [];
   var sent = {};
-  var SEP = lang === 'en' ? ',' : ((lang === 'nl' || lang === 'it') ? '.' : ' ');
+  var SEP = lang === 'en' ? ',' : ((lang === 'nl' || lang === 'it' || lang === 'de' || lang === 'es') ? '.' : ' ');
 
   function fold(s) {
     return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -93,6 +93,9 @@
     var acts = add(res, 'div', 'ct-actions');
     var a = add(acts, 'a', 'ct-btn', t('alert', { p: money(it.p25) }));
     a.href = '/signup?' + new URLSearchParams({ hunt: it.q, max: String(Math.floor(it.p25 / 100)) }).toString();
+    if (box.hasAttribute('data-review-budget')) a.href = '/vinted-search-builder?' + new URLSearchParams({
+      q: it.q, currency: 'EUR', max: (it.p25 / 100).toFixed(2)
+    }).toString();
     a = add(acts, 'a', 'ct-btn ct-ghost', pageLabel(it));
     a.href = url(it);
     res.hidden = false;

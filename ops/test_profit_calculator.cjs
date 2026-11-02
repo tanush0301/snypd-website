@@ -104,3 +104,11 @@ test('French error and impossible-target messages are translated', t => {
   assert.match(h.value('budget'), /^Même un article gratuit/);
   assert.equal(h.value('margin'), 'Non défini');
 });
+
+test('a positive target budget transfers only on the builder link and retains currency and cents',t=>{
+  const h=boot(t,'fr');h.submit({sale:'40.45'});
+  const a=h.form.querySelector('[data-profit-builder]');assert.equal(a.hidden,false);
+  assert.equal(a.pathname,'/fr/creer-recherche-vinted');assert.equal(new URL(a.href).searchParams.get('currency'),'EUR');assert.equal(new URL(a.href).searchParams.get('max'),'23.45');
+  h.form.elements.currency.value='GBP';h.form.elements.currency.dispatchEvent(new h.w.Event('change'));
+  assert.equal(new URL(a.href).searchParams.get('currency'),'GBP');h.submit({sale:'0'});assert.equal(a.hidden,true);
+});

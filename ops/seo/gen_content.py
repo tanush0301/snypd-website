@@ -122,7 +122,7 @@ SLUGS = {
     # work order 18 step 5; both rendered by gen_price_guide.py (they need the price data)
     'sold':    {'en': '/vinted-sold-items', 'fr': '/fr/vinted-voir-articles-vendus', 'de': '/de/vinted-verkaufte-artikel-sehen',
                 'it': '/it/vinted-vedere-articoli-venduti', 'es': '/es/vinted-ver-articulos-vendidos'},
-    'checker': {'en': '/vinted-price-checker', 'fr': '/fr/estimer-prix-vinted', 'it': '/it/stima-prezzo-vinted'},
+    'checker': {'en': '/vinted-price-checker', 'fr': '/fr/estimer-prix-vinted', 'it': '/it/stima-prezzo-vinted', 'de': '/de/vinted-preis-checker', 'es': '/es/comprobar-precio-vinted'},
 }
 
 CSS = r"""
@@ -324,6 +324,11 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
     """parent: optional (name, path) shown between Home and this page in the breadcrumb.
     bare: a page with no URL of its own (404.html): noindex, no canonical, hreflang, JSON-LD or date line."""
     u = UI[lang]
+    if key in ('notify', 'saved') and lang in ('en', 'fr'):
+        body += '<section id="next-tools"><h2>%s</h2><p><a href="%s">%s</a> · <a href="%s">%s</a></p></section>' % (
+            'Next steps' if lang == 'en' else 'Pour continuer', SLUGS['builder'][lang],
+            'Build your search link' if lang == 'en' else 'Créer ton lien de recherche', SLUGS['phone'][lang],
+            'Set up phone alerts' if lang == 'en' else 'Configurer les alertes sur téléphone')
     path = None if bare else SLUGS[key][lang]
     url = SITE + path if path else ''
     langs = [lang] if bare else live_langs(key)
@@ -2399,7 +2404,10 @@ def stamp_modified(path, text):
     m = _TIME_RE.search(text)
     if not m:
         return text
-    old = open(path, encoding='utf-8').read() if os.path.isfile(path) else None
+    old = None
+    if os.path.isfile(path):
+        with open(path, encoding='utf-8') as previous:
+            old = previous.read()
     om = _TIME_RE.search(old) if old else None
     if om and _main_text(old) == _main_text(text):
         iso = max(om.group(2), m.group(2))
@@ -2432,8 +2440,11 @@ cps.install(globals())
 # Copy + sources: copy_guides.py; facts quoted from Vinted's help centre (articles 433, 435, 258).
 import copy_guides as cg  # noqa: E402
 import reseller_content  # noqa: E402
+import expansion_content  # noqa: E402
 SLUGS.update(reseller_content.SLUGS)
+SLUGS.update(expansion_content.SLUGS)
 PAGE_MODIFIED.update({key: reseller_content.UPDATED for key in reseller_content.SLUGS})
+PAGE_MODIFIED.update({key: expansion_content.UPDATED for key in expansion_content.SLUGS})
 GUIDE_FAQ_H = {'en': 'Questions', 'fr': 'Questions', 'de': 'Fragen', 'nl': 'Vragen', 'it': 'Domande', 'es': 'Preguntas',
                'pl': 'Pytania', 'sv': 'Frågor'}
 for _k, _g in cg.GUIDES.items():

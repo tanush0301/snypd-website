@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require(require.resolve('jsdom', { paths: [path.join(__dirname, 'auth')] }));
-const root = path.join(__dirname, '..');
+const root = process.env.SNYPD_PRICE_ROOT || path.join(__dirname, '..');
 const script = fs.readFileSync(path.join(root, 'assets/price-checker.js'), 'utf8');
 const data = JSON.parse(fs.readFileSync(path.join(root, 'assets/data/price-index.json'), 'utf8'));
 const flush = () => new Promise(resolve => setImmediate(resolve));
@@ -67,3 +67,21 @@ test('an index outage preserves the static article instead of claiming a result'
   assert.equal(h.events.length, 0);
   assert.match(h.w.document.body.textContent, /Le 34 stime complessive disponibili/);
 });
+for(const [lang,file,query,guide] of [
+  ['de','de/vinted-preis-checker.html','Ralph Lauren Pullover','/de/vinted-preise/ralph-lauren-jumper'],
+  ['es','es/comprobar-precio-vinted.html','Carhartt Detroit','/vinted-price-guide/carhartt-detroit-jacket']
+]){
+  test(lang+' checker uses verified prices and sends an EUR budget to the review builder',async t=>{
+    const h=await boot(t,{file,query});assert.equal(h.result.hidden,false);assert.match(h.result.textContent,/vinted.be/);
+    assert.ok([...h.result.querySelectorAll('a')].some(a=>a.pathname===guide));
+    const action=h.result.querySelector('a');assert.equal(action.pathname,'/vinted-search-builder');
+    assert.equal(new URL(action.href).searchParams.get('currency'),'EUR');assert.ok(Number(new URL(action.href).searchParams.get('max'))>0);
+    if(lang==='de')assert.match(h.result.textContent,/42\.466/);else assert.match(h.result.textContent,/INGLÉS/);
+    assert.equal(h.events[0][2].page_lang,lang);
+  });
+  test(lang+' checker retains explicit limits for unavailable model data',async t=>{
+    const h=await boot(t,{file,query:'Jordan 4'});assert.equal(h.result.querySelector('.pc-big'),null);
+    assert.equal(h.result.querySelector('a[href*="signup"]'),null);assert.equal(h.result.querySelector('a[href*="vinted-search-builder"]'),null);
+    assert.equal(h.events[0][1],'price_check_unavailable');
+  });
+}

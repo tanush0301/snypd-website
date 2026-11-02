@@ -68,6 +68,8 @@ jobs:
           python3 ops/seo/test_search_publication.py
           python3 ops/seo/gen_reseller.py --check
           python3 ops/seo/test_reseller_publication.py
+          python3 ops/seo/gen_expansion.py --check
+          python3 ops/seo/test_expansion_publication.py
           python3 ops/seo/gen_search_assets.py --check
           python3 ops/seo/check_site.py
           python3 ops/seo/audit_search.py
@@ -78,3 +80,4 @@ jobs:
           npm test --prefix ops/auth
           node --test ops/test_price_checker.cjs
           node --test ops/test_profit_calculator.cjs
+          node --test ops/test_search_builder.cjs ops/test_attribution_chain.cjs

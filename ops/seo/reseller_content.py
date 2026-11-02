@@ -20,6 +20,10 @@ LABELS = {
 def related(lang):
     links = ''.join('<li><a href="%s">%s</a></li>' % (SLUGS[k][lang], label)
                     for k, label in zip(SLUGS, LABELS[lang]))
+    import expansion_content
+    labels = ['Build a search link', 'Set up phone alerts'] if lang == 'en' else ['Créer un lien de recherche', 'Configurer les alertes sur téléphone']
+    links += ''.join('<li><a href="%s">%s</a></li>' % (expansion_content.SLUGS[k][lang], label)
+                     for k, label in zip(('builder', 'phone'), labels))
     heading = 'Resources for Vinted resellers' if lang == 'en' else 'Ressources pour la revente sur Vinted'
     return '<section id="reseller-resources"><h2>%s</h2><ul>%s</ul></section>' % (heading, links)
 
@@ -156,10 +160,11 @@ def calculator(lang):
             '<option value="EUR">EUR — euro</option><option value="GBP">GBP — pound sterling</option></select>%s</div>'
             '<div class="profit-actions"><button type="submit">%s</button><button type="reset">%s</button></div>'
             '<p class="profit-error" id="profit-error" data-profit-error role="alert"></p>'
-            '<div class="profit-results" data-profit-result aria-live="polite" aria-atomic="true" hidden><dl>%s</dl></div>'
+            '<div class="profit-results" data-profit-result aria-live="polite" aria-atomic="true" hidden><dl>%s</dl><p><a data-profit-builder>%s</a></p></div>'
             '<noscript><p>%s</p></noscript></form><script src="/assets/profit-calculator.js" defer></script>'
             % (help_text, 'Devise' if fr else 'Currency', inputs, 'Calculer' if fr else 'Calculate',
                'Réinitialiser l’exemple' if fr else 'Reset example', results,
+               'Utiliser ce plafond dans le créateur de recherche' if fr else 'Use this buying limit in the search builder',
                'Active JavaScript pour le calcul interactif. Les formules et l’exemple restent disponibles ci-dessous.' if fr else
                'Enable JavaScript for the interactive calculation. The formulas and worked example remain available below.'))
     if not fr:

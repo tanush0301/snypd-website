@@ -97,6 +97,8 @@ def iname(it, lang):
         return NAME_DE.get(it['slug'], it['name'])
     if lang == 'it':
         return NAME_IT.get(it['slug'], it['name'])
+    if lang == 'es':
+        return price_expansion.NAME_ES.get(it['slug'], it['name'])
     return it['name']
 
 
@@ -700,16 +702,19 @@ for _lang, _words in {
     PC_TXT[_lang].update(unavailable=_words[0], unavailable_short=_words[1])
 
 
-def checker_box(lang):
+def checker_box(lang, review_budget=False):
     """Search box over INDEX. Hidden until the script has loaded the index, so without JavaScript the page's
     own text and tables answer instead."""
     s = dict(PC_TXT[lang], where='vinted.be, ' + window(lang))
+    if review_budget:
+        s['alert'] = 'SUCHBUDGET PRÜFEN (ENGLISCH)' if lang == 'de' else 'REVISAR PRESUPUESTO (INGLÉS)'
     data = json.dumps(s, ensure_ascii=False).replace('<', '\\u003c')
-    return ('<div class="pc" data-pc data-lang="%s" data-index="/%s" hidden><label for="pc-q">%s</label>'
+    box = ('<div class="pc" data-pc data-lang="%s" data-index="/%s" hidden><label for="pc-q">%s</label>'
             '<input id="pc-q" type="search" autocomplete="off" spellcheck="false" placeholder="%s">'
             '<p class="pc-msg" aria-live="polite"></p><ul class="pc-list"></ul><div class="pc-res" aria-live="polite" hidden></div>'
             '<script type="application/json" class="pc-i18n">%s</script></div>'
             '<script src="/assets/price-checker.js" defer></script>') % (lang, INDEX, esc(s['label']), esc(s['ph']), data)
+    return box.replace('data-pc ', 'data-pc data-review-budget ', 1) if review_budget else box
 
 
 def index_dataset_ld(lang, url):
@@ -915,7 +920,7 @@ def page_sold(lang):
 def price_index():
     """Only what the published pages already show: per item its names, page links, the search words of
     its alert button, typical price, 25th/75th percentile and listing count. No listing or seller data."""
-    langs = gc.live_langs('guide')
+    langs = list(dict.fromkeys(gc.live_langs('guide') + gc.live_langs('checker')))
     items = []
     for it in sorted(PUB, key=lambda x: x['name'].lower()):
         v = V[it['slug']]
@@ -995,10 +1000,14 @@ def page_hub(lang):
         return price_italian.page_hub(sys.modules[__name__])
     import reseller_content
     related = reseller_content.related(lang) if lang in ('en', 'fr') else ''
+    if lang == 'de':
+        related = '<section id="preischeck"><h2>Ein Modell suchen</h2><p><a href="/de/vinted-preis-checker">Öffne den kostenlosen Preischeck</a> und vergleiche Angebotspreise und Datengrenzen.</p></section>'
     return _page_hub_estimates(lang).replace('</article>', related + '</article>', 1).replace('</main>', note_links(sys.modules[__name__], lang) + '</main>')
 
 
 def page_checker(lang):
+    if lang in ('de', 'es'):
+        return price_expansion.page_checker(sys.modules[__name__], lang)
     if lang == 'it':
         return price_italian.page_checker(sys.modules[__name__])
     return _page_checker_estimates(lang).replace('</main>', note_links(sys.modules[__name__], lang) + '</main>')
@@ -1006,6 +1015,8 @@ def page_checker(lang):
 
 import price_italian
 price_italian.install(sys.modules[__name__])
+import price_expansion
+price_expansion.install(sys.modules[__name__])
 
 
 if __name__ == '__main__':
