@@ -2091,6 +2091,14 @@ body {
     ['view-tab-stock', 'bottombar-tab-stock'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = showStock ? '' : 'none'; });
     Array.prototype.forEach.call(document.querySelectorAll('.view-tab[data-view="history"], .bottombar-tab[data-view="history"]'), function (el) { el.style.display = showStock ? 'none' : ''; });
     var row = document.getElementById('prof-stock-row'); if (row) row.style.display = (on && stockHidden) ? '' : 'none';
+    /* Stock never writes back to user_claims, so while Stock replaces History the old claim-based numbers would go stale: hide them (they come back with History) */
+    ['prof-holding-detail', 'prof-sold-detail', 'prof-profit-detail'].forEach(function (id) { var s = document.getElementById(id), r = s && s.closest('.prof-row'); if (r) r.style.display = showStock ? 'none' : ''; });
+    ['prof-profit', 'fs-profit'].forEach(function (id) { var s = document.getElementById(id), r = s && (id === 'fs-profit' ? s.parentElement : s); if (r) r.style.display = showStock ? 'none' : ''; });
+    /* the Feed claim hint names the tab where claims land: Stock while Stock is on, History otherwise (the link keeps working: History lands on Stock) */
+    Array.prototype.forEach.call(document.querySelectorAll('a[data-view-link="history"]'), function (a) {
+      if (showStock) { if (!a.hasAttribute('data-hist-text')) a.setAttribute('data-hist-text', a.textContent); a.setAttribute('data-i18n-skip', ''); a.textContent = 'Stock'; }
+      else if (a.hasAttribute('data-hist-text')) { a.textContent = a.getAttribute('data-hist-text'); a.removeAttribute('data-hist-text'); a.removeAttribute('data-i18n-skip'); }
+    });
   }
   window.SNYPD.stockReplacesHistory = function () { return !!window.SNYPD.stockMode && !stockHidden; };
   window.SNYPD.onStockMode = function (mode, hidden) { window.SNYPD.stockMode = mode; stockHidden = !!hidden; paint(); };

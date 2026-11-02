@@ -58,6 +58,10 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   for (const [q, shown] of [['plan=elite&stock=off', false], ['plan=free&stock=admin', false], ['plan=elite&stock=admin', true], ['plan=free&stock=all', true]]) {
     const page = await open(q); await settle(page, 1800);
     eq(await stockTabShown(page), shown, 'Stock tab visibility for ?' + q);
+    { const rowsShown = await page.evaluate(() => ['prof-holding-detail', 'prof-sold-detail', 'prof-profit-detail'].map(id => getComputedStyle(document.getElementById(id).closest('.prof-row')).display !== 'none').concat([getComputedStyle(document.getElementById('prof-profit')).display !== 'none', getComputedStyle(document.getElementById('fs-profit').parentElement).display !== 'none']));
+      eq(rowsShown.every(x => x === !shown), true, 'Profile Holding / Sold / Realised profit rows and the Feed profit stat are hidden exactly while Stock replaces History (?' + q + '): ' + rowsShown.join(','));
+      const hint = await page.evaluate(() => [...document.querySelectorAll('a[data-view-link="history"]')].map(a => a.textContent));
+      ok(hint.length > 0 && hint.every(x => x === (shown ? 'Stock' : 'History')), 'Feed claim hint names ' + (shown ? 'Stock' : 'History') + ' (?' + q + '): ' + hint.join('|')); }
     eq(page.requested.filter(u => /stock(-core|-i18n)?\.(js|css)/.test(u)), [], 'no Stock asset is requested before the tab is opened (?' + q + ')');
     await page.close();
   }
