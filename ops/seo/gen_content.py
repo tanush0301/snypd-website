@@ -320,7 +320,7 @@ def jsonld(obj):
     return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '</script>'
 
 
-def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None, bare=False):
+def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None, bare=False, published=None):
     """parent: optional (name, path) shown between Home and this page in the breadcrumb.
     bare: a page with no URL of its own (404.html): noindex, no canonical, hreflang, JSON-LD or date line."""
     u = UI[lang]
@@ -357,7 +357,7 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
             {'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': it} for i, (n, it) in enumerate(
                 [(u['home'], SITE + '/')] + ([(parent[0], SITE + parent[1])] if parent else []) + [(h1_plain(h1), url)])]},
         {'@context': 'https://schema.org', '@type': 'WebPage', '@id': url + '#page', 'url': url, 'name': title,
-         'description': desc, 'inLanguage': lang, 'datePublished': PUBLISHED, 'dateModified': PAGE_MODIFIED[key],
+         'description': desc, 'inLanguage': lang, 'datePublished': published or PUBLISHED, 'dateModified': PAGE_MODIFIED[key],
          'isPartOf': {'@id': SITE + '/#website'}, 'publisher': {'@id': SITE + '/#org'}, 'about': {'@id': SITE + '/#app'}},
     ] + list(extra_ld)
     ld_html = '\n'.join(jsonld(o) for o in ld)
@@ -1826,6 +1826,7 @@ def page_deals(lang, steals=None):
   <h2>Watch one search for free</h2>
   {cta('en')}
 </section>"""
+    body += reseller_content.related('en')
     return page('deals', 'en', 'Vinted Deals: How to Find Steals Before Anyone Else | SNYPD',
                 'How to find Vinted deals and steals: real data on how often listings go up far below the typical price, and four steps to see the right one first.',
                 'VINTED DEALS &middot; GUIDE', 'How to find Vinted deals before anyone else',
@@ -2430,6 +2431,9 @@ cps.install(globals())
 # Help guides (18 Oct 2026): Vinted saved searches (8 languages) and price-drop notifications (4).
 # Copy + sources: copy_guides.py; facts quoted from Vinted's help centre (articles 433, 435, 258).
 import copy_guides as cg  # noqa: E402
+import reseller_content  # noqa: E402
+SLUGS.update(reseller_content.SLUGS)
+PAGE_MODIFIED.update({key: reseller_content.UPDATED for key in reseller_content.SLUGS})
 GUIDE_FAQ_H = {'en': 'Questions', 'fr': 'Questions', 'de': 'Fragen', 'nl': 'Vragen', 'it': 'Domande', 'es': 'Preguntas',
                'pl': 'Pytania', 'sv': 'Frågor'}
 for _k, _g in cg.GUIDES.items():

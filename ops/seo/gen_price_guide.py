@@ -993,7 +993,9 @@ def sitemap_pages():
 def page_hub(lang):
     if lang == 'it':
         return price_italian.page_hub(sys.modules[__name__])
-    return _page_hub_estimates(lang).replace('</main>', note_links(sys.modules[__name__], lang) + '</main>')
+    import reseller_content
+    related = reseller_content.related(lang) if lang in ('en', 'fr') else ''
+    return _page_hub_estimates(lang).replace('</article>', related + '</article>', 1).replace('</main>', note_links(sys.modules[__name__], lang) + '</main>')
 
 
 def page_checker(lang):
