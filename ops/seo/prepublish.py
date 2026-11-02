@@ -46,6 +46,9 @@ PAGES = [
     ('/vinted-notifications-not-working', 'vinted-notifications-not-working.html', None),
     ('/vinted-sold-items',          'vinted-sold-items.html',          None),
     ('/vinted-price-checker',       'vinted-price-checker.html',       None),
+    ('/how-to-resell-on-vinted', 'how-to-resell-on-vinted.html', None),
+    ('/best-brands-to-resell-on-vinted', 'best-brands-to-resell-on-vinted.html', None),
+    ('/vinted-profit-calculator', 'vinted-profit-calculator.html', None),
     ('/vinted-saved-searches',      'vinted-saved-searches.html',      None),
     ('/vinted-price-drop-notifications', 'vinted-price-drop-notifications.html', None),
 ]
@@ -131,7 +134,8 @@ def write_sitemap():
 
 
 if __name__ == '__main__':
-    import gen_regions, check_site  # noqa: E402
+    import gen_regions, gen_reseller, check_site  # noqa: E402
+    gen_reseller.main()
     gen_regions.run()
     refresh_counter()
     write_sitemap()
