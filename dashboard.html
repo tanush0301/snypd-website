@@ -1720,6 +1720,7 @@ body {
   <nav class="snypd-topbar__tabs" id="view-tabs">
     <button class="view-tab active" type="button" data-view="feed">Feed</button>
     <button class="view-tab" type="button" data-view="history">History<span id="view-tab-history-count"></span></button>
+    <button class="view-tab" type="button" data-view="stock" id="view-tab-stock" style="display:none">Stock</button>
     <button class="view-tab" type="button" data-view="market">Market Insights</button>
   </nav>
   <div class="snypd-topbar__right" id="topbar-profile-trigger" role="button" tabindex="0" aria-label="Open profile">
@@ -1742,6 +1743,7 @@ body {
 <nav class="snypd-bottombar" id="bottombar">
   <button class="bottombar-tab active" type="button" data-view="feed">Feed</button>
   <button class="bottombar-tab" type="button" data-view="history">History</button>
+  <button class="bottombar-tab" type="button" data-view="stock" id="bottombar-tab-stock" style="display:none">Stock</button>
   <button class="bottombar-tab" type="button" data-view="profile">Profile</button>
 </nav>
 <button class="new-pill" id="new-pill" type="button"></button>
@@ -2073,6 +2075,30 @@ body {
 </div>
 </div>
 
+<div class="panel" id="stock-panel" style="margin-bottom:16px; display:none"></div>
+<script>
+/* Stock (Stock build, step 3): the tab and a lazy loader. Everything stays hidden unless dashboard_boot() reports stock_mode admin or all;
+   assets/stock-core.js, stock-i18n.js, stock.js and stock.css load only when the tab is first opened. History is untouched. */
+(function () {
+  var loaded = null;
+  function addScript(src) { return new Promise(function (ok, bad) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { bad(new Error(src)); }; document.head.appendChild(s); }); }
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.stockMode = null;
+  window.SNYPD.onStockMode = function (mode) {
+    window.SNYPD.stockMode = mode;
+    ['view-tab-stock', 'bottombar-tab-stock'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = ''; });
+  };
+  window.SNYPD.openStock = function () {
+    var panel = document.getElementById('stock-panel');
+    if (!loaded) {
+      var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/assets/stock.css'; document.head.appendChild(css);
+      loaded = addScript('/assets/stock-core.js').then(function () { return addScript('/assets/stock-i18n.js'); }).then(function () { return addScript('/assets/stock.js'); });
+    }
+    loaded.then(function () { window.SNYPD.stock.open({ client: window.SNYPD.supabase, panel: panel }); })
+      .catch(function (e) { loaded = null; panel.textContent = 'Could not load Stock. Reload the page.'; console.error('SNYPD Stock load failed', e); });
+  };
+})();
+</script>
 <div class="panel" id="history-panel" style="margin-bottom:16px; display:none">
 <!-- Ledger 2c: headline stat bar (Saved vs median / Realised profit), same
      shape as Feed's .feed-stats - confirmed against the actual mockup image
@@ -2524,6 +2550,8 @@ const HEARTBEAT_URL = (() => {
     bootUsed.add(reader);
     return boot.data;
   }
+  // Stock (stock build, step 3): show the Stock tab only when the switch is admin or all (dashboard_boot carries stock_mode since migration 068).
+  try { const _sm = boot && boot.data && boot.data.stock_mode; if (_sm && _sm !== 'off' && window.SNYPD && window.SNYPD.onStockMode) window.SNYPD.onStockMode(_sm); } catch (e) { console.error('SNYPD stock mode', e); }
   let me = boot
     ? { data: boot.data.profile || null, error: null }
     : await sb.from('users')
@@ -3689,6 +3717,7 @@ const HEARTBEAT_URL = (() => {
     const feedPanels = [document.getElementById('dashboard-panel')];
     const marketPanel = document.getElementById('market-panel');
     const historyPanel = document.getElementById('history-panel');
+    const stockPanel = document.getElementById('stock-panel');
     const profilePanel = document.getElementById('profile-panel');
     const histList = document.getElementById('hist-list');
     const histEmpty = document.getElementById('hist-empty');
@@ -4555,9 +4584,14 @@ const HEARTBEAT_URL = (() => {
       historyPanel.style.display = view === 'history' ? '' : 'none';
       if (marketPanel) marketPanel.style.display = view === 'market' ? '' : 'none';
       if (profilePanel) profilePanel.style.display = view === 'profile' ? '' : 'none';
+      if (stockPanel) stockPanel.style.display = view === 'stock' ? '' : 'none';
+      /* the feed's floating Filters pill would cover the Stock list; hidden only on the Stock tab (other tabs unchanged) */
+      const _fp = document.getElementById('filter-pill'); if (_fp) _fp.style.visibility = view === 'stock' ? 'hidden' : '';
 
       if (view === 'history') {
         loadClaims();
+      } else if (view === 'stock') {
+        if (window.SNYPD && window.SNYPD.openStock) window.SNYPD.openStock();
       } else if (view === 'profile') {
         loadProfile();
       } else if (view === 'market') {

@@ -327,6 +327,11 @@
       stockReady = fetch('acceptance-fixture.json').then(function (r) { return r.json(); }).then(function (fx) { STOCK.loadFixture(fx); seedClaims(); })
         .catch(function (e) { window.__qaErrors.push('QA stock seed failed: ' + e); });
     } else seedClaims();
+    // Stands in for dashboard_boot().stock_mode (this mock does not implement that RPC): shows the Stock tab when the switch is admin / all.
+    if (params.get('boot') !== '1') STOCK.rpc('stock_boot').then(function (r) {
+      if (!r.data || r.data.mode === 'off') return;
+      var tries = 0, t = setInterval(function () { if (window.SNYPD && window.SNYPD.onStockMode) { clearInterval(t); window.SNYPD.onStockMode(r.data.mode); } else if (++tries > 200) clearInterval(t); }, 50);
+    });
   }
 
   function makeBuilder(table) {
@@ -365,7 +370,7 @@
     };
 
     function execute() {
-      var rows = DB[table] || (DB[table] = []);
+      var rows = (STOCK && table === 'stock_history') ? STOCK.state.history : (DB[table] || (DB[table] = []));   // Stock history is read-only here, like the real select-own table
 
       // Column defaults + CHECKs that the real DB has (migrations 043, 064), so
       // the page sees the same row shape after an insert as in production.
@@ -459,6 +464,17 @@
     },
     from: function (table) { return makeBuilder(table); },
     rpc: function (name, args) {
+      // ?boot=1 serves dashboard_boot() like migration 054/068 (profile, searches, claims, dq, xp_total, streak, quota + stock_mode), so the page's REAL boot path
+      // (including its Stock hook) is exercised. Off by default: the usual QA flows keep using the separate REST reads.
+      if (name === 'dashboard_boot' && params.get('boot') === '1') {
+        var u0 = DB.users[0] || {}, searches = (DB.user_searches || []).slice().sort(function (a, b) { return String(b.created_at).localeCompare(String(a.created_at)); });
+        return Promise.resolve({ data: {
+          profile: { subscription_plan: u0.subscription_plan, sub_status: u0.sub_status, billing_provider: u0.billing_provider, whop_product_id: u0.whop_product_id, whop_manage_url: u0.whop_manage_url,
+            is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: null, trial_ends_at: null, trial_extended_at: null, pass_expires_at: null },
+          searches: searches, claims: (DB.user_claims || []).slice(), dq: [], xp_total: (DB.xp_events || []).reduce(function (a, x) { return a + (x.xp || 0); }, 0),
+          streak: ((DB.user_streak_state || [])[0] || {}).current_streak || null, quota: { quota_limit: PLAN === 'free' ? 1 : 5, used: searches.length },
+          stock_mode: STOCK ? STOCK.mode() : undefined }, error: null });
+      }
       // Stock RPCs (migrations 065-068) -> the in-memory port, see ops/stock_engine.js. Everything else keeps the old "not implemented" answer.
       if (STOCK && /^stock_/.test(name)) return stockReady.then(function () { return STOCK.rpc(name, args); });
       return Promise.resolve({ data: null, error: { message: 'QA mock: rpc not implemented, falls back to plan table' } });

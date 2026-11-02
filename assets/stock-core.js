@@ -180,6 +180,13 @@
       deleteItem: id => call('stock_delete_item', { p_id: id }),
       restoreItem: id => call('stock_restore_item', { p_id: id }),
       undo: () => call('stock_undo'),
+      // the item's timeline (stock_history is select-own through RLS; only the RPCs can write it)
+      itemHistory: async id => {
+        let r;
+        try { r = await client.from('stock_history').select('id,kind,at,data').eq('item_id', id).order('id', { ascending: true }); } catch (e) { throw parseError(e); }
+        if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
+        return r.data || [];
+      },
       // every item of a filter, page by page (never more than 200 per request); stops at the first error
       walkItems: async function* (filters, pageSize) {
         let cursor = null;

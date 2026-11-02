@@ -457,7 +457,7 @@ test('F qa_mock.js itself, run in a sandbox: Stock RPCs reach the engine, ?stock
   function load(search, withEngine) {
     const win = { addEventListener() {}, fetch: async () => ({}) };
     if (withEngine !== false) win.SnypdStockEngine = Engine;
-    const ctx = vm.createContext({ window: win, location: { search }, URLSearchParams, Promise, Date, Math, JSON, console: { log() {}, warn: console.warn, error: console.error }, Response, setTimeout, Object, Array, String, Number, RegExp,
+    const ctx = vm.createContext({ window: win, location: { search }, URLSearchParams, Promise, Date, Math, JSON, console: { log() {}, warn: console.warn, error: console.error }, Response, setTimeout, setInterval, clearInterval, Object, Array, String, Number, RegExp,
       fetch: async url => { assert.equal(url, 'acceptance-fixture.json'); return { json: async () => fx }; } });
     vm.runInContext(src, ctx);
     return win;
@@ -478,6 +478,8 @@ test('F qa_mock.js itself, run in a sandbox: Stock RPCs reach the engine, ?stock
   await sb.from('user_claims').delete().eq('id', 'hook-2');
   assert.equal((await api.itemsPage({ q: 'Delete me' }, 10)).total, 0, 'a deleted claim leaves Stock (soft-deleted)');
   assert.equal((await api.itemsPage({ q: 'Delete me', deleted: 'only' }, 10)).total, 1);
+  const hist = await api.itemHistory(page.rows[0].id);
+  assert.deepEqual(hist.map(h => h.kind), ['bought', 'sale'], 'itemHistory reads stock_history through the mock builder, oldest first');
   // other RPCs keep the old "not implemented" answer; a bad Stock call fails like the SQL does
   assert.match((await sb.rpc('dashboard_boot')).error.message, /not implemented/);
   await rejects(api.markSold('missing-id', { soldCents: 1 }), 'stock_item_not_found', 'unknown item');
