@@ -69,6 +69,22 @@
     try { if (name === 'sign_up' && window.fbq) window.fbq('track', 'CompleteRegistration'); } catch (e) {}
   }
 
+  var signupEventsSent = {};
+  function trackSignUp(user, method) {
+    // A click or an empty SDK response is not an account creation. Keep account
+    // identifiers inside this page only; never include them in analytics payloads.
+    if (!user || typeof user.id !== 'string' || !user.id || signupEventsSent[user.id]) return;
+    if (method === 'google') {
+      var created = Date.parse(user.created_at || '');
+      var signedIn = Date.parse(user.last_sign_in_at || '');
+      // A returning account can log in again within the old 15-minute window.
+      // Count only a first sign-in close to the server's creation timestamp.
+      if (!created || !signedIn || Math.abs(signedIn - created) > 5000) return;
+    }
+    signupEventsSent[user.id] = true;
+    track('sign_up', { method: method });
+  }
+
   var qs = new URLSearchParams((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.search) || location.search);
   var hs = new URLSearchParams(((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.hash) || location.hash).replace(/^#/, ''));
   var plan = (qs.get('plan') || '').toLowerCase();
@@ -292,8 +308,8 @@
         if (!r.error) {
           var u = r.data && r.data.user;
           if (u && Array.isArray(u.identities) && u.identities.length === 0) { existsNow(); return; }
-          if (r.data && r.data.session) { track('sign_up', { method: 'email' }); openDashboard(email); return; }
-          track('sign_up', { method: 'email' });
+          if (r.data && r.data.session) { trackSignUp(u || r.data.session.user, 'email'); openDashboard(email); return; }
+          trackSignUp(u, 'email');
           go('verify', { pw: '' }); startCooldown(); render();
           return;
         }
@@ -755,7 +771,7 @@
          (email sign-ups are counted in signup()). */
       var created = Date.parse(sess.user.created_at || '');
       if (oauthReturn && created && Date.now() - created < 15 * 60 * 1000) {
-        track('sign_up', { method: 'google' });
+        trackSignUp(sess.user, 'google');
         /* Tags from the return address set in google(): same fields as an email sign-up. */
         var md = sess.user.user_metadata || {}, add = md.utm_source ? {} : campaignTags(qs), retAff = qs.get('a');
         var hi = huntIntent();
