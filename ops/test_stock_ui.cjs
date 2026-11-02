@@ -129,6 +129,77 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(await page.evaluate(() => window.__qaErrors.length), 0, 'no window errors (French)');
   await page.close();
 
+  // ---- 4. import (step 4): real files through the real file input
+  const os = require('node:os');
+  const imp = path.join(root, 'ops/stock/import');
+  const tmp = (name, content) => { const p = path.join(os.tmpdir(), 'stock-ui-' + process.pid + '-' + name); fs.writeFileSync(p, content); return p; };
+  const upload = async (page, file) => { await page.evaluate(() => document.querySelector('#stock-panel [data-act="import"]').click()); await new Promise(r => setTimeout(r, 300)); const input = await page.$('#im-file'); await input.uploadFile(file); await new Promise(r => setTimeout(r, 900)); };
+  const clickA = async (page, a) => { await page.evaluate(a => document.querySelector('#stock-panel [data-act="' + a + '"]').click(), a); await new Promise(r => setTimeout(r, 500)); };
+  const sheetText = page => page.$eval('.st-sheet', e => e.innerText.replace(/\n+/g, ' | '));
+  const setSel = (page, sel, v) => page.$eval(sel, (e, v) => { e.value = v; e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+
+  page = await open('plan=elite&stock=all&stock_today=2026-11-02&lang=en');
+  page.on('dialog', d => d.accept());
+  await page.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await page.click('#view-tab-stock'); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await upload(page, path.join(imp, 'template-fr.xlsx'));
+  let txt = await sheetText(page);
+  ok(/template-fr\.xlsx/.test(txt) && /3 rows make 5 items/.test(txt), 'review: ' + txt.slice(0, 200));
+  ok(/comme neuf/i.test(txt) && /vintage/i.test(txt) && /import 5 items/i.test(txt), 'review lists the unknown condition, the new category and the item count: ' + txt);
+  ok(!/Dates like/i.test(txt), 'no date-order question: 27/10 makes it certain');
+  await setSel(page, '[data-im="cond"]', 'very_good'); await wait(300);
+  ok(!/Conditions we do not know/i.test(await sheetText(page)), 'the mapped condition leaves the list');
+  const base0 = await page.evaluate(() => window.__qaStock.state.items.length);   // the mock seeds 3 Feed claims that are mirrored into Stock
+  await clickA(page, 'im-go'); await wait(900);
+  txt = await sheetText(page); ok(/Imported 5 items/.test(txt) && /from 3 rows/.test(txt), 'done: ' + txt.slice(0, 160));
+  eq(await page.evaluate(() => window.__qaStock.state.items.filter(i => i.import_id).length), 5, 'five items in the engine');
+  eq(await page.evaluate(() => window.__qaStock.state.categories.filter(c => c.key === 'c-vintage').length), 1, 'the new category was created');
+  eq(await page.evaluate(() => window.__qaStock.state.items.filter(i => i.condition === 'very_good').length >= 4), true, 'the user\'s condition mapping was applied');
+  await clickA(page, 'im-undo'); await wait(700);
+  eq(await page.evaluate(() => [window.__qaStock.state.items.length, window.__qaStock.state.items.filter(i => i.import_id).length]), [base0, 0], 'undo this import removes every item of the import and nothing else');
+  eq(await rows(), base0, 'and the list is back to what it was');
+
+  // ambiguous dates: the screen asks, the answer decides
+  const csv1 = tmp('amb.csv', 'Item;Buy price;Bought\nJacket;12,50;03/04/2026\nTee;5;05/06/2026\n');
+  await upload(page, csv1); txt = await sheetText(page);
+  ok(/Dates like 03\/04\/2026 can be read two ways/i.test(txt) && /Day first/i.test(txt), 'date-order question for ambiguous dates: ' + txt.slice(0, 300));
+  await page.evaluate(() => document.querySelector('[data-im="order"][value="mdy"]').click()); await wait(300);
+  await page.evaluate(() => { const r = document.querySelector('[data-im="order"][value="mdy"]'); r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }); await wait(300);
+  await clickA(page, 'im-go'); await wait(800);
+  eq(await page.evaluate(() => window.__qaStock.state.items.filter(i => i.import_id).map(i => i.bought_on + ':' + i.buy_cents).sort()), ['2026-03-04:1250', '2026-05-06:500'], 'month-first choice applied, ";" file read with decimal commas');
+  await page.keyboard.press('Escape'); await wait(200);
+
+  // refusals
+  await upload(page, tmp('old.xls', 'not really an xls')); ok(/Old \.xls files are not supported/.test(await sheetText(page)), 'old .xls refused with a clear message');
+  await page.evaluate(() => document.querySelector('#im-file').value = ''); await page.keyboard.press('Escape'); await wait(200);
+  await upload(page, tmp('notitle.csv', 'Brand,Buy price\nNike,5\n')); ok(/No column looks like the item title/.test(await sheetText(page)), 'a file without a title column is explained');
+  await page.keyboard.press('Escape'); await wait(200);
+  eq(await page.evaluate(() => window.__qaErrors.length), 0, 'no window errors (import)');
+  await page.close();
+
+  // Free account: the cap preview and the partial import
+  page = await open('plan=free&stock=all&stock_today=2026-11-02&lang=en');
+  page.on('dialog', d => d.accept());
+  await page.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await page.click('#view-tab-stock'); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await upload(page, tmp('thirty.csv', 'Item,Buy price\n' + Array.from({ length: 30 }, (_, i) => 'Thing ' + i + ',5').join('\n') + '\n'));
+  const heldBefore = await page.evaluate(() => window.__qaStock.state.items.filter(i => ['stock', 'listed', 'reserved', 'returned'].includes(i.status) && !i.deleted_at).length), fits = 25 - heldBefore;
+  txt = await sheetText(page); ok(new RegExp('The Free plan holds 25 items: ' + fits + ' of your held items fit and ' + (30 - fits) + ' would be left out').test(txt), 'cap preview before importing: ' + txt.slice(0, 260));
+  await clickA(page, 'im-go'); await wait(900); txt = await sheetText(page);
+  ok(new RegExp('Imported ' + fits + ' items').test(txt) && new RegExp((30 - fits) + ' rows were not imported', 'i').test(txt) && /over the Free plan limit/.test(txt) && /see plans/i.test(txt), 'partial import reported: ' + txt.slice(0, 260));
+  eq(await page.evaluate(() => window.__qaStock.state.items.filter(i => ['stock', 'listed', 'reserved', 'returned'].includes(i.status) && !i.deleted_at).length), 25, 'the account holds exactly 25, not 30');
+  await page.close();
+
+  // French review on a phone
+  page = await open('plan=elite&stock=all&stock_today=2026-11-02&lang=fr', { width: 390, height: 844, isMobile: true, hasTouch: true });
+  await page.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await page.click('#bottombar-tab-stock'); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await upload(page, tmp('mix.csv', 'Article;Prix d\'achat\nA;12,50 £\nB;5 $\n'));
+  txt = await sheetText(page); ok(/Les montants sont lus en EUR/.test(txt) && /mélange des symboles de devise \(2 montants\)/.test(txt) && /importer 2 articles/i.test(txt), 'French review: ' + txt.slice(0, 260));
+  const g2 = await page.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth, sheetSW: document.querySelector('.st-sheet').scrollWidth, sheetCW: document.querySelector('.st-sheet').clientWidth }));
+  ok(g2.sw <= g2.vw && g2.sheetSW <= g2.sheetCW + 1, 'import sheet fits at 390: ' + JSON.stringify(g2));
+  await page.close();
+
   await browser.close(); server.close();
   if (errors.length) { console.log('PAGE ERRORS:\n' + errors.join('\n')); process.exit(1); }
   console.log(`PASS: ${passed} browser checks (Stock tab gating, lazy load, full item lifecycle, undo, history, delete/restore, French + Free cap, 390 px)`);

@@ -238,4 +238,7 @@ const frTable = fr({
   'h.days': '{n} jours pour vendre', 'h.profit': 'bénéfice {amount}', 'h.reversal': 'ANNULATION {amount}', 'h.to_stock': 'retour en stock', 'h.to_wo': 'passé en perte', 'h.via': 'via {platform}'
 });
 
+const imp = require('./stock_strings_import.cjs');   // step 4: the import screen
+Object.assign(en, imp.en); Object.assign(frTable, fr(imp.fr));
+
 module.exports = { en, fr: frTable };

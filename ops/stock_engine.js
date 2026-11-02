@@ -435,6 +435,18 @@
       if (sold) addHistory(r.id, 'sale', r.sold_on, { sold_cents: r.sold_cents, platform: null, days: diffDays(r.sold_on, bought), profit_cents: (r.buy_cents == null || r.sold_cents == null) ? null : r.sold_cents - r.buy_cents });
       return r.id;
     }
+    function addCategories(list) {   // the direct INSERT into stock_categories (own-row policy + the 30-per-account trigger), all or nothing like one statement
+      const before = S.categories.slice();
+      try {
+        list.forEach(c => {
+          if (c.user_id !== S.uid) raise('new row violates row-level security policy for table "stock_categories"', null, '42501');
+          if (S.categories.length >= CAPS.categories) raise('stock_category_limit', 'At most 30 categories per account.');
+          if (S.categories.some(x => x.key === c.key)) raise('duplicate key value violates unique constraint "stock_categories_pkey"', null, '23505');
+          if (!c.name || btrim(c.name).length < 1 || btrim(c.name).length > 40 || !c.key || c.key.length > 40) raise('new row for relation "stock_categories" violates check constraint "stock_categories_name_check"', null, '23514');
+          S.categories.push({ key: c.key, name: btrim(c.name), sort: c.sort == null ? 100 : c.sort, hidden: false });
+        });
+      } catch (e) { S.categories = before; throw e; }
+    }
     function mirrorClaimUpdate(c, oldBoughtPrice) {   // 067 UPDATE branch: never overwrites what the user did to the item in Stock
       const it = S.items.find(i => i.claim_id === c.id && i.deleted_at == null);
       if (!it) return mirrorClaim(c);
@@ -452,7 +464,7 @@
       const it = S.items.find(i => i.claim_id === claimId && i.deleted_at == null && i.status === 'stock');
       if (it) { it.deleted_at = new Date(nowMs()).toISOString(); touch(it); }
     }
-    return { rpc, state: S, agg, loadFixture, mirrorClaim, mirrorClaimUpdate, mirrorClaimDelete, setMode: m => { S.mode = m; }, mode: stockMode, setPaid: p => { S.paid = !!p; }, setSettings: s => { const n = Object.assign({}, S.settings, s); const bad = nm => raise(`new row for relation "stock_settings" violates check constraint "stock_settings_${nm}_check"`, null, '23514'); if (n.currency != null && !ENUMS.currency.includes(n.currency)) bad('currency'); if (n.persona != null && !ENUMS.persona.includes(n.persona)) bad('persona'); if (n.old_after_days != null && !(n.old_after_days >= 7 && n.old_after_days <= 365)) bad('old_after_days'); S.settings = n; },
+    return { rpc, state: S, agg, loadFixture, addCategories, mirrorClaim, mirrorClaimUpdate, mirrorClaimDelete, setMode: m => { S.mode = m; }, mode: stockMode, setPaid: p => { S.paid = !!p; }, setSettings: s => { const n = Object.assign({}, S.settings, s); const bad = nm => raise(`new row for relation "stock_settings" violates check constraint "stock_settings_${nm}_check"`, null, '23514'); if (n.currency != null && !ENUMS.currency.includes(n.currency)) bad('currency'); if (n.persona != null && !ENUMS.persona.includes(n.persona)) bad('persona'); if (n.old_after_days != null && !(n.old_after_days >= 7 && n.old_after_days <= 365)) bad('old_after_days'); S.settings = n; },
       setSearches: s => { S.searches = s; }, today, helpers: { diffDays, addDays, isoDate } };
   }
 

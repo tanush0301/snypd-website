@@ -87,7 +87,7 @@ if (sql) {
     const engCodes = new Set([...engSrc.matchAll(/raise\('(stock_[a-z_]+)'/g)].map(m => m[1]));
     for (const c of engCodes) assert(sqlCodes.has(c), 'engine raises ' + c + ' which the SQL does not');
     const notInEngine = [...sqlCodes].filter(c => !engCodes.has(c));
-    assert.deepEqual(notInEngine, ['stock_category_limit'], 'only the direct categories insert (a trigger) may be missing from the engine');
+    assert.deepEqual(notInEngine, [], 'every error the SQL raises is implemented by the engine (the category cap now too, step 4)');
   });
   test('C RPC argument names and required arguments in the engine == the SQL function signatures; stock-core calls only those', () => {
     const sigs = {};

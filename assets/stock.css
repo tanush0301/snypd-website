@@ -122,3 +122,12 @@ select.st-in { padding-right: 8px; }
   .st-qty button { width: 44px; height: 44px; }
 }
 @media (min-width: 721px) { .st-row > .c-meta { display: none; } }
+/* import (step 4) */
+.st-drop { border: 1px dashed var(--st-line2); padding: 40px 24px; text-align: center; }
+.st-drop.over { border-color: var(--st-text); background: rgba(255,255,255,.04); }
+.st-drop p { margin: 12px 0 0; color: var(--st-text2); font-size: 13px; }
+.st-map { display: flex; flex-wrap: wrap; gap: 6px; }
+.st-mapc { font-size: 11px; padding: 4px 8px; border: 1px solid var(--st-line); color: var(--st-text2); }
+.st-mapc.ok { color: var(--st-ok); border-color: rgba(0,229,160,.25); }
+.st-mapc.no { color: var(--st-muted); }
+.st-list { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--st-text2); line-height: 1.6; }

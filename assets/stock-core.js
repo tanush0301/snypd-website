@@ -180,6 +180,14 @@
       deleteItem: id => call('stock_delete_item', { p_id: id }),
       restoreItem: id => call('stock_restore_item', { p_id: id }),
       undo: () => call('stock_undo'),
+      // new categories (import review, later Settings): a direct insert, allowed by the own-row policy; the 30-per-account trigger answers stock_category_limit
+      addCategories: async list => {
+        let u; try { u = await client.auth.getUser(); } catch (e) { throw parseError(e); }
+        const uid = u && u.data && u.data.user && u.data.user.id; if (!uid) throw parseError('not authenticated 401');
+        let r; try { r = await client.from('stock_categories').insert(list.map(c => ({ user_id: uid, key: c.key, name: c.name, sort: 100 }))); } catch (e) { throw parseError(e); }
+        if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
+        return list.length;
+      },
       // the item's timeline (stock_history is select-own through RLS; only the RPCs can write it)
       itemHistory: async id => {
         let r;

@@ -381,6 +381,9 @@
       if (table === 'user_searches' && (op === 'insert' || op === 'update') && badPush(payload || {})) {
         return { data: null, error: { code: '23514', message: 'new row violates check constraint (push_mode / push_calm_minutes)' } };
       }
+      if (STOCK && table === 'stock_categories' && op === 'insert') {   // own-row insert policy + the 30-category trigger live in the engine
+        try { STOCK.addCategories(Array.isArray(payload) ? payload : [payload]); return { data: payload, error: null }; } catch (e) { return { data: null, error: e.pg || { message: String(e) } }; }
+      }
       if (op === 'insert') {
         var toInsert = Array.isArray(payload) ? payload : [payload];
         var inserted = toInsert.map(function (r) {

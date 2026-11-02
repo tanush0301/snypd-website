@@ -82,7 +82,7 @@
     var statuses = [['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')]];
     S.panel.innerHTML =
       '<div class="st-wrap">' +
-      '<div class="st-head"><h1 class="st-title">' + esc(T('title')) + '</h1><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div>' +
+      '<div class="st-head"><h1 class="st-title">' + esc(T('title')) + '</h1><button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div>' +
       '<div id="st-meter"></div>' +
       '<div class="st-tools">' +
       '<input class="st-in st-search" type="search" id="st-q" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('search.aria')) + '" autocomplete="off">' +
@@ -92,7 +92,7 @@
       '<span class="st-count" id="st-count" aria-live="polite"></span></div>' +
       '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === '' ? 'true' : 'false') + '">' + esc(s[1]) + '</button>'; }).join('') + '</div>' +
       '<div id="st-body"></div></div><div id="st-ov"></div><div id="st-undo-root"></div>';
-    S.panel.onclick = onClick; S.panel.onkeydown = onKey;
+    S.panel.onclick = onClick; S.panel.onkeydown = onKey; S.panel.onchange = onChange;
     $('#st-q').oninput = function () { clearTimeout(S.searchTimer); var v = this.value; S.searchTimer = setTimeout(function () { S.f.q = v.trim(); load(true); }, 250); };
     $('#st-cond').onchange = function () { S.f.condition = this.value; load(true); };
     $('#st-cat').onchange = function () { S.f.category = this.value; load(true); };
@@ -152,7 +152,7 @@
       var filtered = S.f.status || S.f.q || S.f.condition || S.f.category;
       if (S.f.deleted) h += '<div class="st-empty"><p>' + esc(T('empty.deleted', { days: C.CAPS.deletedDays })) + '</p></div>';
       else if (filtered) h += '<div class="st-empty"><p>' + esc(T('empty.filtered')) + '</p><button type="button" class="st-btn st-ghost" data-act="clear">' + esc(T('clear')) + '</button></div>';
-      else h += '<div class="st-empty"><h3>' + esc(T('empty.title')) + '</h3><p>' + esc(T('empty.body')) + '</p><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('empty.add')) + '</button></div>';
+      else h += '<div class="st-empty"><h3>' + esc(T('empty.title')) + '</h3><p>' + esc(T('empty.body')) + '</p><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('empty.add')) + '</button> <button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button></div>';
       el.innerHTML = h; return;
     }
     h += '<div class="st-table" role="table"><div class="st-th" role="row"><span>' + esc(T('col.item')) + '</span><span>' + esc(T('col.status')) + '</span><span class="st-num">' + esc(T('col.cost')) + '</span><span class="st-num">' + esc(T('col.price')) + '</span><span class="st-num">' + esc(T('col.profit')) + '</span><span class="st-num">' + esc(T('col.age')) + '</span><span>' + esc(T('col.platform')) + '</span></div>';
@@ -184,6 +184,12 @@
     if (el.classList.contains('st-btn') || el.classList.contains('st-chip') || el.classList.contains('st-x') || el.tagName === 'BUTTON' || act === 'open' || act === 'scrim') ev.preventDefault();
     switch (act) {
       case 'add': S.opener = el; openSheet('add'); break;
+      case 'import': S.opener = el; openImport(); break;
+      case 'im-pick': { var fi = $('#im-file'); if (fi) fi.click(); break; }
+      case 'im-go': imRun(false); break;
+      case 'im-resume': imRun(true); break;
+      case 'im-undo': imUndo(); break;
+      case 'im-again': openImport(); break;
       case 'chip': { var st = el.getAttribute('data-status'); S.f.status = st === '' ? null : (st === 'stock' ? ['stock', 'returned'] : [st]); load(true); break; }
       case 'deleted': S.f.deleted = !S.f.deleted; S.f.status = null; load(true); break;
       case 'clear': S.f = { status: null, q: '', condition: '', category: '', deleted: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; load(true); break;
@@ -415,6 +421,139 @@
     if (!Object.keys(patch).length) { closeSheet(); return; }
     var go = $('#st-go'); if (go) go.disabled = true;
     S.api.editItem(id, patch).then(function () { return reloadKeep(); }).then(function () { closeSheet(); showBar(T('toast.saved'), false); }).catch(function (e) { sheetError(e); });
+  }
+
+  // ------------------------------------------------------------------ import (step 4): file -> review -> batches of 500 -> done / undo this import
+  var IM = null;
+  function loadImportLib() {
+    if (window.SnypdStockImport) return Promise.resolve(window.SnypdStockImport);
+    if (!S.importLib) S.importLib = new Promise(function (ok, bad) { var s = document.createElement('script'); s.src = '/assets/stock-import.js'; s.onload = function () { ok(window.SnypdStockImport); }; s.onerror = function () { S.importLib = null; bad(new Error('stock-import.js')); }; document.head.appendChild(s); });
+    return S.importLib;
+  }
+  function freeLeft() { var m = C.freeCapState(S.boot); return m.limited ? Math.max(m.cap - m.held, 0) : null; }
+  function uuid() { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); var h = '0123456789abcdef', o = ''; for (var i = 0; i < 36; i++) o += (i === 8 || i === 13 || i === 18 || i === 23) ? '-' : (i === 14 ? '4' : h[Math.floor(Math.random() * 16)]); return o; }
+  function openImport() {
+    S.sheet = { kind: 'import' };
+    IM = { step: 'pick', file: null, sheets: [], sheetIx: 0, dateOrder: null, skipDups: false, condMap: {}, catMap: {}, plan: null, importId: null, done: null, err: null, rpc: [], batches: [], catsFailed: 0 };
+    renderImport();
+  }
+  function imShell(body, foot) {
+    var bd = $('.st-sheet-bd'), top = bd ? bd.scrollTop : 0;
+    mountSheet(T('imp.title'), '<div id="st-sheet-err"></div>' + body, foot);
+    var nb = $('.st-sheet-bd'); if (nb) nb.scrollTop = top;
+  }
+  function imErrText(e) {
+    var c = e && e.code;
+    return T(c === 'xls_unsupported' ? 'imp.err.xls' : c === 'not_a_spreadsheet' ? 'imp.err.not' : c === 'encrypted' ? 'imp.err.encrypted' : c === 'too_big' ? 'imp.err.big' : 'imp.err.read');
+  }
+  function renderImport() {
+    if (!S.sheet || S.sheet.kind !== 'import' || !IM) return;
+    var close = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('imp.close')) + '</button>';
+    if (IM.step === 'pick' || IM.step === 'reading') {
+      imShell((IM.err ? '<div class="st-err">' + esc(IM.err) + '</div>' : '') + '<div class="st-drop" id="im-drop">' + (IM.step === 'reading' ? '<p>' + esc(T('imp.reading')) + '</p>' :
+        '<button type="button" class="st-btn st-prim" data-act="im-pick">' + esc(T('imp.pick')) + '</button><p>' + esc(T('imp.drop')) + '</p><p class="st-hint">' + esc(T('imp.formats')) + '</p>') +
+        '<input type="file" id="im-file" accept=".csv,.tsv,.txt,.xlsx" hidden></div>', close);
+      var fi = $('#im-file'), dz = $('#im-drop');
+      if (fi) fi.onchange = function () { if (fi.files && fi.files[0]) imRead(fi.files[0]); };
+      if (dz) { dz.ondragover = function (e) { e.preventDefault(); dz.classList.add('over'); }; dz.ondragleave = function () { dz.classList.remove('over'); }; dz.ondrop = function (e) { e.preventDefault(); dz.classList.remove('over'); if (e.dataTransfer.files && e.dataTransfer.files[0]) imRead(e.dataTransfer.files[0]); }; }
+      return;
+    }
+    if (IM.step === 'review') { imReview(close); return; }
+    if (IM.step === 'running') { imShell('<div class="st-prev" id="im-prog" role="status"></div>', ''); imProgress(); return; }
+    if (IM.step === 'failed') { imShell('<div class="st-err">' + esc(T('imp.failed', { done: IM.done.items })) + '</div>', close + '<button type="button" class="st-btn st-ghost st-danger" data-act="im-undo">' + esc(T('imp.undo')) + '</button><button type="button" class="st-btn st-prim" data-act="im-resume">' + esc(T('imp.resume')) + '</button>'); return; }
+    if (IM.step === 'done') imDone(close);
+  }
+  function imRead(file) {
+    IM.step = 'reading'; IM.err = null; renderImport();
+    loadImportLib().then(function (L) { return L.readFile(file).then(function (r) { return [L, r]; }); }).then(function (x) {
+      var L = x[0], r = x[1]; IM.file = file; IM.sheets = r.sheets; IM.sheetIx = 0;
+      for (var i = 0; i < r.sheets.length; i++) { var rows = r.sheets[i].table.rows.filter(function (row) { return row.some(function (c) { return String(c == null ? '' : c).trim() !== ''; }); }); if (rows.length && L.mapHeaders(rows[0]).some(function (m) { return m.field === 'title'; })) { IM.sheetIx = i; break; } }
+      IM.dateOrder = null; IM.skipDups = false; IM.condMap = {}; IM.catMap = {}; imAnalyse(true);
+    }).catch(function (e) { IM.step = 'pick'; IM.err = imErrText(e); renderImport(); });
+  }
+  function imPlan() {
+    var L = window.SnypdStockImport, sh = IM.sheets[IM.sheetIx];
+    return L.buildPlan(sh.table, { lang: lang, currency: S.cur, categories: S.cats, freeLeft: freeLeft(), today: today(), dateOrder: IM.dateOrder || undefined, skipDuplicates: IM.skipDups, conditionMap: IM.condMap, categoryMap: IM.catMap });
+  }
+  function imAnalyse(first) {
+    IM.plan = imPlan();
+    if (IM.plan.errors.length) { IM.step = 'pick'; IM.err = T(IM.plan.errors[0] === 'empty' ? 'imp.err.empty' : 'imp.err.notitle'); renderImport(); return; }
+    IM.step = 'review'; renderImport();
+  }
+  function imReview(close) {
+    var L = window.SnypdStockImport, p = IM.plan, st = p.stats, rv = p.review, rpc = L.toRpcRows(p), items = rpc.reduce(function (a, r) { return a + (r.row.quantity || 1); }, 0), h = '';
+    var skippedTitle = st.skippedNoTitle, badQty = p.rows.filter(function (r) { return r.bad; }).length;
+    h += '<p class="st-note"><b>' + esc(IM.file.name) + '</b>';
+    if (IM.sheets.length > 1) h += ' &middot; ' + esc(T('imp.sheet')) + ' <select class="st-in" data-im="sheet" aria-label="' + esc(T('imp.sheet')) + '">' + IM.sheets.map(function (s, i) { return option(String(i), s.name, i === IM.sheetIx); }).join('') + '</select>';
+    h += '</p>';
+    h += '<div class="st-h3">' + esc(T('imp.cols')) + '</div><div class="st-map">' + p.mapping.map(function (m) { return '<span class="st-mapc ' + (m.field ? 'ok' : 'no') + '">' + esc(m.header || '-') + ' &rarr; ' + esc(m.field ? T('f.' + ({ title: 'title', brand: 'brand', size: 'size', condition: 'condition', category: 'category', quantity: 'quantity', bought: 'bought', buy: 'buy', extra: 'extra', source: 'source', platform: 'platform', list: 'list', sold: 'sold', soldon: 'soldon', fee: 'fee', ship: 'ship', notes: 'notes', link: 'link' }[m.field])) : T('imp.cols.none')) + '</span>'; }).join('') + '</div>';
+    h += '<p class="st-note" style="margin-top:12px">' + esc(T('imp.read_as', { cur: S.cur })) + '</p>';
+    var notes = [T('imp.sum', { rows: st.rows - skippedTitle - badQty, items: items, held: st.held, sold: st.sold })];
+    if (st.qtyRows) notes.push(T('imp.qty', { n: st.qtyRows })); if (st.noBuy) notes.push(T('imp.nobuy', { n: st.noBuy })); if (st.badMoney) notes.push(T('imp.badmoney', { n: st.badMoney }));
+    if (st.badDates) notes.push(T('imp.baddates', { n: st.badDates })); if (st.soldNoDate) notes.push(T('imp.sold_nodate', { n: st.soldNoDate }));
+    if (skippedTitle) notes.push(T('imp.notitle', { n: skippedTitle })); if (badQty) notes.push(T('imp.badqty', { n: badQty })); if (p.truncated) notes.push(T('imp.trunc', { n: p.truncated }));
+    h += '<ul class="st-list">' + notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>';
+    if (rv.mixedCurrencies && Object.keys(rv.mixedCurrencies).length) h += '<div class="st-err" style="border-color:rgba(255,176,32,.4);background:rgba(255,176,32,.06)">' + esc(T('imp.mixed', { n: st.mixedCells, cur: S.cur })) + '</div>';
+    var d = rv.dateOrder;
+    if (d.hasNumericDates && (!d.certain || d.mixed)) h += '<div class="st-h3">' + esc(T('imp.dateorder')) + '</div><div class="st-radios"><label><input type="radio" name="im-order" value="dmy"' + (d.order === 'dmy' ? ' checked' : '') + ' data-im="order"> ' + esc(T('imp.dateorder.dmy')) + '</label><label><input type="radio" name="im-order" value="mdy"' + (d.order === 'mdy' ? ' checked' : '') + ' data-im="order"> ' + esc(T('imp.dateorder.mdy')) + '</label></div>' + (d.mixed ? '<p class="st-hint">' + esc(T('imp.dateorder.mixed')) + '</p>' : '') + (d.sample ? '<p class="st-hint">' + esc(T('imp.dateorder.sample', { s: d.sample })) + '</p>' : '');
+    var cu = Object.keys(rv.unrecognisedConditions);
+    if (cu.length) h += '<div class="st-h3">' + esc(T('imp.cond')) + '</div>' + cu.map(function (raw) { var key = L.norm(raw); return '<div class="st-f" style="margin-bottom:10px"><label>' + esc(T('imp.cond.row', { raw: raw, n: rv.unrecognisedConditions[raw].length })) + '</label><select class="st-in" data-im="cond" data-key="' + esc(key) + '">' + option('', T('imp.cond.none'), !IM.condMap[key]) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c), IM.condMap[key] === c); }).join('') + '</select></div>'; }).join('');
+    var cn = Object.keys(rv.newCategories);
+    if (cn.length) h += '<div class="st-h3">' + esc(T('imp.cat')) + '</div>' + cn.map(function (name) { var key = L.norm(name); return '<div class="st-f" style="margin-bottom:10px"><label>' + esc(T('imp.cat.row', { name: name, n: rv.newCategories[name].length })) + '</label><select class="st-in" data-im="cat" data-key="' + esc(key) + '">' + option('create', T('imp.cat.create'), IM.catMap[key] !== 'skip') + option('skip', T('imp.cat.skip'), IM.catMap[key] === 'skip') + '</select></div>'; }).join('');
+    if (st.duplicates || IM.skipDups) h += '<p class="st-note" style="margin-top:12px">' + esc(T('imp.dups', { n: st.duplicates })) + '</p><label class="st-radios"><span><input type="checkbox" data-im="dups"' + (IM.skipDups ? ' checked' : '') + '> ' + esc(T('imp.dups.skip')) + '</span></label>';
+    if (rv.freeCap && rv.freeCap.over > 0) h += '<div class="st-err">' + esc(T('imp.cap', { cap: (S.boot.plan && S.boot.plan.free_cap) || C.CAPS.freeHeld, fits: rv.freeCap.fits, over: rv.freeCap.over })) + ' <a class="st-link" href="plans.html">' + esc(T('imp.cap.link')) + '</a></div>';
+    var foot = close + '<button type="button" class="st-btn st-ghost" data-act="im-again">' + esc(T('imp.back')) + '</button><button type="button" class="st-btn st-prim" data-act="im-go" id="st-go"' + (items ? '' : ' disabled') + '>' + esc(items ? T('imp.go', { items: items }) : T('imp.go.none')) + '</button>';
+    imShell(h, foot);
+  }
+  function onChange(ev) {
+    var t = ev.target, k = t && t.getAttribute && t.getAttribute('data-im'); if (!k || !IM || IM.step !== 'review') return;
+    if (k === 'sheet') { IM.sheetIx = parseInt(t.value, 10) || 0; IM.condMap = {}; IM.catMap = {}; IM.dateOrder = null; }
+    else if (k === 'order') IM.dateOrder = t.value;
+    else if (k === 'dups') IM.skipDups = !!t.checked;
+    else if (k === 'cond') IM.condMap[t.getAttribute('data-key')] = t.value;
+    else if (k === 'cat') { var key = t.getAttribute('data-key'); if (t.value === 'skip') IM.catMap[key] = 'skip'; else delete IM.catMap[key]; }
+    imAnalyse(false);
+  }
+  function imProgress() {
+    var el = $('#im-prog'); if (!el) return;
+    var total = IM.rpc.reduce(function (a, r) { return a + (r.row.quantity || 1); }, 0);
+    el.innerHTML = esc(T('imp.running', { done: IM.done.items, total: total })) + '<div class="st-meter-bar" style="margin-top:12px"><div class="st-meter-fill" style="width:' + (total ? Math.round(IM.done.items / total * 100) : 0) + '%"></div></div>';
+  }
+  function imRun(resume) {
+    var L = window.SnypdStockImport;
+    var go = $('#st-go'); if (go) go.disabled = true;
+    var start;
+    if (resume) start = Promise.resolve();
+    else {
+      IM.importId = uuid(); IM.done = { rows: 0, items: 0, skipped: [], limit: false, cap: false, batchIx: 0 }; IM.catsFailed = 0;
+      var cats = IM.plan.review.newCategoryKeys;
+      start = (cats.length ? S.api.addCategories(cats) : Promise.resolve()).catch(function (e) {
+        IM.catsFailed = cats.length; Object.keys(IM.plan.review.newCategories).forEach(function (n) { IM.catMap[L.norm(n)] = 'skip'; }); IM.plan = imPlan();   // the rows keep going, without those categories
+      }).then(function () { IM.rpc = L.toRpcRows(IM.plan); IM.batches = L.batches(IM.rpc); });
+    }
+    IM.step = 'running'; renderImport();
+    start.then(function next() {
+      if (IM.done.batchIx >= IM.batches.length) return;
+      var b = IM.batches[IM.done.batchIx];
+      return S.api.importRows(IM.importId, b.map(function (x) { return x.row; })).then(function (r) {
+        IM.done.rows += r.rows_inserted; IM.done.items += r.items_created; IM.done.limit = IM.done.limit || r.free_limit_hit; IM.done.cap = IM.done.cap || r.item_cap_hit;
+        (r.skipped || []).forEach(function (s) { IM.done.skipped.push({ n: b[s.index] ? b[s.index].n : '?', reason: s.reason }); });
+        IM.done.batchIx++; imProgress(); return next();
+      });
+    }).then(function () { return reloadKeep(); }).then(function () { IM.step = 'done'; renderImport(); }).catch(function (e) { IM.step = 'failed'; renderImport(); console.error('SNYPD Stock import stopped', e); });
+  }
+  function skipReason(reason) { var m = /stock_[a-z_]+/.exec(reason || ''); var c = m && m[0]; return T(c === 'stock_title_required' ? 'imp.skip.title_required' : c === 'stock_free_limit' ? 'imp.skip.free_limit' : c === 'stock_item_cap' ? 'imp.skip.item_cap' : 'imp.skip.other'); }
+  function imDone(close) {
+    var d = IM.done, h = '<div class="st-prev"><strong class="st-pos">' + esc(T('imp.done', { items: d.items })) + '</strong>' + esc(T('imp.done.rows', { rows: d.rows })) + '</div>';
+    if (IM.catsFailed) h += '<p class="st-note" style="margin-top:12px">' + esc(T('imp.cat.notcreated', { n: IM.catsFailed })) + '</p>';
+    if (d.skipped.length) h += '<div class="st-h3">' + esc(T('imp.done.skipped', { n: d.skipped.length })) + '</div><ul class="st-list">' + d.skipped.slice(0, 20).map(function (s) { return '<li>' + esc(T('imp.skipped.row', { n: s.n, reason: skipReason(s.reason) })) + '</li>'; }).join('') + '</ul>' + (d.skipped.length > 20 ? '<p class="st-hint">...</p>' : '');
+    if (d.limit) h += '<div class="st-err">' + esc(T('err.free_limit', { cap: (S.boot.plan && S.boot.plan.free_cap) || C.CAPS.freeHeld })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></div>';
+    imShell(h, close + '<button type="button" class="st-btn st-ghost" data-act="im-again">' + esc(T('imp.again')) + '</button>' + (d.items ? '<button type="button" class="st-btn st-ghost st-danger" data-act="im-undo">' + esc(T('imp.undo')) + '</button>' : ''));
+  }
+  function imUndo() {
+    if (!IM || !IM.importId) return;
+    if (!window.confirm(T('imp.undo.confirm', { n: IM.done ? IM.done.items : 0 }))) return;
+    S.api.undoImport(IM.importId).then(function () { return reloadKeep(); }).then(function () { closeSheet(); showBar(T('imp.undone'), false); }).catch(function (e) { sheetError(e); });
   }
 
   window.SNYPD = window.SNYPD || {};
