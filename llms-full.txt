@@ -1,0 +1,49 @@
+# SNYPD
+
+> Public Vinted search monitoring and alerts for new matching listings.
+
+SNYPD is independent of Vinted. It does not log into Vinted accounts, buy items,
+message sellers, or monitor price drops on existing listings.
+This optional navigation summary is not an access policy or a promise of search inclusion.
+
+## Public sources
+
+- [Product](https://www.snypd.store/)
+- [Current plans and billing](https://www.snypd.store/plans)
+- [Price-guide method](https://www.snypd.store/vinted-price-guide#method)
+- [Price checker](https://www.snypd.store/vinted-price-checker)
+- [Monthly reports and source data](https://www.snypd.store/vinted-market-report)
+- [Italian checker](https://www.snypd.store/it/stima-prezzo-vinted)
+- [Italian guide pilot](https://www.snypd.store/it/prezzi-vinted)
+- [Support](https://www.snypd.store/support)
+
+## Pricing
+
+- Free: EUR 0, free.
+- Solo: EUR 5.99, per month.
+- Kickstart: EUR 14.99, per month.
+- Pro: EUR 24.99, per month.
+- Elite: EUR 34.99, per month.
+- Hunt Pass: EUR 3.99, one-time payment; 30 days; no renewal.
+
+Free includes one search, with 24/7 monitoring for the first three days after saving
+the first search; afterwards it runs while the dashboard is open. Consult /plans
+for current limits and billing details.
+
+## Price data
+
+Observation window: 2026-10-18 to 2026-11-01. Marketplace: vinted.be. Currency: EUR.
+34 overall estimates pass the publication checks; 4 existing item guides explain
+why an overall estimate is withheld and show validated condition data where available.
+These are asking prices, not completed-sale prices. The sample follows searches
+SNYPD users monitor and is not representative of every marketplace or seller location.
+Sample sizes for different item searches can overlap. Read the visible methodology.
+
+## Reusable report downloads
+
+- October 2026: https://www.snypd.store/vinted-market-report-2026-10.csv ; metadata: https://www.snypd.store/vinted-market-report-2026-10.metadata.json
+- November 2026: https://www.snypd.store/vinted-market-report-2026-11.csv ; metadata: https://www.snypd.store/vinted-market-report-2026-11.metadata.json
+
+The metadata supplies observation dates, source, licence, row count and checksum.
+The report datasets are CC BY 4.0 with attribution to the dated report.
+Country-language translations do not turn vinted.be samples into national price estimates.
