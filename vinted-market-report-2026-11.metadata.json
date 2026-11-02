@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "name": "SNYPD Vinted Market Report November 2026",
+  "source_url": "https://www.snypd.store/vinted-market-report/november-2026",
+  "csv_url": "https://www.snypd.store/vinted-market-report-2026-11.csv",
+  "csv_sha256": "ea0e57b88d97a9fdfba966a81fdeaa4a5b47d541d2a9a350ac93cfb66f2cb749",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "marketplace": "vinted.be",
+  "currency": "EUR",
+  "price_basis": "asking prices, not completed-sale prices",
+  "window": {
+    "from": "2026-10-18",
+    "to": "2026-11-01"
+  },
+  "published": "2026-11-01",
+  "modified": "2026-11-02",
+  "item_count": 34,
+  "observed_marketplace_listings": 629839,
+  "item_sample_sizes_may_overlap": true,
+  "selection": "Searches monitored by SNYPD users; not a representative census of Vinted. Seller geography is not inferred from the marketplace.",
+  "quality": "Only non-provisional overall estimates passing the original verdict, confidence, sample-size and ordered-quartile checks are included.",
+  "columns": [
+    "item",
+    "search",
+    "category",
+    "typical_asking_eur",
+    "p25_eur",
+    "p75_eur",
+    "listings",
+    "sellers",
+    "new_with_tags_typical_eur",
+    "very_good_typical_eur",
+    "previous_typical_asking_eur",
+    "change_pct"
+  ],
+  "correction": "2 November 2026: unsupported overall estimates removed; existing item guides retain validated condition figures and data limits."
+}

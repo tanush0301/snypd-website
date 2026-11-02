@@ -517,8 +517,8 @@ GUIDES = {
 
     # ---------------------------------------------------------------- EN
     'en': dict(
-        title='Vinted price drop notifications: how they work | SNYPD',
-        desc='Vinted notifies you when a favourited item’s price is reduced or it sells. What that doesn’t cover, and how to hear about new listings under your price.',
+        title='Vinted price drop alerts: notifications for favourites | SNYPD',
+        desc='Does Vinted notify you when a price drops? Learn how alerts for favourites work, which settings to check, and how new-listing alerts differ.',
         eyebrow='VINTED PRICE DROPS',
         h1='Does Vinted tell you when a price drops?',
         lead='Yes, for items you have favourited. Here is what Vinted’s help centre says (read {read}), what it does not cover, and how to hear about new listings under the price you want to pay.',

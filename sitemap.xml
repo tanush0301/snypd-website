@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.snypd.store/</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/plans</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/faq</loc>
@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/signup</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/support</loc>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-bot</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -39,7 +39,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-saved-search-alerts</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -52,7 +52,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-bot-comparison</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot-comparison"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/comparatif-bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot-vergleich"/>
@@ -63,25 +63,25 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-deals</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-fees</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-fees"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/frais-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-fees"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-monitor</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-monitor"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/monitor-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-monitor"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-notifications-not-working</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -92,7 +92,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-sold-items</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-sold-items"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-voir-articles-vendus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-verkaufte-artikel-sehen"/>
@@ -102,14 +102,15 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-checker</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-checker"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/estimer-prix-vinted"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/stima-prezzo-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-checker"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-saved-searches</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -122,7 +123,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-drop-notifications</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
@@ -131,7 +132,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/bot-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -144,7 +145,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-bot</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -157,7 +158,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-bot</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -170,7 +171,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/bot-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -183,7 +184,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/bot-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -196,7 +197,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/pl/bot-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -209,7 +210,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/sv/vinted-bot</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -222,7 +223,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/alertes-recherche-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -235,7 +236,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -248,7 +249,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-melding-nieuwe-artikelen</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -261,7 +262,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/notifiche-vinted-nuovi-annunci</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -274,7 +275,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/alertas-vinted-nuevos-anuncios</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -287,7 +288,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/pl/powiadomienia-vinted-nowe-ogloszenia</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -300,7 +301,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/sv/vinted-bevakning</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-search-alerts"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-recherche-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-neue-artikel"/>
@@ -313,7 +314,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/comparatif-bot-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot-comparison"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/comparatif-bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot-vergleich"/>
@@ -324,7 +325,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-bot-vergleich</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot-comparison"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/comparatif-bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot-vergleich"/>
@@ -335,7 +336,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-bot-vergelijken</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot-comparison"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/comparatif-bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot-vergleich"/>
@@ -346,7 +347,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/confronto-bot-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot-comparison"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/comparatif-bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot-vergleich"/>
@@ -357,7 +358,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/comparativa-bots-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot-comparison"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/comparatif-bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot-vergleich"/>
@@ -368,21 +369,21 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/frais-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-fees"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/frais-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-fees"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/monitor-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-monitor"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/monitor-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-monitor"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -393,7 +394,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -404,7 +405,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-meldingen-werken-niet</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -415,7 +416,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/notifiche-vinted-non-funzionano</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -426,7 +427,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/notificaciones-vinted-no-funcionan</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-notifications-not-working"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/notification-vinted-ne-fonctionne-pas"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-benachrichtigung-funktioniert-nicht"/>
@@ -437,7 +438,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/vinted-voir-articles-vendus</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-sold-items"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-voir-articles-vendus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-verkaufte-artikel-sehen"/>
@@ -447,7 +448,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-verkaufte-artikel-sehen</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-sold-items"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-voir-articles-vendus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-verkaufte-artikel-sehen"/>
@@ -457,7 +458,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/vinted-vedere-articoli-venduti</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-sold-items"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-voir-articles-vendus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-verkaufte-artikel-sehen"/>
@@ -467,7 +468,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/vinted-ver-articulos-vendidos</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-sold-items"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-voir-articles-vendus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-verkaufte-artikel-sehen"/>
@@ -477,14 +478,23 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/estimer-prix-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-checker"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/estimer-prix-vinted"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/stima-prezzo-vinted"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-checker"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/stima-prezzo-vinted</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-checker"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/estimer-prix-vinted"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/stima-prezzo-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-checker"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/recherches-enregistrees-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -497,7 +507,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-gespeicherte-suchen</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -510,7 +520,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-opgeslagen-zoekopdrachten</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -523,7 +533,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/it/vinted-ricerche-salvate</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -536,7 +546,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/es/vinted-busquedas-guardadas</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -549,7 +559,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/pl/vinted-zapisane-wyszukiwania</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -562,7 +572,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/sv/vinted-sparade-sokningar</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-saved-searches"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/recherches-enregistrees-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-gespeicherte-suchen"/>
@@ -575,7 +585,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/vinted-notification-baisse-de-prix</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
@@ -584,7 +594,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
@@ -593,7 +603,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-melding-prijs-verlaagd</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-drop-notifications"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/vinted-notification-baisse-de-prix"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preis-gesenkt-benachrichtigung"/>
@@ -602,115 +612,157 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide"/>
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide"/>
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/prezzi-vinted</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-dunk-low</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-dunk-low</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-dunk-low</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-dunk-low</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/prezzi-vinted/nike-dunk-low</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-dunk-low"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-dunk-low"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-dunk-low"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-air-force-1</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-air-force-1</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-air-force-1</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-air-force-1</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/prezzi-vinted/nike-air-force-1</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/nike-air-force-1"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/nike-air-force-1"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/nike-air-force-1"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/jordan-1-mid</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-1-mid"/>
@@ -719,7 +771,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/jordan-1-mid</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-1-mid"/>
@@ -728,7 +780,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/jordan-1-mid</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-1-mid"/>
@@ -737,7 +789,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/jordan-1-mid</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-1-mid"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-1-mid"/>
@@ -746,7 +798,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/jordan-4</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-4"/>
@@ -755,7 +807,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/jordan-4</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-4"/>
@@ -764,7 +816,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/jordan-4</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-4"/>
@@ -773,7 +825,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/jordan-4</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/jordan-4"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/jordan-4"/>
@@ -782,7 +834,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-air-max-90</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-90"/>
@@ -791,7 +843,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-90</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-90"/>
@@ -800,7 +852,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-air-max-90</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-90"/>
@@ -809,7 +861,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-air-max-90</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-90"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-90"/>
@@ -818,7 +870,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-air-max-95</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-95"/>
@@ -827,7 +879,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-95</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-95"/>
@@ -836,7 +888,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-air-max-95</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-95"/>
@@ -845,7 +897,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-air-max-95</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-95"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-95"/>
@@ -854,7 +906,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-air-max-plus-tn</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-plus-tn"/>
@@ -863,7 +915,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-plus-tn</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-plus-tn"/>
@@ -872,7 +924,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-air-max-plus-tn</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-plus-tn"/>
@@ -881,7 +933,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-air-max-plus-tn</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-air-max-plus-tn"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-air-max-plus-tn"/>
@@ -890,7 +942,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-shox</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-shox"/>
@@ -899,7 +951,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-shox</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-shox"/>
@@ -908,7 +960,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-shox</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-shox"/>
@@ -917,7 +969,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-shox</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-shox"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-shox"/>
@@ -926,7 +978,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-vomero</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-vomero"/>
@@ -935,7 +987,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-vomero</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-vomero"/>
@@ -944,7 +996,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-vomero</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-vomero"/>
@@ -953,7 +1005,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-vomero</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-vomero"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-vomero"/>
@@ -962,43 +1014,57 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/adidas-samba</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/adidas-samba</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/adidas-samba</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/adidas-samba</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/prezzi-vinted/adidas-samba</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/adidas-samba"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/adidas-samba"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/adidas-samba"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/adidas-gazelle</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-gazelle"/>
@@ -1007,7 +1073,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/adidas-gazelle</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-gazelle"/>
@@ -1016,7 +1082,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/adidas-gazelle</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-gazelle"/>
@@ -1025,7 +1091,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/adidas-gazelle</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-gazelle"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-gazelle"/>
@@ -1034,7 +1100,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/adidas-campus</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-campus"/>
@@ -1043,7 +1109,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/adidas-campus</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-campus"/>
@@ -1052,7 +1118,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/adidas-campus</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-campus"/>
@@ -1061,7 +1127,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/adidas-campus</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-campus"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-campus"/>
@@ -1070,7 +1136,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/adidas-spezial</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-spezial"/>
@@ -1079,7 +1145,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/adidas-spezial</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-spezial"/>
@@ -1088,7 +1154,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/adidas-spezial</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-spezial"/>
@@ -1097,7 +1163,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/adidas-spezial</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/adidas-spezial"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/adidas-spezial"/>
@@ -1106,43 +1172,57 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/new-balance-550</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/new-balance-550</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/new-balance-550</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/new-balance-550</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/prezzi-vinted/new-balance-550</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/new-balance-550"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/new-balance-550"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/new-balance-550"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/new-balance-9060</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-9060"/>
@@ -1151,7 +1231,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/new-balance-9060</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-9060"/>
@@ -1160,7 +1240,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/new-balance-9060</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-9060"/>
@@ -1169,7 +1249,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/new-balance-9060</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-9060"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-9060"/>
@@ -1178,7 +1258,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/new-balance-2002r</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-2002r"/>
@@ -1187,7 +1267,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/new-balance-2002r</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-2002r"/>
@@ -1196,7 +1276,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/new-balance-2002r</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-2002r"/>
@@ -1205,7 +1285,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/new-balance-2002r</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/new-balance-2002r"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/new-balance-2002r"/>
@@ -1214,7 +1294,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/asics-gel-kayano-14</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-kayano-14"/>
@@ -1223,7 +1303,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/asics-gel-kayano-14</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-kayano-14"/>
@@ -1232,7 +1312,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/asics-gel-kayano-14</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-kayano-14"/>
@@ -1241,7 +1321,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/asics-gel-kayano-14</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-kayano-14"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-kayano-14"/>
@@ -1250,7 +1330,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/asics-gel-1130</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-1130"/>
@@ -1259,7 +1339,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/asics-gel-1130</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-1130"/>
@@ -1268,7 +1348,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/asics-gel-1130</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-1130"/>
@@ -1277,7 +1357,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/asics-gel-1130</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/asics-gel-1130"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/asics-gel-1130"/>
@@ -1286,7 +1366,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/onitsuka-tiger-mexico-66</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/onitsuka-tiger-mexico-66"/>
@@ -1295,7 +1375,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/onitsuka-tiger-mexico-66</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/onitsuka-tiger-mexico-66"/>
@@ -1304,7 +1384,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/onitsuka-tiger-mexico-66</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/onitsuka-tiger-mexico-66"/>
@@ -1313,7 +1393,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/onitsuka-tiger-mexico-66</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/onitsuka-tiger-mexico-66"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/onitsuka-tiger-mexico-66"/>
@@ -1322,7 +1402,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/ralph-lauren-polo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-polo"/>
@@ -1331,7 +1411,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-polo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-polo"/>
@@ -1340,7 +1420,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/ralph-lauren-polo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-polo"/>
@@ -1349,7 +1429,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/ralph-lauren-polo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-polo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-polo"/>
@@ -1358,7 +1438,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/ralph-lauren-quarter-zip</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-quarter-zip"/>
@@ -1367,7 +1447,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-quarter-zip</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-quarter-zip"/>
@@ -1376,7 +1456,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/ralph-lauren-quarter-zip</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-quarter-zip"/>
@@ -1385,7 +1465,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/ralph-lauren-quarter-zip</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-quarter-zip"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-quarter-zip"/>
@@ -1394,7 +1474,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/ralph-lauren-jumper</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-jumper"/>
@@ -1403,7 +1483,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-jumper</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-jumper"/>
@@ -1412,7 +1492,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/ralph-lauren-jumper</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-jumper"/>
@@ -1421,7 +1501,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/ralph-lauren-jumper</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-jumper"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-jumper"/>
@@ -1430,7 +1510,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/ralph-lauren-shirt</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-shirt"/>
@@ -1439,7 +1519,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-shirt</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-shirt"/>
@@ -1448,7 +1528,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/ralph-lauren-shirt</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-shirt"/>
@@ -1457,7 +1537,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/ralph-lauren-shirt</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/ralph-lauren-shirt"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/ralph-lauren-shirt"/>
@@ -1466,7 +1546,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/carhartt-detroit-jacket</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-detroit-jacket"/>
@@ -1475,7 +1555,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/carhartt-detroit-jacket</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-detroit-jacket"/>
@@ -1484,7 +1564,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/carhartt-detroit-jacket</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-detroit-jacket"/>
@@ -1493,7 +1573,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/carhartt-detroit-jacket</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-detroit-jacket"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-detroit-jacket"/>
@@ -1502,7 +1582,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/carhartt-double-knee</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-double-knee"/>
@@ -1511,7 +1591,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/carhartt-double-knee</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-double-knee"/>
@@ -1520,7 +1600,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/carhartt-double-knee</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-double-knee"/>
@@ -1529,7 +1609,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/carhartt-double-knee</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/carhartt-double-knee"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/carhartt-double-knee"/>
@@ -1538,43 +1618,57 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/the-north-face-nuptse</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/the-north-face-nuptse</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/the-north-face-nuptse</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/the-north-face-nuptse</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/prezzi-vinted/the-north-face-nuptse</loc>
+    <lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/vinted-prijzen/the-north-face-nuptse"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/prezzi-vinted/the-north-face-nuptse"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-price-guide/the-north-face-nuptse"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/the-north-face-1996</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-1996"/>
@@ -1583,7 +1677,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/the-north-face-1996</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-1996"/>
@@ -1592,7 +1686,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/the-north-face-1996</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-1996"/>
@@ -1601,7 +1695,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/the-north-face-1996</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/the-north-face-1996"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/the-north-face-1996"/>
@@ -1610,7 +1704,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/patagonia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-fleece"/>
@@ -1619,7 +1713,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/patagonia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-fleece"/>
@@ -1628,7 +1722,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/patagonia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-fleece"/>
@@ -1637,7 +1731,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/patagonia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-fleece"/>
@@ -1646,7 +1740,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/patagonia-retro-x</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-retro-x"/>
@@ -1655,7 +1749,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/patagonia-retro-x</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-retro-x"/>
@@ -1664,7 +1758,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/patagonia-retro-x</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-retro-x"/>
@@ -1673,7 +1767,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/patagonia-retro-x</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/patagonia-retro-x"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/patagonia-retro-x"/>
@@ -1682,7 +1776,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/nike-tech-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-tech-fleece"/>
@@ -1691,7 +1785,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/nike-tech-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-tech-fleece"/>
@@ -1700,7 +1794,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/nike-tech-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-tech-fleece"/>
@@ -1709,7 +1803,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/nike-tech-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/nike-tech-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/nike-tech-fleece"/>
@@ -1718,7 +1812,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/stussy-hoodie</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/stussy-hoodie"/>
@@ -1727,7 +1821,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/stussy-hoodie</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/stussy-hoodie"/>
@@ -1736,7 +1830,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/stussy-hoodie</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/stussy-hoodie"/>
@@ -1745,7 +1839,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/stussy-hoodie</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/stussy-hoodie"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/stussy-hoodie"/>
@@ -1754,7 +1848,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/supreme-box-logo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/supreme-box-logo"/>
@@ -1763,7 +1857,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/supreme-box-logo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/supreme-box-logo"/>
@@ -1772,7 +1866,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/supreme-box-logo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/supreme-box-logo"/>
@@ -1781,7 +1875,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/supreme-box-logo</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/supreme-box-logo"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/supreme-box-logo"/>
@@ -1790,7 +1884,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/levis-501</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/levis-501"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/levis-501"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/levis-501"/>
@@ -1799,7 +1893,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/levis-501</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/levis-501"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/levis-501"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/levis-501"/>
@@ -1808,7 +1902,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/levis-501</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/levis-501"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/levis-501"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/levis-501"/>
@@ -1817,7 +1911,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/levis-501</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/levis-501"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/levis-501"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/levis-501"/>
@@ -1826,7 +1920,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/dickies-874</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/dickies-874"/>
@@ -1835,7 +1929,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/dickies-874</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/dickies-874"/>
@@ -1844,7 +1938,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/dickies-874</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/dickies-874"/>
@@ -1853,7 +1947,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/dickies-874</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/dickies-874"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/dickies-874"/>
@@ -1862,7 +1956,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/columbia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/columbia-fleece"/>
@@ -1871,7 +1965,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/columbia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/columbia-fleece"/>
@@ -1880,7 +1974,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/columbia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/columbia-fleece"/>
@@ -1889,7 +1983,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/columbia-fleece</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/columbia-fleece"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/columbia-fleece"/>
@@ -1898,7 +1992,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/longchamp-le-pliage</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/longchamp-le-pliage"/>
@@ -1907,7 +2001,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/longchamp-le-pliage</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/longchamp-le-pliage"/>
@@ -1916,7 +2010,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/longchamp-le-pliage</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/longchamp-le-pliage"/>
@@ -1925,7 +2019,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/longchamp-le-pliage</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/longchamp-le-pliage"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/longchamp-le-pliage"/>
@@ -1934,7 +2028,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/seiko-5</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/seiko-5"/>
@@ -1943,7 +2037,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/seiko-5</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/seiko-5"/>
@@ -1952,7 +2046,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/seiko-5</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/seiko-5"/>
@@ -1961,7 +2055,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/seiko-5</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/seiko-5"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/seiko-5"/>
@@ -1970,7 +2064,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-price-guide/pandora-bracelet</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/pandora-bracelet"/>
@@ -1979,7 +2073,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/guide-prix-vinted/pandora-bracelet</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/pandora-bracelet"/>
@@ -1988,7 +2082,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/de/vinted-preise/pandora-bracelet</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/pandora-bracelet"/>
@@ -1997,7 +2091,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/nl/vinted-prijzen/pandora-bracelet</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-price-guide/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/guide-prix-vinted/pandora-bracelet"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-preise/pandora-bracelet"/>
@@ -2006,56 +2100,56 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-market-report</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/rapport-marche-vinted</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-market-report/october-2026</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/october-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/octobre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/october-2026"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/rapport-marche-vinted/octobre-2026</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/october-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/octobre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/october-2026"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-market-report/november-2026</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/november-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/novembre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/november-2026"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/rapport-marche-vinted/novembre-2026</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/november-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/novembre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/november-2026"/>
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-market-report/september-2026</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/september-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/septembre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/september-2026"/>
   </url>
   <url>
     <loc>https://www.snypd.store/fr/rapport-marche-vinted/septembre-2026</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-market-report/september-2026"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/rapport-marche-vinted/septembre-2026"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-market-report/september-2026"/>
