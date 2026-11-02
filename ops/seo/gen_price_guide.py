@@ -24,6 +24,9 @@ from gen_content import SITE, SLUGS, PAGE_MODIFIED, esc, table, faq_ld, faq_html
 ROOT = gc.ROOT
 ITEMS = json.load(open(os.path.join(ROOT, 'ops', 'seo', 'price_items.json'), encoding='utf-8'))['items']
 DATA = json.load(open(os.path.join(ROOT, 'ops', 'seo', 'data', 'price-guide.json'), encoding='utf-8'))
+from price_quality import publishable_overall
+from price_notes import note_links, page_note
+
 MIN_LISTINGS = 100
 MIN_COND = 10
 LANGS = ('en', 'fr', 'nl', 'de')
@@ -92,6 +95,8 @@ def iname(it, lang):
         return NAME_NL.get(it['slug'], it['name'])
     if lang == 'de':
         return NAME_DE.get(it['slug'], it['name'])
+    if lang == 'it':
+        return NAME_IT.get(it['slug'], it['name'])
     return it['name']
 
 
@@ -103,15 +108,17 @@ def views():
         if it.get('skip'):
             continue  # one price would mislead (see price_items.json)
         v = by_q.get(it['query'])
-        if v and v.get('display_verdict') == 'ok' and v.get('confidence') in ('medium', 'high') \
-                and (v.get('sample_size') or 0) >= MIN_LISTINGS and v.get('typical_cents') and v.get('range_cents'):
+        if publishable_overall(v, MIN_LISTINGS):
             out[it['slug']] = v
     return out
 
 
 V = views()
 PUB = [it for it in ITEMS if it['slug'] in V]
-for it in PUB:
+RAW_V = {r['q']: r.get('view', {}) for r in DATA['results'] if r.get('ok')}
+NOTE_ITEMS = [it for it in ITEMS if not it.get('skip') and it['slug'] not in V and (RAW_V.get(it['query'], {}).get('sample_size') or 0) >= MIN_LISTINGS]
+GUIDE_ITEMS = [it for it in ITEMS if it in PUB or it in NOTE_ITEMS]
+for it in GUIDE_ITEMS:
     key = 'pg:' + it['slug']
     SLUGS[key] = {l: HUB[l] + '/' + it['slug'] for l in LANGS}
     PAGE_MODIFIED[key] = GEN.isoformat()
@@ -132,7 +139,8 @@ def out_path(key, lang):
 
 
 def item_url(it, lang):
-    return HUB[lang] + '/' + it['slug']
+    urls = SLUGS['pg:' + it['slug']]
+    return urls.get(lang, urls['en'])
 
 
 def alert_href(it, lo_cents):
@@ -207,6 +215,10 @@ def related(it, lang):
 
 
 def page_item(it, lang):
+    if lang == 'it':
+        return price_italian.page_item(sys.modules[__name__], it)
+    if it['slug'] not in V:
+        return page_note(sys.modules[__name__], it, lang)
     v = V[it['slug']]
     name, typ, lo, hi = iname(it, lang), v['typical_cents'], v['range_cents']['low'], v['range_cents']['high']
     n, sellers, out_pct = v['sample_size'], v.get('distinct_sellers') or 0, v.get('outlier_pct')
@@ -396,7 +408,7 @@ def method(lang):
             % (nb, nb, nb, WIN_DAYS, WIN_DAYS, nb, nb, nb, nb, MIN_LISTINGS, nb, skipped, MIN_COND, SLUGS['sold']['fr'], nb, nb))
 
 
-def page_hub(lang):
+def _page_hub_estimates(lang):
     cats = ['sneakers', 'clothing', 'accessories', 'collectibles']
     head = {'en': ['ITEM', 'TYPICAL ASKING PRICE', 'MIDDLE HALF', 'LISTINGS'],
             'fr': ['ARTICLE', 'PRIX DEMANDÉ TYPIQUE', 'MOITIÉ CENTRALE', 'ANNONCES'],
@@ -679,6 +691,15 @@ PC_TXT = {
 }
 
 
+for _lang, _words in {
+    'en': ('No reliable overall estimate. Open the guide for validated condition figures and data limits.', 'no overall estimate'),
+    'fr': ('Aucune estimation globale fiable. Consulte le guide pour les prix par état validés et les limites des données.', 'pas de prix global'),
+    'nl': ('Geen betrouwbare algemene schatting. Open de gids voor gevalideerde prijzen per staat en databeperkingen.', 'geen algemene schatting'),
+    'de': ('Keine verlässliche allgemeine Schätzung. Öffne den Leitfaden für geprüfte Zustandspreise und Datengrenzen.', 'keine allgemeine Schätzung'),
+}.items():
+    PC_TXT[_lang].update(unavailable=_words[0], unavailable_short=_words[1])
+
+
 def checker_box(lang):
     """Search box over INDEX. Hidden until the script has loaded the index, so without JavaScript the page's
     own text and tables answer instead."""
@@ -704,7 +725,7 @@ def index_dataset_ld(lang, url):
             'dateModified': GEN.isoformat()}
 
 
-def page_checker(lang):
+def _page_checker_estimates(lang):
     total = sum(V[it['slug']]['sample_size'] for it in PUB)
     win = window(lang)
     url = SLUGS['checker'][lang]
@@ -821,7 +842,7 @@ def page_sold(lang):
     total = sum(V[it['slug']]['sample_size'] for it in PUB)
     read = gc.date_txt(copy_sold.HELP_READ, lang)
     f = dict(items=len(PUB), listings=num(total, lang), window=window(lang), days=WIN_DAYS, read=read,
-             guide=HUB[hl], checker=SLUGS['checker'][gl], method=HUB[hl] + ('#method' if hl == 'en' else '#methode'))
+             guide=HUB[hl], checker=SLUGS['checker'][gl], method=HUB[hl] + {'en': '#method', 'it': '#metodo'}.get(hl, '#methode'))
 
     def F(s):
         return s.format(**f)
@@ -894,18 +915,22 @@ def page_sold(lang):
 def price_index():
     """Only what the published pages already show: per item its names, page links, the search words of
     its alert button, typical price, 25th/75th percentile and listing count. No listing or seller data."""
-    langs = [l for l in LANGS if is_live('guide', l)]
+    langs = gc.live_langs('guide')
     items = []
     for it in sorted(PUB, key=lambda x: x['name'].lower()):
         v = V[it['slug']]
         items.append({'id': it['slug'], 'name': {l: iname(it, l) for l in langs}, 'brand': it['brand'], 'cat': it['cat'],
                       'q': it['query'], 'typical': v['typical_cents'], 'p25': v['range_cents']['low'], 'p75': v['range_cents']['high'],
-                      'n': v['sample_size'], 'url': {l: item_url(it, l) for l in langs}})
+                      'n': v['sample_size'], 'url': {l: item_url(it, l) for l in langs if l in gc.live_langs('pg:' + it['slug'])}})
+    unavailable = [{'id': it['slug'], 'name': {l: iname(it, l) for l in langs},
+                    'brand': it['brand'], 'cat': it['cat'], 'q': it['query'],
+                    'n': RAW_V[it['query']].get('sample_size') or 0, 'unavailable': True,
+                    'url': {l: item_url(it, l) for l in langs if l in gc.live_langs('pg:' + it['slug'])}} for it in NOTE_ITEMS]
     return {'about': 'Typical Vinted asking prices: median and 25th-75th percentile, in euro cents, of vinted.be listings that matched '
                      'SNYPD users\' searches. Asking prices, not sale prices. Method: ' + SITE + HUB['en'] + '#method',
             'source': 'vinted.be', 'currency': 'EUR', 'unit': 'cents',
             'window': {'from': WIN_FROM.isoformat(), 'to': GEN.isoformat()},
-            'license': DATASET_LICENSE, 'attribution': SITE + HUB['en'], 'items': items}
+            'license': DATASET_LICENSE, 'attribution': SITE + HUB['en'], 'items': items, 'unavailable': unavailable}
 
 
 def write_json(rel, obj):
@@ -957,7 +982,7 @@ def nl_review_file(sample='adidas-samba'):
 def sitemap_pages():
     """(path, file, hreflang alternates) for prepublish.py. Held languages stay out."""
     out = []
-    for key in ['guide'] + ['pg:' + it['slug'] for it in PUB]:
+    for key in ['guide'] + ['pg:' + it['slug'] for it in GUIDE_ITEMS]:
         langs = gc.live_langs(key)
         alts = {l: SLUGS[key][l] for l in langs}
         alts['x-default'] = SLUGS[key]['en']
@@ -965,12 +990,32 @@ def sitemap_pages():
     return out
 
 
+def page_hub(lang):
+    if lang == 'it':
+        return price_italian.page_hub(sys.modules[__name__])
+    return _page_hub_estimates(lang).replace('</main>', note_links(sys.modules[__name__], lang) + '</main>')
+
+
+def page_checker(lang):
+    if lang == 'it':
+        return price_italian.page_checker(sys.modules[__name__])
+    return _page_checker_estimates(lang).replace('</main>', note_links(sys.modules[__name__], lang) + '</main>')
+
+
+import price_italian
+price_italian.install(sys.modules[__name__])
+
+
 if __name__ == '__main__':
     print('items published: %d of %d (min %d listings)' % (len(PUB), len(ITEMS), MIN_LISTINGS))
     for lang in LANGS:
         write(out_path('guide', lang), page_hub(lang))
-        for it in PUB:
+        for it in GUIDE_ITEMS:
             write(out_path('pg:' + it['slug'], lang), page_item(it, lang))
+    write(out_path('guide', 'it'), page_hub('it'))
+    for it in PUB:
+        if it['slug'] in price_italian.PILOT:
+            write(out_path('pg:' + it['slug'], 'it'), page_item(it, 'it'))
     for lang in SLUGS['checker']:
         write(out_path('checker', lang), page_checker(lang))
     for lang in SLUGS['sold']:

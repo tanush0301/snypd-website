@@ -19,7 +19,7 @@ SLUGS['faq'] = {'en': '/faq'}
 SLUGS['support'] = {'en': '/support'}
 PAGE_MODIFIED['faq'] = '2026-10-10'
 PAGE_MODIFIED['support'] = '2026-10-10'
-EMAIL = 'snypd@gmail.com'
+EMAIL = 'help@snypd.store'
 REPLY = 'within 24 hours'  # Tanush's commitment, 10 Oct 2026
 MANAGE = 'https://whop.com/@me/settings/orders/'
 
