@@ -32,7 +32,7 @@ select.st-in { padding-right: 8px; }
 .st-chip[aria-pressed="true"] { background: var(--st-ok); color: var(--bg, #0B0C0D); border-color: var(--st-ok); }
 .st-count { font-size: 11px; color: var(--st-muted); margin-left: auto; }
 .st-table { border: 1px solid var(--st-line); background: var(--st-bg); }
-.st-th, .st-row { display: grid; grid-template-columns: minmax(180px, 3fr) 110px 90px 90px 90px 70px 120px; gap: 12px; align-items: center; padding: 0 16px; }
+.st-th, .st-row { display: grid; grid-template-columns: minmax(200px, 3fr) 170px 150px 90px 100px 120px; gap: 12px; align-items: center; padding: 0 16px; }
 .st-th { height: 36px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--st-muted); background: var(--st-hd); border-bottom: 1px solid var(--st-line); }
 .st-row { min-height: 52px; border-bottom: 1px solid var(--st-line); cursor: pointer; font-size: 13px; }
 .st-row:last-child { border-bottom: 0; }
@@ -110,7 +110,7 @@ select.st-in { padding-right: 8px; }
   .st-row > * { min-width: 0; }
   .st-item b { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .st-row > .c-item { grid-area: item; } .st-row > .c-status { grid-area: status; justify-self: end; }
-  .st-row > .c-cost, .st-row > .c-price, .st-row > .c-profit, .st-row > .c-age, .st-row > .c-plat { display: none; }
+  .st-row > .c-cost, .st-row > .c-pop, .st-row > .c-age, .st-row > .c-plat { display: none; }
   .st-row > .c-meta { grid-area: meta; display: flex; gap: 12px; font-size: 12px; color: var(--st-text2); }
   .st-btn, .st-in, .st-x { min-height: 44px; height: 44px; }
   .st-chip, .st-navb, .st-segb { height: 44px; }
@@ -268,3 +268,13 @@ select.st-in { padding-right: 8px; }
   .st-navb { flex: 1 1 0; padding: 0 8px; height: 44px; }
   .st-segb { height: 44px; }
 }
+
+/* ---- step 4a: Items table like design Ca ---- */
+.st-itemshd { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.st-itemshd .st-h2 { margin: 0; font-size: 22px; letter-spacing: 0; text-transform: none; color: var(--st-text); font-weight: 600; }
+.st-itemc { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.st-itemc .st-item { min-width: 0; }
+.st-tag.stale { color: var(--st-warn); border-color: rgba(255,176,32,.4); background: rgba(255,176,32,.06); }
+.st-tag.stale::before { display: none; }
+.st-row .c-age.st-warnv { color: var(--st-warn); }
+.st-foot2 { margin: 12px 0 0; font-size: 12px; color: var(--st-muted); }

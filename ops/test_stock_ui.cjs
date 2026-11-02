@@ -78,7 +78,14 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   const openFirst = async () => { await page.evaluate(() => document.querySelector('#stock-panel .st-row').click()); await wait(350); };
 
   eq(await rows(), 50, 'first page is 50 rows');
-  ok(/50 of 218/.test(await text('#st-count')) || /50 of 215/.test(await text('#st-count')), 'count line: ' + await text('#st-count'));
+  ok(/^Showing 50 of 21[58]$/.test(await text('#st-showing')), 'footer line (design): ' + await text('#st-showing'));
+  ok(/^\d+ held \u00b7 21[58] rows$/.test(await text('#st-itemssub')), 'Items title line: N held . N rows: ' + await text('#st-itemssub'));
+  eq(await page.$$eval('.st-th > span', s => s.map(x => x.textContent)), ['Item', 'Status', 'Platform', 'Bought', 'Days in stock', 'Price or profit'], 'table columns (design Ca)');
+  { const tiles = await page.$$eval('.st-row .st-tile2', e => e.length); ok(tiles === 50, 'an initials tile on every row (' + tiles + ')'); }
+  await setv('#st-q', 'Detroit jacket'); await wait(700); { const stale = await page.$$eval('.st-row .st-tag.stale', e => e.length), amber = await page.$$eval('.st-row .c-age.st-warnv', e => e.length); ok(stale > 0 && stale === amber, 'old held items carry the STALE tag and an amber day count (' + stale + ')'); }
+  await setv('#st-q', ''); await wait(600);
+  await setv('#st-plat', 'depop'); await wait(600); { const pl = await page.$$eval('#stock-panel .st-row .c-plat', e => e.map(x => x.textContent)); ok(pl.length > 0 && pl.every(x => x === 'Depop'), 'platform filter: only Depop rows (' + pl.length + ')'); }
+  await setv('#st-plat', ''); await wait(500);
   eq(await page.$$eval('#st-chips .st-chip', c => c.length), 7, '7 status chips');
   await page.evaluate(() => document.querySelector('#st-chips [data-status="sold"]').click()); await wait(500);
   ok((await page.$$eval('#stock-panel .st-row .st-tag', t => t.every(x => /sold/i.test(x.className)))), 'Sold chip shows only sold items');

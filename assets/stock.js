@@ -87,10 +87,12 @@
       '<div class="st-navr"><div id="st-meter"></div><button type="button" class="st-btn st-tert" data-act="settings">' + esc(T('set.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div></div>' +
       '<div id="st-capmsg"></div>' +
       '<div id="st-over"></div><div id="st-items" style="display:none">' +
+      '<div class="st-itemshd"><h2 class="st-h2">' + esc(T('nav.items')) + '</h2><span class="st-secsub" id="st-itemssub"></span></div>' +
       '<div class="st-tools">' +
       '<input class="st-in st-search" type="search" id="st-q" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('search.aria')) + '" autocomplete="off">' +
       '<select class="st-in" id="st-cond" aria-label="' + esc(T('filter.condition')) + '">' + option('', T('filter.condition') + ': ' + T('filter.any'), true) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c)); }).join('') + '</select>' +
       '<select class="st-in" id="st-cat" aria-label="' + esc(T('filter.category')) + '">' + option('', T('filter.category') + ': ' + T('filter.any'), true) + (S.cats || []).filter(function (c) { return !c.hidden; }).map(function (c) { return option(c.key, catName(c.key)); }).join('') + '</select>' +
+      '<select class="st-in" id="st-plat" aria-label="' + esc(T('f.platform')) + '">' + option('', T('plat.all'), true) + C.PLATFORMS.map(function (p) { return option(p, T('plat.' + p)); }).join('') + '</select>' +
       '<button type="button" class="st-btn st-tert" data-act="deleted" id="st-del" aria-pressed="false">' + esc(T('deleted.show')) + '</button>' +
       '<button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="export" id="st-export">' + esc(T('exp.btn')) + '</button>' +
       '<span class="st-count" id="st-count" aria-live="polite"></span></div>' +
@@ -100,12 +102,14 @@
     $('#st-q').oninput = function () { clearTimeout(S.searchTimer); var v = this.value; S.searchTimer = setTimeout(function () { S.f.q = v.trim(); load(true); }, 250); };
     $('#st-cond').onchange = function () { S.f.condition = this.value; load(true); };
     $('#st-cat').onchange = function () { S.f.category = this.value; load(true); };
+    $('#st-plat').onchange = function () { S.f.platform = this.value; load(true); };
     renderMeter();
   }
   function renderMeter() {
     var el = $('#st-meter'); if (!el) return;
-    var m = C.freeCapState(S.boot), n = $('#st-navn'), cm = $('#st-capmsg');
+    var m = C.freeCapState(S.boot), n = $('#st-navn'), cm = $('#st-capmsg'), sub = $('#st-itemssub');
     if (n) n.textContent = String(m.held);
+    if (sub && S.boot.counts) sub.textContent = T('it.sub', { held: S.boot.counts.held, rows: S.boot.counts.items });
     if (!m.limited) { el.innerHTML = ''; if (cm) cm.innerHTML = ''; return; }
     el.innerHTML = '<div class="st-meter' + (m.warn ? ' warn' : '') + '"><span class="st-meter-txt">' + esc(T('meter.label')) + ' <b>' + m.held + ' / ' + m.cap + '</b></span><span class="st-meter-bar"><span class="st-meter-fill" style="width:' + Math.min(100, Math.round(m.held / m.cap * 100)) + '%"></span></span></div>';
     if (cm) cm.innerHTML = m.atCap ? '<p class="st-note">' + esc(T('meter.limit', { cap: m.cap })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></p>' : '';
@@ -336,6 +340,7 @@
     if (f.q) o.q = f.q;
     if (f.condition) o.condition = [f.condition];
     if (f.category) o.category = f.category;
+    if (f.platform) o.platform = f.platform;
     if (f.deleted) o.deleted = 'only';
     if (f.old) o.old = true;
     o.today = today();
@@ -368,38 +373,41 @@
     if (del) { del.setAttribute('aria-pressed', S.f.deleted ? 'true' : 'false'); del.textContent = S.f.deleted ? T('deleted.back') : T('deleted.show'); }
     $('#st-chips').style.display = S.f.deleted ? 'none' : '';
     Array.prototype.forEach.call(S.panel.querySelectorAll('.st-chip'), function (b) { var st = b.getAttribute('data-status'); b.setAttribute('aria-pressed', ((S.f.status || []).join(',') === (st === 'stock' ? 'stock,returned' : st) || (!S.f.status && st === '')) ? 'true' : 'false'); });
-    if (cnt) cnt.textContent = S.loading || S.err ? '' : T('shown', { n: S.rows.length, total: S.total });
+    if (cnt) cnt.textContent = '';
     var h = '';
     if (S.err) h += '<div class="st-err">' + esc(errMsg(S.err)) + ' <button type="button" class="st-btn st-ghost" data-act="retry">' + esc(T('err.retry')) + '</button></div>';
     if (S.f.deleted) h += '<p class="st-note">' + esc(T('deleted.note', { days: C.CAPS.deletedDays })) + '</p>';
     if (S.f.old) h += '<p class="st-note">' + esc(T('filter.old', { d: (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault })) + ' <button type="button" class="st-linkb" data-act="clear">' + esc(T('clear')) + '</button></p>';
     if (S.loading && !S.rows.length) { el.innerHTML = h + '<div class="st-table" role="status" aria-label="' + esc(T('loading')) + '"><div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div></div>'; return; }
     if (!S.rows.length && !S.err) {
-      var filtered = S.f.status || S.f.q || S.f.condition || S.f.category || S.f.old;
+      var filtered = S.f.status || S.f.q || S.f.condition || S.f.category || S.f.platform || S.f.old;
       if (S.f.deleted) h += '<div class="st-empty"><p>' + esc(T('empty.deleted', { days: C.CAPS.deletedDays })) + '</p></div>';
       else if (filtered) h += '<div class="st-empty"><p>' + esc(T('empty.filtered')) + '</p><button type="button" class="st-btn st-ghost" data-act="clear">' + esc(T('clear')) + '</button></div>';
       else h += '<div class="st-empty"><h3>' + esc(T('empty.title')) + '</h3><p>' + esc(T('empty.body')) + '</p><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('empty.add')) + '</button> <button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button></div>';
       el.innerHTML = h; return;
     }
-    h += '<div class="st-table" role="table"><div class="st-th" role="row"><span>' + esc(T('col.item')) + '</span><span>' + esc(T('col.status')) + '</span><span class="st-num">' + esc(T('col.cost')) + '</span><span class="st-num">' + esc(T('col.price')) + '</span><span class="st-num">' + esc(T('col.profit')) + '</span><span class="st-num">' + esc(T('col.age')) + '</span><span>' + esc(T('col.platform')) + '</span></div>';
+    h += '<div class="st-table" role="table"><div class="st-th" role="row"><span>' + esc(T('col.item')) + '</span><span>' + esc(T('col.status')) + '</span><span>' + esc(T('col.platform')) + '</span><span class="st-num">' + esc(T('col.bought')) + '</span><span class="st-num">' + esc(T('col.days')) + '</span><span class="st-num">' + esc(T('col.pop')) + '</span></div>';
     var t0 = today();
     S.rows.forEach(function (r) { h += rowHtml(r, t0); });
     h += '</div>';
+    h += '<p class="st-foot2" id="st-showing" aria-live="polite">' + esc(T('it.showing', { n: S.rows.length, total: S.total })) + '</p>';
     if (S.next) h += '<div class="st-more"><button type="button" class="st-btn st-ghost" data-act="more"' + (S.loading ? ' disabled' : '') + '>' + esc(T('more')) + '</button></div>';
     el.innerHTML = h;
   }
   function rowHtml(r, t0) {
     var cost = C.costCents(r), profit = C.saleProfitCents(r), held = C.isHeld({ status: r.status, deleted_at: null });
     var price = r.status === 'sold' ? r.sold_cents : r.list_cents, age = held ? C.ageDays(r, t0) : null;
+    var oldAfter = (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault, stale = held && age != null && age >= oldAfter;
     var sub = [r.brand, r.size].filter(Boolean).map(esc).join(' &middot; ');
     var pTxt = profit == null ? '<span class="st-miss">--</span>' : '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>';
+    var pop = r.status === 'sold' ? pTxt : (r.list_cents != null ? esc(M(r.list_cents)) : '<span class="st-miss">--</span>');
     var last = S.f.deleted ? '<button type="button" class="st-btn st-ghost" data-act="restore" data-id="' + esc(r.id) + '">' + esc(T('act.restore')) + '</button>' : esc(r.platform ? T('plat.' + r.platform) : '--');
     return '<div class="st-row" role="row" tabindex="0" data-act="open" data-id="' + esc(r.id) + '">' +
-      '<div class="c-item st-item"><b>' + esc(r.title) + '</b>' + (sub ? '<span class="st-sub">' + sub + '</span>' : '') + '</div>' +
-      '<div class="c-status"><span class="st-tag ' + esc(r.status) + '">' + esc(statusLabel(r.status)) + '</span></div>' +
-      '<div class="c-cost st-num">' + esc(M(cost)) + '</div><div class="c-price st-num">' + esc(M(price)) + '</div><div class="c-profit st-num">' + pTxt + '</div>' +
-      '<div class="c-age st-num">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-plat">' + last + '</div>' +
-      '<div class="c-meta"><span>' + esc(M(cost)) + '</span><span>' + esc(M(price)) + '</span>' + (profit != null ? '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>' : '') + (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
+      '<div class="c-item st-itemc"><span class="st-tile2" aria-hidden="true">' + esc(initials(r.title)) + '</span><span class="st-item"><b>' + esc(r.title) + '</b>' + (sub ? '<span class="st-sub">' + sub + '</span>' : '') + '</span></div>' +
+      '<div class="c-status"><span class="st-tag ' + esc(r.status) + '">' + esc(statusLabel(r.status)) + '</span>' + (stale ? ' <span class="st-tag stale">' + esc(T('tag.stale')) + '</span>' : '') + '</div>' +
+      '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + esc(M(cost)) + '</div>' +
+      '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-pop st-num">' + pop + '</div>' +
+      '<div class="c-meta"><span>' + esc(M(cost)) + '</span><span>' + esc(pop.replace(/<[^>]*>/g, '')) + '</span>' + (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
   }
 
   // ------------------------------------------------------------------ events
@@ -420,7 +428,7 @@
       case 'im-again': openImport(); break;
       case 'chip': { var st = el.getAttribute('data-status'); S.f.status = st === '' ? null : (st === 'stock' ? ['stock', 'returned'] : [st]); load(true); break; }
       case 'deleted': S.f.deleted = !S.f.deleted; S.f.status = null; load(true); break;
-      case 'clear': S.f = { status: null, q: '', condition: '', category: '', deleted: false, old: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; load(true); break;
+      case 'clear': S.f = { status: null, q: '', condition: '', category: '', platform: '', deleted: false, old: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; $('#st-plat').value = ''; load(true); break;
       case 'more': load(false); break;
       case 'retry': load(true); break;
       case 'open': S.opener = el; openDetail(id); break;
