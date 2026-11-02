@@ -415,6 +415,7 @@
       '<div class="c-status"><span class="st-tag ' + esc(r.status) + '">' + esc(statusLabel(r.status)) + '</span>' + (stale ? ' <span class="st-tag stale">' + esc(T('tag.stale')) + '</span>' : '') + '</div>' +
       '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + esc(M(cost)) + '</div>' +
       '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-pop st-num">' + pop + '</div>' +
+      '<div class="c-acts">' + (held ? '<button type="button" class="st-btn st-ghost" data-act="lane-act" data-do="sold" data-id="' + esc(r.id) + '">' + esc(T('act.sold')) + '</button>' : '') + '<button type="button" class="st-btn st-tert" data-act="open" data-id="' + esc(r.id) + '">' + esc(T('act.edit')) + '</button></div>' +
       '<div class="c-meta"><span>' + esc(M(cost)) + '</span><span>' + esc(pop.replace(/<[^>]*>/g, '')) + '</span>' + (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
   }
 

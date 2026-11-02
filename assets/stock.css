@@ -121,6 +121,12 @@ select.st-in { padding-right: 8px; }
   .st-facts { grid-template-columns: 1fr 1fr; }
   .st-undo { bottom: 76px; }
   .st-qty button { width: 44px; height: 44px; }
+  /* phone tap targets (44px): inline links keep their look but get a bigger hit area, close / period / checkbox get real size */
+  .st-link, .st-linkb { display: inline-block; padding: 14px 6px; margin: -14px -6px; }
+  .st-x { width: 44px; }
+  .st-chip { min-width: 44px; }
+  .st-check { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+  .st-check input { width: 22px; height: 22px; flex: none; }
 }
 @media (min-width: 721px) { .st-row > .c-meta { display: none; } }
 /* import (step 4) */
@@ -288,3 +294,28 @@ select.st-in { padding-right: 8px; }
 .st-prev strong { font-size: 24px; font-variant-numeric: tabular-nums; }
 .st-prev small { font-size: 12px; color: var(--st-muted); }
 #st-soldctx { margin: 0 0 14px; }
+/* phone tap targets: after every base rule (rule order) */
+@media (max-width: 720px) {
+  .st-link, .st-linkb { display: inline-block; padding: 14px 6px; margin: -14px -6px; min-height: 44px; box-sizing: border-box; }
+  .st-x { width: 44px; }
+  .st-check { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+  .st-check input { width: 22px; height: 22px; flex: none; }
+}
+/* phone Items cards (design Cd): Mark sold + Edit on every card */
+.st-row > .c-acts { display: none; }
+@media (max-width: 720px) {
+  .st-row { grid-template-areas: "item status" "meta meta" "acts acts"; }
+  .st-row > .c-acts { grid-area: acts; display: flex; gap: 8px; }
+  .st-row > .c-acts .st-btn { flex: 1 1 0; }
+  .st-row > .c-acts .st-tert { border: 1px solid var(--st-line); }
+}
+.st-prev strong { font-size: clamp(34px, 8vw, 48px); font-weight: 900; letter-spacing: -.02em; }
+/* phone Items toolbar: search on top, filters in two columns, chips scroll sideways (design Cd) */
+@media (max-width: 720px) {
+  .st-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .st-tools .st-search, .st-tools #st-plat, .st-tools #st-del { grid-column: 1 / -1; }
+  .st-tools .st-in { width: 100%; max-width: none; padding: 0 8px; font-size: 12px; }
+  .st-tools .st-count { display: none; }
+  .st-chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  .st-chips .st-chip { flex: none; }
+}

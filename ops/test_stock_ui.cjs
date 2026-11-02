@@ -165,6 +165,9 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   await page.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
   await page.click('#bottombar-tab-stock'); await openItems(page); await page.waitForSelector('#stock-panel .st-row', { timeout: 8000 });
   ok(/ajouter un article/i.test(await page.$eval('#stock-panel .st-navrow', e => e.innerText)), 'French title row');
+  { const acts = await page.$$eval('#stock-panel .st-row .c-acts', c => c.map(x => ({ shown: getComputedStyle(x).display !== 'none', n: x.querySelectorAll('button').length, h: Math.min.apply(null, [].map.call(x.querySelectorAll('button'), b => b.getBoundingClientRect().height)) })));
+    ok(acts.length > 0 && acts.every(x => x.shown && x.n >= 1 && x.h >= 43.5), 'phone cards: every card has its own buttons (Mark sold for held items, Edit for all), 44 px tall: ' + JSON.stringify(acts[0]));
+    const first = await page.$eval('#stock-panel .st-row .c-acts', x => x.innerText.replace(/\s+/g, ' ')); ok(/Marquer vendu|Edit|Modifier/i.test(first), 'phone card buttons are French: ' + first); }
   ok(/tes articles\s+\d+ \/ 25/i.test(await text('.st-meter')) && /Voir les plans/.test(await text('#st-capmsg')), 'French cap meter: ' + await text('.st-meter') + ' / ' + await text('#st-capmsg'));
   const geo = await page.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth, over: [...document.querySelectorAll('#stock-panel .st-row')].filter(r => r.scrollWidth > r.clientWidth + 1).length,
     small: [...document.querySelectorAll('#stock-panel .st-btn, #stock-panel .st-chip, #stock-panel .st-in')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 43.5).length }));
@@ -456,7 +459,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     await pg.click('#bottombar-tab-stock'); await waitOv(pg); await wait5(400);
     const gm = await pg.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth,
       cut: [...document.querySelectorAll('#st-over .st-card, #st-over .st-lane, #st-over .st-cell')].filter(e => e.scrollWidth > e.clientWidth + 1).length,
-      small: [...document.querySelectorAll('#stock-panel .st-btn, #stock-panel .st-chip, #stock-panel .st-navb, #stock-panel .st-segb, #stock-panel .st-lane-it')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 43.5).map(e => e.className + ' ' + e.textContent.trim().slice(0, 20) + ' ' + Math.round(e.getBoundingClientRect().height)) }));
+      small: [...document.querySelectorAll('#stock-panel .st-btn, #stock-panel .st-chip, #stock-panel .st-navb, #stock-panel .st-segb, #stock-panel .st-lane-it, #stock-panel .st-link, #stock-panel .st-linkb, #stock-panel .st-x, #stock-panel .st-check')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 43.5).map(e => e.className + ' ' + e.textContent.trim().slice(0, 20) + ' ' + Math.round(e.getBoundingClientRect().height)) }));
     eq([gm.sw <= gm.vw, gm.cut, gm.small], [true, 0, []], 'Overview at 390 (' + lng + '): no horizontal overflow, nothing cut, every control >= 44 px: ' + JSON.stringify(gm));
     if (lng === 'fr') {
       const frNum = await pg.$eval('#st-over', e => e.innerText);
