@@ -260,8 +260,8 @@
       "ok": true,
       "view": {
         "query": "jordan 4",
-        "display_verdict": "ok",
-        "confidence": "medium",
+        "display_verdict": "too_broad",
+        "confidence": "low",
         "sample_size": 1190,
         "distinct_sellers": 1083,
         "flags": [],
@@ -325,17 +325,11 @@
         ],
         "coverage_note": "Based on listings SNYPD has actually seen in the last 14 days.",
         "tracking": null,
-        "show_headline": true,
+        "show_headline": false,
         "observed_cents": {
           "low": 300,
           "high": 1545000
-        },
-        "typical_cents": 10000,
-        "range_cents": {
-          "low": 6000,
-          "high": 15000
-        },
-        "provisional": true
+        }
       }
     },
     {
@@ -343,8 +337,8 @@
       "ok": true,
       "view": {
         "query": "air max 90",
-        "display_verdict": "ok",
-        "confidence": "medium",
+        "display_verdict": "too_broad",
+        "confidence": "low",
         "sample_size": 274,
         "distinct_sellers": 224,
         "flags": [
@@ -384,11 +378,11 @@
           {
             "condition_label": "Very good",
             "sample_size": 112,
-            "verdict": "ok",
+            "verdict": "too_broad",
             "typical_cents": 2200,
             "range_cents": {
               "low": 1500,
-              "high": 5000
+              "high": 8125
             },
             "provisional": true
           },
@@ -417,17 +411,11 @@
         ],
         "coverage_note": "Based on listings SNYPD has actually seen in the last 14 days.",
         "tracking": null,
-        "show_headline": true,
+        "show_headline": false,
         "observed_cents": {
           "low": 250,
           "high": 37900
-        },
-        "typical_cents": 2200,
-        "range_cents": {
-          "low": 1500,
-          "high": 5000
-        },
-        "provisional": true
+        }
       }
     },
     {
@@ -1537,8 +1525,8 @@
       "ok": true,
       "view": {
         "query": "ralph lauren polo",
-        "display_verdict": "ok",
-        "confidence": "medium",
+        "display_verdict": "too_broad",
+        "confidence": "low",
         "sample_size": 84042,
         "distinct_sellers": 51166,
         "flags": [],
@@ -1569,7 +1557,7 @@
           {
             "condition_label": "Very good",
             "sample_size": 53761,
-            "verdict": "ok",
+            "verdict": "too_broad",
             "typical_cents": 3500,
             "range_cents": {
               "low": 1500,
@@ -1602,17 +1590,11 @@
         ],
         "coverage_note": "Based on listings SNYPD has actually seen in the last 14 days.",
         "tracking": null,
-        "show_headline": true,
+        "show_headline": false,
         "observed_cents": {
           "low": 100,
           "high": 3000000
-        },
-        "typical_cents": 3500,
-        "range_cents": {
-          "low": 1500,
-          "high": 5000
-        },
-        "provisional": true
+        }
       }
     },
     {
@@ -2525,8 +2507,8 @@
       "ok": true,
       "view": {
         "query": "nike tech fleece",
-        "display_verdict": "ok",
-        "confidence": "medium",
+        "display_verdict": "too_broad",
+        "confidence": "low",
         "sample_size": 2445,
         "distinct_sellers": 1808,
         "flags": [],
@@ -2590,17 +2572,11 @@
         ],
         "coverage_note": "Based on listings SNYPD has actually seen in the last 14 days.",
         "tracking": null,
-        "show_headline": true,
+        "show_headline": false,
         "observed_cents": {
           "low": 100,
           "high": 45000
-        },
-        "typical_cents": 3500,
-        "range_cents": {
-          "low": 2000,
-          "high": 5600
-        },
-        "provisional": true
+        }
       }
     },
     {

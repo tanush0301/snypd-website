@@ -1,0 +1,13 @@
+{
+  "corrected_on": "2026-11-02",
+  "observations_generated_at": "2026-11-01T12:31:20Z",
+  "source_commit": "8f85a15adc9978d9842ef0ffaa4e28a3f923af87",
+  "original_snapshot_sha256": "37ca740328cc5e95cd7782905700e374ad51b4f4b35ffb6af95a8be98cc1f9e6",
+  "affected_queries": [
+    "jordan 4",
+    "air max 90",
+    "ralph lauren polo",
+    "nike tech fleece"
+  ],
+  "reason": "Restore source quality verdicts and measured condition quartiles. A later fallback promoted condition estimates to overall estimates and replaced one upper quartile with a hard-coded value. Overall estimates remain withheld where quality checks fail; existing item URLs retain validated condition data and limits."
+}
