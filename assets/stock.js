@@ -181,13 +181,13 @@
       (m.limited ? '<p class="st-hint">' + esc(T('fr.free', { cap: m.cap })) + '</p>' : '') + '</div>';
     if (!persona && !skipped()) {
       h += '<div class="st-pq" id="st-pq" role="group" aria-label="' + esc(T('pq.title')) + '"><span class="st-lbl">' + esc(T('pq.title')) + '</span><div class="st-seg">' +
-        C.PERSONAS.map(function (p) { return '<button type="button" class="st-segb" data-act="persona" data-p="' + p + '" aria-pressed="false">' + esc(T('pq.' + p)) + '</button>'; }).join('') +
+        C.PERSONAS.map(function (p) { return '<button type="button" class="st-segb" data-act="persona" data-p="' + p + '" aria-pressed="false"><b>' + esc(T('pq.' + p)) + '</b><span>' + esc(T('pq.' + p + '.d')) + '</span></button>'; }).join('') +
         '</div><button type="button" class="st-btn st-tert" data-act="pq-skip">' + esc(T('pq.skip')) + '</button><p class="st-hint">' + esc(T('pq.note')) + '</p></div>';
     }
     return h;
   }
   function answerPersona(p) {
-    S.api.saveSettings({ persona: p }).then(function () { S.boot.persona = p; renderOverview(); showBar(T('pq.saved'), false); }).catch(function (e) { showBar(errMsg(e), false); });
+    S.api.saveSettings({ persona: p }).then(function () { S.boot.persona = p; renderOverview(); showBar(T('pq.saved', { a: T('pq.' + p) }), false); }).catch(function (e) { showBar(errMsg(e), false); });
   }
   function hideTab() {
     S.api.saveSettings({ tab_hidden: true }).then(function () { S.boot.tab_hidden = true; applyTab(true); }).catch(function (e) { showBar(errMsg(e), false); });

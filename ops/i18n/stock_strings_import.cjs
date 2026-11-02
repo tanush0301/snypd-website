@@ -15,8 +15,8 @@ const en = {
   'imp.trunc': 'Only the first 5,000 rows are imported. {n} more are left out.',
   'imp.dateorder': 'Dates like 03/04/2026 can be read two ways', 'imp.dateorder.dmy': 'Day first (3 April)', 'imp.dateorder.mdy': 'Month first (March 4)',
   'imp.dateorder.mixed': 'This file mixes both orders. Rows that do not fit your choice are left empty.', 'imp.dateorder.sample': 'Example from your file: {s}',
-  'imp.cond': 'Conditions we do not know', 'imp.cond.row': '"{raw}" ({n} rows) counts as', 'imp.cond.none': 'Leave empty',
-  'imp.cat': 'New categories', 'imp.cat.row': '"{name}" ({n} rows)', 'imp.cat.create': 'Create it', 'imp.cat.skip': 'Leave empty',
+  'imp.cond': 'Conditions we do not know', 'imp.cond.row': '"{raw}" ({n} rows) counts as', 'imp.cond.none': 'Leave empty (--)',
+  'imp.cat': 'New categories', 'imp.cat.row': '"{name}" ({n} rows)', 'imp.cat.create': 'Create it', 'imp.cat.skip': 'Leave empty (--)',
   'imp.cat.notcreated': '{n} categories could not be created (30 at most). Those rows have no category.',
   'imp.cap': 'The Free plan holds {cap} items: {fits} of your held items fit and {over} would be left out.', 'imp.cap.link': 'See plans',
   'imp.go': 'Import {items} items', 'imp.go.none': 'Nothing to import', 'imp.running': 'Importing {done} of {total}',
@@ -26,7 +26,7 @@ const en = {
   'imp.resume': 'Resume', 'imp.failed': 'The import stopped after {done} items. Nothing is lost: resume, or undo this import.', 'imp.again': 'Import another file'
 };
 const fr = {
-  'f.fee': 'Frais de plateforme', 'imp.btn': 'Importer', 'imp.title': 'Importer ton stock', 'imp.pick': 'Choisir un fichier CSV ou Excel', 'imp.drop': 'ou le déposer ici',
+  'f.fee': 'Frais', 'imp.btn': 'Importer', 'imp.title': 'Importer ton stock', 'imp.pick': 'Choisir un fichier CSV ou Excel', 'imp.drop': 'ou le déposer ici',
   'imp.formats': 'CSV ou .xlsx, 10 Mo et 5 000 lignes au maximum. Le fichier est lu dans ton navigateur : rien n’est envoyé avant que tu appuies sur Importer.',
   'imp.reading': 'Lecture du fichier', 'imp.sheet': 'Feuille', 'imp.back': 'Choisir un autre fichier', 'imp.close': 'Fermer',
   'imp.err.xls': 'Les anciens fichiers .xls ne sont pas pris en charge. Enregistre le fichier en .xlsx ou en CSV et réessaie.', 'imp.err.not': 'Ce fichier ne ressemble pas à un CSV ou à un fichier Excel.',
@@ -41,8 +41,8 @@ const fr = {
   'imp.trunc': 'Seules les 5 000 premières lignes sont importées. {n} de plus sont laissées de côté.',
   'imp.dateorder': 'Des dates comme 03/04/2026 se lisent de deux façons', 'imp.dateorder.dmy': 'Jour d’abord (3 avril)', 'imp.dateorder.mdy': 'Mois d’abord (4 mars)',
   'imp.dateorder.mixed': 'Ce fichier mélange les deux ordres. Les lignes qui ne correspondent pas à ton choix restent vides.', 'imp.dateorder.sample': 'Exemple de ton fichier : {s}',
-  'imp.cond': 'États que nous ne connaissons pas', 'imp.cond.row': '« {raw} » ({n} lignes) compte comme', 'imp.cond.none': 'Laisser vide',
-  'imp.cat': 'Nouvelles catégories', 'imp.cat.row': '« {name} » ({n} lignes)', 'imp.cat.create': 'La créer', 'imp.cat.skip': 'Laisser vide',
+  'imp.cond': 'États que nous ne connaissons pas', 'imp.cond.row': '« {raw} » ({n} lignes) compte comme', 'imp.cond.none': 'Laisser vide (--)',
+  'imp.cat': 'Nouvelles catégories', 'imp.cat.row': '« {name} » ({n} lignes)', 'imp.cat.create': 'La créer', 'imp.cat.skip': 'Laisser vide (--)',
   'imp.cat.notcreated': '{n} catégories n’ont pas pu être créées (30 au maximum). Ces lignes n’ont pas de catégorie.',
   'imp.cap': 'Le plan Free garde {cap} articles : {fits} de tes articles en stock entrent et {over} seraient laissés de côté.', 'imp.cap.link': 'Voir les plans',
   'imp.go': 'Importer {items} articles', 'imp.go.none': 'Rien à importer', 'imp.running': 'Import de {done} sur {total}',

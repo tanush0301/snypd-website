@@ -178,6 +178,10 @@ select.st-in { padding-right: 8px; }
 .st-seg { display: inline-flex; flex-wrap: wrap; }
 .st-segb { font: inherit; font-size: 12px; letter-spacing: .04em; height: 36px; padding: 0 16px; border: 1px solid var(--st-line2); margin-left: -1px; background: transparent; color: var(--st-text2); cursor: pointer; }
 .st-segb:first-child { margin-left: 0; }
+.st-pq .st-seg { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+.st-pq .st-segb { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; flex: 1 1 200px; height: auto; min-height: 44px; margin-left: 0; padding: 12px 16px; text-align: left; border-color: var(--st-line2); }
+.st-pq .st-segb b { font-weight: 700; font-size: 13px; letter-spacing: .02em; color: var(--st-text); }
+.st-pq .st-segb span { font-size: 12px; line-height: 1.4; letter-spacing: 0; color: var(--st-text2); }
 .st-segb[aria-pressed="true"] { background: var(--st-ok); color: var(--bg, #0B0C0D); border-color: var(--st-ok); }
 .st-form > p.st-hint { grid-column: 1 / -1; margin: -6px 0 0; }
 .st-check { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
