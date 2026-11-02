@@ -269,6 +269,20 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   { const rows = await pg.$$eval('#st-lane-reprice .st-lane-row', r => r.map(x => x.innerText.replace(/\n+/g, ' | ')));
     ok(rows.length > 0 && rows.every(x => /listed \d+d/.test(x) && /REPRICE/i.test(x)), 'lane rows carry the design meta line and a Reprice action: ' + rows[0]);
     const fr0 = await pg.$eval('#st-lane-follow .st-lane-row', x => x.innerText.replace(/\n+/g, ' | ')); ok(/reserved \d+d/.test(fr0) && /MARK SOLD/i.test(fr0) && /BACK TO ACTIVE/i.test(fr0), 'follow-up rows: Mark sold + Back to active: ' + fr0);
+    const meta = await pg.$$eval('#st-lane-reprice .st-lane-row .a', x => x.map(e => e.textContent));
+    eq(meta[0], 'Depop \u00b7 \u20ac85.00 \u00b7 listed 90d \u00b7 0 price drops', 'Reprice row meta line (design): platform, list price, days since listed (not since bought), price drops');
+    const lm = await pg.$eval('#st-lane-list .st-lane-row .a', e => e.textContent); ok(/^in stock \d+d \u00b7 cost \u20ac\d/.test(lm), 'List row meta line: in stock Nd, cost: ' + lm);
+    const fm = await pg.$eval('#st-lane-follow .st-lane-row .a', e => e.textContent); ok(/^[A-Za-z ]+ \u00b7 \u20ac\d+\.\d\d \u00b7 reserved \d+d$/.test(fm), 'Follow-up row meta line: platform, price, reserved Nd: ' + fm);
+    // the two charts (migration 069)
+    const plat = await pg.$$eval('#st-ch-plat .st-pbars li', x => x.map(e => e.innerText.replace(/\s+/g, ' ').trim()));
+    eq(plat, ['Vinted \u20ac292.90 \u00b7 16 sold', 'Facebook Marketplace \u20ac116.70 \u00b7 6 sold', 'Marktplaats \u20ac103.80 \u00b7 3 sold', 'Vestiaire Collective \u20ac46.00 \u00b7 2 sold', 'eBay \u20ac34.50 \u00b7 3 sold', 'Depop \u20ac18.50 \u00b7 1 sold'], 'chart: net profit by platform = the design numbers');
+    ok(/Platforms are tracked by hand\. SNYPD isn.t connected to any of them\./.test(await tc(pg, '#st-ch-plat')), 'chart: the honesty line');
+    const bars = await pg.$$eval('#st-ch-day svg rect', r => r.length), svgText = await pg.$eval('#st-ch-day svg', e => e.textContent), aria = await pg.$eval('#st-ch-day svg', e => e.getAttribute('aria-label'));
+    ok(bars >= 20 && bars <= 30, 'chart: one bar per day with sales (' + bars + ' of 30)'); ok(/cumulative \u20ac612\.40/.test(svgText), 'chart: cumulative \u20ac612.40 on the line: ' + svgText.slice(0, 80)); ok(/\u20ac612\.40/.test(aria) && /28 Sept?|28 Sep/.test(aria), 'chart: accessible summary: ' + aria);
+    ok(/30D \u00b7 daily/.test(await tc(pg, '#st-ch-day .st-secsub')), 'chart: 30D . daily');
+    await clickBy(pg, '#st-ch-plat [data-act="chart-table"]'); await wait5(250);
+    eq(await pg.$$eval('#st-ch-plat table tbody tr', r => r.length), 6, 'chart: the Table toggle shows the same 6 platform rows as a real table');
+    await clickBy(pg, '#st-ch-plat [data-act="chart-table"]'); await wait5(250);
     await clickBy(pg, '#st-lane-reprice [data-act="lane-act"][data-do="reprice"]'); await pg.waitForSelector('.st-sheet #sf-newprice, .st-sheet input', { timeout: 5000 });
     ok(/Lower the price/i.test(await tc(pg, '.st-sheet')), 'a lane Reprice button opens the reprice sheet for that item'); await pg.keyboard.press('Escape'); await wait5(300); }
   // a lane item opens its own detail without the Items list having been loaded

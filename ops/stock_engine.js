@@ -35,7 +35,7 @@
     ['electronics', 'Electronics', 60], ['home', 'Home', 70], ['collect', 'Collectibles and games', 80], ['other', 'Other', 90]];
   // Allowed argument names per function (PostgREST refuses a call whose argument set it cannot match).
   const SIGNATURES = {
-    stock_boot: [], stock_overview: ['p_days', 'p_today'], stock_lanes: ['p_today'], stock_items_page: ['p_filters', 'p_limit', 'p_cursor'],
+    stock_boot: [], stock_overview: ['p_days', 'p_today'], stock_overview_series: ['p_days', 'p_today'], stock_lanes: ['p_today'], stock_items_page: ['p_filters', 'p_limit', 'p_cursor'],
     stock_add_items: ['p_item', 'p_quantity'], stock_import_rows: ['p_import_id', 'p_rows'], stock_undo_import: ['p_import_id'],
     stock_set_status: ['p_id', 'p_to', 'p_platform', 'p_list_cents', 'p_on'], stock_mark_sold: ['p_id', 'p_sold_cents', 'p_sold_on', 'p_platform', 'p_fee_cents', 'p_ship_paid_cents'],
     stock_mark_returned: ['p_id', 'p_returned_on', 'p_refund_cents', 'p_refund_fee', 'p_return_ship_cents', 'p_to', 'p_reason'],
@@ -196,14 +196,15 @@
     // ---------- event maths (== _stock_agg) ----------
     function events() {
       const lv = new Map(live().map(i => [i.id, i])), ev = [];
+      const lastSalePlatform = h => { const s = S.history.filter(x => x.item_id === h.item_id && x.kind === 'sale' && x.id < h.id).sort((p, q) => q.id - p.id)[0]; return (s && s.data.platform) || ''; };
       live().forEach(i => {
-        if (i.status === 'sold') ev.push({ t: 'sale', d: i.sold_on, amt: i.sold_cents, prof: (i.buy_cents == null || i.sold_cents == null) ? null : i.sold_cents - (i.buy_cents + i.extra_cents) - (i.fee_cents || 0) - (i.ship_paid_cents || 0), days: diffDays(i.sold_on, i.returned_on || i.bought_on) });
-        if (i.status === 'written_off') ev.push({ t: 'wo', d: i.written_off_on, cost: costOf(i.buy_cents, i.extra_cents) });
+        if (i.status === 'sold') ev.push({ t: 'sale', platform: i.platform || '', d: i.sold_on, amt: i.sold_cents, prof: (i.buy_cents == null || i.sold_cents == null) ? null : i.sold_cents - (i.buy_cents + i.extra_cents) - (i.fee_cents || 0) - (i.ship_paid_cents || 0), days: diffDays(i.sold_on, i.returned_on || i.bought_on) });
+        if (i.status === 'written_off') ev.push({ t: 'wo', platform: '', d: i.written_off_on, cost: costOf(i.buy_cents, i.extra_cents) });
       });
       S.history.forEach(h => {
         if (!lv.has(h.item_id)) return;
-        if (h.kind === 'sale' && S.history.some(r => r.item_id === h.item_id && r.kind === 'return' && r.id > h.id)) ev.push({ t: 'sale', d: h.at, amt: h.data.sold_cents == null ? null : h.data.sold_cents, prof: h.data.profit_cents == null ? null : h.data.profit_cents, days: h.data.days == null ? null : h.data.days });
-        if (h.kind === 'return') ev.push({ t: 'return', d: h.at, prof: h.data.profit_cents == null ? null : h.data.profit_cents, refund: h.data.refund_cents == null ? null : h.data.refund_cents });
+        if (h.kind === 'sale' && S.history.some(r => r.item_id === h.item_id && r.kind === 'return' && r.id > h.id)) ev.push({ t: 'sale', platform: (h.data.platform || ''), d: h.at, amt: h.data.sold_cents == null ? null : h.data.sold_cents, prof: h.data.profit_cents == null ? null : h.data.profit_cents, days: h.data.days == null ? null : h.data.days });
+        if (h.kind === 'return') ev.push({ t: 'return', platform: lastSalePlatform(h), d: h.at, prof: h.data.profit_cents == null ? null : h.data.profit_cents, refund: h.data.refund_cents == null ? null : h.data.refund_cents });
       });
       return ev;
     }
@@ -261,8 +262,22 @@
         follow: x => x.i.status === 'reserved' && x.i.reserved_on != null && diffDays(t, x.i.reserved_on) >= 3,
         hold: x => (x.i.status === 'stock' || x.i.status === 'returned') && x.i.src_type === 'hunt' && x.age >= 14 };
       const out = { today: t };
-      Object.keys(rules).forEach(k => { const m = h.filter(rules[k]).sort((p, q) => q.age - p.age || (p.i.id < q.i.id ? -1 : 1)); out[k] = { count: m.length, items: m.slice(0, 5).map(x => ({ id: x.i.id, title: x.i.title, days: x.age })) }; });
+      Object.keys(rules).forEach(k => { const m = h.filter(rules[k]).sort((p, q) => q.age - p.age || (p.i.id < q.i.id ? -1 : 1)); out[k] = { count: m.length, items: m.slice(0, 5).map(x => ({ id: x.i.id, title: x.i.title, days: x.age, lane_days: k === 'reprice' ? diffDays(t, x.i.listed_on) : (k === 'follow' ? diffDays(t, x.i.reserved_on) : x.age), platform: x.i.platform == null ? null : x.i.platform, list_cents: x.i.list_cents == null ? null : x.i.list_cents, cost_cents: x.i.buy_cents == null ? null : x.i.buy_cents + x.i.extra_cents, drops: x.i.drops, brand: x.i.brand == null ? null : x.i.brand })) }; });
       return out;
+    };
+    // == stock_overview_series (migration 069): net per day (zero-filled) and per platform; net = sale profit + reversals - write-off cost, by the event's own date
+    R.stock_overview_series = function (a) {
+      gate();
+      const days = a.p_days == null ? null : a.p_days, t = checkDate(parseDate(a.p_today)) || today();
+      if (days != null && ![7, 30, 90, 365].includes(days)) raise('stock_bad_period', null, '22023');
+      const from = days == null ? '0001-01-01' : addDays(t, -days + 1), w = events().filter(e => e.d >= from && e.d < addDays(t, 1));
+      const net = ev => sum(ev.filter(e => e.t === 'sale' || e.t === 'return'), e => e.prof) - sum(ev.filter(e => e.t === 'wo'), e => e.cost);
+      const sold = ev => ev.filter(e => e.t === 'sale').length - ev.filter(e => e.t === 'return').length;
+      const daily = [];
+      if (days != null) for (let k = 0; k < days; k++) { const d = addDays(from, k), ev = w.filter(e => e.d === d); daily.push({ d, net: net(ev), sold: sold(ev) }); }
+      const by = Array.from(new Set(w.map(e => e.platform))).map(p => { const ev = w.filter(e => e.platform === p); return { platform: p, net: net(ev), sold: sold(ev) }; })
+        .sort((x, y) => y.net - x.net || (x.platform < y.platform ? -1 : (x.platform > y.platform ? 1 : 0)));
+      return { today: t, days, daily, by_platform: by };
     };
     R.stock_items_page = function (a) {
       gate();

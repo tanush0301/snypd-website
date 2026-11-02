@@ -126,8 +126,8 @@
   }
   function loadOverview() {
     var o = S.ov, req = ++o.req; o.loading = true; o.err = null; renderOverview();
-    return Promise.all([S.api.overview(o.days), S.api.lanes()]).then(function (r) {
-      if (req !== o.req) return; o.data = r[0]; o.lanes = r[1]; o.loading = false; o.stale = false; renderOverview();
+    return Promise.all([S.api.overview(o.days), S.api.lanes(), S.api.overviewSeries(o.days).catch(function () { return null; })]).then(function (r) {
+      if (req !== o.req) return; o.data = r[0]; o.lanes = r[1]; o.series = r[2]; o.loading = false; o.stale = false; renderOverview();
     }).catch(function (e) { if (req !== o.req) return; o.loading = false; o.err = e; renderOverview(); });
   }
   function renderOverview() {
@@ -151,7 +151,7 @@
         var k = ld[0], ln = L[k] || { count: 0, items: [] };
         return '<div class="st-lane" id="st-lane-' + k + '"><div class="st-lane-hd"><span>' + esc(T('lane.' + k)) + '</span><b>' + esc(String(ln.count)) + '</b></div><p class="st-d">' + esc(T('lane.' + k + '.d')) + '</p>' +
           (ln.count ? ln.items.map(function (it) {
-            return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="st-tile2" aria-hidden="true">' + esc(initials(it.title)) + '</span><span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(T(ld[1], { d: it.days })) + '</span></span></button>' +
+            return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="st-tile2" aria-hidden="true">' + esc(initials(it.title)) + '</span><span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(laneMeta(k, it)) + '</span></span></button>' +
               '<div class="st-lane-acts">' + ld[2].map(function (a, i) { return '<button type="button" class="st-btn ' + (i ? 'st-tert' : 'st-ghost') + '" data-act="lane-act" data-do="' + a[0] + '" data-id="' + esc(it.id) + '">' + esc(T(a[1])) + '</button>'; }).join('') + '</div></div>';
           }).join('') + (ln.count > ln.items.length ? '<p class="st-d st-more">' + esc(T('lane.more', { n: ln.count - ln.items.length })) + '</p>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
       }).join('') + '</div></section>';
@@ -176,8 +176,58 @@
       cell(T('ov.sold'), String(v.sold), T('per.' + pk), 'st-c-sales') +
       cell(T('ov.avg'), v.avgProfitCents == null ? '--' : M(v.avgProfitCents), v.sold ? T('ov.avg.cap', { a: v.withCost, b: v.sold }) : null, 'st-c-avg') +
       cell(T('ov.days'), v.daysToSell == null ? '--' : T('ov.days.v', { n: Math.round(v.daysToSell) }), T('ov.days.cap'), 'st-c-days') + '</div>' +
-      '<div class="st-numsub">' + cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') + cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div></section>';
+      '<div class="st-numsub">' + cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') + cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div>' + chartsHtml(o) + '</section>';
     el.innerHTML = h;
+  }
+  // the meta line of a lane row (design Bc): Reprice "Depop . 85.00 . listed 90d . 0 price drops", List "in stock 91d . cost 53.40", Follow up "Vinted . 56.00 . reserved 5d".
+  // lane_days / platform / price / cost come from migration 069; before it only the age is known and only that is shown.
+  function laneMeta(k, it) {
+    var d = it.lane_days != null ? it.lane_days : it.days, parts = [];
+    var plat = it.platform ? T('plat.' + it.platform) : null, price = it.list_cents != null ? M(it.list_cents) : null;
+    if (k === 'reprice') { if (plat) parts.push(plat); if (price) parts.push(price); parts.push(T('lane.meta.listed', { d: d })); if (it.drops != null) parts.push(T('lane.meta.drops', { n: it.drops })); }
+    else if (k === 'follow') { if (plat) parts.push(plat); if (price) parts.push(price); parts.push(T('lane.meta.reserved', { d: d })); }
+    else { parts.push(T('lane.meta.stock', { d: d })); if (it.cost_cents != null) parts.push(T('lane.meta.cost', { c: M(it.cost_cents) })); }
+    return parts.join(' \u00b7 ');
+  }
+  // ------------------------------------------------------------------ Overview charts (migration 069): net profit per day + by platform, plain SVG / CSS, a Table toggle for each
+  function niceMax(v) { if (v <= 0) return 1; var u = Math.pow(10, Math.floor(Math.log(v) / Math.LN10)), c = [1, 2, 2.5, 5, 10], i; for (i = 0; i < c.length; i++) if (c[i] * u >= v) return c[i] * u; return 10 * u; }
+  function shortDay(iso) { var p = iso.split('-'); try { return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' }).format(new Date(+p[0], +p[1] - 1, +p[2])); } catch (e) { return iso; } }
+  function chartsHtml(o) {
+    var s = o.series; if (!s) return '';
+    var pk = perKey(o.days), h = '<div class="st-charts">';
+    var pts = [], i, j, bucket = (s.daily.length > 90) ? 7 : 1;
+    for (i = 0; i < s.daily.length; i += bucket) { var seg = s.daily.slice(i, i + bucket), n = 0, so = 0; for (j = 0; j < seg.length; j++) { n += seg[j].net; so += seg[j].sold; } pts.push({ d: seg[0].d, net: n, sold: so }); }
+    var anySales = s.by_platform.length > 0;
+    if (pts.length) {
+      var total = pts.reduce(function (a, p) { return a + p.net; }, 0), asTable = !!S.ov.dayTable;
+      h += '<section class="st-chart" id="st-ch-day" aria-labelledby="st-h-chd"><div class="st-chart-hd"><h3 class="st-h3" id="st-h-chd">' + esc(T('ch.day.title')) + '</h3><span class="st-secsub">' + esc(T(bucket > 1 ? 'ch.sub.weekly' : 'ch.sub.daily', { period: T('per.btn.' + pk) })) + '</span>' +
+        '<button type="button" class="st-btn st-ghost st-tbl" data-act="chart-table" data-which="day" aria-pressed="' + (asTable ? 'true' : 'false') + '">' + esc(T(asTable ? 'ch.chart' : 'ch.table')) + '</button></div>';
+      if (!anySales) h += '<p class="st-d st-dim">' + esc(T('ch.none')) + '</p>';
+      else if (asTable) h += '<div class="st-tblwrap"><table class="st-ctable"><thead><tr><th>' + esc(T('ch.col.day')) + '</th><th>' + esc(T('ch.col.net')) + '</th><th>' + esc(T('ch.col.sold')) + '</th></tr></thead><tbody>' + pts.filter(function (p) { return p.net !== 0 || p.sold !== 0; }).map(function (p) { return '<tr><td>' + esc(shortDay(p.d)) + '</td><td>' + esc(MS(p.net)) + '</td><td>' + esc(String(p.sold)) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      else h += dayChartSvg(pts, total);
+      h += '</section>';
+    }
+    var by = s.by_platform, asT2 = !!S.ov.platTable, maxAbs = by.reduce(function (m, x) { return Math.max(m, Math.abs(x.net)); }, 1);
+    h += '<section class="st-chart" id="st-ch-plat" aria-labelledby="st-h-chp"><div class="st-chart-hd"><h3 class="st-h3" id="st-h-chp">' + esc(T('ch.plat.title')) + '</h3>' +
+      '<button type="button" class="st-btn st-ghost st-tbl" data-act="chart-table" data-which="plat" aria-pressed="' + (asT2 ? 'true' : 'false') + '">' + esc(T(asT2 ? 'ch.chart' : 'ch.table')) + '</button></div>';
+    if (!by.length) h += '<p class="st-d st-dim">' + esc(T('ch.none')) + '</p>';
+    else if (asT2) h += '<div class="st-tblwrap"><table class="st-ctable"><thead><tr><th>' + esc(T('f.platform')) + '</th><th>' + esc(T('ch.col.net')) + '</th><th>' + esc(T('ch.col.sold')) + '</th></tr></thead><tbody>' + by.map(function (x) { return '<tr><td>' + esc(x.platform ? T('plat.' + x.platform) : T('plat.none')) + '</td><td>' + esc(MS(x.net)) + '</td><td>' + esc(String(x.sold)) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+    else h += '<ul class="st-pbars">' + by.map(function (x) { var w = Math.max(2, Math.round(Math.abs(x.net) / maxAbs * 100)); return '<li><span class="st-pn">' + esc(x.platform ? T('plat.' + x.platform) : T('plat.none')) + '</span><span class="st-pbar"><i class="' + (x.net < 0 ? 'neg' : 'pos') + '" style="width:' + w + '%"></i></span><span class="st-pv">' + esc(T(x.sold === 1 ? 'ch.plat.row1' : 'ch.plat.row', { amount: M(x.net), n: x.sold })) + '</span></li>'; }).join('') + '</ul>';
+    h += '<p class="st-hint">' + esc(T('ch.note')) + '</p></section></div>';
+    return h;
+  }
+  function dayChartSvg(pts, total) {
+    var W = 640, H = 200, L = 52, Rr = 8, Tp = 14, B = 24, n = pts.length, pw = W - L - Rr, ph = H - Tp - B;
+    var mx = niceMax(Math.max.apply(null, pts.map(function (p) { return p.net; }).concat([0])) / 100) * 100, mnRaw = Math.min.apply(null, pts.map(function (p) { return p.net; }).concat([0])), mn = mnRaw < 0 ? -niceMax(-mnRaw / 100) * 100 : 0;
+    var y = function (v) { return Tp + (mx - v) / (mx - mn) * ph; }, bw = Math.max(1, pw / n * 0.7), step = pw / n, svg = '', cum = 0, cumPts = [], cmax = 1, k;
+    pts.forEach(function (p) { cum += p.net; cumPts.push(cum); if (cum > cmax) cmax = cum; });
+    var ticks = [mn, 0, mx / 2, mx].filter(function (v, i, a) { return a.indexOf(v) === i; });
+    ticks.forEach(function (v) { svg += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '" class="st-gl' + (v === 0 ? ' z' : '') + '"/><text x="' + (L - 6) + '" y="' + (y(v) + 3).toFixed(1) + '" text-anchor="end" class="st-ax">' + esc(C.formatMoney(v, S.cur, lang, { dp: 0 })) + '</text>'; });
+    pts.forEach(function (p, i) { var x = L + i * step + (step - bw) / 2, y0 = y(0), y1 = y(p.net), top = Math.min(y0, y1), hh = Math.max(Math.abs(y1 - y0), p.net === 0 ? 0 : 1); if (hh > 0) svg += '<rect x="' + x.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" class="' + (p.net < 0 ? 'st-bn' : 'st-bp') + '"><title>' + esc(shortDay(p.d) + ': ' + MS(p.net)) + '</title></rect>'; });
+    if (cmax > 0 && n > 1) { var line = cumPts.map(function (v, i) { return (L + i * step + step / 2).toFixed(1) + ',' + (Tp + (1 - Math.max(v, 0) / cmax) * ph * 0.45).toFixed(1); }).join(' '); svg += '<polyline points="' + line + '" class="st-cumline"/><text x="' + (L + 6) + '" y="' + (Tp + 10) + '" class="st-ax st-cumt">' + esc(T('ch.cum', { amount: M(total) })) + '</text>'; }
+    var idx = n <= 1 ? [0] : [0, Math.round((n - 1) / 3), Math.round((n - 1) * 2 / 3), n - 1];
+    idx.filter(function (v, i, a) { return a.indexOf(v) === i; }).forEach(function (i) { svg += '<text x="' + (L + i * step + step / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="' + (i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle')) + '" class="st-ax">' + esc(shortDay(pts[i].d)) + '</text>'; });
+    return '<svg class="st-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(T('ch.aria.day', { from: shortDay(pts[0].d), to: shortDay(pts[n - 1].d), amount: M(total) })) + '" preserveAspectRatio="none">' + svg + '</svg>';
   }
   function initials(title) { return String(title || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '--'; }
   function todayLabel() {
@@ -386,6 +436,7 @@
       case 'seg': { var sg = el.getAttribute('data-p'); S.sheet.persona = sg; Array.prototype.forEach.call(S.panel.querySelectorAll('#sf-persona .st-segb'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-p') === sg ? 'true' : 'false'); }); break; }
       case 'period': { var dv = el.getAttribute('data-days'); S.ov.days = dv === 'all' ? null : +dv; loadOverview(); break; }
       case 'ov-retry': loadOverview(); break;
+      case 'chart-table': { var wh = el.getAttribute('data-which'); if (wh === 'day') S.ov.dayTable = !S.ov.dayTable; else S.ov.platTable = !S.ov.platTable; renderOverview(); break; }
       case 'see-old': S.f = { status: null, q: '', condition: '', category: '', deleted: false, old: true }; if ($('#st-q')) $('#st-q').value = ''; if ($('#st-cond')) $('#st-cond').value = ''; if ($('#st-cat')) $('#st-cat').value = ''; S.itemsLoaded = true; showView('items'); load(true); break;
       case 'lane-open': openLane(id); break;
       case 'lane-act': laneAct(el.getAttribute('data-do'), id, el); break;

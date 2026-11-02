@@ -46,7 +46,7 @@ const money = (c, lang) => core.formatMoney(c, 'EUR', lang || 'en');
 let sql = null;
 try {
   const dir = path.join(BACKEND, 'ops', 'migrations');
-  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8') };
+  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8') };
 } catch (e) { sql = null; }
 const listIn = (text, col) => { const m = new RegExp('\\b' + col + '\\s+text[^,]*?check\\s*\\(\\s*' + col + '\\s+in\\s*\\(([^)]*)\\)\\s*\\)').exec(text); assert(m, 'no CHECK list for column ' + col); return [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]); };
 if (sql) {
@@ -91,11 +91,11 @@ if (sql) {
   });
   test('C RPC argument names and required arguments in the engine == the SQL function signatures; stock-core calls only those', () => {
     const sigs = {};
-    for (const m of sql.t066.matchAll(/create or replace function public\.(stock_[a-z_]+)\(([^)]*)\)\s*returns/g)) {
+    for (const m of (sql.t066 + sql.t069).matchAll(/create or replace function public\.(stock_[a-z_]+)\(([^)]*)\)\s*returns/g)) {
       sigs[m[1]] = m[2].split(',').map(s => s.trim()).filter(Boolean).map(s => ({ name: s.split(/\s+/)[0], required: !/\bdefault\b/i.test(s) }));
     }
     const publicNames = Object.keys(Engine.SIGNATURES);
-    assert.equal(publicNames.length, 15);
+    assert.equal(publicNames.length, 16);
     for (const n of publicNames) {
       assert(sigs[n], 'SQL has no function ' + n);
       assert.deepEqual(Engine.SIGNATURES[n], sigs[n].map(a => a.name), 'argument names of ' + n);
@@ -107,8 +107,8 @@ if (sql) {
     const api = core.createApi(spy, { today: () => '2026-10-27' });
     return Promise.all([api.boot(), api.overview(30), api.lanes(), api.itemsPage({}, 10, null), api.addItems({ title: 'x' }, 1), api.importRows('i', []), api.undoImport('i'), api.setStatus('1', 'listed', { platform: 'vinted', listCents: 1, on: '2026-01-01' }),
       api.markSold('1', { soldCents: 1, on: '2026-01-01', platform: 'vinted', feeCents: 1, shipPaidCents: 1 }), api.markReturned('1', { on: '2026-01-01', refundCents: 1, refundFee: true, returnShipCents: 1, to: 'stock', reason: null }),
-      api.writeOff('1', 'lost', '2026-01-01'), api.editItem('1', {}), api.deleteItem('1'), api.restoreItem('1'), api.undo()].map(p => p.catch(() => null))).then(() => {
-      assert.equal(seen.length, 15);
+      api.writeOff('1', 'lost', '2026-01-01'), api.editItem('1', {}), api.deleteItem('1'), api.restoreItem('1'), api.undo(), api.overviewSeries(30)].map(p => p.catch(() => null))).then(() => {
+      assert.equal(seen.length, 16);
       for (const [name, keys] of seen) {
         assert(sigs[name], 'api calls unknown function ' + name);
         for (const k of keys) assert(sigs[name].some(a => a.name === k), `${name} sent undeclared argument ${k}`);
@@ -251,6 +251,39 @@ test('A the plan\'s literal acceptance numbers, formatted like the screen will s
   assert.equal(items.filter(i => i.returned_on && i.deleted_at == null).length, 3);
   const wo = items.filter(i => i.status === 'written_off'); assert.equal(wo.length, 4); assert.equal(money(wo.reduce((x, i) => x + i.buy_cents + i.extra_cents, 0)), E + '74.50');
   assert.equal(v30.held.count + 0, 58); assert.equal(items.filter(i => i.deleted_at != null).length, 3, 'deleted copies are in the table but in no total');
+});
+test('A migration 069 in the engine: lane rows carry platform, list price, cost, drops, brand; the charts add up to the Overview number for every period, and the design chart numbers match', async () => {
+  const a = account({ uid: 'A' }); a.eng.loadFixture(fx);
+  const lanes = await a.api.lanes('2026-10-27');
+  assert.deepEqual(Object.keys(lanes.reprice.items[0]).sort(), ['brand', 'cost_cents', 'days', 'drops', 'id', 'lane_days', 'list_cents', 'platform', 'title']);
+  const top = lanes.reprice.items[0]; assert.deepEqual([top.title, top.platform, top.list_cents, top.cost_cents, top.drops, top.lane_days, top.days], ['Carhartt WIP Detroit jacket, black, XL', 'depop', 8500, 4000, 0, 90, 94]);
+  assert.deepEqual([lanes.reprice.count, lanes.list.count, lanes.follow.count, lanes.hold.count], [9, 17, 3, 9]);
+  for (const k of ['reprice', 'list', 'follow', 'hold']) for (const x of lanes[k].items) { const it = a.eng.state.items.find(i => i.id === x.id); assert.deepEqual([x.platform, x.list_cents, x.drops, x.brand, x.cost_cents], [it.platform == null ? null : it.platform, it.list_cents == null ? null : it.list_cents, it.drops, it.brand == null ? null : it.brand, it.buy_cents == null ? null : it.buy_cents + it.extra_cents]); }
+  for (const d of [7, 30, 90, 365, null]) {
+    const ov = await a.api.overview(d, '2026-10-27'), s = await a.api.overviewSeries(d, '2026-10-27'), sm = (arr, k) => arr.reduce((n, x) => n + x[k], 0);
+    assert.equal(sm(s.by_platform, 'net'), ov.current.net, 'platform bars add up to the net, period ' + d); assert.equal(sm(s.by_platform, 'sold'), ov.current.sold);
+    if (d != null) { assert.equal(s.daily.length, d); assert.equal(sm(s.daily, 'net'), ov.current.net, 'daily bars add up to the net, period ' + d); assert.equal(sm(s.daily, 'sold'), ov.current.sold); } else assert.equal(s.daily.length, 0);
+  }
+  const s30 = await a.api.overviewSeries(30, '2026-10-27');
+  assert.deepEqual(s30.by_platform, [{ platform: 'vinted', net: 29290, sold: 16 }, { platform: 'facebook', net: 11670, sold: 6 }, { platform: 'marktplaats', net: 10380, sold: 3 }, { platform: 'vestiaire', net: 4600, sold: 2 }, { platform: 'ebay', net: 3450, sold: 3 }, { platform: 'depop', net: 1850, sold: 1 }]);
+  assert.deepEqual([s30.daily[0].d, s30.daily[29].d, Math.min(...s30.daily.map(x => x.net))], ['2026-09-28', '2026-10-27', -1800]);
+  await rejects(a.api.overviewSeries(45), 'stock_bad_period', 'bad period');
+});
+test('L hand-worked charts (== SQL test C4): a sale that is returned, a sale, a write-off, a sale with fee + shipping, then undo', async () => {
+  const { api } = account({ uid: 'Q' });
+  const add = async (title, buy, extra) => (await api.addItems({ title, buy_cents: buy, extra_cents: extra || 0, bought_on: '2026-10-01' }, 1)).ids[0];
+  const g1 = await add('G1', 1000), g2 = await add('G2', 500), g3 = await add('G3', 500), g4 = await add('G4', 2000, 100);
+  await api.markSold(g1, { soldCents: 2500, on: '2026-10-20', platform: 'ebay' }); await api.markReturned(g1, { on: '2026-10-22', returnShipCents: 0, to: 'stock' });
+  await api.markSold(g2, { soldCents: 1200, on: '2026-10-20', platform: 'vinted' }); await api.writeOff(g3, 'lost', '2026-10-22');
+  await api.markSold(g4, { soldCents: 3000, on: '2026-10-25', platform: 'depop', feeCents: 200, shipPaidCents: 100 });
+  const ov = await api.overview(30, '2026-10-27'), s = await api.overviewSeries(30, '2026-10-27');
+  assert.deepEqual([ov.current.net, ov.current.sold], [800, 2]);
+  assert.deepEqual(s.by_platform, [{ platform: 'vinted', net: 700, sold: 1 }, { platform: 'depop', net: 600, sold: 1 }, { platform: 'ebay', net: 0, sold: 0 }, { platform: '', net: -500, sold: 0 }]);
+  assert.deepEqual(s.daily.filter(x => x.net !== 0 || x.sold !== 0), [{ d: '2026-10-20', net: 2200, sold: 2 }, { d: '2026-10-22', net: -2000, sold: -1 }, { d: '2026-10-25', net: 600, sold: 1 }]);
+  const s7 = await api.overviewSeries(7, '2026-10-27');
+  assert.deepEqual(s7.by_platform, [{ platform: 'depop', net: 600, sold: 1 }, { platform: '', net: -500, sold: 0 }, { platform: 'ebay', net: -1500, sold: -1 }]);
+  await api.undo();
+  const su = await api.overviewSeries(30, '2026-10-27'); assert.equal(su.by_platform.reduce((n, x) => n + x.net, 0), 200); assert(!su.by_platform.some(x => x.platform === 'depop'));
 });
 test('A empty account: boot, overview and view are quiet (no events, "--" numbers)', async () => {
   const { api } = account({ uid: 'N' });

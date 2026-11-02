@@ -168,6 +168,7 @@
       boot: () => call('stock_boot'),
       overview: (days, on) => call('stock_overview', { p_days: days == null ? null : days, p_today: on || today() }),
       lanes: on => call('stock_lanes', { p_today: on || today() }),
+      overviewSeries: (days, on) => call('stock_overview_series', { p_days: days == null ? null : days, p_today: on || today() }),
       itemsPage: (filters, limit, cursor) => call('stock_items_page', { p_filters: filters || {}, p_limit: limit == null ? 50 : limit, p_cursor: cursor || null }),
       addItems: (item, quantity) => call('stock_add_items', { p_item: item, p_quantity: quantity == null ? 1 : quantity }),
       importRows: (importId, rows) => call('stock_import_rows', { p_import_id: importId, p_rows: rows }),
