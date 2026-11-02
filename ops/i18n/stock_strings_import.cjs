@@ -1,7 +1,7 @@
 // Import screen strings (step 4); merged into assets/stock-i18n.js by gen_stock_i18n.cjs through stock_strings.cjs. UTF-8 with real accents, informal "tu".
 const en = {
   'f.fee': 'Fees', 'imp.btn': 'Import', 'imp.title': 'Import your stock', 'imp.pick': 'Choose a CSV or Excel file', 'imp.drop': 'or drop it here',
-  'imp.formats': 'CSV or .xlsx, up to 10 MB and 5,000 rows. The file is read in your browser: nothing is sent until you press Import.',
+  'imp.formats': '.xlsx, .csv. In Google Sheets use File > Download > CSV.',
   'imp.reading': 'Reading the file', 'imp.sheet': 'Sheet', 'imp.back': 'Choose another file', 'imp.close': 'Close',
   'imp.err.xls': 'Old .xls files are not supported. Save the file as .xlsx or CSV and try again.', 'imp.err.not': 'This does not look like a CSV or Excel file.',
   'imp.err.encrypted': 'The file is password protected. Remove the password and try again.', 'imp.err.big': 'The file is too big (10 MB maximum).',
@@ -27,7 +27,7 @@ const en = {
 };
 const fr = {
   'f.fee': 'Frais', 'imp.btn': 'Importer', 'imp.title': 'Importer ton stock', 'imp.pick': 'Choisir un fichier CSV ou Excel', 'imp.drop': 'ou le déposer ici',
-  'imp.formats': 'CSV ou .xlsx, 10 Mo et 5 000 lignes au maximum. Le fichier est lu dans ton navigateur : rien n’est envoyé avant que tu appuies sur Importer.',
+  'imp.formats': '.xlsx, .csv. Dans Google Sheets, utilise Fichier > Télécharger > CSV.',
   'imp.reading': 'Lecture du fichier', 'imp.sheet': 'Feuille', 'imp.back': 'Choisir un autre fichier', 'imp.close': 'Fermer',
   'imp.err.xls': 'Les anciens fichiers .xls ne sont pas pris en charge. Enregistre le fichier en .xlsx ou en CSV et réessaie.', 'imp.err.not': 'Ce fichier ne ressemble pas à un CSV ou à un fichier Excel.',
   'imp.err.encrypted': 'Le fichier est protégé par un mot de passe. Retire le mot de passe et réessaie.', 'imp.err.big': 'Le fichier est trop gros (10 Mo au maximum).',

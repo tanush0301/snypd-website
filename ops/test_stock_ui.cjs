@@ -127,6 +127,27 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   await act('deleted'); ok(/UI flow item edited/.test(await firstRow()), 'it is in Recently deleted'); await act('restore'); await act('deleted'); eq(await rows(), 1, 'restored');
   await act('add'); await page.keyboard.press('Escape'); await wait(200); eq(await page.$('.st-sheet'), null, 'Escape closes the sheet');
   eq(await page.evaluate(() => window.__qaErrors.length), 0, 'no window errors in the mock');
+  // ---- 2a. step 5: Quick add keys + log, Mark sold context / preview / sold elsewhere, Import drop step (design Cc, Bb)
+  await act('add');
+  ok(/nothing added yet/.test(await text('#st-addlog')) && /Enter adds the next one \u00b7 Esc clears/.test(await text('.st-sheet')) && /ADD AND NEXT/i.test(await text('.st-sheet-ft')) && /ADD AND CLOSE/i.test(await text('.st-sheet-ft')), 'Quick add: design copy (log line, keys line, Add and next / Add and close)');
+  await setv('#sf-title', 'Step5 jacket'); await setv('#sf-buy', '12'); await page.focus('#sf-title'); await page.keyboard.press('Enter'); await wait(800);
+  ok(!!(await page.$('.st-sheet')) && /Added: Step5 jacket\./.test(await text('#st-addlog')) && (await page.$eval('#sf-title', e => e.value)) === '', 'Enter adds and keeps the sheet open for the next one, with the log line: ' + await text('#st-addlog'));
+  await setv('#sf-title', 'half typed'); await page.focus('#sf-title'); await page.keyboard.press('Escape'); await wait(250);
+  ok(!!(await page.$('.st-sheet')) && (await page.$eval('#sf-title', e => e.value)) === '', 'Esc clears what was typed first');
+  await page.keyboard.press('Escape'); await wait(250); eq(await page.$('.st-sheet'), null, 'Esc on an empty form closes it');
+  await setv('#st-q', 'Step5 jacket'); await wait(800); await openFirst();
+  await act('do', '[data-do="sold"]');
+  ok(/bought \u20ac12\.00/.test(await text('#st-soldctx')), 'Mark sold: the item line says what it cost: ' + await text('#st-soldctx'));
+  await setv('#sf-sold', '30'); await setv('#sf-ship', '2'); await wait(200);
+  { const pv = await text('#st-prev'); ok(/PROFIT|Profit/i.test(pv) && /\u20ac30\.00 sold \u2212 \u20ac12\.00 bought \u2212 \u20ac2\.00 shipping/.test(pv) && /16\.00/.test(pv), 'Mark sold: profit before fees with its formula: ' + pv); }
+  ok(/Fees not set: profit shown before fees\./.test(await text('.st-sheet')), 'Mark sold: the fees note');
+  await act('submit-noprice'); await wait(800);
+  { const row = await page.$eval('#stock-panel .st-row', e => e.innerText.replace(/\n+/g, ' | ')); ok(/SOLD/i.test(row) && /--/.test(row), 'Sold elsewhere, no price: sold with no price, profit shows --: ' + row); }
+  await setv('#st-q', ''); await wait(600);
+  await act('import'); await wait(300);
+  ok(/What we need/i.test(await text('.st-sheet')) && (await page.$$eval('.st-need .st-mapc', c => c.length)) === 13 && /Item name and buy price\. Everything else is optional\./.test(await text('.st-need')) && /Download our template/.test(await text('.st-sheet')) && /In Google Sheets use File > Download > CSV/.test(await text('.st-sheet')), 'Import drop step: What we need (13 columns), formats line, template link');
+  await page.keyboard.press('Escape'); await wait(250);
+
   // ---- 2b. export (step 2): every non-deleted item, design column set, a missing value stays empty
   await page.evaluate(() => { window.__dl = []; const o = URL.createObjectURL.bind(URL); URL.createObjectURL = b => { window.__dl.push(b); return o(b); }; });
   await act('export'); await wait(1500);

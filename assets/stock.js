@@ -445,6 +445,7 @@
       case 'qty-': case 'qty+': { var q = $('#sf-quantity'); if (q) { q.value = Math.max(1, Math.min(C.CAPS.quantityPerAdd, (parseInt(q.value, 10) || 1) + (act === 'qty+' ? 1 : -1))); } break; }
       case 'submit': submitSheet(false); break;
       case 'submit-next': submitSheet(true); break;
+      case 'submit-noprice': submitSheet(false, true); break;
       case 'do': runDetailAction(el.getAttribute('data-do'), id); break;
       case 'save-detail': saveDetail(id); break;
       case 'view': showView(el.getAttribute('data-view')); break;
@@ -463,9 +464,9 @@
     }
   }
   function onKey(ev) {
-    if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); closeSheet(); return; }
+    if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); if (S.sheet.kind === 'add' && clearAdd()) return; closeSheet(); return; }
     if (ev.key === 'Enter' && ev.target.closest('.st-row') && ev.target.classList.contains('st-row')) { S.opener = ev.target; openDetail(ev.target.getAttribute('data-id')); return; }
-    if (ev.key === 'Enter' && S.sheet && S.sheet.kind !== 'detail' && ev.target.tagName === 'INPUT') { ev.preventDefault(); submitSheet(ev.shiftKey && S.sheet.kind === 'add'); }
+    if (ev.key === 'Enter' && S.sheet && S.sheet.kind !== 'detail' && ev.target.tagName === 'INPUT') { ev.preventDefault(); submitSheet(!ev.shiftKey && S.sheet.kind === 'add'); }
     if (ev.key === 'Tab' && S.sheet) trapFocus(ev);
   }
   document.addEventListener('keydown', function (ev) {
@@ -509,7 +510,7 @@
     var go = { add: 'sheet.add.go', list: 'sheet.list.go', reprice: 'sheet.reprice.go', sold: 'sheet.sold.go', returned: 'sheet.returned.go', wo: 'sheet.wo.go' }[kind];
     var body = formFor(kind, item);
     var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button>' +
-      (kind === 'add' ? '<button type="button" class="st-btn st-ghost" data-act="submit-next">' + esc(T('sheet.add.next')) + '</button>' : '') +
+      (kind === 'add' ? '<button type="button" class="st-btn st-ghost" data-act="submit-next">' + esc(T('sheet.add.next')) + '</button>' : '') + (kind === 'sold' ? '<button type="button" class="st-btn st-ghost" data-act="submit-noprice">' + esc(T('sheet.sold.none')) + '</button>' : '') +
       '<button type="button" class="st-btn ' + (kind === 'wo' ? 'st-danger' : 'st-prim') + '" data-act="submit" id="st-go">' + esc(T(go)) + '</button>';
     mountSheet(T(title) + (item ? ': ' + item.title : ''), '<div id="st-sheet-err"></div>' + body, foot);
     var first = $('.st-sheet input:not([type=hidden]), .st-sheet select'); if (first) first.focus();
@@ -518,6 +519,17 @@
   }
   function mountSheet(title, bodyHtml, footHtml) {
     $('#st-ov').innerHTML = '<div class="st-scrim" data-act="scrim"></div><div class="st-sheet" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><div class="st-sheet-hd"><h2>' + esc(title) + '</h2><button type="button" class="st-x" data-act="close" aria-label="' + esc(T('close')) + '">&times;</button></div><div class="st-sheet-bd">' + bodyHtml + '</div>' + (footHtml ? '<div class="st-sheet-ft">' + footHtml + '</div>' : '') + '</div>';
+  }
+  // Esc on Quick add clears what was typed first (design Cc: "Esc clears"); it closes only when the form is already empty
+  function clearAdd() {
+    var ids = ['title', 'brand', 'size', 'buy', 'extra', 'source'], dirty = false;
+    ids.forEach(function (n) { var e = $('#sf-' + n); if (e && e.value) { dirty = true; e.value = ''; } });
+    if (dirty) { var t = $('#sf-title'); if (t) t.focus(); }
+    return dirty;
+  }
+  function needPanel() {
+    var chips = []; for (var i = 0; i < 13; i++) chips.push('<span class="st-mapc">' + esc(T('imp.need.c' + i)) + '</span>');
+    return '<div class="st-need"><span class="st-lbl">' + esc(T('imp.need.title')) + '</span><p>' + esc(T('imp.need.body')) + '</p><div class="st-map">' + chips.join('') + '</div><p class="st-hint">' + esc(T('imp.need.priv')) + '</p></div>';
   }
   function closeSheet() {
     S.sheet = null; var ov = $('#st-ov'); if (ov) ov.innerHTML = '';
@@ -533,12 +545,12 @@
       return '<div class="st-form">' + fld('title', T('f.title'), txt('title', '', '', ' maxlength="140"'), 'full') + fld('brand', T('f.brand'), txt('brand', '', '', ' maxlength="60"')) + fld('size', T('f.size'), txt('size', '', '', ' maxlength="20"')) +
         fld('condition', T('f.condition'), '<select class="st-in" id="sf-condition">' + condOptions('') + '</select>') + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions('') + '</select>') +
         fld('quantity', T('f.quantity'), '<div class="st-qty"><button type="button" data-act="qty-" aria-label="' + esc(T('qty.dec')) + '">-</button><input class="st-in" id="sf-quantity" value="1" inputmode="numeric" maxlength="2"><button type="button" data-act="qty+" aria-label="' + esc(T('qty.inc')) + '">+</button></div>') +
-        fld('bought', T('f.bought'), dat('bought', t0, t0)) + fld('buy', T('f.buy'), mny('buy')) + fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint">' + esc(T('sheet.add.hint')) + '</p>';
+        fld('bought', T('f.bought'), dat('bought', t0, t0)) + fld('buy', T('f.buy'), mny('buy')) + fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint" id="st-addlog" aria-live="polite">' + esc(T('sheet.add.log0')) + '</p><p class="st-hint">' + esc(T('sheet.add.keys')) + '</p><p class="st-hint">' + esc(T('sheet.add.hint')) + '</p>';
     }
     if (kind === 'list') return '<div class="st-form">' + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('list', T('f.list'), mny('list', it.list_cents)) + fld('listed', T('f.listed'), dat('listed', t0, t0)) + '</div>';
     if (kind === 'reprice') return '<div class="st-form"><div class="st-f full"><span class="st-lbl">' + esc(T('f.list')) + '</span><b>' + esc(M(it.list_cents)) + '</b></div>' + fld('newprice', T('f.newprice'), mny('newprice'), 'full') + '</div>';
     if (kind === 'sold') {
-      return '<div class="st-form">' + fld('sold', T('f.sold'), mny('sold', it.list_cents), 'full') + fld('soldon', T('f.soldon'), dat('soldon', t0, t0)) + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('ship', T('f.ship'), mny('ship'), 'full') + '</div><div class="st-prev" id="st-prev" style="margin-top:14px"></div>';
+      return '<p class="st-d" id="st-soldctx">' + esc(soldCtx(it)) + '</p><div class="st-form">' + fld('sold', T('f.sold'), mny('sold', it.list_cents), 'full') + fld('soldon', T('f.soldon'), dat('soldon', t0, t0)) + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('ship', T('f.ship'), mny('ship'), 'full') + '</div><div class="st-prev" id="st-prev" style="margin-top:14px"></div><p class="st-hint">' + esc(T('sold.nofees')) + '</p><p class="st-hint">' + esc(T('sold.formula')) + '</p>';
     }
     if (kind === 'returned') {
       return '<div class="st-form">' + fld('returnedon', T('f.returnedon'), dat('returnedon', t0, t0)) + fld('refund', T('f.refund'), mny('refund', it.sold_cents)) + fld('retship', T('f.retship'), mny('retship'), 'full') +
@@ -548,13 +560,21 @@
     if (kind === 'wo') return '<div class="st-form">' + fld('reason', T('f.reason'), '<select class="st-in" id="sf-reason">' + C.WRITE_OFF_REASONS.map(function (r) { return option(r, T('reason.' + r)); }).join('') + '</select>') + fld('date', T('f.date'), dat('date', t0, t0)) + '</div><p class="st-hint">' + esc(T('sheet.wo.note')) + '</p>';
     return '';
   }
+  function soldCtx(it) {
+    var parts = [], cost = C.costCents(it), MN = String.fromCharCode(0xb7);
+    if (it.buy_cents != null) parts.push(T('sold.ctx.bought', { v: M(it.buy_cents) }));
+    if (it.extra_cents) parts.push(T('sold.ctx.extra', { v: M(it.extra_cents) }));
+    if (it.list_cents != null) parts.push(T('sold.ctx.listed', { v: M(it.list_cents), plat: it.platform ? T('plat.' + it.platform) : '--' }));
+    return parts.join(' ' + MN + ' ');
+  }
   function previewSold() {
     var it = S.sheet.item, box = $('#st-prev'); if (!box) return;
-    var sold = C.parseMoneyInput(($('#sf-sold') || {}).value, lang), ship = C.parseMoneyInput(($('#sf-ship') || {}).value, lang), cost = C.costCents(it);
+    var sold = C.parseMoneyInput(($('#sf-sold') || {}).value, lang), ship = C.parseMoneyInput(($('#sf-ship') || {}).value, lang), cost = C.costCents(it), MI = String.fromCharCode(0x2212);
     if (cost == null) { box.innerHTML = esc(T('preview.nocost')); return; }
     if (!sold.ok || sold.cents == null) { box.innerHTML = esc(T('preview.cost', { cost: M(cost) })); return; }
-    var p = sold.cents - cost - (ship.ok && ship.cents ? ship.cents : 0);
-    box.innerHTML = esc(T('preview.profit')) + '<strong class="' + (p < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(p)) + '</strong>';
+    var sh = ship.ok && ship.cents ? ship.cents : 0, p = sold.cents - cost - sh, f = [T('prev.f.sold', { v: M(sold.cents) }), T('prev.f.buy', { v: M(it.buy_cents) })];
+    if (it.extra_cents) f.push(T('prev.f.extra', { v: M(it.extra_cents) })); if (sh) f.push(T('prev.f.ship', { v: M(sh) }));
+    box.innerHTML = '<span class="st-lbl">' + esc(T('prev.title')) + '</span><strong class="' + (p < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(p)) + '</strong><small>' + esc(f.join(' ' + MI + ' ')) + '</small>';
   }
   // read helpers: set the inline error and return undefined on failure
   function fieldErr(name, msg) { var e = S.panel.querySelector('.st-fe[data-for="' + name + '"]'), i = S.panel.querySelector('#sf-' + name); if (e) e.textContent = msg || ''; if (i) i.classList.toggle('bad', !!msg); }
@@ -567,7 +587,7 @@
   function readDate(name) { var el = $('#sf-' + name), v = el ? el.value : ''; if (!v) { fieldErr(name, T('err.required')); return { bad: true }; } fieldErr(name, ''); return { v: v }; }
   function sheetError(e) { var box = $('#st-sheet-err'); if (box) box.innerHTML = '<div class="st-err">' + esc(errMsg(e)) + (e && e.code === 'stock_free_limit' ? ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a>' : '') + '</div>'; var go = $('#st-go'); if (go) go.disabled = false; }
 
-  function submitSheet(andNext) {
+  function submitSheet(andNext, noPrice) {
     var sh = S.sheet; if (!sh) return;
     if (sh.kind === 'settings') { saveSettingsSheet(); return; }
     var go = $('#st-go'), item = sh.item, run, label, bad = false;
@@ -588,8 +608,8 @@
       if (item.list_cents != null && np.cents >= item.list_cents) { fieldErr('newprice', T('err.reprice')); return; }
       run = function () { return S.api.setStatus(item.id, 'listed', { listCents: np.cents }); }; label = T('toast.repriced');
     } else if (sh.kind === 'sold') {
-      var sp = readMoney('sold', true), sd = readDate('soldon'), sh2 = readMoney('ship'); if (sp.bad || sd.bad || sh2.bad) return;
-      run = function () { return S.api.markSold(item.id, { soldCents: sp.cents, on: sd.v, platform: $('#sf-platform').value || undefined, shipPaidCents: sh2.cents == null ? undefined : sh2.cents }); }; label = T('toast.sold');
+      var sp = noPrice ? { cents: null } : readMoney('sold', true), sd = readDate('soldon'), sh2 = readMoney('ship'); if (sp.bad || sd.bad || sh2.bad) return;
+      run = function () { return S.api.markSold(item.id, { soldCents: sp.cents == null ? null : sp.cents, on: sd.v, platform: $('#sf-platform').value || undefined, shipPaidCents: sh2.cents == null ? undefined : sh2.cents }); }; label = T('toast.sold');
     } else if (sh.kind === 'returned') {
       var rd = readDate('returnedon'), rf = readMoney('refund'), rs = readMoney('retship'); if (rd.bad || rf.bad || rs.bad) return;
       var wo = S.panel.querySelector('input[name=dest]:checked').value === 'wo';
@@ -602,7 +622,7 @@
     mutate(run, label).then(function (res) {
       if (!res.ok) { sheetError(res.e); return; }
       if (sh.kind === 'add' && andNext) {   // keep brand, category, date and source for the next one
-        $('#sf-title').value = ''; $('#sf-buy').value = ''; $('#sf-extra').value = ''; $('#sf-size').value = ''; $('#sf-quantity').value = '1'; if (go) go.disabled = false; $('#sf-title').focus();
+        var lg = $('#st-addlog'); if (lg) lg.textContent = T('sheet.add.log', { t: title }); $('#sf-title').value = ''; $('#sf-buy').value = ''; $('#sf-extra').value = ''; $('#sf-size').value = ''; $('#sf-quantity').value = '1'; if (go) go.disabled = false; $('#sf-title').focus();
       } else closeSheet();
     });
   }
@@ -708,7 +728,7 @@
     var close = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('imp.close')) + '</button>';
     if (IM.step === 'pick' || IM.step === 'reading') {
       imShell((IM.err ? '<div class="st-err">' + esc(IM.err) + '</div>' : '') + '<div class="st-drop" id="im-drop">' + (IM.step === 'reading' ? '<p>' + esc(T('imp.reading')) + '</p>' :
-        '<button type="button" class="st-btn st-prim" data-act="im-pick">' + esc(T('imp.pick')) + '</button><p>' + esc(T('imp.drop')) + '</p><p class="st-hint">' + esc(T('imp.formats')) + '</p>') +
+        '<button type="button" class="st-btn st-prim" data-act="im-pick">' + esc(T('imp.pick')) + '</button><p>' + esc(T('imp.drop')) + '</p><p class="st-hint">' + esc(T('imp.formats')) + ' ' + esc(T('imp.limits')) + '</p><p class="st-hint"><button type="button" class="st-link" data-act="template">' + esc(T('fr.template')) + '</button></p>') + needPanel() +
         '<input type="file" id="im-file" accept=".csv,.tsv,.txt,.xlsx" hidden></div>', close);
       var fi = $('#im-file'), dz = $('#im-drop');
       if (fi) fi.onchange = function () { if (fi.files && fi.files[0]) imRead(fi.files[0]); };
