@@ -46,6 +46,7 @@ machine-readable summaries and downloads synchronized:
 python3 ops/seo/gen_content.py
 python3 ops/seo/gen_price_guide.py
 python3 ops/seo/gen_reseller.py
+python3 ops/seo/gen_expansion.py
 python3 ops/seo/gen_market_report.py
 python3 ops/seo/gen_regions.py
 python3 ops/seo/gen_search_assets.py

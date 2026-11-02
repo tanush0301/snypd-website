@@ -48,7 +48,7 @@ function base() {
   g.window = g;
   return { g, el, context: vm.createContext(g), events };
 }
-async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, trialEnds = null, boot = null, insertedRow = {id: 'h1'}} = {}) {
+async function wizardFixture({count = 0, status = 'off', insertError = null, xpFails = false, pendingInsert = null, trialStart = null, trialEnds = null, boot = null, insertedRow = {id: 'h1'}, intent = null} = {}) {
   const f = base(); let inserts = 0, countValue = count, countReads = 0;
   // dashboard_boot snapshot (migration 054): the wizard takes its hunt count from it once.
   f.g.fromBoot = reader => { assert.equal(reader, 'wizard'); const b = boot; boot = null; return b; };
@@ -59,7 +59,9 @@ async function wizardFixture({count = 0, status = 'off', insertError = null, xpF
   f.g.SNYPD.enableAlerts = async () => ({ok: false, state: 'error', message: 'Retry safely'});
   const built = [];
   f.built = built;
-  f.g.SNYPD.vq = { fillSites() {}, currencyFor: site => site === 'vinted.co.uk' ? 'GBP' : 'EUR', floorFor: site => site === 'vinted.co.uk' ? 25 : 30,
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../assets/search-contract.js'), 'utf8'), f.context);
+  f.g.localStorage.getItem = key => key === 'snypd_hunt_intent' && intent ? JSON.stringify(intent) : null;
+  f.g.SNYPD.vq = { fillSites(sel) { sel.options = f.g.SNYPDSearch.markets.map(m => ({value:m[0]})); sel.value = 'vinted.fr'; }, currencyFor: site => (f.g.SNYPDSearch.market(site) || [,,, 'EUR'])[3], floorFor: site => site === 'vinted.co.uk' ? 25 : 30,
     build: (...args) => { built.push(args); return 'https://www.vinted.fr/catalog?search_text=carhartt'; } };
   f.g.sb = { from() { return {
     select() { return this; }, eq() { return this; },
@@ -78,10 +80,13 @@ async function wizardFixture({count = 0, status = 'off', insertError = null, xpF
   f.setStatus = value => { status = value; f.g.dispatchEvent(new f.g.Event('snypd:alerts-changed')); };
   return f;
 }
-async function pushFixture({sub = true, registerStatus = 200, permission = 'granted', ios = false, standalone = false, statusReady = true} = {}) {
+async function pushFixture({sub = true, registerStatus = 200, permission = 'granted', ios = false, standalone = false, statusReady = true, localTestFails = false, french = false} = {}) {
   const f = base(); let permissionCalls = 0, subscribeCalls = 0, unsubscribes = 0, statusCalls = 0;
   const subscription = { toJSON: () => ({ endpoint: 'https://push.invalid/test', keys: {auth:'fake', p256dh:'fake'} }), unsubscribe: async () => { unsubscribes++; return true; } };
-  const reg = { pushManager: { getSubscription: async () => sub ? subscription : null, subscribe: async () => { subscribeCalls++; sub = true; return subscription; } } };
+  const displayed = [];
+  const reg = { showNotification: async (title, options) => { if (localTestFails) throw new Error('device'); displayed.push({title,options}); }, pushManager: { getSubscription: async () => sub ? subscription : null, subscribe: async () => { subscribeCalls++; sub = true; return subscription; } } };
+  f.g.document.documentElement = {lang:french ? 'fr' : 'en'};
+  f.notifications = displayed;
   f.g.Notification = { permission, requestPermission: async () => { permissionCalls++; f.g.Notification.permission = 'granted'; return 'granted'; } };
   f.g.PushManager = function() {};
   f.g.navigator.standalone = standalone;
@@ -231,10 +236,33 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   }
   f=await wizardFixture(); f.el('wiz-q-site').value='vinted.co.uk';
   for (const cb of f.el('wiz-q-site').listeners.change) cb();
-  assert.equal(f.el('wiz-q-min').value,'25'); assert.equal(f.el('wiz-q-min-currency').textContent,'GBP');
+  assert.equal(f.el('wiz-q-min').value,''); assert.equal(f.el('wiz-q-min-currency').textContent,'GBP');
   f.el('wiz-q-min').value='5'; for (const cb of f.el('wiz-q-min').listeners.input) cb();
   f.el('wiz-q-site').value='vinted.fr'; for (const cb of f.el('wiz-q-site').listeners.change) cb();
-  assert.equal(f.el('wiz-q-min').value,'5'); assert.equal(f.el('wiz-q-min-currency').textContent,'EUR'); passed++;
+  assert.equal(f.el('wiz-q-min').value,''); assert.equal(f.el('wiz-q-min-currency').textContent,'EUR'); passed++;
+
+  // Builder intent preserves marketplace/currency and exact decimal bounds, with no automatic save.
+  for (const site of ['vinted.co.uk','vinted.pl']) {
+    f=await wizardFixture({intent:{q:'Nike Dunk Low',site,min:'5.25',max:'23.45',t:Date.now()}});
+    assert.equal(f.inserts(),0); assert.equal(f.el('wiz-q-site').value,site);
+    assert.equal(f.el('wiz-q-max').value,'23.45'); assert.equal(f.el('wiz-q-min').value,'5.25');
+    await f.el('wiz-q-save').click(); assert.equal(f.inserts(),1);
+    assert.equal(f.built[0][0],site); assert.equal(f.built[0][2],'23.45'); assert.equal(f.built[0][3],5.25); passed++;
+  }
+  f=await wizardFixture({intent:{q:'private words',site:'evil.example',min:'1',max:'30',t:Date.now()}});
+  assert.equal(f.el('wiz-q-words').value,''); assert.equal(f.inserts(),0); passed++;
+
+  // A local test is opt-in, needs an enabled device and cannot be confused with server delivery.
+  f=await pushFixture(); assert.equal(f.notifications.length,0); assert.equal(f.el('btn-notify-test').hidden,false);
+  const before=f.metrics(); await f.el('btn-notify-test').click();
+  assert.equal(f.notifications.length,1); assert.deepEqual(f.metrics(),before);
+  assert.match(f.notifications[0].options.body,/does not test server delivery/); passed++;
+  f=await pushFixture({sub:false}); assert.equal(f.el('btn-notify-test').hidden,true);
+  await f.el('btn-notify-test').click(); assert.equal(f.notifications.length,0); passed++;
+  f=await pushFixture({localTestFails:true}); await f.el('btn-notify-test').click();
+  assert.equal(f.el('btn-notify-test').disabled,false); assert.match(f.el('notify-note').textContent,/could not be displayed/); passed++;
+  f=await pushFixture({french:true}); await f.el('btn-notify-test').click();
+  assert.equal(f.el('btn-notify-test').textContent,'Tester cet appareil'); assert.match(f.notifications[0].title,/test de cet appareil/); passed++;
 
   console.log(`PASS: ${passed} onboarding/push recovery scenarios; no production requests.`);
 })().catch(error=>{console.error(error);process.exitCode=1;});

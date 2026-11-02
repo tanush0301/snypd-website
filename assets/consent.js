@@ -401,12 +401,13 @@
     if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) tags.push([k, v]);
   });
   /* Entry page: the SNYPD page a visitor started on ("fr.bot-vinted", "home"), carried
-     only on links to /signup, /login and /plans so sign-ups can be counted per page
+     through public links and then /signup, /login and /plans so sign-ups can be counted per page
      (auth.js saves it as entry_page). From the address only, never stored. */
-  var from = q.get('from'), FROM_OK = /^[a-z0-9.-]{1,80}$/;
+  var from = q.get('from'), FROM_OK = /^[a-z0-9.-]{1,80}$/, fromBasis = q.get('entry_basis') === 'nav-v1' ? 'nav-v1' : null;
   if (!(from && FROM_OK.test(from))) {
     from = location.pathname.replace(/^\/+|\/+$/g, '').replace(/\.html$/, '').replace(/\//g, '.') || 'home';
-    if (!FROM_OK.test(from) || /^(signup|login|reset-password|dashboard|account|admin|plans)$/.test(from)) from = null;
+    if (!FROM_OK.test(from) || /^(signup|login|reset-password|dashboard|account|admin|plans)(\.|$)/.test(from)) from = null;
+    fromBasis = from ? 'nav-v1' : null;
   }
   if (!tags.length && !from) return;
   var aff = q.get('a');
@@ -421,7 +422,14 @@
     try { u = new URL(a.getAttribute('href'), location.href); } catch (e) { return; }
     if (u.origin !== location.origin || u.pathname === location.pathname) return;
     tags.forEach(function (t) { if (!u.searchParams.has(t[0])) u.searchParams.set(t[0], t[1]); });
-    if (from && /^\/(signup|login|plans)$/.test(u.pathname) && !u.searchParams.has('from')) u.searchParams.set('from', from);
+    // Carry the first public page through ordinary internal navigation without
+    // cookies/storage. Never decorate private pages, downloads or external sites.
+    var publicPage = !/^\/(dashboard|account|admin|reset-password|assets|ops|api)(\/|$)/.test(u.pathname)
+      && (!/\.[a-z0-9]+$/i.test(u.pathname) || /\.html$/i.test(u.pathname));
+    if (from && publicPage && !u.searchParams.has('from')) {
+      u.searchParams.set('from', from);
+      if (fromBasis) u.searchParams.set('entry_basis', fromBasis);
+    }
     a.setAttribute('href', u.pathname + u.search + u.hash);
   }
   function onUse(e) {

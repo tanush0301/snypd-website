@@ -50,6 +50,13 @@
     put('roi', total > 0 ? percent(profit / total * 100) : na);
     put('break-even', money(total));
     put('budget', budget >= 0 ? money(budget) : (fr ? 'Même un article gratuit ne permet pas cet objectif.' : 'No non-negative buying price meets this target.'));
+    var builder = result.querySelector('[data-profit-builder]');
+    if (builder) {
+      builder.hidden = budget <= 0;
+      builder.href = (fr ? '/fr/creer-recherche-vinted' : '/vinted-search-builder') + '?' + new URLSearchParams({
+        currency: form.elements.currency.value, max: (budget / 100).toFixed(2)
+      }).toString();
+    }
     result.hidden = false;
   }
   form.addEventListener('submit', calculate);

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Configurer les alertes SNYPD sur iPhone et Android | SNYPD</title>
+<meta name="description" content="Configure les alertes de nouvelles annonces sur téléphone : installation iPhone, autorisations Android, test local et dépannage étape par étape.">
+<link rel="canonical" href="https://www.snypd.store/fr/alertes-vinted-telephone">
+<link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-alerts-on-your-phone">
+<link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/alertes-vinted-telephone">
+<link rel="alternate" hreflang="x-default" href="https://www.snypd.store/vinted-alerts-on-your-phone">
+<meta property="og:title" content="Configurer les alertes SNYPD sur iPhone et Android | SNYPD">
+<meta property="og:description" content="Configure les alertes de nouvelles annonces sur téléphone : installation iPhone, autorisations Android, test local et dépannage étape par étape.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.snypd.store/fr/alertes-vinted-telephone">
+<meta property="og:site_name" content="SNYPD">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
+<link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<style>
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+html, body { margin: 0; background: #0A0A0B; }
+body { font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; -webkit-font-smoothing: antialiased; }
+a { color: #00E5A0; text-decoration: none; }
+a:hover { color: #57FFC8; }
+a:focus-visible, button:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+::selection { background: #A200FF; color: #FFFFFF; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor { animation: none !important; } }
+.lg-wrap { max-width: 1320px; margin: 0 auto; padding-left: 20px; padding-right: 20px; box-sizing: border-box; }
+.lg-nav { position: sticky; top: 0; z-index: 30; background: rgba(10,10,11,.92); border-bottom: 1px solid #1D1D20; }
+.lg-nav-in { display: flex; align-items: center; gap: 10px 18px; padding-top: 8px; padding-bottom: 8px; }
+.lg-brand { display: flex; align-items: center; gap: 9px; color: #FFFFFF; min-height: 44px; }
+.lg-brand:hover { color: #FFFFFF; }
+.lg-brand img { width: 22px; height: 22px; object-fit: contain; display: block; }
+.lg-brand span { font-size: 15.5px; font-weight: 700; letter-spacing: .02em; }
+.lg-cursor { animation: blink 1.2s step-end infinite; }
+.lg-links { display: flex; gap: 4px; flex: 1; }
+.lg-navlink { font-size: 12px; letter-spacing: .1em; color: #8B9094; padding: 14px 10px; }
+.lg-navlink:hover { color: #FFFFFF; }
+.lg-navlink[aria-current="page"] { color: #FFFFFF; }
+.lg-cta { font-size: 12px; letter-spacing: .1em; color: #FFFFFF; background: #A200FF; padding: 14px 16px; }
+.lg-cta:hover { color: #FFFFFF; filter: brightness(1.18); }
+@media (max-width: 699.98px) { .lg-links { display: none; } .lg-nav-in { justify-content: space-between; } .lg-login { margin-left: auto; } }
+@media (max-width: 459.98px) { .lg-nav-in { gap: 4px; } .lg-navlink { padding: 14px 6px; letter-spacing: .05em; } .lg-cta { padding: 14px 10px; letter-spacing: .05em; } .lg-brand span { font-size: 14px; } }
+.lg-head { border-bottom: 1px solid #1D1D20; }
+.lg-head-in { padding-top: 56px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 14px; }
+.lg-eyebrow { font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+.lg-h1 { margin: 0; max-width: 20ch; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(36px, 6vw, 60px); line-height: .98; letter-spacing: -.04em; color: #FFFFFF; }
+.lg-meta { font-size: 12px; color: #8B9094; }
+.lg-lead { margin: 6px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.7; color: #B8BCBF; }
+.lg-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding-top: 40px; padding-bottom: 72px; align-items: start; }
+@media (max-width: 899.98px) { .lg-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 28px; } }
+.lg-toc { position: sticky; top: 84px; border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 18px; display: flex; flex-direction: column; gap: 2px; }
+@media (max-width: 899.98px) { .lg-toc { position: static; } }
+.lg-toc span { font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.lg-toc a { font-size: 12px; line-height: 1.5; color: #B8BCBF; padding: 5px 0; }
+.lg-toc a:hover { color: #00E5A0; }
+.lg-doc { max-width: 820px; min-width: 0; }
+.lg-wide { grid-template-columns: minmax(0, 1fr); }
+.lg-wide .lg-doc { max-width: 1120px; }
+.lg-doc section { border-top: 1px solid #1D1D20; padding: 30px 0 6px; scroll-margin-top: 80px; }
+.lg-doc section:first-child { border-top: 0; padding-top: 0; }
+.lg-doc h2 { margin: 0 0 14px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(24px, 3.2vw, 30px); line-height: 1.05; letter-spacing: -.03em; color: #FFFFFF; }
+.lg-doc h3 { margin: 22px 0 8px; font-size: 12.5px; font-weight: 400; letter-spacing: .1em; color: #FFFFFF; }
+.lg-doc p, .lg-doc li { font-size: 13px; line-height: 1.75; color: #B8BCBF; }
+.lg-doc p { margin: 0 0 14px; }
+.lg-doc ul, .lg-doc ol { margin: 0 0 14px; padding-left: 20px; }
+.lg-doc li { margin: 0 0 6px; }
+.lg-doc strong { font-weight: 400; color: #FFFFFF; }
+.lg-doc code { font-family: inherit; font-size: 12px; color: #FFFFFF; background: #141416; border: 1px solid #26262A; padding: 1px 5px; overflow-wrap: anywhere; }
+.lg-doc blockquote { margin: 0 0 14px; padding: 12px 16px; border-left: 2px solid #00E5A0; background: #0C0C0D; font-size: 13px; line-height: 1.7; color: #E8EAEB; }
+.lg-doc blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: 11.5px; color: #8B9094; }
+.lg-box { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 12px; }
+.lg-box.lg-mint { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.06); }
+.lg-box p { margin: 0; }
+.ct-scroll { overflow-x: auto; margin: 0 0 18px; border: 1px solid #1D1D20; -webkit-overflow-scrolling: touch; }
+.ct-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.ct-table th, .ct-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.55; color: #B8BCBF; }
+.ct-table thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .1em; color: #8B9094; }
+.ct-table tbody th { font-weight: 400; color: #FFFFFF; min-width: 150px; }
+.ct-table tbody tr { background: #0C0C0D; }
+.ct-table tbody tr.ct-us { background: rgba(162,0,255,.07); }
+.ct-table .ct-num { white-space: nowrap; color: #FFFFFF; }
+.ct-table small { display: block; color: #8B9094; font-size: 11px; }
+.ct-note { font-size: 11.5px !important; color: #8B9094 !important; }
+.ct-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ct-btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; font-size: 12px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; }
+.ct-btn:hover { color: #FFFFFF; filter: brightness(1.18); }
+.ct-btn.ct-ghost { background: #141416; border: 1px solid #3A3A40; }
+.ct-btn.ct-ghost:hover { filter: none; background: #1C1C1F; border-color: #55555C; }
+.lg-foot { border-top: 1px solid #1D1D20; }
+.lg-foot-in { padding-top: 24px; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lg-foot-a { display: flex; flex-direction: column; gap: 6px; }
+.lg-foot small { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.lg-foot-t { font-size: 12px; color: #8B9094; }
+.lg-foot-l { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-top: 4px; }
+.lg-foot-l a, .lg-foot-l button { font-size: 12px; }
+.lg-foot-l button { font-family: inherit; color: #00E5A0; background: none; border: 0; padding: 0; cursor: pointer; }
+.lg-foot-l button:hover { color: #57FFC8; }
+.lg-lang { position: relative; }
+.lg-lang > summary { list-style: none; cursor: pointer; }
+.lg-lang > summary::-webkit-details-marker { display: none; }
+.lg-lang > div { position: absolute; left: 0; top: 100%; z-index: 40; display: flex; flex-direction: column; min-width: 150px; background: #0A0A0B; border: 1px solid #1D1D20; }
+.pc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 18px; margin: 0 0 18px; }
+.pc label { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; margin-bottom: 8px; }
+.pc input { width: 100%; box-sizing: border-box; min-height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #3A3A40; border-radius: 0; }
+.pc input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+.lg-doc .pc-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-doc .pc-list li { margin: 0; }
+.pc-list button { font: inherit; font-size: 12px; color: #E8EAEB; background: #141416; border: 1px solid #3A3A40; padding: 9px 12px; min-height: 40px; cursor: pointer; text-align: left; }
+.pc-list button:hover, .pc-list button[aria-pressed="true"] { border-color: #00E5A0; color: #FFFFFF; }
+.pc-res { margin-top: 16px; border-top: 1px solid #1D1D20; padding-top: 16px; }
+.pc-res[hidden] { display: none; }
+.lg-doc .pc-res h3 { margin-top: 0; }
+.pc-big { display: block; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; margin: 2px 0 12px; }
+.pc-msg { font-size: 12.5px; color: #8B9094; margin: 10px 0 0; }
+.pc-az { columns: 2 240px; column-gap: 32px; }
+
+.rs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+@media (max-width: 759.98px) { .rs-grid { grid-template-columns: minmax(0, 1fr); } }
+.rs-card { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.rs-card:first-child, .rs-card:nth-child(2) { border-color: rgba(0,229,160,.38); background: rgba(0,229,160,.05); }
+.rs-num { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+.lg-doc .rs-title { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.02em; color: #FFFFFF; }
+.lg-doc .rs-card p { margin: 0; font-size: 12.5px; line-height: 1.7; }
+.lg-doc .rs-card p.rs-proof { padding-top: 9px; border-top: 1px dashed #26262A; font-size: 11.5px; color: #8B9094; }
+.rs-proof a { color: #00E5A0; }
+.ct-yes { color: #00E5A0; }
+.ct-table tbody tr.ct-us th, .ct-table tbody tr.ct-us td { color: #FFFFFF; border-top-color: rgba(0,229,160,.45); }
+.ct-table tbody tr.ct-us th { box-shadow: inset 3px 0 0 #00E5A0; }
+.ct-badge { display: inline-block; margin-left: 6px; padding: 2px 6px; font-size: 10px; letter-spacing: .1em; color: #0A0A0B; background: #00E5A0; vertical-align: 1px; }
+.ct-table tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: #0C0C0D; }
+.ct-table thead th:first-child { position: sticky; left: 0; z-index: 2; background: #121214; }
+.ct-table tbody tr.ct-us th[scope="row"] { background: #160C20; }
+@media (max-width: 699.98px) { .ct-table tbody th { min-width: 118px; } }
+.glance { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.glance li { font-size: 12px; letter-spacing: .04em; color: #FFFFFF; border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.06); padding: 8px 11px; }
+.glance li span { color: #00E5A0; margin-right: 6px; }
+.fit-list { list-style: none; padding: 0 !important; margin: 0 0 18px !important; display: flex; flex-direction: column; gap: 10px; }
+.fit-list li { margin: 0 !important; padding: 12px 14px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.fit-list li strong { display: block; margin-bottom: 3px; }
+.fit-list li.fit-yes { border-color: rgba(0,229,160,.38); }
+.lg-fig { margin: 4px 0 20px; border: 1px solid #1D1D20; background: #0C0C0D; }
+.lg-fig picture { display: block; }
+.lg-fig img { display: block; width: 100%; height: auto; }
+.lg-fig figcaption { padding: 10px 14px; border-top: 1px solid #1D1D20; font-size: 11.5px; line-height: 1.6; color: #8B9094; }
+.lg-fig.fig-narrow { max-width: 520px; }
+.fig-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; margin: 0 0 18px; }
+.fig-row .lg-fig { margin: 0; max-width: none; }
+@media (max-width: 759.98px) { .fig-row { grid-template-columns: minmax(0, 1fr); } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ct-duel { margin: 0 0 18px; }
+.ct-duel label { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.ct-duel select { font-family: inherit; font-size: 14px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 46px; }
+.ct-duel table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #1D1D20; }
+.ct-duel th, .ct-duel td { text-align: left; vertical-align: top; padding: 11px 10px; border-top: 1px solid #1D1D20; font-size: 12px; line-height: 1.5; color: #B8BCBF; overflow-wrap: anywhere; }
+.ct-duel thead th { border-top: 0; background: #121214; font-size: 11px; font-weight: 400; letter-spacing: .08em; color: #8B9094; }
+.ct-duel thead th.d-us { color: #FFFFFF; }
+.ct-duel tbody th { width: 28%; font-weight: 400; font-size: 11px; letter-spacing: .06em; color: #8B9094; }
+.ct-duel td.d-us { color: #FFFFFF; background: rgba(162,0,255,.07); }
+.ct-duel [data-t] { display: none; }
+.ct-duel [data-t].on { display: table-cell; }
+@media (min-width: 700px) { .ct-duel { display: none; } }
+@media (max-width: 699.98px) { .ct-full { display: none; } }
+.fc { border: 1px solid rgba(0,229,160,.38); background: rgba(0,229,160,.05); padding: 18px; margin: 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
+.fc-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 559.98px) { .fc-in { grid-template-columns: minmax(0, 1fr); } }
+.fc label { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: .12em; color: #8B9094; }
+.fc input, .fc select { font-family: inherit; font-size: 16px; color: #FFFFFF; background: #141416; border: 1px solid #3A3A40; border-radius: 0; padding: 0 12px; min-height: 48px; width: 100%; box-sizing: border-box; }
+.fc input:focus-visible, .fc select:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.fc-out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin: 0; }
+.fc-out div { background: #0C0C0D; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.fc-out dt { font-size: 11px; letter-spacing: .1em; color: #8B9094; }
+.fc-out dd { margin: 0; font-size: 18px; color: #FFFFFF; }
+.fc-out div.fc-total dd { color: #00E5A0; }
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://www.snypd.store/"},{"@type":"ListItem","position":2,"name":"Reçois les nouvelles annonces SNYPD sur ton téléphone","item":"https://www.snypd.store/fr/alertes-vinted-telephone"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","@id":"https://www.snypd.store/fr/alertes-vinted-telephone#page","url":"https://www.snypd.store/fr/alertes-vinted-telephone","name":"Configurer les alertes SNYPD sur iPhone et Android | SNYPD","description":"Configure les alertes de nouvelles annonces sur téléphone : installation iPhone, autorisations Android, test local et dépannage étape par étape.","inLanguage":"fr","datePublished":"2026-11-02","dateModified":"2026-11-02","isPartOf":{"@id":"https://www.snypd.store/#website"},"publisher":{"@id":"https://www.snypd.store/#org"},"about":{"@id":"https://www.snypd.store/#app"}}</script>
+<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VBC0SXPR6F');
+</script>
+</head>
+<body>
+<header class="lg-nav">
+  <div class="lg-wrap lg-nav-in">
+    <a class="lg-brand" href="/"><img src="/assets/home/logo.png" alt="SNYPD" width="22" height="22"><span>SNYPD<span class="lg-cursor">_</span></span></a>
+    <nav class="lg-links" aria-label="Main"><a class="lg-navlink" href="/fr/bot-vinted">BOT VINTED</a><a class="lg-navlink" href="/fr/guide-prix-vinted">PRIX VINTED</a><a class="lg-navlink" href="/plans">TARIFS</a><a class="lg-navlink" href="https://discord.gg/gjKD4auXhK">DISCORD</a></nav>
+    <a class="lg-navlink" href="/vinted-alerts-on-your-phone" hreflang="en" lang="en" title="English">EN</a>
+    <a class="lg-navlink lg-login" href="/login">CONNEXION</a>
+    <a class="lg-cta" href="/signup">COMMENCER</a>
+  </div>
+</header>
+<main>
+  <div class="lg-head">
+    <div class="lg-wrap lg-head-in">
+      <span class="lg-eyebrow">VINTED · SNYPD</span>
+      <h1 class="lg-h1">Reçois les nouvelles annonces SNYPD sur ton téléphone</h1>
+      <span class="lg-meta">Mis à jour le <time datetime="2026-11-02">2 novembre 2026</time> &middot; Par SNYPD, créé par un revendeur de sneakers belge</span>
+      <p class="lg-lead">Enregistre une recherche, autorise les notifications sur cet appareil, puis vérifie séparément leur affichage et l’état de la surveillance.</p>
+
+    </div>
+  </div>
+  <div class="lg-wrap lg-grid">
+    <nav class="lg-toc" aria-label="Sur Cette Page"><span>SUR CETTE PAGE</span><a href="#avant">Avant de commencer</a><a href="#iphone">iPhone et iPad</a><a href="#android">Android</a><a href="#test">Teste l’appareil, puis la réception réelle</a><a href="#depannage">Vérifie chaque étape séparément</a><a href="#sources">Sources</a></nav>
+    <article class="lg-doc">
+<section id="avant"><h2>Avant de commencer</h2><p>SNYPD est indépendant de Vinted. Ses alertes concernent les nouvelles annonces de tes recherches, pas les baisses de prix d’annonces existantes ni les messages de ton compte Vinted. Connecte-toi sur cet appareil et enregistre ta première recherche. Free commence par trois jours de surveillance 24 h/24 après cette première recherche ; ensuite la surveillance gratuite fonctionne avec le tableau de bord ouvert. L’accès payant maintient la surveillance lorsque tu le fermes. Vérifie les <a href="/plans?lang=fr">offres actuelles</a> et la date d’essai affichée dans ton tableau de bord.</p></section><section id="iphone"><h2>iPhone et iPad</h2><ol><li>Utilise iOS ou iPadOS 16.4 minimum. Ouvre SNYPD dans Safari.</li><li>Choisis Partager puis Sur l’écran d’accueil ; garde Ouvrir comme app web activé si proposé.</li><li>Ouvre cette icône, connecte-toi et enregistre une recherche.</li><li>Touche Configurer les alertes ou Activer les alertes, puis autorise les notifications.</li></ol><p>Les notifications web iPhone nécessitent l’application de l’écran d’accueil. Si Instagram ou Facebook bloque l’installation, ouvre d’abord la page dans Safari. En cas de silence, vérifie les réglages Notifications et Concentration de l’application installée.</p></section><section id="android"><h2>Android</h2><ol><li>Ouvre SNYPD dans Chrome en navigation normale et connecte-toi.</li><li>Enregistre une recherche, touche Configurer les alertes ou Activer les alertes et autorise les notifications.</li><li>Si elles sont bloquées, vérifie les autorisations du site snypd.store dans Chrome et celles de Chrome dans Android.</li></ol><p>Chrome ne fournit pas les notifications de site en navigation privée. L’installation sur l’écran d’accueil est facultative pour ce parcours Android ; l’autorisation reste nécessaire.</p></section><section id="test"><h2>Teste l’appareil, puis la réception réelle</h2><p>Lorsque le tableau de bord indique que les alertes sont activées, touche <strong>Tester cet appareil</strong>. Ce test local utilise le service worker enregistré sur cet appareil. Il ne demande pas de nouvel abonnement, ne crée pas d’annonce, n’envoie pas de message à une autre personne et ne teste pas le parcours serveur des nouvelles annonces.</p><p>Son apparition confirme que cet appareil peut afficher une notification dans cet état. Pour une réception réelle, garde une recherche active, vérifie la surveillance prévue par ton offre ou ton essai, puis observe une nouvelle correspondance. Le mode Chaque annonce peut avertir individuellement ; le mode Calme regroupe les correspondances et peut attendre son intervalle. Sans nouvelle annonce correspondante, il peut ne rien y avoir à notifier.</p></section><section id="depannage"><h2>Vérifie chaque étape séparément</h2><ul><li><strong>Aucune demande :</strong> ouvre l’application installée sur iPhone ou un navigateur Android compatible, puis touche directement l’activation.</li><li><strong>Autorisation bloquée :</strong> autorise le site ou l’application dans le navigateur et le système, puis réessaie. Toucher plusieurs fois ne contourne pas un refus.</li><li><strong>Le test local échoue :</strong> vérifie les autorisations, Concentration ou Ne pas déranger et l’affichage des notifications du navigateur.</li><li><strong>Le test fonctionne, mais aucune alerte d’annonce :</strong> contrôle les filtres, nouvelles correspondances, mode Calme, surveillance, essai et connexion. Le test local ne prouve pas la réception serveur.</li><li><strong>L’enregistrement serveur échoue :</strong> réessaie depuis le tableau de bord et attends son état activé. L’autorisation du navigateur seule ne prouve pas l’enregistrement de l’appareil.</li></ul><p>Pour le <a href="/support?lang=fr">support</a>, indique le système, le navigateur, le statut affiché et le résultat du test local. Ne partage ni mot de passe, ni jeton de session, ni adresse d’abonnement push.</p></section><section id="sources"><h2>Sources</h2><p>Étapes vérifiées avec les commandes SNYPD actuelles et la documentation des plateformes le 2 novembre 2026. Les libellés varient selon la version ; ce guide ne prétend pas avoir testé chaque appareil.</p><ul><li><a href="https://support.apple.com/guide/iphone/turn-a-website-into-an-app-iphea86e5236/ios" rel="noopener">Apple: Home Screen web apps</a></li><li><a href="https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/" rel="noopener">WebKit: iOS web push</a></li><li><a href="https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DAndroid&hl=fr" rel="noopener">Google Chrome: notifications</a></li></ul></section><section id="start"><h2>Commencer</h2><div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les 3 premiers jours tournent 24h/24 avec les alertes. Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p><p class="ct-note">Inscription et paiement en français.</p><div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a><a class="ct-btn ct-ghost" href="/plans">VOIR LES TARIFS</a></div></div></section>
+    </article>
+  </div>
+</main>
+<footer class="lg-foot">
+  <div class="lg-wrap lg-foot-in">
+    <div class="lg-foot-a">
+      <small>SNYPD &middot; NON AFFILIÉ À VINTED</small>
+      <span class="lg-foot-t">Lit uniquement les annonces publiques.</span>
+      <span class="lg-foot-l"><a href="/fr/bot-vinted">Bot Vinted</a><a href="/fr/monitor-vinted">Monitor Vinted</a><a href="/fr/alertes-recherche-vinted">Alertes Vinted</a><a href="/fr/notification-vinted-ne-fonctionne-pas">Notifications Vinted en panne</a><a href="/fr/recherches-enregistrees-vinted">Recherches enregistrées Vinted</a><a href="/fr/vinted-notification-baisse-de-prix">Baisse de prix Vinted</a><a href="/fr/comparatif-bot-vinted">Comparatif des bots Vinted</a><a href="/fr/guide-prix-vinted">Guide des prix Vinted</a><a href="/fr/estimer-prix-vinted">Estimer un prix Vinted</a><a href="/fr/vinted-voir-articles-vendus">Articles vendus sur Vinted</a><a href="/fr/rapport-marche-vinted">Rapport du marché Vinted</a><a href="/fr/frais-vinted">Frais Vinted</a><a href="/faq">FAQ (anglais)</a><a href="/support">Support (anglais)</a><a href="https://discord.gg/gjKD4auXhK">Discord</a></span>
+    </div>
+    <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a></nav>
+  </div>
+</footer>
+</body>
+</html>
