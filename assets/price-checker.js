@@ -1,5 +1,5 @@
 /* SNYPD Vinted price checker. Searches /assets/data/price-index.json, which holds only the items the
-   price guide already publishes (written by ops/seo/gen_price_guide.py). No cookies, no backend calls.
+   price guide already publishes (written by ops/seo/gen_price_guide.py). No account API calls or typed-query transmission.
    Words come from the page (<script type="application/json" class="pc-i18n">); this file stays ASCII.
    One GA4 event per item shown ('price_check' or 'price_check_unavailable', item id only, never the typed text); GA4 itself only
    loads after cookie consent (assets/consent.js), so without consent nothing leaves the browser. */
@@ -125,7 +125,8 @@
     });
   }
 
-  fetch(box.getAttribute('data-index'), { credentials: 'omit' }).then(function (r) {
+  // Retain same-origin deployment access on protected previews; never send credentials cross-origin.
+  fetch(box.getAttribute('data-index'), { credentials: 'same-origin' }).then(function (r) {
     if (!r.ok) throw new Error('index ' + r.status);
     return r.json();
   }).then(function (d) {
