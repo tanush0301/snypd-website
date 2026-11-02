@@ -2077,24 +2077,46 @@ body {
 
 <div class="panel" id="stock-panel" style="margin-bottom:16px; display:none"></div>
 <script>
-/* Stock (Stock build, step 3): the tab and a lazy loader. Everything stays hidden unless dashboard_boot() reports stock_mode admin or all;
-   assets/stock-core.js, stock-i18n.js, stock.js and stock.css load only when the tab is first opened. History is untouched. */
+/* Stock (Stock build, steps 3 and 5): the tab and a lazy loader. Everything stays hidden unless dashboard_boot() reports stock_mode admin or all;
+   assets/stock-core.js, stock-i18n.js, stock.js and stock.css load only when the tab is first opened. While Stock is on (and the user did not hide it)
+   it REPLACES the History tab (claims are mirrored into Stock, migration 067); switch off or hide the tab and History is back untouched. */
 (function () {
   var loaded = null;
   function addScript(src) { return new Promise(function (ok, bad) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { bad(new Error(src)); }; document.head.appendChild(s); }); }
   window.SNYPD = window.SNYPD || {};
   window.SNYPD.stockMode = null;
-  window.SNYPD.onStockMode = function (mode) {
-    window.SNYPD.stockMode = mode;
-    ['view-tab-stock', 'bottombar-tab-stock'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = ''; });
+  var stockHidden = false;
+  function paint() {
+    var on = !!window.SNYPD.stockMode, showStock = on && !stockHidden;
+    ['view-tab-stock', 'bottombar-tab-stock'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = showStock ? '' : 'none'; });
+    Array.prototype.forEach.call(document.querySelectorAll('.view-tab[data-view="history"], .bottombar-tab[data-view="history"]'), function (el) { el.style.display = showStock ? 'none' : ''; });
+    var row = document.getElementById('prof-stock-row'); if (row) row.style.display = (on && stockHidden) ? '' : 'none';
+  }
+  window.SNYPD.stockReplacesHistory = function () { return !!window.SNYPD.stockMode && !stockHidden; };
+  window.SNYPD.onStockMode = function (mode, hidden) { window.SNYPD.stockMode = mode; stockHidden = !!hidden; paint(); };
+  window.SNYPD.applyStockTab = function (hidden) {
+    stockHidden = !!hidden; paint();
+    var a = document.querySelector('.view-tab.active');
+    if (stockHidden && a && a.getAttribute('data-view') === 'stock' && window.SNYPD.switchView) window.SNYPD.switchView('feed');
   };
-  window.SNYPD.openStock = function () {
-    var panel = document.getElementById('stock-panel');
+  function ensureLoaded() {
     if (!loaded) {
       var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/assets/stock.css'; document.head.appendChild(css);
       loaded = addScript('/assets/stock-core.js').then(function () { return addScript('/assets/stock-i18n.js'); }).then(function () { return addScript('/assets/stock.js'); });
     }
-    loaded.then(function () { window.SNYPD.stock.open({ client: window.SNYPD.supabase, panel: panel }); })
+    return loaded;
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('#prof-stock-show'); if (!b) return;
+    b.disabled = true;
+    ensureLoaded().then(function () { return window.SnypdStock.createApi(window.SNYPD.supabase).saveSettings({ tab_hidden: false }); })
+      .then(function () { b.disabled = false; window.SNYPD.applyStockTab(false); if (window.SNYPD.switchView) window.SNYPD.switchView('stock'); })
+      .catch(function (err) { b.disabled = false; console.error('SNYPD Stock show tab failed', err); });
+  });
+  window.SNYPD.openStock = function () {
+    var panel = document.getElementById('stock-panel');
+    ensureLoaded()
+      .then(function () { window.SNYPD.stock.open({ client: window.SNYPD.supabase, panel: panel, today: window.SNYPD.stockToday || undefined }); })   /* stockToday: QA mock only */
       .catch(function (e) { loaded = null; panel.textContent = 'Could not load Stock. Reload the page.'; console.error('SNYPD Stock load failed', e); });
   };
 })();
@@ -2149,6 +2171,7 @@ body {
   <div class="prof-row"><span>Holding</span><span id="prof-holding-detail">—</span></div>
   <div class="prof-row"><span>Sold</span><span id="prof-sold-detail">—</span></div>
   <div class="prof-row"><span>Realised profit</span><span id="prof-profit-detail">—</span></div>
+  <div class="prof-row" id="prof-stock-row" style="display:none"><span>Stock tab</span><span><button type="button" class="chip" id="prof-stock-show" style="cursor:pointer">Show</button></span></div>
 </div>
 <div id="prof-xp-block" style="margin-top:16px">
   <div id="prof-streak-row" style="display:none;font-size:13px;color:var(--text-primary);margin-bottom:8px">&#128293; <span id="prof-streak-text"></span></div>
@@ -2551,7 +2574,7 @@ const HEARTBEAT_URL = (() => {
     return boot.data;
   }
   // Stock (stock build, step 3): show the Stock tab only when the switch is admin or all (dashboard_boot carries stock_mode since migration 068).
-  try { const _sm = boot && boot.data && boot.data.stock_mode; if (_sm && _sm !== 'off' && window.SNYPD && window.SNYPD.onStockMode) window.SNYPD.onStockMode(_sm); } catch (e) { console.error('SNYPD stock mode', e); }
+  try { const _sm = boot && boot.data && boot.data.stock_mode; if (_sm && _sm !== 'off' && window.SNYPD && window.SNYPD.onStockMode) window.SNYPD.onStockMode(_sm, boot.data.stock_tab_hidden); } catch (e) { console.error('SNYPD stock mode', e); }
   let me = boot
     ? { data: boot.data.profile || null, error: null }
     : await sb.from('users')
@@ -4578,6 +4601,7 @@ const HEARTBEAT_URL = (() => {
       // deliberately not one of the three tab buttons - matches the final
       // desktop mockup, which shows Feed/History/Market Insights as tabs
       // and plan/streak/founding info always-visible instead.
+      if (view === 'history' && window.SNYPD && window.SNYPD.stockReplacesHistory && window.SNYPD.stockReplacesHistory()) view = 'stock';
       document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
       document.querySelectorAll('.bottombar-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
       feedPanels.forEach(p => { if (p) p.style.display = view === 'feed' ? '' : 'none'; });
@@ -4759,6 +4783,8 @@ const HEARTBEAT_URL = (() => {
       document.addEventListener('touchend', onRelease, { passive: true });
       document.addEventListener('touchcancel', onRelease, { passive: true });
     })();
+
+    window.SNYPD = window.SNYPD || {}; window.SNYPD.switchView = switchView;
 
     viewTabs.addEventListener('click', (e) => {
       const tab = e.target.closest('.view-tab');

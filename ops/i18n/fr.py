@@ -222,6 +222,9 @@ FR = {
     'Retry': 'Réessayer',
     'Tapping': 'Appuyer sur',
     'Claim': 'J’ai acheté',
+    'Stock tab': 'Onglet Stock',
+    'Show': 'Afficher',
+    'Could not load Stock. Reload the page.': 'Impossible de charger le Stock. Recharge la page.',
     'marks an item as bought and tracks it in your': 'marque un article comme acheté et le suit dans ton onglet',
     'tab, where you can later mark it sold, mark it still listed, or remove it if you claimed it by mistake.':
         '— tu pourras ensuite le marquer vendu, toujours en vente, ou le retirer si tu l’as marqué par erreur.',

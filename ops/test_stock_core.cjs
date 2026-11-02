@@ -483,6 +483,15 @@ test('F qa_mock.js itself, run in a sandbox: Stock RPCs reach the engine, ?stock
   // other RPCs keep the old "not implemented" answer; a bad Stock call fails like the SQL does
   assert.match((await sb.rpc('dashboard_boot')).error.message, /not implemented/);
   await rejects(api.markSold('missing-id', { soldCents: 1 }), 'stock_item_not_found', 'unknown item');
+  // step 5: settings are one own-row upsert (065 policies), an item can be read by id, and a currency change never converts a stored amount
+  const cashBefore = (await api.overview(30, '2026-10-27')).held.cash_cents;
+  assert.deepEqual(await api.saveSettings({ currency: 'GBP', persona: 'resell', old_after_days: 60, tab_hidden: true, junk: 1 }), { currency: 'GBP', persona: 'resell', old_after_days: 60, tab_hidden: true, user_id: uid }, 'only the four settings are written');
+  const bset = await api.boot(); assert.deepEqual([bset.currency, bset.currency_source, bset.persona, bset.old_after_days, bset.tab_hidden], ['GBP', 'settings', 'resell', 60, true]);
+  assert.equal((await api.overview(30, '2026-10-27')).held.cash_cents, cashBefore, 'relabelling to GBP leaves every stored amount as it was');
+  await rejects(api.saveSettings({ old_after_days: 3 }), 'stock_check_violation', 'old threshold outside 7 to 365');
+  await rejects(api.saveSettings({ currency: 'JPY' }), 'stock_check_violation', 'a currency outside the 8 launch currencies');
+  const oneRow = await api.itemById(page.rows[0].id); assert.equal(oneRow.id, page.rows[0].id, 'itemById returns the row'); assert.equal(await api.itemById('no-such-id'), null, 'itemById: unknown id is null, not an error');
+  const bootKeyHidden = (await api.boot()).tab_hidden; assert.equal(bootKeyHidden, true, 'boot carries tab_hidden');
   // switches
   assert.deepEqual(await core.createApi(load('?plan=elite&stock=off').supabase.createClient()).boot(), { mode: 'off' });
   assert.equal((await core.createApi(load('?plan=free').supabase.createClient()).boot()).plan.free_cap, 25, '?plan=free is a Free account');
@@ -494,7 +503,7 @@ test('F qa_mock.js itself, run in a sandbox: Stock RPCs reach the engine, ?stock
 });
 test('F qa_mock.js wiring: the Stock RPCs and the claims hooks are present, and ops/ stays out of deploys', () => {
   const mock = fs.readFileSync(path.join(__dirname, 'qa_mock.js'), 'utf8');
-  for (const needle of ['SnypdStockEngine', "/^stock_/.test(name)", 'stock_seed', 'mirrorClaimUpdate', 'mirrorClaimDelete', 'stock_today']) assert(mock.includes(needle), 'qa_mock.js is missing ' + needle);
+  for (const needle of ['SnypdStockEngine', "/^stock_/.test(name)", 'stock_seed', 'mirrorClaimUpdate', 'mirrorClaimDelete', 'stock_today', 'stock_claims', 'stock_hidden', 'stock_tab_hidden', "table === 'stock_settings'"]) assert(mock.includes(needle), 'qa_mock.js is missing ' + needle);
   assert(/^ops\/\s*$/m.test(fs.readFileSync(path.join(__dirname, '..', '.vercelignore'), 'utf8')), 'ops/ must stay in .vercelignore');
   assert.equal((fs.readFileSync(path.join(__dirname, '..', 'assets', 'stock-core.js'), 'utf8').match(/[^\x20-\x7e\r\n]/g) || []).length, 0, 'stock-core.js must stay pure ASCII');
 });

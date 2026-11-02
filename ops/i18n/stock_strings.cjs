@@ -240,5 +240,7 @@ const frTable = fr({
 
 const imp = require('./stock_strings_import.cjs');   // step 4: the import screen
 Object.assign(en, imp.en); Object.assign(frTable, fr(imp.fr));
+const home = require('./stock_strings_home.cjs');   // step 5: Overview, lanes, first run, persona, settings
+Object.assign(en, home.en); Object.assign(frTable, fr(home.fr));
 
 module.exports = { en, fr: frTable };

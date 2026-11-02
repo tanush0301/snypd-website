@@ -22,7 +22,7 @@
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function M(cents) { return C.formatMoney(cents, S.cur, lang); }
   function MS(cents) { return C.formatMoney(cents, S.cur, lang, { signed: true }); }
-  function today() { return C.localToday(); }
+  function today() { return (S && S.todayFn) ? S.todayFn() : C.localToday(); }
   function fmtDate(iso) { if (!iso) return '--'; try { return new Date(iso + 'T12:00:00').toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return iso; } }
   function $(sel, root) { return (root || S.panel).querySelector(sel); }
   function catName(key) {
@@ -67,23 +67,25 @@
   // ------------------------------------------------------------------ open / shell
   function open(opts) {
     if (S && S.panel === opts.panel) { refresh(); return; }
-    S = { client: opts.client, panel: opts.panel, api: C.createApi(opts.client, { today: opts.today }), boot: null, cur: 'EUR', cats: [], rows: [], next: null, total: 0,
-      f: { status: null, q: '', condition: '', category: '', deleted: false }, loading: true, err: null, req: 0, undo: null, undoTimer: null, sheet: null, opener: null, searchTimer: null };
+    S = { client: opts.client, panel: opts.panel, todayFn: opts.today || null, api: C.createApi(opts.client, { today: opts.today }), boot: null, cur: 'EUR', cats: [], rows: [], next: null, total: 0,
+      f: { status: null, q: '', condition: '', category: '', deleted: false }, loading: true, err: null, req: 0, view: 'overview', ov: { days: 30, data: null, lanes: null, loading: false, err: null, req: 0, stale: false }, pinned: {}, itemsLoaded: false, undo: null, undoTimer: null, sheet: null, opener: null, searchTimer: null };
     S.panel.setAttribute('data-i18n-skip', '');
     S.panel.innerHTML = '<div class="st-wrap"><div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div></div>';
     S.api.boot().then(function (b) {
       S.boot = b;
       if (b.mode === 'off') { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.disabled')) + '</div></div>'; return; }
       S.cur = b.currency || 'EUR'; S.cats = b.categories || [];
-      shell(); load(true);
+      shell(); showView('overview');
     }).catch(function (e) { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.load')) + ' <button class="st-btn st-ghost" data-act="reopen">' + esc(T('err.retry')) + '</button></div></div>'; S.panel.onclick = function (ev) { if (ev.target.closest('[data-act="reopen"]')) { var p = S.panel, c = S.client; S = null; open({ client: c, panel: p }); } }; console.error('SNYPD Stock boot failed', e); });
   }
   function shell() {
     var statuses = [['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')]];
     S.panel.innerHTML =
       '<div class="st-wrap">' +
-      '<div class="st-head"><h1 class="st-title">' + esc(T('title')) + '</h1><button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div>' +
+      '<div class="st-head"><h1 class="st-title">' + esc(T('title')) + '</h1><button type="button" class="st-btn st-tert" data-act="settings">' + esc(T('set.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div>' +
       '<div id="st-meter"></div>' +
+      '<div class="st-nav" role="group" aria-label="' + esc(T('title')) + '"><button type="button" class="st-navb" data-act="view" data-view="overview" aria-pressed="true">' + esc(T('nav.overview')) + '</button><button type="button" class="st-navb" data-act="view" data-view="items" aria-pressed="false">' + esc(T('nav.items')) + '</button></div>' +
+      '<div id="st-over"></div><div id="st-items" style="display:none">' +
       '<div class="st-tools">' +
       '<input class="st-in st-search" type="search" id="st-q" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('search.aria')) + '" autocomplete="off">' +
       '<select class="st-in" id="st-cond" aria-label="' + esc(T('filter.condition')) + '">' + option('', T('filter.condition') + ': ' + T('filter.any'), true) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c)); }).join('') + '</select>' +
@@ -91,7 +93,7 @@
       '<button type="button" class="st-btn st-tert" data-act="deleted" id="st-del" aria-pressed="false">' + esc(T('deleted.show')) + '</button>' +
       '<span class="st-count" id="st-count" aria-live="polite"></span></div>' +
       '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === '' ? 'true' : 'false') + '">' + esc(s[1]) + '</button>'; }).join('') + '</div>' +
-      '<div id="st-body"></div></div><div id="st-ov"></div><div id="st-undo-root"></div>';
+      '<div id="st-body"></div></div></div><div id="st-ov"></div><div id="st-undo-root"></div>';
     S.panel.onclick = onClick; S.panel.onkeydown = onKey; S.panel.onchange = onChange;
     $('#st-q').oninput = function () { clearTimeout(S.searchTimer); var v = this.value; S.searchTimer = setTimeout(function () { S.f.q = v.trim(); load(true); }, 250); };
     $('#st-cond').onchange = function () { S.f.condition = this.value; load(true); };
@@ -106,6 +108,130 @@
       (m.atCap ? '<p>' + esc(T('meter.limit', { cap: m.cap })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></p>' : '') + '</div>';
   }
 
+  // ------------------------------------------------------------------ overview + Today lanes + first run + settings (step 5)
+  var PERIODS = [7, 30, 90, 365, null];
+  function perKey(d) { return d == null ? 'all' : String(d); }
+  function skipped() { try { return localStorage.getItem('snypd_stock_pq_skipped') === '1'; } catch (e) { return false; } }
+  function setSkipped() { try { localStorage.setItem('snypd_stock_pq_skipped', '1'); } catch (e) { /* a convenience only */ } }
+  function showView(v) {
+    S.view = v;
+    var over = $('#st-over'), items = $('#st-items'); if (!over || !items) return;
+    over.style.display = v === 'overview' ? '' : 'none'; items.style.display = v === 'items' ? '' : 'none';
+    Array.prototype.forEach.call(S.panel.querySelectorAll('.st-navb'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false'); });
+    if (v === 'overview') { if (!S.ov.data || S.ov.stale) loadOverview(); else renderOverview(); }
+    else if (!S.itemsLoaded) { S.itemsLoaded = true; load(true); } else if (S.ov.stale) refresh();
+  }
+  function loadOverview() {
+    var o = S.ov, req = ++o.req; o.loading = true; o.err = null; renderOverview();
+    return Promise.all([S.api.overview(o.days), S.api.lanes()]).then(function (r) {
+      if (req !== o.req) return; o.data = r[0]; o.lanes = r[1]; o.loading = false; o.stale = false; renderOverview();
+    }).catch(function (e) { if (req !== o.req) return; o.loading = false; o.err = e; renderOverview(); });
+  }
+  function renderOverview() {
+    var el = $('#st-over'); if (!el) return;
+    var o = S.ov;
+    if (o.err && !o.data) { el.innerHTML = '<div class="st-err">' + esc(errMsg(o.err)) + ' <button type="button" class="st-btn st-ghost" data-act="ov-retry">' + esc(T('err.retry')) + '</button></div>'; return; }
+    if (!o.data) { el.innerHTML = '<div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div>'; return; }
+    var v = C.viewOverview(o.data);
+    if (v.empty) { el.innerHTML = firstRunHtml(); return; }
+    var h = '';
+    if (o.err) h += '<div class="st-err">' + esc(errMsg(o.err)) + ' <button type="button" class="st-btn st-ghost" data-act="ov-retry">' + esc(T('err.retry')) + '</button></div>';
+    if (S.boot.currency_source === 'default') h += '<p class="st-note">' + esc(T('ov.cur', { cur: S.cur })) + ' <button type="button" class="st-linkb" data-act="settings">' + esc(T('ov.cur.change')) + '</button></p>';
+    // Stock now
+    var oldDays = o.data.old_after_days || S.boot.old_after_days || C.CAPS.oldAfterDefault;
+    h += '<section class="st-card" aria-labelledby="st-h-now"><h2 class="st-h2" id="st-h-now">' + esc(T('ov.now')) + '</h2>' +
+      '<div class="st-heroline"><span class="st-hero" id="st-hero-held">' + esc(String(v.held.count)) + '</span><span class="st-herolbl">' + esc(T('ov.held')) + '</span></div>' +
+      '<p class="st-split">' + esc(T('ov.split', { a: v.held.inStock, b: v.held.listed, c: v.held.reserved })) + '</p>' +
+      '<div class="st-pair"><div class="st-stat"><span class="st-lbl">' + esc(T('ov.cash')) + '</span><b class="st-big" id="st-cash">' + esc(M(v.held.cashCents)) + '</b>' + (v.held.noCost ? '<small>' + esc(T('ov.cash.nocost', { n: v.held.noCost })) + '</small>' : '') + '</div>' +
+      '<div class="st-stat"><span class="st-lbl">' + esc(T('ov.old', { d: oldDays })) + '</span>' +
+      (v.held.old ? '<b class="st-big" id="st-old">' + esc(T('ov.old.some', { n: v.held.old, cost: M(v.held.oldCostCents) })) + '</b><button type="button" class="st-btn st-ghost" data-act="see-old">' + esc(T('ov.old.see')) + '</button>' : '<b class="st-big st-dim" id="st-old">' + esc(T('ov.old.none')) + '</b>') + '</div></div></section>';
+    // The numbers
+    h += '<section class="st-card" aria-labelledby="st-h-num"><div class="st-sechd"><h2 class="st-h2" id="st-h-num">' + esc(T('ov.numbers', { period: T('per.' + perKey(o.days)) })) + '</h2>' +
+      '<div class="st-chips" role="group" aria-label="' + esc(T('per.label')) + '">' + PERIODS.map(function (d) { return '<button type="button" class="st-chip" data-act="period" data-days="' + perKey(d) + '" aria-pressed="' + (d === o.days ? 'true' : 'false') + '">' + esc(T('per.btn.' + perKey(d))) + '</button>'; }).join('') + '</div></div>' +
+      '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : '') + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(MS(v.netCents))) + '</span><span class="st-herolbl">' + esc(T('ov.net')) + '</span></div>' +
+      (v.deltaNetCents != null && o.days != null ? '<p class="st-split" id="st-delta">' + esc(T('ov.delta', { amount: MS(v.deltaNetCents), n: o.days })) + '</p>' : '') +
+      (v.hasEvents ? '' : '<p class="st-split">' + esc(T('ov.net.empty')) + '</p>') +
+      '<div class="st-grid">' +
+      cell(T('ov.rev'), v.revenueCents == null ? '--' : M(v.revenueCents), null, 'st-c-rev') +
+      cell(T('ov.sales'), String(v.sold), v.partial ? T('ov.sales.partial', { a: v.withCost, b: v.sold }) : null, 'st-c-sales') +
+      cell(T('ov.avg'), v.avgProfitCents == null ? '--' : MS(v.avgProfitCents), null, 'st-c-avg') +
+      cell(T('ov.days'), v.daysToSell == null ? '--' : T('ov.days.v', { n: Math.round(v.daysToSell) }), null, 'st-c-days') +
+      cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') +
+      cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div>' +
+      (v.partial ? '<p class="st-hint">' + esc(T('ov.partial.note', { a: v.withCost, b: v.sold })) + '</p>' : '') + '</section>';
+    // Today lanes
+    var L = o.lanes || {};
+    h += '<section class="st-card" aria-labelledby="st-h-lanes"><h2 class="st-h2" id="st-h-lanes">' + esc(T('ov.lanes')) + '</h2><div class="st-lanes">' +
+      ['reprice', 'list', 'follow', 'hold'].map(function (k) {
+        var ln = L[k] || { count: 0, items: [] };
+        return '<div class="st-lane" id="st-lane-' + k + '"><div class="st-lane-hd"><span>' + esc(T('lane.' + k)) + '</span><b>' + esc(String(ln.count)) + '</b></div><p class="st-d">' + esc(T('lane.' + k + '.d')) + '</p>' +
+          (ln.count ? ln.items.map(function (it) { return '<button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(T('age.days', { n: it.days })) + '</span></button>'; }).join('') +
+            (ln.count > ln.items.length ? '<p class="st-d">' + esc(T('lane.more', { n: ln.count - ln.items.length })) + '</p>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
+      }).join('') + '</div></section>';
+    el.innerHTML = h;
+  }
+  function cell(label, value, sub, id) { return '<div class="st-cell" id="' + id + '"><span class="st-lbl">' + esc(label) + '</span><b>' + esc(value) + '</b>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</div>'; }
+  function firstRunHtml() {
+    var persona = S.boot.persona, m = C.freeCapState(S.boot), h;
+    if (persona === 'buy') {   // buyers get the light card: one action, and a way to hide the tab
+      return '<div class="st-first" id="st-first-light"><h2>' + esc(T('fr.buy.title')) + '</h2><p>' + esc(T('fr.buy.body')) + '</p><div class="st-firstb"><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('fr.add')) + '</button> <button type="button" class="st-btn st-ghost" data-act="hide-tab">' + esc(T('fr.buy.hide')) + '</button></div></div>';
+    }
+    h = '<div class="st-first" id="st-first"><div class="st-kicker">' + esc(T('fr.kicker')) + '</div><h2>' + esc(T('fr.title')) + '</h2><p>' + esc(T('fr.body')) + '</p>' +
+      '<div class="st-firstb"><button type="button" class="st-btn st-prim" data-act="import">' + esc(T('imp.btn')) + '</button> <button type="button" class="st-btn st-ghost" data-act="add">' + esc(T('fr.add')) + '</button></div>' +
+      (m.limited ? '<p class="st-hint">' + esc(T('fr.free', { cap: m.cap })) + '</p>' : '') + '</div>';
+    if (!persona && !skipped()) {
+      h += '<div class="st-pq" id="st-pq" role="group" aria-label="' + esc(T('pq.title')) + '"><span class="st-lbl">' + esc(T('pq.title')) + '</span><div class="st-seg">' +
+        C.PERSONAS.map(function (p) { return '<button type="button" class="st-segb" data-act="persona" data-p="' + p + '" aria-pressed="false">' + esc(T('pq.' + p)) + '</button>'; }).join('') +
+        '</div><button type="button" class="st-btn st-tert" data-act="pq-skip">' + esc(T('pq.skip')) + '</button><p class="st-hint">' + esc(T('pq.note')) + '</p></div>';
+    }
+    return h;
+  }
+  function answerPersona(p) {
+    S.api.saveSettings({ persona: p }).then(function () { S.boot.persona = p; renderOverview(); showBar(T('pq.saved'), false); }).catch(function (e) { showBar(errMsg(e), false); });
+  }
+  function hideTab() {
+    S.api.saveSettings({ tab_hidden: true }).then(function () { S.boot.tab_hidden = true; applyTab(true); }).catch(function (e) { showBar(errMsg(e), false); });
+  }
+  function applyTab(hidden) { if (window.SNYPD && window.SNYPD.applyStockTab) window.SNYPD.applyStockTab(hidden); }
+  function openLane(id) {
+    var known = findRow(id);
+    var go = function (row) { if (!row) return; S.pinned[id] = row; S.opener = $('[data-id="' + id + '"]'); openDetail(id); };
+    if (known) { go(known); return; }
+    S.api.itemById(id).then(go).catch(function (e) { showBar(errMsg(e), false); });
+  }
+  function currencyName(code) {
+    try { return code + ' - ' + new Intl.DisplayNames([lang === 'fr' ? 'fr' : 'en'], { type: 'currency' }).of(code); } catch (e) { return code; }
+  }
+  function openSettings(opener) {
+    S.opener = opener || null; S.sheet = { kind: 'settings', persona: S.boot.persona || null };
+    var b = S.boot;
+    var body = '<div id="st-sheet-err"></div><div class="st-form">' +
+      fld('cur', T('set.currency'), '<select class="st-in" id="sf-cur">' + C.CURRENCIES.map(function (c) { return option(c, currencyName(c), c === S.cur); }).join('') + '</select>', 'full') +
+      '<p class="st-hint full">' + esc(T('set.currency.note')) + (b.currency_source === 'default' ? ' ' + esc(T('set.currency.src')) : '') + '</p>' +
+      '<div class="st-f full"><span class="st-lbl">' + esc(T('set.persona')) + '</span><div class="st-seg" id="sf-persona">' +
+      C.PERSONAS.map(function (p) { return '<button type="button" class="st-segb" data-act="seg" data-p="' + p + '" aria-pressed="' + (S.sheet.persona === p ? 'true' : 'false') + '">' + esc(T('pq.' + p)) + '</button>'; }).join('') + '</div></div>' +
+      fld('old', T('set.old'), txt('old', b.old_after_days || C.CAPS.oldAfterDefault, '', ' inputmode="numeric" maxlength="3"')) +
+      '<p class="st-hint full">' + esc(T('set.old.hint')) + '</p>' +
+      '<div class="st-f full"><label class="st-check"><input type="checkbox" id="sf-tab"' + (b.tab_hidden ? '' : ' checked') + '> ' + esc(T('set.tab')) + '</label><p class="st-hint">' + esc(T('set.tab.hint')) + '</p></div></div>';
+    mountSheet(T('set.title'), body, '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button><button type="button" class="st-btn st-prim" data-act="submit" id="st-go">' + esc(T('set.save')) + '</button>');
+    var f = $('#sf-cur'); if (f) f.focus();
+  }
+  function saveSettingsSheet() {
+    var b = S.boot, patch = {}, cur = $('#sf-cur').value, oldv = ($('#sf-old').value || '').trim();
+    if (!/^[0-9]{1,3}$/.test(oldv) || +oldv < 7 || +oldv > 365) { fieldErr('old', T('set.err.old')); return; } fieldErr('old', '');
+    if (cur !== S.cur) patch.currency = cur;
+    var pers = S.sheet.persona; if (pers && pers !== b.persona) patch.persona = pers;
+    if (+oldv !== (b.old_after_days || C.CAPS.oldAfterDefault)) patch.old_after_days = +oldv;
+    var hidden = !$('#sf-tab').checked; if (hidden !== !!b.tab_hidden) patch.tab_hidden = hidden;
+    if (!Object.keys(patch).length) { closeSheet(); return; }
+    var go = $('#st-go'); if (go) go.disabled = true;
+    S.api.saveSettings(patch).then(function () {
+      closeSheet(); S.ov.stale = true;
+      if (patch.tab_hidden !== undefined) applyTab(patch.tab_hidden);
+      return reloadKeep().then(function () { showBar(patch.currency ? T('set.cur.saved', { cur: patch.currency }) : T('set.saved'), false); });
+    }).catch(function (e) { sheetError(e); });
+  }
+
   // ------------------------------------------------------------------ data
   function apiFilters() {
     var f = S.f, o = {};
@@ -114,6 +240,7 @@
     if (f.condition) o.condition = [f.condition];
     if (f.category) o.category = f.category;
     if (f.deleted) o.deleted = 'only';
+    if (f.old) o.old = true;
     o.today = today();
     return o;
   }
@@ -130,8 +257,9 @@
     var req = ++S.req, n = Math.min(200, Math.max(50, S.rows.length));
     return Promise.all([S.api.itemsPage(apiFilters(), n, null), S.api.boot().catch(function () { return null; })]).then(function (r) {
       if (req !== S.req) return;
-      S.rows = r[0].rows; S.next = r[0].next_cursor; S.total = r[0].total; if (r[1] && r[1].mode !== 'off') { S.boot = r[1]; S.cats = r[1].categories || S.cats; }
+      S.rows = r[0].rows; S.next = r[0].next_cursor; S.total = r[0].total; if (r[1] && r[1].mode !== 'off') { S.boot = r[1]; S.cur = r[1].currency || S.cur; S.cats = r[1].categories || S.cats; }
       renderMeter(); renderBody();
+      if (S.view === 'overview') loadOverview(); else S.ov.stale = true;
     });
   }
   function refresh() { if (S && S.boot && S.boot.mode !== 'off') reloadKeep().catch(function (e) { console.error('SNYPD Stock refresh failed', e); }); }
@@ -147,9 +275,10 @@
     var h = '';
     if (S.err) h += '<div class="st-err">' + esc(errMsg(S.err)) + ' <button type="button" class="st-btn st-ghost" data-act="retry">' + esc(T('err.retry')) + '</button></div>';
     if (S.f.deleted) h += '<p class="st-note">' + esc(T('deleted.note', { days: C.CAPS.deletedDays })) + '</p>';
+    if (S.f.old) h += '<p class="st-note">' + esc(T('filter.old', { d: (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault })) + ' <button type="button" class="st-linkb" data-act="clear">' + esc(T('clear')) + '</button></p>';
     if (S.loading && !S.rows.length) { el.innerHTML = h + '<div class="st-table" role="status" aria-label="' + esc(T('loading')) + '"><div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div></div>'; return; }
     if (!S.rows.length && !S.err) {
-      var filtered = S.f.status || S.f.q || S.f.condition || S.f.category;
+      var filtered = S.f.status || S.f.q || S.f.condition || S.f.category || S.f.old;
       if (S.f.deleted) h += '<div class="st-empty"><p>' + esc(T('empty.deleted', { days: C.CAPS.deletedDays })) + '</p></div>';
       else if (filtered) h += '<div class="st-empty"><p>' + esc(T('empty.filtered')) + '</p><button type="button" class="st-btn st-ghost" data-act="clear">' + esc(T('clear')) + '</button></div>';
       else h += '<div class="st-empty"><h3>' + esc(T('empty.title')) + '</h3><p>' + esc(T('empty.body')) + '</p><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('empty.add')) + '</button> <button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button></div>';
@@ -192,7 +321,7 @@
       case 'im-again': openImport(); break;
       case 'chip': { var st = el.getAttribute('data-status'); S.f.status = st === '' ? null : (st === 'stock' ? ['stock', 'returned'] : [st]); load(true); break; }
       case 'deleted': S.f.deleted = !S.f.deleted; S.f.status = null; load(true); break;
-      case 'clear': S.f = { status: null, q: '', condition: '', category: '', deleted: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; load(true); break;
+      case 'clear': S.f = { status: null, q: '', condition: '', category: '', deleted: false, old: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; load(true); break;
       case 'more': load(false); break;
       case 'retry': load(true); break;
       case 'open': S.opener = el; openDetail(id); break;
@@ -203,6 +332,16 @@
       case 'submit-next': submitSheet(true); break;
       case 'do': runDetailAction(el.getAttribute('data-do'), id); break;
       case 'save-detail': saveDetail(id); break;
+      case 'view': showView(el.getAttribute('data-view')); break;
+      case 'settings': openSettings(el); break;
+      case 'seg': { var sg = el.getAttribute('data-p'); S.sheet.persona = sg; Array.prototype.forEach.call(S.panel.querySelectorAll('#sf-persona .st-segb'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-p') === sg ? 'true' : 'false'); }); break; }
+      case 'period': { var dv = el.getAttribute('data-days'); S.ov.days = dv === 'all' ? null : +dv; loadOverview(); break; }
+      case 'ov-retry': loadOverview(); break;
+      case 'see-old': S.f = { status: null, q: '', condition: '', category: '', deleted: false, old: true }; if ($('#st-q')) $('#st-q').value = ''; if ($('#st-cond')) $('#st-cond').value = ''; if ($('#st-cat')) $('#st-cat').value = ''; S.itemsLoaded = true; showView('items'); load(true); break;
+      case 'lane-open': openLane(id); break;
+      case 'persona': answerPersona(el.getAttribute('data-p')); break;
+      case 'pq-skip': setSkipped(); renderOverview(); showBar(T('pq.skipped'), false); break;
+      case 'hide-tab': hideTab(); break;
       default: break;
     }
   }
@@ -313,6 +452,7 @@
 
   function submitSheet(andNext) {
     var sh = S.sheet; if (!sh) return;
+    if (sh.kind === 'settings') { saveSettingsSheet(); return; }
     var go = $('#st-go'), item = sh.item, run, label, bad = false;
     var box = $('#st-sheet-err'); if (box) box.innerHTML = '';
     if (sh.kind === 'add') {
@@ -351,7 +491,7 @@
   }
 
   // ------------------------------------------------------------------ item detail
-  function findRow(id) { return S.rows.filter(function (r) { return r.id === id; })[0]; }
+  function findRow(id) { return S.rows.filter(function (r) { return r.id === id; })[0] || S.pinned[id]; }
   function actionsFor(it) {
     var a = [];
     if (it.status === 'stock' || it.status === 'returned') a.push('list', 'sold', 'wo');
@@ -376,7 +516,7 @@
       (it.status === 'sold' ? fld('sold', T('f.sold'), mny('sold', it.sold_cents)) + fld('soldon', T('f.soldon'), dat('soldon', it.sold_on, t0)) : fld('list', T('f.list'), mny('list', it.list_cents))) +
       fld('source', T('f.source'), txt('source', it.src === 'SNYPD alert' ? T('src.alert') : it.src, '', ' maxlength="80"' + (it.src === 'SNYPD alert' ? ' disabled' : '')), 'full') +
       fld('link', T('f.link'), txt('link', it.link, '', ' maxlength="500"'), 'full') + fld('notes', T('f.notes'), '<textarea class="st-in" id="sf-notes" rows="3" maxlength="2000" style="height:auto;padding:8px 12px">' + esc(it.notes || '') + '</textarea>', 'full') + '</div>';
-    var extra = it.returned_on ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '';
+    var extra = (it.returned_on ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '') + (it.claim_id ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.claim')) + '</p>' : '');
     var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('close')) + '</button><button type="button" class="st-btn st-prim" data-act="save-detail" data-id="' + esc(it.id) + '" id="st-go">' + esc(T('save')) + '</button>';
     mountSheet(it.title, '<div id="st-sheet-err"></div><span class="st-tag ' + esc(it.status) + '" style="margin-bottom:12px">' + esc(statusLabel(it.status)) + '</span>' + facts + acts + form + extra + '<div class="st-h3">' + esc(T('detail.history')) + '</div><ul class="st-tl" id="st-tl"><li>...</li></ul>', foot);
     S.api.itemHistory(it.id).then(function (h) { if (!S.sheet || S.sheet.item.id !== it.id) return; var ul = $('#st-tl'); if (ul) ul.innerHTML = h.length ? h.map(histHtml).join('') : '<li>' + esc(T('detail.history.none')) + '</li>'; }).catch(function () { var ul = $('#st-tl'); if (ul) ul.innerHTML = '<li>' + esc(T('err.load')) + '</li>'; });

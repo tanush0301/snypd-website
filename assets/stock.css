@@ -113,7 +113,8 @@ select.st-in { padding-right: 8px; }
   .st-row > .c-cost, .st-row > .c-price, .st-row > .c-profit, .st-row > .c-age, .st-row > .c-plat { display: none; }
   .st-row > .c-meta { grid-area: meta; display: flex; gap: 12px; font-size: 12px; color: var(--st-text2); }
   .st-btn, .st-in, .st-x { min-height: 44px; height: 44px; }
-  .st-chip { height: 44px; }
+  .st-chip, .st-navb, .st-segb { height: 44px; }
+  .st-lane-it { min-height: 44px; align-items: center; }
   .st-search { max-width: none; flex-basis: 100%; }
   .st-sheet { top: auto; left: 0; right: 0; width: 100%; max-height: 92vh; border-left: 0; border-top: 1px solid var(--st-line2); }
   .st-form { grid-template-columns: 1fr; }
@@ -131,3 +132,62 @@ select.st-in { padding-right: 8px; }
 .st-mapc.ok { color: var(--st-ok); border-color: rgba(0,229,160,.25); }
 .st-mapc.no { color: var(--st-muted); }
 .st-list { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--st-text2); line-height: 1.6; }
+
+/* ---- step 5: Overview, Today lanes, first run, persona, settings ---- */
+.st-nav { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 1px solid var(--st-line); }
+.st-navb { font: inherit; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; height: 40px; padding: 0 20px; background: transparent; color: var(--st-muted); border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.st-navb:hover { color: var(--st-text); }
+.st-navb[aria-pressed="true"] { color: var(--st-text); border-bottom-color: var(--st-text); }
+.st-navb:focus-visible, .st-segb:focus-visible, .st-lane-it:focus-visible, .st-linkb:focus-visible { outline: 2px solid var(--st-text); outline-offset: 2px; }
+.st-card { border: 1px solid var(--st-line); background: var(--st-bg); padding: 20px 24px; margin-bottom: 16px; }
+.st-h2 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--st-muted); margin: 0 0 14px; font-weight: 600; }
+.st-sechd { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.st-sechd .st-h2 { margin: 0; }
+.st-sechd .st-chips { margin: 0; }
+.st-heroline { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.st-hero { font-size: 48px; line-height: 1.05; font-weight: 800; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.st-herolbl { font-size: 13px; color: var(--st-text2); }
+.st-split { margin: 8px 0 0; font-size: 13px; color: var(--st-text2); }
+.st-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+.st-stat { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-width: 0; }
+.st-lbl { font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--st-muted); }
+.st-big { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.st-dim { color: var(--st-muted); font-weight: 400; }
+.st-stat small, .st-cell small { font-size: 12px; color: var(--st-muted); }
+.st-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--st-line); border: 1px solid var(--st-line); margin-top: 18px; }
+.st-cell { background: var(--st-bg); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.st-cell b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.st-lanes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.st-lane { border: 1px solid var(--st-line); padding: 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.st-lane-hd { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.st-lane-hd b { font-size: 20px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.st-d { margin: 0; font-size: 12px; color: var(--st-muted); }
+.st-lane-it { font: inherit; font-size: 13px; text-align: left; display: flex; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 0; border: 0; border-top: 1px solid var(--st-line); background: transparent; color: var(--st-text); cursor: pointer; min-width: 0; }
+.st-lane-it:hover .t { text-decoration: underline; }
+.st-lane-it .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-lane-it .a { color: var(--st-muted); flex: none; font-variant-numeric: tabular-nums; }
+.st-linkb { font: inherit; background: none; border: 0; padding: 0; color: var(--st-text); text-decoration: underline; cursor: pointer; }
+.st-first { border: 1px solid var(--st-line); background: var(--st-bg); padding: 40px 32px; margin-bottom: 16px; max-width: 760px; }
+.st-first h2 { font-size: 26px; line-height: 1.2; margin: 6px 0 12px; }
+.st-first p { color: var(--st-text2); margin: 0 0 20px; line-height: 1.5; max-width: 60ch; }
+.st-first .st-hint { margin: 16px 0 0; }
+.st-kicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--st-muted); }
+.st-firstb { display: flex; gap: 10px; flex-wrap: wrap; }
+.st-pq { border: 1px solid var(--st-line); padding: 16px 20px; max-width: 760px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.st-pq .st-hint { flex: 1 1 100%; margin: 0; }
+.st-seg { display: inline-flex; flex-wrap: wrap; }
+.st-segb { font: inherit; font-size: 12px; letter-spacing: .04em; height: 36px; padding: 0 16px; border: 1px solid var(--st-line2); margin-left: -1px; background: transparent; color: var(--st-text2); cursor: pointer; }
+.st-segb:first-child { margin-left: 0; }
+.st-segb[aria-pressed="true"] { background: var(--st-ok); color: var(--bg, #0B0C0D); border-color: var(--st-ok); }
+.st-form > p.st-hint { grid-column: 1 / -1; margin: -6px 0 0; }
+.st-check { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+@media (max-width: 720px) {
+  .st-card { padding: 16px; }
+  .st-hero { font-size: 36px; }
+  .st-pair { grid-template-columns: minmax(0, 1fr); }
+  .st-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .st-lanes { grid-template-columns: minmax(0, 1fr); }
+  .st-first { padding: 24px 16px; }
+  .st-navb { flex: 1 1 0; padding: 0 8px; height: 44px; }
+  .st-segb { height: 44px; }
+}

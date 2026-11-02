@@ -270,6 +270,7 @@
   };
 
   if (NO_HUNTS) { DB.user_searches = []; DB.user_claims = []; DB.xp_events = []; }
+  if (params.get('stock_claims') === '0') DB.user_claims = [];   // an account that never claimed anything: Stock's first-run screen
 
   // ?broad=1: 40 fresh listings stamped for the active seeded hunt (search-1), enough for the dashboard's
   // "This hunt is very broad" card (>= 25 matches in 30 min). The stamp mirrors dashboard savedSearchSignature();
@@ -314,6 +315,7 @@
   //   ?stock_seed=acceptance loads the frozen design dataset (215 items, 580 history rows): copy ops/stock/acceptance-fixture.json next to the page
   //   ?stock_today=YYYY-MM-DD fixes the engine's "today" (the dataset's own today is 2026-10-27)
   //   ?stock_paid=0          a Free account (25 held items); default follows ?plan=
+  //   ?stock_claims=0        no Feed claims (an empty Stock: first-run screen); ?stock_hidden=1 the user already hid the Stock tab
   // Feed claims in this mock's user_claims are mirrored into Stock like trigger 067 does (insert / update / delete).
   var STOCK = null, stockReady = Promise.resolve();
   if (window.SnypdStockEngine) {
@@ -322,6 +324,8 @@
       searches: DB.user_searches || [], today: params.get('stock_today') ? function () { return params.get('stock_today'); } : null
     });
     window.__qaStock = STOCK;
+    window.SNYPD = window.SNYPD || {}; if (params.get('stock_today')) window.SNYPD.stockToday = function () { return params.get('stock_today'); };   // the page's Stock UI asks for this "today" like the engine does
+    if (params.get('stock_hidden') === '1') STOCK.setSettings({ tab_hidden: true });   // the user hid the Stock tab earlier: dashboard_boot().stock_tab_hidden is true
     var seedClaims = function () { (DB.user_claims || []).forEach(function (c) { try { STOCK.mirrorClaim(c); } catch (e) { console.warn('QA stock claim mirror failed', e); } }); };
     if (params.get('stock_seed') === 'acceptance') {
       stockReady = fetch('acceptance-fixture.json').then(function (r) { return r.json(); }).then(function (fx) { STOCK.loadFixture(fx); seedClaims(); })
@@ -364,6 +368,7 @@
       insert: function (data) { op = 'insert'; payload = data; return builder; },
       update: function (data) { op = 'update'; payload = data; return builder; },
       delete: function () { op = 'delete'; return builder; },
+      upsert: function (data) { op = 'upsert'; payload = data; return builder; },
       then: function (resolve, reject) {
         try { resolve(execute()); } catch (e) { if (reject) reject(e); else throw e; }
       },
@@ -381,6 +386,11 @@
       if (table === 'user_searches' && (op === 'insert' || op === 'update') && badPush(payload || {})) {
         return { data: null, error: { code: '23514', message: 'new row violates check constraint (push_mode / push_calm_minutes)' } };
       }
+      if (STOCK && table === 'stock_settings') {   // own-row select / insert / update / upsert (policies of 065); the CHECKs live in the engine
+        if (op === 'select') { var srow = STOCK.settingsRow(); return { data: singleMode ? srow : (srow ? [srow] : []), error: null }; }
+        try { var sp = Object.assign({}, payload); delete sp.user_id; STOCK.setSettings(sp); return { data: payload, error: null }; } catch (e) { return { data: null, error: e.pg || { message: String(e) } }; }
+      }
+      if (STOCK && table === 'stock_items' && op === 'select') rows = STOCK.state.items;   // read-only, like the real select-own table
       if (STOCK && table === 'stock_categories' && op === 'insert') {   // own-row insert policy + the 30-category trigger live in the engine
         try { STOCK.addCategories(Array.isArray(payload) ? payload : [payload]); return { data: payload, error: null }; } catch (e) { return { data: null, error: e.pg || { message: String(e) } }; }
       }
@@ -476,7 +486,7 @@
             is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: null, trial_ends_at: null, trial_extended_at: null, pass_expires_at: null },
           searches: searches, claims: (DB.user_claims || []).slice(), dq: [], xp_total: (DB.xp_events || []).reduce(function (a, x) { return a + (x.xp || 0); }, 0),
           streak: ((DB.user_streak_state || [])[0] || {}).current_streak || null, quota: { quota_limit: PLAN === 'free' ? 1 : 5, used: searches.length },
-          stock_mode: STOCK ? STOCK.mode() : undefined }, error: null });
+          stock_mode: STOCK ? STOCK.mode() : undefined, stock_tab_hidden: STOCK ? STOCK.tabHidden() : false }, error: null });
       }
       // Stock RPCs (migrations 065-068) -> the in-memory port, see ops/stock_engine.js. Everything else keeps the old "not implemented" answer.
       if (STOCK && /^stock_/.test(name)) return stockReady.then(function () { return STOCK.rpc(name, args); });

@@ -50,6 +50,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     page.requested = requested;
     return page;
   }
+  const openItems = async p => { await p.waitForSelector('#stock-panel .st-navb', { timeout: 8000 }); await p.evaluate(() => document.querySelector('#stock-panel .st-navb[data-view="items"]').click()); };
   const stockTabShown = page => page.evaluate(() => { const t = document.getElementById('view-tab-stock'); return !!t && getComputedStyle(t).display !== 'none'; });
   const settle = (page, ms) => new Promise(r => setTimeout(r, ms || 1500));
 
@@ -65,6 +66,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   let page = await open('plan=elite&stock=all&stock_seed=acceptance&stock_today=2026-11-02');
   await page.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
   await page.click('#view-tab-stock');
+  await openItems(page);
   await page.waitForSelector('#stock-panel .st-row', { timeout: 8000 });
   ok(page.requested.some(u => /stock-core\.js/.test(u)) && page.requested.some(u => /stock\.js/.test(u)) && page.requested.some(u => /stock\.css/.test(u)), 'assets load when the tab opens');
   const text = sel => page.$eval(sel, e => e.innerText.replace(/\n+/g, ' | '));
@@ -116,7 +118,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   // ---- 3. French, Free account over the cap, phone width
   page = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&lang=fr', { width: 390, height: 844, isMobile: true, hasTouch: true });
   await page.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
-  await page.click('#bottombar-tab-stock'); await page.waitForSelector('#stock-panel .st-row', { timeout: 8000 });
+  await page.click('#bottombar-tab-stock'); await openItems(page); await page.waitForSelector('#stock-panel .st-row', { timeout: 8000 });
   ok(/ajouter un article/i.test(await page.$eval('#stock-panel .st-head', e => e.innerText)), 'French title row');
   ok(/articles sur 25/.test(await text('.st-meter')) && /Voir les plans/.test(await text('.st-meter')), 'French cap meter: ' + await text('.st-meter'));
   const geo = await page.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth, over: [...document.querySelectorAll('#stock-panel .st-row')].filter(r => r.scrollWidth > r.clientWidth + 1).length,
@@ -141,7 +143,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   page = await open('plan=elite&stock=all&stock_today=2026-11-02&lang=en');
   page.on('dialog', d => d.accept());
   await page.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
-  await page.click('#view-tab-stock'); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
+  await page.click('#view-tab-stock'); await openItems(page); await page.waitForSelector('#stock-panel .st-head', { timeout: 8000 });
   await upload(page, path.join(imp, 'template-fr.xlsx'));
   let txt = await sheetText(page);
   ok(/template-fr\.xlsx/.test(txt) && /3 rows make 5 items/.test(txt), 'review: ' + txt.slice(0, 200));
@@ -200,7 +202,194 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   ok(g2.sw <= g2.vw && g2.sheetSW <= g2.sheetCW + 1, 'import sheet fits at 390: ' + JSON.stringify(g2));
   await page.close();
 
+  // ---- 5. step 5: Overview, Today lanes, first run, persona, settings, History swap, claims mirror
+  const tc = (p, sel) => p.$eval(sel, e => e.textContent.trim());
+  const waitOv = p => p.waitForSelector('#stock-panel #st-over .st-card, #stock-panel #st-over .st-first', { timeout: 8000 });
+  const fmt = (cents, cur, lng, signed) => `window.SnypdStock.formatMoney(${cents}, '${cur || 'EUR'}', '${lng || 'en'}'${signed ? ', { signed: true }' : ''})`;
+  const money = (p, cents, cur, lng, signed) => p.evaluate(`${fmt(cents, cur, lng, signed)}`);
+  const clickBy = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) throw new Error('no ' + s); e.click(); }, sel);
+  const tabVis = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); return !!e && getComputedStyle(e).display !== 'none'; }, sel);
+  const wait5 = ms => new Promise(r => setTimeout(r, ms));
+  const shown = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); return !!e && e.offsetParent !== null; }, sel);
+
+  // 5a. the design dataset on the Overview (desktop, English): exact acceptance numbers, then every period
+  let pg = await open('plan=elite&stock=all&stock_seed=acceptance&stock_today=2026-10-27&stock_claims=0&lang=en');   // the design numbers are exact only without the mock's 3 mirrored Feed claims
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  eq(await tabVis(pg, '.view-tab[data-view="history"]'), false, 'History tab is replaced while Stock is on (top bar)');
+  eq(await tabVis(pg, '.bottombar-tab[data-view="history"]'), false, 'History tab is replaced while Stock is on (phone bar)');
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  eq(await tc(pg, '#st-hero-held'), '58', 'Overview: 58 items held');
+  { const sp = await pg.$eval('#st-over .st-split', e => e.textContent); ok(/18 in stock .* 36 listed .* 4 reserved/.test(sp), 'Overview: 18 / 36 / 4, got: ' + sp); }
+  eq(await tc(pg, '#st-cash'), '€1,124.50', 'Overview: cash tied up EUR 1,124.50');
+  eq(await tc(pg, '#st-old'), '12 items, €318.00 at cost', 'Overview: 12 old items, EUR 318.00');
+  eq(await tc(pg, '#st-hero-net'), await money(pg, 61240, 'EUR', 'en', true), 'Overview 30 days: net profit EUR 612.40');
+  eq(await tc(pg, '#st-c-rev b'), await money(pg, 184600), 'Overview 30 days: revenue EUR 1,846.00');
+  eq([await tc(pg, '#st-c-sales b'), await tc(pg, '#st-c-sales small')], ['31', '29 of 31 with a cost'], 'Overview 30 days: 31 sales, 29 of 31 with a cost (never a silent partial)');
+  eq(await tc(pg, '#st-c-avg b'), await money(pg, 2112, 'EUR', 'en', true), 'Overview 30 days: average EUR 21.12');
+  eq(await tc(pg, '#st-c-days b'), '18 days', 'Overview 30 days: 18 days to sell');
+  eq(await tc(pg, '#st-delta'), (await money(pg, 6280, 'EUR', 'en', true)) + ' vs the 30 days before', 'Overview: +EUR 62.80 against the 30 days before (549.60)');
+  const periodNet = async d => { await clickBy(pg, '#st-over [data-act="period"][data-days="' + d + '"]'); await pg.waitForFunction(x => document.querySelector('#st-over [data-act="period"][aria-pressed="true"]').getAttribute('data-days') === x, {}, d); await wait5(250); return tc(pg, '#st-hero-net'); };
+  eq(await periodNet('7'), await money(pg, 15200, 'EUR', 'en', true), '7 days: EUR 152.00');
+  eq(await tc(pg, '#st-delta'), (await money(pg, -1220, 'EUR', 'en', true)) + ' vs the 7 days before', '7 days: against 164.20 the 7 days before');
+  eq(await periodNet('90'), await money(pg, 154560, 'EUR', 'en', true), '90 days: EUR 1,545.60');
+  eq(await periodNet('all'), await money(pg, 290770, 'EUR', 'en', true), 'all time: EUR 2,907.70');
+  eq(await pg.$('#st-delta'), null, 'all time has no "before" period, so no delta line');
+  eq(await pg.evaluate(() => document.querySelector('#st-h-num').textContent), 'The numbers · all time', 'heading follows the period');
+  await periodNet('30');
+  // the Today lanes against the lane rules computed independently from the items
+  const lanes = await pg.evaluate(() => {
+    const t0 = Date.UTC(2026, 9, 27), dd = iso => Math.round((t0 - Date.parse(iso + 'T00:00:00Z')) / 86400000), L = { reprice: 0, list: 0, follow: 0, hold: 0 };
+    window.__qaStock.state.items.filter(i => !i.deleted_at && ['stock', 'listed', 'reserved', 'returned'].includes(i.status)).forEach(i => {
+      const age = dd(i.returned_on || i.bought_on);
+      if (i.status === 'listed' && i.listed_on && dd(i.listed_on) >= 30 && i.drops === 0) L.reprice++;
+      if ((i.status === 'stock' || i.status === 'returned') && age >= 7) L.list++;
+      if (i.status === 'reserved' && i.reserved_on && dd(i.reserved_on) >= 3) L.follow++;
+      if ((i.status === 'stock' || i.status === 'returned') && i.src_type === 'hunt' && age >= 14) L.hold++;
+    });
+    const dom = {}; ['reprice', 'list', 'follow', 'hold'].forEach(k => { dom[k] = +document.querySelector('#st-lane-' + k + ' .st-lane-hd b').textContent; });
+    return { want: L, dom, empties: ['reprice', 'list', 'follow', 'hold'].filter(k => !+document.querySelector('#st-lane-' + k + ' .st-lane-hd b').textContent && !document.querySelector('#st-lane-' + k + ' .st-dim')) };
+  });
+  eq(lanes.dom, lanes.want, 'Today lanes: the four counts follow the lane rules: ' + JSON.stringify(lanes.want));
+  ok(lanes.want.reprice + lanes.want.list + lanes.want.follow + lanes.want.hold > 0, 'the dataset has something in the lanes');
+  eq(lanes.empties, [], 'an empty lane says so in words');
+  // a lane item opens its own detail without the Items list having been loaded
+  const laneKey = ['list', 'reprice', 'follow', 'hold'].find(k => lanes.want[k] > 0);
+  const laneTitle = await pg.$eval('#st-lane-' + laneKey + ' .st-lane-it .t', e => e.textContent);
+  await clickBy(pg, '#st-lane-' + laneKey + ' .st-lane-it'); await pg.waitForSelector('.st-sheet', { timeout: 5000 });
+  eq(await pg.$eval('.st-sheet-hd h2', e => e.textContent), laneTitle, 'lane item opens its detail (' + laneKey + ')');
+  await pg.keyboard.press('Escape'); await wait5(200);
+  // old items -> Items filtered, and the note clears it
+  await clickBy(pg, '#st-over [data-act="see-old"]'); await pg.waitForSelector('#stock-panel .st-row', { timeout: 5000 }); await wait5(300);
+  eq(await pg.$$eval('#stock-panel .st-row', r => r.length), 12, 'See old items: the 12 old items');
+  ok(/Showing old items only \(45\+ days\)/.test(await pg.$eval('#st-body', e => e.textContent)), 'the old filter is visible and says how old');
+  await clickBy(pg, '#st-body [data-act="clear"]'); await wait5(400);
+  ok(await pg.$$eval('#stock-panel .st-row', r => r.length) > 12, 'clearing the old filter brings every item back');
+  await clickBy(pg, '#stock-panel .st-navb[data-view="overview"]');
+
+  // 5b. settings: currency relabels and never converts, persona, old threshold, validation
+  const sums = () => pg.evaluate(() => window.__qaStock.state.items.reduce((a, i) => a + (i.buy_cents || 0) + (i.sold_cents || 0) + (i.extra_cents || 0), 0));
+  const sumBefore = await sums();
+  await clickBy(pg, '#stock-panel [data-act="settings"]'); await pg.waitForSelector('.st-sheet #sf-cur', { timeout: 5000 });
+  ok(/Your amounts keep their numbers\. Nothing is converted\./.test(await pg.$eval('.st-sheet', e => e.textContent)), 'the settings say nothing is converted');
+  await pg.$eval('#sf-old', e => { e.value = '5'; }); await clickBy(pg, '#st-go'); await wait5(300);
+  ok(/7 to 365/.test(await pg.$eval('.st-fe[data-for="old"]', e => e.textContent)) && !!(await pg.$('.st-sheet')), 'an old threshold outside 7 to 365 is refused inline and the sheet stays');
+  eq(await pg.evaluate(() => window.__qaStock.state.settings), null, 'nothing was saved by the refused form');
+  await pg.select('#sf-cur', 'GBP'); await clickBy(pg, '#sf-persona [data-p="resell"]'); await pg.$eval('#sf-old', e => { e.value = '60'; });
+  await clickBy(pg, '#st-go'); await pg.waitForFunction(() => !document.querySelector('.st-sheet'), { timeout: 5000 }); await wait5(500);
+  eq(await pg.evaluate(() => { const s = window.__qaStock.state.settings; return [s.currency, s.persona, s.old_after_days]; }), ['GBP', 'resell', 60], 'settings saved (currency, persona, old after)');
+  eq(await tc(pg, '#st-cash'), await money(pg, 112450, 'GBP', 'en'), 'currency relabelled: the same 1,124.50 now in GBP');
+  eq(await sums(), sumBefore, 'no stored amount changed: nothing is converted');
+  ok(/Currency set to GBP\. Your amounts kept their numbers\./.test(await tc(pg, '#st-undo-root')), 'toast says the amounts kept their numbers');
+  const old60 = await pg.evaluate(() => { const t0 = Date.UTC(2026, 9, 27); return window.__qaStock.state.items.filter(i => !i.deleted_at && ['stock', 'listed', 'reserved', 'returned'].includes(i.status) && Math.round((t0 - Date.parse((i.returned_on || i.bought_on) + 'T00:00:00Z')) / 86400000) >= 60).length; });
+  ok(old60 > 0 && new RegExp('^' + old60 + ' items, ').test(await tc(pg, '#st-old')), 'the old count follows the new threshold: ' + old60 + ' items, got ' + await tc(pg, '#st-old'));
+  ok(/Old stock \(60\+ days\)/.test(await pg.$eval('#st-over', e => e.textContent)), 'the old label says 60+ days');
+  eq(await pg.evaluate(() => window.__qaErrors.length), 0, 'no window errors in the mock (5a, 5b)');
+
+  // 5c. hiding the tab brings History back; Profile brings Stock back; a tapped History link lands on Stock while it replaces History
+  eq(await pg.evaluate(() => { window.SNYPD.switchView('history'); return document.querySelector('.view-tab.active').getAttribute('data-view'); }), 'stock', 'a History link lands on Stock while Stock replaces History');
+  await clickBy(pg, '#stock-panel [data-act="settings"]'); await pg.waitForSelector('.st-sheet #sf-tab', { timeout: 5000 });
+  await pg.$eval('#sf-tab', e => { e.checked = false; }); await clickBy(pg, '#st-go'); await wait5(700);
+  eq([await tabVis(pg, '#view-tab-stock'), await tabVis(pg, '.view-tab[data-view="history"]'), await pg.evaluate(() => document.querySelector('.view-tab.active').getAttribute('data-view'))], [false, true, 'feed'], 'Show the Stock tab off: Stock tab gone, History back, the page moves to the Feed');
+  eq(await pg.evaluate(() => window.__qaStock.state.settings.tab_hidden), true, 'tab_hidden saved');
+  await clickBy(pg, '#topbar-profile-trigger'); await wait5(300);
+  eq(await shown(pg, '#prof-stock-row'), true, 'Profile offers the way back');
+  await clickBy(pg, '#prof-stock-show'); await pg.waitForFunction(() => document.querySelector('.view-tab.active').getAttribute('data-view') === 'stock', { timeout: 6000 }); await wait5(300);
+  eq([await tabVis(pg, '#view-tab-stock'), await tabVis(pg, '.view-tab[data-view="history"]'), await pg.evaluate(() => window.__qaStock.state.settings.tab_hidden)], [true, false, false], 'Show again: Stock tab back, History replaced, saved');
+  await pg.close();
+
+  // 5d. the switch off: History is the History tab and Stock is not there at all; a hidden tab at page load comes from dashboard_boot
+  pg = await open('plan=elite&stock=off&lang=en');
+  await wait5(1500);
+  eq([await tabVis(pg, '#view-tab-stock'), await tabVis(pg, '.view-tab[data-view="history"]'), await tabVis(pg, '.bottombar-tab[data-view="history"]')], [false, true, true], 'stock_mode off: History tabs shown, Stock tab hidden');
+  await pg.close();
+  pg = await open('plan=elite&stock=all&stock_hidden=1&lang=en');
+  await wait5(1500);
+  eq([await tabVis(pg, '#view-tab-stock'), await tabVis(pg, '.view-tab[data-view="history"]'), await shown(pg, '#prof-stock-row')], [false, true, false], 'tab hidden by the user: History stays, Stock hidden on first paint (Profile row only shows on Profile)');
+  await clickBy(pg, '#topbar-profile-trigger'); await wait5(300);
+  eq(await shown(pg, '#prof-stock-row'), true, 'and Profile shows the Show button');
+  await pg.close();
+
+  // 5e. first run: an empty account sees the import-first screen and the optional persona question
+  pg = await open('plan=free&stock=all&stock_claims=0&lang=en');
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  ok(/Start with the stock you already have/i.test(await tc(pg, '#st-first h2')), 'first run: headline');
+  eq([!!(await pg.$('#st-first [data-act="import"]')), !!(await pg.$('#st-first [data-act="add"]')), (await pg.$$('#st-pq .st-segb')).length], [true, true, 3], 'first run: Import, Add one item, three persona choices');
+  ok(/Free for your first 25 held items\. No card\./.test(await tc(pg, '#st-first')), 'a Free account sees the 25-item line');
+  await clickBy(pg, '#st-pq [data-p="resell"]'); await pg.waitForFunction(() => !document.querySelector('#st-pq'), { timeout: 5000 });
+  eq(await pg.evaluate(() => window.__qaStock.state.settings.persona), 'resell', 'answering writes the persona once');
+  ok(!!(await pg.$('#st-first')) && !(await pg.$('#st-first-light')), 'Resell keeps the import-first screen');
+  await clickBy(pg, '#st-first [data-act="add"]'); await pg.waitForSelector('.st-sheet #sf-title', { timeout: 5000 });
+  await pg.type('#sf-title', 'First item'); await pg.type('#sf-buy', '10'); await clickBy(pg, '#st-go'); await pg.waitForFunction(() => !document.querySelector('.st-sheet'), { timeout: 5000 }); await wait5(700);
+  eq([await tc(pg, '#st-hero-held'), !!(await pg.$('#st-first'))], ['1', false], 'the first item turns the first-run screen into the Overview');
+  eq(await pg.$eval('#st-hero-net', e => e.textContent.trim()), '--', 'no sale yet: net profit is -- and says how to get one');
+  ok(/Net profit appears when you mark an item sold\./.test(await tc(pg, '#st-over')), 'the empty-profit sentence');
+  await pg.close();
+
+  pg = await open('plan=elite&stock=all&stock_claims=0&lang=en');
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  await clickBy(pg, '#st-pq [data-p="buy"]'); await pg.waitForSelector('#st-first-light', { timeout: 5000 });
+  ok(/Keep track of what you buy/.test(await tc(pg, '#st-first-light h2')) && !!(await pg.$('#st-first-light [data-act="hide-tab"]')), 'Buy for myself: the light card with Hide the tab');
+  await clickBy(pg, '#st-first-light [data-act="hide-tab"]'); await wait5(700);
+  eq([await tabVis(pg, '#view-tab-stock'), await pg.evaluate(() => window.__qaStock.state.settings.tab_hidden)], [false, true], 'Hide the tab: hidden and saved');
+  await pg.close();
+
+  pg = await open('plan=elite&stock=all&stock_claims=0&lang=en');
+  await pg.evaluate(() => { try { localStorage.removeItem('snypd_stock_pq_skipped'); } catch (e) {} });
+  await pg.reload({ waitUntil: 'domcontentloaded' });
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  await clickBy(pg, '#st-pq [data-act="pq-skip"]'); await wait5(300);
+  eq([!!(await pg.$('#st-pq')), await pg.evaluate(() => window.__qaStock.state.settings)], [false, null], 'Skip hides the question and writes nothing');
+  await pg.reload({ waitUntil: 'domcontentloaded' });
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  eq(!!(await pg.$('#st-pq')), false, 'a skipped question is not asked again');
+  await pg.evaluate(() => { try { localStorage.removeItem('snypd_stock_pq_skipped'); } catch (e) {} });
+  await pg.close();
+
+  // French first run: no English left
+  pg = await open('plan=free&stock=all&stock_claims=0&lang=fr');
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  const frText = await pg.$eval('#st-over', e => e.innerText);
+  ok(/Commence par le stock que tu as déjà/i.test(frText) && /Importer/i.test(frText) && /Ajouter un article/i.test(frText) && /Gratuit pour tes 25 premiers articles/i.test(frText), 'French first run: ' + frText.replace(/\n+/g, ' | ').slice(0, 260));
+  ok(!/Start with|Import your|Add one|Resell|I mainly|Skip|Free for/i.test(frText), 'French first run has no English left');
+  await pg.close();
+
+  // 5f. a claim made in the Feed lands in Stock with its own note
+  pg = await open('plan=elite&stock=all&lang=en');
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+  await pg.click('#view-tab-stock'); await waitOv(pg);
+  const heldPre = +(await tc(pg, '#st-hero-held'));
+  await pg.evaluate(() => window.SNYPD.supabase.from('user_claims').insert({ id: 'claim-9', user_id: 'qa-user-0000-0000-0000-000000000001', listing_id: 9009, title: 'Mirror Test Item', brand_title: 'Nike', size_title: 'M', vinted_url: 'https://www.vinted.be/items/9009', bought_price_cents: 1500, status: 'holding', claimed_at: new Date().toISOString() }));
+  await pg.evaluate(() => window.SNYPD.openStock()); await wait5(900);
+  eq(+(await tc(pg, '#st-hero-held')), heldPre + 1, 'a new Feed claim adds one held item to the Overview');
+  await clickBy(pg, '#stock-panel .st-navb[data-view="items"]'); await pg.waitForSelector('#stock-panel .st-row', { timeout: 5000 }); await wait5(300);
+  await pg.evaluate(() => { const r = [...document.querySelectorAll('#stock-panel .st-row')].find(x => /Mirror Test Item/.test(x.textContent)); if (!r) throw new Error('claim item not in the list'); r.click(); });
+  await pg.waitForSelector('.st-sheet', { timeout: 4000 }); await wait5(300);
+  ok(/pressed Claim in the Feed/.test(await pg.$eval('.st-sheet', e => e.textContent)), 'the item says it came from a Feed claim');
+  await pg.close();
+
+  // 5g. phone width, English and French: no overflow, every control 44 px
+  for (const lng of ['en', 'fr']) {
+    pg = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&stock_claims=0&lang=' + lng, { width: 390, height: 844, isMobile: true, hasTouch: true });
+    await pg.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    await pg.click('#bottombar-tab-stock'); await waitOv(pg); await wait5(400);
+    const gm = await pg.evaluate(() => ({ vw: innerWidth, sw: document.documentElement.scrollWidth,
+      cut: [...document.querySelectorAll('#st-over .st-card, #st-over .st-lane, #st-over .st-cell')].filter(e => e.scrollWidth > e.clientWidth + 1).length,
+      small: [...document.querySelectorAll('#stock-panel .st-btn, #stock-panel .st-chip, #stock-panel .st-navb, #stock-panel .st-segb, #stock-panel .st-lane-it')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 43.5).map(e => e.className + ' ' + e.textContent.trim().slice(0, 20) + ' ' + Math.round(e.getBoundingClientRect().height)) }));
+    eq([gm.sw <= gm.vw, gm.cut, gm.small], [true, 0, []], 'Overview at 390 (' + lng + '): no horizontal overflow, nothing cut, every control >= 44 px: ' + JSON.stringify(gm));
+    if (lng === 'fr') {
+      const frNum = await pg.$eval('#st-over', e => e.innerText);
+      ok(/Stock actuel/i.test(frNum) && /Les chiffres/i.test(frNum) && /Aujourd.hui/i.test(frNum) && /Argent immobilisé/i.test(frNum) && !/Stock now|The numbers|Cash tied up|Reprice|Follow up/i.test(frNum), 'French Overview has no English left: ' + frNum.replace(/\n+/g, ' | ').slice(0, 200));
+      ok(new RegExp('1.?124,50').test(frNum), 'French money format, comma decimal: ' + frNum.slice(0, 120));
+    }
+    await pg.close();
+  }
+
   await browser.close(); server.close();
   if (errors.length) { console.log('PAGE ERRORS:\n' + errors.join('\n')); process.exit(1); }
-  console.log(`PASS: ${passed} browser checks (Stock tab gating, lazy load, full item lifecycle, undo, history, delete/restore, French + Free cap, 390 px)`);
+  console.log(`PASS: ${passed} browser checks (Stock tab gating, lazy load, full item lifecycle, undo, history, delete/restore, French + Free cap, import, Overview, lanes, first run, persona, settings, History swap, claims, 390 px)`);
 })().catch(async e => { console.error('FAIL', e && e.stack || e); try { server.close(); } catch (x) {} process.exit(1); });

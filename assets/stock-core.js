@@ -188,6 +188,23 @@
         if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
         return list.length;
       },
+      // account settings (currency, persona, tab_hidden, old_after_days): own-row insert/update policies on stock_settings (065), so one upsert; the CHECKs answer stock_check_violation.
+      // Changing the currency relabels the numbers and never converts them.
+      saveSettings: async patch => {
+        const row = {}; ['currency', 'persona', 'tab_hidden', 'old_after_days'].forEach(k => { if (patch[k] !== undefined) row[k] = patch[k]; });
+        let u; try { u = await client.auth.getUser(); } catch (e) { throw parseError(e); }
+        const uid = u && u.data && u.data.user && u.data.user.id; if (!uid) throw parseError('not authenticated 401');
+        row.user_id = uid;
+        let r; try { r = await client.from('stock_settings').upsert(row, { onConflict: 'user_id' }); } catch (e) { throw parseError(e); }
+        if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
+        return row;
+      },
+      // one item by id (a Today lane opens its item without paging through the list); select-own through RLS
+      itemById: async id => {
+        let r; try { r = await client.from('stock_items').select('*').eq('id', id).maybeSingle(); } catch (e) { throw parseError(e); }
+        if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
+        return r.data || null;
+      },
       // the item's timeline (stock_history is select-own through RLS; only the RPCs can write it)
       itemHistory: async id => {
         let r;
