@@ -69,6 +69,22 @@
     try { if (name === 'sign_up' && window.fbq) window.fbq('track', 'CompleteRegistration'); } catch (e) {}
   }
 
+  var signupEventsSent = {};
+  function trackSignUp(user, method) {
+    // A click or an empty SDK response is not an account creation. Keep account
+    // identifiers inside this page only; never include them in analytics payloads.
+    if (!user || typeof user.id !== 'string' || !user.id || signupEventsSent[user.id]) return;
+    if (method === 'google') {
+      var created = Date.parse(user.created_at || '');
+      var signedIn = Date.parse(user.last_sign_in_at || '');
+      // A returning account can log in again within the old 15-minute window.
+      // Count only a first sign-in close to the server's creation timestamp.
+      if (!created || !signedIn || Math.abs(signedIn - created) > 5000) return;
+    }
+    signupEventsSent[user.id] = true;
+    track('sign_up', { method: method });
+  }
+
   var qs = new URLSearchParams((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.search) || location.search);
   var hs = new URLSearchParams(((window.SNYPD_AUTH_URL && window.SNYPD_AUTH_URL.hash) || location.hash).replace(/^#/, ''));
   var plan = (qs.get('plan') || '').toLowerCase();
@@ -86,6 +102,16 @@
      day so the dashboard's first-hunt wizard opens with this search filled in
      (dashboard.html). Stored only because the visitor asked for exactly this search. */
   (function () {
+    if (qs.has('site')) {
+      // Explicit builder intent: preserve its marketplace and decimal bounds.
+      // Reject the whole intent if the contract is unavailable or invalid.
+      try {
+        var intent = window.SNYPDSearch.fromParams(qs);
+        intent.t = Date.now();
+        lsSet('snypd_hunt_intent', JSON.stringify(intent));
+      } catch (e) { try { localStorage.removeItem('snypd_hunt_intent'); } catch (ignored) {} }
+      return;
+    }
     var h = (qs.get('hunt') || '').trim().replace(/\s+/g, ' '), m = Number(qs.get('max'));
     if (h && h.length <= 80) lsSet('snypd_hunt_intent', JSON.stringify({ q: h, max: m > 0 ? Math.round(m) : 0, t: Date.now() }));
   })();
@@ -194,7 +220,7 @@
      only, never stored on the device; saved with the new account so sign-ups can be
      counted per ad (assets/consent.js keeps them on links between pages). */
   function campaignTags(src) {
-    var out = {}, q = src || new URLSearchParams(location.search);
+    var out = {}, q = src || qs;
     ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
       var v = q.get(k);
       if (v && /^[A-Za-z0-9_.-]{1,60}$/.test(v)) out[k] = v;
@@ -206,8 +232,17 @@
      /login and /plans): the SNYPD page this visitor started on. Address only. */
   function entryPage(src) {
     var v = null;
-    try { v = (src || new URLSearchParams(location.search)).get('from'); } catch (e) {}
+    try { v = (src || qs).get('from'); } catch (e) {}
     return v && /^[a-z0-9.-]{1,80}$/.test(v) ? v : null;
+  }
+
+  function landingData(src) {
+    var q = src || qs, ep = entryPage(q);
+    // Versioned navigation chain, not a claim of a persisted browser session.
+    if (!ep || !/^[a-z0-9-]+(\.[a-z0-9-]+)*$/.test(ep) || q.get('entry_basis') !== 'nav-v1') return {};
+    var path = ep === 'home' ? '/' : '/' + ep.replace(/\./g, '/');
+    if (/^\/(signup|login|reset-password|dashboard|account|admin|plans)(\/|$)/.test(path)) return {};
+    return { landing_path: path, landing_path_basis: 'navigation_chain_v1' };
   }
 
   /* Whop partner code (a=<Whop username>) from a partner's link: from the address
@@ -248,6 +283,8 @@
     if (hi) data.entry_hunt = hi;
     var ep = entryPage();
     if (ep) data.entry_page = ep;
+    var landing = landingData();
+    for (var key in landing) data[key] = landing[key];
     if (heardOk(S.heard)) data.heard_from = S.heard;
     var ref = lsGet('snypd_ref');
     if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;
@@ -292,8 +329,8 @@
         if (!r.error) {
           var u = r.data && r.data.user;
           if (u && Array.isArray(u.identities) && u.identities.length === 0) { existsNow(); return; }
-          if (r.data && r.data.session) { track('sign_up', { method: 'email' }); openDashboard(email); return; }
-          track('sign_up', { method: 'email' });
+          if (r.data && r.data.session) { trackSignUp(u || r.data.session.user, 'email'); openDashboard(email); return; }
+          trackSignUp(u, 'email');
           go('verify', { pw: '' }); startCooldown(); render();
           return;
         }
@@ -385,6 +422,7 @@
     if (aff) back.set('a', aff);
     var ep = entryPage();
     if (ep) back.set('from', ep);
+    if (Object.keys(landingData()).length) back.set('entry_basis', 'nav-v1');
     if (heardOk(S.heard)) back.set('heard', S.heard);
     var backQs = back.toString();
     Promise.resolve().then(function () {
@@ -754,14 +792,17 @@
       /* Google sign-ups come back here from Google; count a brand-new account as a sign-up
          (email sign-ups are counted in signup()). */
       var created = Date.parse(sess.user.created_at || '');
-      if (oauthReturn && created && Date.now() - created < 15 * 60 * 1000) {
-        track('sign_up', { method: 'google' });
+      var firstSignIn = Date.parse(sess.user.last_sign_in_at || '');
+      if (oauthReturn && created && firstSignIn && Math.abs(firstSignIn - created) <= 5000 && Date.now() - created < 15 * 60 * 1000) {
+        trackSignUp(sess.user, 'google');
         /* Tags from the return address set in google(): same fields as an email sign-up. */
         var md = sess.user.user_metadata || {}, add = md.utm_source ? {} : campaignTags(qs), retAff = qs.get('a');
         var hi = huntIntent();
         if (hi && !md.entry_hunt) add.entry_hunt = hi;
         var retEp = entryPage(qs);
         if (retEp && !md.entry_page) add.entry_page = retEp;
+        var landing = landingData(qs);
+        if (!md.landing_path) for (var key in landing) add[key] = landing[key];
         var retHeard = heardOk(qs.get('heard'));
         if (retHeard && !md.heard_from) add.heard_from = retHeard;
         if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;

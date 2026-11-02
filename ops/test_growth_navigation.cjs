@@ -47,10 +47,12 @@ for (const [href,expected] of [
 const tagStart=end, tagEnd=consent.indexOf('/* Not about consent: Vercel Web Analytics',tagStart);
 const tagging=consent.slice(tagStart,tagEnd);
 for (const [search,pathname,href,expected] of [
-  ['?utm_source=chatgpt.com&a=partner','/vinted-bot','/signup','/signup?utm_source=chatgpt.com&a=partner&from=vinted-bot'],
-  ['','/fr/bot-vinted','/plans#card-pass','/plans?from=fr.bot-vinted#card-pass'],
-  ['','/vinted-bot','/faq','/faq'],
+  ['?utm_source=chatgpt.com&a=partner','/vinted-bot','/signup','/signup?utm_source=chatgpt.com&a=partner&from=vinted-bot&entry_basis=nav-v1'],
+  ['','/fr/bot-vinted','/plans#card-pass','/plans?from=fr.bot-vinted&entry_basis=nav-v1#card-pass'],
+  ['','/vinted-bot','/faq','/faq?from=vinted-bot&entry_basis=nav-v1'],
   ['?from=fr.guide-prix-vinted','/signup','/login','/login?from=fr.guide-prix-vinted'],
+  ['','/vinted-bot','/dashboard','/dashboard'],
+  ['','/vinted-bot','https://example.com/','https://example.com/'],
 ]) {
   let actual=href; const on={};
   const a={getAttribute:()=>actual,setAttribute:(k,v)=>{actual=v;}};

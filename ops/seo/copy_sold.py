@@ -133,8 +133,8 @@ COPY = {
         sources_data='Données de prix' + NB + ': guide des prix Vinted de SNYPD, vinted.be, {window} (<a href="{method}">méthode</a>).',
     ),
     'de': dict(
-        title='Verkaufte Artikel bei Vinted sehen: was möglich ist (2026) | SNYPD',
-        desc='Was du laut Vinted-Hilfe über verkaufte Artikel sehen kannst und was nicht, warum der angezeigte Preis nicht immer der bezahlte ist, und wie du einen Preis prüfst.',
+        title='Vinted: Verkaufte Artikel und Verkaufspreise sehen? | SNYPD',
+        desc='Vinted bietet keine Suche nach verkauften Artikeln. Welche Angaben sichtbar bleiben und wie du mit aktuellen Angebotspreisen vergleichst.',
         eyebrow='VINTED-PREISE', h1='Kann man bei Vinted verkaufte Artikel und ihre Preise sehen?',
         lead='Nein. Vinted hat keine Suche nach verkauften Artikeln und keinen Nachweis, zu welchem Preis ein Artikel verkauft wurde: Die Vinted-Hilfe beschreibt weder das eine noch das andere. Hier steht, was Vinted laut seiner eigenen Hilfe zeigt, warum der Preis in einem Angebot nicht immer der bezahlte Preis ist und wie du einen Preis stattdessen über verlangte Preise prüfst.',
         toc=[('antwort', 'Kurze Antwort'), ('zeigt', 'Was Vinted zeigt'), ('bezahlt', 'Angezeigter vs. bezahlter Preis'), ('preise', 'Verlangte Preise'),

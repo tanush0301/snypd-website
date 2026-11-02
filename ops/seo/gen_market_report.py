@@ -9,7 +9,7 @@
 #   - the SQL output (ops/seo/data/market-report-<edition>.json, market_report_stats.sql, md5-checked)
 # New edition: run both, add a line to EDITIONS, regenerate. An edition's page never changes after
 # publication except for wording fixes: it is meant to be cited.
-import csv, datetime, io, json, os, sys
+import csv, datetime, hashlib, io, json, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gen_content as gc  # noqa: E402
@@ -22,10 +22,12 @@ DATA = os.path.join(ROOT, 'ops', 'seo', 'data')
 EDITIONS = [
     {'id': '2026-10', 'published': '2026-10-09', 'guide': 'price-guide-2026-10-09.json', 'stats': 'market-report-2026-10.json',
      'slug': {'en': 'october-2026', 'fr': 'octobre-2026'}, 'name': {'en': 'October 2026', 'fr': 'octobre 2026'}},
-    {'id': '2026-11', 'published': '2026-11-01', 'guide': 'price-guide-2026-11-01.json', 'stats': 'market-report-2026-11.json',
+    {'id': '2026-11', 'published': '2026-11-01', 'modified': '2026-11-02', 'guide': 'price-guide-2026-11-01.json', 'stats': 'market-report-2026-11.json',
      'slug': {'en': 'november-2026', 'fr': 'novembre-2026'}, 'name': {'en': 'November 2026', 'fr': 'novembre 2026'}},
 ]
 HUB = {'en': '/vinted-market-report', 'fr': '/fr/rapport-marche-vinted'}
+from price_quality import publishable_overall
+
 LANGS = ('en', 'fr')
 NB = ' '
 COND_ORDER = ['Neuf avec étiquette', 'Neuf sans étiquette', 'Très bon état', 'Bon état', 'Satisfaisant']
@@ -42,8 +44,7 @@ def load(ed):
     items = []
     for it in pg.ITEMS:  # same publication rule as the price guide
         v = by_q.get(it['query'])
-        if it.get('skip') or not v or v.get('display_verdict') != 'ok' or v.get('confidence') not in ('medium', 'high') \
-                or (v.get('sample_size') or 0) < pg.MIN_LISTINGS or not v.get('typical_cents') or not v.get('range_cents'):
+        if it.get('skip') or not publishable_overall(v, pg.MIN_LISTINGS):
             continue
         conds = {c['condition_label']: c for c in v.get('by_condition') or []
                  if c.get('verdict') == 'ok' and (c.get('sample_size') or 0) >= pg.MIN_COND and c.get('typical_cents')}
@@ -133,9 +134,25 @@ def write_csv(ed, items, st):
         w.writerow([x['it']['name'], x['it']['query'], x['it']['cat'], x['typ'] / 100, x['lo'] / 100, x['hi'] / 100, x['n'], x['sellers'],
                     (x['nwt'] / 100) if x['nwt'] else '', (x['vg'] / 100) if x['vg'] else '']
                    + (([p[0] / 100, p[1]] if p else ['', '']) if mom else []))
-    buf.write('# Source: SNYPD Vinted Market Report %s, %s/vinted-market-report/%s. Asking prices (median, 25th and 75th percentile) of vinted.be listings that matched SNYPD users\' searches, %s to %s. Not sale prices. CC BY 4.0.\n'
-              % (ed['name']['en'], SITE, ed['slug']['en'], st['window_start'][:10], st['window_end'][:10]))
-    write(csv_path(ed), buf.getvalue())
+    data = buf.getvalue()
+    write(csv_path(ed), data)
+    metadata = {
+        'schema_version': 1, 'name': 'SNYPD Vinted Market Report ' + ed['name']['en'],
+        'source_url': SITE + '/vinted-market-report/' + ed['slug']['en'],
+        'csv_url': SITE + '/' + csv_path(ed), 'csv_sha256': hashlib.sha256(data.encode('utf-8')).hexdigest(),
+        'license': DATASET_LICENSE, 'marketplace': 'vinted.be', 'currency': 'EUR',
+        'price_basis': 'asking prices, not completed-sale prices',
+        'window': {'from': st['window_start'][:10], 'to': st['window_end'][:10]},
+        'published': ed['published'], 'modified': ed.get('modified', ed['published']),
+        'item_count': len(items), 'observed_marketplace_listings': st['listings'],
+        'item_sample_sizes_may_overlap': True,
+        'selection': 'Searches monitored by SNYPD users; not a representative census of Vinted. Seller geography is not inferred from the marketplace.',
+        'quality': 'Only non-provisional overall estimates passing the original verdict, confidence, sample-size and ordered-quartile checks are included.',
+        'columns': next(csv.reader(io.StringIO(data))),
+    }
+    if ed['id'] == '2026-11':
+        metadata['correction'] = '2 November 2026: unsupported overall estimates removed; existing item guides retain validated condition figures and data limits.'
+    write(csv_path(ed).replace('.csv', '.metadata.json'), json.dumps(metadata, ensure_ascii=False, indent=2) + '\n')
 
 
 def mom_point(m, lang):
@@ -322,6 +339,16 @@ def page_edition(ed, lang):
         lead = 'Ce que disent %s annonces vinted.be de %s vendeurs sur les prix demandés sur Vinted, %s.' % (num(st['listings'], 'fr'), num(st['sellers'], 'fr'), win)
         toc = [('resultats', 'Résultats clés')] + mom_toc + [('prix', 'Prix'), ('etat', 'État'), ('baisses', 'Baisses de prix'), ('repartition', 'Répartition'), ('methode', 'Méthode'), ('citer', 'Utiliser les données')]
         parent = ('Rapport du marché Vinted', HUB['fr'])
+    metadata_url = '/' + csv_path(ed).replace('.csv', '.metadata.json')
+    if lang == 'en':
+        body += '<section id="metadata"><h2>Reuse the data</h2><p>The CSV has one header and consistent data rows. <a href="%s">Download the metadata</a> for the source, licence, observation window, column names and file checksum. Item sample counts may overlap across searches.</p></section>' % metadata_url
+    else:
+        body += '<section id="metadata"><h2>Réutiliser les données</h2><p>Le CSV contient un en-tête et des lignes de données cohérentes. <a href="%s">Télécharge les métadonnées</a> : source, licence, période, colonnes et empreinte du fichier. Les échantillons peuvent se recouper entre recherches.</p></section>' % metadata_url
+    toc.append(('metadata', 'Data and metadata' if lang == 'en' else 'Données et métadonnées'))
+    if ed['id'] == '2026-11':
+        correction = ('Data correction, 2 November 2026: four overall estimates were removed after restoring the source quality checks. Their existing guides retain validated condition figures and data limits. The original observation window is unchanged.' if lang == 'en' else 'Correction du 2 novembre 2026 : quatre estimations globales ont été retirées après rétablissement des contrôles de qualité. Les guides existants conservent les prix par état validés et les limites des données. La période observée ne change pas.')
+        body = '<section id="correction"><div class="lg-box"><p>' + correction + '</p></div></section>' + body
+        toc.insert(0, ('correction', 'Data correction' if lang == 'en' else 'Correction des données'))
     ds = {'@context': 'https://schema.org', '@type': 'Dataset',
           'name': ('Vinted Market Report %s (vinted.be asking prices)' % ed['name']['en']) if lang == 'en' else ('Rapport du marché Vinted %s (prix demandés vinted.be)' % ed['name']['fr']),
           'description': ('Median, 25th and 75th percentile asking prices of %d items, condition premium, price cuts and condition mix, from %s vinted.be listings that matched SNYPD users\' searches. Asking prices, not sale prices.' % (len(items), st['listings'])) if lang == 'en'
@@ -329,7 +356,7 @@ def page_edition(ed, lang):
           'url': SITE + url, 'creator': DATASET_CREATOR, 'license': DATASET_LICENSE, 'inLanguage': lang, 'isAccessibleForFree': True,
           'temporalCoverage': '%s/%s' % (st['window_start'][:10], st['window_end'][:10]), 'spatialCoverage': 'Belgium',
           'distribution': [{'@type': 'DataDownload', 'encodingFormat': 'text/csv', 'contentUrl': SITE + '/' + csv_path(ed)}],
-          'datePublished': ed['published']}
+          'datePublished': ed['published'], 'dateModified': ed.get('modified', ed['published'])}
     return gc.page(key, lang, title, desc, 'VINTED MARKET REPORT' if lang == 'en' else 'RAPPORT DU MARCHÉ VINTED', h1, lead, toc, body, [ds], parent=parent)
 
 

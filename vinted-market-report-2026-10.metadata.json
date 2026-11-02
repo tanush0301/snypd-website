@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "name": "SNYPD Vinted Market Report October 2026",
+  "source_url": "https://www.snypd.store/vinted-market-report/october-2026",
+  "csv_url": "https://www.snypd.store/vinted-market-report-2026-10.csv",
+  "csv_sha256": "a2cd6666796f86138fe91c252e4886fd40079f8695913aafea203cfdeea8e371",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "marketplace": "vinted.be",
+  "currency": "EUR",
+  "price_basis": "asking prices, not completed-sale prices",
+  "window": {
+    "from": "2026-09-25",
+    "to": "2026-10-09"
+  },
+  "published": "2026-10-09",
+  "modified": "2026-10-09",
+  "item_count": 38,
+  "observed_marketplace_listings": 317962,
+  "item_sample_sizes_may_overlap": true,
+  "selection": "Searches monitored by SNYPD users; not a representative census of Vinted. Seller geography is not inferred from the marketplace.",
+  "quality": "Only non-provisional overall estimates passing the original verdict, confidence, sample-size and ordered-quartile checks are included.",
+  "columns": [
+    "item",
+    "search",
+    "category",
+    "typical_asking_eur",
+    "p25_eur",
+    "p75_eur",
+    "listings",
+    "sellers",
+    "new_with_tags_typical_eur",
+    "very_good_typical_eur"
+  ]
+}

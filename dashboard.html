@@ -4,6 +4,7 @@
 <html lang="en" data-i18n-app>
 <head>
 <script src="/assets/i18n.js"></script>
+<script src="/assets/search-contract.js"></script>
 <script>
   /* Plan intent: a visitor who clicked START KICKSTART / PRO / ELITE on the
      homepage signed up via /signup?plan=<plan>. Once they are signed in, send
@@ -1808,10 +1809,10 @@ body {
         <input type="text" class="vq-input" id="wiz-q-words" placeholder="e.g. ralph lauren, jordan 4, carhartt jacket" autocomplete="off" autocapitalize="none" aria-label="What are you looking for?" />
         <div class="vq-row">
           <select id="wiz-q-site" aria-label="Which Vinted country"></select>
-          <input type="number" id="wiz-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
+          <input type="number" id="wiz-q-max" min="0" step="0.01" inputmode="decimal" placeholder="Max price" aria-label="Maximum price (optional)" />
         </div>
         <label class="wiz-quick__note" for="wiz-q-min"><span>Minimum price (optional)</span> · <span id="wiz-q-min-currency">EUR</span></label>
-        <input type="number" class="vq-input" id="wiz-q-min" min="0" step="1" inputmode="numeric" value="30" aria-describedby="wiz-q-note" />
+        <input type="number" class="vq-input" id="wiz-q-min" min="0" step="0.01" inputmode="decimal" value="30" aria-describedby="wiz-q-note" />
         <p class="wiz-quick__note" id="wiz-q-note">Lower or clear the minimum to include cheaper items. Like Vinted's search, matches can include words in the description.</p>
         <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
       </div>
@@ -1968,6 +1969,8 @@ body {
 <button class="btn btn-prim" id="btn-start">Start Sniping</button>
 <button class="btn btn-ghost" id="btn-stop">Stop</button>
 <button class="btn btn-ghost" id="btn-notify" style="display:none">Enable alerts</button>
+<button class="btn btn-ghost" id="btn-notify-test" type="button" hidden data-i18n-skip>Test this device</button>
+<a class="btn btn-ghost" id="alerts-guide-link" href="/vinted-alerts-on-your-phone" data-i18n-skip>Alert setup guide</a>
 </div>
 <p id="notify-note" style="display:none;margin:8px 0 0;font-size:13px;color:#8A8A8A;line-height:1.5;max-width:56ch"></p>
 </div>
@@ -3045,7 +3048,7 @@ const HEARTBEAT_URL = (() => {
       const m = Number(max);
       const hasMax = String(max || '').trim() !== '' && isFinite(m) && m > 0;
       if (floor !== null && floor !== undefined && (!hasMax || floor < m)) x.searchParams.set('price_from', String(floor));
-      if (hasMax) x.searchParams.set('price_to', String(Math.round(m)));
+      if (hasMax) x.searchParams.set('price_to', String(m));
       x.searchParams.set('order', 'newest_first');
       return x.toString();
     }
@@ -3590,9 +3593,11 @@ const HEARTBEAT_URL = (() => {
       if (vq && wqWords && wqSite && wqSave) {
         vq.fillSites(wqSite);
         let minEdited = false;
+        let wqCurrency = vq.currencyFor(wqSite.value);
         if (wqMin) wqMin.addEventListener('input', () => { minEdited = true; });
         const paintWqNote = () => {
           const cur = vq.currencyFor(wqSite.value);
+          wqCurrency = cur;
           const minCurrency = document.getElementById('wiz-q-min-currency');
           if (minCurrency) minCurrency.textContent = cur;
           if (wqMax) wqMax.placeholder = 'Max ' + cur;
@@ -3602,23 +3607,41 @@ const HEARTBEAT_URL = (() => {
           }
           if (wqNote) wqNote.textContent = 'Lower or clear the minimum to include cheaper items. Like Vinted\'s search, matches can include words in the description.';
         };
-        wqSite.addEventListener('change', paintWqNote);
+        wqSite.addEventListener('change', () => {
+          const changedCurrency = wqCurrency !== vq.currencyFor(wqSite.value);
+          if (changedCurrency) {
+            if (wqMin) { wqMin.value = ''; minEdited = true; }
+            if (wqMax) wqMax.value = '';
+          }
+          paintWqNote();
+          if (changedCurrency && wqNote) wqNote.textContent = document.documentElement && document.documentElement.lang === 'fr'
+            ? 'Les prix ont été effacés car la devise a changé. Saisis ton budget dans la devise affichée ; aucune conversion n’a été appliquée.'
+            : 'Prices were cleared because the currency changed. Enter your budget in the displayed currency; no conversion was applied.';
+        });
         paintWqNote();
-        // A price-guide page sent this visitor here for one item ("alert me under
-        // EUR X"): assets/auth.js keeps it as snypd_hunt_intent for a day. Fill the
-        // words and max price only (country stays the browser guess); never save
-        // on the user's behalf.
+        // Explicit builder intent preserves country and decimal bounds. Legacy
+        // price-guide intents keep their old words/max behavior. This only fills
+        // a form; the user must review and save it.
         try {
           const hi = JSON.parse(localStorage.getItem('snypd_hunt_intent') || 'null');
-          if (hi && typeof hi.q === 'string' && hi.q.trim() && Date.now() - Number(hi.t) < 864e5) {
-            wqWords.value = hi.q.trim().slice(0, 80);
-            if (wqMax && Number(hi.max) > 0) {
-              wqMax.value = String(Math.round(Number(hi.max)));
-              if (wqMin && Number(wqMin.value) >= Number(wqMax.value)) { wqMin.value = ''; minEdited = true; }
+          if (hi && typeof hi.q === 'string' && hi.q.trim() && Date.now() - Number(hi.t) >= 0 && Date.now() - Number(hi.t) < 864e5) {
+            if (hi.site) {
+              const intent = window.SNYPDSearch.normalize(hi);
+              if (![...wqSite.options].some(o => o.value === intent.site)) throw new Error('Unsupported hunt marketplace');
+              wqSite.value = intent.site;
+              paintWqNote();
+              if (wqMin) { wqMin.value = intent.min; minEdited = true; }
+              if (wqMax) wqMax.value = intent.max;
+              wqWords.value = intent.q;
+            } else {
+              wqWords.value = hi.q.trim().slice(0, 80);
+              if (wqMax && Number(hi.max) > 0) {
+                wqMax.value = String(Math.round(Number(hi.max)));
+                if (wqMin && Number(wqMin.value) >= Number(wqMax.value)) { wqMin.value = ''; minEdited = true; }
+              }
             }
           }
-          localStorage.removeItem('snypd_hunt_intent');
-        } catch (e) {}
+        } catch (e) {} finally { try { localStorage.removeItem('snypd_hunt_intent'); } catch (ignored) {} }
         wqSave.addEventListener('click', async () => {
           const words = wqWords.value.trim();
           if (!words) {
@@ -6373,6 +6396,10 @@ const HEARTBEAT_URL = (() => {
   var API = 'https://api.snypd.store';
   var btn = document.getElementById('btn-notify');
   var note = document.getElementById('notify-note');
+  var testBtn = document.getElementById('btn-notify-test');
+  var guideLink = document.getElementById('alerts-guide-link');
+  function pushFrench() { return document.documentElement && document.documentElement.lang === 'fr'; }
+  if (guideLink && pushFrench()) { guideLink.href = '/fr/alertes-vinted-telephone'; guideLink.textContent = 'Guide de configuration des alertes'; }
   if (!btn) { return; }
 
   var sb = (window.SNYPD && window.SNYPD.supabase) || null;
@@ -6392,6 +6419,7 @@ const HEARTBEAT_URL = (() => {
 
   function setPushState(value) {
     pushState = value;
+    if (testBtn) { testBtn.hidden = value.state !== 'on'; testBtn.textContent = pushFrench() ? 'Tester cet appareil' : 'Test this device'; }
     window.dispatchEvent(new Event('snypd:alerts-changed'));
   }
 
@@ -6506,6 +6534,27 @@ const HEARTBEAT_URL = (() => {
     }
     return { ok: true, state: 'on', message: 'Alerts are on for this device.' };
   }
+
+  async function testDevice() {
+    if (!reg || pushState.state !== 'on' || Notification.permission !== 'granted') return { ok: false };
+    if (testBtn && testBtn.disabled) return { ok: false };
+    if (testBtn) testBtn.disabled = true;
+    try {
+      await reg.showNotification(pushFrench() ? 'SNYPD : test de cet appareil' : 'SNYPD device test', {
+        body: pushFrench() ? 'Test local : cet appareil peut afficher une notification. Ceci ne teste pas les alertes serveur.' :
+          'Local test: this device can display a notification. This does not test server delivery.',
+        tag: 'snypd-device-test', data: { url: '/dashboard' }
+      });
+      say(pushFrench() ? 'Test local demandé. Vérifie les notifications de cet appareil. Les alertes de nouvelles annonces doivent être vérifiées séparément.' :
+        'Local test requested. Check this device’s notifications. New-listing delivery must be checked separately.');
+      return { ok: true };
+    } catch (e) {
+      say(pushFrench() ? 'Le test local n’a pas pu être affiché. Vérifie les autorisations du navigateur et du système, puis réessaie.' :
+        'The local test could not be displayed. Check browser and device permissions, then try again.');
+      return { ok: false };
+    } finally { if (testBtn) testBtn.disabled = false; }
+  }
+  if (testBtn) testBtn.addEventListener('click', testDevice);
 
   async function disable() {
     show('Working...', true);

@@ -173,6 +173,7 @@ BODY = """<body>
 
   </div>
 </div>
+<script src="/assets/search-contract.js"></script>
 <script src="/assets/auth.js" data-page="{page}"></script>
 </body>
 </html>

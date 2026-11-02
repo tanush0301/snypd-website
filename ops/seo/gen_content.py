@@ -27,7 +27,7 @@ import copy_alerts_compare as cac  # noqa: E402  (DE/NL/IT/ES copy for the alert
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SITE = 'https://www.snypd.store'
 DISCORD = 'https://discord.gg/gjKD4auXhK'
-EMAIL = 'snypd@gmail.com'
+EMAIL = 'help@snypd.store'
 PUBLISHED = '2026-09-28'
 MODIFIED = '2026-10-01'
 CHECKED = {'en': '28 September 2026', 'fr': '28 septembre 2026'}
@@ -122,7 +122,7 @@ SLUGS = {
     # work order 18 step 5; both rendered by gen_price_guide.py (they need the price data)
     'sold':    {'en': '/vinted-sold-items', 'fr': '/fr/vinted-voir-articles-vendus', 'de': '/de/vinted-verkaufte-artikel-sehen',
                 'it': '/it/vinted-vedere-articoli-venduti', 'es': '/es/vinted-ver-articulos-vendidos'},
-    'checker': {'en': '/vinted-price-checker', 'fr': '/fr/estimer-prix-vinted'},
+    'checker': {'en': '/vinted-price-checker', 'fr': '/fr/estimer-prix-vinted', 'it': '/it/stima-prezzo-vinted', 'de': '/de/vinted-preis-checker', 'es': '/es/comprobar-precio-vinted'},
 }
 
 CSS = r"""
@@ -233,7 +233,7 @@ UI = {
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
                foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('saved', 'Vinted saved searches'), ('pricedrop', 'Vinted price drop alerts'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'), ('sold', 'Vinted sold items'),('/vinted-market-report', 'Vinted market report'), 
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
     'fr': dict(locale='fr_FR', toc='SUR CETTE PAGE', updated='Mis à jour le', by='Par SNYPD, créé par un revendeur de sneakers belge',
                nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
@@ -241,7 +241,7 @@ UI = {
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
                foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('saved', 'Recherches enregistrées Vinted'), ('pricedrop', 'Baisse de prix Vinted'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('checker', 'Estimer un prix Vinted'), ('sold', 'Articles vendus sur Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
+               legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
     'de': dict(locale='de_DE', toc='AUF DIESER SEITE', updated='Aktualisiert am', by='Von SNYPD, gebaut von einem belgischen Sneaker-Reseller',
                nav=[('bot', 'VINTED BOT'), ('/de/vinted-preise', 'VINTED-PREISE'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
@@ -249,7 +249,7 @@ UI = {
                foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
                foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('saved', 'Gespeicherte Suchen auf Vinted'), ('pricedrop', 'Vinted-Preissenkung'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/de/vinted-preise', 'Vinted-Preisführer'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:snypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
+               legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:help@snypd.store">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
     'nl': dict(locale='nl_NL', toc='OP DEZE PAGINA', updated='Bijgewerkt op', by='Door SNYPD, gemaakt door een Belgische sneakerreseller',
                nav=[('bot', 'VINTED BOT'), ('/nl/vinted-prijzen', 'VINTED-PRIJZEN'), ('/plans', 'ABONNEMENTEN'), (DISCORD, 'DISCORD')],
@@ -257,15 +257,15 @@ UI = {
                foot_tag='SNYPD &middot; NIET VERBONDEN AAN VINTED', foot_t='Leest alleen openbare advertenties.',
                foot=[('bot', 'Vinted bot'), ('notify', 'Vinted-melding bij nieuwe artikelen'), ('notwork', 'Vinted-meldingen werken niet'), ('saved', 'Opgeslagen zoekopdrachten op Vinted'), ('pricedrop', 'Vinted-prijsverlaging'), ('compare', 'Vinted bots vergeleken'), ('/nl/vinted-prijzen', 'Vinted-prijsgids'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:snypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
                home='Home'),
     'it': dict(locale='it_IT', toc='IN QUESTA PAGINA', updated='Aggiornato il', by='Di SNYPD, creato da un reseller di sneaker belga',
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PREZZI'), (DISCORD, 'DISCORD')],
                login='ACCEDI', start='INIZIA',
                foot_tag='SNYPD &middot; NON AFFILIATO A VINTED', foot_t='Legge solo annunci pubblici.',
-               foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('saved', 'Ricerche salvate su Vinted'), ('compare', 'Bot Vinted a confronto'), ('sold', 'Vedere gli articoli venduti su Vinted'), ('/vinted-price-guide', 'Prezzi Vinted (EN)'),('fees', 'Commissioni Vinted (EN)'),
+               foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('saved', 'Ricerche salvate su Vinted'), ('compare', 'Bot Vinted a confronto'), ('sold', 'Vedere gli articoli venduti su Vinted'), ('/it/prezzi-vinted', 'Guide prezzi Vinted'), ('/it/stima-prezzo-vinted', 'Stima prezzo Vinted'),('fees', 'Commissioni Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Supporto (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:snypd@gmail.com">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:help@snypd.store">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
                home='Home'),
     'es': dict(locale='es_ES', toc='EN ESTA PÁGINA', updated='Actualizado el', by='Por SNYPD, creado por un revendedor de zapatillas belga',
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PRECIOS'), (DISCORD, 'DISCORD')],
@@ -273,7 +273,7 @@ UI = {
                foot_tag='SNYPD &middot; SIN RELACIÓN CON VINTED', foot_t='Solo lee anuncios públicos.',
                foot=[('bot', 'Bot de Vinted'), ('notify', 'Alertas de Vinted para anuncios nuevos'), ('notwork', 'Notificaciones de Vinted no funcionan'), ('saved', 'Búsquedas guardadas en Vinted'), ('compare', 'Bots de Vinted comparados'), ('sold', 'Ver artículos vendidos en Vinted'), ('/vinted-price-guide', 'Precios de Vinted (EN)'),('fees', 'Comisiones de Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Soporte (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:snypd@gmail.com">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
+               legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:help@snypd.store">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
                home='Inicio'),
 }
 
@@ -320,10 +320,15 @@ def jsonld(obj):
     return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '</script>'
 
 
-def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None, bare=False):
+def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head_extra='', parent=None, bare=False, published=None):
     """parent: optional (name, path) shown between Home and this page in the breadcrumb.
     bare: a page with no URL of its own (404.html): noindex, no canonical, hreflang, JSON-LD or date line."""
     u = UI[lang]
+    if key in ('notify', 'saved') and lang in ('en', 'fr'):
+        body += '<section id="next-tools"><h2>%s</h2><p><a href="%s">%s</a> · <a href="%s">%s</a></p></section>' % (
+            'Next steps' if lang == 'en' else 'Pour continuer', SLUGS['builder'][lang],
+            'Build your search link' if lang == 'en' else 'Créer ton lien de recherche', SLUGS['phone'][lang],
+            'Set up phone alerts' if lang == 'en' else 'Configurer les alertes sur téléphone')
     path = None if bare else SLUGS[key][lang]
     url = SITE + path if path else ''
     langs = [lang] if bare else live_langs(key)
@@ -357,7 +362,7 @@ def page(key, lang, title, desc, eyebrow, h1, lead, toc, body, extra_ld=(), head
             {'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': it} for i, (n, it) in enumerate(
                 [(u['home'], SITE + '/')] + ([(parent[0], SITE + parent[1])] if parent else []) + [(h1_plain(h1), url)])]},
         {'@context': 'https://schema.org', '@type': 'WebPage', '@id': url + '#page', 'url': url, 'name': title,
-         'description': desc, 'inLanguage': lang, 'datePublished': PUBLISHED, 'dateModified': PAGE_MODIFIED[key],
+         'description': desc, 'inLanguage': lang, 'datePublished': published or PUBLISHED, 'dateModified': PAGE_MODIFIED[key],
          'isPartOf': {'@id': SITE + '/#website'}, 'publisher': {'@id': SITE + '/#org'}, 'about': {'@id': SITE + '/#app'}},
     ] + list(extra_ld)
     ld_html = '\n'.join(jsonld(o) for o in ld)
@@ -1826,6 +1831,7 @@ def page_deals(lang, steals=None):
   <h2>Watch one search for free</h2>
   {cta('en')}
 </section>"""
+    body += reseller_content.related('en')
     return page('deals', 'en', 'Vinted Deals: How to Find Steals Before Anyone Else | SNYPD',
                 'How to find Vinted deals and steals: real data on how often listings go up far below the typical price, and four steps to see the right one first.',
                 'VINTED DEALS &middot; GUIDE', 'How to find Vinted deals before anyone else',
@@ -2177,8 +2183,8 @@ NOTWORK = {
              ('Hoe zet ik Vinted-meldingen weer aan?', 'In de app: profiel, Mijn instellingen, Pushmeldingen. Check daarna de instellingen van je telefoon voor Vinted en de daglimiet onder Minder belangrijke notificaties.'),
              ('Hoe krijg ik een melding als er een nieuw artikel op Vinted komt?', 'Met een tool die de zoekopdracht voor je in de gaten houdt. SNYPD controleert een Vinted-zoekopdracht ongeveer elke 30 seconden en stuurt voor elke nieuwe treffer een pushmelding; de eerste zoekopdracht is gratis, de eerste @@trial_days@@ dagen 24/7.')]),
     'it': dict(
-        title='Notifiche Vinted che non funzionano? Il motivo e la soluzione | SNYPD',
-        desc='Le ricerche salvate su Vinted non inviano una notifica per ogni nuovo annuncio: Vinted mostra solo un contatore "+" nella barra di ricerca. Per cosa Vinted invia notifiche, le impostazioni da controllare e come ricevere un avviso per ogni nuovo annuncio.',
+        title='Notifiche Vinted non funzionano? Impostazioni e ricerche salvate | SNYPD',
+        desc='Non ricevi notifiche Vinted? Controlla le impostazioni push e scopri la differenza tra avvisi per i preferiti e nuovi risultati delle ricerche salvate.',
         eyebrow='NOTIFICHE VINTED', h1='Vinted non ti avvisa dei nuovi annunci? Ecco perché.',
         lead='Le ricerche salvate su Vinted non inviano una notifica push per ogni nuovo annuncio. Il centro assistenza di Vinted descrive solo un contatore nella barra di ricerca. Qui sotto: per cosa Vinted invia davvero notifiche, le impostazioni da controllare se sono sparite anche altre notifiche e come ricevere una notifica push per ogni nuovo annuncio che corrisponde.',
         toc=[('breve', 'In breve'), ('cosa', 'Cosa notifica Vinted'), ('impostazioni', 'Le impostazioni'), ('ogni', 'Una notifica per annuncio'), ('domande', 'Domande')],
@@ -2398,7 +2404,10 @@ def stamp_modified(path, text):
     m = _TIME_RE.search(text)
     if not m:
         return text
-    old = open(path, encoding='utf-8').read() if os.path.isfile(path) else None
+    old = None
+    if os.path.isfile(path):
+        with open(path, encoding='utf-8') as previous:
+            old = previous.read()
     om = _TIME_RE.search(old) if old else None
     if om and _main_text(old) == _main_text(text):
         iso = max(om.group(2), m.group(2))
@@ -2430,6 +2439,12 @@ cps.install(globals())
 # Help guides (18 Oct 2026): Vinted saved searches (8 languages) and price-drop notifications (4).
 # Copy + sources: copy_guides.py; facts quoted from Vinted's help centre (articles 433, 435, 258).
 import copy_guides as cg  # noqa: E402
+import reseller_content  # noqa: E402
+import expansion_content  # noqa: E402
+SLUGS.update(reseller_content.SLUGS)
+SLUGS.update(expansion_content.SLUGS)
+PAGE_MODIFIED.update({key: reseller_content.UPDATED for key in reseller_content.SLUGS})
+PAGE_MODIFIED.update({key: expansion_content.UPDATED for key in expansion_content.SLUGS})
 GUIDE_FAQ_H = {'en': 'Questions', 'fr': 'Questions', 'de': 'Fragen', 'nl': 'Vragen', 'it': 'Domande', 'es': 'Preguntas',
                'pl': 'Pytania', 'sv': 'Frågor'}
 for _k, _g in cg.GUIDES.items():

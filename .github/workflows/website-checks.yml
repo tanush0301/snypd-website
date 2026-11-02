@@ -30,6 +30,7 @@ jobs:
           python3 --version
       - name: Checkout, onboarding and navigation regressions
         run: |
+          node --test ops/test_registration_measurement.cjs
           node ops/test_purchase_flow.cjs
           node ops/test_checkout_reliability.cjs
           node ops/test_growth_navigation.cjs
@@ -64,8 +65,19 @@ jobs:
           python3 ops/test_growth_report.py
           python3 ops/seo/test_gen_regions.py
           python3 ops/seo/gen_regions.py --check
+          python3 ops/seo/test_search_publication.py
+          python3 ops/seo/gen_reseller.py --check
+          python3 ops/seo/test_reseller_publication.py
+          python3 ops/seo/gen_expansion.py --check
+          python3 ops/seo/test_expansion_publication.py
+          python3 ops/seo/gen_search_assets.py --check
           python3 ops/seo/check_site.py
+          python3 ops/seo/audit_search.py
       - name: Install locked authentication test dependencies
         run: npm ci --prefix ops/auth --ignore-scripts --no-audit --no-fund
       - name: Authentication confirmation regressions
-        run: npm test --prefix ops/auth
+        run: |
+          npm test --prefix ops/auth
+          node --test ops/test_price_checker.cjs
+          node --test ops/test_profit_calculator.cjs
+          node --test ops/test_search_builder.cjs ops/test_attribution_chain.cjs

@@ -46,6 +46,11 @@ PAGES = [
     ('/vinted-notifications-not-working', 'vinted-notifications-not-working.html', None),
     ('/vinted-sold-items',          'vinted-sold-items.html',          None),
     ('/vinted-price-checker',       'vinted-price-checker.html',       None),
+    ('/how-to-resell-on-vinted', 'how-to-resell-on-vinted.html', None),
+    ('/best-brands-to-resell-on-vinted', 'best-brands-to-resell-on-vinted.html', None),
+    ('/vinted-profit-calculator', 'vinted-profit-calculator.html', None),
+    ('/vinted-search-builder', 'vinted-search-builder.html', None),
+    ('/vinted-alerts-on-your-phone', 'vinted-alerts-on-your-phone.html', None),
     ('/vinted-saved-searches',      'vinted-saved-searches.html',      None),
     ('/vinted-price-drop-notifications', 'vinted-price-drop-notifications.html', None),
 ]
@@ -55,6 +60,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gen_content import SLUGS, live_langs  # noqa: E402
 _done = []
 for key, s_ in SLUGS.items():
+    if key == 'guide' or key.startswith('pg:'):
+        continue  # these sets belong to gen_price_guide.sitemap_pages(), regardless of import order
     langs = live_langs(key)
     if len(langs) < 2:
         continue  # English-only page
@@ -131,7 +138,9 @@ def write_sitemap():
 
 
 if __name__ == '__main__':
-    import gen_regions, check_site  # noqa: E402
+    import gen_regions, gen_reseller, gen_expansion, check_site  # noqa: E402
+    gen_reseller.main()
+    gen_expansion.main()
     gen_regions.run()
     refresh_counter()
     write_sitemap()

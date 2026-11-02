@@ -17,7 +17,7 @@ async function boot(t, { url = '/login?verify=1', page = 'login', auth = {}, sav
   const location = { hostname: 'www.snypd.store', origin: 'https://www.snypd.store', pathname: '', search: '', hash: '', replace: value => redirects.push(value) };
   const setUrl = value => { const u = new URL(value, location.origin); Object.assign(location, { pathname: u.pathname, search: u.search, hash: u.hash }); };
   setUrl(url);
-  const defaults = { getSession: () => ({ data: { session: null } }), onAuthStateChange: () => ({}), verifyOtp: () => verified(), resend: () => ({}), signUp: () => ({ data: { user: { identities: [{}] } } }), signInWithPassword: () => verified(), resetPasswordForEmail: () => ({}), updateUser: () => ({}) };
+  const defaults = { getSession: () => ({ data: { session: null } }), onAuthStateChange: () => ({}), verifyOtp: () => verified(), resend: () => ({}), signUp: () => ({ data: { user: { identities: [{}] } } }), signInWithPassword: () => verified(), signInWithOAuth: () => ({}), resetPasswordForEmail: () => ({}), updateUser: () => ({}) };
   const api = {};
   for (const key of Object.keys(defaults)) api[key] = (...args) => { calls.push([key, ...args]); return Promise.resolve((auth[key] || defaults[key])(...args)); };
   w.SNYPD = { supabase: { auth: api } };
@@ -25,6 +25,7 @@ async function boot(t, { url = '/login?verify=1', page = 'login', auth = {}, sav
   w.sessionStorage.setItem('snypd_verify_email', saved);
   Object.defineProperty(w.document, 'currentScript', { value: { getAttribute: () => page } });
   const context = { window: w, document: w.document, navigator: w.navigator, location, history: { replaceState: (_, __, value) => setUrl(value) }, localStorage: w.localStorage, sessionStorage: w.sessionStorage, URLSearchParams, console, fetch: async () => ({ ok: false }), setTimeout: (fn, ms) => { const id = ++clock; timers.set(id, { fn, ms }); return id; }, clearTimeout: id => timers.delete(id), setInterval: (fn, ms) => { const id = ++clock; timers.set(id, { fn, ms, repeat: true }); return id; }, clearInterval: id => timers.delete(id) };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../../assets/search-contract.js'), 'utf8'), context);
   vm.runInNewContext(source, context);
   await flush();
   const form = w.document.querySelector('form');
@@ -128,4 +129,43 @@ test('email template has a code and neutral link, no consumable credential URL',
   const template = fs.readFileSync(path.join(__dirname, 'confirm-signup-email.html'), 'utf8');
   assert.match(template, /{{ \.Token }}/); assert.match(template, /login\?verify=1/);
   assert.doesNotMatch(template, /ConfirmationURL|TokenHash|token_hash|\/auth\/v1\/verify/);
+});
+
+test('email signup retains captured navigation attribution after URL cleanup', async t => {
+  const h = await boot(t, {url:'/signup?from=fr.achat-revente-vinted&entry_basis=nav-v1&utm_source=test',page:'signup'});
+  h.location.search=''; h.input('email','new@example.com'); h.input('pw','test-password'); await h.submit();
+  const request=h.calls.find(c=>c[0]==='signUp'); assert.ok(request);
+  const data=request[1].options.data;
+  assert.equal(data.entry_page,'fr.achat-revente-vinted'); assert.equal(data.landing_path,'/fr/achat-revente-vinted');
+  assert.equal(data.landing_path_basis,'navigation_chain_v1'); assert.equal(data.utm_source,'test');
+});
+test('legacy entry hints and private paths never become claimed first-page observations', async t => {
+  for(const query of ['from=vinted-bot','from=dashboard&entry_basis=nav-v1','from=fr..admin&entry_basis=nav-v1']){
+    const h=await boot(t,{url:'/signup?'+query,page:'signup'});h.input('email','new@example.com');h.input('pw','test-password');await h.submit();
+    const data=h.calls.find(c=>c[0]==='signUp')[1].options.data;assert.equal(data.landing_path,undefined);
+  }
+});
+test('an explicit builder intent preserves country and decimals in functional local storage',async t=>{
+  const h=await boot(t,{url:'/signup?hunt=coat&site=vinted.co.uk&min=1.25&max=23.45',page:'signup'});
+  const v=JSON.parse(h.w.localStorage.getItem('snypd_hunt_intent'));
+  assert.equal(v.site,'vinted.co.uk');assert.equal(v.min,'1.25');assert.equal(v.max,'23.45');assert.equal(v.q,'coat');
+  assert.equal(h.calls.filter(c=>c[0]==='signUp').length,0);
+});
+test('invalid marketplace intent fails as a whole rather than reinterpreting its budget',async t=>{
+  const h=await boot(t,{url:'/signup?hunt=coat&site=evil.example&max=23.45',page:'signup'});
+  assert.equal(h.w.localStorage.getItem('snypd_hunt_intent'),null);
+});
+test('Google redirect carries the same versioned navigation context',async t=>{
+  const h=await boot(t,{url:'/signup?from=home&entry_basis=nav-v1',page:'signup'});h.click('google');await flush();
+  const request=h.calls.find(c=>c[0]==='signInWithOAuth');assert.ok(request);
+  const redirect=new URL(request[1].options.redirectTo);
+  assert.equal(redirect.searchParams.get('from'),'home');assert.equal(redirect.searchParams.get('entry_basis'),'nav-v1');
+});
+test('only an identified first Google sign-in fills missing landing metadata',async t=>{
+  for(const returning of [false,true]){
+    const created=new Date(Date.now()-1000).toISOString();
+    const h=await boot(t,{url:'/login?from=vinted-search-builder&entry_basis=nav-v1#access_token=test-only',auth:{getSession:()=>({data:{session:{user:{id:'test',created_at:created,last_sign_in_at:new Date(Date.parse(created)+(returning?10000:0)).toISOString(),user_metadata:{}}}}})}});
+    const update=h.calls.find(c=>c[0]==='updateUser');
+    if(returning)assert.equal(update,undefined);else {assert.ok(update);assert.equal(update[1].data.landing_path,'/vinted-search-builder');}
+  }
 });
