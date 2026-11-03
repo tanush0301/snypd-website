@@ -262,9 +262,23 @@
     }
     return U(0xfeff) + lines.join('\r\n') + '\r\n';
   }
+  // ------------------------------------------------------------------ bundle: one price paid for several items
+  // splitCents(total, n, locked): locked = { rowIndex: cents } the user typed; the other rows share what is left evenly, the leftover cents going to the
+  // first of them (so the rows always add up to the total exactly). reason: 'over' = typed costs exceed the total, 'mismatch' = every row typed, sum != total.
+  function splitCents(total, n, locked) {
+    locked = locked || {};
+    const out = new Array(n).fill(null), free = []; let used = 0;
+    for (let i = 0; i < n; i++) { if (locked[i] != null) { out[i] = locked[i]; used += locked[i]; } else free.push(i); }
+    const rest = total - used;
+    if (rest < 0) return { ok: false, reason: 'over', cents: out, rest };
+    if (!free.length) return rest === 0 ? { ok: true, cents: out, rest } : { ok: false, reason: 'mismatch', cents: out, rest };
+    const base = Math.floor(rest / free.length); let extra = rest - base * free.length;
+    free.forEach(i => { out[i] = base + (extra > 0 ? 1 : 0); if (extra > 0) extra--; });
+    return { ok: true, cents: out, rest };
+  }
   function templateCsv(lang) { const l = lang === 'fr' ? 'fr' : 'en'; return U(0xfeff) + TEMPLATE_HEAD[l].join(l === 'fr' ? ';' : ',') + '\r\n'; }
 
   return { STATUSES, HELD, PLATFORMS, CONDITIONS, WRITE_OFF_REASONS, SRC_TYPES, CURRENCIES, PERSONAS, PERIODS, DEFAULT_CATEGORY_KEYS, CAPS, LOCALES, MINUS, CODE_KIND,
     formatMoney, moneyLabel, parseMoneyInput, localToday, daysBetween, isHeld, costCents, ageDays, isOld, saleProfitCents, viewOverview, freeCapState,
-    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD };
+    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD, splitCents };
 });

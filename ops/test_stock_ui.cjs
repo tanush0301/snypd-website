@@ -514,6 +514,54 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     await pg.close();
   }
 
+  // 5i. bundle entry: one price for several items -> one import (one undo takes all back); the split always adds up; all or nothing on the Free cap
+  {
+    const tstock = p => p.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    const val = (p, sel, v) => p.$eval(sel, (e, v) => { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); }, v);
+    const paste = (p, ix, lines) => p.evaluate((ix, lines) => { const dt = new DataTransfer(); dt.setData('text/plain', lines.join('\n')); document.querySelector('#b-rows .b-title[data-i="' + ix + '"]').dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true })); }, ix, lines);
+    const openBundle = async p => { await clickBy(p, '#stock-panel [data-act="add"]'); await wait5(300); await clickBy(p, '#stock-panel [data-act="bundle"]'); await p.waitForSelector('#b-rows .b-title', { timeout: 4000 }); };
+    pg = await open('plan=elite&stock=all&stock_claims=0&lang=en'); await tstock(pg);
+    await pg.click('#view-tab-stock'); await waitOv(pg);
+    const n0 = await pg.evaluate(() => window.__qaStock.state.items.length);
+    await openBundle(pg);
+    eq(await pg.$$eval('#b-rows .st-brow', r => r.length), 3, 'bundle sheet opens from Add item with 3 rows');
+    await val(pg, '#sf-btotal', '40'); await pg.$eval('#sf-source', e => { e.value = 'Kilo sale'; });
+    await paste(pg, 0, Array.from({ length: 11 }, (_, i) => 'Bundle tee ' + (i + 1))); await wait5(200);
+    await clickBy(pg, '#stock-panel [data-act="b-add"]'); await wait5(200);
+    eq(await pg.$$eval('#b-rows .st-brow', r => r.length), 12, 'a pasted list of 11 names + "Add a row" makes 12 rows');
+    ok(/^12 items \u00b7 about \u20ac3\.33 each \u00b7 adds up to \u20ac40\.00$/.test(await tc(pg, '#b-sum')) && (await tc(pg, '#st-go')) === 'Add 12 items', 'summary + button: ' + await tc(pg, '#b-sum'));
+    await val(pg, '#b-rows .b-cost[data-i="0"]', '10'); await wait5(150);
+    eq(await pg.$$eval('#b-rows .b-cost', c => [c[1].placeholder, c[8].placeholder, c[9].placeholder, c[11].placeholder]), ['2.73', '2.73', '2.72', '2.72'], 'a typed cost is kept and the other 11 rows share the EUR30.00 left (8 x 2.73 + 3 x 2.72)');
+    ok(/^12 items \u00b7 adds up to \u20ac40\.00$/.test(await tc(pg, '#b-sum')), 'summary with a typed cost: ' + await tc(pg, '#b-sum'));
+    await val(pg, '#b-rows .b-cost[data-i="0"]', '50'); await wait5(150);
+    ok(/more than the total/.test(await tc(pg, '#b-sum')), 'typed costs over the total are refused in words: ' + await tc(pg, '#b-sum'));
+    await clickBy(pg, '#st-go'); await wait5(600);
+    eq(await pg.evaluate(() => window.__qaStock.state.items.length), n0, 'nothing is added while the costs do not add up');
+    await val(pg, '#b-rows .b-cost[data-i="0"]', '10'); await wait5(150);
+    await clickBy(pg, '#st-go'); await wait5(1200);
+    const got = await pg.evaluate(n0 => { const it = window.__qaStock.state.items.slice(n0); return { n: it.length, sum: it.reduce((a, i) => a + i.buy_cents, 0), first: it[0] && it[0].buy_cents, imp: new Set(it.map(i => i.import_id)).size, impSet: it.every(i => !!i.import_id), last: it[11] && it[11].title, src: it.every(i => i.src === 'Kilo sale'), note: it[0] && it[0].notes }; }, n0);
+    eq([got.n, got.sum, got.first, got.imp, got.impSet, got.last, got.src], [12, 4000, 1000, 1, true, 'Kilo sale \u00b7 item 12', true], 'bundle saved: 12 items, costs add up to EUR40.00 exactly, typed cost kept, one import id, blank name auto-named, source on every item');
+    ok(/^From a bundle of 12 items bought for \u20ac40\.00 on /.test(got.note || ''), 'every item notes where it came from: ' + got.note);
+    ok(!(await pg.$('.st-sheet')) && /Added 12 items from a bundle of \u20ac40\.00/.test(await tc(pg, '.st-undo')), 'sheet closes, the bar says what was added');
+    await clickBy(pg, '#stock-panel [data-act="undo"]'); await wait5(1200);
+    eq(await pg.evaluate(() => window.__qaStock.state.items.length), n0, 'one Undo takes the whole bundle back');
+    ok(/Bundle removed/.test(await tc(pg, '.st-undo')), 'and says so');
+    await pg.close();
+    // Free: the cap is checked before anything is written (all or nothing)
+    pg = await open('plan=free&stock=all&stock_claims=0&lang=en'); await tstock(pg); await pg.click('#view-tab-stock'); await waitOv(pg);
+    const f0 = await pg.evaluate(() => window.__qaStock.state.items.length);
+    await openBundle(pg); await val(pg, '#sf-btotal', '30'); await paste(pg, 0, Array.from({ length: 26 }, (_, i) => 'Free tee ' + (i + 1))); await wait5(200);
+    ok(/^Free holds 25 items: you have room for 25 more\.$/.test(await tc(pg, '#b-sum')), 'Free: 26 rows -> the cap in words: ' + await tc(pg, '#b-sum'));
+    await clickBy(pg, '#st-go'); await wait5(800);
+    eq(await pg.evaluate(() => window.__qaStock.state.items.length), f0, 'Free: nothing is added when the bundle does not fit');
+    await pg.close();
+    // French: no English left on the bundle sheet
+    pg = await open('plan=elite&stock=all&stock_claims=0&lang=fr'); await tstock(pg); await pg.click('#view-tab-stock'); await waitOv(pg);
+    await openBundle(pg); await val(pg, '#sf-btotal', '40'); await wait5(200);
+    { const t = await pg.$eval('.st-sheet', e => e.innerText); ok(/Ajouter un lot/i.test(t) && /Total pay\u00e9/i.test(t) && /Articles du lot/i.test(t) && /3 articles \u00b7 environ 13,33.\u20ac chacun/.test(t) && !/Total paid|Items in the bundle|Add a row|each|adds up/.test(t), 'French bundle sheet: ' + t.replace(/\n+/g, ' | ').slice(0, 300)); }
+    await pg.close();
+  }
+
   // 5g. phone width, English and French: no overflow, every control 44 px
   for (const lng of ['en', 'fr']) {
     pg = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&stock_claims=0&lang=' + lng, { width: 390, height: 844, isMobile: true, hasTouch: true });

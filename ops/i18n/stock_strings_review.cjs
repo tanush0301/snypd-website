@@ -20,7 +20,35 @@ const en = {
   // phone item cards and inputs
   'meta.price': 'price {v}', 'meta.profit': 'profit {v}', 'ph.money': 'e.g. {v}', 'tools.btn': 'Filters',
   // 071: sort + claim photo
-  'sort.label': 'Sort', 'sort.oldest': 'Longest in stock first', 'sort.newest': 'Newest bought first', 'detail.photo': 'Photo from the Vinted listing'
+  'sort.label': 'Sort', 'sort.oldest': 'Longest in stock first', 'sort.newest': 'Newest bought first', 'detail.photo': 'Photo from the Vinted listing',
+  // bundle entry (one price for several items)
+  'bundle.open': 'Bought several items for one price? Add a bundle',
+  'sheet.bundle': 'Add a bundle',
+  'bundle.total': 'Total paid · incl. shipping',
+  'bundle.items': 'Items in the bundle',
+  'bundle.item.ph': 'Item {n}',
+  'bundle.item.aria': 'Name of item {n}',
+  'bundle.size.aria': 'Size of item {n}',
+  'bundle.cost.aria': 'Cost of item {n}',
+  'bundle.del': 'Remove item {n}',
+  'bundle.addrow': '+ Add a row',
+  'bundle.hint': 'One name per row, or paste a list (one item per line). The total splits evenly; type a cost to fix it and the other rows share what is left.',
+  'bundle.sum': '{n} items · {each} each · adds up to {total}',
+  'bundle.sum.about': '{n} items · about {each} each · adds up to {total}',
+  'bundle.sum2': '{n} items · adds up to {total}',
+  'bundle.need_total': 'Enter the total you paid.',
+  'bundle.over': 'The costs you typed add up to more than the total ({total}).',
+  'bundle.mismatch': 'The costs add up to {sum}, not {total}. Change one or clear it to split again.',
+  'bundle.min': 'A bundle needs at least 2 items.',
+  'bundle.max': 'Up to {n} items per bundle.',
+  'bundle.cap': 'Free holds {cap} items: you have room for {room} more.',
+  'bundle.go': 'Add {n} items',
+  'bundle.autoname': '{src} · item {k}',
+  'bundle.word': 'Bundle',
+  'bundle.note': 'From a bundle of {n} items bought for {total} on {date}.',
+  'bundle.added': 'Added {n} items from a bundle of {total}.',
+  'bundle.undone': 'Bundle removed. Nothing else changed.',
+  'bundle.partial': 'Could not add the whole bundle, so nothing was added. Try again.'
 };
 const fr = {
   'status.stock': 'Pas en vente', 'chip.held': 'En stock',
@@ -38,6 +66,34 @@ const fr = {
   'meta.price': 'prix {v}', 'meta.profit': 'bénéfice {v}', 'ph.money': 'ex. {v}', 'tools.btn': 'Filtres',
   // typo fixes of the step-5 French (coùt, jusqu'è, régles) and an English word left in French
   'lane.meta.cost': 'coût {c}', 'exp.btn': 'Exporter',
-  'sort.label': 'Trier', 'sort.oldest': 'Les plus anciens en stock d’abord', 'sort.newest': 'Derniers achats d’abord', 'detail.photo': 'Photo de l’annonce Vinted'
+  'sort.label': 'Trier', 'sort.oldest': 'Les plus anciens en stock d’abord', 'sort.newest': 'Derniers achats d’abord', 'detail.photo': 'Photo de l’annonce Vinted',
+  // bundle entry
+  'bundle.open': 'Plusieurs articles pour un seul prix ? Ajoute un lot',
+  'sheet.bundle': 'Ajouter un lot',
+  'bundle.total': 'Total payé · port compris',
+  'bundle.items': 'Articles du lot',
+  'bundle.item.ph': 'Article {n}',
+  'bundle.item.aria': 'Nom de l’article {n}',
+  'bundle.size.aria': 'Taille de l’article {n}',
+  'bundle.cost.aria': 'Coût de l’article {n}',
+  'bundle.del': 'Retirer l’article {n}',
+  'bundle.addrow': '+ Ajouter une ligne',
+  'bundle.hint': 'Un nom par ligne, ou colle une liste (un article par ligne). Le total se partage à parts égales ; tape un coût pour le fixer, les autres lignes se partagent le reste.',
+  'bundle.sum': '{n} articles · {each} chacun · total {total}',
+  'bundle.sum.about': '{n} articles · environ {each} chacun · total {total}',
+  'bundle.sum2': '{n} articles · total {total}',
+  'bundle.need_total': 'Indique le total payé.',
+  'bundle.over': 'Les coûts saisis dépassent le total ({total}).',
+  'bundle.mismatch': 'Les coûts font {sum}, pas {total}. Modifie-en un ou efface-le pour répartir à nouveau.',
+  'bundle.min': 'Un lot compte au moins 2 articles.',
+  'bundle.max': 'Jusqu’à {n} articles par lot.',
+  'bundle.cap': 'Gratuit : {cap} articles au maximum, il te reste {room} places.',
+  'bundle.go': 'Ajouter {n} articles',
+  'bundle.autoname': '{src} · article {k}',
+  'bundle.word': 'Lot',
+  'bundle.note': 'Issu d’un lot de {n} articles acheté {total} le {date}.',
+  'bundle.added': 'Ajouté : {n} articles d’un lot de {total}.',
+  'bundle.undone': 'Lot retiré. Rien d’autre n’a changé.',
+  'bundle.partial': 'Impossible d’ajouter tout le lot, donc rien n’a été ajouté. Réessaie.'
 };
 module.exports = { en, fr };

@@ -453,6 +453,9 @@
     if (el.classList.contains('st-btn') || el.classList.contains('st-chip') || el.classList.contains('st-x') || el.tagName === 'BUTTON' || act === 'open' || act === 'scrim') ev.preventDefault();
     switch (act) {
       case 'add': S.opener = el; openSheet('add'); break;
+      case 'bundle': openBundle(); break;
+      case 'b-add': bundleAddRow(null, true); break;
+      case 'b-del': bundleDelRow(+el.getAttribute('data-i')); break;
       case 'import': S.opener = el; openImport(); break;
       case 'template': downloadFile(C.templateCsv(lang), lang === 'fr' ? 'snypd-modele-revendeur.csv' : 'snypd-reseller-template.csv'); break;
       case 'export': exportItems(el); break;
@@ -501,6 +504,7 @@
     var top = $('#st-items'); if (top && top.scrollIntoView) top.scrollIntoView({ block: 'start' });
   }
   function onKey(ev) {
+    if (ev.key === 'Enter' && S.sheet && S.sheet.kind === 'bundle' && ev.target.tagName === 'INPUT') { ev.preventDefault(); bundleEnter(ev.target); return; }
     if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); if (S.sheet.kind === 'add' && clearAdd()) return; closeSheet(); return; }
     if (ev.key === 'Enter' && ev.target.closest('.st-row') && ev.target.classList.contains('st-row')) { S.opener = ev.target; openDetail(ev.target.getAttribute('data-id')); return; }
     if (ev.key === 'Enter' && S.sheet && S.sheet.kind !== 'detail' && ev.target.tagName === 'INPUT') { ev.preventDefault(); submitSheet(!ev.shiftKey && S.sheet.kind === 'add'); }
@@ -518,10 +522,10 @@
   }
 
   // ------------------------------------------------------------------ undo bar / toast
-  function showBar(text, canUndo) {
+  function showBar(text, canUndo, undoFn) {
     clearTimeout(S.undoTimer);
     var prev = S.undo && S.undo.canUndo ? S.undo.text : null;
-    S.undo = { text: text, canUndo: canUndo };
+    S.undo = { text: text, canUndo: canUndo, fn: undoFn || null };
     var root = $('#st-undo-root'); if (!root) return;
     root.innerHTML = '<div class="st-undo" role="status"><div class="st-undo-row"><span>' + esc(text) + (prev ? '<small>' + esc(T('undo.prev', { what: prev })) + '</small>' : '') + '</span>' + (canUndo ? '<button type="button" class="st-btn st-tert" data-act="undo">' + esc(T('undo')) + '</button>' : '') + '</div><div class="st-undo-bar"></div></div>';
     S.undoTimer = setTimeout(hideBar, canUndo ? 8000 : 4000);
@@ -529,6 +533,7 @@
   function hideBar() { clearTimeout(S.undoTimer); S.undo = null; var root = $('#st-undo-root'); if (root) root.innerHTML = ''; }
   function doUndo() {
     if (!S.undo || !S.undo.canUndo) return;
+    if (S.undo.fn) { var fn = S.undo.fn; hideBar(); fn().catch(function (e) { showBar(errMsg(e), false); }); return; }
     S.api.undo().then(function () { hideBar(); return reloadKeep(); }).then(function () { showBar(T('toast.undone'), false); }).catch(function (e) { showBar(errMsg(e), false); reloadKeep().catch(function () {}); });
   }
 
@@ -579,7 +584,7 @@
   function formFor(kind, it) {
     var t0 = today();
     if (kind === 'add') {
-      return '<div class="st-form">' + fld('title', T('f.title'), txt('title', '', '', ' maxlength="140"'), 'full') + fld('brand', T('f.brand'), txt('brand', '', '', ' maxlength="60"')) + fld('size', T('f.size'), txt('size', '', '', ' maxlength="20"')) +
+      return '<p class="st-hint st-bopen"><button type="button" class="st-linkb" data-act="bundle">' + esc(T('bundle.open')) + '</button></p><div class="st-form">' + fld('title', T('f.title'), txt('title', '', '', ' maxlength="140"'), 'full') + fld('brand', T('f.brand'), txt('brand', '', '', ' maxlength="60"')) + fld('size', T('f.size'), txt('size', '', '', ' maxlength="20"')) +
         fld('condition', T('f.condition'), '<select class="st-in" id="sf-condition">' + condOptions('') + '</select>') + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions('') + '</select>') +
         fld('quantity', T('f.quantity'), '<div class="st-qty"><button type="button" data-act="qty-" aria-label="' + esc(T('qty.dec')) + '">-</button><input class="st-in" id="sf-quantity" value="1" inputmode="numeric" maxlength="2"><button type="button" data-act="qty+" aria-label="' + esc(T('qty.inc')) + '">+</button></div>') +
         fld('bought', T('f.bought'), dat('bought', t0, t0)) + fld('buy', T('f.buy'), mny('buy')) + fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint" id="st-addlog" aria-live="polite">' + esc(T('sheet.add.log0')) + '</p><p class="st-hint">' + esc(T('sheet.add.keys')) + '</p><p class="st-hint">' + esc(T('sheet.add.hint')) + '</p>';
@@ -632,6 +637,7 @@
   function submitSheet(andNext, noPrice) {
     var sh = S.sheet; if (!sh) return;
     if (sh.kind === 'settings') { saveSettingsSheet(); return; }
+    if (sh.kind === 'bundle') { submitBundle(); return; }
     var go = $('#st-go'), item = sh.item, run, label, bad = false;
     var box = $('#st-sheet-err'); if (box) box.innerHTML = '';
     if (sh.kind === 'add') {
@@ -668,6 +674,101 @@
         var lg = $('#st-addlog'); if (lg) lg.textContent = T('sheet.add.log', { t: title }); $('#sf-title').value = ''; $('#sf-buy').value = ''; $('#sf-extra').value = ''; $('#sf-size').value = ''; $('#sf-quantity').value = '1'; if (go) go.disabled = false; $('#sf-title').focus();
       } else closeSheet();
     });
+  }
+
+  // ------------------------------------------------------------------ bundle: several items bought for one price (rows go in as one import, undone as one)
+  var BUNDLE_MAX = 50;
+  function openBundle() {
+    var keep = S.sheet && S.sheet.kind === 'add' ? { src: ($('#sf-source') || {}).value || '', bought: ($('#sf-bought') || {}).value || '' } : { src: '', bought: '' };
+    S.sheet = { kind: 'bundle', rows: [0, 1, 2].map(function () { return { title: '', size: '', cost: '' }; }) };
+    var t0 = today();
+    var body = '<div id="st-sheet-err"></div><div class="st-form">' + fld('btotal', T('bundle.total'), mny('btotal'), 'full') + fld('bought', T('f.bought'), dat('bought', keep.bought || t0, t0)) +
+      fld('source', T('f.source'), txt('source', keep.src, T('f.source.ph'), ' maxlength="80"')) +
+      fld('condition', T('f.condition'), '<select class="st-in" id="sf-condition">' + condOptions('') + '</select>') + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions('') + '</select>') + '</div>' +
+      '<div class="st-h3">' + esc(T('bundle.items')) + '</div><div id="b-rows"></div>' +
+      '<p><button type="button" class="st-btn st-ghost" data-act="b-add">' + esc(T('bundle.addrow')) + '</button></p>' +
+      '<p class="st-note" id="b-sum" aria-live="polite"></p><p class="st-hint">' + esc(T('bundle.hint')) + '</p>';
+    mountSheet(T('sheet.bundle'), body, '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button><button type="button" class="st-btn st-prim" data-act="submit" id="st-go">' + esc(T('bundle.go', { n: 3 })) + '</button>');
+    renderBundleRows(); $('#sf-btotal').addEventListener('input', bundleUpdate); $('#sf-btotal').focus();
+  }
+  function bundleRowHtml(r, i) {
+    var n = i + 1;
+    return '<div class="st-brow" data-i="' + i + '"><input class="st-in b-title" data-i="' + i + '" value="' + esc(r.title) + '" placeholder="' + esc(T('bundle.item.ph', { n: n })) + '" aria-label="' + esc(T('bundle.item.aria', { n: n })) + '" maxlength="140" autocomplete="off">' +
+      '<input class="st-in b-size" data-i="' + i + '" value="' + esc(r.size) + '" placeholder="' + esc(T('f.size')) + '" aria-label="' + esc(T('bundle.size.aria', { n: n })) + '" maxlength="20" autocomplete="off">' +
+      '<input class="st-in b-cost" data-i="' + i + '" value="' + esc(r.cost) + '" inputmode="decimal" aria-label="' + esc(T('bundle.cost.aria', { n: n })) + '" autocomplete="off">' +
+      '<button type="button" class="st-x b-del" data-act="b-del" data-i="' + i + '" aria-label="' + esc(T('bundle.del', { n: n })) + '">&times;</button></div>';
+  }
+  function renderBundleRows(focusIx) {
+    var box = $('#b-rows'); if (!box) return;
+    box.innerHTML = S.sheet.rows.map(bundleRowHtml).join('');
+    Array.prototype.forEach.call(box.querySelectorAll('input'), function (inp) {
+      inp.addEventListener('input', function () { var r = S.sheet.rows[+inp.getAttribute('data-i')]; if (!r) return; r[inp.classList.contains('b-title') ? 'title' : (inp.classList.contains('b-size') ? 'size' : 'cost')] = inp.value; bundleUpdate(); });
+      if (inp.classList.contains('b-title')) inp.addEventListener('paste', bundlePaste);
+    });
+    bundleUpdate();
+    if (focusIx != null) { var f = box.querySelector('.b-title[data-i="' + focusIx + '"]'); if (f) f.focus(); }
+  }
+  function bundleAddRow(after, focus) {
+    var rows = S.sheet.rows; if (rows.length >= BUNDLE_MAX) { bundleUpdate(); return; }
+    var at = after == null ? rows.length : after + 1; rows.splice(at, 0, { title: '', size: '', cost: '' }); renderBundleRows(focus ? at : null);
+  }
+  function bundleDelRow(i) { if (S.sheet.rows.length <= 1) return; S.sheet.rows.splice(i, 1); renderBundleRows(Math.min(i, S.sheet.rows.length - 1)); }
+  function bundleEnter(t) {   // Enter on a name: next row (a new one after the last); elsewhere: on to the first name
+    if (t.classList.contains('b-title')) { var i = +t.getAttribute('data-i'); if (i === S.sheet.rows.length - 1) bundleAddRow(i, true); else { var nx = $('.b-title[data-i="' + (i + 1) + '"]'); if (nx) nx.focus(); } return; }
+    var first = $('.b-title[data-i="0"]'); if (first) first.focus();
+  }
+  function bundlePaste(ev) {   // a pasted list (one item per line) becomes rows, starting at this one
+    var txt0 = (ev.clipboardData || window.clipboardData) ? (ev.clipboardData || window.clipboardData).getData('text') : '';
+    var lines = String(txt0 || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    if (lines.length < 2) return;
+    ev.preventDefault();
+    var i = +ev.target.getAttribute('data-i'), rows = S.sheet.rows;
+    lines.forEach(function (l, k) { var at = i + k; if (at >= BUNDLE_MAX) return; if (!rows[at]) rows[at] = { title: '', size: '', cost: '' }; rows[at].title = l.slice(0, 140); });
+    renderBundleRows(Math.min(i + lines.length, rows.length) - 1);
+  }
+  // reads the sheet: total, typed costs, the split; writes the cost placeholders and the summary line
+  function bundleState() {
+    var tot = C.parseMoneyInput(($('#sf-btotal') || {}).value, lang), rows = S.sheet.rows, locked = {}, badCost = [];
+    rows.forEach(function (r, i) { if (String(r.cost || '').trim() === '') return; var p = C.parseMoneyInput(r.cost, lang); if (!p.ok || p.cents == null) badCost.push(i); else locked[i] = p.cents; });
+    var total = tot.ok && !tot.empty ? tot.cents : null;
+    var sp = total == null ? null : C.splitCents(total, rows.length, locked), m = C.freeCapState(S.boot), room = m.limited ? Math.max(m.cap - m.held, 0) : null;
+    return { total: total, totalBad: !tot.ok, rows: rows, locked: locked, badCost: badCost, split: sp, room: room, cap: m.cap };
+  }
+  function bundleUpdate() {
+    var st = bundleState(), sum = $('#b-sum'), go = $('#st-go'), n = st.rows.length, msg, bad = true;
+    Array.prototype.forEach.call(S.panel.querySelectorAll('#b-rows .b-cost'), function (inp) { var i = +inp.getAttribute('data-i'); inp.placeholder = st.split && st.split.cents[i] != null && st.locked[i] == null ? moneyText(st.split.cents[i]) : moneyExample(); inp.classList.toggle('bad', st.badCost.indexOf(i) >= 0); });
+    if (n < 2) msg = T('bundle.min');
+    else if (n > BUNDLE_MAX) msg = T('bundle.max', { n: BUNDLE_MAX });
+    else if (st.room != null && n > st.room) msg = T('bundle.cap', { cap: st.cap, room: st.room });
+    else if (st.totalBad) msg = T('err.amount', { example: moneyExample() });
+    else if (st.total == null) msg = T('bundle.need_total');
+    else if (st.badCost.length) msg = T('err.amount', { example: moneyExample() });
+    else if (!st.split.ok) msg = st.split.reason === 'over' ? T('bundle.over', { total: M(st.total) }) : T('bundle.mismatch', { sum: M(st.total - st.split.rest), total: M(st.total) });
+    else { bad = false; msg = Object.keys(st.locked).length ? T('bundle.sum2', { n: n, total: M(st.total) }) : T(st.total % n ? 'bundle.sum.about' : 'bundle.sum', { n: n, each: M(Math.floor(st.total / n)), total: M(st.total) }); }
+    if (sum) { sum.textContent = msg; sum.classList.toggle('st-warn', bad); }
+    if (go) go.textContent = T('bundle.go', { n: n });
+    return !bad;
+  }
+  function submitBundle() {
+    var box = $('#st-sheet-err'); if (box) box.innerHTML = '';
+    if (!bundleUpdate()) { var s0 = $('#b-sum'); if (s0) s0.focus && s0.scrollIntoView && s0.scrollIntoView({ block: 'nearest' }); return; }
+    var bd = readDate('bought'); if (bd.bad) return;
+    var st = bundleState(), src = ($('#sf-source').value || '').trim(), cond = $('#sf-condition').value || null, cat = $('#sf-category').value || null, n = st.rows.length;
+    var note = T('bundle.note', { n: n, total: M(st.total), date: fmtDate(bd.v) });
+    var rows = st.rows.map(function (r, i) {
+      return { title: (r.title || '').trim() || T('bundle.autoname', { src: src || T('bundle.word'), k: i + 1 }), size: (r.size || '').trim() || null, buy_cents: st.split.cents[i], extra_cents: 0,
+        bought_on: bd.v, src: src || null, src_type: src ? 'place' : null, condition: cond, category: cat, notes: note };
+    });
+    var importId = uuid(), go = $('#st-go'); if (go) go.disabled = true;
+    S.api.importRows(importId, rows).then(function (r) {
+      if (!r || r.rows_inserted !== n || (r.skipped && r.skipped.length)) {   // all or nothing: take back whatever went in
+        return S.api.undoImport(importId).catch(function () {}).then(function () { sheetError({ code: r && r.free_limit_hit ? 'stock_free_limit' : 'bundle_partial' }); var b2 = $('#st-sheet-err'); if (b2 && !(r && r.free_limit_hit)) b2.innerHTML = '<div class="st-err">' + esc(T('bundle.partial')) + '</div>'; });
+      }
+      closeSheet();
+      return reloadKeep().then(function () {
+        showBar(T('bundle.added', { n: n, total: M(st.total) }), true, function () { return S.api.undoImport(importId).then(function () { return reloadKeep(); }).then(function () { showBar(T('bundle.undone'), false); }); });
+      });
+    }).catch(function (e) { sheetError(e); });
   }
 
   // ------------------------------------------------------------------ item detail

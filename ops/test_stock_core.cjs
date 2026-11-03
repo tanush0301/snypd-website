@@ -585,6 +585,30 @@ test('X CSV export + template: formula guard on text cells only, missing stays e
     assert(fields.every(Boolean) && new Set(fields).size === 17, lang + ' template: all 17 columns recognised by the importer, none twice: ' + fields.join(','));
   }
 });
+// bundle entry: one price for several items
+test('A bundle split: rows always add up to the total exactly, leftover cents go to the first rows, typed costs are kept, over / mismatch refused', () => {
+  const sp = core.splitCents;
+  assert.deepEqual(sp(4000, 12, {}).cents, [334, 334, 334, 334, 333, 333, 333, 333, 333, 333, 333, 333]);
+  assert.deepEqual(sp(1000, 3, { 0: 500 }).cents, [500, 250, 250]);
+  assert.deepEqual(sp(1001, 3, { 1: 1 }).cents, [500, 1, 500]);
+  assert.deepEqual([sp(1000, 2, { 0: 600, 1: 500 }).ok, sp(1000, 2, { 0: 600, 1: 500 }).reason], [false, 'over']);
+  assert.deepEqual([sp(1000, 2, { 0: 300, 1: 500 }).ok, sp(1000, 2, { 0: 300, 1: 500 }).reason, sp(1000, 2, { 0: 300, 1: 500 }).rest], [false, 'mismatch', 200]);
+  assert.deepEqual(sp(1000, 2, { 0: 400, 1: 600 }), { ok: true, cents: [400, 600], rest: 0 });
+  assert.deepEqual(sp(0, 3, {}).cents, [0, 0, 0]);
+  let seed = 7; const rnd = n => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % n; };
+  for (let k = 0; k < 2000; k++) {
+    const n = 1 + rnd(50), total = rnd(500000), locked = {};
+    for (let i = 0; i < n; i++) if (rnd(4) === 0) locked[i] = rnd(Math.max(1, Math.floor(total / n) * 2));
+    const r = sp(total, n, locked), used = Object.values(locked).reduce((a, b) => a + b, 0);
+    if (r.ok) {
+      assert.equal(r.cents.reduce((a, b) => a + b, 0), total, 'sum == total');
+      for (const i of Object.keys(locked)) assert.equal(r.cents[i], locked[i], 'typed cost kept');
+      const free = r.cents.filter((c, i) => locked[i] == null); if (free.length) assert(Math.max(...free) - Math.min(...free) <= 1, 'even within 1 cent');
+      assert(r.cents.every(c => Number.isInteger(c) && c >= 0), 'whole, non-negative cents');
+    } else assert(used > total ? r.reason === 'over' : (r.reason === 'mismatch' && Object.keys(locked).length === n), 'refusal reason: ' + r.reason);
+  }
+});
+
 run().then(() => {
   const total = passed + failures.length;
   if (failures.length) {
