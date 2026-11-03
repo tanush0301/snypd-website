@@ -81,20 +81,25 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   const firstRow = () => text('#stock-panel .st-row');
   const openFirst = async () => { await page.evaluate(() => document.querySelector('#stock-panel .st-row').click()); await wait(350); };
 
+  { const pressed = await page.$eval('#st-chips .st-chip[aria-pressed="true"]', e => e.getAttribute('data-status')); eq(pressed, 'held', 'Items opens on "In stock" (everything held), not All (review 3 Nov)');
+    const heldN = await page.evaluate(() => window.__qaStock.state.items.filter(i => ['stock', 'listed', 'reserved', 'returned'].includes(i.status) && !i.deleted_at).length);
+    eq(await text('#st-showing'), 'Showing 50 of ' + heldN, 'held default: footer counts held items only');
+    ok(await page.$$eval('#stock-panel .st-row .st-tag', t => t.every(x => !/(^| )(sold|written_off)( |$)/.test(x.className))), 'held default shows no sold or written-off rows'); }
+  await page.evaluate(() => document.querySelector('#st-chips [data-status=""]').click()); await wait(700);
   eq(await rows(), 50, 'first page is 50 rows');
   ok(/^Showing 50 of 21[58]$/.test(await text('#st-showing')), 'footer line (design): ' + await text('#st-showing'));
-  ok(/^\d+ held \u00b7 (\d+ sold \u00b7 )?21[58] rows$/.test(await text('#st-itemssub')), 'Items title line: N held . (N sold .) N rows: ' + await text('#st-itemssub'));
+  ok(/^\d+ in stock \u00b7 (\d+ sold \u00b7 )?21[58] rows$/.test(await text('#st-itemssub')), 'Items title line: N in stock . (N sold .) N rows: ' + await text('#st-itemssub'));
   eq(await page.$$eval('.st-th > span', s => s.map(x => x.textContent)), ['Item', 'Status', 'Platform', 'Bought', 'Days in stock', 'Price or profit'], 'table columns (design Ca)');
   { const tiles = await page.$$eval('.st-row .st-tile2', e => e.length); ok(tiles === 50, 'an initials tile on every row (' + tiles + ')'); }
   await setv('#st-q', 'Detroit jacket'); await wait(700); { const stale = await page.$$eval('.st-row .st-tag.stale', e => e.length), amber = await page.$$eval('.st-row .c-age.st-warnv', e => e.length); ok(stale > 0 && stale === amber, 'old held items carry the STALE tag and an amber day count (' + stale + ')'); }
   await setv('#st-q', ''); await wait(600);
   await setv('#st-plat', 'depop'); await wait(600); { const pl = await page.$$eval('#stock-panel .st-row .c-plat', e => e.map(x => x.textContent)); ok(pl.length > 0 && pl.every(x => x === 'Depop'), 'platform filter: only Depop rows (' + pl.length + ')'); }
   await setv('#st-plat', ''); await wait(500);
-  eq(await page.$$eval('#st-chips .st-chip', c => c.length), 8, '8 chips: All, In stock, Listed, Reserved, Sold, Returned, Written off, Stale');
+  eq(await page.$$eval('#st-chips .st-chip', c => c.length), 9, '9 chips: In stock (held), All, Not listed, Listed, Reserved, Sold, Returned, Written off, Stale');
   await wait(500);
   { const chips = await page.$$eval('#st-chips .st-chip', c => c.map(x => x.textContent.replace(/\s+/g, ' ').trim())), want = await page.evaluate(() => { const it = window.__qaStock.state.items.filter(i => !i.deleted_at), n = s => it.filter(i => i.status === s).length; return { all: it.length, sold: n('sold'), listed: n('listed') }; });
-    ok(chips[0] === 'All ' + want.all && chips[2] === 'Listed ' + want.listed && chips[4] === 'Sold ' + want.sold && /^Stale \d+$/.test(chips[7]), 'chips carry their counts (design Ca): ' + chips.join(' | '));
-    const sub = await text('#st-itemssub'); ok(new RegExp('^\\d+ held \\u00b7 ' + want.sold + ' sold \\u00b7 ' + want.all + ' rows$').test(sub), 'title line with the sold count: ' + sub); }
+    ok(chips[1] === 'All ' + want.all && chips[3] === 'Listed ' + want.listed && chips[5] === 'Sold ' + want.sold && /^Stale \d+$/.test(chips[8]) && /^In stock \d+$/.test(chips[0]), 'chips carry their counts (design Ca): ' + chips.join(' | '));
+    const sub = await text('#st-itemssub'); ok(new RegExp('^\\d+ in stock \\u00b7 ' + want.sold + ' sold \\u00b7 ' + want.all + ' rows$').test(sub), 'title line with the sold count: ' + sub); }
   await page.evaluate(() => document.querySelector('#st-chips [data-status="old"]').click()); await wait(600);
   { const st = await page.$$eval('#stock-panel .st-row .st-tag.stale', e => e.length), rows0 = await rows(); ok(rows0 > 0 && st === rows0, 'Stale chip: only old held items (' + rows0 + ' rows, all tagged STALE)'); }
   await page.evaluate(() => document.querySelector('#st-chips [data-status=""]').click()); await wait(500);
@@ -104,7 +109,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
 
   await act('add'); await setv('#sf-title', 'UI flow item'); await setv('#sf-buy', '30'); await act('submit');
   await setv('#st-q', 'UI flow item'); await wait(700);
-  eq(await rows(), 1, 'search finds the new item'); ok(/IN STOCK/i.test(await firstRow()) && /30\.00/.test(await firstRow()), 'new item: ' + await firstRow());
+  eq(await rows(), 1, 'search finds the new item'); ok(/NOT LISTED/i.test(await firstRow()) && /30\.00/.test(await firstRow()), 'new item: ' + await firstRow());
   ok(await page.$('.st-undo') !== null, 'undo bar after add');
 
   await openFirst(); await act('do', '[data-do="list"]'); await setv('#sf-platform', 'vinted'); await setv('#sf-list', '80'); await act('submit');
@@ -144,7 +149,13 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   ok(/bought \u20ac12\.00/.test(await text('#st-soldctx')), 'Mark sold: the item line says what it cost: ' + await text('#st-soldctx'));
   await setv('#sf-sold', '30'); await setv('#sf-ship', '2'); await wait(200);
   { const pv = await text('#st-prev'); ok(/PROFIT|Profit/i.test(pv) && /\u20ac30\.00 sold \u2212 \u20ac12\.00 bought \u2212 \u20ac2\.00 shipping/.test(pv) && /16\.00/.test(pv), 'Mark sold: profit before fees with its formula: ' + pv); }
-  ok(/Fees not set: profit shown before fees\./.test(await text('.st-sheet')), 'Mark sold: the fees note');
+  eq(await page.$eval('#sf-platform', e => e.value), 'vinted', 'Mark sold: platform defaults to Vinted for an item without one');
+  ok(/Vinted charges sellers no selling fee/.test(await text('#st-feenote')) && await page.$eval('#sf-fee', e => e.closest('.st-f').style.display === 'none'), 'Mark sold on Vinted: no fee field, says why');
+  ok(/^PROFIT/i.test(await text('#st-prev')) && !/before fees/i.test(await text('#st-prev')), 'Mark sold on Vinted: the preview is the profit, not "before fees": ' + await text('#st-prev'));
+  await page.$eval('#sf-platform', e => { e.value = 'ebay'; e.dispatchEvent(new Event('change', { bubbles: true })); }); await wait(150);
+  ok(await page.$eval('#sf-fee', e => e.closest('.st-f').style.display !== 'none') && /No fee entered/.test(await text('#st-feenote')) && /before fees/i.test(await text('#st-prev')), 'Mark sold on eBay: fee field shown, profit before fees until one is typed');
+  await setv('#sf-fee', '3'); await wait(150);
+  { const pv = await text('#st-prev'); ok(/13\.00/.test(pv) && /\u20ac3\.00 fee/.test(pv) && /Platform fee included/.test(await text('#st-feenote')), 'Mark sold: the fee comes off the profit: ' + pv); }
   await act('submit-noprice'); await wait(800);
   { const row = await page.$eval('#stock-panel .st-row', e => e.innerText.replace(/\n+/g, ' | ')); ok(/SOLD/i.test(row) && /--/.test(row), 'Sold elsewhere, no price: sold with no price, profit shows --: ' + row); }
   await setv('#st-q', ''); await wait(600);
@@ -211,7 +222,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(await page.evaluate(() => window.__qaStock.state.items.filter(i => i.condition === 'very_good').length >= 4), true, 'the user\'s condition mapping was applied');
   await clickA(page, 'im-undo'); await wait(700);
   eq(await page.evaluate(() => [window.__qaStock.state.items.length, window.__qaStock.state.items.filter(i => i.import_id).length]), [base0, 0], 'undo this import removes every item of the import and nothing else');
-  eq(await rows(), base0, 'and the list is back to what it was');
+  eq(await rows(), await page.evaluate(() => window.__qaStock.state.items.filter(i => !i.deleted_at && ['stock', 'listed', 'reserved', 'returned'].includes(i.status)).length), 'and the list (In stock by default) is back to what it was');
 
   // ambiguous dates: the screen asks, the answer decides
   const csv1 = tmp('amb.csv', 'Item;Buy price;Bought\nJacket;12,50;03/04/2026\nTee;5;05/06/2026\n');
@@ -271,14 +282,17 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(await tabVis(pg, '.bottombar-tab[data-view="history"]'), false, 'History tab is replaced while Stock is on (phone bar)');
   await pg.click('#view-tab-stock'); await waitOv(pg);
   eq(await tc(pg, '#st-hero-held'), '58', 'Overview: 58 items held');
-  { const sp = await pg.$eval('#st-over .st-t3:first-child small:last-child', e => e.textContent); ok(/18 in stock .* 36 listed .* 4 reserved/.test(sp), 'Overview: 18 / 36 / 4, got: ' + sp); }
+  { const sp = await pg.$eval('#st-over .st-t3:first-child small:last-child', e => e.textContent); ok(/18 not listed .* 36 listed .* 4 reserved/.test(sp), 'Overview: 18 / 36 / 4, got: ' + sp); }
   eq(await tc(pg, '#st-cash'), '€1,124.50', 'Overview: cash tied up EUR 1,124.50');
   eq([await tc(pg, '#st-old'), await tc(pg, '#st-old-sub')], ['12', '€318.00 at cost'], 'Overview: 12 old items, EUR 318.00 at cost');
   eq(await tc(pg, '#st-hero-net'), await money(pg, 61240, 'EUR', 'en'), 'Overview 30 days: net profit EUR 612.40 (unsigned hero, as in the design)');
   eq(await tc(pg, '#st-c-rev b'), await money(pg, 184600), 'Overview 30 days: revenue EUR 1,846.00');
   eq([await tc(pg, '#st-c-sales b'), await tc(pg, '#st-c-sales small'), await tc(pg, '#st-c-rev small')], ['31', 'last 30 days', '31 sales'], 'Overview 30 days: ITEMS SOLD 31 / last 30 days, REVENUE caption 31 sales');
-  eq(await tc(pg, '#st-c-avg small'), '29 of 31 have a cost', 'Overview 30 days: 29 of 31 have a cost (never a silent partial)');
-  eq(await tc(pg, '#st-partial'), '29 of 31 sold items have a cost, 2 left out until you add one', 'Overview: the design sentence under the hero number');
+  eq(await tc(pg, '#st-c-avg small'), '29 of 31 counted', 'Overview 30 days: 29 of 31 counted (never a silent partial)');
+  ok(/^29 of 31 sales count toward profit\. 2 miss a cost or a sale price\. ?Fix them$/.test(await tc(pg, '#st-partial')), 'Overview: what is left out of profit, with a Fix them button: ' + await tc(pg, '#st-partial'));
+  ok(await pg.evaluate(() => { const a = document.getElementById('st-h-num'), b = document.getElementById('st-h-lanes'), c = document.getElementById('st-h-now'), d = document.getElementById('st-ch-day'); return !!(a.compareDocumentPosition(b) & 4) && !!(b.compareDocumentPosition(c) & 4) && !!(c.compareDocumentPosition(d) & 4); }), 'Overview order: The numbers, Today, Stock now, charts (review 3 Nov)');
+  eq(await pg.$('#st-lane-hold'), null, 'no Holding lane (it repeated List / never fired for claims)');
+  ok(await pg.$$eval('.st-lane', l => l.length === 3 && l.every(x => x.querySelectorAll('.st-lane-row').length <= 3)), 'three lanes, at most 3 rows each');
   eq(await tc(pg, '#st-c-avg b'), await money(pg, 2112, 'EUR', 'en'), 'Overview 30 days: average EUR 21.12');
   eq([await tc(pg, '#st-c-days b'), await tc(pg, '#st-c-days small')], ['18d', 'bought to sold'], 'Overview 30 days: 18d, bought to sold');
   eq(await tc(pg, '#st-delta'), String.fromCharCode(0x25b2) + ' ' + (await money(pg, 6280, 'EUR', 'en', true)) + ' (+11.4%) vs ' + (await money(pg, 54960, 'EUR', 'en')) + ', the 30 days before', 'Overview: the design delta line, +EUR 62.80 (+11.4%) vs 549.60');
@@ -293,19 +307,18 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   await periodNet('30');
   // the Today lanes against the lane rules computed independently from the items
   const lanes = await pg.evaluate(() => {
-    const t0 = Date.UTC(2026, 9, 27), dd = iso => Math.round((t0 - Date.parse(iso + 'T00:00:00Z')) / 86400000), L = { reprice: 0, list: 0, follow: 0, hold: 0 };
+    const t0 = Date.UTC(2026, 9, 27), dd = iso => Math.round((t0 - Date.parse(iso + 'T00:00:00Z')) / 86400000), L = { reprice: 0, list: 0, follow: 0 };
     window.__qaStock.state.items.filter(i => !i.deleted_at && ['stock', 'listed', 'reserved', 'returned'].includes(i.status)).forEach(i => {
       const age = dd(i.returned_on || i.bought_on);
       if (i.status === 'listed' && i.listed_on && dd(i.listed_on) >= 30 && i.drops === 0) L.reprice++;
       if ((i.status === 'stock' || i.status === 'returned') && age >= 7) L.list++;
       if (i.status === 'reserved' && i.reserved_on && dd(i.reserved_on) >= 3) L.follow++;
-      if ((i.status === 'stock' || i.status === 'returned') && i.src_type === 'hunt' && age >= 14) L.hold++;
     });
-    const dom = {}; ['reprice', 'list', 'follow', 'hold'].forEach(k => { dom[k] = +document.querySelector('#st-lane-' + k + ' .st-lane-hd b').textContent; });
-    return { want: L, dom, empties: ['reprice', 'list', 'follow', 'hold'].filter(k => !+document.querySelector('#st-lane-' + k + ' .st-lane-hd b').textContent && !document.querySelector('#st-lane-' + k + ' .st-dim')) };
+    const dom = {}; ['reprice', 'list', 'follow'].forEach(k => { dom[k] = +document.querySelector('#st-lane-' + k + ' .st-lane-hd b').textContent; });
+    return { want: L, dom, empties: ['reprice', 'list', 'follow'].filter(k => !+document.querySelector('#st-lane-' + k + ' .st-lane-hd b').textContent && !document.querySelector('#st-lane-' + k + ' .st-dim')) };
   });
-  eq(lanes.dom, lanes.want, 'Today lanes: the four counts follow the lane rules: ' + JSON.stringify(lanes.want));
-  ok(lanes.want.reprice + lanes.want.list + lanes.want.follow + lanes.want.hold > 0, 'the dataset has something in the lanes');
+  eq(lanes.dom, lanes.want, 'Today lanes: the three counts follow the lane rules: ' + JSON.stringify(lanes.want));
+  ok(lanes.want.reprice + lanes.want.list + lanes.want.follow > 0, 'the dataset has something in the lanes');
   eq(lanes.empties, [], 'an empty lane says so in words');
   eq(await tc(pg, '#st-lanes-sub'), (lanes.want.reprice + lanes.want.list + lanes.want.follow) + ' things worth a minute \u00b7 Tue 27 Oct', 'Today sub-line: the three design lanes counted, with the date');
   { const rows = await pg.$$eval('#st-lane-reprice .st-lane-row', r => r.map(x => x.innerText.replace(/\n+/g, ' | ')));
@@ -327,8 +340,17 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     await clickBy(pg, '#st-ch-plat [data-act="chart-table"]'); await wait5(250);
     await clickBy(pg, '#st-lane-reprice [data-act="lane-act"][data-do="reprice"]'); await pg.waitForSelector('.st-sheet #sf-newprice, .st-sheet input', { timeout: 5000 });
     ok(/Lower the price/i.test(await tc(pg, '.st-sheet')), 'a lane Reprice button opens the reprice sheet for that item'); await pg.keyboard.press('Escape'); await wait5(300); }
+  { await clickBy(pg, '#st-lane-list [data-act="lane-more"]'); await wait5(900);
+    const st = await pg.evaluate(() => ({ items: getComputedStyle(document.getElementById('st-items')).display !== 'none', chip: (document.querySelector('#st-chips .st-chip[aria-pressed="true"]') || {}).getAttribute && document.querySelector('#st-chips .st-chip[aria-pressed="true"]').getAttribute('data-status'), tags: [...document.querySelectorAll('#stock-panel .st-row .st-tag:not(.stale)')].map(t => t.className.replace('st-tag ', '')) }));
+    ok(st.items && st.chip === 'stock' && st.tags.length > 0 && st.tags.every(t => t === 'stock' || t === 'returned'), '"+ N more" on List opens Items on Not listed: ' + JSON.stringify({ chip: st.chip, n: st.tags.length }));
+    await clickBy(pg, '#stock-panel .st-navb[data-view="overview"]'); await wait5(900);
+    await clickBy(pg, '#st-partial [data-act="fix"]'); await wait5(900);
+    const want = await pg.evaluate(() => window.__qaStock.state.items.filter(i => !i.deleted_at && i.status === 'sold' && (i.sold_cents == null || i.buy_cents == null)).length);
+    const got = await pg.evaluate(() => ({ rows: document.querySelectorAll('#stock-panel .st-row').length, note: (document.getElementById('st-fixnote') || {}).textContent || '' }));
+    ok(want > 0 && got.rows === want && new RegExp('^Sales left out of profit: ' + want + '\\.').test(got.note), 'Fix them lists exactly the sales without a cost or a price (' + want + '): ' + got.note);
+    await clickBy(pg, '#stock-panel .st-navb[data-view="overview"]'); await wait5(900); }
   // a lane item opens its own detail without the Items list having been loaded
-  const laneKey = ['list', 'reprice', 'follow', 'hold'].find(k => lanes.want[k] > 0);
+  const laneKey = ['list', 'reprice', 'follow'].find(k => lanes.want[k] > 0);
   const laneTitle = await pg.$eval('#st-lane-' + laneKey + ' .st-lane-it .t', e => e.textContent);
   await clickBy(pg, '#st-lane-' + laneKey + ' .st-lane-it'); await pg.waitForSelector('.st-sheet', { timeout: 5000 });
   eq(await pg.$eval('.st-sheet-hd h2', e => e.textContent), laneTitle, 'lane item opens its detail (' + laneKey + ')');

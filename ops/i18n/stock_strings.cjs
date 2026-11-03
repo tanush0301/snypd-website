@@ -242,5 +242,7 @@ const imp = require('./stock_strings_import.cjs');   // step 4: the import scree
 Object.assign(en, imp.en); Object.assign(frTable, fr(imp.fr));
 const home = require('./stock_strings_home.cjs');   // step 5: Overview, lanes, first run, persona, settings
 Object.assign(en, home.en); Object.assign(frTable, fr(home.fr));
+const review = require('./stock_strings_review.cjs');   // review 3 Nov 2026: wording fixes, fee field, records to fix
+Object.assign(en, review.en); Object.assign(frTable, fr(review.fr));
 
 module.exports = { en, fr: frTable };

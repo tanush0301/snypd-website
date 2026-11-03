@@ -68,7 +68,7 @@
   function open(opts) {
     if (S && S.panel === opts.panel) { refresh(); return; }
     S = { client: opts.client, panel: opts.panel, todayFn: opts.today || null, api: C.createApi(opts.client, { today: opts.today }), boot: null, cur: 'EUR', cats: [], rows: [], next: null, total: 0,
-      f: { status: null, q: '', condition: '', category: '', deleted: false }, loading: true, err: null, req: 0, view: 'overview', ov: { days: 30, data: null, lanes: null, loading: false, err: null, req: 0, stale: false }, pinned: {}, itemsLoaded: false, undo: null, undoTimer: null, sheet: null, opener: null, searchTimer: null };
+      f: { status: HELD.slice(), q: '', condition: '', category: '', deleted: false }, loading: true, err: null, req: 0, view: 'overview', ov: { days: 30, data: null, lanes: null, loading: false, err: null, req: 0, stale: false }, pinned: {}, itemsLoaded: false, undo: null, undoTimer: null, sheet: null, opener: null, searchTimer: null };
     S.panel.setAttribute('data-i18n-skip', '');
     S.panel.innerHTML = '<div class="st-wrap"><div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div></div>';
     S.api.boot().then(function (b) {
@@ -79,7 +79,7 @@
     }).catch(function (e) { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.load')) + ' <button class="st-btn st-ghost" data-act="reopen">' + esc(T('err.retry')) + '</button></div></div>'; S.panel.onclick = function (ev) { if (ev.target.closest('[data-act="reopen"]')) { var p = S.panel, c = S.client; S = null; open({ client: c, panel: p }); } }; console.error('SNYPD Stock boot failed', e); });
   }
   function shell() {
-    var statuses = [['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')], ['old', T('tag.stale')]];
+    var statuses = [['held', T('chip.held')], ['', T('all')], ['stock', T('status.stock')], ['listed', T('status.listed')], ['reserved', T('status.reserved')], ['sold', T('status.sold')], ['returned', T('status.returned')], ['written_off', T('status.written_off')], ['old', T('tag.stale')]];
     S.panel.innerHTML =
       '<div class="st-wrap">' +
       '<h1 class="st-sr">' + esc(T('title')) + '</h1>' +
@@ -88,15 +88,16 @@
       '<div id="st-capmsg"></div>' +
       '<div id="st-over"></div><div id="st-items" style="display:none">' +
       '<div class="st-itemshd"><h2 class="st-h2">' + esc(T('nav.items')) + '</h2><span class="st-secsub" id="st-itemssub"></span></div>' +
-      '<div class="st-tools">' +
+      '<div class="st-tools" id="st-tools">' +
       '<input class="st-in st-search" type="search" id="st-q" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('search.aria')) + '" autocomplete="off">' +
-      '<select class="st-in" id="st-cond" aria-label="' + esc(T('filter.condition')) + '">' + option('', T('filter.condition') + ': ' + T('filter.any'), true) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c)); }).join('') + '</select>' +
-      '<select class="st-in" id="st-cat" aria-label="' + esc(T('filter.category')) + '">' + option('', T('filter.category') + ': ' + T('filter.any'), true) + (S.cats || []).filter(function (c) { return !c.hidden; }).map(function (c) { return option(c.key, catName(c.key)); }).join('') + '</select>' +
+      '<button type="button" class="st-btn st-ghost st-toolsbtn" data-act="tools" aria-expanded="false" aria-controls="st-tools">' + esc(T('tools.btn')) + '</button>' +
+      '<select class="st-in" id="st-cond" aria-label="' + esc(T('filter.condition')) + '">' + option('', T('filter.condition') + colon() + T('filter.any'), true) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c)); }).join('') + '</select>' +
+      '<select class="st-in" id="st-cat" aria-label="' + esc(T('filter.category')) + '">' + option('', T('filter.category') + colon() + T('filter.any'), true) + (S.cats || []).filter(function (c) { return !c.hidden; }).map(function (c) { return option(c.key, catName(c.key)); }).join('') + '</select>' +
       '<select class="st-in" id="st-plat" aria-label="' + esc(T('f.platform')) + '">' + option('', T('plat.all'), true) + C.PLATFORMS.map(function (p) { return option(p, T('plat.' + p)); }).join('') + '</select>' +
       '<button type="button" class="st-btn st-tert" data-act="deleted" id="st-del" aria-pressed="false">' + esc(T('deleted.show')) + '</button>' +
       '<button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="export" id="st-export">' + esc(T('exp.btn')) + '</button>' +
       '<span class="st-count" id="st-count" aria-live="polite"></span></div>' +
-      '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === '' ? 'true' : 'false') + '">' + esc(s[1]) + ' <span class="st-cn"></span></button>'; }).join('') + '</div>' +
+      '<div class="st-chips" id="st-chips" role="group" aria-label="' + esc(T('filter.status')) + '">' + statuses.map(function (s) { return '<button type="button" class="st-chip" data-act="chip" data-status="' + s[0] + '" aria-pressed="' + (s[0] === 'held' ? 'true' : 'false') + '">' + esc(s[1]) + ' <span class="st-cn"></span></button>'; }).join('') + '</div>' +
       '<div id="st-body"></div></div></div><div id="st-ov"></div><div id="st-undo-root"></div>';
     S.panel.onclick = onClick; S.panel.onkeydown = onKey; S.panel.onchange = onChange;
     $('#st-q').oninput = function () { clearTimeout(S.searchTimer); var v = this.value; S.searchTimer = setTimeout(function () { S.f.q = v.trim(); load(true); }, 250); };
@@ -105,7 +106,7 @@
     $('#st-plat').onchange = function () { S.f.platform = this.value; load(true); };
     renderMeter();
   }
-  var CHIP_KEY = { '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
+  var CHIP_KEY = { held: 'held', '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
   function renderChipCounts() {
     Array.prototype.forEach.call(S.panel.querySelectorAll('#st-chips .st-chip'), function (b) { var n = b.querySelector('.st-cn'); if (n) n.textContent = S.counts ? String(S.counts[CHIP_KEY[b.getAttribute('data-status')]]) : ''; });
   }
@@ -124,6 +125,9 @@
 
   // ------------------------------------------------------------------ overview + Today lanes + first run + settings (step 5)
   var PERIODS = [7, 30, 90, 365, null];
+  var LANE_ROWS = 3;   // rows per Today lane (the RPC returns up to 5)
+  var HELD = ['stock', 'listed', 'reserved', 'returned'];
+  function colon() { return lang === 'fr' ? String.fromCharCode(0xa0) + ': ' : ': '; }
   function perKey(d) { return d == null ? 'all' : String(d); }
   function skipped() { try { return localStorage.getItem('snypd_stock_pq_skipped') === '1'; } catch (e) { return false; } }
   function setSkipped() { try { localStorage.setItem('snypd_stock_pq_skipped', '1'); } catch (e) { /* a convenience only */ } }
@@ -152,19 +156,20 @@
     if (o.err) h += '<div class="st-err">' + esc(errMsg(o.err)) + ' <button type="button" class="st-btn st-ghost" data-act="ov-retry">' + esc(T('err.retry')) + '</button></div>';
     if (S.boot.currency_source === 'default') h += '<p class="st-note">' + esc(T('ov.cur', { cur: S.cur })) + ' <button type="button" class="st-linkb" data-act="settings">' + esc(T('ov.cur.change')) + '</button></p>';
     var oldDays = o.data.old_after_days || S.boot.old_after_days || C.CAPS.oldAfterDefault, pk = perKey(o.days), L = o.lanes || {};
-    var ARROW_UP = String.fromCharCode(0x25b2), ARROW_DN = String.fromCharCode(0x25bc);
-    // Today: three lanes worth a minute (the design's count) + Holding, each row with its own action
-    var LANES = [['reprice', 'lane.meta.listed', [['reprice', 'lane.btn.reprice']]], ['list', 'lane.meta.stock', [['list', 'act.list']]], ['follow', 'lane.meta.reserved', [['sold', 'act.sold'], ['active', 'act.active']]], ['hold', 'lane.meta.stock', [['list', 'act.list']]]];
-    var worth = ['reprice', 'list', 'follow'].reduce(function (n, k) { return n + ((L[k] && L[k].count) || 0); }, 0);
+    // Order (review 3 Nov 2026): The numbers first, because profit is what people open Stock for, then Today, Stock now, and the charts last.
+    // Holding was dropped the same day: its rule is a subset of List, and the claims mirror never sets src_type, so it repeated List or stayed empty.
+    h += numbersHtml(o, v, pk);
+    var LANES = [['reprice', [['reprice', 'lane.btn.reprice']], 'listed'], ['list', [['list', 'act.list']], 'stock'], ['follow', [['sold', 'act.sold'], ['active', 'act.active']], 'reserved']];
+    var worth = LANES.reduce(function (n, ld) { return n + ((L[ld[0]] && L[ld[0]].count) || 0); }, 0);
     h += '<section class="st-sec" aria-labelledby="st-h-lanes"><div class="st-sechd"><h2 class="st-h2" id="st-h-lanes">' + esc(T('ov.lanes')) + '</h2>' +
       (o.lanes ? '<span class="st-secsub" id="st-lanes-sub">' + esc(T('ov.lanes.sub', { n: worth, date: todayLabel() })) + '</span>' : '') + '</div><div class="st-lanes">' +
       LANES.map(function (ld) {
-        var k = ld[0], ln = L[k] || { count: 0, items: [] };
+        var k = ld[0], ln = L[k] || { count: 0, items: [] }, shown = ln.items.slice(0, LANE_ROWS);
         return '<div class="st-lane" id="st-lane-' + k + '"><div class="st-lane-hd"><span>' + esc(T('lane.' + k)) + '</span><b>' + esc(String(ln.count)) + '</b></div><p class="st-d">' + esc(T('lane.' + k + '.d')) + '</p>' +
-          (ln.count ? ln.items.map(function (it) {
+          (ln.count ? shown.map(function (it) {
             return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="st-tile2" aria-hidden="true">' + esc(initials(it.title)) + '</span><span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(laneMeta(k, it)) + '</span></span></button>' +
-              '<div class="st-lane-acts">' + ld[2].map(function (a, i) { return '<button type="button" class="st-btn ' + (i ? 'st-tert' : 'st-ghost') + '" data-act="lane-act" data-do="' + a[0] + '" data-id="' + esc(it.id) + '">' + esc(T(a[1])) + '</button>'; }).join('') + '</div></div>';
-          }).join('') + (ln.count > ln.items.length ? '<p class="st-d st-more">' + esc(T('lane.more', { n: ln.count - ln.items.length })) + '</p>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
+              '<div class="st-lane-acts">' + ld[1].map(function (a, i) { return '<button type="button" class="st-btn ' + (i ? 'st-tert' : 'st-ghost') + '" data-act="lane-act" data-do="' + a[0] + '" data-id="' + esc(it.id) + '">' + esc(T(a[1])) + '</button>'; }).join('') + '</div></div>';
+          }).join('') + (ln.count > shown.length ? '<button type="button" class="st-linkb st-lane-more" data-act="lane-more" data-status="' + ld[2] + '">' + esc(T('lane.more', { n: ln.count - shown.length })) + '</button>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
       }).join('') + '</div></section>';
     // Stock now: today's snapshot, not affected by the period
     h += '<section class="st-sec" aria-labelledby="st-h-now"><div class="st-sechd"><h2 class="st-h2" id="st-h-now">' + esc(T('ov.now')) + '</h2><span class="st-secsub">' + esc(T('ov.snapshot')) + '</span></div><div class="st-strip">' +
@@ -172,23 +177,28 @@
       '<div class="st-t3"><span class="st-lbl">' + esc(T('ov.cash')) + '</span><b class="st-big" id="st-cash">' + esc(M(v.held.cashCents)) + '</b><small>' + esc(T('ov.cash.cap')) + '</small>' + (v.held.noCost ? '<small>' + esc(T('ov.cash.nocost', { n: v.held.noCost })) + '</small>' : '') + '</div>' +
       '<div class="st-t3"><span class="st-lbl">' + esc(T('ov.stale', { d: oldDays })) + '</span><b class="st-big' + (v.held.old ? ' st-warnv' : ' st-dim') + '" id="st-old">' + esc(String(v.held.old)) + '</b>' +
       (v.held.old ? '<small id="st-old-sub">' + esc(T('ov.old.cost', { cost: M(v.held.oldCostCents) })) + '</small><button type="button" class="st-btn st-ghost" data-act="see-old">' + esc(T('ov.old.see')) + '</button>' : '<small id="st-old-sub">' + esc(T('ov.old.none')) + '</small>') + '</div></div></section>';
-    // The numbers
+    var charts = chartsHtml(o);
+    if (charts) h += '<section class="st-sec st-chsec" aria-label="' + esc(T('ch.day.title')) + '">' + charts + '</section>';
+    el.innerHTML = h;
+  }
+  // The numbers: hero net profit + delta, revenue / sales / average / days to sell, returns and write-offs; "Fix them" when sales are left out
+  function numbersHtml(o, v, pk) {
+    var ARROW_UP = String.fromCharCode(0x25b2), ARROW_DN = String.fromCharCode(0x25bc);
     var pct = (v.deltaNetCents != null && v.prevNetCents) ? v.deltaNetCents / Math.abs(v.prevNetCents) : null, dir = v.deltaNetCents == null ? 0 : (v.deltaNetCents > 0 ? 1 : (v.deltaNetCents < 0 ? -1 : 0));
     var pctTxt = pct == null ? null : (pct < 0 ? C.MINUS : '+') + (Math.abs(pct) * 100).toFixed(1).replace('.', lang === 'fr' ? ',' : '.') + (lang === 'fr' ? String.fromCharCode(0xa0) + '%' : '%');
     var deltaP = { amount: v.deltaNetCents == null ? '' : MS(v.deltaNetCents), pct: pctTxt, prev: v.prevNetCents == null ? '' : M(v.prevNetCents), n: o.days };
-    h += '<section class="st-sec" aria-labelledby="st-h-num"><div class="st-sechd"><h2 class="st-h2" id="st-h-num">' + esc(T('ov.numbers')) + '</h2><span class="st-secsub" id="st-num-sub">' + esc(T('per.' + pk) + (o.days != null ? ' \u00b7 ' + T('ov.vs', { n: o.days }) : '')) + '</span>' +
+    return '<section class="st-sec" aria-labelledby="st-h-num"><div class="st-sechd"><h2 class="st-h2" id="st-h-num">' + esc(T('ov.numbers')) + '</h2><span class="st-secsub" id="st-num-sub">' + esc(T('per.' + pk) + (o.days != null ? ' \u00b7 ' + T('ov.vs', { n: o.days }) : '')) + '</span>' +
       '<div class="st-chips" role="group" aria-label="' + esc(T('per.label')) + '">' + PERIODS.map(function (d) { return '<button type="button" class="st-chip" data-act="period" data-days="' + perKey(d) + '" aria-pressed="' + (d === o.days ? 'true' : 'false') + '">' + esc(T('per.btn.' + perKey(d))) + '</button>'; }).join('') + '</div></div>' +
       '<div class="st-numgrid"><div class="st-herocard"><span class="st-lbl">' + esc(T('ov.net') + ' \u00b7 ' + T('per.' + pk)) + '</span>' +
       '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : '') + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(M(v.netCents))) + '</span></div>' +
       (v.deltaNetCents != null && o.days != null ? '<p class="st-delta" id="st-delta">' + (dir ? '<span class="' + (dir > 0 ? 'st-pos' : 'st-neg') + '">' + (dir > 0 ? ARROW_UP : ARROW_DN) + '</span> ' : '') + esc(T(pctTxt == null ? 'ov.delta.nopct' : 'ov.delta', deltaP)) + '</p>' : '') +
       (v.hasEvents ? '' : '<p class="st-split">' + esc(T('ov.net.empty')) + '</p>') +
-      (v.partial ? '<p class="st-hint" id="st-partial">' + esc(T('ov.partial.note', { a: v.withCost, b: v.sold, c: v.sold - v.withCost })) + '</p>' : '') + '</div>' +
+      (v.partial ? '<p class="st-hint" id="st-partial">' + esc(T('ov.partial.note', { a: v.withCost, b: v.sold, c: v.sold - v.withCost })) + ' <button type="button" class="st-linkb" data-act="fix">' + esc(T('fix.btn')) + '</button></p>' : '') + '</div>' +
       cell(T('ov.rev'), v.revenueCents == null ? '--' : M(v.revenueCents), v.sold === 1 ? T('ov.sales.n1') : T('ov.sales.n', { n: v.sold }), 'st-c-rev') +
       cell(T('ov.sold'), String(v.sold), T('per.' + pk), 'st-c-sales') +
       cell(T('ov.avg'), v.avgProfitCents == null ? '--' : M(v.avgProfitCents), v.sold ? T('ov.avg.cap', { a: v.withCost, b: v.sold }) : null, 'st-c-avg') +
       cell(T('ov.days'), v.daysToSell == null ? '--' : T('ov.days.v', { n: Math.round(v.daysToSell) }), T('ov.days.cap'), 'st-c-days') + '</div>' +
-      '<div class="st-numsub">' + cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') + cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div>' + chartsHtml(o) + '</section>';
-    el.innerHTML = h;
+      '<div class="st-numsub">' + cell(T('ov.returns'), String(v.returns), null, 'st-c-ret') + cell(T('ov.wo'), String(v.writeOffs), v.writeOffs ? T('ov.wo.cost', { amount: M(v.writeOffCostCents) }) : null, 'st-c-wo') + '</div></section>';
   }
   // the meta line of a lane row (design Bc): Reprice "Depop . 85.00 . listed 90d . 0 price drops", List "in stock 91d . cost 53.40", Follow up "Vinted . 56.00 . reserved 5d".
   // lane_days / platform / price / cost come from migration 069; before it only the age is known and only that is shown.
@@ -343,7 +353,7 @@
   // ------------------------------------------------------------------ data
   function apiFilters() {
     var f = S.f, o = {};
-    if (f.status) o.status = f.status;
+    if (f.fix) o.status = ['sold']; else if (f.status) o.status = f.status;
     if (f.q) o.q = f.q;
     if (f.condition) o.condition = [f.condition];
     if (f.category) o.category = f.category;
@@ -357,7 +367,7 @@
     var req = ++S.req; S.loading = true; S.err = null;
     if (reset) { S.rows = []; S.next = null; }
     renderBody();
-    return S.api.itemsPage(apiFilters(), 50, reset ? null : S.next).then(function (p) {
+    return S.api.itemsPage(apiFilters(), S.f.fix ? 200 : 50, reset ? null : S.next).then(function (p) {
       if (req !== S.req) return;
       S.rows = reset ? p.rows : S.rows.concat(p.rows); S.next = p.next_cursor; S.total = p.total; S.loading = false; renderBody();
     }).catch(function (e) { if (req !== S.req) return; S.loading = false; S.err = e; renderBody(); });
@@ -379,16 +389,19 @@
     var cnt = $('#st-count'), del = $('#st-del');
     if (del) { del.setAttribute('aria-pressed', S.f.deleted ? 'true' : 'false'); del.textContent = S.f.deleted ? T('deleted.back') : T('deleted.show'); }
     $('#st-chips').style.display = S.f.deleted ? 'none' : '';
-    Array.prototype.forEach.call(S.panel.querySelectorAll('.st-chip'), function (b) { var st = b.getAttribute('data-status'); b.setAttribute('aria-pressed', (st === 'old' ? !!S.f.old : (!S.f.old && ((S.f.status || []).join(',') === (st === 'stock' ? 'stock,returned' : st) || (!S.f.status && st === '')))) ? 'true' : 'false'); });
+    Array.prototype.forEach.call(S.panel.querySelectorAll('.st-chip'), function (b) { var st = b.getAttribute('data-status'); b.setAttribute('aria-pressed', (!S.f.fix && (st === 'old' ? !!S.f.old : (!S.f.old && ((S.f.status || []).join(',') === (st === 'stock' ? 'stock,returned' : (st === 'held' ? HELD.join(',') : st)) || (!S.f.status && st === ''))))) ? 'true' : 'false'); });
     renderChipCounts();
     if (cnt) cnt.textContent = '';
     var h = '';
     if (S.err) h += '<div class="st-err">' + esc(errMsg(S.err)) + ' <button type="button" class="st-btn st-ghost" data-act="retry">' + esc(T('err.retry')) + '</button></div>';
     if (S.f.deleted) h += '<p class="st-note">' + esc(T('deleted.note', { days: C.CAPS.deletedDays })) + '</p>';
     if (S.f.old) h += '<p class="st-note">' + esc(T('filter.old', { d: (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault })) + ' <button type="button" class="st-linkb" data-act="clear">' + esc(T('clear')) + '</button></p>';
+    var rows = S.f.fix ? S.rows.filter(needsFix) : S.rows;
+    if (S.f.fix && !S.loading) h += '<p class="st-note" id="st-fixnote">' + esc(rows.length ? T('fix.note', { n: rows.length }) : T('fix.none')) + ' <button type="button" class="st-linkb" data-act="clear">' + esc(T('clear')) + '</button></p>';
     if (S.loading && !S.rows.length) { el.innerHTML = h + '<div class="st-table" role="status" aria-label="' + esc(T('loading')) + '"><div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div></div>'; return; }
-    if (!S.rows.length && !S.err) {
-      var filtered = S.f.status || S.f.q || S.f.condition || S.f.category || S.f.platform || S.f.old;
+    if (!rows.length && !S.err) {
+      var noItems = !!(S.boot && S.boot.counts && S.boot.counts.items === 0), filtered = !noItems || S.f.q || S.f.condition || S.f.category || S.f.platform || S.f.old;
+      if (S.f.fix) { el.innerHTML = h; return; }
       if (S.f.deleted) h += '<div class="st-empty"><p>' + esc(T('empty.deleted', { days: C.CAPS.deletedDays })) + '</p></div>';
       else if (filtered) h += '<div class="st-empty"><p>' + esc(T('empty.filtered')) + '</p><button type="button" class="st-btn st-ghost" data-act="clear">' + esc(T('clear')) + '</button></div>';
       else h += '<div class="st-empty"><h3>' + esc(T('empty.title')) + '</h3><p>' + esc(T('empty.body')) + '</p><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('empty.add')) + '</button> <button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button></div>';
@@ -396,12 +409,13 @@
     }
     h += '<div class="st-table" role="table"><div class="st-th" role="row"><span>' + esc(T('col.item')) + '</span><span>' + esc(T('col.status')) + '</span><span>' + esc(T('col.platform')) + '</span><span class="st-num">' + esc(T('col.bought')) + '</span><span class="st-num">' + esc(T('col.days')) + '</span><span class="st-num">' + esc(T('col.pop')) + '</span></div>';
     var t0 = today();
-    S.rows.forEach(function (r) { h += rowHtml(r, t0); });
+    rows.forEach(function (r) { h += rowHtml(r, t0); });
     h += '</div>';
-    h += '<p class="st-foot2" id="st-showing" aria-live="polite">' + esc(T('it.showing', { n: S.rows.length, total: S.total })) + '</p>';
+    h += '<p class="st-foot2" id="st-showing" aria-live="polite">' + esc(S.f.fix ? (S.next ? T('fix.checked', { n: S.rows.length, total: S.total }) : '') : T('it.showing', { n: S.rows.length, total: S.total })) + '</p>';
     if (S.next) h += '<div class="st-more"><button type="button" class="st-btn st-ghost" data-act="more"' + (S.loading ? ' disabled' : '') + '>' + esc(T('more')) + '</button></div>';
     el.innerHTML = h;
   }
+  function needsFix(r) { return r.status === 'sold' && (r.sold_cents == null || r.buy_cents == null); }
   function rowHtml(r, t0) {
     var cost = C.costCents(r), profit = C.saleProfitCents(r), held = C.isHeld({ status: r.status, deleted_at: null });
     var price = r.status === 'sold' ? r.sold_cents : r.list_cents, age = held ? C.ageDays(r, t0) : null;
@@ -416,7 +430,7 @@
       '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + esc(M(cost)) + '</div>' +
       '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-pop st-num">' + pop + '</div>' +
       '<div class="c-acts">' + (held ? '<button type="button" class="st-btn st-ghost" data-act="lane-act" data-do="sold" data-id="' + esc(r.id) + '">' + esc(T('act.sold')) + '</button>' : '') + '<button type="button" class="st-btn st-tert" data-act="open" data-id="' + esc(r.id) + '">' + esc(T('act.edit')) + '</button></div>' +
-      '<div class="c-meta"><span>' + esc(M(cost)) + '</span><span>' + esc(pop.replace(/<[^>]*>/g, '')) + '</span>' + (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
+      '<div class="c-meta"><span>' + esc(T('lane.meta.cost', { c: M(cost) })) + '</span><span>' + esc(T(r.status === 'sold' ? 'meta.profit' : 'meta.price', { v: pop.replace(/<[^>]*>/g, '') })) + '</span>' + (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
   }
 
   // ------------------------------------------------------------------ events
@@ -435,9 +449,9 @@
       case 'im-resume': imRun(true); break;
       case 'im-undo': imUndo(); break;
       case 'im-again': openImport(); break;
-      case 'chip': { var st = el.getAttribute('data-status'); S.f.old = st === 'old'; S.f.status = (st === '' || st === 'old') ? null : (st === 'stock' ? ['stock', 'returned'] : [st]); load(true); break; }
+      case 'chip': { var st = el.getAttribute('data-status'); S.f.fix = false; S.f.old = st === 'old'; S.f.status = (st === '' || st === 'old') ? null : (st === 'stock' ? ['stock', 'returned'] : (st === 'held' ? HELD.slice() : [st])); load(true); break; }
       case 'deleted': S.f.deleted = !S.f.deleted; S.f.status = null; load(true); break;
-      case 'clear': S.f = { status: null, q: '', condition: '', category: '', platform: '', deleted: false, old: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; $('#st-plat').value = ''; load(true); break;
+      case 'clear': S.f = { status: null, q: '', condition: '', category: '', platform: '', deleted: false, old: false, fix: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; $('#st-plat').value = ''; load(true); break;
       case 'more': load(false); break;
       case 'retry': load(true); break;
       case 'open': S.opener = el; openDetail(id); break;
@@ -457,12 +471,22 @@
       case 'chart-table': { var wh = el.getAttribute('data-which'); if (wh === 'day') S.ov.dayTable = !S.ov.dayTable; else S.ov.platTable = !S.ov.platTable; renderOverview(); break; }
       case 'see-old': S.f = { status: null, q: '', condition: '', category: '', deleted: false, old: true }; if ($('#st-q')) $('#st-q').value = ''; if ($('#st-cond')) $('#st-cond').value = ''; if ($('#st-cat')) $('#st-cat').value = ''; S.itemsLoaded = true; showView('items'); load(true); break;
       case 'lane-open': openLane(id); break;
+      case 'lane-more': { var ls = el.getAttribute('data-status'); goItems({ status: ls === 'stock' ? ['stock', 'returned'] : [ls] }); break; }
+      case 'fix': goItems({ status: null, fix: true }); break;
+      case 'tools': { var tl = $('#st-tools'), open1 = !tl.classList.contains('open'); tl.classList.toggle('open', open1); el.setAttribute('aria-expanded', open1 ? 'true' : 'false'); break; }
       case 'lane-act': laneAct(el.getAttribute('data-do'), id, el); break;
       case 'persona': answerPersona(el.getAttribute('data-p')); break;
       case 'pq-skip': setSkipped(); renderOverview(); showBar(T('pq.skipped'), false); break;
       case 'hide-tab': hideTab(); break;
       default: break;
     }
+  }
+  // jump from the Overview to Items with a fresh filter (search and selects cleared)
+  function goItems(f) {
+    S.f = { status: f.status, q: '', condition: '', category: '', platform: '', deleted: false, old: false, fix: !!f.fix };
+    ['#st-q', '#st-cond', '#st-cat', '#st-plat'].forEach(function (s) { var e = $(s); if (e) e.value = ''; });
+    S.itemsLoaded = true; showView('items'); load(true); loadCounts();
+    var top = $('#st-items'); if (top && top.scrollIntoView) top.scrollIntoView({ block: 'start' });
   }
   function onKey(ev) {
     if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); if (S.sheet.kind === 'add' && clearAdd()) return; closeSheet(); return; }
@@ -515,7 +539,7 @@
       '<button type="button" class="st-btn ' + (kind === 'wo' ? 'st-danger' : 'st-prim') + '" data-act="submit" id="st-go">' + esc(T(go)) + '</button>';
     mountSheet(T(title) + (item ? ': ' + item.title : ''), '<div id="st-sheet-err"></div>' + body, foot);
     var first = $('.st-sheet input:not([type=hidden]), .st-sheet select'); if (first) first.focus();
-    if (kind === 'sold') { var upd = function () { previewSold(); }; Array.prototype.forEach.call(S.panel.querySelectorAll('#sf-sold, #sf-ship'), function (i) { i.addEventListener('input', upd); }); upd(); }
+    if (kind === 'sold') { var upd = function () { previewSold(); }; Array.prototype.forEach.call(S.panel.querySelectorAll('#sf-sold, #sf-ship, #sf-fee'), function (i) { i.addEventListener('input', upd); }); $('#sf-platform').addEventListener('change', upd); upd(); }
     if (kind === 'returned') { var dest = function () { var wo = S.panel.querySelector('input[name=dest]:checked').value === 'wo'; $('#sf-reason-wrap').style.display = wo ? '' : 'none'; }; Array.prototype.forEach.call(S.panel.querySelectorAll('input[name=dest]'), function (i) { i.addEventListener('change', dest); }); dest(); }
   }
   function mountSheet(title, bodyHtml, footHtml) {
@@ -538,7 +562,7 @@
   }
   function fld(name, label, control, cls) { return '<div class="st-f' + (cls ? ' ' + cls : '') + '"><label for="sf-' + name + '">' + esc(label) + '</label>' + control + '<div class="st-fe" data-for="' + name + '"></div></div>'; }
   function txt(name, val, ph, extra) { return '<input class="st-in" id="sf-' + name + '" name="' + name + '" value="' + esc(val == null ? '' : val) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + (extra || '') + ' autocomplete="off">'; }
-  function mny(name, cents) { return txt(name, moneyText(cents), moneyExample(), ' inputmode="decimal"'); }
+  function mny(name, cents) { return txt(name, moneyText(cents), T('ph.money', { v: moneyExample() }), ' inputmode="decimal"'); }
   function dat(name, val, max) { return '<input class="st-in" type="date" id="sf-' + name + '" name="' + name + '" value="' + esc(val || '') + '"' + (max ? ' max="' + esc(max) + '"' : '') + '>'; }
   function formFor(kind, it) {
     var t0 = today();
@@ -551,7 +575,8 @@
     if (kind === 'list') return '<div class="st-form">' + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('list', T('f.list'), mny('list', it.list_cents)) + fld('listed', T('f.listed'), dat('listed', t0, t0)) + '</div>';
     if (kind === 'reprice') return '<div class="st-form"><div class="st-f full"><span class="st-lbl">' + esc(T('f.list')) + '</span><b>' + esc(M(it.list_cents)) + '</b></div>' + fld('newprice', T('f.newprice'), mny('newprice'), 'full') + '</div>';
     if (kind === 'sold') {
-      return '<p class="st-d" id="st-soldctx">' + esc(soldCtx(it)) + '</p><div class="st-form">' + fld('sold', T('f.sold'), mny('sold', it.list_cents), 'full') + fld('soldon', T('f.soldon'), dat('soldon', t0, t0)) + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('ship', T('f.ship'), mny('ship'), 'full') + '</div><div class="st-prev" id="st-prev" style="margin-top:14px"></div><p class="st-hint">' + esc(T('sold.nofees')) + '</p><p class="st-hint">' + esc(T('sold.formula')) + '</p>';
+      var plat0 = it.platform || S.lastPlat || 'vinted';
+      return '<p class="st-d" id="st-soldctx">' + esc(soldCtx(it)) + '</p><div class="st-form">' + fld('sold', T('f.sold'), mny('sold', it.list_cents), 'full') + fld('soldon', T('f.soldon'), dat('soldon', t0, t0)) + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(plat0) + '</select>') + fld('fee', T('f.fee.sale'), mny('fee'), 'full') + fld('ship', T('f.ship'), mny('ship'), 'full') + '</div><div class="st-prev" id="st-prev" style="margin-top:14px"></div><p class="st-hint" id="st-feenote"></p><p class="st-hint">' + esc(T('sold.formula')) + '</p>';
     }
     if (kind === 'returned') {
       return '<div class="st-form">' + fld('returnedon', T('f.returnedon'), dat('returnedon', t0, t0)) + fld('refund', T('f.refund'), mny('refund', it.sold_cents)) + fld('retship', T('f.retship'), mny('retship'), 'full') +
@@ -565,18 +590,22 @@
     var parts = [], cost = C.costCents(it), MN = String.fromCharCode(0xb7);
     if (it.buy_cents != null) parts.push(T('sold.ctx.bought', { v: M(it.buy_cents) }));
     if (it.extra_cents) parts.push(T('sold.ctx.extra', { v: M(it.extra_cents) }));
-    if (it.list_cents != null) parts.push(T('sold.ctx.listed', { v: M(it.list_cents), plat: it.platform ? T('plat.' + it.platform) : '--' }));
+    if (it.list_cents != null) parts.push(it.status !== 'listed' && it.status !== 'reserved' ? T('sold.ctx.price', { v: M(it.list_cents) }) : (it.platform ? T('sold.ctx.listed', { v: M(it.list_cents), plat: T('plat.' + it.platform) }) : T('sold.ctx.listed0', { v: M(it.list_cents) })));
     return parts.join(' ' + MN + ' ');
   }
   function previewSold() {
     var it = S.sheet.item, box = $('#st-prev'); if (!box) return;
+    var isV = soldOnVinted(), feeIn = $('#sf-fee'), feeWrap = feeIn && feeIn.closest('.st-f'), fee = isV ? { ok: true, cents: null } : C.parseMoneyInput(feeIn ? feeIn.value : '', lang), fc = fee.ok && fee.cents ? fee.cents : 0;
+    if (feeWrap) feeWrap.style.display = isV ? 'none' : '';
+    var note = $('#st-feenote'); if (note) note.textContent = T(isV ? 'sold.fee.vinted' : (fc ? 'sold.fee.set' : 'sold.nofees'));
     var sold = C.parseMoneyInput(($('#sf-sold') || {}).value, lang), ship = C.parseMoneyInput(($('#sf-ship') || {}).value, lang), cost = C.costCents(it), MI = String.fromCharCode(0x2212);
     if (cost == null) { box.innerHTML = esc(T('preview.nocost')); return; }
     if (!sold.ok || sold.cents == null) { box.innerHTML = esc(T('preview.cost', { cost: M(cost) })); return; }
-    var sh = ship.ok && ship.cents ? ship.cents : 0, p = sold.cents - cost - sh, f = [T('prev.f.sold', { v: M(sold.cents) }), T('prev.f.buy', { v: M(it.buy_cents) })];
-    if (it.extra_cents) f.push(T('prev.f.extra', { v: M(it.extra_cents) })); if (sh) f.push(T('prev.f.ship', { v: M(sh) }));
-    box.innerHTML = '<span class="st-lbl">' + esc(T('prev.title')) + '</span><strong class="' + (p < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(p)) + '</strong><small>' + esc(f.join(' ' + MI + ' ')) + '</small>';
+    var sh = ship.ok && ship.cents ? ship.cents : 0, p = sold.cents - cost - sh - fc, f = [T('prev.f.sold', { v: M(sold.cents) }), T('prev.f.buy', { v: M(it.buy_cents) })];
+    if (it.extra_cents) f.push(T('prev.f.extra', { v: M(it.extra_cents) })); if (fc) f.push(T('prev.f.fee', { v: M(fc) })); if (sh) f.push(T('prev.f.ship', { v: M(sh) }));
+    box.innerHTML = '<span class="st-lbl">' + esc(T(isV || fc ? 'prev.title2' : 'prev.title')) + '</span><strong class="' + (p < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(p)) + '</strong><small>' + esc(f.join(' ' + MI + ' ')) + '</small>';
   }
+  function soldOnVinted() { var p = $('#sf-platform'); return !!p && p.value === 'vinted'; }
   // read helpers: set the inline error and return undefined on failure
   function fieldErr(name, msg) { var e = S.panel.querySelector('.st-fe[data-for="' + name + '"]'), i = S.panel.querySelector('#sf-' + name); if (e) e.textContent = msg || ''; if (i) i.classList.toggle('bad', !!msg); }
   function readMoney(name, required) {
@@ -609,8 +638,9 @@
       if (item.list_cents != null && np.cents >= item.list_cents) { fieldErr('newprice', T('err.reprice')); return; }
       run = function () { return S.api.setStatus(item.id, 'listed', { listCents: np.cents }); }; label = T('toast.repriced');
     } else if (sh.kind === 'sold') {
-      var sp = noPrice ? { cents: null } : readMoney('sold', true), sd = readDate('soldon'), sh2 = readMoney('ship'); if (sp.bad || sd.bad || sh2.bad) return;
-      run = function () { return S.api.markSold(item.id, { soldCents: sp.cents == null ? null : sp.cents, on: sd.v, platform: $('#sf-platform').value || undefined, shipPaidCents: sh2.cents == null ? undefined : sh2.cents }); }; label = T('toast.sold');
+      var sp = noPrice ? { cents: null } : readMoney('sold', true), sd = readDate('soldon'), sh2 = readMoney('ship'), fe = soldOnVinted() ? { cents: null } : readMoney('fee'); if (sp.bad || sd.bad || sh2.bad || fe.bad) return;
+      var splat = $('#sf-platform').value || undefined; if (splat) S.lastPlat = splat;
+      run = function () { return S.api.markSold(item.id, { soldCents: sp.cents == null ? null : sp.cents, on: sd.v, platform: splat, feeCents: fe.cents == null ? undefined : fe.cents, shipPaidCents: sh2.cents == null ? undefined : sh2.cents }); }; label = T('toast.sold');
     } else if (sh.kind === 'returned') {
       var rd = readDate('returnedon'), rf = readMoney('refund'), rs = readMoney('retship'); if (rd.bad || rf.bad || rs.bad) return;
       var wo = S.panel.querySelector('input[name=dest]:checked').value === 'wo';
