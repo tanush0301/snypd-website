@@ -18,7 +18,9 @@ const en = {
   'sold.fee.set': 'Platform fee included.',
   'sold.ctx.listed0': 'listed {v}', 'sold.ctx.price': 'asking {v}',
   // phone item cards and inputs
-  'meta.price': 'price {v}', 'meta.profit': 'profit {v}', 'ph.money': 'e.g. {v}', 'tools.btn': 'Filters'
+  'meta.price': 'price {v}', 'meta.profit': 'profit {v}', 'ph.money': 'e.g. {v}', 'tools.btn': 'Filters',
+  // 071: sort + claim photo
+  'sort.label': 'Sort', 'sort.oldest': 'Longest in stock first', 'sort.newest': 'Newest bought first', 'detail.photo': 'Photo from the Vinted listing'
 };
 const fr = {
   'status.stock': 'Pas en vente', 'chip.held': 'En stock',
@@ -35,6 +37,7 @@ const fr = {
   'sold.ctx.listed0': 'affiché {v}', 'sold.ctx.price': 'prix demandé {v}',
   'meta.price': 'prix {v}', 'meta.profit': 'bénéfice {v}', 'ph.money': 'ex. {v}', 'tools.btn': 'Filtres',
   // typo fixes of the step-5 French (coùt, jusqu'è, régles) and an English word left in French
-  'lane.meta.cost': 'coût {c}', 'exp.btn': 'Exporter'
+  'lane.meta.cost': 'coût {c}', 'exp.btn': 'Exporter',
+  'sort.label': 'Trier', 'sort.oldest': 'Les plus anciens en stock d’abord', 'sort.newest': 'Derniers achats d’abord', 'detail.photo': 'Photo de l’annonce Vinted'
 };
 module.exports = { en, fr };

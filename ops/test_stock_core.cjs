@@ -46,7 +46,7 @@ const money = (c, lang) => core.formatMoney(c, 'EUR', lang || 'en');
 let sql = null;
 try {
   const dir = path.join(BACKEND, 'ops', 'migrations');
-  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8'), t070: fs.readFileSync(path.join(dir, '070_stock_counts.sql'), 'utf8') };
+  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8'), t070: fs.readFileSync(path.join(dir, '070_stock_counts.sql'), 'utf8'), t071: fs.readFileSync(path.join(dir, '071_stock_items_sort_and_photos.sql'), 'utf8') };
 } catch (e) { sql = null; }
 const listIn = (text, col) => { const m = new RegExp('\\b' + col + '\\s+text[^,]*?check\\s*\\(\\s*' + col + '\\s+in\\s*\\(([^)]*)\\)\\s*\\)').exec(text); assert(m, 'no CHECK list for column ' + col); return [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]); };
 if (sql) {
@@ -80,7 +80,7 @@ if (sql) {
     assert.deepEqual(Engine.DEFAULT_CATEGORIES.map(c => c[0]), core.DEFAULT_CATEGORY_KEYS);
   });
   test('C every error the SQL raises has a code + kind in stock-core, and the engine raises only codes the SQL raises', () => {
-    const sqlCodes = new Set([...(sql.t065 + sql.t066).matchAll(/raise exception '(stock_[a-z_]+)'/g)].map(m => m[1]));
+    const sqlCodes = new Set([...(sql.t065 + sql.t066 + sql.t071).matchAll(/raise exception '(stock_[a-z_]+)'/g)].map(m => m[1]));
     assert(sqlCodes.size >= 20, 'found only ' + sqlCodes.size + ' codes in the SQL');
     assert.deepEqual([...sqlCodes].sort(), Object.keys(core.CODE_KIND).sort(), 'CODE_KIND must list exactly the codes the SQL raises');
     const engSrc = fs.readFileSync(path.join(__dirname, 'stock_engine.js'), 'utf8');
@@ -255,7 +255,7 @@ test('A the plan\'s literal acceptance numbers, formatted like the screen will s
 test('A migration 069 in the engine: lane rows carry platform, list price, cost, drops, brand; the charts add up to the Overview number for every period, and the design chart numbers match', async () => {
   const a = account({ uid: 'A' }); a.eng.loadFixture(fx);
   const lanes = await a.api.lanes('2026-10-27');
-  assert.deepEqual(Object.keys(lanes.reprice.items[0]).sort(), ['brand', 'cost_cents', 'days', 'drops', 'id', 'lane_days', 'list_cents', 'platform', 'title']);
+  assert.deepEqual(Object.keys(lanes.reprice.items[0]).sort(), ['brand', 'cost_cents', 'days', 'drops', 'id', 'image_url', 'lane_days', 'list_cents', 'platform', 'title']);   // image_url: migration 071
   const top = lanes.reprice.items[0]; assert.deepEqual([top.title, top.platform, top.list_cents, top.cost_cents, top.drops, top.lane_days, top.days], ['Carhartt WIP Detroit jacket, black, XL', 'depop', 8500, 4000, 0, 90, 94]);
   assert.deepEqual([lanes.reprice.count, lanes.list.count, lanes.follow.count, lanes.hold.count], [9, 17, 3, 9]);
   for (const k of ['reprice', 'list', 'follow', 'hold']) for (const x of lanes[k].items) { const it = a.eng.state.items.find(i => i.id === x.id); assert.deepEqual([x.platform, x.list_cents, x.drops, x.brand, x.cost_cents], [it.platform == null ? null : it.platform, it.list_cents == null ? null : it.list_cents, it.drops, it.brand == null ? null : it.brand, it.buy_cents == null ? null : it.buy_cents + it.extra_cents]); }

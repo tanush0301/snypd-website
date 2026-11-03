@@ -449,7 +449,11 @@ window.SNYPD_STOCK_STR = {
   "meta.price": "price {v}",
   "meta.profit": "profit {v}",
   "ph.money": "e.g. {v}",
-  "tools.btn": "Filters"
+  "tools.btn": "Filters",
+  "sort.label": "Sort",
+  "sort.oldest": "Longest in stock first",
+  "sort.newest": "Newest bought first",
+  "detail.photo": "Photo from the Vinted listing"
  },
  "fr": {
   "tab": "Stock",
@@ -900,6 +904,10 @@ window.SNYPD_STOCK_STR = {
   "meta.price": "prix {v}",
   "meta.profit": "b\u00e9n\u00e9fice {v}",
   "ph.money": "ex. {v}",
-  "tools.btn": "Filtres"
+  "tools.btn": "Filtres",
+  "sort.label": "Trier",
+  "sort.oldest": "Les plus anciens en stock d\u2019abord",
+  "sort.newest": "Derniers achats d\u2019abord",
+  "detail.photo": "Photo de l\u2019annonce Vinted"
  }
 };

@@ -105,7 +105,7 @@
     opts = opts || {};
     const S = {
       uid: opts.uid || 'qa-user-0000-0000-0000-000000000001', items: [], history: [], hid: 0, settings: null, categories: [], undo: null, searches: opts.searches || [],
-      paid: opts.paid !== false, admin: !!opts.admin, mode: opts.mode || 'all', seq: 0
+      paid: opts.paid !== false, admin: !!opts.admin, mode: opts.mode || 'all', seq: 0, claimImg: {}
     };
     const nowMs = () => (opts.now ? opts.now() : Date.now());
     const today = () => (opts.today ? opts.today() : isoDate(nowMs()));
@@ -262,7 +262,7 @@
         follow: x => x.i.status === 'reserved' && x.i.reserved_on != null && diffDays(t, x.i.reserved_on) >= 3,
         hold: x => (x.i.status === 'stock' || x.i.status === 'returned') && x.i.src_type === 'hunt' && x.age >= 14 };
       const out = { today: t };
-      Object.keys(rules).forEach(k => { const m = h.filter(rules[k]).sort((p, q) => q.age - p.age || (p.i.id < q.i.id ? -1 : 1)); out[k] = { count: m.length, items: m.slice(0, 5).map(x => ({ id: x.i.id, title: x.i.title, days: x.age, lane_days: k === 'reprice' ? diffDays(t, x.i.listed_on) : (k === 'follow' ? diffDays(t, x.i.reserved_on) : x.age), platform: x.i.platform == null ? null : x.i.platform, list_cents: x.i.list_cents == null ? null : x.i.list_cents, cost_cents: x.i.buy_cents == null ? null : x.i.buy_cents + x.i.extra_cents, drops: x.i.drops, brand: x.i.brand == null ? null : x.i.brand })) }; });
+      Object.keys(rules).forEach(k => { const m = h.filter(rules[k]).sort((p, q) => q.age - p.age || (p.i.id < q.i.id ? -1 : 1)); out[k] = { count: m.length, items: m.slice(0, 5).map(x => ({ id: x.i.id, title: x.i.title, days: x.age, lane_days: k === 'reprice' ? diffDays(t, x.i.listed_on) : (k === 'follow' ? diffDays(t, x.i.reserved_on) : x.age), platform: x.i.platform == null ? null : x.i.platform, list_cents: x.i.list_cents == null ? null : x.i.list_cents, cost_cents: x.i.buy_cents == null ? null : x.i.buy_cents + x.i.extra_cents, drops: x.i.drops, brand: x.i.brand == null ? null : x.i.brand, image_url: imageOf(x.i) })) }; });
       return out;
     };
     // == stock_overview_series (migration 069): net per day (zero-filled) and per platform; net = sale profit + reversals - write-off cost, by the event's own date
@@ -286,6 +286,8 @@
       return { today: t, all: L.length, in_stock: L.filter(i => i.status === 'stock' || i.status === 'returned').length, listed: c('listed'), reserved: c('reserved'), sold: c('sold'),
         returned: c('returned'), written_off: c('written_off'), held: h.length, old: h.filter(i => ageOf(i, t) >= old).length };
     };
+    // 071: the caller's own claim photo, only an https://imagesN.vinted.net/ address
+    const imageOf = i => { const c = i.claim_id && S.claimImg[i.claim_id]; return c && c.uid === S.uid && c.url && /^https:\/\/images[0-9]*\.vinted\.net\//.test(c.url) ? c.url : null; };
     R.stock_items_page = function (a) {
       gate();
       const f = a.p_filters || {}, limit = Math.min(Math.max(a.p_limit == null ? 50 : a.p_limit, 1), 200), t = parseDate(f.today) || today();
@@ -296,13 +298,17 @@
         && (!q || (i.title || '').toLowerCase().includes(q) || (i.brand || '').toLowerCase().includes(q))
         && (!f.category || i.category === f.category) && (!f.platform || i.platform === f.platform) && (!f.src || i.src === f.src)
         && (!f.old || (isHeld(i) && ageOf(i, t) >= old)));
-      base.sort((x, y) => (x.bought_on < y.bought_on ? 1 : x.bought_on > y.bought_on ? -1 : (x.id < y.id ? 1 : x.id > y.id ? -1 : 0)));
-      const c = a.p_cursor && a.p_cursor.bought_on ? a.p_cursor : null;
-      const after = c ? base.filter(i => i.bought_on < c.bought_on || (i.bought_on === c.bought_on && i.id < c.id)) : base;
+      const sort = opts.pre071 || f.sort == null || f.sort === '' ? 'newest' : f.sort;   // 071 (opts.pre071: as before 071, the key is ignored)
+      if (sort !== 'newest' && sort !== 'oldest') raise('stock_bad_sort', null, '22023');
+      const asc = sort === 'oldest', k = i => i.returned_on || i.bought_on;
+      if (asc) base.sort((x, y) => (k(x) < k(y) ? -1 : k(x) > k(y) ? 1 : (x.id < y.id ? -1 : x.id > y.id ? 1 : 0)));
+      else base.sort((x, y) => (x.bought_on < y.bought_on ? 1 : x.bought_on > y.bought_on ? -1 : (x.id < y.id ? 1 : x.id > y.id ? -1 : 0)));
+      const c = a.p_cursor && (asc ? a.p_cursor.k : a.p_cursor.bought_on) ? a.p_cursor : null;
+      const after = !c ? base : (asc ? base.filter(i => k(i) > c.k || (k(i) === c.k && i.id > c.id)) : base.filter(i => i.bought_on < c.bought_on || (i.bought_on === c.bought_on && i.id < c.id)));
       const shown = after.slice(0, limit), more = after.length > limit;
-      const strip = i => { const o = clone(i); delete o.user_id; return o; };
+      const strip = i => { const o = clone(i); delete o.user_id; if (!opts.pre071) o.image_url = imageOf(i); return o; };
       const last = shown[shown.length - 1];
-      return { rows: shown.map(strip), next_cursor: more && last ? { bought_on: last.bought_on, id: last.id } : null, total: base.length };
+      return { rows: shown.map(strip), next_cursor: more && last ? (asc ? { k: k(last), id: last.id } : { bought_on: last.bought_on, id: last.id }) : null, total: base.length };
     };
     R.stock_add_items = function (a) {
       gate(); purgeDeleted();
@@ -450,6 +456,7 @@
       if (S.items.some(i => i.claim_id === c.id)) return null;
       const bought = isoDate(Date.parse(c.claimed_at || new Date(nowMs()).toISOString())), sold = c.status === 'sold';
       const soldOn = sold ? (c.sold_at ? isoDate(Date.parse(c.sold_at)) : bought) : null;
+      S.claimImg[c.id] = { uid: c.user_id || S.uid, url: c.image_url == null ? null : String(c.image_url) };   // 071 reads user_claims.image_url at query time
       const r = blank({ title: (btrim(c.title) || 'Claimed listing').slice(0, 140), brand: nullif(btrim(c.brand_title).slice(0, 60), ''), size: nullif(btrim(c.size_title).slice(0, 20), ''),
         buy_cents: c.bought_price_cents == null ? null : c.bought_price_cents, bought_on: bought, status: sold ? 'sold' : 'stock', sold_cents: sold ? (c.sold_price_cents == null ? null : c.sold_price_cents) : null,
         sold_on: soldOn && soldOn < bought ? bought : soldOn, src: 'SNYPD alert', link: nullif(btrim(c.vinted_url).slice(0, 500), ''), claim_id: c.id });

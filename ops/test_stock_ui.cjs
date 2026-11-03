@@ -478,6 +478,42 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   ok(/pressed Claim in the Feed/.test(await pg.$eval('.st-sheet', e => e.textContent)), 'the item says it came from a Feed claim');
   await pg.close();
 
+  // 5h. migration 071: Items sort (longest in stock first by default) + the claim's Vinted photo, with a fallback to the initials when the photo is gone.
+  //     Vinted's image host is answered locally (request interception): /ok/ paths get a 1x1 PNG, anything else a 404. Nothing leaves the machine.
+  {
+    const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
+    pg = await browser.newPage(); await pg.setViewport({ width: 1280, height: 900 });
+    await pg.setRequestInterception(true);
+    pg.on('request', r => { const u = r.url(); if (/^https:\/\/images[0-9]*\.vinted\.net\//.test(u)) return /\/ok\//.test(u) ? r.respond({ status: 200, contentType: 'image/png', body: PNG }) : r.respond({ status: 404, body: '' }); r.continue(); });
+    pg.on('pageerror', e => errors.push('5h pageerror: ' + e.message));
+    await pg.goto(base + '/dashboard.html?boot=1&plan=elite&stock=all&lang=en', { waitUntil: 'domcontentloaded' });
+    await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    await pg.evaluate(() => { const ago = d => new Date(Date.now() - d * 86400000).toISOString(), u = 'qa-user-0000-0000-0000-000000000001', c = (id, title, img, d) => window.SNYPD.supabase.from('user_claims').insert({ id, user_id: u, listing_id: 7100 + d, title, brand_title: 'Nike', size_title: 'M', image_url: img, vinted_url: 'https://www.vinted.be/items/' + (7100 + d), bought_price_cents: 1000, status: 'holding', claimed_at: ago(d) });
+      return Promise.all([c('claim-71a', 'Photo OK item', 'https://images1.vinted.net/t/ok/f800/a.webp?s=1', 40), c('claim-71b', 'Photo gone item', 'https://images1.vinted.net/t/gone/f800/b.webp?s=2', 39), c('claim-71c', 'Odd host item', 'https://picsum.photos/seed/71/600/600', 38)]); });
+    await pg.click('#view-tab-stock'); await waitOv(pg); await wait5(800);
+    { const lane = await pg.evaluate(() => [...document.querySelectorAll('#st-lane-list .st-lane-row')].map(r => ({ t: r.querySelector('.t').textContent, img: !!r.querySelector('img.st-ph') })));
+      ok(lane.some(x => x.t === 'Photo OK item' && x.img) && lane.filter(x => x.t !== 'Photo OK item' && x.t !== 'Photo gone item').every(x => !x.img), 'Today List lane: the claim photo on its row, none on rows without one: ' + JSON.stringify(lane)); }
+    await clickBy(pg, '#stock-panel .st-navb[data-view="items"]'); await pg.waitForSelector('#stock-panel .st-row', { timeout: 5000 }); await wait5(900);
+    eq(await pg.$eval('#st-sort', e => [e.value, getComputedStyle(e).display !== 'none']), ['oldest', true], 'Items sorts longest in stock first by default (071)');
+    const ages = () => pg.$$eval('#stock-panel .st-row .c-age', c => c.map(x => parseInt(x.textContent, 10)).filter(n => !isNaN(n)));
+    { const a = await ages(); ok(a.length > 2 && a.every((v, i) => i === 0 || v <= a[i - 1]), 'oldest first: days in stock never go up down the list: ' + a.join(',')); }
+    const tiles = await pg.evaluate(() => Object.fromEntries([...document.querySelectorAll('#stock-panel .st-row')].filter(r => /Photo OK item|Photo gone item|Odd host item/.test(r.textContent)).map(r => { const t = r.querySelector('.st-tile2'), im = t.querySelector('img'); return [r.querySelector('.st-item b').textContent, im ? (im.complete && im.naturalWidth > 0 ? 'photo' : 'loading') : 'initials:' + t.textContent]; })));
+    eq(tiles, { 'Photo OK item': 'photo', 'Photo gone item': 'initials:PH', 'Odd host item': 'initials:OD' }, 'claim photo shown; a photo that 404s falls back to the initials; a non-Vinted address is never loaded');
+    await pg.evaluate(() => { const r = [...document.querySelectorAll('#stock-panel .st-row')].find(x => /Photo OK item/.test(x.textContent)); r.click(); }); await pg.waitForSelector('.st-sheet', { timeout: 4000 }); await wait5(400);
+    ok(await pg.$eval('.st-sheet', e => { const im = e.querySelector('.st-dphoto img'); return !!im && im.getAttribute('referrerpolicy') === 'no-referrer' && im.alt === 'Photo from the Vinted listing'; }), 'item detail shows the photo (no referrer sent to Vinted, with alt text)');
+    await pg.keyboard.press('Escape'); await wait5(300);
+    await pg.$eval('#st-sort', e => { e.value = 'newest'; e.dispatchEvent(new Event('change', { bubbles: true })); }); await wait5(900);
+    { const a = await ages(); ok(a.length > 2 && a.every((v, i) => i === 0 || v >= a[i - 1]), 'newest first: days in stock never go down the list: ' + a.join(',')); }
+    ok(await pg.$$eval('#stock-panel img.st-ph', im => im.every(i => i.getAttribute('loading') === 'lazy' && /^https:\/\/images[0-9]*\.vinted\.net\//.test(i.src))), 'list photos load lazily and only from Vinted\'s image host');
+    await pg.close();
+    // the site may ship before 071 reaches the database: the sort control hides itself and the list stays in the old newest-first order
+    pg = await open('plan=elite&stock=all&stock_seed=acceptance&stock_today=2026-10-27&stock_claims=0&stock_pre071=1&lang=en');
+    await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    await pg.click('#view-tab-stock'); await waitOv(pg); await clickBy(pg, '#stock-panel .st-navb[data-view="items"]'); await pg.waitForSelector('#stock-panel .st-row', { timeout: 5000 }); await wait5(900);
+    { const a = await ages(); eq([await pg.$eval('#st-sort', e => getComputedStyle(e).display), a.length > 2 && a.every((v, i) => i === 0 || v >= a[i - 1])], ['none', true], 'before 071: no sort control, newest-first list, no error: ' + a.slice(0, 8).join(',')); }
+    await pg.close();
+  }
+
   // 5g. phone width, English and French: no overflow, every control 44 px
   for (const lng of ['en', 'fr']) {
     pg = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&stock_claims=0&lang=' + lng, { width: 390, height: 844, isMobile: true, hasTouch: true });

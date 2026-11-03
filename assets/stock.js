@@ -68,7 +68,7 @@
   function open(opts) {
     if (S && S.panel === opts.panel) { refresh(); return; }
     S = { client: opts.client, panel: opts.panel, todayFn: opts.today || null, api: C.createApi(opts.client, { today: opts.today }), boot: null, cur: 'EUR', cats: [], rows: [], next: null, total: 0,
-      f: { status: HELD.slice(), q: '', condition: '', category: '', deleted: false }, loading: true, err: null, req: 0, view: 'overview', ov: { days: 30, data: null, lanes: null, loading: false, err: null, req: 0, stale: false }, pinned: {}, itemsLoaded: false, undo: null, undoTimer: null, sheet: null, opener: null, searchTimer: null };
+      f: { status: HELD.slice(), q: '', condition: '', category: '', deleted: false, sort: 'oldest' }, sortOk: true, loading: true, err: null, req: 0, view: 'overview', ov: { days: 30, data: null, lanes: null, loading: false, err: null, req: 0, stale: false }, pinned: {}, itemsLoaded: false, undo: null, undoTimer: null, sheet: null, opener: null, searchTimer: null };
     S.panel.setAttribute('data-i18n-skip', '');
     S.panel.innerHTML = '<div class="st-wrap"><div class="st-skel"></div><div class="st-skel"></div><div class="st-skel"></div></div>';
     S.api.boot().then(function (b) {
@@ -93,6 +93,7 @@
       '<button type="button" class="st-btn st-ghost st-toolsbtn" data-act="tools" aria-expanded="false" aria-controls="st-tools">' + esc(T('tools.btn')) + '</button>' +
       '<select class="st-in" id="st-cond" aria-label="' + esc(T('filter.condition')) + '">' + option('', T('filter.condition') + colon() + T('filter.any'), true) + C.CONDITIONS.map(function (c) { return option(c, T('cond.' + c)); }).join('') + '</select>' +
       '<select class="st-in" id="st-cat" aria-label="' + esc(T('filter.category')) + '">' + option('', T('filter.category') + colon() + T('filter.any'), true) + (S.cats || []).filter(function (c) { return !c.hidden; }).map(function (c) { return option(c.key, catName(c.key)); }).join('') + '</select>' +
+      '<select class="st-in" id="st-sort" aria-label="' + esc(T('sort.label')) + '">' + option('oldest', T('sort.oldest'), true) + option('newest', T('sort.newest')) + '</select>' +
       '<select class="st-in" id="st-plat" aria-label="' + esc(T('f.platform')) + '">' + option('', T('plat.all'), true) + C.PLATFORMS.map(function (p) { return option(p, T('plat.' + p)); }).join('') + '</select>' +
       '<button type="button" class="st-btn st-tert" data-act="deleted" id="st-del" aria-pressed="false">' + esc(T('deleted.show')) + '</button>' +
       '<button type="button" class="st-btn st-ghost" data-act="import">' + esc(T('imp.btn')) + '</button><button type="button" class="st-btn st-ghost" data-act="export" id="st-export">' + esc(T('exp.btn')) + '</button>' +
@@ -104,6 +105,9 @@
     $('#st-cond').onchange = function () { S.f.condition = this.value; load(true); };
     $('#st-cat').onchange = function () { S.f.category = this.value; load(true); };
     $('#st-plat').onchange = function () { S.f.platform = this.value; load(true); };
+    $('#st-sort').onchange = function () { S.f.sort = this.value; load(true); };
+    // a claim photo that fails to load (deleted on Vinted, offline) turns back into the initials tile
+    S.panel.addEventListener('error', function (ev) { var im = ev.target; if (im && im.tagName === 'IMG' && im.classList.contains('st-ph')) { var t = im.parentNode; if (t) { t.classList.remove('has-ph'); t.textContent = t.getAttribute('data-ini') || '--'; } } }, true);
     renderMeter();
   }
   var CHIP_KEY = { held: 'held', '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
@@ -167,7 +171,7 @@
         var k = ld[0], ln = L[k] || { count: 0, items: [] }, shown = ln.items.slice(0, LANE_ROWS);
         return '<div class="st-lane" id="st-lane-' + k + '"><div class="st-lane-hd"><span>' + esc(T('lane.' + k)) + '</span><b>' + esc(String(ln.count)) + '</b></div><p class="st-d">' + esc(T('lane.' + k + '.d')) + '</p>' +
           (ln.count ? shown.map(function (it) {
-            return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '"><span class="st-tile2" aria-hidden="true">' + esc(initials(it.title)) + '</span><span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(laneMeta(k, it)) + '</span></span></button>' +
+            return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '">' + tileHtml(it.title, it.image_url) + '<span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(laneMeta(k, it)) + '</span></span></button>' +
               '<div class="st-lane-acts">' + ld[1].map(function (a, i) { return '<button type="button" class="st-btn ' + (i ? 'st-tert' : 'st-ghost') + '" data-act="lane-act" data-do="' + a[0] + '" data-id="' + esc(it.id) + '">' + esc(T(a[1])) + '</button>'; }).join('') + '</div></div>';
           }).join('') + (ln.count > shown.length ? '<button type="button" class="st-linkb st-lane-more" data-act="lane-more" data-status="' + ld[2] + '">' + esc(T('lane.more', { n: ln.count - shown.length })) + '</button>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
       }).join('') + '</div></section>';
@@ -250,6 +254,11 @@
     idx.filter(function (v, i, a) { return a.indexOf(v) === i; }).forEach(function (i) { svg += '<text x="' + (L + i * step + step / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="' + (i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle')) + '" class="st-ax">' + esc(shortDay(pts[i].d)) + '</text>'; });
     return '<svg class="st-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(T('ch.aria.day', { from: shortDay(pts[0].d), to: shortDay(pts[n - 1].d), amount: M(total) })) + '" preserveAspectRatio="none">' + svg + '</svg>';
   }
+  function tileHtml(title, img) {
+    var ini = initials(title);
+    if (!img || !/^https:\/\/images[0-9]*\.vinted\.net\//.test(img)) return '<span class="st-tile2" aria-hidden="true">' + esc(ini) + '</span>';
+    return '<span class="st-tile2 has-ph" aria-hidden="true" data-ini="' + esc(ini) + '"><img class="st-ph" src="' + esc(img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>';
+  }
   function initials(title) { return String(title || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '--'; }
   function todayLabel() {
     var p = today().split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]);
@@ -308,10 +317,11 @@
   function applyTab(hidden) { if (window.SNYPD && window.SNYPD.applyStockTab) window.SNYPD.applyStockTab(hidden); }
   function openLane(id) {
     var known = findRow(id);
-    var go = function (row) { if (!row) return; S.pinned[id] = row; S.opener = $('[data-id="' + id + '"]'); openDetail(id); };
+    var go = function (row) { if (!row) return; if (row.image_url === undefined) row.image_url = laneImage(id); S.pinned[id] = row; S.opener = $('[data-id="' + id + '"]'); openDetail(id); };
     if (known) { go(known); return; }
     S.api.itemById(id).then(go).catch(function (e) { showBar(errMsg(e), false); });
   }
+  function laneImage(id) { var L = (S.ov && S.ov.lanes) || {}, hit = null; ['reprice', 'list', 'follow', 'hold'].forEach(function (k) { ((L[k] && L[k].items) || []).forEach(function (it) { if (it.id === id && it.image_url) hit = it.image_url; }); }); return hit; }
   function laneAct(a, id, opener) {
     var go = function (row) { if (!row) return; S.pinned[id] = row; S.opener = opener || null; runDetailAction(a, id); };
     var known = findRow(id);
@@ -354,6 +364,7 @@
   function apiFilters() {
     var f = S.f, o = {};
     if (f.fix) o.status = ['sold']; else if (f.status) o.status = f.status;
+    if (f.sort && S.sortOk) o.sort = f.sort;
     if (f.q) o.q = f.q;
     if (f.condition) o.condition = [f.condition];
     if (f.category) o.category = f.category;
@@ -369,6 +380,7 @@
     renderBody();
     return S.api.itemsPage(apiFilters(), S.f.fix ? 200 : 50, reset ? null : S.next).then(function (p) {
       if (req !== S.req) return;
+      if (p.rows.length && !('image_url' in p.rows[0]) && S.sortOk) { S.sortOk = false; var so = $('#st-sort'); if (so) so.style.display = 'none'; if (S.f.sort === 'oldest') { S.f.sort = 'newest'; return load(true); } }   // before 071: newest order only
       S.rows = reset ? p.rows : S.rows.concat(p.rows); S.next = p.next_cursor; S.total = p.total; S.loading = false; renderBody();
     }).catch(function (e) { if (req !== S.req) return; S.loading = false; S.err = e; renderBody(); });
   }
@@ -425,7 +437,7 @@
     var pop = r.status === 'sold' ? pTxt : (r.list_cents != null ? esc(M(r.list_cents)) : '<span class="st-miss">--</span>');
     var last = S.f.deleted ? '<button type="button" class="st-btn st-ghost" data-act="restore" data-id="' + esc(r.id) + '">' + esc(T('act.restore')) + '</button>' : esc(r.platform ? T('plat.' + r.platform) : '--');
     return '<div class="st-row" role="row" tabindex="0" data-act="open" data-id="' + esc(r.id) + '">' +
-      '<div class="c-item st-itemc"><span class="st-tile2" aria-hidden="true">' + esc(initials(r.title)) + '</span><span class="st-item"><b>' + esc(r.title) + '</b>' + (sub ? '<span class="st-sub">' + sub + '</span>' : '') + '</span></div>' +
+      '<div class="c-item st-itemc">' + tileHtml(r.title, r.image_url) + '<span class="st-item"><b>' + esc(r.title) + '</b>' + (sub ? '<span class="st-sub">' + sub + '</span>' : '') + '</span></div>' +
       '<div class="c-status"><span class="st-tag ' + esc(r.status) + '">' + esc(statusLabel(r.status)) + '</span>' + (stale ? ' <span class="st-tag stale">' + esc(T('tag.stale')) + '</span>' : '') + '</div>' +
       '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + esc(M(cost)) + '</div>' +
       '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-pop st-num">' + pop + '</div>' +
@@ -686,7 +698,8 @@
       fld('link', T('f.link'), txt('link', it.link, '', ' maxlength="500"'), 'full') + fld('notes', T('f.notes'), '<textarea class="st-in" id="sf-notes" rows="3" maxlength="2000" style="height:auto;padding:8px 12px">' + esc(it.notes || '') + '</textarea>', 'full') + '</div>';
     var extra = (it.returned_on ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '') + (it.claim_id ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.claim')) + '</p>' : '');
     var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('close')) + '</button><button type="button" class="st-btn st-prim" data-act="save-detail" data-id="' + esc(it.id) + '" id="st-go">' + esc(T('save')) + '</button>';
-    mountSheet(it.title, '<div id="st-sheet-err"></div><span class="st-tag ' + esc(it.status) + '" style="margin-bottom:12px">' + esc(statusLabel(it.status)) + '</span>' + facts + acts + form + extra + '<div class="st-h3">' + esc(T('detail.history')) + '</div><ul class="st-tl" id="st-tl"><li>...</li></ul>', foot);
+    var photo = it.image_url && /^https:\/\/images[0-9]*\.vinted\.net\//.test(it.image_url) ? '<div class="st-dphoto" data-ini=""><img class="st-ph" src="' + esc(it.image_url) + '" alt="' + esc(T('detail.photo')) + '" decoding="async" referrerpolicy="no-referrer"></div>' : '';
+    mountSheet(it.title, '<div id="st-sheet-err"></div>' + photo + '<span class="st-tag ' + esc(it.status) + '" style="margin-bottom:12px">' + esc(statusLabel(it.status)) + '</span>' + facts + acts + form + extra + '<div class="st-h3">' + esc(T('detail.history')) + '</div><ul class="st-tl" id="st-tl"><li>...</li></ul>', foot);
     S.api.itemHistory(it.id).then(function (h) { if (!S.sheet || S.sheet.item.id !== it.id) return; var ul = $('#st-tl'); if (ul) ul.innerHTML = h.length ? h.map(histHtml).join('') : '<li>' + esc(T('detail.history.none')) + '</li>'; }).catch(function () { var ul = $('#st-tl'); if (ul) ul.innerHTML = '<li>' + esc(T('err.load')) + '</li>'; });
     var f = $('.st-sheet .st-btn'); if (f) f.focus();
   }

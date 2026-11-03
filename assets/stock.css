@@ -328,3 +328,9 @@ select.st-in { padding-right: 8px; }
   .st-tools > :not(.st-search):not(.st-toolsbtn) { display: none; }
   .st-tools.open > :not(.st-search):not(.st-toolsbtn):not(.st-count) { display: revert; }
 }
+/* 071: claim photos + sort */
+.st-tile2.has-ph { overflow: hidden; padding: 0; }
+.st-tile2 .st-ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+.st-dphoto { margin: 0 0 14px; max-width: 220px; aspect-ratio: 3 / 4; overflow: hidden; border: 1px solid var(--st-line); background: var(--st-hd); }
+.st-dphoto .st-ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 720px) { .st-tools #st-sort { grid-column: 1 / -1; } }

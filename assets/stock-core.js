@@ -133,7 +133,7 @@
     stock_date_in_future: 'validation', stock_rows_must_be_array: 'validation', stock_title_required: 'validation', stock_bad_status: 'validation', stock_quantity_range: 'validation',
     stock_sold_needs_date: 'validation', stock_batch_too_large: 'validation', stock_import_id_required: 'validation', stock_reprice_must_lower: 'validation',
     stock_sold_before_bought: 'validation', stock_bad_destination: 'validation', stock_write_off_reason_required: 'validation', stock_return_before_sale: 'validation',
-    stock_patch_must_be_object: 'validation', stock_bad_period: 'validation'
+    stock_patch_must_be_object: 'validation', stock_bad_period: 'validation', stock_bad_sort: 'validation'
   };
   class StockError extends Error {
     constructor(info) { super(info.message || info.code); this.name = 'StockError'; this.code = info.code; this.kind = info.kind; this.detail = info.detail || null; this.constraint = info.constraint || null; this.retryable = !!info.retryable; this.raw = info.raw || null; }
