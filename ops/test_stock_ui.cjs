@@ -114,7 +114,12 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
 
   await openFirst(); await act('do', '[data-do="list"]'); await setv('#sf-platform', 'vinted'); await setv('#sf-list', '80'); await act('submit');
   ok(/LISTED/i.test(await firstRow()) && /80\.00/.test(await firstRow()), 'listed: ' + await firstRow());
-  await openFirst(); await act('do', '[data-do="reprice"]'); await setv('#sf-newprice', '90'); await act('submit');
+  await openFirst(); await act('do', '[data-do="reprice"]');
+  eq(await page.evaluate(() => [document.getElementById('sf-newprice').value, [...document.querySelectorAll('[data-act="rp"]')].map(b => b.textContent + (b.getAttribute('aria-pressed') === 'true' ? '*' : ''))]),
+    ['72.00', ['-5%', '-10%*', '-20%']], 'Lower the price opens with 10% off (80.00 -> 72.00) and -5 / -10 / -20% chips');
+  await page.evaluate(() => document.querySelector('[data-act="rp"][data-pct="20"]').click()); await wait(150);
+  eq(await page.evaluate(() => [document.getElementById('sf-newprice').value, document.getElementById('st-rp-hint').textContent]), ['64.00', 'Suggested: 20% under the current price, rounded down. Change it if you like.'], 'the -20% chip fills 64.00 and says so');
+  await setv('#sf-newprice', '90'); await act('submit');
   ok((await page.$eval('.st-fe[data-for="newprice"]', e => e.innerText)).length > 0, 'a higher price is refused inline');
   await setv('#sf-newprice', '70'); await act('submit'); ok(/70\.00/.test(await firstRow()), 'repriced: ' + await firstRow());
   await openFirst(); await act('do', '[data-do="reserve"]'); ok(/RESERVED/i.test(await firstRow()), 'reserved');

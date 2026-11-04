@@ -612,6 +612,13 @@ test('A migration 072 in the engine: P&L months = the design numbers and the Ove
   assert.equal((await a.api.expensesMonth('2026-09-01')).total, 500, 'undo puts it back');
 });
 
+test('A reprice suggestion: pct lower, rounded down (whole units from 10.00, 0.10 below), always above 0 and below the price', () => {
+  const s = core.suggestLower;
+  assert.deepEqual([s(8500, 10), s(8000, 10), s(8000, 20), s(1200, 10), s(1200, 5), s(999, 10), s(150, 10), s(10, 10), s(0, 10), s(null, 10), s(5000, 0), s(5000, 100)],
+    [7600, 7200, 6400, 1000, 1100, 890, 130, null, null, null, null, null]);
+  for (let c = 1; c <= 20000; c += 7) for (const p of [5, 10, 20]) { const v = s(c, p); if (v != null) assert.ok(v > 0 && v < c && v <= Math.floor(c * (100 - p) / 100) && (v >= 1000 ? v % 100 === 0 : v % 10 === 0), 'c=' + c + ' p=' + p + ' v=' + v); }
+});
+
 // bundle entry: one price for several items
 test('A bundle split: rows always add up to the total exactly, leftover cents go to the first rows, typed costs are kept, over / mismatch refused', () => {
   const sp = core.splitCents;

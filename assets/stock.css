@@ -28,6 +28,7 @@
 .st-search { flex: 1 1 220px; max-width: 360px; }
 select.st-in { padding-right: 8px; }
 .st-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.st-rpc { margin: 4px 0 0; }
 .st-chip { font: inherit; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; height: 32px; padding: 0 12px; border: 1px solid var(--st-line); background: rgba(255,255,255,.05); color: var(--st-text2); cursor: pointer; }
 .st-chip[aria-pressed="true"] { background: var(--st-ok); color: var(--bg, #0B0C0D); border-color: var(--st-ok); }
 .st-count { font-size: 11px; color: var(--st-muted); margin-left: auto; }

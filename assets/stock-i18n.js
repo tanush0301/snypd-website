@@ -528,7 +528,10 @@ window.SNYPD_STOCK_STR = {
   "set.weekly": "Weekly summary email (Mondays)",
   "set.weekly.hint": "Last week\u2019s profit, your stock and what to do first, every Monday morning.",
   "set.weekly.on": "Weekly email on.",
-  "set.weekly.off": "Weekly email off. You can switch it back on here."
+  "set.weekly.off": "Weekly email off. You can switch it back on here.",
+  "rp.chips": "Lower by",
+  "rp.chip": "-{p}%",
+  "rp.hint": "Suggested: {p}% under the current price, rounded down. Change it if you like."
  },
  "fr": {
   "tab": "Stock",
@@ -1058,6 +1061,9 @@ window.SNYPD_STOCK_STR = {
   "set.weekly": "E-mail r\u00e9capitulatif du lundi",
   "set.weekly.hint": "Le b\u00e9n\u00e9fice de la semaine, ton stock et quoi faire en premier, chaque lundi matin.",
   "set.weekly.on": "E-mail du lundi activ\u00e9.",
-  "set.weekly.off": "E-mail du lundi d\u00e9sactiv\u00e9. Tu peux le r\u00e9activer ici."
+  "set.weekly.off": "E-mail du lundi d\u00e9sactiv\u00e9. Tu peux le r\u00e9activer ici.",
+  "rp.chips": "Baisser de",
+  "rp.chip": "-{p}\u00a0%",
+  "rp.hint": "Suggestion\u00a0: {p}\u00a0% de moins que le prix actuel, arrondi vers le bas. Tu peux le modifier."
  }
 };
