@@ -472,6 +472,10 @@
       case 'mo-next': if (S.mo.month < monthStart(today())) { S.mo.month = monthShift(S.mo.month, 1); loadMoney(); } break;
       case 'mo-repeat': repeatLastMonth(el); break;
       case 'mo-csv': exportPnl(); break;
+      case 'rp': { var rit = S.sheet && S.sheet.item, rp = parseInt(el.getAttribute('data-pct'), 10), rv = rit ? C.suggestLower(rit.list_cents, rp) : null;
+        if (rv != null) { var rf = $('#sf-newprice'); if (rf) rf.value = moneyText(rv); Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act="rp"]'), function (b) { b.setAttribute('aria-pressed', b === el ? 'true' : 'false'); });
+          var rh = $('#st-rp-hint'); if (rh) rh.textContent = T('rp.hint', { p: rp }); var re = S.panel.querySelector('.st-fe[data-for="newprice"]'); if (re) re.textContent = ''; }
+        break; }
       case 'b-add': bundleAddRow(null, true); break;
       case 'b-del': bundleDelRow(+el.getAttribute('data-i')); break;
       case 'import': S.opener = el; openImport(); break;
@@ -572,7 +576,7 @@
     var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button>' +
       (kind === 'add' ? '<button type="button" class="st-btn st-ghost" data-act="submit-next">' + esc(T('sheet.add.next')) + '</button>' : '') + (kind === 'sold' ? '<button type="button" class="st-btn st-ghost" data-act="submit-noprice">' + esc(T('sheet.sold.none')) + '</button>' : '') +
       '<button type="button" class="st-btn ' + (kind === 'wo' ? 'st-danger' : 'st-prim') + '" data-act="submit" id="st-go">' + esc(T(go)) + '</button>';
-    mountSheet(T(title) + (item ? ': ' + item.title : ''), '<div id="st-sheet-err"></div>' + body, foot);
+    mountSheet(T(title) + (item ? (lang === 'fr' ? String.fromCharCode(160) : '') + ': ' + item.title : ''), '<div id="st-sheet-err"></div>' + body, foot);
     var first = $('.st-sheet input:not([type=hidden]), .st-sheet select'); if (first) first.focus();
     if (kind === 'sold') { var upd = function () { previewSold(); }; Array.prototype.forEach.call(S.panel.querySelectorAll('#sf-sold, #sf-ship, #sf-fee'), function (i) { i.addEventListener('input', upd); }); $('#sf-platform').addEventListener('change', upd); upd(); }
     if (kind === 'returned') { var dest = function () { var wo = S.panel.querySelector('input[name=dest]:checked').value === 'wo'; $('#sf-reason-wrap').style.display = wo ? '' : 'none'; }; Array.prototype.forEach.call(S.panel.querySelectorAll('input[name=dest]'), function (i) { i.addEventListener('change', dest); }); dest(); }
@@ -608,7 +612,12 @@
         fld('bought', T('f.bought'), dat('bought', t0, t0)) + fld('buy', T('f.buy'), mny('buy')) + fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint" id="st-addlog" aria-live="polite">' + esc(T('sheet.add.log0')) + '</p><p class="st-hint">' + esc(T('sheet.add.keys')) + '</p><p class="st-hint">' + esc(T('sheet.add.hint')) + '</p>';
     }
     if (kind === 'list') return '<div class="st-form">' + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('list', T('f.list'), mny('list', it.list_cents)) + fld('listed', T('f.listed'), dat('listed', t0, t0)) + '</div>';
-    if (kind === 'reprice') return '<div class="st-form"><div class="st-f full"><span class="st-lbl">' + esc(T('f.list')) + '</span><b>' + esc(M(it.list_cents)) + '</b></div>' + fld('newprice', T('f.newprice'), mny('newprice'), 'full') + '</div>';
+    if (kind === 'reprice') {
+      var rpc = [5, 10, 20].filter(function (p) { return C.suggestLower(it.list_cents, p) != null; });
+      return '<div class="st-form"><div class="st-f full"><span class="st-lbl">' + esc(T('f.list')) + '</span><b>' + esc(M(it.list_cents)) + '</b></div>' + fld('newprice', T('f.newprice'), mny('newprice', C.suggestLower(it.list_cents, 10)), 'full') +
+        (rpc.length ? '<div class="st-f full st-rp"><span class="st-lbl">' + esc(T('rp.chips')) + '</span><div class="st-chips st-rpc">' + rpc.map(function (p) { return '<button type="button" class="st-chip" data-act="rp" data-pct="' + p + '" aria-pressed="' + (p === 10) + '">' + esc(T('rp.chip', { p: p })) + '</button>'; }).join('') + '</div>' +
+          (rpc.indexOf(10) >= 0 ? '<p class="st-hint" id="st-rp-hint">' + esc(T('rp.hint', { p: 10 })) + '</p>' : '') + '</div>' : '') + '</div>';
+    }
     if (kind === 'sold') {
       var plat0 = it.platform || S.lastPlat || 'vinted';
       return '<p class="st-d" id="st-soldctx">' + esc(soldCtx(it)) + '</p><div class="st-form">' + fld('sold', T('f.sold'), mny('sold', it.list_cents), 'full') + fld('soldon', T('f.soldon'), dat('soldon', t0, t0)) + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(plat0) + '</select>') + fld('fee', T('f.fee.sale'), mny('fee'), 'full') + fld('ship', T('f.ship'), mny('ship'), 'full') + '</div><div class="st-prev" id="st-prev" style="margin-top:14px"></div><p class="st-hint" id="st-feenote"></p><p class="st-hint">' + esc(T('sold.formula')) + '</p>';

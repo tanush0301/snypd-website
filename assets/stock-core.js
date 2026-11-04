@@ -291,9 +291,16 @@
     free.forEach(i => { out[i] = base + (extra > 0 ? 1 : 0); if (extra > 0) extra--; });
     return { ok: true, cents: out, rest };
   }
+  // reprice suggestion: pct lower than the current price, rounded DOWN to a whole unit from 10.00 up (to 0.10 below 10.00);
+  // always above 0 and below the current price, else null (no lower price to suggest)
+  function suggestLower(cents, pct) {
+    if (!(cents > 0) || !(pct > 0 && pct < 100)) return null;
+    const raw = Math.floor(cents * (100 - pct) / 100), step = raw >= 1000 ? 100 : 10, v = Math.floor(raw / step) * step;
+    return v > 0 && v < cents ? v : null;
+  }
   function templateCsv(lang) { const l = lang === 'fr' ? 'fr' : 'en'; return U(0xfeff) + TEMPLATE_HEAD[l].join(l === 'fr' ? ';' : ',') + '\r\n'; }
 
   return { STATUSES, HELD, PLATFORMS, CONDITIONS, WRITE_OFF_REASONS, SRC_TYPES, CURRENCIES, PERSONAS, PERIODS, DEFAULT_CATEGORY_KEYS, CAPS, LOCALES, MINUS, CODE_KIND,
     formatMoney, moneyLabel, parseMoneyInput, localToday, daysBetween, isHeld, costCents, ageDays, isOld, saleProfitCents, viewOverview, freeCapState,
-    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD, splitCents, EXPENSE_CATEGORIES };
+    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD, splitCents, suggestLower, EXPENSE_CATEGORIES };
 });

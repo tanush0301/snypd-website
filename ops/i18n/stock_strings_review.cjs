@@ -97,7 +97,11 @@ const en = {
   'set.weekly': 'Weekly summary email (Mondays)',
   'set.weekly.hint': 'Last week’s profit, your stock and what to do first, every Monday morning.',
   'set.weekly.on': 'Weekly email on.',
-  'set.weekly.off': 'Weekly email off. You can switch it back on here.'
+  'set.weekly.off': 'Weekly email off. You can switch it back on here.',
+  // reprice suggestion (4 Nov)
+  'rp.chips': 'Lower by',
+  'rp.chip': '-{p}%',
+  'rp.hint': 'Suggested: {p}% under the current price, rounded down. Change it if you like.'
 };
 const fr = {
   'status.stock': 'Pas en vente', 'chip.held': 'En stock',
@@ -192,6 +196,10 @@ const fr = {
   'set.weekly': 'E-mail récapitulatif du lundi',
   'set.weekly.hint': 'Le bénéfice de la semaine, ton stock et quoi faire en premier, chaque lundi matin.',
   'set.weekly.on': 'E-mail du lundi activé.',
-  'set.weekly.off': 'E-mail du lundi désactivé. Tu peux le réactiver ici.'
+  'set.weekly.off': 'E-mail du lundi désactivé. Tu peux le réactiver ici.',
+  // reprice suggestion (4 Nov)
+  'rp.chips': 'Baisser de',
+  'rp.chip': '-{p} %',
+  'rp.hint': 'Suggestion : {p} % de moins que le prix actuel, arrondi vers le bas. Tu peux le modifier.'
 };
 module.exports = { en, fr };
