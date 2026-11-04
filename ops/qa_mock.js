@@ -556,12 +556,28 @@
           query: q, sample_size: 0, display_verdict: 'too_thin', show_headline: false, quota: { hour_remaining: 19, hour_limit: 20 },
         }), { status: 200 }));
       }
+      // Forgiving search (Session 66): the backend says what it compared on and what it ignored. Mirrors the
+      // real shape for "size N" queries, "keep" (add back) and one "Try without" case (q containing "travis").
+      var mkWords = q.split(/\s+/).filter(Boolean), mkIgn = [], mkOn = [], mkKeep = (body.keep || []).map(function (k) { return String(k).toLowerCase(); });
+      for (var mi = 0; mi < mkWords.length; mi++) {
+        var mw = mkWords[mi].replace(/[^a-z0-9]/g, '');
+        if (!mw) continue;
+        if (mkKeep.indexOf(mw) === -1 && (mw === 'size' || (mi > 0 && mkWords[mi - 1] === 'size') || mw === 'black')) mkIgn.push({ word: mw, why: mw === 'black' ? 'colour' : 'size' });
+        else mkOn.push(mw);
+      }
+      var mkSearch = { compared_on: mkOn, ignored: mkIgn, offer_drop: q.indexOf('travis') !== -1 ? ['travis'] : [], pinned: mkKeep };
+      var mkSource = { site: 'vinted.be', market: 'EU', currency: 'EUR', window_days: 14 };
+      if (q.indexOf('travis') !== -1) {
+        return Promise.resolve(new Response(JSON.stringify({
+          query: q, sample_size: 1, display_verdict: 'too_thin', show_headline: false, search: mkSearch, source: mkSource, quota: { hour_remaining: 18, hour_limit: 20 },
+        }), { status: 200 }));
+      }
       // Default: a normal, trustworthy result. typical_cents is deliberately
       // NOT a round number (EUR273.70) - this is the exact shape that caught
       // Market Insights' own eur() rounding bug (Session 17): a round number
       // like 4500 would pass even with that bug still present.
       return Promise.resolve(new Response(JSON.stringify({
-        query: q || 'jordan 1 mid', sample_size: 5399, distinct_sellers: 812,
+        query: mkOn.join(' ') || 'jordan 1 mid', search: mkSearch, source: mkSource, sample_size: 5399, distinct_sellers: 812,
         display_verdict: 'ok', provisional: false, show_headline: true,
         typical_cents: 27370, range_cents: { low: 3800, high: 5200 },
         by_condition: [

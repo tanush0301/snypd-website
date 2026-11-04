@@ -43,6 +43,14 @@ async function fire(payload, { stored, navLang, cachesBroken }) {
       '1 nouvelle annonce - New listing hunt', 'Touche pour les voir.'],
     [{ title: '12 new matches - jordan 1', body: 'From 45.0 EUR. Tap to see them.' }, { stored: 'en' },
       '12 new matches - jordan 1', 'From 45.0 EUR. Tap to see them.'],
+    // Price check (push.py "rank", Session 66): worded in the user's language, only for 50-100 integers.
+    [Object.assign({ rank: 82 }, two), { stored: 'en' }, '2 new finds', "Cheaper than 82% of this week's finds \u00b7 " + two.body],
+    [Object.assign({ rank: 82 }, two), { stored: 'fr' }, '2 nouvelles trouvailles',
+      'Moins cher que 82\u00a0% des trouvailles de la semaine \u00b7 45.0 EUR \u2014 Nike Air (Nike \u00b7 M) et 1 de plus'],
+    [Object.assign({ rank: 40 }, two), { stored: 'en' }, '2 new finds', two.body],
+    [Object.assign({ rank: '82' }, two), { stored: 'en' }, '2 new finds', two.body],
+    [Object.assign({ rank: 101 }, two), { stored: 'en' }, '2 new finds', two.body],
+    [Object.assign({ rank: 90 }, one), { cachesBroken: true, navLang: 'en-US' }, 'New find', "Cheaper than 90% of this week's finds \u00b7 New listing"],
   ];
   let bad = 0;
   for (const [payload, env, wantT, wantB] of cases) {
