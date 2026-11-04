@@ -1110,3 +1110,26 @@ FR_PATTERNS += [
     (r"^Pricier than (\d+)% of this hunt's finds this week$", 'Plus cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
     (r'^same condition · (\d+) finds compared$', 'même état · $1 annonces comparées'),
 ]
+
+# ---------------------------------------------------------------- Market price fix (Session 66, 4 Nov 2026)
+FR.update({
+    'Compared on:': 'Comparé sur' + NB + ':',
+    'Ignored (tap to add back):': 'Ignoré (touche pour remettre)' + NB + ':',
+    'Too few listings with every word. Try without:': 'Trop peu d’annonces avec tous ces mots. Essaie sans' + NB + ':',
+    'size': 'taille', 'colour': 'couleur', 'year': 'année', 'condition': 'état', 'filler': 'mot vide',
+    'not in our listings': 'absent de nos annonces', 'left out to find more': 'retiré pour trouver plus',
+    'Quick sale': 'Vente rapide', 'Typical': 'Typique', 'Patient': 'Patient',
+    'Asking prices, not sold prices.': 'Prix demandés, pas les prix réellement payés.',
+    'Pay at most': 'Paie au maximum', 'to keep a': 'pour garder une marge de',
+    '% margin at the typical asking price.': NB + '% au prix demandé typique.',
+    '(this item)': '(cet article)',
+    'Price check': 'Vérifier le prix',
+    'Price checks are part of Pro and Elite.': 'La vérification des prix fait partie de Pro et Elite.',
+})
+FR_PATTERNS += [
+    (r'^For this condition \((.+)\)\. Asking prices, not sold prices\.$', 'Pour cet état ($1). Prix demandés, pas les prix réellement payés.'),
+    (r'^Asking prices on (\S+) \(EU listings\), in ([A-Z]{3}), last (\d+) days\.$',
+     'Prix demandés sur $1 (annonces UE), en $2, $3 derniers jours.'),
+    (r'^Asking prices on (\S+) \(EU listings\), in ([A-Z]{3}), last (\d+) days\. Your feed has listings from (.+): these prices are not from there\.$',
+     'Prix demandés sur $1 (annonces UE), en $2, $3 derniers jours. Ton flux contient des annonces de $4' + NB + ': ces prix n’en viennent pas.'),
+]
