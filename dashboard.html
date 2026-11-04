@@ -1020,6 +1020,29 @@ body {
 .card:hover { border-color: var(--border-hover); }
 
 .card-actions { display: flex; gap: 8px; margin-top: 10px; }
+/* Price check (Session 66, outreach/36): the scraper rates each find against what the same hunt found in the last
+   7 days in the same condition (item_box.snypd_price {p, n, c}). Paid plans and the trial see every line; Free sees
+   the line on the best-rated card only (.pr-open) and a lock on the others. */
+.pr-line { display: flex; flex-direction: column; gap: 1px; font-size: 12px; line-height: 1.35; color: var(--success); }
+.pr-line--hi { color: var(--text-secondary); }
+.pr-line__sub { font-size: 11px; color: var(--text-muted); }
+.pr-lock { display: none; align-self: flex-start; font-size: 11px; color: var(--text-muted); border: 1px dashed var(--border3); padding: 2px 8px; text-decoration: none; }
+.pr-lock::before { content: "\1F512\00A0"; }
+.pr-lock:hover { color: var(--text-primary); }
+body.pr-free .card[data-pr] .pr-line { display: none; }
+body.pr-free .card[data-pr] .pr-lock { display: inline-block; }
+body.pr-free .card.pr-open .pr-line { display: flex; }
+body.pr-free .card.pr-open .pr-lock { display: none; }
+body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-cheap] { border-color: rgba(0, 229, 160, 0.45); }
+.pr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 12px; }
+.pr-bar__lbl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-right: 2px; }
+.pr-chip { font: inherit; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; background: transparent; color: var(--text-secondary); border: 1px solid var(--border3); padding: 6px 10px; min-height: 32px; cursor: pointer; }
+.pr-chip.on { color: var(--text-primary); border-color: var(--text-primary); }
+.pr-chip.is-locked { opacity: 0.55; }
+.pr-chip.is-locked::after { content: "\00A0\1F512"; }
+.pr-bar__free { font-size: 11px; color: var(--text-muted); }
+.list.pr-cheap-only .card:not([data-pr-cheap]) { display: none; }
+.pr-empty { font-size: 12px; color: var(--text-muted); padding: 8px 0; }
 .card-actions .btn {
   height: 30px;
   padding: 0 12px;
@@ -2044,6 +2067,14 @@ body {
   <a href="#" data-dismiss-hint style="margin-left:8px;text-transform:uppercase;letter-spacing:0.08em;font-size:11px">Got it</a>
 </div>
 <div class="empty" id="empty" style="display:none">No results yet. Press “Start Sniping Now”.</div>
+<div class="pr-bar" id="pr-bar" style="display:none">
+<span class="pr-bar__lbl">Sort</span>
+<button type="button" class="pr-chip on" data-pr-sort="new">Newest</button>
+<button type="button" class="pr-chip" data-pr-sort="best">Best price first</button>
+<button type="button" class="pr-chip" id="pr-cheap">Cheapest 25% only</button>
+<a class="pr-bar__free" id="pr-bar-free" href="/plans" style="display:none">Price checks on every find: Solo and up</a>
+</div>
+<div class="pr-empty" id="pr-empty" style="display:none">No find in the cheapest 25% right now.</div>
 <div class="list" id="list">
 <div class="skeleton"></div>
 <div class="skeleton"></div>
@@ -2644,6 +2675,10 @@ const HEARTBEAT_URL = (() => {
   const eliteBanner = document.getElementById('elite-banner');
   // All paid plans run 24/7 (PAID_PLANS-gated), so this is a Free-only nudge.
   if (eliteBanner) eliteBanner.style.display = (effectivePlan === 'free') ? '' : 'none';
+  // Price check (Session 66): every line for paid plans and during the trial; Free gets one open card (see .pr-free).
+  // Presentation only: the rating sits in the user's own feed rows either way.
+  document.body.classList.toggle('pr-free', effectivePlan === 'free' &&
+    !(profile.free_trial_started_at && trialEndMs(profile) > Date.now()));
   // Trial end (migration 061, 20 Oct 2026): users.trial_ends_at. New trials are
   // 72 h (+48 h once if the hunt found nothing); every trial that started
   // before 061 is start + 7 days, which is also the fallback when the column
@@ -5328,8 +5363,17 @@ const HEARTBEAT_URL = (() => {
     // you cannot buy something that is no longer listed.
     const isGone = r.is_visible === false;
 
+    // Price check: written by the scraper (price_rank.py) only when the hunt has >= 30 finds in this condition this week
+    // and they are not too mixed. "Cheaper than p%" = share of those finds asking more; below 50 it reads "Pricier than".
+    const sp = r.item_box && r.item_box.snypd_price;
+    const prP = sp && Number.isInteger(sp.p) && sp.p >= 0 && sp.p <= 100 && Number.isInteger(sp.n) && sp.n >= 30 && !isGone ? sp.p : null;
+    const prHtml = prP == null ? '' :
+      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prP >= 50 ? 'Cheaper than ' + prP : 'Pricier than ' + (100 - prP)}% of this hunt's finds this week</span>` +
+      `<span class="pr-line__sub">same condition &middot; ${sp.n} finds compared</span></div>` +
+      `<a class="pr-lock" href="/plans">Price check &middot; Solo and up</a>`;
+
     return `
-      <div class="card${isGone ? ' is-gone' : ''}"
+      <div class="card${isGone ? ' is-gone' : ''}"${prP == null ? '' : ` data-pr="${prP}"${prP >= 75 ? ' data-pr-cheap' : ''}`}
          data-id="${r.listing_id}"
          data-uploaded-ms="${uploadedMs}">
         <div class="thumb-wrap">${imgHtml}${isGone ? '' : badge}</div>
@@ -5350,6 +5394,7 @@ const HEARTBEAT_URL = (() => {
           <div class="muted" title="${esc(fullLabel)}">
             ${[brand, size, status, src, (knownUploadMs ? '' : 'Seen ') + relativeTime(uploadedMs)].filter(Boolean).map(esc).join(' • ')}
           </div>
+          ${prHtml}
           <div class="card-actions">
             <a class="btn btn-ghost card-link" href="${esc(vintedListingUrl(r))}" target="${vintedLinkTarget()}" rel="noopener external">Open on Vinted</a>
             ${isGone
@@ -7154,6 +7199,70 @@ const HEARTBEAT_URL = (() => {
    * whichever arrives first: the event, or an already-set attribute. */
   document.addEventListener('snypd:plan', function (e) { applyPlan(e.detail); });
   if (document.body.dataset.plan) { applyPlan(document.body.dataset.plan); }
+})();
+</script>
+<script>
+/* Price check bar (Session 66, outreach/36): sorts and filters the cards already on screen by their rating (data-pr),
+   so the feed's own loading, "new" insertion and Show more stay untouched. Free: sort/filter are locked and only
+   the best-rated card shows its line (.pr-open). Choices are remembered per browser. */
+(function () {
+  var list = document.getElementById('list'), bar = document.getElementById('pr-bar');
+  var cheapBtn = document.getElementById('pr-cheap'), freeLink = document.getElementById('pr-bar-free'), empty = document.getElementById('pr-empty');
+  if (!list || !bar || !cheapBtn) return;
+  var mode = 'new', cheap = false, busy = false, queued = false;
+  try { mode = localStorage.getItem('snypd_pr_sort') === 'best' ? 'best' : 'new'; cheap = localStorage.getItem('snypd_pr_cheap') === '1'; } catch (e) {}
+  function save() { try { localStorage.setItem('snypd_pr_sort', mode); localStorage.setItem('snypd_pr_cheap', cheap ? '1' : '0'); } catch (e) {} }
+  function isFree() { return document.body.classList.contains('pr-free'); }
+  function rank(c) { var v = c.getAttribute('data-pr'); return v == null ? -1 : Number(v); }
+  function upMs(c) { return Number(c.getAttribute('data-uploaded-ms')) || 0; }
+  function apply() {
+    queued = false;
+    if (busy) return;
+    busy = true;
+    try {
+      var cards = Array.prototype.filter.call(list.children, function (c) { return c.classList && c.classList.contains('card'); });
+      var rated = cards.filter(function (c) { return c.hasAttribute('data-pr'); });
+      var free = isFree();
+      bar.style.display = rated.length ? '' : 'none';
+      var best = null;
+      rated.forEach(function (c) { c.classList.remove('pr-open'); if (!best || rank(c) > rank(best)) best = c; });
+      if (free && best) best.classList.add('pr-open');
+      var m = free ? 'new' : mode, ch = !free && cheap;
+      Array.prototype.forEach.call(bar.querySelectorAll('[data-pr-sort]'), function (b) {
+        b.classList.toggle('on', b.getAttribute('data-pr-sort') === m);
+        b.classList.toggle('is-locked', free && b.getAttribute('data-pr-sort') === 'best');
+      });
+      cheapBtn.classList.toggle('on', ch);
+      cheapBtn.classList.toggle('is-locked', free);
+      if (freeLink) freeLink.style.display = free ? '' : 'none';
+      list.classList.toggle('pr-cheap-only', ch);
+      if (empty) empty.style.display = ch && rated.length && !cards.some(function (c) { return c.hasAttribute('data-pr-cheap'); }) ? '' : 'none';
+      var order = cards.slice().sort(m === 'best'
+        ? function (a, b) { return (rank(b) - rank(a)) || (upMs(b) - upMs(a)); }
+        : function (a, b) { return upMs(b) - upMs(a); });
+      var same = order.every(function (c, i) { return c === cards[i]; });
+      if (!same && (m === 'best' || list.getAttribute('data-pr-sorted') === '1')) {
+        var anchor = cards[0] ? cards[0].previousSibling : null, frag = document.createDocumentFragment();
+        order.forEach(function (c) { frag.appendChild(c); });
+        list.insertBefore(frag, anchor ? anchor.nextSibling : list.firstChild);
+      }
+      list.setAttribute('data-pr-sorted', m === 'best' ? '1' : '0');
+    } finally {
+      busy = false;
+    }
+  }
+  function soon() { if (!queued) { queued = true; setTimeout(apply, 0); } }
+  new MutationObserver(function () { if (!busy) soon(); }).observe(list, { childList: true });
+  new MutationObserver(soon).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  bar.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pr-sort], #pr-cheap');
+    if (!b) return;
+    if (isFree()) { window.location.href = '/plans'; return; }
+    if (b.id === 'pr-cheap') cheap = !cheap; else mode = b.getAttribute('data-pr-sort');
+    save();
+    apply();
+  });
+  soon();
 })();
 </script>
 </body>

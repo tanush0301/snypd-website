@@ -121,10 +121,14 @@
       {
         id: UID,
         subscription_plan: PLAN,
-        sub_status: PLAN === 'elite' ? 'active' : 'free',
-        billing_provider: PLAN === 'elite' ? 'whop' : null,
-        whop_product_id: PLAN === 'elite' ? 'prod_test123' : null,
-        whop_manage_url: PLAN === 'elite' ? 'https://whop.com/manage' : null,
+        // ?active=1 makes any paid plan (solo, kickstart, pro) an active Whop membership like elite.
+        sub_status: (PLAN === 'elite' || params.get('active') === '1') ? 'active' : 'free',
+        billing_provider: (PLAN === 'elite' || params.get('active') === '1') ? 'whop' : null,
+        whop_product_id: (PLAN === 'elite' || params.get('active') === '1') ? 'prod_test123' : null,
+        whop_manage_url: (PLAN === 'elite' || params.get('active') === '1') ? 'https://whop.com/manage' : null,
+        // ?trial=1: a running 72 h trial (migration 061 columns), 2 days left.
+        free_trial_started_at: params.get('trial') === '1' ? new Date(now - 86400000).toISOString() : null,
+        trial_ends_at: params.get('trial') === '1' ? new Date(now + 2 * 86400000).toISOString() : null,
         is_founding_member: true,
         founding_number: 7,
       },
@@ -294,6 +298,27 @@
         uploaded_ts: Math.floor(t / 1000), uploaded_at_ts: new Date(t).toISOString(), is_visible: true, promoted: false,
       });
     }
+  }
+
+  // ?pr=1: 9 fresh listings of the active seeded hunt carrying the scraper's price check (item_box.snypd_price, Session 66):
+  // ratings 82, 58, -, 80, 23, -, -, 68 and one GONE listing rated 90 (never shown). Same stamp as ?broad=1.
+  if (params.get('pr') === '1' && DB.user_searches[0]) {
+    var u2 = new URL(DB.user_searches[0].vinted_url);
+    var pairs2 = Array.from(u2.searchParams).filter(function (p) { return ['page', 'per_page', 'order', 'time', 'search_id'].indexOf(p[0]) < 0 && p[1]; }).sort();
+    var sig2 = JSON.stringify([u2.hostname.toLowerCase(), u2.pathname.replace(/\/+$/, '') || '/', pairs2]);
+    [[82, 12], [58, 22], [null, 14], [80, 8], [23, 45], [null, 30], [null, 6], [68, 18], [90, 5]].forEach(function (x, i) {
+      var t = now - (2 + 2 * i) * min;
+      var box = { snypd_filter_contract: { version: 1, search: sig2 } };
+      if (x[0] != null) box.snypd_price = { p: x[0], n: 412, c: 'Very good' };
+      DB.current_ads.push({
+        listing_id: 7000 + i, user_id: UID, title: 'Price check QA listing ' + i,
+        price: { amount: x[1], currency_code: 'EUR' }, brand_title: 'Ralph Lauren', size_title: 'M', status: 'Very good',
+        url: 'https://www.vinted.fr/items/' + (7000 + i), content_source: 'search', image_url: '',
+        item_box: box, 'item_box->snypd_filter_contract->>version': '1',
+        fetched_at: new Date(t).toISOString(), created_at: new Date(t).toISOString(),
+        uploaded_ts: Math.floor(t / 1000), uploaded_at_ts: new Date(t).toISOString(), is_visible: i !== 8, promoted: false,
+      });
+    });
   }
 
   function matchRow(row, filters) {
@@ -485,7 +510,7 @@
         var u0 = DB.users[0] || {}, searches = (DB.user_searches || []).slice().sort(function (a, b) { return String(b.created_at).localeCompare(String(a.created_at)); });
         return Promise.resolve({ data: {
           profile: { subscription_plan: u0.subscription_plan, sub_status: u0.sub_status, billing_provider: u0.billing_provider, whop_product_id: u0.whop_product_id, whop_manage_url: u0.whop_manage_url,
-            is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: null, trial_ends_at: null, trial_extended_at: null, pass_expires_at: null },
+            is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: u0.free_trial_started_at || null, trial_ends_at: u0.trial_ends_at || null, trial_extended_at: null, pass_expires_at: null },
           searches: searches, claims: (DB.user_claims || []).slice(), dq: [], xp_total: (DB.xp_events || []).reduce(function (a, x) { return a + (x.xp || 0); }, 0),
           streak: ((DB.user_streak_state || [])[0] || {}).current_streak || null, quota: { quota_limit: PLAN === 'free' ? 1 : 5, used: searches.length },
           stock_mode: STOCK ? STOCK.mode() : undefined, stock_tab_hidden: STOCK ? STOCK.tabHidden() : false }, error: null });

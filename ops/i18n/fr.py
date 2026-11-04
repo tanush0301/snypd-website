@@ -1094,3 +1094,19 @@ FR.update({
     "and check the total before paying.": "et vérifie le total avant de payer.",
     "CONTINUE TO WHOP": "CONTINUER SUR WHOP"
 })
+
+# ---------------------------------------------------------------- price check on Feed cards (Session 66, 4 Nov 2026)
+FR.update({
+    'Sort': 'Trier',
+    'Newest': 'Plus récentes',
+    'Best price first': 'Meilleur prix d’abord',
+    'Cheapest 25% only': 'Les 25' + NB + '% les moins chères',
+    'Price checks on every find: Solo and up': 'Le prix comparé sur chaque trouvaille' + NB + ': dès Solo',
+    'No find in the cheapest 25% right now.': 'Aucune trouvaille dans les 25' + NB + '% les moins chères pour l’instant.',
+    'Price check · Solo and up': 'Prix comparé · dès Solo',
+})
+FR_PATTERNS += [
+    (r"^Cheaper than (\d+)% of this hunt's finds this week$", 'Moins cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
+    (r"^Pricier than (\d+)% of this hunt's finds this week$", 'Plus cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
+    (r'^same condition · (\d+) finds compared$', 'même état · $1 annonces comparées'),
+]
