@@ -315,6 +315,7 @@
   //   ?stock_seed=acceptance loads the frozen design dataset (215 items, 580 history rows): copy ops/stock/acceptance-fixture.json next to the page
   //   ?stock_today=YYYY-MM-DD fixes the engine's "today" (the dataset's own today is 2026-10-27)
   //   ?stock_paid=0          a Free account (25 held items); default follows ?plan=
+  //   ?stock_pre072=1        the engine answers like production before migration 072 (no expense functions, series without expenses)
   //   ?stock_pre071=1        the engine answers like production before migration 071 (Items page ignores sort, rows without image_url)
   //   ?stock_claims=0        no Feed claims (an empty Stock: first-run screen); ?stock_hidden=1 the user already hid the Stock tab
   // Feed claims in this mock's user_claims are mirrored into Stock like trigger 067 does (insert / update / delete).
@@ -322,7 +323,7 @@
   if (window.SnypdStockEngine) {
     STOCK = window.SnypdStockEngine.createEngine({
       uid: UID, mode: params.get('stock') || 'all', admin: PLAN === 'elite', paid: params.get('stock_paid') ? params.get('stock_paid') !== '0' : PLAN !== 'free',
-      searches: DB.user_searches || [], pre071: params.get('stock_pre071') === '1', today: params.get('stock_today') ? function () { return params.get('stock_today'); } : null
+      searches: DB.user_searches || [], pre071: params.get('stock_pre071') === '1', pre072: params.get('stock_pre072') === '1', today: params.get('stock_today') ? function () { return params.get('stock_today'); } : null
     });
     window.__qaStock = STOCK;
     window.SNYPD = window.SNYPD || {}; if (params.get('stock_today')) window.SNYPD.stockToday = function () { return params.get('stock_today'); };   // the page's Stock UI asks for this "today" like the engine does

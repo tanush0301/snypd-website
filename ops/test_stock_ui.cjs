@@ -562,6 +562,58 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     await pg.close();
   }
 
+  // 5j. Money tab (migration 072): one month's expenses, month-by-month P&L, "after expenses" on the Overview, delete + undo, repeat last month, CSV, before 072, French, 390 px
+  {
+    const tstock = p => p.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    const setv2 = (p, sel, v) => p.$eval(sel, (e, v) => { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+    const q = 'plan=elite&stock=all&stock_seed=acceptance&stock_today=2026-10-27&stock_claims=0&lang=';
+    const money = async p => { await clickBy(p, '#stock-panel .st-navb[data-view="money"]'); await p.waitForSelector('#st-pnl', { timeout: 5000 }); await wait5(300); };
+    const cell = (p, month, ix) => p.$eval('#st-pnl tr[data-month="' + month + '"]', (r, ix) => r.children[ix].textContent.trim(), ix);
+    const addExp = async (p, amount, date, cat, note) => { await clickBy(p, '#stock-panel [data-act="exp-add"]'); await p.waitForSelector('#sf-xamount', { timeout: 4000 }); await setv2(p, '#sf-xamount', amount); await setv2(p, '#sf-xdate', date); await setv2(p, '#sf-xcat', cat); if (note) await setv2(p, '#sf-xnote', note); await clickBy(p, '#st-go'); await wait5(900); };
+    pg = await open(q + 'en'); await tstock(pg); await pg.click('#view-tab-stock'); await waitOv(pg); await wait5(400);
+    ok(await pg.$eval('#st-nav-money', e => getComputedStyle(e).display !== 'none') && !(await pg.$('#st-after')), 'Money tab shown once the server has 072; no "after expenses" line while there are none');
+    await money(pg);
+    eq([await tc(pg, '#st-mo-month'), !!(await pg.$('#st-mo-empty')), await pg.$$eval('#st-pnl tbody tr', r => r.length), await pg.$eval('[data-act="mo-next"]', b => b.disabled)], ['October 2026', true, 6, true], 'Money opens on the current month, empty; P&L = the 6 months since the first sale (May-Oct, empty months before it left out); no going past this month');
+    ok(/\u20ac471\.20/.test(await cell(pg, '2026-08', 3)) && /\u20ac504\.10/.test(await cell(pg, '2026-09', 3)) && /\u20ac548\.90/.test(await cell(pg, '2026-10', 3)), 'P&L item profit = the design numbers: Aug 471.20, Sep 504.10, Oct 548.90');
+    await addExp(pg, '12.50', '2026-10-05', 'packaging', 'Mailer bags');
+    ok(/\u20ac12\.50/.test(await tc(pg, '#st-mo-total')) && /Mailer bags/.test(await tc(pg, '.st-mlist')) && /Packaging/.test(await tc(pg, '.st-mlist')), 'expense added: month total, row with category and note');
+    ok(/\u20ac12\.50/.test(await cell(pg, '2026-10', 4)) && /\u20ac536\.40/.test(await cell(pg, '2026-10', 5)), 'P&L October: expenses 12.50, after expenses 548.90 - 12.50 = 536.40');
+    await clickBy(pg, '#stock-panel .st-navb[data-view="overview"]'); await wait5(900);
+    ok(/^\u20ac12\.50 expenses \u00b7 \+\u20ac599\.90 after expenses See Money$/.test(await tc(pg, '#st-after')), 'Overview: 30 days 612.40 - 12.50 = 599.90 after expenses: ' + await tc(pg, '#st-after'));
+    await clickBy(pg, '#st-after [data-view="money"]'); await pg.waitForSelector('#st-pnl', { timeout: 5000 }); await wait5(300);
+    await clickBy(pg, '#stock-panel [data-act="exp-del"]'); await wait5(900);
+    ok(!!(await pg.$('#st-mo-empty')) && /Expense deleted/.test(await tc(pg, '.st-undo')), 'delete: the month is empty again, the bar offers Undo');
+    await clickBy(pg, '#stock-panel [data-act="undo"]'); await wait5(900);
+    ok(/Mailer bags/.test(await tc(pg, '.st-mlist')) && /Expense back/.test(await tc(pg, '.st-undo')), 'Undo puts the expense back');
+    await clickBy(pg, '[data-act="mo-prev"]'); await wait5(700);
+    await addExp(pg, '9.99', '2026-09-30', 'tools', 'Listing tool');
+    eq(await tc(pg, '#st-mo-month'), 'September 2026', 'adding a September expense shows September');
+    await clickBy(pg, '[data-act="mo-next"]'); await wait5(700);
+    await clickBy(pg, '[data-act="mo-repeat"]'); await wait5(1200);
+    ok(/\u20ac22\.49/.test(await tc(pg, '#st-mo-total')) && /Copied 1 expense from September 2026/.test(await tc(pg, '.st-undo')), 'Repeat last month copies September into October: ' + await tc(pg, '#st-mo-total'));
+    eq(await pg.evaluate(() => window.__qaStock.state.expenses.filter(x => x.note === 'Listing tool').map(x => x.spent_on).sort()), ['2026-09-30', '2026-10-27'], 'the copy keeps the day of the month but never lands after today (30 Oct -> 27 Oct)');
+    await clickBy(pg, '#stock-panel [data-act="undo"]'); await wait5(900);
+    ok(/\u20ac12\.50/.test(await tc(pg, '#st-mo-total')) && /Copies removed/.test(await tc(pg, '.st-undo')), 'Undo takes the copies back');
+    await pg.evaluate(() => { window.__csv = null; URL.createObjectURL = b => { window.__csv = b; return 'blob:qa'; }; });
+    await clickBy(pg, '[data-act="mo-csv"]'); await wait5(300);
+    { const csv = await pg.evaluate(() => window.__csv ? window.__csv.text() : ''); const lines = csv.replace(/^\ufeff/, '').trim().split(/\r?\n/);
+      ok(lines[0] === 'Month,Sold,Revenue,Item profit,Expenses,After expenses' && lines.length === 7 && lines.some(l => l === '2026-10,28,1739.00,548.90,12.50,536.40') && lines.some(l => /^2026-08,26,1092\.00,471\.20,0\.00,471\.20$/.test(l)), 'CSV export of the 12 months: ' + lines.slice(0, 3).join(' | ') + ' ... ' + lines.slice(-2).join(' | ')); }
+    await pg.close();
+    // before 072 reaches the database: no Money tab, no after-expenses line, no error
+    pg = await open(q + 'en&stock_pre072=1'); await tstock(pg); await pg.click('#view-tab-stock'); await waitOv(pg); await wait5(600);
+    ok(await pg.$eval('#st-nav-money', e => getComputedStyle(e).display === 'none') && !(await pg.$('#st-after')) && !!(await pg.$('#st-hero-net')), 'before 072: the Money tab stays hidden and the Overview works');
+    await pg.close();
+    // French + phone
+    pg = await open(q + 'fr', { width: 390, height: 844, isMobile: true, hasTouch: true }); await pg.waitForFunction(() => { const t = document.getElementById('bottombar-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    await pg.click('#bottombar-tab-stock'); await waitOv(pg); await wait5(400); await money(pg);
+    await addExp(pg, '12,50', '2026-10-05', 'postage', 'Scotch');
+    { const t = await pg.$eval('#st-money', e => e.innerText), g = await pg.evaluate(() => ({ sw: document.documentElement.scrollWidth, vw: innerWidth, small: [...document.querySelectorAll('#st-money .st-btn, #st-money .st-x')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 43.5).length }));
+      ok(/octobre 2026/i.test(t) && /Mois par mois/i.test(t) && /Fournitures d.envoi/.test(t) && /12,50.\u20ac/.test(t) && !/Expenses|Month by month|Add expense|Revenue|After expenses|Postage/.test(t), 'French Money view: ' + t.replace(/\n+/g, ' | ').slice(0, 260));
+      eq([g.sw <= g.vw, g.small], [true, 0], 'Money at 390 px: no page overflow, every button 44 px');
+      ok(await pg.$eval('#st-pnl', e => e.offsetParent === null) && /oct\. 2026|octobre 2026/i.test(await tc(pg, '#st-pnlcards li[data-month="2026-10"]')) && /Apr\u00e8s d\u00e9penses/i.test(await tc(pg, '#st-pnlcards li[data-month="2026-10"]')), 'phone: month cards instead of the wide table, profit after expenses on each'); }
+    await pg.close();
+  }
+
   // 5g. phone width, English and French: no overflow, every control 44 px
   for (const lng of ['en', 'fr']) {
     pg = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&stock_claims=0&lang=' + lng, { width: 390, height: 844, isMobile: true, hasTouch: true });

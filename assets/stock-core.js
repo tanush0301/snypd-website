@@ -133,7 +133,8 @@
     stock_date_in_future: 'validation', stock_rows_must_be_array: 'validation', stock_title_required: 'validation', stock_bad_status: 'validation', stock_quantity_range: 'validation',
     stock_sold_needs_date: 'validation', stock_batch_too_large: 'validation', stock_import_id_required: 'validation', stock_reprice_must_lower: 'validation',
     stock_sold_before_bought: 'validation', stock_bad_destination: 'validation', stock_write_off_reason_required: 'validation', stock_return_before_sale: 'validation',
-    stock_patch_must_be_object: 'validation', stock_bad_period: 'validation', stock_bad_sort: 'validation'
+    stock_patch_must_be_object: 'validation', stock_bad_period: 'validation', stock_bad_sort: 'validation',
+    stock_expense_cap: 'limit', stock_expense_not_found: 'not_found', stock_expense_date_required: 'validation', stock_amount_range: 'validation', stock_bad_category: 'validation', stock_note_too_long: 'validation'   // 072
   };
   class StockError extends Error {
     constructor(info) { super(info.message || info.code); this.name = 'StockError'; this.code = info.code; this.kind = info.kind; this.detail = info.detail || null; this.constraint = info.constraint || null; this.retryable = !!info.retryable; this.raw = info.raw || null; }
@@ -170,6 +171,11 @@
       lanes: on => call('stock_lanes', { p_today: on || today() }),
       counts: on => call('stock_counts', { p_today: on || today() }),
       overviewSeries: (days, on) => call('stock_overview_series', { p_days: days == null ? null : days, p_today: on || today() }),
+      // 072: expenses + month-by-month P&L
+      addExpenses: rows => call('stock_add_expenses', { p_rows: rows }),
+      deleteExpenses: ids => call('stock_delete_expenses', { p_ids: ids }),
+      expensesMonth: month => call('stock_expenses_month', { p_month: month || today() }),
+      pnl: (months, on) => call('stock_pnl', { p_months: months == null ? 12 : months, p_today: on || today() }),
       itemsPage: (filters, limit, cursor) => call('stock_items_page', { p_filters: filters || {}, p_limit: limit == null ? 50 : limit, p_cursor: cursor || null }),
       addItems: (item, quantity) => call('stock_add_items', { p_item: item, p_quantity: quantity == null ? 1 : quantity }),
       importRows: (importId, rows) => call('stock_import_rows', { p_import_id: importId, p_rows: rows }),
@@ -262,6 +268,9 @@
     }
     return U(0xfeff) + lines.join('\r\n') + '\r\n';
   }
+  // == migration 072: the six expense categories (CHECK on stock_expenses.category)
+  const EXPENSE_CATEGORIES = ['packaging', 'postage', 'promotion', 'tools', 'travel', 'other'];
+
   // ------------------------------------------------------------------ bundle: one price paid for several items
   // splitCents(total, n, locked): locked = { rowIndex: cents } the user typed; the other rows share what is left evenly, the leftover cents going to the
   // first of them (so the rows always add up to the total exactly). reason: 'over' = typed costs exceed the total, 'mismatch' = every row typed, sum != total.
@@ -280,5 +289,5 @@
 
   return { STATUSES, HELD, PLATFORMS, CONDITIONS, WRITE_OFF_REASONS, SRC_TYPES, CURRENCIES, PERSONAS, PERIODS, DEFAULT_CATEGORY_KEYS, CAPS, LOCALES, MINUS, CODE_KIND,
     formatMoney, moneyLabel, parseMoneyInput, localToday, daysBetween, isHeld, costCents, ageDays, isOld, saleProfitCents, viewOverview, freeCapState,
-    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD, splitCents };
+    StockError, parseError, createApi, exportCsv, templateCsv, EXPORT_HEAD, TEMPLATE_HEAD, splitCents, EXPENSE_CATEGORIES };
 });

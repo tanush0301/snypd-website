@@ -46,7 +46,7 @@ const money = (c, lang) => core.formatMoney(c, 'EUR', lang || 'en');
 let sql = null;
 try {
   const dir = path.join(BACKEND, 'ops', 'migrations');
-  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8'), t070: fs.readFileSync(path.join(dir, '070_stock_counts.sql'), 'utf8'), t071: fs.readFileSync(path.join(dir, '071_stock_items_sort_and_photos.sql'), 'utf8') };
+  sql = { t065: fs.readFileSync(path.join(dir, '065_stock_tables.sql'), 'utf8'), t066: fs.readFileSync(path.join(dir, '066_stock_rpcs.sql'), 'utf8'), t067: fs.readFileSync(path.join(dir, '067_stock_claims_mirror.sql'), 'utf8'), t069: fs.readFileSync(path.join(dir, '069_stock_overview_series_and_lane_rows.sql'), 'utf8'), t070: fs.readFileSync(path.join(dir, '070_stock_counts.sql'), 'utf8'), t071: fs.readFileSync(path.join(dir, '071_stock_items_sort_and_photos.sql'), 'utf8'), t072: fs.readFileSync(path.join(dir, '072_stock_expenses.sql'), 'utf8') };
 } catch (e) { sql = null; }
 const listIn = (text, col) => { const m = new RegExp('\\b' + col + '\\s+text[^,]*?check\\s*\\(\\s*' + col + '\\s+in\\s*\\(([^)]*)\\)\\s*\\)').exec(text); assert(m, 'no CHECK list for column ' + col); return [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]); };
 if (sql) {
@@ -79,8 +79,12 @@ if (sql) {
     assert.deepEqual([...sql.t066.matchAll(/\('([a-z]+)', '[^']+', \d+\)/g)].map(m => m[1]), core.DEFAULT_CATEGORY_KEYS);
     assert.deepEqual(Engine.DEFAULT_CATEGORIES.map(c => c[0]), core.DEFAULT_CATEGORY_KEYS);
   });
+  test('C expense categories in stock-core == the CHECK in migration 072', () => {
+    const m = /category\s+text not null check \(category in \(([^)]*)\)\)/.exec(sql.t072); assert(m, 'no category CHECK in 072');
+    assert.deepEqual([...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]), core.EXPENSE_CATEGORIES);
+  });
   test('C every error the SQL raises has a code + kind in stock-core, and the engine raises only codes the SQL raises', () => {
-    const sqlCodes = new Set([...(sql.t065 + sql.t066 + sql.t071).matchAll(/raise exception '(stock_[a-z_]+)'/g)].map(m => m[1]));
+    const sqlCodes = new Set([...(sql.t065 + sql.t066 + sql.t071 + sql.t072).matchAll(/raise exception '(stock_[a-z_]+)'/g)].map(m => m[1]));
     assert(sqlCodes.size >= 20, 'found only ' + sqlCodes.size + ' codes in the SQL');
     assert.deepEqual([...sqlCodes].sort(), Object.keys(core.CODE_KIND).sort(), 'CODE_KIND must list exactly the codes the SQL raises');
     const engSrc = fs.readFileSync(path.join(__dirname, 'stock_engine.js'), 'utf8');
@@ -91,11 +95,11 @@ if (sql) {
   });
   test('C RPC argument names and required arguments in the engine == the SQL function signatures; stock-core calls only those', () => {
     const sigs = {};
-    for (const m of (sql.t066 + sql.t069 + sql.t070).matchAll(/create or replace function public\.(stock_[a-z_]+)\(([^)]*)\)\s*returns/g)) {
+    for (const m of (sql.t066 + sql.t069 + sql.t070 + sql.t072).matchAll(/create or replace function public\.(stock_[a-z_]+)\(([^)]*)\)\s*returns/g)) {
       sigs[m[1]] = m[2].split(',').map(s => s.trim()).filter(Boolean).map(s => ({ name: s.split(/\s+/)[0], required: !/\bdefault\b/i.test(s) }));
     }
     const publicNames = Object.keys(Engine.SIGNATURES);
-    assert.equal(publicNames.length, 17);
+    assert.equal(publicNames.length, 21);
     for (const n of publicNames) {
       assert(sigs[n], 'SQL has no function ' + n);
       assert.deepEqual(Engine.SIGNATURES[n], sigs[n].map(a => a.name), 'argument names of ' + n);
@@ -107,8 +111,8 @@ if (sql) {
     const api = core.createApi(spy, { today: () => '2026-10-27' });
     return Promise.all([api.boot(), api.overview(30), api.lanes(), api.itemsPage({}, 10, null), api.addItems({ title: 'x' }, 1), api.importRows('i', []), api.undoImport('i'), api.setStatus('1', 'listed', { platform: 'vinted', listCents: 1, on: '2026-01-01' }),
       api.markSold('1', { soldCents: 1, on: '2026-01-01', platform: 'vinted', feeCents: 1, shipPaidCents: 1 }), api.markReturned('1', { on: '2026-01-01', refundCents: 1, refundFee: true, returnShipCents: 1, to: 'stock', reason: null }),
-      api.writeOff('1', 'lost', '2026-01-01'), api.editItem('1', {}), api.deleteItem('1'), api.restoreItem('1'), api.undo(), api.overviewSeries(30), api.counts()].map(p => p.catch(() => null))).then(() => {
-      assert.equal(seen.length, 17);
+      api.writeOff('1', 'lost', '2026-01-01'), api.editItem('1', {}), api.deleteItem('1'), api.restoreItem('1'), api.undo(), api.overviewSeries(30), api.counts(), api.addExpenses([]), api.deleteExpenses(['1']), api.expensesMonth('2026-10-01'), api.pnl(12)].map(p => p.catch(() => null))).then(() => {
+      assert.equal(seen.length, 21);
       for (const [name, keys] of seen) {
         assert(sigs[name], 'api calls unknown function ' + name);
         for (const k of keys) assert(sigs[name].some(a => a.name === k), `${name} sent undeclared argument ${k}`);
@@ -585,6 +589,29 @@ test('X CSV export + template: formula guard on text cells only, missing stays e
     assert(fields.every(Boolean) && new Set(fields).size === 17, lang + ' template: all 17 columns recognised by the importer, none twice: ' + fields.join(','));
   }
 });
+test('A migration 072 in the engine: P&L months = the design numbers and the Overview engine; expenses come off; series carries the period total; validation, isolation, undo', async () => {
+  const a = account({ uid: 'A' }); a.eng.loadFixture(fx);
+  const ox = require('./stock/acceptance-oracle.json');
+  await a.api.addExpenses([{ spent_on: '2026-10-05', amount_cents: 1250, category: 'packaging' }, { spent_on: '2026-10-20', amount_cents: 999, category: 'tools', note: '  Listing tool  ' }, { spent_on: '2026-09-15', amount_cents: 500, category: 'postage' }]);
+  const p = await a.api.pnl(3, '2026-10-27');
+  assert.deepEqual(p.months.map(m => m.month), ['2026-10', '2026-09', '2026-08']);
+  assert.deepEqual(p.months.map(m => m.item_profit).reverse(), ['2026-08', '2026-09', '2026-10'].map(k => ox.months[k].net));
+  assert.deepEqual(p.months.map(m => m.revenue).reverse(), ['2026-08', '2026-09', '2026-10'].map(k => ox.months[k].rev));
+  assert.deepEqual(p.months.map(m => m.sold).reverse(), ['2026-08', '2026-09', '2026-10'].map(k => ox.months[k].sold));
+  assert.deepEqual(p.months.map(m => [m.expenses, m.item_profit - m.after]), [[2249, 2249], [500, 500], [0, 0]]);
+  const mo = await a.api.expensesMonth('2026-10-17');
+  assert.deepEqual([mo.month, mo.total, mo.count, mo.rows.map(r => r.amount_cents), mo.by_category.map(c => c.category + ':' + c.total), mo.rows.find(r => r.category === 'tools').note], ['2026-10', 2249, 2, [999, 1250], ['packaging:1250', 'tools:999'], 'Listing tool']);
+  assert.deepEqual([(await a.api.overviewSeries(30, '2026-10-27')).expenses, (await a.api.overviewSeries(90, '2026-10-27')).expenses], [2249, 2749]);
+  for (const [rows, code] of [[[{ spent_on: '2026-10-01', amount_cents: 100, category: 'food' }], 'stock_bad_category'], [[{ spent_on: '2026-10-01', amount_cents: 0, category: 'other' }], 'stock_amount_range'], [[{ amount_cents: 1, category: 'other' }], 'stock_expense_date_required'], [[{ spent_on: '2026-10-01', amount_cents: 1, category: 'other', note: 'x'.repeat(201) }], 'stock_note_too_long'], [[], 'stock_batch_too_large'], [[{ spent_on: '2026-10-01', amount_cents: 1, category: 'other' }, { spent_on: '2026-10-01', amount_cents: 1, category: 'nope' }], 'stock_bad_category']])
+    await rejects(a.api.addExpenses(rows), code, code);
+  assert.equal((await a.api.expensesMonth('2026-10-01')).count, 2, 'all or nothing');
+  const sep = (await a.api.expensesMonth('2026-09-01')).rows[0], del = await a.api.deleteExpenses([sep.id]);
+  assert.deepEqual(del.deleted.map(r => [r.spent_on, r.amount_cents, r.category]), [['2026-09-15', 500, 'postage']]);
+  await rejects(a.api.deleteExpenses([sep.id]), 'stock_expense_not_found', 'gone');
+  await a.api.addExpenses(del.deleted.map(r => ({ spent_on: r.spent_on, amount_cents: r.amount_cents, category: r.category, note: r.note })));
+  assert.equal((await a.api.expensesMonth('2026-09-01')).total, 500, 'undo puts it back');
+});
+
 // bundle entry: one price for several items
 test('A bundle split: rows always add up to the total exactly, leftover cents go to the first rows, typed costs are kept, over / mismatch refused', () => {
   const sp = core.splitCents;

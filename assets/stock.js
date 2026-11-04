@@ -59,6 +59,7 @@
       case 'stock_undo_expired': return T('err.undo_gone');
       case 'stock_nothing_to_undo': return T('err.nothing_undo');
       case 'stock_disabled': return T('err.disabled');
+      case 'stock_expense_cap': return T('err.exp_cap');
       case 'stock_network': return T('err.network');
       default: return (e && e.kind === 'validation') ? T('err.validation') : T('err.unknown');
     }
@@ -83,10 +84,10 @@
     S.panel.innerHTML =
       '<div class="st-wrap">' +
       '<h1 class="st-sr">' + esc(T('title')) + '</h1>' +
-      '<div class="st-navrow"><div class="st-nav" role="group" aria-label="' + esc(T('title')) + '"><button type="button" class="st-navb" data-act="view" data-view="overview" aria-pressed="true">' + esc(T('nav.overview')) + '</button><button type="button" class="st-navb" data-act="view" data-view="items" aria-pressed="false">' + esc(T('nav.items')) + ' <span id="st-navn"></span></button></div>' +
+      '<div class="st-navrow"><div class="st-nav" role="group" aria-label="' + esc(T('title')) + '"><button type="button" class="st-navb" data-act="view" data-view="overview" aria-pressed="true">' + esc(T('nav.overview')) + '</button><button type="button" class="st-navb" data-act="view" data-view="items" aria-pressed="false">' + esc(T('nav.items')) + ' <span id="st-navn"></span></button><button type="button" class="st-navb" data-act="view" data-view="money" aria-pressed="false" id="st-nav-money" style="display:none">' + esc(T('nav.money')) + '</button></div>' +
       '<div class="st-navr"><div id="st-meter"></div><button type="button" class="st-btn st-tert" data-act="settings">' + esc(T('set.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div></div>' +
       '<div id="st-capmsg"></div>' +
-      '<div id="st-over"></div><div id="st-items" style="display:none">' +
+      '<div id="st-over"></div><div id="st-money" style="display:none"></div><div id="st-items" style="display:none">' +
       '<div class="st-itemshd"><h2 class="st-h2">' + esc(T('nav.items')) + '</h2><span class="st-secsub" id="st-itemssub"></span></div>' +
       '<div class="st-tools" id="st-tools">' +
       '<input class="st-in st-search" type="search" id="st-q" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('search.aria')) + '" autocomplete="off">' +
@@ -137,16 +138,17 @@
   function setSkipped() { try { localStorage.setItem('snypd_stock_pq_skipped', '1'); } catch (e) { /* a convenience only */ } }
   function showView(v) {
     S.view = v;
-    var over = $('#st-over'), items = $('#st-items'); if (!over || !items) return;
-    over.style.display = v === 'overview' ? '' : 'none'; items.style.display = v === 'items' ? '' : 'none';
+    var over = $('#st-over'), items = $('#st-items'), money = $('#st-money'); if (!over || !items) return;
+    over.style.display = v === 'overview' ? '' : 'none'; items.style.display = v === 'items' ? '' : 'none'; if (money) money.style.display = v === 'money' ? '' : 'none';
     Array.prototype.forEach.call(S.panel.querySelectorAll('.st-navb'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false'); });
     if (v === 'overview') { if (!S.ov.data || S.ov.stale) loadOverview(); else renderOverview(); }
+    else if (v === 'money') loadMoney();
     else if (!S.itemsLoaded) { S.itemsLoaded = true; load(true); loadCounts(); } else if (S.ov.stale) refresh();
   }
   function loadOverview() {
     var o = S.ov, req = ++o.req; o.loading = true; o.err = null; renderOverview();
     return Promise.all([S.api.overview(o.days), S.api.lanes(), S.api.overviewSeries(o.days).catch(function () { return null; })]).then(function (r) {
-      if (req !== o.req) return; o.data = r[0]; o.lanes = r[1]; o.series = r[2]; o.loading = false; o.stale = false; renderOverview();
+      if (req !== o.req) return; o.data = r[0]; o.lanes = r[1]; o.series = r[2]; markMoney(r[2]); o.loading = false; o.stale = false; renderOverview();
     }).catch(function (e) { if (req !== o.req) return; o.loading = false; o.err = e; renderOverview(); });
   }
   function renderOverview() {
@@ -195,6 +197,7 @@
       '<div class="st-chips" role="group" aria-label="' + esc(T('per.label')) + '">' + PERIODS.map(function (d) { return '<button type="button" class="st-chip" data-act="period" data-days="' + perKey(d) + '" aria-pressed="' + (d === o.days ? 'true' : 'false') + '">' + esc(T('per.btn.' + perKey(d))) + '</button>'; }).join('') + '</div></div>' +
       '<div class="st-numgrid"><div class="st-herocard"><span class="st-lbl">' + esc(T('ov.net') + ' \u00b7 ' + T('per.' + pk)) + '</span>' +
       '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : '') + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(M(v.netCents))) + '</span></div>' +
+      (o.series && o.series.expenses > 0 && v.netCents != null ? '<p class="st-delta" id="st-after">' + esc(T('ov.after', { exp: M(o.series.expenses), after: MS(v.netCents - o.series.expenses) })) + ' <button type="button" class="st-linkb" data-act="view" data-view="money">' + esc(T('ov.after.link')) + '</button></p>' : '') +
       (v.deltaNetCents != null && o.days != null ? '<p class="st-delta" id="st-delta">' + (dir ? '<span class="' + (dir > 0 ? 'st-pos' : 'st-neg') + '">' + (dir > 0 ? ARROW_UP : ARROW_DN) + '</span> ' : '') + esc(T(pctTxt == null ? 'ov.delta.nopct' : 'ov.delta', deltaP)) + '</p>' : '') +
       (v.hasEvents ? '' : '<p class="st-split">' + esc(T('ov.net.empty')) + '</p>') +
       (v.partial ? '<p class="st-hint" id="st-partial">' + esc(T('ov.partial.note', { a: v.withCost, b: v.sold, c: v.sold - v.withCost })) + ' <button type="button" class="st-linkb" data-act="fix">' + esc(T('fix.btn')) + '</button></p>' : '') + '</div>' +
@@ -391,6 +394,7 @@
       S.rows = r[0].rows; S.next = r[0].next_cursor; S.total = r[0].total; if (r[1] && r[1].mode !== 'off') { S.boot = r[1]; S.cur = r[1].currency || S.cur; S.cats = r[1].categories || S.cats; }
       renderMeter(); renderBody(); if (S.itemsLoaded) loadCounts();
       if (S.view === 'overview') loadOverview(); else S.ov.stale = true;
+      if (S.view === 'money') loadMoney();
     });
   }
   function refresh() { if (S && S.boot && S.boot.mode !== 'off') reloadKeep().catch(function (e) { console.error('SNYPD Stock refresh failed', e); }); }
@@ -454,6 +458,12 @@
     switch (act) {
       case 'add': S.opener = el; openSheet('add'); break;
       case 'bundle': openBundle(); break;
+      case 'exp-add': S.opener = el; openExpense(); break;
+      case 'exp-del': deleteExpense(id); break;
+      case 'mo-prev': S.mo.month = monthShift(S.mo.month, -1); loadMoney(); break;
+      case 'mo-next': if (S.mo.month < monthStart(today())) { S.mo.month = monthShift(S.mo.month, 1); loadMoney(); } break;
+      case 'mo-repeat': repeatLastMonth(el); break;
+      case 'mo-csv': exportPnl(); break;
       case 'b-add': bundleAddRow(null, true); break;
       case 'b-del': bundleDelRow(+el.getAttribute('data-i')); break;
       case 'import': S.opener = el; openImport(); break;
@@ -638,6 +648,7 @@
     var sh = S.sheet; if (!sh) return;
     if (sh.kind === 'settings') { saveSettingsSheet(); return; }
     if (sh.kind === 'bundle') { submitBundle(); return; }
+    if (sh.kind === 'expense') { submitExpense(); return; }
     var go = $('#st-go'), item = sh.item, run, label, bad = false;
     var box = $('#st-sheet-err'); if (box) box.innerHTML = '';
     if (sh.kind === 'add') {
@@ -674,6 +685,109 @@
         var lg = $('#st-addlog'); if (lg) lg.textContent = T('sheet.add.log', { t: title }); $('#sf-title').value = ''; $('#sf-buy').value = ''; $('#sf-extra').value = ''; $('#sf-size').value = ''; $('#sf-quantity').value = '1'; if (go) go.disabled = false; $('#sf-title').focus();
       } else closeSheet();
     });
+  }
+
+  // ------------------------------------------------------------------ Money (migration 072): one month's expenses + month-by-month P&L
+  function monthStart(d) { return d.slice(0, 8) + '01'; }
+  function monthShift(d, k) { var y = +d.slice(0, 4), m = +d.slice(5, 7) + k; while (m > 12) { m -= 12; y++; } while (m < 1) { m += 12; y--; } return y + '-' + (m < 10 ? '0' : '') + m + '-01'; }
+  function monthEnd(d) { var n = monthShift(d, 1), t = Date.UTC(+n.slice(0, 4), +n.slice(5, 7) - 1, 1) - 86400000, x = new Date(t); return x.getUTCFullYear() + '-' + ('0' + (x.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + x.getUTCDate()).slice(-2); }
+  function monthLabel(d, short) { try { return new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-GB', { month: short ? 'short' : 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, 1))); } catch (e) { return d.slice(0, 7); } }
+  function markMoney(series) { if (!series || !('expenses' in series)) return; S.hasMoney = true; var b = $('#st-nav-money'); if (b) b.style.display = ''; }
+  function loadMoney() {
+    if (!S.mo) S.mo = { month: monthStart(today()), data: null, pnl: null, req: 0 };
+    var mo = S.mo, req = ++mo.req; mo.loading = true; mo.err = null; renderMoney();
+    return Promise.all([S.api.expensesMonth(mo.month), S.api.pnl(12)]).then(function (r) {
+      if (req !== mo.req) return; mo.data = r[0]; mo.pnl = r[1]; mo.loading = false; renderMoney();
+    }).catch(function (e) { if (req !== mo.req) return; mo.loading = false; mo.err = e; renderMoney(); });
+  }
+  function catLabel(k) { return T('xcat.' + k); }
+  // the P&L months, newest first, without the empty months before the account's first activity (the current month always stays)
+  function pnlRows() {
+    var rows = (S.mo && S.mo.pnl && S.mo.pnl.months) || [], last = 0;
+    rows.forEach(function (m, i) { if (m.sold || m.revenue || m.item_profit || m.expenses) last = i; });
+    return rows.slice(0, last + 1);
+  }
+  function renderMoney() {
+    var el = $('#st-money'); if (!el || !S.mo) return;
+    var mo = S.mo, cur = monthStart(today()), ml = monthLabel(mo.month), h = '';
+    h += '<section class="st-sec" aria-labelledby="st-h-money"><div class="st-sechd"><h2 class="st-h2" id="st-h-money">' + esc(T('mo.title')) + '</h2><span class="st-secsub">' + esc(T('mo.sub')) + '</span></div>';
+    h += '<div class="st-motools"><div class="st-monav"><button type="button" class="st-btn st-ghost" data-act="mo-prev" aria-label="' + esc(T('mo.prev')) + '">&lsaquo;</button><b id="st-mo-month">' + esc(ml) + '</b>' +
+      '<button type="button" class="st-btn st-ghost" data-act="mo-next" aria-label="' + esc(T('mo.next')) + '"' + (mo.month >= cur ? ' disabled' : '') + '>&rsaquo;</button></div>' +
+      '<div class="st-moacts"><button type="button" class="st-btn st-ghost" data-act="mo-repeat">' + esc(T('mo.repeat')) + '</button><button type="button" class="st-btn st-prim" data-act="exp-add">' + esc(T('mo.add')) + '</button></div></div>';
+    if (mo.err) h += '<div class="st-err">' + esc(errMsg(mo.err)) + ' <button type="button" class="st-btn st-ghost" data-act="view" data-view="money">' + esc(T('err.retry')) + '</button></div>';
+    if (!mo.data) { el.innerHTML = h + '<div class="st-skel"></div><div class="st-skel"></div></section>'; return; }
+    var d = mo.data;
+    h += '<div class="st-mosum"><div class="st-cell"><span class="st-lbl">' + esc(T('mo.total', { month: ml })) + '</span><b id="st-mo-total">' + esc(M(d.total)) + '</b>' +
+      (d.by_category.length ? '<small>' + esc(d.by_category.map(function (c) { return catLabel(c.category) + ' ' + M(c.total); }).join(' \u00b7 ')) + '</small>' : '') + '</div></div>';
+    if (!d.rows.length) h += '<p class="st-d st-dim" id="st-mo-empty">' + esc(T('mo.none', { month: ml })) + '</p>';
+    else h += '<div class="st-mlist" role="table" aria-label="' + esc(T('mo.total', { month: ml })) + '">' + d.rows.map(function (r) {
+      return '<div class="st-mrow" role="row"><span class="d">' + esc(fmtDate(r.spent_on)) + '</span><span class="c">' + esc(catLabel(r.category)) + '</span><span class="n">' + esc(r.note || '') + '</span><b class="a">' + esc(M(r.amount_cents)) + '</b>' +
+        '<button type="button" class="st-x" data-act="exp-del" data-id="' + esc(r.id) + '" aria-label="' + esc(T('mo.del')) + '">&times;</button></div>';
+    }).join('') + '</div>';
+    h += '</section>';
+    // month by month
+    var rows = pnlRows();
+    h += '<section class="st-sec" aria-labelledby="st-h-pnl"><div class="st-sechd"><h2 class="st-h2" id="st-h-pnl">' + esc(T('mo.pnl')) + '</h2><span class="st-secsub">' + esc(T(rows.length === 1 ? 'mo.pnl.sub1' : 'mo.pnl.sub', { n: rows.length })) + '</span>' +
+      '<button type="button" class="st-btn st-ghost" data-act="mo-csv">' + esc(T('mo.export')) + '</button></div>' +
+      '<div class="st-tblwrap st-pnlwrap"><table class="st-ctable st-pnl" id="st-pnl"><thead><tr><th>' + esc(T('mo.c.month')) + '</th><th class="st-num">' + esc(T('mo.c.sold')) + '</th><th class="st-num">' + esc(T('mo.c.rev')) + '</th><th class="st-num">' + esc(T('mo.c.item')) + '</th><th class="st-num">' + esc(T('mo.c.exp')) + '</th><th class="st-num">' + esc(T('mo.c.after')) + '</th></tr></thead><tbody>' +
+      rows.map(function (m) {
+        var quiet = !m.sold && !m.revenue && !m.item_profit && !m.expenses;
+        return '<tr' + (quiet ? ' class="st-dim"' : '') + ' data-month="' + esc(m.month) + '"><td>' + esc(monthLabel(m.month + '-01', true)) + '</td><td class="st-num">' + esc(String(m.sold)) + '</td><td class="st-num">' + esc(M(m.revenue)) + '</td><td class="st-num">' + esc(MS(m.item_profit)) + '</td><td class="st-num">' + esc(M(m.expenses)) + '</td><td class="st-num"><b class="' + (m.after < 0 ? 'st-neg' : '') + '">' + esc(MS(m.after)) + '</b></td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      // phones: one card per month, profit after expenses first (the six-column table does not fit 390 px)
+      '<ul class="st-pnlcards" id="st-pnlcards">' + rows.map(function (m) {
+        return '<li data-month="' + esc(m.month) + '"><div class="t"><b>' + esc(monthLabel(m.month + '-01')) + '</b><span><small>' + esc(T('mo.c.after')) + '</small> <b class="' + (m.after < 0 ? 'st-neg' : '') + '">' + esc(MS(m.after)) + '</b></span></div>' +
+          '<small>' + esc(T('mo.card', { item: MS(m.item_profit), exp: M(m.expenses), sold: m.sold })) + '</small></li>';
+      }).join('') + '</ul><p class="st-hint">' + esc(T('mo.pnl.note')) + '</p></section>';
+    el.innerHTML = h;
+  }
+  function openExpense() {
+    if (!S.mo) S.mo = { month: monthStart(today()), data: null, pnl: null, req: 0 };
+    var t0 = today(), def = S.mo.month === monthStart(t0) ? t0 : monthEnd(S.mo.month);
+    S.sheet = { kind: 'expense' };
+    var body = '<div id="st-sheet-err"></div><div class="st-form">' + fld('xamount', T('f.exp.amount'), mny('xamount'), 'full') + fld('xdate', T('f.exp.date'), dat('xdate', def, t0)) +
+      fld('xcat', T('f.exp.cat'), '<select class="st-in" id="sf-xcat">' + C.EXPENSE_CATEGORIES.map(function (c) { return option(c, catLabel(c), c === 'packaging'); }).join('') + '</select>') +
+      fld('xnote', T('f.exp.note'), txt('xnote', '', '', ' maxlength="200"'), 'full') + '</div>';
+    mountSheet(T('sheet.exp'), body, '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button><button type="button" class="st-btn st-prim" data-act="submit" id="st-go">' + esc(T('exp.go')) + '</button>');
+    var f = $('#sf-xamount'); if (f) f.focus();
+  }
+  function submitExpense() {
+    var am = readMoney('xamount', true), dd = readDate('xdate'); if (am.bad || dd.bad) return;
+    if (!(am.cents > 0)) { fieldErr('xamount', T('err.amount', { example: moneyExample() })); return; }
+    var row = { spent_on: dd.v, amount_cents: am.cents, category: $('#sf-xcat').value, note: ($('#sf-xnote').value || '').trim() || null }, go = $('#st-go'); if (go) go.disabled = true;
+    S.api.addExpenses([row]).then(function () {
+      closeSheet(); S.ov.stale = true; S.mo.month = monthStart(row.spent_on);
+      return loadMoney().then(function () { showBar(T('toast.exp.added', { amount: M(row.amount_cents) }), false); });
+    }).catch(function (e) { sheetError(e); });
+  }
+  function deleteExpense(id) {
+    S.api.deleteExpenses([id]).then(function (r) {
+      var back = (r.deleted || []).map(function (x) { return { spent_on: x.spent_on, amount_cents: x.amount_cents, category: x.category, note: x.note }; });
+      S.ov.stale = true;
+      return loadMoney().then(function () {
+        showBar(T('toast.exp.deleted'), true, function () { return S.api.addExpenses(back).then(function () { return loadMoney(); }).then(function () { showBar(T('toast.exp.restored'), false); }); });
+      });
+    }).catch(function (e) { showBar(errMsg(e), false); });
+  }
+  function repeatLastMonth(btn) {   // copies the previous month's expenses into the month shown, same day of the month (never after today)
+    var to = S.mo.month, from = monthShift(to, -1), t0 = today(), last = monthEnd(to) < t0 ? monthEnd(to) : t0;
+    if (btn) btn.disabled = true;
+    S.api.expensesMonth(from).then(function (m) {
+      if (!m.rows.length) { showBar(T('mo.repeat.none', { month: monthLabel(from) }), false); return; }
+      var rows = m.rows.slice(0, 100).map(function (r) { var day = to.slice(0, 8) + r.spent_on.slice(8, 10); if (day > monthEnd(to)) day = monthEnd(to); if (day > last) day = last; return { spent_on: day, amount_cents: r.amount_cents, category: r.category, note: r.note }; });
+      return S.api.addExpenses(rows).then(function (res) {
+        var ids = res.ids || []; S.ov.stale = true;
+        return loadMoney().then(function () {
+          showBar(T(ids.length === 1 ? 'mo.repeat.done1' : 'mo.repeat.done', { n: ids.length, month: monthLabel(from) }), true, function () { return S.api.deleteExpenses(ids).then(function () { return loadMoney(); }).then(function () { showBar(T('mo.repeat.undone'), false); }); });
+        });
+      });
+    }).catch(function (e) { showBar(errMsg(e), false); }).then(function () { if (btn) btn.disabled = false; });
+  }
+  function exportPnl() {   // the table as CSV: FR = semicolon + decimal comma, like the items export
+    var rows = pnlRows(), sep = lang === 'fr' ? ';' : ',', q = function (v) { v = String(v); return /[";,\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var lines = [[T('mo.c.month'), T('mo.c.sold'), T('mo.c.rev'), T('mo.c.item'), T('mo.c.exp'), T('mo.c.after')].map(q).join(sep)];
+    rows.slice().reverse().forEach(function (m) { lines.push([m.month, m.sold, moneyText(m.revenue), moneyText(m.item_profit), moneyText(m.expenses), moneyText(m.after)].map(q).join(sep)); });
+    downloadFile(String.fromCharCode(0xfeff) + lines.join('\r\n') + '\r\n', (lang === 'fr' ? 'snypd-mois-par-mois-' : 'snypd-month-by-month-') + C.localToday() + '.csv');
   }
 
   // ------------------------------------------------------------------ bundle: several items bought for one price (rows go in as one import, undone as one)

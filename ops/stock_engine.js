@@ -39,10 +39,12 @@
     stock_add_items: ['p_item', 'p_quantity'], stock_import_rows: ['p_import_id', 'p_rows'], stock_undo_import: ['p_import_id'],
     stock_set_status: ['p_id', 'p_to', 'p_platform', 'p_list_cents', 'p_on'], stock_mark_sold: ['p_id', 'p_sold_cents', 'p_sold_on', 'p_platform', 'p_fee_cents', 'p_ship_paid_cents'],
     stock_mark_returned: ['p_id', 'p_returned_on', 'p_refund_cents', 'p_refund_fee', 'p_return_ship_cents', 'p_to', 'p_reason'],
-    stock_write_off: ['p_id', 'p_reason', 'p_on'], stock_edit_item: ['p_id', 'p_patch'], stock_delete_item: ['p_id'], stock_restore_item: ['p_id'], stock_undo: []
+    stock_write_off: ['p_id', 'p_reason', 'p_on'], stock_edit_item: ['p_id', 'p_patch'], stock_delete_item: ['p_id'], stock_restore_item: ['p_id'], stock_undo: [],
+    stock_add_expenses: ['p_rows'], stock_delete_expenses: ['p_ids'], stock_expenses_month: ['p_month'], stock_pnl: ['p_months', 'p_today']   // 072
   };
   const REQUIRED = { stock_add_items: ['p_item'], stock_import_rows: ['p_import_id', 'p_rows'], stock_undo_import: ['p_import_id'], stock_set_status: ['p_id', 'p_to'], stock_mark_sold: ['p_id', 'p_sold_cents'],
-    stock_mark_returned: ['p_id'], stock_write_off: ['p_id', 'p_reason'], stock_edit_item: ['p_id', 'p_patch'], stock_delete_item: ['p_id'], stock_restore_item: ['p_id'] };
+    stock_mark_returned: ['p_id'], stock_write_off: ['p_id', 'p_reason'], stock_edit_item: ['p_id', 'p_patch'], stock_delete_item: ['p_id'], stock_restore_item: ['p_id'],
+    stock_add_expenses: ['p_rows'], stock_delete_expenses: ['p_ids'] };
   const EDITABLE = ['title', 'brand', 'size', 'condition', 'category', 'buy_cents', 'extra_cents', 'list_cents', 'bought_on', 'src', 'src_type', 'notes', 'link', 'platform', 'sold_cents', 'sold_on', 'fee_cents', 'ship_paid_cents'];
 
   // ---------- errors (shape of a PostgREST error body: message, code, details, hint) ----------
@@ -105,7 +107,7 @@
     opts = opts || {};
     const S = {
       uid: opts.uid || 'qa-user-0000-0000-0000-000000000001', items: [], history: [], hid: 0, settings: null, categories: [], undo: null, searches: opts.searches || [],
-      paid: opts.paid !== false, admin: !!opts.admin, mode: opts.mode || 'all', seq: 0, claimImg: {}
+      paid: opts.paid !== false, admin: !!opts.admin, mode: opts.mode || 'all', seq: 0, claimImg: {}, expenses: []
     };
     const nowMs = () => (opts.now ? opts.now() : Date.now());
     const today = () => (opts.today ? opts.today() : isoDate(nowMs()));
@@ -277,7 +279,65 @@
       if (days != null) for (let k = 0; k < days; k++) { const d = addDays(from, k), ev = w.filter(e => e.d === d); daily.push({ d, net: net(ev), sold: sold(ev) }); }
       const by = Array.from(new Set(w.map(e => e.platform))).map(p => { const ev = w.filter(e => e.platform === p); return { platform: p, net: net(ev), sold: sold(ev) }; })
         .sort((x, y) => y.net - x.net || (x.platform < y.platform ? -1 : (x.platform > y.platform ? 1 : 0)));
-      return { today: t, days, daily, by_platform: by };
+      const out = { today: t, days, daily, by_platform: by };
+      if (!opts.pre072) out.expenses = sum(myExp().filter(x => x.spent_on >= from && x.spent_on < addDays(t, 1)), x => x.amount_cents);   // 072
+      return out;
+    };
+    // == 072: expenses (own rows only, 1..100 per call, all or nothing, 5,000 per account) + month-by-month P&L on the same events as the Overview
+    const EXP_CATS = ['packaging', 'postage', 'promotion', 'tools', 'travel', 'other'];
+    const myExp = () => S.expenses.filter(x => x.user_id === S.uid);
+    const monthStart = d => d.slice(0, 8) + '01';
+    const nextMonth = d => { let y = +d.slice(0, 4), m = +d.slice(5, 7) + 1; if (m > 12) { m = 1; y++; } return y + '-' + String(m).padStart(2, '0') + '-01'; };
+    const prevMonth = d => { let y = +d.slice(0, 4), m = +d.slice(5, 7) - 1; if (m < 1) { m = 12; y--; } return y + '-' + String(m).padStart(2, '0') + '-01'; };
+    const expRow = x => ({ id: x.id, spent_on: x.spent_on, amount_cents: x.amount_cents, category: x.category, note: x.note });
+    R.stock_add_expenses = function (a) {
+      gate();
+      const rows = a.p_rows;
+      if (!Array.isArray(rows)) raise('stock_rows_must_be_array', null, '22023');
+      if (rows.length < 1 || rows.length > 100) raise('stock_batch_too_large', null, '22023');
+      if (myExp().length + rows.length > 5000) raise('stock_expense_cap');
+      const out = rows.map(j => {
+        const d = checkDate(parseDate(j && j.spent_on)); if (!d) raise('stock_expense_date_required', null, '22023');
+        const amt = toBigint(j.amount_cents); if (amt == null || amt < 1 || amt > 1000000000) raise('stock_amount_range', null, '22023');
+        if (!EXP_CATS.includes(j.category)) raise('stock_bad_category', null, '22023');
+        const note = nullif(btrim(j.note), ''); if (note != null && note.length > 200) raise('stock_note_too_long', null, '22023');
+        return { id: newId(), user_id: S.uid, spent_on: d, amount_cents: amt, category: j.category, note, created_at: new Date(nowMs()).toISOString() };
+      });
+      out.forEach(x => S.expenses.push(x));
+      return { added: out.length, ids: out.map(x => x.id) };
+    };
+    R.stock_delete_expenses = function (a) {
+      gate();
+      const ids = a.p_ids;
+      if (!Array.isArray(ids) || ids.length < 1 || ids.length > 100) raise('stock_batch_too_large', null, '22023');
+      const del = S.expenses.filter(x => x.user_id === S.uid && ids.includes(x.id));
+      if (!del.length) raise('stock_expense_not_found');
+      S.expenses = S.expenses.filter(x => !del.includes(x));
+      return { deleted: del.map(expRow) };
+    };
+    R.stock_expenses_month = function (a) {
+      gate();
+      const from = monthStart(parseDate(a.p_month) || today()), to = nextMonth(from);
+      const m = myExp().filter(x => x.spent_on >= from && x.spent_on < to).sort((p, q) => (p.spent_on < q.spent_on ? 1 : p.spent_on > q.spent_on ? -1 : (p.id < q.id ? 1 : -1)));
+      const by = {};
+      m.forEach(x => { const c = by[x.category] || (by[x.category] = { category: x.category, total: 0, n: 0 }); c.total += x.amount_cents; c.n++; });
+      return { month: from.slice(0, 7), rows: m.slice(0, 1000).map(expRow), total: sum(m, x => x.amount_cents), count: m.length,
+        by_category: Object.values(by).sort((p, q) => q.total - p.total || (p.category < q.category ? -1 : 1)) };
+    };
+    R.stock_pnl = function (a) {
+      gate();
+      const n = a.p_months == null ? 12 : a.p_months, t = checkDate(parseDate(a.p_today)) || today();
+      if (!Number.isInteger(n) || n < 1 || n > 36) raise('stock_bad_period', null, '22023');
+      const months = []; let m = monthStart(t); for (let i = 0; i < n; i++) { months.push(m); m = prevMonth(m); }
+      const first = months[months.length - 1], end = addDays(t, 1);
+      const ev = events().filter(e => e.d >= first && e.d < end), ex = myExp().filter(x => x.spent_on >= first && x.spent_on < end);
+      return { today: t, months: months.map(ms => {
+        const me = nextMonth(ms), e = ev.filter(x => x.d >= ms && x.d < me);
+        const item = sum(e.filter(x => x.t === 'sale' || x.t === 'return'), x => x.prof) - sum(e.filter(x => x.t === 'wo'), x => x.cost);
+        const expenses = sum(ex.filter(x => x.spent_on >= ms && x.spent_on < me), x => x.amount_cents);
+        return { month: ms.slice(0, 7), sold: e.filter(x => x.t === 'sale').length - e.filter(x => x.t === 'return').length,
+          revenue: sum(e.filter(x => x.t === 'sale'), x => x.amt) - sum(e.filter(x => x.t === 'return'), x => x.refund), item_profit: item, expenses, after: item - expenses };
+      }) };
     };
     // == stock_counts (migration 070): per-status counts of the caller's non-deleted items
     R.stock_counts = function (a) {
@@ -437,7 +497,7 @@
 
     async function rpc(name, args) {
       args = args || {};
-      const fn = R[name];
+      const fn = (opts.pre072 && /^stock_(add_expenses|delete_expenses|expenses_month|pnl)$/.test(name)) ? null : R[name];   // ?stock_pre072=1: production before 072
       if (!fn || !SIGNATURES[name]) return { data: null, error: { message: `Could not find the function public.${name} in the schema cache`, code: 'PGRST202', details: null, hint: null } };
       const unknown = Object.keys(args).filter(k => !SIGNATURES[name].includes(k));
       const missing = (REQUIRED[name] || []).filter(k => !(k in args));
