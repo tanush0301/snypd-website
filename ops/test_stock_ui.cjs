@@ -642,6 +642,14 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     pg = await open(q + '&open=stock-settings'); await settled(pg); await pg.waitForSelector('.st-sheet #sf-cur', { timeout: 8000 }); await wait5(600);
     ok(/Settings/.test(await tc(pg, '.st-sheet-hd h2')) && await pg.$eval('#sf-weekly-wrap', e => getComputedStyle(e).display !== 'none'), '?open=stock-settings opens Stock > Settings with the weekly switch');
     await pg.close();
+    // not signed in: the link goes through /login and still lands on Settings afterwards (same tab), exactly once
+    pg = await open(q + '&open=stock-settings&nosession=1'); await pg.waitForFunction(() => /\/login/.test(location.pathname), { timeout: 8000 });
+    eq(await pg.evaluate(() => sessionStorage.getItem('snypd_open_after_login')), 'stock-settings', 'logged out: the link is kept for after the login');
+    await pg.goto(base + '/dashboard.html?boot=1&' + q, { waitUntil: 'domcontentloaded' }); await settled(pg); await pg.waitForSelector('.st-sheet #sf-cur', { timeout: 8000 }); await wait5(600);
+    ok(/Settings/.test(await tc(pg, '.st-sheet-hd h2')) && await pg.evaluate(() => sessionStorage.getItem('snypd_open_after_login')) === null, 'after the login the dashboard opens Stock > Settings and forgets the link');
+    await pg.goto(base + '/dashboard.html?boot=1&' + q, { waitUntil: 'domcontentloaded' }); await settled(pg); await wait5(1500);
+    eq(await pg.evaluate(() => [document.querySelector('.view-tab.active') && document.querySelector('.view-tab.active').getAttribute('data-view'), !!document.querySelector('.st-sheet')]), ['feed', false], 'the next visit opens the Feed as usual');
+    await pg.close();
     pg = await open('plan=elite&stock=off&open=stock'); await wait5(2500);
     eq(await pg.evaluate(() => [document.querySelector('.view-tab.active') && document.querySelector('.view-tab.active').getAttribute('data-view'), !!document.querySelector('#stock-panel .st-wrap')]), ['feed', false], 'with Stock off the link does nothing (the Feed stays)');
     await pg.close();

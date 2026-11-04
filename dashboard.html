@@ -2136,10 +2136,16 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
   }
   window.SNYPD.stockReplacesHistory = function () { return !!window.SNYPD.stockMode && !stockHidden; };
   window.SNYPD.onStockMode = function (mode, hidden) { window.SNYPD.stockMode = mode; stockHidden = !!hidden; paint(); openFromLink(); };
-  /* links from the weekly Stock email: ?open=stock opens the Stock tab, ?open=stock-settings also opens Stock > Settings (once per page load, only when Stock is on and not hidden) */
-  var linkDone = false;
+  /* links from the weekly Stock email: ?open=stock opens the Stock tab, ?open=stock-settings also opens Stock > Settings (once per page load, only when Stock is on and not hidden).
+     A reader who is not signed in goes through /login first: the auth check below keeps the value in sessionStorage (same tab), read once here. */
+  var linkDone = false, linkOpen;
   function openFromLink() {
-    var o = null; try { o = new URLSearchParams(location.search).get('open'); } catch (e) { o = null; }
+    if (linkOpen === undefined) {
+      linkOpen = null;
+      try { linkOpen = new URLSearchParams(location.search).get('open'); } catch (e) { linkOpen = null; }
+      try { var kept = sessionStorage.getItem('snypd_open_after_login'); sessionStorage.removeItem('snypd_open_after_login'); if (linkOpen !== 'stock' && linkOpen !== 'stock-settings') linkOpen = kept; } catch (e) {}
+    }
+    var o = linkOpen;
     if (linkDone || (o !== 'stock' && o !== 'stock-settings') || !window.SNYPD.stockMode || window.SNYPD.stockMode === 'off' || stockHidden) return;
     linkDone = true; window.SNYPD.pendingStockSettings = o === 'stock-settings';
     setTimeout(function () { if (window.SNYPD.switchView) window.SNYPD.switchView('stock'); }, 0);
@@ -2383,6 +2389,8 @@ const HEARTBEAT_URL = (() => {
     // log-in screen with their email filled in; a first visit gets the plain one.
     let hadSession = false;
     try { hadSession = !!localStorage.getItem('snypd_last_email'); } catch (e) {}
+    // a link from the weekly Stock email (?open=stock / ?open=stock-settings) survives the login: openFromLink() reads it back once
+    try { const o = new URLSearchParams(location.search).get('open'); if (o === 'stock' || o === 'stock-settings') sessionStorage.setItem('snypd_open_after_login', o); } catch (e) {}
     location.href = hadSession ? '/login?reason=expired' : '/login';
     return;
   }
