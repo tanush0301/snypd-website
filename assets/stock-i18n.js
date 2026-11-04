@@ -524,7 +524,11 @@ window.SNYPD_STOCK_STR = {
   "xcat.promotion": "Boosts and promotions",
   "xcat.tools": "Subscriptions and tools",
   "xcat.travel": "Travel",
-  "xcat.other": "Other"
+  "xcat.other": "Other",
+  "set.weekly": "Weekly summary email (Mondays)",
+  "set.weekly.hint": "Last week\u2019s profit, your stock and what to do first, every Monday morning.",
+  "set.weekly.on": "Weekly email on.",
+  "set.weekly.off": "Weekly email off. You can switch it back on here."
  },
  "fr": {
   "tab": "Stock",
@@ -1050,6 +1054,10 @@ window.SNYPD_STOCK_STR = {
   "xcat.promotion": "Boosts et mises en avant",
   "xcat.tools": "Abonnements et outils",
   "xcat.travel": "D\u00e9placements",
-  "xcat.other": "Autre"
+  "xcat.other": "Autre",
+  "set.weekly": "E-mail r\u00e9capitulatif du lundi",
+  "set.weekly.hint": "Le b\u00e9n\u00e9fice de la semaine, ton stock et quoi faire en premier, chaque lundi matin.",
+  "set.weekly.on": "E-mail du lundi activ\u00e9.",
+  "set.weekly.off": "E-mail du lundi d\u00e9sactiv\u00e9. Tu peux le r\u00e9activer ici."
  }
 };

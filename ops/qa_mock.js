@@ -315,6 +315,7 @@
   //   ?stock_seed=acceptance loads the frozen design dataset (215 items, 580 history rows): copy ops/stock/acceptance-fixture.json next to the page
   //   ?stock_today=YYYY-MM-DD fixes the engine's "today" (the dataset's own today is 2026-10-27)
   //   ?stock_paid=0          a Free account (25 held items); default follows ?plan=
+  //   ?stock_pre073=1        stock_settings has no weekly_email column yet (the Settings switch must stay hidden)
   //   ?stock_pre072=1        the engine answers like production before migration 072 (no expense functions, series without expenses)
   //   ?stock_pre071=1        the engine answers like production before migration 071 (Items page ignores sort, rows without image_url)
   //   ?stock_claims=0        no Feed claims (an empty Stock: first-run screen); ?stock_hidden=1 the user already hid the Stock tab
@@ -389,6 +390,7 @@
         return { data: null, error: { code: '23514', message: 'new row violates check constraint (push_mode / push_calm_minutes)' } };
       }
       if (STOCK && table === 'stock_settings') {   // own-row select / insert / update / upsert (policies of 065); the CHECKs live in the engine
+        if (op === 'select' && params.get('stock_pre073') === '1') return { data: null, error: { code: '42703', message: 'column stock_settings.weekly_email does not exist' } };   // ?stock_pre073=1: production before 073
         if (op === 'select') { var srow = STOCK.settingsRow(); return { data: singleMode ? srow : (srow ? [srow] : []), error: null }; }
         try { var sp = Object.assign({}, payload); delete sp.user_id; STOCK.setSettings(sp); return { data: payload, error: null }; } catch (e) { return { data: null, error: e.pg || { message: String(e) } }; }
       }

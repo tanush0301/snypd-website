@@ -614,6 +614,44 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     await pg.close();
   }
 
+  // 5k. weekly email (073): the switch in Stock > Settings (on by default, hidden before 073) and the email's links ?open=stock / ?open=stock-settings
+  {
+    const settled = p => p.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 8000 });
+    const q = 'plan=elite&stock=all&stock_seed=acceptance&stock_today=2026-10-27&stock_claims=0&lang=en';
+    pg = await open(q); await settled(pg); await pg.click('#view-tab-stock'); await waitOv(pg); await wait5(300);
+    await clickBy(pg, '#stock-panel [data-act="settings"]'); await pg.waitForSelector('#sf-weekly', { timeout: 4000 }); await wait5(500);
+    eq(await pg.$eval('#sf-weekly', e => [e.checked, getComputedStyle(e.closest('.st-f')).display !== 'none']), [true, true], 'Settings: the weekly email switch is shown and on by default');
+    ok(/Weekly summary email \(Mondays\)/.test(await tc(pg, '#sf-weekly-wrap')), 'switch label');
+    await pg.$eval('#sf-weekly', e => { e.checked = false; }); await clickBy(pg, '#st-go'); await wait5(900);
+    eq(await pg.evaluate(() => window.__qaStock.state.settings && window.__qaStock.state.settings.weekly_email), false, 'switching it off saves weekly_email = false on the own settings row');
+    ok(/Weekly email off\. You can switch it back on here\./.test(await tc(pg, '.st-undo')), 'the bar says it is off and where to turn it back on');
+    await clickBy(pg, '#stock-panel [data-act="settings"]'); await pg.waitForSelector('#sf-weekly', { timeout: 4000 }); await wait5(500);
+    eq(await pg.$eval('#sf-weekly', e => e.checked), false, 'reopening Settings shows it off');
+    await pg.close();
+    // before 073 the column does not exist: no switch, and the rest of Settings still saves
+    pg = await open(q + '&stock_pre073=1'); await settled(pg); await pg.click('#view-tab-stock'); await waitOv(pg); await wait5(300);
+    await clickBy(pg, '#stock-panel [data-act="settings"]'); await pg.waitForSelector('#sf-cur', { timeout: 4000 }); await wait5(500);
+    eq(await pg.$eval('#sf-weekly-wrap', e => getComputedStyle(e).display), 'none', 'before 073: no weekly switch');
+    await pg.$eval('#sf-old', e => { e.value = '60'; }); await clickBy(pg, '#st-go'); await wait5(900);
+    eq(await pg.evaluate(() => [window.__qaStock.state.settings.old_after_days, 'weekly_email' in window.__qaStock.state.settings]), [60, false], 'before 073: other settings still save, no weekly_email is sent');
+    await pg.close();
+    // the email's links
+    pg = await open(q + '&open=stock'); await settled(pg); await waitOv(pg); await wait5(600);
+    eq(await pg.evaluate(() => [document.querySelector('.view-tab.active') && document.querySelector('.view-tab.active').getAttribute('data-view'), getComputedStyle(document.getElementById('stock-panel')).display !== 'none', !!document.querySelector('.st-sheet')]), ['stock', true, false], '?open=stock opens the Stock tab');
+    await pg.close();
+    pg = await open(q + '&open=stock-settings'); await settled(pg); await pg.waitForSelector('.st-sheet #sf-cur', { timeout: 8000 }); await wait5(600);
+    ok(/Settings/.test(await tc(pg, '.st-sheet-hd h2')) && await pg.$eval('#sf-weekly-wrap', e => getComputedStyle(e).display !== 'none'), '?open=stock-settings opens Stock > Settings with the weekly switch');
+    await pg.close();
+    pg = await open('plan=elite&stock=off&open=stock'); await wait5(2500);
+    eq(await pg.evaluate(() => [document.querySelector('.view-tab.active') && document.querySelector('.view-tab.active').getAttribute('data-view'), !!document.querySelector('#stock-panel .st-wrap')]), ['feed', false], 'with Stock off the link does nothing (the Feed stays)');
+    await pg.close();
+    // French label
+    pg = await open(q.replace('lang=en', 'lang=fr')); await settled(pg); await pg.click('#view-tab-stock'); await waitOv(pg); await wait5(300);
+    await clickBy(pg, '#stock-panel [data-act="settings"]'); await pg.waitForSelector('#sf-weekly', { timeout: 4000 }); await wait5(500);
+    ok(/E-mail r\u00e9capitulatif du lundi/.test(await tc(pg, '#sf-weekly-wrap')) && !/Weekly|Monday/.test(await tc(pg, '#sf-weekly-wrap')), 'French switch label');
+    await pg.close();
+  }
+
   // 5g. phone width, English and French: no overflow, every control 44 px
   for (const lng of ['en', 'fr']) {
     pg = await open('plan=free&stock=all&stock_seed=acceptance&stock_today=2026-11-02&stock_claims=0&lang=' + lng, { width: 390, height: 844, isMobile: true, hasTouch: true });

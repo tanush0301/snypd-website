@@ -2104,7 +2104,15 @@ body {
     });
   }
   window.SNYPD.stockReplacesHistory = function () { return !!window.SNYPD.stockMode && !stockHidden; };
-  window.SNYPD.onStockMode = function (mode, hidden) { window.SNYPD.stockMode = mode; stockHidden = !!hidden; paint(); };
+  window.SNYPD.onStockMode = function (mode, hidden) { window.SNYPD.stockMode = mode; stockHidden = !!hidden; paint(); openFromLink(); };
+  /* links from the weekly Stock email: ?open=stock opens the Stock tab, ?open=stock-settings also opens Stock > Settings (once per page load, only when Stock is on and not hidden) */
+  var linkDone = false;
+  function openFromLink() {
+    var o = null; try { o = new URLSearchParams(location.search).get('open'); } catch (e) { o = null; }
+    if (linkDone || (o !== 'stock' && o !== 'stock-settings') || !window.SNYPD.stockMode || window.SNYPD.stockMode === 'off' || stockHidden) return;
+    linkDone = true; window.SNYPD.pendingStockSettings = o === 'stock-settings';
+    setTimeout(function () { if (window.SNYPD.switchView) window.SNYPD.switchView('stock'); }, 0);
+  }
   window.SNYPD.applyStockTab = function (hidden) {
     stockHidden = !!hidden; paint();
     var a = document.querySelector('.view-tab.active');

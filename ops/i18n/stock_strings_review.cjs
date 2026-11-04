@@ -92,7 +92,12 @@ const en = {
   'xcat.promotion': 'Boosts and promotions',
   'xcat.tools': 'Subscriptions and tools',
   'xcat.travel': 'Travel',
-  'xcat.other': 'Other'
+  'xcat.other': 'Other',
+  // 073: weekly email switch
+  'set.weekly': 'Weekly summary email (Mondays)',
+  'set.weekly.hint': 'Last week’s profit, your stock and what to do first, every Monday morning.',
+  'set.weekly.on': 'Weekly email on.',
+  'set.weekly.off': 'Weekly email off. You can switch it back on here.'
 };
 const fr = {
   'status.stock': 'Pas en vente', 'chip.held': 'En stock',
@@ -182,6 +187,11 @@ const fr = {
   'xcat.promotion': 'Boosts et mises en avant',
   'xcat.tools': 'Abonnements et outils',
   'xcat.travel': 'Déplacements',
-  'xcat.other': 'Autre'
+  'xcat.other': 'Autre',
+  // 073: weekly email switch
+  'set.weekly': 'E-mail récapitulatif du lundi',
+  'set.weekly.hint': 'Le bénéfice de la semaine, ton stock et quoi faire en premier, chaque lundi matin.',
+  'set.weekly.on': 'E-mail du lundi activé.',
+  'set.weekly.off': 'E-mail du lundi désactivé. Tu peux le réactiver ici.'
 };
 module.exports = { en, fr };

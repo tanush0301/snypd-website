@@ -199,13 +199,19 @@
       // account settings (currency, persona, tab_hidden, old_after_days): own-row insert/update policies on stock_settings (065), so one upsert; the CHECKs answer stock_check_violation.
       // Changing the currency relabels the numbers and never converts them.
       saveSettings: async patch => {
-        const row = {}; ['currency', 'persona', 'tab_hidden', 'old_after_days'].forEach(k => { if (patch[k] !== undefined) row[k] = patch[k]; });
+        const row = {}; ['currency', 'persona', 'tab_hidden', 'old_after_days', 'weekly_email'].forEach(k => { if (patch[k] !== undefined) row[k] = patch[k]; });   // weekly_email: 073
         let u; try { u = await client.auth.getUser(); } catch (e) { throw parseError(e); }
         const uid = u && u.data && u.data.user && u.data.user.id; if (!uid) throw parseError('not authenticated 401');
         row.user_id = uid;
         let r; try { r = await client.from('stock_settings').upsert(row, { onConflict: 'user_id' }); } catch (e) { throw parseError(e); }
         if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
         return row;
+      },
+      // the weekly-email switch (073) lives only in the settings row: select-own through RLS; null = no row yet (= on). Before 073 the column is missing and this throws.
+      settingsRow: async () => {
+        let r; try { r = await client.from('stock_settings').select('weekly_email').maybeSingle(); } catch (e) { throw parseError(e); }
+        if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
+        return r.data || null;
       },
       // one item by id (a Today lane opens its item without paging through the list); select-own through RLS
       itemById: async id => {

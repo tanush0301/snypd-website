@@ -77,6 +77,7 @@
       if (b.mode === 'off') { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.disabled')) + '</div></div>'; return; }
       S.cur = b.currency || 'EUR'; S.cats = b.categories || [];
       shell(); showView('overview');
+      if (window.SNYPD && window.SNYPD.pendingStockSettings) { window.SNYPD.pendingStockSettings = false; openSettings(null); }
     }).catch(function (e) { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.load')) + ' <button class="st-btn st-ghost" data-act="reopen">' + esc(T('err.retry')) + '</button></div></div>'; S.panel.onclick = function (ev) { if (ev.target.closest('[data-act="reopen"]')) { var p = S.panel, c = S.client; S = null; open({ client: c, panel: p }); } }; console.error('SNYPD Stock boot failed', e); });
   }
   function shell() {
@@ -343,9 +344,15 @@
       C.PERSONAS.map(function (p) { return '<button type="button" class="st-segb" data-act="seg" data-p="' + p + '" aria-pressed="' + (S.sheet.persona === p ? 'true' : 'false') + '">' + esc(T('pq.' + p)) + '</button>'; }).join('') + '</div></div>' +
       fld('old', T('set.old'), txt('old', b.old_after_days || C.CAPS.oldAfterDefault, '', ' inputmode="numeric" maxlength="3"')) +
       '<p class="st-hint full">' + esc(T('set.old.hint')) + '</p>' +
-      '<div class="st-f full"><label class="st-check"><input type="checkbox" id="sf-tab"' + (b.tab_hidden ? '' : ' checked') + '> ' + esc(T('set.tab')) + '</label><p class="st-hint">' + esc(T('set.tab.hint')) + '</p></div></div>';
+      '<div class="st-f full"><label class="st-check"><input type="checkbox" id="sf-tab"' + (b.tab_hidden ? '' : ' checked') + '> ' + esc(T('set.tab')) + '</label><p class="st-hint">' + esc(T('set.tab.hint')) + '</p></div>' +
+      '<div class="st-f full" id="sf-weekly-wrap" style="display:none"><label class="st-check"><input type="checkbox" id="sf-weekly" checked> ' + esc(T('set.weekly')) + '</label><p class="st-hint">' + esc(T('set.weekly.hint')) + '</p></div></div>';
     mountSheet(T('set.title'), body, '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button><button type="button" class="st-btn st-prim" data-act="submit" id="st-go">' + esc(T('set.save')) + '</button>');
     var f = $('#sf-cur'); if (f) f.focus();
+    S.api.settingsRow().then(function (r) {   // 073; before it the column does not exist and the switch simply stays hidden
+      if (!S.sheet || S.sheet.kind !== 'settings') return;
+      var on = !r || r.weekly_email !== false, cb = $('#sf-weekly'), w = $('#sf-weekly-wrap'); if (!cb || !w) return;
+      cb.checked = on; S.sheet.weekly0 = on; w.style.display = '';
+    }).catch(function () { /* no switch */ });
   }
   function saveSettingsSheet() {
     var b = S.boot, patch = {}, cur = $('#sf-cur').value, oldv = ($('#sf-old').value || '').trim();
@@ -354,12 +361,13 @@
     var pers = S.sheet.persona; if (pers && pers !== b.persona) patch.persona = pers;
     if (+oldv !== (b.old_after_days || C.CAPS.oldAfterDefault)) patch.old_after_days = +oldv;
     var hidden = !$('#sf-tab').checked; if (hidden !== !!b.tab_hidden) patch.tab_hidden = hidden;
+    var wk = $('#sf-weekly'); if (wk && S.sheet.weekly0 !== undefined && wk.checked !== S.sheet.weekly0) patch.weekly_email = wk.checked;
     if (!Object.keys(patch).length) { closeSheet(); return; }
     var go = $('#st-go'); if (go) go.disabled = true;
     S.api.saveSettings(patch).then(function () {
       closeSheet(); S.ov.stale = true;
       if (patch.tab_hidden !== undefined) applyTab(patch.tab_hidden);
-      return reloadKeep().then(function () { showBar(patch.currency ? T('set.cur.saved', { cur: patch.currency }) : T('set.saved'), false); });
+      return reloadKeep().then(function () { showBar(patch.currency ? T('set.cur.saved', { cur: patch.currency }) : (Object.keys(patch).length === 1 && patch.weekly_email !== undefined ? T(patch.weekly_email ? 'set.weekly.on' : 'set.weekly.off') : T('set.saved')), false); });
     }).catch(function (e) { sheetError(e); });
   }
 
