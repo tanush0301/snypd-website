@@ -776,6 +776,26 @@ body {
 .mr-quota.low { color: var(--warning); }
 /* Price fix (Session 66): what the price is for, three labelled asking prices, max buy price, source, sheet. */
 .mr-cmp { margin-top: 12px; font-size: 12.5px; color: var(--text-muted); line-height: 1.7; }
+.hr { margin: 0 0 18px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; }
+.hr-hd { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; align-items: baseline; }
+.hr-title { font-size: 14px; color: var(--text-primary); }
+.hr-dates { font-size: 11.5px; color: var(--text-muted); }
+.hr-h { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.hr-h__top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.hr-name { color: var(--text-primary); font-size: 13.5px; overflow-wrap: anywhere; }
+.hr-n { font-size: 12.5px; color: var(--text-muted); }
+.hr-d { font-size: 11.5px; margin-left: 6px; color: var(--text-muted); }
+.hr-cheap { margin-top: 6px; font-size: 12.5px; color: var(--text-muted); }
+.hr-cheap b { color: var(--text-primary); font-weight: 400; }
+.hr-cheap a { margin-left: 6px; }
+.hr-c { margin-top: 8px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; font-size: 12.5px; }
+.hr-c__name { color: var(--text-primary); }
+.hr-c__n { color: var(--text-muted); text-align: right; }
+.hr-c__p { grid-column: 1 / -1; color: var(--text-muted); }
+.hr-c__p b { color: var(--text-primary); font-weight: 400; }
+.hr-note { margin-top: 12px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+.hr-teaser { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+.hr-teaser b { color: var(--text-primary); font-weight: 400; }
 .mr-nf { margin-top: 12px; padding: 8px 10px; border: 1px solid var(--amber, #c9a227); border-radius: 8px; font-size: 12.5px; line-height: 1.5; color: var(--text-primary); }
 .mr-cmp b { color: var(--text-primary); font-weight: 400; }
 .mr-ign, .mr-try { display: inline-block; margin: 2px 4px 0 0; padding: 3px 9px; min-height: 30px; font: inherit; font-size: 12px; color: var(--text-secondary); background: transparent; border: 1px dashed var(--border3); cursor: pointer; }
@@ -2132,6 +2152,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 </div>
 </div>
 <div class="bd">
+<div id="hr-box" class="hr" style="display:none"></div>
 <div id="mr-result"></div>
 </div>
 </div>
@@ -7410,6 +7431,85 @@ const HEARTBEAT_URL = (() => {
     input.value = t;
     run();
   };
+
+  /* "Your hunts this week" (Session 66 P6): GET /api/v1/hunt-report. The backend decides the tier (Pro / Elite /
+     trial = full, others = one line) from the user's own row; this only draws what comes back. Loaded when the Market
+     tab opens, at most once every 5 minutes (the backend caches 10). */
+  var hrBox = document.getElementById('hr-box'), hrAt = 0, hrBusy = false;
+  var CUR = { EUR: '\u20AC', GBP: '\u00A3', USD: '$' };
+  function money(cents, cur) {
+    if (cents == null || isNaN(cents)) { return '?'; }
+    var v = (cents / 100).toFixed(2).replace(/[.]00$/, '');
+    return CUR[cur] ? CUR[cur] + v : v + ' ' + escapeHtml(cur || '');
+  }
+  function sp(t) { return '<span>' + escapeHtml(t) + '</span>'; }
+  function change(p) { return p == null ? '' : ' <span class="hr-d">' + sp((p > 0 ? '+' : '') + p + '%') + ' ' + sp('vs last week') + '</span>'; }
+  function day(iso) {
+    var lang = (window.SNYPD_I18N && window.SNYPD_I18N.lang) === 'fr' ? 'fr-FR' : 'en-GB';
+    try { return new Date(iso + 'T12:00:00Z').toLocaleDateString(lang, { day: 'numeric', month: 'short', timeZone: 'UTC' }); } catch (e) { return iso; }
+  }
+  function count(n, one, many) { return n === 1 ? one : n + ' ' + many; }
+  function hrRender(d) {
+    var html = '<div class="hr-hd"><span class="hr-title">' + sp('Your hunts this week') + '</span>'
+      + '<span class="hr-dates">' + escapeHtml(day(d.since)) + ' &ndash; ' + escapeHtml(day(d.until)) + '</span></div>';
+    if (d.tier !== 'full') {
+      var t = d.teaser || {};
+      html += '<p class="hr-teaser" style="margin-top:8px">' + sp(count(t.finds || 0, '1 new listing found by your hunts.', 'new listings found by your hunts.'))
+        + (t.cheapest_cents != null ? ' ' + sp('Cheapest find') + ' <b>' + money(t.cheapest_cents, t.currency) + '</b> (' + escapeHtml(t.hunt_name || '') + ').' : '')
+        + '<br>' + sp('The full report (typical price per condition, the cheapest find with its link, change vs last week) is part of Pro and Elite.')
+        + ' <a href="/plans">' + sp('See plans') + '</a></p>';
+      return html;
+    }
+    var hunts = d.hunts || [];
+    if (!hunts.length) { return html + '<p class="hr-teaser" style="margin-top:8px">' + sp('No active hunts. Start a hunt to get this report.') + '</p>'; }
+    hunts.forEach(function (h) {
+      html += '<div class="hr-h"><div class="hr-h__top"><span class="hr-name">' + escapeHtml(h.name || '') + '</span>'
+        + '<span class="hr-n">' + sp(count(h.finds || 0, '1 new listing', 'new listings')) + change(h.finds_change_pct) + '</span></div>';
+      if (!h.finds) {
+        html += '<div class="hr-cheap">' + sp('No new listings this week yet.') + '</div></div>';
+        return;
+      }
+      if (h.cheapest) {
+        html += '<div class="hr-cheap">' + sp('Cheapest find') + ' <b>' + money(h.cheapest.price_cents, h.currency) + '</b> &middot; ' + sp(h.cheapest.condition)
+          + (h.cheapest.url ? ' <a href="' + escapeHtml(h.cheapest.url) + '" target="_blank" rel="noopener noreferrer">' + sp('Open on Vinted') + '</a>' : '') + '</div>';
+      }
+      (h.conditions || []).forEach(function (c) {
+        html += '<div class="hr-c"><span class="hr-c__name">' + sp(c.condition) + '</span><span class="hr-c__n">' + sp(count(c.finds || 0, '1 listing', 'listings')) + '</span>'
+          + '<span class="hr-c__p">' + (c.status === 'ok'
+            ? sp('typical') + ' <b>' + money(c.typical_cents, h.currency) + '</b> &middot; ' + money(c.low_cents, h.currency) + '&ndash;' + money(c.high_cents, h.currency) + change(c.typical_change_pct)
+            : sp(c.status === 'mixed' ? 'Too mixed for one price' : 'Too few to price yet')) + '</span></div>';
+      });
+      html += '</div>';
+    });
+    return html + '<p class="hr-note">' + sp('Asking prices of the new listings your hunts found in the last 7 days (UTC days), not sold prices. The cheapest find comes from the prices we keep: up to 400 a day per condition.') + '</p>';
+  }
+  async function loadHuntReport(force) {
+    if (!hrBox || hrBusy) { return; }
+    if (!force && Date.now() - hrAt < 300000) { return; }
+    hrBusy = true;
+    try {
+      var res = await api('/api/v1/hunt-report', 'GET');
+      if (res.status === 200 && res.body) {
+        hrAt = Date.now();
+        hrBox.innerHTML = hrRender(res.body);
+        hrBox.style.display = '';
+      } else if (res.status === 401) {
+        hrBox.style.display = 'none';
+      } else {
+        hrBox.innerHTML = '<p class="hr-teaser">' + sp('Could not load your weekly report right now.') + '</p>';
+        hrBox.style.display = '';
+      }
+    } catch (e) {
+      hrBox.style.display = 'none';
+    } finally {
+      hrBusy = false;
+    }
+  }
+  document.addEventListener('snypd:plan', function () {
+    var panel = document.getElementById('market-panel');
+    if (panel && panel.style.display !== 'none') { loadHuntReport(false); }
+  });
+  window.SNYPD.loadHuntReport = loadHuntReport;
 
   /* The plan is resolved asynchronously by the block above, so take it from
    * whichever arrives first: the event, or an already-set attribute. */

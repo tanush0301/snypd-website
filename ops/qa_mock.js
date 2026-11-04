@@ -540,6 +540,27 @@
     if (u.indexOf('/api/v1/push/status') !== -1) {
       return Promise.resolve(new Response(JSON.stringify({ status: 'ready' }), { status: 200 }));
     }
+    // Weekly hunt report (Session 66 P6): ?hr=teaser | empty | error, else the full report for paid/trial plans
+    if (u.indexOf('/api/v1/hunt-report') !== -1) {
+      var hrq = new URLSearchParams(location.search).get('hr');
+      if (hrq === 'error') return Promise.resolve(new Response(JSON.stringify({ detail: 'could not build your report right now' }), { status: 503 }));
+      var hrBase = { days: 7, since: '2026-11-12', until: '2026-11-18', generated_at: '2026-11-18T15:00:00Z', cached: false };
+      if (hrq === 'teaser' || (PLAN !== 'elite' && PLAN !== 'pro' && hrq !== 'full')) {
+        return Promise.resolve(new Response(JSON.stringify(Object.assign({ tier: 'teaser', teaser: { finds: 288, hunts: 3, cheapest_cents: 900, currency: 'EUR', hunt_name: 'carhartt' } }, hrBase)), { status: 200 }));
+      }
+      if (hrq === 'empty') return Promise.resolve(new Response(JSON.stringify(Object.assign({ tier: 'full', hunts: [] }, hrBase)), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify(Object.assign({ tier: 'full', hunts: [
+        { id: 'h1', name: 'carhartt', site: 'vinted.fr', currency: 'EUR', finds: 213, finds_before: 140, finds_change_pct: 52,
+          cheapest: { price_cents: 900, condition: 'Good', listing_id: '10300009001', url: 'https://www.vinted.fr/items/10300009001' },
+          conditions: [
+            { condition: 'Very good', finds: 210, finds_before: 140, status: 'ok', typical_cents: 2750, low_cents: 1950, high_cents: 3300, typical_change_pct: 8 },
+            { condition: 'Good', finds: 3, finds_before: null, status: 'few', typical_cents: null, low_cents: null, high_cents: null, typical_change_pct: null }] },
+        { id: 'h2', name: 'barbour <b>wax</b>', site: 'vinted.co.uk', currency: 'GBP', finds: 75, finds_before: null, finds_change_pct: null,
+          cheapest: { price_cents: 100, condition: 'Muy bueno', listing_id: 'x' },
+          conditions: [{ condition: 'Muy bueno', finds: 40, status: 'mixed', typical_cents: null, typical_change_pct: null },
+                       { condition: 'Other condition', finds: 35, status: 'ok', typical_cents: 2000, low_cents: 2000, high_cents: 2000, typical_change_pct: null }] },
+        { id: 'h3', name: 'lego', site: 'vinted.pl', currency: 'PLN', finds: 0, finds_before: null, finds_change_pct: null, cheapest: null, conditions: [] }] }, hrBase)), { status: 200 }));
+    }
     if (u.indexOf('/api/v1/market/snapshot') !== -1) {
       var body = {};
       try { body = JSON.parse(opts && opts.body || '{}'); } catch (e) {}
