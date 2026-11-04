@@ -75,9 +75,17 @@ function toFrench(s) {
 async function show(data) {
   let title = data.title || 'SNYPD';
   let body = data.body || 'A new listing matched your search.';
+  let fr = false;
   try {
-    if ((await uiLang()) === 'fr') { title = toFrench(title); body = toFrench(body); }
+    fr = (await uiLang()) === 'fr';
+    if (fr) { title = toFrench(title); body = toFrench(body); }
   } catch (e) {}
+  // Price check (Session 66): push.py sends "rank" (50-100) only for paid plans and running trials, as a number,
+  // so the sentence follows the user's language here. Payloads without it are shown exactly as before.
+  if (Number.isInteger(data.rank) && data.rank >= 50 && data.rank <= 100) {
+    body = (fr ? 'Moins cher que ' + data.rank + '\u00a0% des trouvailles de la semaine \u00b7 '
+               : 'Cheaper than ' + data.rank + '% of this week\'s finds \u00b7 ') + body;
+  }
   const options = {
     body: body,
     icon: '/assets/icons/icon-192.png',
