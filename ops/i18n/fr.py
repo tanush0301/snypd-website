@@ -1120,8 +1120,8 @@ FR.update({
     'not in our listings': 'absent de nos annonces', 'left out to find more': 'retiré pour trouver plus',
     'Quick sale': 'Vente rapide', 'Typical': 'Typique', 'Patient': 'Patient',
     'Asking prices, not sold prices.': 'Prix demandés, pas les prix réellement payés.',
-    'Pay at most': 'Paie au maximum', 'to keep a': 'pour garder une marge de',
-    '% margin at the typical asking price.': NB + '% au prix demandé typique.',
+    'Pay at most': 'Paie au maximum', 'Margin': 'Marge',
+    '% at the typical asking price': NB + '% sur le prix demandé typique',
     '(this item)': '(cet article)',
     'Price check': 'Vérifier le prix',
     'Price checks are part of Pro and Elite.': 'La vérification des prix fait partie de Pro et Elite.',
@@ -1132,4 +1132,11 @@ FR_PATTERNS += [
      'Prix demandés sur $1 (annonces UE), en $2, $3 derniers jours.'),
     (r'^Asking prices on (\S+) \(EU listings\), in ([A-Z]{3}), last (\d+) days\. Your feed has listings from (.+): these prices are not from there\.$',
      'Prix demandés sur $1 (annonces UE), en $2, $3 derniers jours. Ton flux contient des annonces de $4' + NB + ': ces prix n’en viennent pas.'),
+]
+FR.update({
+    "Typical asking prices from listings SNYPD saw on Vinted's EU site in the last 14 days, by condition. Type a brand and model; sizes and colours are ignored.":
+        'Prix demandés typiques des annonces que SNYPD a vues sur le site UE de Vinted ces 14 derniers jours, par état. Tape une marque et un modèle' + NB + '; tailles et couleurs sont ignorées.',
+})
+FR_PATTERNS += [
+    (r'^Typical asking price for (.+) \(all conditions: (.+)\)$', 'Prix demandé typique pour $1 (tous états' + NB + ': $2)'),
 ]

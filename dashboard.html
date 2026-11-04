@@ -2116,7 +2116,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 <div class="chip plan">Market Insights</div>
 <div class="chip neutral" id="mr-tier-chip">Pro &amp; Elite</div>
 </div>
-<p class="tiny-note" style="margin-top:10px">Median asking price and sample size for any item, computed live across current Vinted listings, broken down by condition.</p>
+<p class="tiny-note" style="margin-top:10px">Typical asking prices from listings SNYPD saw on Vinted's EU site in the last 14 days, by condition. Type a brand and model; sizes and colours are ignored.</p>
 <div class="mr-row" id="mr-controls" style="margin-top:10px">
 <input class="mr-input" id="mr-query" type="text" autocomplete="off" spellcheck="false" placeholder="Search an item, e.g. jordan 1 mid" />
 <button class="btn btn-prim" id="mr-go" type="button">Check price</button>
@@ -7104,9 +7104,9 @@ const HEARTBEAT_URL = (() => {
       + '<div><div class="v">' + eur(r.high) + '</div><div class="l">Patient</div></div></div>'
       + '<div class="mr-sub">' + (row ? 'For this condition (' + escapeHtml(mine) + '). ' : '')
       + 'Asking prices, not sold prices.</div>'
-      + '<div class="mr-max"><span>Pay at most</span> <b data-mr-max>' + eur(Math.round(t * (100 - m) / 100)) + '</b>'
-      + ' <span>to keep a</span> <input type="number" min="0" max="90" step="5" value="' + m + '" data-mr-margin aria-label="Margin in percent">'
-      + ' <span>% margin at the typical asking price.</span></div></div>';
+      + '<div class="mr-max"><span>Pay at most</span> <b data-mr-max>' + eur(Math.round(t * (100 - m) / 100)) + '</b></div>'
+      + '<div class="mr-max"><span>Margin</span> <input type="number" min="0" max="90" step="5" value="' + m + '" data-mr-margin aria-label="Margin in percent">'
+      + ' <span>% at the typical asking price</span></div></div>';
   }
   var OTHER_MARKETS = ['vinted.co.uk', 'vinted.com', 'vinted.pl', 'vinted.cz', 'vinted.hu', 'vinted.ro', 'vinted.se', 'vinted.dk'];
   function otherMarketNote() {
@@ -7131,10 +7131,15 @@ const HEARTBEAT_URL = (() => {
 
     if (d.show_headline && d.typical_cents != null) {
       var r = d.range_cents || {};
+      var own = null;
+      (d.by_condition || []).forEach(function (c) {
+        if (mine && c.condition_label === mine && c.verdict === 'ok' && c.typical_cents != null) { own = c; }
+      });
       html += '<div style="margin-top:10px"><div class="mr-price">'
-            + (d.provisional ? '~' : '') + eur(d.typical_cents) + '</div>'
+            + (d.provisional && !own ? '~' : '') + eur(own ? own.typical_cents : d.typical_cents) + '</div>'
             + '<div class="mr-sub">'
-            + (d.provisional ? 'Midpoint of what few listings exist' : 'Most sit between ' + eur(r.low) + ' and ' + eur(r.high))
+            + (own ? 'Typical asking price for ' + escapeHtml(mine) + ' (all conditions: ' + eur(d.typical_cents) + ')'
+                   : (d.provisional ? 'Midpoint of what few listings exist' : 'Most sit between ' + eur(r.low) + ' and ' + eur(r.high)))
             + '</div></div>';
     }
 
