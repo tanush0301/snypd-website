@@ -1108,6 +1108,9 @@ FR.update({
 FR_PATTERNS += [
     (r"^Cheaper than (\d+)% of this hunt's finds this week$", 'Moins cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
     (r"^Pricier than (\d+)% of this hunt's finds this week$", 'Plus cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
+    (r"^Only (\d+)% of this hunt's finds this week cost more$", 'Seulement $1' + NB + '% des trouvailles de cette recherche cette semaine coûtent plus cher'),
+    (r"^Not found in any listing of the last 14 days, so left out of this price: (.+)$",
+     'Absent de toutes les annonces des 14 derniers jours, donc pas pris en compte dans ce prix' + NB + ': $1'),
     (r'^same condition · (\d+) finds compared$', 'même état · $1 annonces comparées'),
 ]
 
@@ -1118,6 +1121,13 @@ FR.update({
     'Too few listings with every word. Try without:': 'Trop peu d’annonces avec tous ces mots. Essaie sans' + NB + ':',
     'size': 'taille', 'colour': 'couleur', 'year': 'année', 'condition': 'état', 'filler': 'mot vide',
     'not in our listings': 'absent de nos annonces', 'left out to find more': 'retiré pour trouver plus',
+    'On the Free plan every match comes through.': 'Avec le plan Free, toutes les annonces arrivent.',
+    'Only the cheap ones': 'Seulement les moins chères',
+    'Only the cheap ones (paid plans)': 'Seulement les moins chères (plans payants)',
+    "Only the cheap ones: a push only for a find cheaper than 75% of this hunt's finds this week. Finds without a price check yet still come through. The Feed shows everything.":
+        'Seulement les moins chères' + NB + ': une notification seulement pour une trouvaille moins chère que 75' + NB + '% des trouvailles de cette recherche cette semaine. Les trouvailles sans vérification de prix arrivent quand même. Le Feed montre tout.',
+    "The priciest of this hunt's finds this week": 'La plus chère des trouvailles de cette recherche cette semaine',
+    'Few listings: a rough guide.': 'Peu d’annonces' + NB + ': une estimation approximative.',
     'Quick sale': 'Vente rapide', 'Typical': 'Typique', 'Patient': 'Patient',
     'Asking prices, not sold prices.': 'Prix demandés, pas les prix réellement payés.',
     'Pay at most': 'Paie au maximum', 'Margin': 'Marge',

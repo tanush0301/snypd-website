@@ -86,7 +86,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(rated(s).length, 5, '5 rated cards (the gone listing rated 90 is not rated on screen)');
   eq(s.lines.length, 5, 'every rated card shows its line on a paid plan');
   ok(s.lines.includes("Cheaper than 82% of this hunt's finds this week | same condition \u00b7 412 finds compared"), 'line + sub-line text: ' + s.lines[0]);
-  ok(s.lines.includes("Pricier than 77% of this hunt's finds this week | same condition \u00b7 412 finds compared"), 'below 50 reads "Pricier than (100 - p)%"');
+  ok(s.lines.includes("Only 23% of this hunt's finds this week cost more | same condition \u00b7 412 finds compared"), 'below 50 reads "Only p% ... cost more" (p = share asking more; ties never counted as cheaper)');
   eq(s.locks, 0, 'no lock chips on a paid plan');
   eq(s.cheapBorders, 2, 'the two cards in the cheapest quarter (82, 80) get the mint border');
   ok(s.gone.length >= 1 && s.gone.every(x => x === false), 'a gone listing never shows a rating');
@@ -165,13 +165,40 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(s.order.length > 0, 'feed rendered without ratings');
   eq([s.bar, s.lines.length, s.locks], [false, 0, 0], 'no bar and no lines when no card is rated');
   await page.close();
+  // review #1: a saved "cheapest 25%" choice must never blank a feed that has no rated card (the bar is hidden then)
+  page = await open('plan=elite&broad=1', { noWait: true, storage: { snypd_pr_cheap: '1' } });
+  s = await state(page);
+  eq([s.bar, s.shownCards === s.order.length, s.empty], [false, true, false], 'saved cheap filter + no rated cards: every card stays visible, no empty note');
+  ok(s.order.length > 0, 'feed rendered');
+  await page.close();
+
+  // ---- 4b. P5: "Only the cheap ones" in the Filters sheet (paid: selectable, saves push_mode cheap; Free: locked)
+  async function fsMode(page) {
+    await page.click('#filter-pill');
+    await page.waitForSelector('[data-fs-mode]', { timeout: 8000 });
+    return page.$$eval('[data-fs-mode] option', os => os.map(o => o.value + (o.selected ? '*' : '') + (o.disabled ? '!' : '') + '=' + o.textContent.trim()));
+  }
+  page = await open('plan=elite&pr=1');
+  let opts = await fsMode(page);
+  ok(opts.includes('cheap=Only the cheap ones'), 'paid: "Only the cheap ones" offered and enabled: ' + opts.join(' | '));
+  ok(opts.includes('every*=Every match') && opts.includes('calm:30*=Calm - 30 min'), 'paid: every and calm hunts still show their own mode: ' + opts.join(' | '));
+  await page.select('[data-fs-mode]', 'cheap');
+  await page.waitForFunction(() => { const x = document.querySelector('[data-fs-mode]'); return x && !x.disabled && x.value === 'cheap'; }, { timeout: 8000 });
+  opts = await page.$eval('[data-fs-mode]', x => [...x.options].map(o => o.value + (o.selected ? '*' : '')));
+  ok(opts.includes('cheap*') && !opts.includes('calm:30*'), 'first hunt saved as cheap and read back: ' + opts.join(' | '));
+  ok(await page.evaluate(() => [...document.querySelectorAll('.fs-floor__note')].some(n => /^Only the cheap ones: a push only for a find cheaper than 75%/.test(n.textContent))), 'cheap note shown');
+  await page.close();
+  page = await open('plan=free&pr=1');
+  opts = await fsMode(page);
+  ok(opts.includes('cheap!=Only the cheap ones (paid plans)'), 'Free: the option is locked and says paid plans: ' + opts.join(' | '));
+  await page.close();
 
   // ---- 5. French + phone width
   page = await open('plan=elite&pr=1&lang=fr', { vp: { width: 390, height: 844, isMobile: true, hasTouch: true } });
   await wait(600);
   s = await state(page);
   ok(s.lines.includes('Moins cher que 82\u00a0% des trouvailles de cette recherche cette semaine | m\u00eame \u00e9tat \u00b7 412 annonces compar\u00e9es'), 'French line: ' + s.lines[0]);
-  ok(s.lines.some(l => /^Plus cher que 77\u00a0%/.test(l)), 'French "Pricier than"');
+  ok(s.lines.includes('Seulement 23\u00a0% des trouvailles de cette recherche cette semaine co\u00fbtent plus cher | m\u00eame \u00e9tat \u00b7 412 annonces compar\u00e9es'), 'French "Only p% ... cost more"');
   eq(s.chips, ['Plus r\u00e9centes*', 'Meilleur prix d\u2019abord', 'Les 25\u00a0% les moins ch\u00e8res'], 'French chips');
   ok(s.overflow <= 0, '390 px: no horizontal overflow (' + s.overflow + ')');
   ok(await page.$$eval('#pr-bar .pr-chip', bs => bs.every(b => b.getBoundingClientRect().height >= 32)), '390 px: chips at least 32 px tall');

@@ -408,7 +408,7 @@
       // Column defaults + CHECKs that the real DB has (migrations 043, 064), so
       // the page sees the same row shape after an insert as in production.
       var badPush = function (r) {
-        return (r.push_mode !== undefined && ['every', 'calm'].indexOf(r.push_mode) < 0) ||
+        return (r.push_mode !== undefined && ['every', 'calm', 'cheap'].indexOf(r.push_mode) < 0) ||
           (r.push_calm_minutes !== undefined && [15, 30].indexOf(r.push_calm_minutes) < 0);
       };
       if (table === 'user_searches' && (op === 'insert' || op === 'update') && badPush(payload || {})) {
@@ -565,9 +565,24 @@
         if (mkKeep.indexOf(mw) === -1 && (mw === 'size' || (mi > 0 && mkWords[mi - 1] === 'size') || mw === 'black')) mkIgn.push({ word: mw, why: mw === 'black' ? 'colour' : 'size' });
         else mkOn.push(mw);
       }
-      var mkSearch = { compared_on: mkOn, ignored: mkIgn, offer_drop: q.indexOf('travis') !== -1 ? ['travis'] : [], pinned: mkKeep };
+      if (mkOn.indexOf('tahari') !== -1) { mkOn = mkOn.filter(function (w) { return w !== 'tahari'; }); mkIgn.push({ word: 'tahari', why: 'not_found' }); }
+      var mkThinDrop = q.indexOf('p-6000') !== -1 ? ['6000'] : [];
+      var mkSearch = { compared_on: mkOn, ignored: mkIgn, offer_drop: q.indexOf('travis') !== -1 ? ['travis'] : mkThinDrop, pinned: mkKeep };
       var mkSource = { site: 'vinted.be', market: 'EU', currency: 'EUR', window_days: 14 };
-      if (q.indexOf('travis') !== -1) {
+      // review checks: 'slowq' answers late (two quick taps), 'thinq' is a provisional price (few listings)
+      if (q.indexOf('slowq') !== -1) {
+        return new Promise(function (res) { setTimeout(function () { res(new Response(JSON.stringify({
+          query: q, search: mkSearch, source: mkSource, sample_size: 300, display_verdict: 'ok', provisional: false, show_headline: true,
+          typical_cents: 99900, range_cents: { low: 90000, high: 110000 }, by_condition: [], quota: { hour_remaining: 16, hour_limit: 20 },
+        }), { status: 200 })); }, 1200); });
+      }
+      if (q.indexOf('thinq') !== -1) {
+        return Promise.resolve(new Response(JSON.stringify({
+          query: q, search: mkSearch, source: mkSource, sample_size: 5, display_verdict: 'too_thin', provisional: true, show_headline: true,
+          typical_cents: 3000, range_cents: { low: 2500, high: 3500 }, by_condition: [], quota: { hour_remaining: 16, hour_limit: 20 },
+        }), { status: 200 }));
+      }
+      if (q.indexOf('travis') !== -1 || mkThinDrop.length) {
         return Promise.resolve(new Response(JSON.stringify({
           query: q, sample_size: 1, display_verdict: 'too_thin', show_headline: false, search: mkSearch, source: mkSource, quota: { hour_remaining: 18, hour_limit: 20 },
         }), { status: 200 }));

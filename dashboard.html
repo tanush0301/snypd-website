@@ -776,6 +776,7 @@ body {
 .mr-quota.low { color: var(--warning); }
 /* Price fix (Session 66): what the price is for, three labelled asking prices, max buy price, source, sheet. */
 .mr-cmp { margin-top: 12px; font-size: 12.5px; color: var(--text-muted); line-height: 1.7; }
+.mr-nf { margin-top: 12px; padding: 8px 10px; border: 1px solid var(--amber, #c9a227); border-radius: 8px; font-size: 12.5px; line-height: 1.5; color: var(--text-primary); }
 .mr-cmp b { color: var(--text-primary); font-weight: 400; }
 .mr-ign, .mr-try { display: inline-block; margin: 2px 4px 0 0; padding: 3px 9px; min-height: 30px; font: inherit; font-size: 12px; color: var(--text-secondary); background: transparent; border: 1px dashed var(--border3); cursor: pointer; }
 .mr-ign:hover, .mr-try:hover { color: var(--text-primary); border-color: var(--text-secondary); }
@@ -3253,10 +3254,13 @@ const HEARTBEAT_URL = (() => {
               : 'Showing listings with every word of your search in the title or brand. Vinted also returns listings that only mention it in the description.'}</p>
             ${('push_mode' in r) ? `<label class="fs-row__mode"><span>ALERTS</span>
               <select data-fs-mode aria-label="Alerts for this hunt">
-                <option value="every"${r.push_mode === 'calm' ? '' : ' selected'}>Every match</option>
+                <option value="every"${(r.push_mode === 'calm' || r.push_mode === 'cheap') ? '' : ' selected'}>Every match</option>
                 ${[15, 30].map(m => `<option value="calm:${m}"${r.push_mode === 'calm' && Number(r.push_calm_minutes) === m ? ' selected' : ''}>Calm - ${m} min</option>`).join('')}
+                <option value="cheap"${r.push_mode === 'cheap' ? ' selected' : (document.body.classList.contains('pr-free') ? ' disabled' : '')}>${document.body.classList.contains('pr-free') ? 'Only the cheap ones (paid plans)' : 'Only the cheap ones'}</option>
               </select></label>
-              ${r.push_mode === 'calm' ? `<p class="fs-floor__note" role="note">Calm: the first find right away, then at most one summary every ${Number(r.push_calm_minutes) || 15} min.</p>` : ''}` : ''}
+              ${r.push_mode === 'calm' ? `<p class="fs-floor__note" role="note">Calm: the first find right away, then at most one summary every ${Number(r.push_calm_minutes) || 15} min.</p>` : ''}
+              ${r.push_mode === 'cheap' ? `<p class="fs-floor__note" role="note">Only the cheap ones: a push only for a find cheaper than 75% of this hunt's finds this week. Finds without a price check yet still come through. The Feed shows everything.</p>` : ''}
+              ${r.push_mode === 'cheap' && document.body.classList.contains('pr-free') ? `<p class="fs-floor__note is-warn" role="note">On the Free plan every match comes through.</p>` : ''}` : ''}
             <div class="fs-row__actions">
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
               <button type="button" data-fs-showall aria-pressed="${r.show_all_results ? 'true' : 'false'}">${r.show_all_results ? 'TITLE MATCH ONLY' : 'SHOW ALL VINTED RESULTS'}</button>
@@ -3410,7 +3414,7 @@ const HEARTBEAT_URL = (() => {
       const parts = String(sel.value).split(':');
       const patch = parts[0] === 'calm'
         ? { push_mode: 'calm', push_calm_minutes: Number(parts[1]) || 15 }
-        : { push_mode: 'every' };
+        : (parts[0] === 'cheap' ? { push_mode: 'cheap' } : { push_mode: 'every' });
       sel.disabled = true;
       const { error } = await sb.from('user_searches').update(patch).eq('id', row.dataset.id).eq('user_id', uid);
       if (error) console.error('SNYPD filter sheet: could not change alert mode', error);
@@ -5404,11 +5408,12 @@ const HEARTBEAT_URL = (() => {
     const isGone = r.is_visible === false;
 
     // Price check: written by the scraper (price_rank.py) only when the hunt has >= 30 finds in this condition this week
-    // and they are not too mixed. "Cheaper than p%" = share of those finds asking more; below 50 it reads "Pricier than".
+    // and they are not too mixed. p = share of those finds asking MORE: "Cheaper than p%"; below 50 "Only p% ... cost more"
+    // (not "Pricier than 100-p", which would count finds at the same price as cheaper).
     const sp = r.item_box && r.item_box.snypd_price;
     const prP = sp && Number.isInteger(sp.p) && sp.p >= 0 && sp.p <= 100 && Number.isInteger(sp.n) && sp.n >= 30 && !isGone ? sp.p : null;
     const prHtml = prP == null ? '' :
-      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prP >= 50 ? 'Cheaper than ' + prP : 'Pricier than ' + (100 - prP)}% of this hunt's finds this week</span>` +
+      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prP >= 50 ? 'Cheaper than ' + prP + "% of this hunt's finds this week" : (prP === 0 ? "The priciest of this hunt's finds this week" : 'Only ' + prP + "% of this hunt's finds this week cost more")}</span>` +
       `<span class="pr-line__sub">same condition &middot; ${sp.n} finds compared</span></div>` +
       `<a class="pr-lock" href="/plans">Price check &middot; Solo and up</a>`;
 
@@ -6058,7 +6063,7 @@ const HEARTBEAT_URL = (() => {
     try {
       row = (await huntModes()).find(h => h.is_active === true && savedSearchSignature(h.vinted_url) === top) || null;
     } catch (e) { console.error('SNYPD: broad-hunt mode lookup failed', e); }
-    if (row && row.push_mode === 'calm') return;
+    if (row && (row.push_mode === 'calm' || row.push_mode === 'cheap')) return;
     broadSig = top;
     broadHunt = row && ('push_mode' in row) ? row : null;
     text.textContent = 'About ' + (topN * 2) + ' new listings an hour match "' + (url ? huntLabel(url) : 'this hunt')
@@ -7073,8 +7078,11 @@ const HEARTBEAT_URL = (() => {
   function searchBlock(d) {
     var s = d.search;
     if (!s || !s.compared_on) { return ''; }
-    var html = '<div class="mr-cmp">Compared on: <b>' + escapeHtml(s.compared_on.join(' ')) + '</b>';
     var ig = s.ignored || [];
+    var nf = ig.filter(function (i) { return i.why === 'not_found'; }).map(function (i) { return i.word; });
+    var html = (nf.length ? '<div class="mr-nf" role="note">Not found in any listing of the last 14 days, so left out of this price: '
+      + escapeHtml(nf.join(', ')) + '</div>' : '')
+      + '<div class="mr-cmp">Compared on: <b>' + escapeHtml(s.compared_on.join(' ')) + '</b>';
     if (ig.length) {
       html += '<br><span>Ignored (tap to add back):</span> ' + ig.map(function (i) {
         return '<button type="button" class="mr-ign" data-mr-keep="' + escapeHtml(i.word) + '">' + escapeHtml(i.word)
@@ -7098,13 +7106,14 @@ const HEARTBEAT_URL = (() => {
     }
     var src = row || d, r = src.range_cents || {}, t = src.typical_cents, m = margin();
     if (r.low == null || r.high == null) { return ''; }
+    var pv = !row && d.provisional ? '~' : '';
     return '<div class="mr-pb" data-mr-typical="' + t + '"><div class="mr-3">'
-      + '<div><div class="v">' + eur(r.low) + '</div><div class="l">Quick sale</div></div>'
-      + '<div><div class="v">' + eur(t) + '</div><div class="l">Typical</div></div>'
-      + '<div><div class="v">' + eur(r.high) + '</div><div class="l">Patient</div></div></div>'
-      + '<div class="mr-sub">' + (row ? 'For this condition (' + escapeHtml(mine) + '). ' : '')
+      + '<div><div class="v">' + pv + eur(r.low) + '</div><div class="l">Quick sale</div></div>'
+      + '<div><div class="v">' + pv + eur(t) + '</div><div class="l">Typical</div></div>'
+      + '<div><div class="v">' + pv + eur(r.high) + '</div><div class="l">Patient</div></div></div>'
+      + '<div class="mr-sub">' + (pv ? 'Few listings: a rough guide. ' : '') + (row ? 'For this condition (' + escapeHtml(mine) + '). ' : '')
       + 'Asking prices, not sold prices.</div>'
-      + '<div class="mr-max"><span>Pay at most</span> <b data-mr-max>' + eur(Math.round(t * (100 - m) / 100)) + '</b></div>'
+      + '<div class="mr-max"><span>Pay at most</span> <b data-mr-max>' + pv + eur(Math.round(t * (100 - m) / 100)) + '</b></div>'
       + '<div class="mr-max"><span>Margin</span> <input type="number" min="0" max="90" step="5" value="' + m + '" data-mr-margin aria-label="Margin in percent">'
       + ' <span>% at the typical asking price</span></div></div>';
   }
@@ -7230,23 +7239,25 @@ const HEARTBEAT_URL = (() => {
     });
   }
 
-  var busy = false;
-  /* The last search, so "add back" / "try without" re-run it in the same place (panel or Feed sheet). */
+  var seq = 0;
+  /* The last search per place (panel or Feed sheet, kept on the element), so "add back" / "try without" re-run it
+     where it was tapped. Every search gets a number; only the newest one may write its answer. */
   var state = { q: '', keep: [], mine: null, into: null };
   async function run(opts) {
-    if (busy) { return; }
     opts = (opts && typeof opts === 'object' && !opts.target) ? opts : {};
     var into = opts.into || result;
     var q = (opts.q != null ? String(opts.q) : (input.value || '')).trim();
     if (!q) { return; }
     var keep = Array.isArray(opts.keep) ? opts.keep.slice(0, 12) : [];
     state = { q: q, keep: keep, mine: opts.mine || null, into: into };
-    busy = true;
+    into.__mrState = state;
+    var my = ++seq;
     goBtn.disabled = true;
     into.innerHTML = '<div class="mr-loading"><span class="mr-spinner"></span>'
       + '<span>Checking real listings across every condition' + HELLIP + '</span></div>';
     try {
       var res = await api('/api/v1/market/snapshot', 'POST', { q: q, keep: keep });
+      if (my !== seq) { return; }
       if (res.status === 200 && res.body) {
         render(res.body, into, state.mine);
         if (into === result) { pushRecent(q); }
@@ -7269,10 +7280,9 @@ const HEARTBEAT_URL = (() => {
         into.innerHTML = '<div class="mr-error">Could not complete that search. Nothing changed.</div>';
       }
     } catch (e) {
-      into.innerHTML = '<div class="mr-error">Could not reach the server.</div>';
+      if (my === seq) { into.innerHTML = '<div class="mr-error">Could not reach the server.</div>'; }
     } finally {
-      busy = false;
-      goBtn.disabled = false;
+      if (my === seq) { goBtn.disabled = false; }
     }
   }
 
@@ -7309,19 +7319,37 @@ const HEARTBEAT_URL = (() => {
 
   /* "Add back" an ignored word, "try without" a word, and the margin input -- in the panel and in the sheet. */
   function wordsOf(q) { return String(q || '').split(/\s+/).filter(Boolean); }
-  function tok(w) { return String(w || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function toks(w) {
+    var t = String(w || '').toLowerCase();
+    try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch (e) {}
+    return t.replace(/['\u2019]/g, '').match(/[a-z0-9]+/g) || [];
+  }
+  function without(q, w) {
+    return wordsOf(q).map(function (x) {
+      var p = toks(x);
+      if (p.indexOf(w) === -1) { return x; }
+      return p.filter(function (y) { return y !== w; }).join(' ');
+    }).filter(Boolean).join(' ');
+  }
+  function stateAt(el) {
+    var box = el.closest('.mr-sheet__bd') || result;
+    return (box && box.__mrState) || state;
+  }
   document.addEventListener('click', function (e) {
     var k = e.target.closest('[data-mr-keep]');
-    if (k && state.q) {
-      run({ q: state.q, keep: state.keep.concat([k.getAttribute('data-mr-keep')]), mine: state.mine, into: state.into });
+    var st = k ? stateAt(k) : null;
+    if (k && st.q) {
+      run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into });
       return;
     }
     var dr = e.target.closest('[data-mr-drop]');
-    if (dr && state.q) {
+    st = dr ? stateAt(dr) : null;
+    if (dr && st.q) {
       var w = dr.getAttribute('data-mr-drop');
-      var q2 = wordsOf(state.q).filter(function (x) { return tok(x) !== w; }).join(' ');
-      if (state.into === result) { input.value = q2; }
-      run({ q: q2, keep: state.keep.filter(function (x) { return x !== w; }), mine: state.mine, into: state.into });
+      var q2 = without(st.q, w);
+      if (!q2) { return; }
+      if (st.into === result) { input.value = q2; }
+      run({ q: q2, keep: st.keep.filter(function (x) { return x !== w; }), mine: st.mine, into: st.into });
     }
   });
   document.addEventListener('input', function (e) {
@@ -7332,7 +7360,7 @@ const HEARTBEAT_URL = (() => {
     try { localStorage.setItem(MARGIN_KEY, String(m)); } catch (er) {}
     var box = inp.closest('[data-mr-typical]');
     var out = box && box.querySelector('[data-mr-max]');
-    if (out) { out.textContent = eur(Math.round(Number(box.getAttribute('data-mr-typical')) * (100 - m) / 100)); }
+    if (out) { out.textContent = (out.textContent.charAt(0) === '~' ? '~' : '') + eur(Math.round(Number(box.getAttribute('data-mr-typical')) * (100 - m) / 100)); }
   });
 
   /* One tap from a Feed card: the answer opens in a sheet over the page, nothing to type. */
@@ -7407,7 +7435,7 @@ const HEARTBEAT_URL = (() => {
       var best = null;
       rated.forEach(function (c) { c.classList.remove('pr-open'); if (!best || rank(c) > rank(best)) best = c; });
       if (free && best) best.classList.add('pr-open');
-      var m = free ? 'new' : mode, ch = !free && cheap;
+      var m = free ? 'new' : mode, ch = !free && cheap && rated.length > 0;
       Array.prototype.forEach.call(bar.querySelectorAll('[data-pr-sort]'), function (b) {
         b.classList.toggle('on', b.getAttribute('data-pr-sort') === m);
         b.classList.toggle('is-locked', free && b.getAttribute('data-pr-sort') === 'best');
@@ -7416,7 +7444,7 @@ const HEARTBEAT_URL = (() => {
       cheapBtn.classList.toggle('is-locked', free);
       if (freeLink) freeLink.style.display = free ? '' : 'none';
       list.classList.toggle('pr-cheap-only', ch);
-      if (empty) empty.style.display = ch && rated.length && !cards.some(function (c) { return c.hasAttribute('data-pr-cheap'); }) ? '' : 'none';
+      if (empty) empty.style.display = ch && !cards.some(function (c) { return c.hasAttribute('data-pr-cheap'); }) ? '' : 'none';
       var order = cards.slice().sort(m === 'best'
         ? function (a, b) { return (rank(b) - rank(a)) || (upMs(b) - upMs(a)); }
         : function (a, b) { return upMs(b) - upMs(a); });

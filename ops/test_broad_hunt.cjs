@@ -100,6 +100,11 @@ f = fixture({}, [{id:'calm-hunt',is_active:true,vinted_url:RL,push_mode:'calm'}]
 await f.g.noteBroadHunt(feed(f.g,60,[[RL,60]]));
 assert.equal(f.el('broad-hunt').style.display,'none'); passed++;
 
+// 8b. A cheap-only hunt (migration 074) already pushes little: no broad-hunt notice either.
+f = fixture({}, [{id:'cheap-hunt',is_active:true,vinted_url:RL,push_mode:'cheap'}]);
+await f.g.noteBroadHunt(feed(f.g,60,[[RL,60]]));
+assert.equal(f.el('broad-hunt').style.display,'none'); passed++;
+
 // 9. A known every-match hunt offers the Calm action.
 f = fixture({}, [{id:'every-hunt',is_active:true,vinted_url:RL,push_mode:'every'}]);
 await f.g.noteBroadHunt(feed(f.g,60,[[RL,60]]));

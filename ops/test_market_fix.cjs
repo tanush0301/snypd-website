@@ -123,6 +123,51 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await page.waitForFunction(() => !document.querySelector('#mr-result .mr-loading') && document.querySelector('#mr-result .mr-3'), { timeout: 6000 });
   eq(await page.$eval('#mr-query', e => e.value), 'jordan 1', 'try without updates the search box');
   eq(await page.evaluate(() => window.__mk[window.__mk.length - 1]), { q: 'jordan 1', keep: [] }, 'and re-runs without the word');
+  // ---- 2b. review fixes
+  // #14: the panel keeps its own search while the sheet runs another one
+  await page.$eval('#mr-query', e => { e.value = 'nike p6000 size 8'; });
+  await page.click('#mr-go');
+  await page.waitForSelector('#mr-result [data-mr-keep="8"]', { timeout: 6000 });
+  await page.evaluate(() => window.SNYPD.marketCheckCard({ title: 'fast shirt' }));
+  await waitAnswer(page);
+  await page.click('.mr-sheet .mr-sheet__x');
+  await page.evaluate(() => { window.__mk.length = 0; });
+  await page.click('#mr-result [data-mr-keep="8"]');
+  await page.waitForFunction(() => window.__mk.length === 1 && !document.querySelector('#mr-result .mr-loading'), { timeout: 6000 });
+  eq(await page.evaluate(() => window.__mk[0]), { q: 'nike p6000 size 8', keep: ['8'] }, 'a panel chip re-runs the panel search, not the last sheet one');
+  eq(await page.$eval('#mr-result .mr-cmp b', e => e.textContent), 'nike p6000 8', '... and answers in the panel');
+  // #2: two quick taps -> the sheet shows the SECOND item, never the slow first answer
+  await page.evaluate(() => { window.SNYPD.marketCheckCard({ title: 'slowq jacket' }); });
+  await wait(150);
+  await page.evaluate(() => { window.SNYPD.marketCheckCard({ title: 'fast shirt' }); });
+  await wait(1800);
+  txt = await sheetText(page);
+  ok(/Compared on: fast shirt/.test(txt) && !/999/.test(txt), 'second tap wins, the slow first answer never lands: ' + txt.slice(0, 120));
+  await page.click('.mr-sheet .mr-sheet__x');
+  // #5: a word no listing has is called out above the price
+  await page.evaluate(() => window.SNYPD.marketCheckCard({ title: 'tahari cashmere sweater' }));
+  await waitAnswer(page);
+  txt = await sheetText(page);
+  ok(/^Not found in any listing of the last 14 days, so left out of this price: tahari/m.test(txt), 'not-found note above the price: ' + txt.slice(0, 120));
+  await page.click('.mr-sheet .mr-sheet__x');
+  // #13: a thin (provisional) price is marked as a rough guide
+  await page.evaluate(() => window.SNYPD.marketCheckCard({ title: 'thinq vase' }));
+  await waitAnswer(page);
+  st = await page.evaluate(() => ({ tiles: [...document.querySelectorAll('.mr-sheet .mr-3 .v')].map(e => e.textContent),
+    max: document.querySelector('.mr-sheet [data-mr-max]').textContent, txt: document.querySelector('.mr-sheet .mr-sheet__bd').innerText }));
+  ok(st.tiles.length === 3 && st.tiles.every(t => t.charAt(0) === '~') && st.max.charAt(0) === '~' && /Few listings: a rough guide\./.test(st.txt), 'provisional price marked ~ + rough guide: ' + JSON.stringify(st.tiles) + ' ' + st.max);
+  await page.$eval('.mr-sheet [data-mr-margin]', e => { e.value = '50'; e.dispatchEvent(new Event('input', { bubbles: true })); });
+  ok((await page.$eval('.mr-sheet [data-mr-max]', e => e.textContent)).charAt(0) === '~', 'margin edit keeps the ~ mark');
+  await page.$eval('.mr-sheet [data-mr-margin]', e => { e.value = '30'; e.dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.click('.mr-sheet .mr-sheet__x');
+  // #11: "try without" a part of a hyphenated word (backend splits P-6000 into p + 6000)
+  await page.$eval('#mr-query', e => { e.value = 'nike P-6000'; });
+  await page.click('#mr-go');
+  await page.waitForSelector('#mr-result [data-mr-drop="6000"]', { timeout: 6000 });
+  await page.evaluate(() => { window.__mk.length = 0; });
+  await page.click('#mr-result [data-mr-drop="6000"]');
+  await page.waitForFunction(() => window.__mk.length === 1, { timeout: 6000 });
+  eq(await page.evaluate(() => window.__mk[0]), { q: 'nike p', keep: [] }, 'try without 6000 on "P-6000" really removes it');
   await page.close();
 
   // ---- 3. Free: old path, no request, locked panel
