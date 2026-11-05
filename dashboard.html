@@ -795,6 +795,47 @@ body {
 .hr-c__p b { color: var(--text-primary); font-weight: 400; }
 .hr-note { margin-top: 12px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
 .hr-teaser { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+/* Market board (Session 67, outreach/37) */
+.hr--top { margin: 24px 24px 0; }
+.mb { margin-top: 18px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; }
+.mb-hd { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; align-items: baseline; }
+.mb-title { font-size: 14px; color: var(--text-primary); }
+.mb-src { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+.mb-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
+.mb-col__t { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-secondary); margin-bottom: 4px; }
+.mb-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 2px 10px; align-items: baseline; width: 100%; min-height: 44px; padding: 8px 0; font: inherit; font-size: 13px; text-align: left; color: var(--text-primary); background: transparent; border: 0; border-top: 1px solid var(--border); cursor: pointer; }
+.mb-row:hover .mb-name, .mb-row:focus-visible .mb-name { text-decoration: underline; }
+.mb-name { overflow-wrap: anywhere; }
+.mb-p { color: var(--text-secondary); font-size: 12.5px; }
+.mb-ch { font-size: 12.5px; color: var(--text-muted); min-width: 3.5em; text-align: right; }
+.mb-ch.up { color: var(--success); }
+.mb-ch.down { color: var(--warning); }
+.mb-sub { grid-column: 1 / -1; font-size: 11.5px; color: var(--text-muted); }
+.mb-tag { display: inline-block; margin-left: 6px; padding: 0 6px; font-size: 10.5px; line-height: 17px; border: 1px solid var(--border3); color: var(--text-secondary); }
+.mb-none { font-size: 12.5px; color: var(--text-muted); padding: 10px 0; border-top: 1px solid var(--border); }
+.mb-more { margin-top: 12px; min-height: 44px; padding: 6px 14px; font: inherit; font-size: 12.5px; color: var(--text-primary); background: transparent; border: 1px solid var(--border3); cursor: pointer; }
+.mb-all { margin-top: 8px; }
+.mb-cats { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.mb-cat { min-height: 36px; padding: 3px 11px; font: inherit; font-size: 12px; color: var(--text-secondary); background: transparent; border: 1px solid var(--border3); cursor: pointer; }
+.mb-cat.on { color: var(--text-primary); border-color: var(--text-secondary); }
+.mb-spark { width: 60px; height: 18px; vertical-align: middle; margin-left: 8px; }
+.mb-hunt { margin-top: 18px; }
+.mb-hunt__r { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; font-size: 12.5px; padding: 7px 0; border-top: 1px solid var(--border); color: var(--text-primary); }
+.mb-hunt__n { color: var(--text-muted); }
+.mb-bar { grid-column: 1 / -1; height: 3px; background: var(--border); }
+.mb-bar i { display: block; height: 3px; background: var(--text-secondary); }
+.mb-note { margin-top: 12px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+.mb-up { margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--border3); font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; }
+.mb-chart { width: 100%; height: auto; display: block; margin-top: 12px; }
+.mb-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.mb-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 12px; }
+.mb-nums > div { background: var(--panel); padding: 8px 10px; }
+.mb-nums .v { font-size: 15px; color: var(--text-primary); }
+.mb-nums .l { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.mb-mean { margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+.mb-go { margin-top: 14px; }
+@media (max-width: 767px) { .hr--top { margin: 14px 14px 0; } }
+@media (max-width: 600px) { .mb-cols { grid-template-columns: minmax(0, 1fr); } .mb { padding: 12px; } }
 .hr-teaser b { color: var(--text-primary); font-weight: 400; }
 .mr-nf { margin-top: 12px; padding: 8px 10px; border: 1px solid var(--amber, #c9a227); border-radius: 8px; font-size: 12.5px; line-height: 1.5; color: var(--text-primary); }
 .mr-cmp b { color: var(--text-primary); font-weight: 400; }
@@ -2132,6 +2173,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 </div>
 </div>
 <div class="panel" id="market-panel" style="margin-bottom:16px; display:none">
+<div id="hr-box" class="hr hr--top" style="display:none"></div>
 <div class="hd">
 <div class="status-bar">
 <div class="chip plan">Market Insights</div>
@@ -2152,8 +2194,8 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 </div>
 </div>
 <div class="bd">
-<div id="hr-box" class="hr" style="display:none"></div>
 <div id="mr-result"></div>
+<div id="mb-box" class="mb" style="display:none"></div>
 </div>
 </div>
 
@@ -3399,6 +3441,41 @@ const HEARTBEAT_URL = (() => {
       };
       [qWords, qSite, qMax].forEach(el => { if (el) { el.addEventListener('input', fillFromQuick); el.addEventListener('change', fillFromQuick); } });
       fillFromQuick();
+    /* Market board (Session 67): the account's hunt site = its FIRST hunt's Vinted site (the board's prices are EUR from
+       the EU site, so a maximum price is only filled in on a euro site). */
+    let firstSite = null;
+    window.addEventListener('snypd:hunts-changed', () => { firstSite = null; });
+    async function huntSite() {
+      if (firstSite) return firstSite;
+      let list = rows && rows.length ? rows : null;
+      if (!list) {
+        try {
+          const { data } = await sb.from('user_searches').select('vinted_url,created_at').eq('user_id', uid).order('created_at', { ascending: true }).limit(1);
+          list = data || [];
+        } catch (e) { list = []; }
+      } else {
+        list = list.slice().sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')));
+      }
+      const site = list.length ? vintedSite(list[0].vinted_url) : '';
+      firstSite = SUPPORTED_VINTED.indexOf(site) !== -1 ? site : '';
+      return firstSite;
+    }
+    window.SNYPD.huntCurrency = async () => { const site = await huntSite(); return site ? (SITE_CURRENCY[site] || 'EUR') : 'EUR'; };
+    window.SNYPD.openNewHunt = async (o) => {
+      o = o || {};
+      if (!qWords || !qSite) return null;
+      const site = await huntSite();
+      openSheet();
+      if (site) qSite.value = site;
+      const eurSite = (SITE_CURRENCY[qSite.value] || 'EUR') === 'EUR';
+      qWords.value = String(o.words || '').slice(0, 80);
+      if (qMax) qMax.value = (eurSite && Number(o.maxEur) > 0) ? String(Math.floor(Number(o.maxEur))) : '';
+      nameInput.value = ''; nameInput.dataset.auto = '1';
+      fillFromQuick();
+      const box = document.getElementById('filter-sheet-new');
+      if (box && box.scrollIntoView) box.scrollIntoView({ block: 'start' });
+      return { site: qSite.value, max: qMax ? qMax.value : '' };
+    };
     }
 
     listEl.addEventListener('click', async (e) => {
@@ -4743,7 +4820,7 @@ const HEARTBEAT_URL = (() => {
       if (profilePanel) profilePanel.style.display = view === 'profile' ? '' : 'none';
       if (stockPanel) stockPanel.style.display = view === 'stock' ? '' : 'none';
       /* the feed's floating Filters pill would cover the Stock list; hidden only on the Stock tab (other tabs unchanged) */
-      const _fp = document.getElementById('filter-pill'); if (_fp) _fp.style.visibility = view === 'stock' ? 'hidden' : '';
+      const _fp = document.getElementById('filter-pill'); if (_fp) _fp.style.visibility = (view === 'stock' || view === 'market') ? 'hidden' : '';
 
       if (view === 'history') {
         loadClaims();
@@ -7507,9 +7584,226 @@ const HEARTBEAT_URL = (() => {
   }
   document.addEventListener('snypd:plan', function () {
     var panel = document.getElementById('market-panel');
-    if (panel && panel.style.display !== 'none') { loadHuntReport(false); }
+    if (panel && panel.style.display !== 'none') { loadHuntReport(false); loadBoard(false); }
   });
   window.SNYPD.loadHuntReport = loadHuntReport;
+
+  /* Market board (Session 67, outreach/37): GET /api/v1/market-board. The backend decides the tier (Pro / Elite /
+     running trial = every item with its 5-week series + what hunters watch; others = the top rising and top falling
+     item) and builds one board for everyone at most every 30 min; this only draws it. Loaded when the Market tab
+     opens, at most once every 30 min per page; redrawn on every visit (language). Prices: EU site (vinted.be), EUR. */
+  var mbBox = document.getElementById('mb-box'), mbAt = 0, mbBusy = false, mbData = null, mbCat = '', mbAllOpen = false;
+  var MB_CATS = ['sneakers', 'jackets', 'tops', 'trousers', 'bags', 'accessories'];
+  var MB_CAT_EN = { sneakers: 'Sneakers', jackets: 'Jackets & coats', tops: 'Tops & knitwear', trousers: 'Trousers', bags: 'Bags', accessories: 'Accessories' };
+  function mbFr() { return (window.SNYPD_I18N && window.SNYPD_I18N.lang) === 'fr'; }
+  function mbName(i) { return mbFr() && i.name_fr ? i.name_fr : i.name; }
+  function mbNameHtml(i) { return '<span data-i18n-skip>' + escapeHtml(mbName(i)) + '</span>'; }
+  function mbPct(p) {
+    var r = Math.round(Math.abs(Number(p) || 0));
+    return (p > 0 ? '+' : (p < 0 ? '&minus;' : '')) + r + (mbFr() ? '&nbsp;%' : '%');
+  }
+  function mbItem(q) {
+    var list = (mbData && mbData.items) || [];
+    for (var k = 0; k < list.length; k++) { if (list[k].q === q) { return list[k]; } }
+    return null;
+  }
+  function mbSpark(i) {
+    var t = (i.series && i.series.typical) || [], pts = [], vals = [];
+    t.forEach(function (v) { if (v != null) { vals.push(v); } });
+    if (vals.length < 2) { return ''; }
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals), st = 60 / Math.max(1, t.length - 1);
+    t.forEach(function (v, k) { if (v != null) { pts.push((k * st).toFixed(1) + ',' + (mx === mn ? 9 : (16 - (v - mn) / (mx - mn) * 14)).toFixed(1)); } });
+    return '<svg class="mb-spark" viewBox="0 0 60 18" aria-hidden="true"><polyline points="' + pts.join(' ') + '" style="fill:none;stroke:var(--text-secondary);stroke-width:1.5"/></svg>';
+  }
+  function mbRow(i, spark) {
+    var dir = i.signal === 'rising' ? ' up' : (i.signal === 'falling' ? ' down' : '');
+    return '<button type="button" class="mb-row" data-mb-q="' + escapeHtml(i.q) + '">'
+      + '<span class="mb-name">' + mbNameHtml(i) + '</span>'
+      + '<span class="mb-p">' + eur(i.typical_cents) + (spark ? mbSpark(i) : '') + '</span>'
+      + '<span class="mb-ch' + dir + '">' + (i.signal ? mbPct(i.change_pct) : '') + '</span>'
+      + '<span class="mb-sub">' + sp(MB_CAT_EN[i.cat] || '') + (i.cutting ? ' <span class="mb-tag">' + sp('Price cuts') + '</span>' : '') + '</span>'
+      + '</button>';
+  }
+  function mbRender(d) {
+    var full = d.tier === 'full', c = d.counts || {};
+    var html = '<div class="mb-hd"><span class="mb-title">' + sp("What's moving") + '</span>'
+      + '<span class="mb-src">' + sp('EU asking prices (EUR)') + ' &middot; ' + escapeHtml(day(d.asof)) + '</span></div>';
+    function col(title, list, none) {
+      var rows = (list || []).slice(0, full ? 3 : 1).map(function (q) { var i = mbItem(q); return i ? mbRow(i, false) : ''; }).join('');
+      return '<div class="mb-col"><div class="mb-col__t">' + sp(title) + '</div>' + (rows || '<div class="mb-none">' + sp(none) + '</div>') + '</div>';
+    }
+    html += '<div class="mb-cols">' + col('Asking prices rising', d.rising, 'Nothing rising by 10% or more right now.')
+      + col('Asking prices falling', d.falling, 'Nothing falling by 10% or more right now.') + '</div>';
+    if (!full) {
+      html += '<div class="mb-up">' + sp((c.shown || 0) + ' items on the board today.') + ' '
+        + sp('See every tracked item with its 5-week trend, price cuts and what hunters watch: part of Pro and Elite.')
+        + ' <a href="/plans">' + sp('See plans') + '</a></div>';
+    } else {
+      if (c.mix) {
+        html += '<p class="mb-note">' + sp(c.mix === 1 ? '1 item hidden: the mix of listings changed too much to call a direction.'
+          : c.mix + ' items hidden: the mix of listings changed too much to call a direction.') + '</p>';
+      }
+      var items = d.items || [];
+      html += '<button type="button" class="mb-more" data-mb-all aria-expanded="' + (mbAllOpen ? 'true' : 'false') + '">'
+        + sp(mbAllOpen ? 'Hide the list' : 'See all ' + items.length + ' items') + '</button>';
+      if (mbAllOpen) {
+        var cats = MB_CATS.filter(function (k) { return items.some(function (i) { return i.cat === k; }); });
+        html += '<div class="mb-cats"><button type="button" class="mb-cat' + (mbCat ? '' : ' on') + '" data-mb-cat="">' + sp('All') + '</button>'
+          + cats.map(function (k) { return '<button type="button" class="mb-cat' + (mbCat === k ? ' on' : '') + '" data-mb-cat="' + k + '">' + sp(MB_CAT_EN[k]) + '</button>'; }).join('') + '</div>';
+        var shown = items.filter(function (i) { return !mbCat || i.cat === mbCat; }).slice();
+        shown.sort(function (a, b) { return mbName(a).localeCompare(mbName(b), mbFr() ? 'fr' : 'en'); });
+        html += '<div class="mb-all">' + shown.map(function (i) { return mbRow(i, true); }).join('') + '</div>';
+      }
+      var hs = d.hunters || [];
+      if (hs.length) {
+        var top = hs[0].hunters || 1;
+        html += '<div class="mb-hunt"><div class="mb-col__t">' + sp('What hunters watch') + '</div>'
+          + hs.map(function (h) {
+            return '<div class="mb-hunt__r"><span data-i18n-skip>' + escapeHtml(h.brand) + '</span><span class="mb-hunt__n">' + sp(h.hunters + ' hunters') + '</span>'
+              + '<span class="mb-bar"><i style="width:' + Math.max(2, Math.round(h.hunters / top * 100)) + '%"></i></span></div>';
+          }).join('')
+          + '<p class="mb-note">' + sp('Brands that 5 or more SNYPD users hunt right now, counted once per user.') + '</p></div>';
+      }
+    }
+    return html + '<p class="mb-note">' + sp('Typical asking price over the last 7 days of listings on vinted.be (EU site, EUR), for the items SNYPD tracks. Rising or falling = the last 3 days against 8 to 21 days ago, by 10% or more and by at least 5% on each of the last 3 days. Asking prices, not sold prices: a description, not a forecast.') + '</p>';
+  }
+  function mbPaint() {
+    if (!mbBox || !mbData) { return; }
+    mbBox.innerHTML = mbRender(mbData);
+    mbBox.style.display = '';
+  }
+  function mbChart(s, asof) {
+    var t = s.typical || [], lo = s.low || [], hi = s.high || [], n = s.listings || [], len = t.length;
+    var vals = [];
+    for (var k = 0; k < len; k++) { [t[k], lo[k], hi[k]].forEach(function (v) { if (v != null) { vals.push(v); } }); }
+    if (!vals.length) { return ''; }
+    var L = 70, R = 6, TOP = 14, PB = 140, BT = 156, BB = 204;
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+    if (mx === mn) { mx = mn + 100; }
+    var nm = Math.max.apply(null, n.map(function (v) { return v || 0; })) || 1;
+    var st = (600 - L - R) / Math.max(1, len - 1);
+    function X(k2) { return (L + k2 * st).toFixed(1); }
+    function Y(v) { return (PB - (v - mn) / (mx - mn) * (PB - TOP)).toFixed(1); }
+    var band = '', seg = [], path = '', pen = false, dots = '', bars = '';
+    function flush() {
+      if (seg.length > 1) {
+        band += '<polygon points="' + seg.map(function (k2) { return X(k2) + ',' + Y(hi[k2]); }).concat(seg.slice().reverse().map(function (k2) { return X(k2) + ',' + Y(lo[k2]); })).join(' ')
+          + '" style="fill:var(--border3);opacity:0.5"/>';
+      }
+      seg = [];
+    }
+    var bw = Math.max(2, st - 3);
+    for (k = 0; k < len; k++) {
+      if (t[k] != null && lo[k] != null && hi[k] != null) { seg.push(k); } else { flush(); }
+      if (t[k] != null) {
+        path += (pen ? 'L' : 'M') + X(k) + ' ' + Y(t[k]) + ' '; pen = true;
+        dots += '<circle cx="' + X(k) + '" cy="' + Y(t[k]) + '" r="1.8" style="fill:var(--text-primary)"/>';
+      } else { pen = false; }
+      if (n[k]) {
+        var h = Math.max(1, (BB - BT) * n[k] / nm);
+        bars += '<rect x="' + (L + k * st - bw / 2).toFixed(1) + '" y="' + (BB - h).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" style="fill:var(--border3)"/>';
+      }
+    }
+    flush();
+    var lab = function (y, txt) { return '<text x="' + (L - 6) + '" y="' + y + '" text-anchor="end" style="fill:var(--text-muted);font-size:17px;font-family:inherit">' + txt + '</text>'; };
+    return '<svg class="mb-chart" viewBox="0 0 600 210" role="img" aria-label="5-week trend">' + band
+      + '<path d="' + path + '" style="fill:none;stroke:var(--text-primary);stroke-width:2"/>' + dots + bars
+      + lab(TOP + 6, eur(mx)) + lab(PB, eur(mn)) + '</svg>'
+      + '<div class="mb-axis"><span>' + escapeHtml(day(s.from)) + '</span><span>' + escapeHtml(day(asof)) + '</span></div>';
+  }
+  function mbMeaning(i) {
+    var html = '';
+    if (i.signal === 'rising') {
+      html = sp('Sellers now ask ' + Math.round(Math.abs(i.change_pct)) + '% more than 8 to 21 days ago (' + eur(i.before_cents) + ' to ' + eur(i.now_cents) + ').')
+        + ' ' + sp('Good time to list if you hold some. Sourcing costs more than it did.');
+    } else if (i.signal === 'falling') {
+      html = sp('Sellers now ask ' + Math.round(Math.abs(i.change_pct)) + '% less than 8 to 21 days ago (' + eur(i.before_cents) + ' to ' + eur(i.now_cents) + ').')
+        + ' ' + sp("Cheaper to source now, but check it's not fading: look at the listings count and the price cuts.");
+    } else if (i.mix) {
+      html = sp("The mix of listings changed a lot, so we don't call a direction.");
+    } else {
+      html = sp('Asking prices held steady: within 10% of 8 to 21 days ago.');
+    }
+    if (i.cutting && i.cut_pct != null) {
+      html += ' ' + sp(Math.round(i.cut_pct) + '% of listings had a price cut this week: buyers are taking their time.');
+    }
+    return html;
+  }
+  async function mbOpen(q) {
+    var i = mbItem(q);
+    if (!i) { return; }
+    var into = openSheet(mbName(i));
+    if (!mbData || mbData.tier !== 'full' || !i.series) {
+      into.innerHTML = '<div class="mb-up">' + sp('See every tracked item with its 5-week trend, price cuts and what hunters watch: part of Pro and Elite.')
+        + ' <a href="/plans">' + sp('See plans') + '</a></div>';
+      return;
+    }
+    var m = margin(), t = i.typical_cents, maxEur = i.low_cents ? Math.floor(i.low_cents / 100) : null;
+    var nums = [[eur(t), 'Typical now'], [eur(i.low_cents) + '&ndash;' + eur(i.high_cents), 'Normal range'], [escapeHtml(num(i.listings)), 'Listings (7 days)']];
+    if (i.sellers != null) { nums.push([escapeHtml(num(i.sellers)), 'Sellers']); }
+    if (i.cut_pct != null) { nums.push([Math.round(i.cut_pct) + (mbFr() ? '&nbsp;%' : '%'), 'Price cuts this week']); }
+    into.innerHTML = '<div class="mb-src" style="margin-top:10px">' + sp(MB_CAT_EN[i.cat] || '') + ' &middot; ' + sp('EU asking prices (EUR)') + ' &middot; '
+        + sp('Search words:') + ' <span data-i18n-skip>' + escapeHtml(i.q) + '</span>'
+        + (i.signal ? ' &middot; <b class="mb-ch ' + (i.signal === 'rising' ? 'up' : 'down') + '">' + mbPct(i.change_pct) + '</b>' : '') + '</div>'
+      + mbChart(i.series, mbData.asof)
+      + '<div class="mb-src">' + sp('Line: typical asking price. Band: normal range (the middle half of asking prices). Bars: listings seen. Gaps: days too mixed to price.') + '</div>'
+      + '<div class="mb-nums">' + nums.map(function (x) { return '<div><div class="v">' + x[0] + '</div><div class="l">' + sp(x[1]) + '</div></div>'; }).join('') + '</div>'
+      + '<p class="mb-mean">' + mbMeaning(i) + '</p>'
+      + '<div class="mr-pb" data-mr-typical="' + t + '">'
+      + '<div class="mr-max"><span>Pay at most</span> <b data-mr-max>' + eur(Math.round(t * (100 - m) / 100)) + '</b></div>'
+      + '<div class="mr-max"><span>Margin</span> <input type="number" min="0" max="90" step="5" value="' + m + '" data-mr-margin aria-label="Margin in percent">'
+      + ' <span>% at the typical asking price</span></div></div>'
+      + '<button type="button" class="btn btn-prim mb-go" data-mb-hunt="' + escapeHtml(i.q) + '"' + (maxEur ? ' data-mb-max="' + maxEur + '"' : '') + '>'
+      + (maxEur ? sp('Hunt this below') + ' <span data-mb-max-label style="margin-left:0.5em">' + eur(maxEur * 100) + '</span>' : sp('Hunt this item')) + '</button>'
+      + '<p class="mb-note" data-mb-hunt-note>' + (maxEur ? sp('That is the quick-sale price: only a quarter of listings ask less. You check the hunt before it is saved.') : '') + '</p>';
+    var cur = 'EUR';
+    try { if (window.SNYPD.huntCurrency) { cur = await window.SNYPD.huntCurrency(); } } catch (e) { cur = 'EUR'; }
+    var btn = into.querySelector('[data-mb-hunt]');
+    if (cur !== 'EUR' && btn && btn.getAttribute('data-mb-hunt') === i.q) {
+      btn.removeAttribute('data-mb-max');
+      btn.innerHTML = sp('Hunt this item');
+      var note = into.querySelector('[data-mb-hunt-note]');
+      if (note) { note.innerHTML = sp('Your hunts are on a non-euro Vinted site, so no maximum price is filled in: set your own.'); }
+    }
+  }
+  async function loadBoard(force) {
+    if (!mbBox || mbBusy) { return; }
+    if (!force && mbData && Date.now() - mbAt < 1800000) { mbPaint(); return; }
+    mbBusy = true;
+    try {
+      var res = await api('/api/v1/market-board', 'GET');
+      if (res.status === 200 && res.body && (res.body.tier === 'full' || res.body.tier === 'teaser')) {
+        mbAt = Date.now();
+        mbData = res.body;
+        mbPaint();
+      } else if (res.status === 401) {
+        mbBox.style.display = 'none';
+      } else if (!mbData) {
+        mbBox.innerHTML = '<p class="hr-teaser">' + sp('Could not load what is moving right now.') + '</p>';
+        mbBox.style.display = '';
+      }
+    } catch (e) {
+      if (!mbData) { mbBox.style.display = 'none'; }
+    } finally {
+      mbBusy = false;
+    }
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target : null;
+    if (!t) { return; }
+    var all = t.closest('[data-mb-all]');
+    if (all) { mbAllOpen = !mbAllOpen; mbPaint(); return; }
+    var cat = t.closest('[data-mb-cat]');
+    if (cat) { mbCat = cat.getAttribute('data-mb-cat') || ''; mbPaint(); return; }
+    var row = t.closest('[data-mb-q]');
+    if (row) { mbOpen(row.getAttribute('data-mb-q')); return; }
+    var hunt = t.closest('[data-mb-hunt]');
+    if (hunt && window.SNYPD.openNewHunt) {
+      closeSheet();
+      window.SNYPD.openNewHunt({ words: hunt.getAttribute('data-mb-hunt'), maxEur: Number(hunt.getAttribute('data-mb-max')) || null });
+    }
+  });
+  window.SNYPD.loadBoard = loadBoard;
 
   /* The plan is resolved asynchronously by the block above, so take it from
    * whichever arrives first: the event, or an already-set attribute. */

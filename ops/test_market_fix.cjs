@@ -103,7 +103,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await page.waitForFunction(() => getComputedStyle(document.getElementById('market-panel')).display !== 'none', { timeout: 5000 });
   await page.$eval('#mr-query', e => { e.value = 'nike p6000 size 8'; });
   await page.evaluate(() => { window.__mk.length = 0; });
-  await page.click('#mr-go');
+  await page.$eval('#mr-go', e => e.scrollIntoView({ block: 'center' })); await page.click('#mr-go');
   await page.waitForSelector('#mr-result [data-mr-keep]', { timeout: 6000 });
   st = await page.evaluate(() => ({ chips: [...document.querySelectorAll('#mr-result [data-mr-keep]')].map(b => b.innerText.replace(/\s+/g, ' ')),
     on: (document.querySelector('#mr-result .mr-cmp b') || {}).textContent, req: window.__mk.slice() }));
@@ -115,7 +115,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(st.req, { q: 'nike p6000 size 8', keep: ['8'] }, 'tap on an ignored word re-runs with it kept');
   eq(st.on, 'nike p6000 8', 'the kept word is now compared on');
   await page.$eval('#mr-query', e => { e.value = 'jordan 1 travis'; });
-  await page.click('#mr-go');
+  await page.$eval('#mr-go', e => e.scrollIntoView({ block: 'center' })); await page.click('#mr-go');
   await page.waitForSelector('#mr-result [data-mr-drop="travis"]', { timeout: 6000 });
   txt = await page.$eval('#mr-result', e => e.innerText);
   ok(/Try without:/.test(txt), 'thin answer offers "Try without"');
@@ -126,7 +126,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   // ---- 2b. review fixes
   // #14: the panel keeps its own search while the sheet runs another one
   await page.$eval('#mr-query', e => { e.value = 'nike p6000 size 8'; });
-  await page.click('#mr-go');
+  await page.$eval('#mr-go', e => e.scrollIntoView({ block: 'center' })); await page.click('#mr-go');
   await page.waitForSelector('#mr-result [data-mr-keep="8"]', { timeout: 6000 });
   await page.evaluate(() => window.SNYPD.marketCheckCard({ title: 'fast shirt' }));
   await waitAnswer(page);
@@ -162,7 +162,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await page.click('.mr-sheet .mr-sheet__x');
   // #11: "try without" a part of a hyphenated word (backend splits P-6000 into p + 6000)
   await page.$eval('#mr-query', e => { e.value = 'nike P-6000'; });
-  await page.click('#mr-go');
+  await page.$eval('#mr-go', e => e.scrollIntoView({ block: 'center' })); await page.click('#mr-go');
   await page.waitForSelector('#mr-result [data-mr-drop="6000"]', { timeout: 6000 });
   await page.evaluate(() => { window.__mk.length = 0; });
   await page.click('#mr-result [data-mr-drop="6000"]');

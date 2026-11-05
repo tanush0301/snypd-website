@@ -1173,3 +1173,60 @@ FR.update({
 FR_PATTERNS += [
     (r'^Typical asking price for (.+) \(all conditions: (.+)\)$', 'Prix demandé typique pour $1 (tous états' + NB + ': $2)'),
 ]
+
+# ---------------------------------------------------------------- Market board (Session 67, 5 Nov 2026)
+FR.update({
+    "What's moving": 'Ce qui bouge',
+    'EU asking prices (EUR)': 'Prix demandés UE (EUR)',
+    'Asking prices rising': 'Prix demandés en hausse',
+    'Asking prices falling': 'Prix demandés en baisse',
+    'Nothing rising by 10% or more right now.': 'Rien en hausse de 10' + NB + '% ou plus en ce moment.',
+    'Nothing falling by 10% or more right now.': 'Rien en baisse de 10' + NB + '% ou plus en ce moment.',
+    'Price cuts': 'Baisses de prix',
+    'Sneakers': 'Baskets', 'Jackets & coats': 'Vestes et manteaux', 'Tops & knitwear': 'Hauts et pulls',
+    'Trousers': 'Pantalons', 'Bags': 'Sacs', 'Accessories': 'Accessoires',
+    'See every tracked item with its 5-week trend, price cuts and what hunters watch: part of Pro and Elite.':
+        'Chaque article suivi avec sa tendance sur 5 semaines, les baisses de prix et ce que surveillent les utilisateurs' + NB + ': inclus dans Pro et Elite.',
+    '1 item hidden: the mix of listings changed too much to call a direction.':
+        '1 article masqué' + NB + ': le mélange des annonces a trop changé pour dire dans quel sens va le prix.',
+    'Hide the list': 'Masquer la liste',
+    'What hunters watch': 'Ce que surveillent les utilisateurs',
+    'Brands that 5 or more SNYPD users hunt right now, counted once per user.':
+        'Marques que 5 utilisateurs de SNYPD ou plus recherchent en ce moment, chaque utilisateur compté une fois.',
+    'Typical asking price over the last 7 days of listings on vinted.be (EU site, EUR), for the items SNYPD tracks. Rising or falling = the last 3 days against 8 to 21 days ago, by 10% or more and by at least 5% on each of the last 3 days. Asking prices, not sold prices: a description, not a forecast.':
+        'Prix demandé typique sur les 7 derniers jours d’annonces de vinted.be (site UE, EUR), pour les articles que SNYPD suit. En hausse ou en baisse = les 3 derniers jours comparés à il y a 8 à 21 jours, d’au moins 10' + NB + '% et d’au moins 5' + NB + '% chacun des 3 derniers jours. Prix demandés, pas les prix réellement payés' + NB + ': une description, pas une prévision.',
+    'Search words:': 'Mots de recherche' + NB + ':',
+    'Line: typical asking price. Band: normal range (the middle half of asking prices). Bars: listings seen. Gaps: days too mixed to price.':
+        'Ligne' + NB + ': prix demandé typique. Bande' + NB + ': fourchette normale (la moitié centrale des prix demandés). Barres' + NB + ': annonces vues. Trous' + NB + ': jours trop mélangés pour un prix.',
+    'Typical now': 'Typique maintenant', 'Normal range': 'Fourchette normale', 'Listings (7 days)': 'Annonces (7 jours)',
+    'Sellers': 'Vendeurs', 'Price cuts this week': 'Baisses de prix cette semaine',
+    'Good time to list if you hold some. Sourcing costs more than it did.':
+        'Bon moment pour mettre en vente si tu en as. Trouver du stock coûte plus cher qu’avant.',
+    "Cheaper to source now, but check it's not fading: look at the listings count and the price cuts.":
+        'Moins cher à trouver maintenant, mais vérifie que l’intérêt ne retombe pas' + NB + ': regarde le nombre d’annonces et les baisses de prix.',
+    "The mix of listings changed a lot, so we don't call a direction.":
+        'Le mélange des annonces a beaucoup changé, alors on ne donne pas de sens.',
+    'Asking prices held steady: within 10% of 8 to 21 days ago.':
+        'Prix demandés stables' + NB + ': à 10' + NB + '% près d’il y a 8 à 21 jours.',
+    'Hunt this below': 'Chercher en dessous de',
+    'Hunt this item': 'Lancer une recherche',
+    'That is the quick-sale price: only a quarter of listings ask less. You check the hunt before it is saved.':
+        'C’est le bas de la fourchette' + NB + ': seulement un quart des annonces demandent moins. Tu vérifies la recherche avant qu’elle soit enregistrée.',
+    'Your hunts are on a non-euro Vinted site, so no maximum price is filled in: set your own.':
+        'Tes recherches sont sur un site Vinted hors euro, donc aucun prix maximum n’est rempli' + NB + ': fixe le tien.',
+    'Could not load what is moving right now.': 'Impossible de charger ce qui bouge pour le moment.',
+    '5-week trend': 'Tendance sur 5 semaines', 'Margin in percent': 'Marge en pourcentage', 'Close': 'Fermer',
+})
+FR_PATTERNS += [
+    (r'^(\d+) items on the board today\.$', '$1 articles sur le tableau aujourd’hui.'),
+    (r'^(\d+) items hidden: the mix of listings changed too much to call a direction\.$',
+     '$1 articles masqués' + NB + ': le mélange des annonces a trop changé pour dire dans quel sens va le prix.'),
+    (r'^See all (\d+) items$', 'Voir les $1 articles'),
+    (r'^(\d+) hunters$', '$1 utilisateurs'),
+    (r'^Sellers now ask (\d+)% more than 8 to 21 days ago \((.+) to (.+)\)\.$',
+     'Les vendeurs demandent maintenant $1' + NB + '% de plus qu’il y a 8 à 21 jours ($2 puis $3).'),
+    (r'^Sellers now ask (\d+)% less than 8 to 21 days ago \((.+) to (.+)\)\.$',
+     'Les vendeurs demandent maintenant $1' + NB + '% de moins qu’il y a 8 à 21 jours ($2 puis $3).'),
+    (r'^(\d+)% of listings had a price cut this week: buyers are taking their time\.$',
+     '$1' + NB + '% des annonces ont baissé leur prix cette semaine' + NB + ': les acheteurs prennent leur temps.'),
+]
