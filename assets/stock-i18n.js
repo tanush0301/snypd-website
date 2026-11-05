@@ -39,7 +39,7 @@ window.SNYPD_STOCK_STR = {
   "reason.unsellable": "Unsellable",
   "reason.given_away": "Given away",
   "wo.effect": "What this changes",
-  "wo.line": "{st} \u00b7 in stock {days} days \u00b7 cost {cost}",
+  "wo.line": "{st} \u00b7 in stock {days} \u00b7 cost {cost}",
   "wo.e1": "{cost} counted as a loss on {date}, on its own Write-offs line.",
   "wo.e2": "Leaves In stock: held {a} \u2192 {b}, cash tied up {c} \u2192 {d}.",
   "wo.e3old": "Old ({n}+ days): {a} \u2192 {b}. Leaves aging and the Today lanes.",
@@ -550,7 +550,6 @@ window.SNYPD_STOCK_STR = {
   "cond.clear": "Clear",
   "cat.manage": "Manage categories",
   "cat.title": "Categories",
-  "cat.note": "Rename, add or hide. Hidden categories keep their items.",
   "cat.hide": "Hide",
   "cat.show": "Show",
   "cat.add": "Add",
@@ -572,7 +571,14 @@ window.SNYPD_STOCK_STR = {
   "dt.note.nofee": "No platform fee entered, so net profit is before fees.",
   "dt.edit": "Edit details",
   "dt.save": "Save changes",
-  "meta.bought": "bought {c}"
+  "meta.bought": "bought {c}",
+  "dt.day1": "1 day",
+  "dt.days": "{n} days",
+  "ret.e4": "Net profit, last 30 days: {a} \u2192 {b}.",
+  "ch.total": "Total {amount}",
+  "ov.lanes.none": "Nothing needs you today.",
+  "ov.cur.ok": "OK",
+  "cat.note": "Rename, add or hide. Changes save right away; hidden categories keep their items."
  },
  "fr": {
   "tab": "Stock",
@@ -613,7 +619,7 @@ window.SNYPD_STOCK_STR = {
   "reason.unsellable": "Invendable",
   "reason.given_away": "Donn\u00e9",
   "wo.effect": "Ce que \u00e7a change",
-  "wo.line": "{st} \u00b7 en stock depuis {days} jours \u00b7 co\u00fbt {cost}",
+  "wo.line": "{st} \u00b7 en stock depuis {days} \u00b7 co\u00fbt {cost}",
   "wo.e1": "{cost} compt\u00e9 comme perte le {date}, sur une ligne Pertes \u00e0 part.",
   "wo.e2": "Sort du stock\u00a0: en stock {a} \u2192 {b}, argent immobilis\u00e9 {c} \u2192 {d}.",
   "wo.e3old": "Anciens ({n} jours et +)\u00a0: {a} \u2192 {b}. Sort de l\u2019\u00e2ge du stock et des listes du jour.",
@@ -1124,7 +1130,6 @@ window.SNYPD_STOCK_STR = {
   "cond.clear": "Effacer",
   "cat.manage": "G\u00e9rer les cat\u00e9gories",
   "cat.title": "Cat\u00e9gories",
-  "cat.note": "Renomme, ajoute ou masque. Les cat\u00e9gories masqu\u00e9es gardent leurs articles.",
   "cat.hide": "Masquer",
   "cat.show": "Afficher",
   "cat.add": "Ajouter",
@@ -1146,6 +1151,13 @@ window.SNYPD_STOCK_STR = {
   "dt.note.nofee": "Aucuns frais de plateforme saisis\u00a0: le b\u00e9n\u00e9fice net est avant frais.",
   "dt.edit": "Modifier les d\u00e9tails",
   "dt.save": "Enregistrer les modifications",
-  "meta.bought": "achet\u00e9 {c}"
+  "meta.bought": "achet\u00e9 {c}",
+  "dt.day1": "1 jour",
+  "dt.days": "{n} jours",
+  "ret.e4": "B\u00e9n\u00e9fice net, 30 derniers jours\u00a0: {a} \u2192 {b}.",
+  "ch.total": "Total\u00a0: {amount}",
+  "ov.lanes.none": "Rien ne t\u2019attend aujourd\u2019hui.",
+  "ov.cur.ok": "OK",
+  "cat.note": "Renomme, ajoute ou masque. Les changements sont enregistr\u00e9s tout de suite\u00a0; les cat\u00e9gories masqu\u00e9es gardent leurs articles."
  }
 };

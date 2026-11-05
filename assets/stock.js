@@ -161,7 +161,7 @@
     if (v.empty) { el.innerHTML = firstRunHtml(); return; }
     var h = '';
     if (o.err) h += '<div class="st-err">' + esc(errMsg(o.err)) + ' <button type="button" class="st-btn st-ghost" data-act="ov-retry">' + esc(T('err.retry')) + '</button></div>';
-    if (S.boot.currency_source === 'default') h += '<p class="st-note">' + esc(T('ov.cur', { cur: S.cur })) + ' <button type="button" class="st-linkb" data-act="settings">' + esc(T('ov.cur.change')) + '</button></p>';
+    if (S.boot.currency_source === 'default' && curNoteDue()) h += '<p class="st-note" id="st-curnote">' + esc(T('ov.cur', { cur: S.cur })) + ' <button type="button" class="st-linkb" data-act="settings">' + esc(T('ov.cur.change')) + '</button> <button type="button" class="st-linkb" data-act="cur-ok">' + esc(T('ov.cur.ok')) + '</button></p>';
     var oldDays = o.data.old_after_days || S.boot.old_after_days || C.CAPS.oldAfterDefault, pk = perKey(o.days), L = o.lanes || {};
     // Order (review 3 Nov 2026): The numbers first, because profit is what people open Stock for, then Today, Stock now, and the charts last.
     // Holding was dropped the same day: its rule is a subset of List, and the claims mirror never sets src_type, so it repeated List or stayed empty.
@@ -169,7 +169,8 @@
     var LANES = [['reprice', [['reprice', 'lane.btn.reprice']], 'listed'], ['list', [['list', 'act.list']], 'stock'], ['follow', [['sold', 'act.sold'], ['active', 'act.active']], 'reserved']];
     var worth = LANES.reduce(function (n, ld) { return n + ((L[ld[0]] && L[ld[0]].count) || 0); }, 0);
     h += '<section class="st-sec" aria-labelledby="st-h-lanes"><div class="st-sechd"><h2 class="st-h2" id="st-h-lanes">' + esc(T('ov.lanes')) + '</h2>' +
-      (o.lanes ? '<span class="st-secsub" id="st-lanes-sub">' + esc(T('ov.lanes.sub', { n: worth, date: todayLabel() })) + '</span>' : '') + '</div><div class="st-lanes">' +
+      (o.lanes && worth ? '<span class="st-secsub" id="st-lanes-sub">' + esc(T('ov.lanes.sub', { n: worth, date: todayLabel() })) + '</span>' : '') + '</div>' +
+      (o.lanes && !worth ? '<p class="st-d" id="st-lanes-none">' + esc(T('ov.lanes.none', { date: todayLabel() })) + '</p></section>' : '<div class="st-lanes">' +
       LANES.map(function (ld) {
         var k = ld[0], ln = L[k] || { count: 0, items: [] }, shown = ln.items.slice(0, LANE_ROWS);
         return '<div class="st-lane" id="st-lane-' + k + '"><div class="st-lane-hd"><span>' + esc(T('lane.' + k)) + '</span><b>' + esc(String(ln.count)) + '</b></div><p class="st-d">' + esc(T('lane.' + k + '.d')) + '</p>' +
@@ -177,7 +178,7 @@
             return '<div class="st-lane-row"><button type="button" class="st-lane-it" data-act="lane-open" data-id="' + esc(it.id) + '">' + tileHtml(it.title, it.image_url) + '<span class="st-lane-tx"><span class="t">' + esc(it.title) + '</span><span class="a">' + esc(laneMeta(k, it)) + '</span></span></button>' +
               '<div class="st-lane-acts">' + ld[1].map(function (a, i) { return '<button type="button" class="st-btn ' + (i ? 'st-tert' : 'st-ghost') + '" data-act="lane-act" data-do="' + a[0] + '" data-id="' + esc(it.id) + '">' + esc(T(a[1])) + '</button>'; }).join('') + '</div></div>';
           }).join('') + (ln.count > shown.length ? '<button type="button" class="st-linkb st-lane-more" data-act="lane-more" data-status="' + ld[2] + '">' + esc(T('lane.more', { n: ln.count - shown.length })) + '</button>' : '') : '<p class="st-d st-dim">' + esc(T('lane.' + k + '.none')) + '</p>') + '</div>';
-      }).join('') + '</div></section>';
+      }).join('') + '</div></section>');
     // Stock now: today's snapshot, not affected by the period
     h += '<section class="st-sec" aria-labelledby="st-h-now"><div class="st-sechd"><h2 class="st-h2" id="st-h-now">' + esc(T('ov.now')) + '</h2><span class="st-secsub">' + esc(T('ov.snapshot')) + '</span></div><div class="st-strip">' +
       '<div class="st-t3"><span class="st-lbl">' + esc(T('ov.t.stock')) + '</span><b class="st-big" id="st-hero-held">' + esc(String(v.held.count)) + '</b><small>' + esc(T('ov.held')) + '</small><small>' + esc(T('ov.split', { a: v.held.inStock, b: v.held.listed, c: v.held.reserved })) + '</small></div>' +
@@ -253,7 +254,8 @@
     var ticks = [mn, 0, mx / 2, mx].filter(function (v, i, a) { return a.indexOf(v) === i; });
     ticks.forEach(function (v) { svg += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '" class="st-gl' + (v === 0 ? ' z' : '') + '"/><text x="' + (L - 6) + '" y="' + (y(v) + 3).toFixed(1) + '" text-anchor="end" class="st-ax">' + esc(C.formatMoney(v, S.cur, lang, { dp: 0 })) + '</text>'; });
     pts.forEach(function (p, i) { var x = L + i * step + (step - bw) / 2, y0 = y(0), y1 = y(p.net), top = Math.min(y0, y1), hh = Math.max(Math.abs(y1 - y0), p.net === 0 ? 0 : 1); if (hh > 0) svg += '<rect x="' + x.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" class="' + (p.net < 0 ? 'st-bn' : 'st-bp') + '"><title>' + esc(shortDay(p.d) + ': ' + MS(p.net)) + '</title></rect>'; });
-    if (cmax > 0 && n > 1) { var line = cumPts.map(function (v, i) { return (L + i * step + step / 2).toFixed(1) + ',' + (Tp + (1 - Math.max(v, 0) / cmax) * ph * 0.45).toFixed(1); }).join(' '); svg += '<polyline points="' + line + '" class="st-cumline"/><text x="' + (L + 6) + '" y="' + (Tp + 10) + '" class="st-ax st-cumt">' + esc(T('ch.cum', { amount: M(total) })) + '</text>'; }
+    // live check 5 Nov 2026: the running-total line had its own hidden scale and sat at the EUR 10 gridline while the total was 0; the total stays as text only
+    if (n > 1) svg += '<text x="' + (L + 6) + '" y="' + (Tp + 10) + '" class="st-ax st-cumt">' + esc(T('ch.total', { amount: M(total) })) + '</text>';
     var idx = n <= 1 ? [0] : [0, Math.round((n - 1) / 3), Math.round((n - 1) * 2 / 3), n - 1];
     idx.filter(function (v, i, a) { return a.indexOf(v) === i; }).forEach(function (i) { svg += '<text x="' + (L + i * step + step / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="' + (i === 0 ? 'start' : (i === n - 1 ? 'end' : 'middle')) + '" class="st-ax">' + esc(shortDay(pts[i].d)) + '</text>'; });
     return '<svg class="st-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(T('ch.aria.day', { from: shortDay(pts[0].d), to: shortDay(pts[n - 1].d), amount: M(total) })) + '" preserveAspectRatio="none">' + svg + '</svg>';
@@ -345,7 +347,8 @@
       fld('old', T('set.old'), txt('old', b.old_after_days || C.CAPS.oldAfterDefault, '', ' inputmode="numeric" maxlength="3"')) +
       '<p class="st-hint full">' + esc(T('set.old.hint')) + '</p>' +
       '<div class="st-f full"><label class="st-check"><input type="checkbox" id="sf-tab"' + (b.tab_hidden ? '' : ' checked') + '> ' + esc(T('set.tab')) + '</label><p class="st-hint">' + esc(T('set.tab.hint')) + '</p></div>' +
-      '<div class="st-f full" id="sf-weekly-wrap" style="display:none"><label class="st-check"><input type="checkbox" id="sf-weekly" checked> ' + esc(T('set.weekly')) + '</label><p class="st-hint">' + esc(T('set.weekly.hint')) + '</p></div></div>';
+      '<div class="st-f full" id="sf-weekly-wrap" style="display:none"><label class="st-check"><input type="checkbox" id="sf-weekly" checked> ' + esc(T('set.weekly')) + '</label><p class="st-hint">' + esc(T('set.weekly.hint')) + '</p></div>' +
+      '<div class="st-f full"><span class="st-lbl">' + esc(T('cat.title')) + '</span><button type="button" class="st-btn st-ghost st-catset" data-act="cat-manage" aria-expanded="false" aria-controls="st-catman">' + esc(T('cat.manage')) + '</button><div id="st-catman"></div></div></div>';
     mountSheet(T('set.title'), body, '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button><button type="button" class="st-btn st-prim" data-act="submit" id="st-go">' + esc(T('set.save')) + '</button>');
     var f = $('#sf-cur'); if (f) f.focus();
     S.api.settingsRow().then(function (r) {   // 073; before it the column does not exist and the switch simply stays hidden
@@ -489,6 +492,7 @@
       case 'im-again': openImport(); break;
       case 'cond-pick': case 'cond-clear': { var cv = act === 'cond-pick' ? el.getAttribute('data-c') : ''; Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act=cond-pick]'), function (b) { b.setAttribute('aria-checked', b.getAttribute('data-c') === cv ? 'true' : 'false'); }); $('#sf-condition').value = cv; break; }
       case 'cat-manage': catToggle(); break;
+      case 'cur-ok': curNoteOff(); break;
       case 'cat-hide': { var hk = el.getAttribute('data-key'), hc = (S.cats || []).filter(function (x) { return x.key === hk; })[0]; if (hc) catSave(hk, { hidden: !hc.hidden }, hk); break; }
       case 'cat-add': catAdd(); break;
       case 'wo-reason': { Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act=wo-reason]'), function (b) { b.setAttribute('aria-checked', b === el ? 'true' : 'false'); }); $('#sf-reason').value = el.getAttribute('data-r'); break; }
@@ -621,7 +625,7 @@
     if (wo) L.push(cst == null ? T('wo.nocost') : T('ret.eThenWo', { cost: M(cst) }));
     else if (v && !v.empty) L.push(T('ret.eBack', { a: v.held.count, b: v.held.count + 1, c: M(v.held.cashCents), d: M(v.held.cashCents + (cst || 0)) }));
     // the Overview's net (sales profit + return reversals - write-off costs) moves only when the return date sits inside the period on screen
-    if (v && S.ov.days === 30 && v.netCents != null && rev != null && C.daysBetween(t0, d) >= 0 && C.daysBetween(t0, d) < 30) L.push(T('wo.e4', { a: M(v.netCents), b: M(v.netCents + rev - (wo ? cst : 0)) }));
+    if (v && S.ov.days === 30 && v.netCents != null && rev != null && C.daysBetween(t0, d) >= 0 && C.daysBetween(t0, d) < 30) L.push(T(wo ? 'wo.e4' : 'ret.e4', { a: M(v.netCents), b: M(v.netCents + rev - (wo ? cst : 0)) }));
     return '<span class="st-lbl">' + esc(T('wo.effect')) + '</span><ul class="st-list">' + L.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
   }
   function woEffect(it, t0) {
@@ -644,9 +648,10 @@
     var t0 = today();
     if (kind === 'add') {
       return '<p class="st-hint st-bopen"><button type="button" class="st-linkb" data-act="bundle">' + esc(T('bundle.open')) + '</button></p><div class="st-form">' + fld('title', T('f.title'), txt('title', '', '', ' maxlength="140"'), 'full') + fld('brand', T('f.brand'), txt('brand', '', '', ' maxlength="60"')) + fld('size', T('f.size'), txt('size', '', '', ' maxlength="20"')) +
+        fld('buy', T('f.buy'), mny('buy')) + fld('bought', T('f.bought'), dat('bought', t0, t0)) +
         '<div class="st-f full">' + condButtons('') + '</div>' + catField('') +
         fld('quantity', T('f.quantity'), '<div class="st-qty"><button type="button" data-act="qty-" aria-label="' + esc(T('qty.dec')) + '">-</button><input class="st-in" id="sf-quantity" value="1" inputmode="numeric" maxlength="2"><button type="button" data-act="qty+" aria-label="' + esc(T('qty.inc')) + '">+</button></div>') +
-        fld('bought', T('f.bought'), dat('bought', t0, t0)) + fld('buy', T('f.buy'), mny('buy')) + fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint" id="st-addlog" aria-live="polite">' + esc(T('sheet.add.log0')) + '</p><p class="st-hint">' + esc(T('sheet.add.keys')) + '</p><p class="st-hint">' + esc(T('sheet.add.hint')) + '</p>';
+        fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint" id="st-addlog" aria-live="polite">' + esc(T('sheet.add.keys')) + '</p>';
     }
     if (kind === 'list') return '<div class="st-form">' + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(it.platform) + '</select>') + fld('list', T('f.list'), mny('list', it.list_cents)) + fld('listed', T('f.listed'), dat('listed', t0, t0)) + '</div>';
     if (kind === 'reprice') {
@@ -667,10 +672,14 @@
     }
     if (kind === 'wo') {
       var wcst = C.costCents(it), wag = C.ageDays(it, t0);
-      return '<p class="st-d" id="st-woctx">' + esc(T('wo.line', { st: statusLabel(it.status), days: wag, cost: wcst == null ? '--' : M(wcst) })) + '</p><div class="st-form"><div class="st-f full">' + reasonButtons() + '</div>' + fld('date', T('f.date'), dat('date', t0, t0)) + '</div><div class="st-effect" id="st-effect">' + woEffect(it, t0) + '</div><p class="st-hint">' + esc(T('sheet.wo.note')) + '</p>';
+      return '<p class="st-d" id="st-woctx">' + esc(T('wo.line', { st: statusLabel(it.status), days: T(wag === 1 ? 'dt.day1' : 'dt.days', { n: wag }), cost: wcst == null ? '--' : M(wcst) })) + '</p><div class="st-form"><div class="st-f full">' + reasonButtons() + '</div>' + fld('date', T('f.date'), dat('date', t0, t0)) + '</div><div class="st-effect" id="st-effect">' + woEffect(it, t0) + '</div><p class="st-hint">' + esc(T('sheet.wo.note')) + '</p>';
     }
     return '';
   }
+  // live check 5 Nov 2026: the currency note is for the first visit, not every visit. Shown on the first day it appears (or until OK), then only in Settings.
+  var CUR_KEY = 'snypd_stock_curnote';
+  function curNoteDue() { try { var v = localStorage.getItem(CUR_KEY); if (v === 'off') return false; if (!v) { localStorage.setItem(CUR_KEY, today()); return true; } return v === today(); } catch (e) { return true; } }
+  function curNoteOff() { try { localStorage.setItem(CUR_KEY, 'off'); } catch (e) { /* private mode: it simply shows again */ } var n = $('#st-curnote'); if (n) n.parentNode.removeChild(n); }
   // design Ia: condition as 5 tap buttons (best to worst) with Clear; the value lives in a hidden #sf-condition ('' = not set)
   function condButtons(sel) {
     return '<div class="st-condhd"><span class="st-lbl" id="st-condlbl">' + esc(T('f.condition.opt')) + '</span><button type="button" class="st-linkb" data-act="cond-clear">' + esc(T('cond.clear')) + '</button></div>' +
@@ -679,8 +688,8 @@
   }
   // design Ia: category select + "Manage categories" (rename, add, hide; hidden categories keep their items)
   function catField(sel) {
-    return '<div class="st-f full"><label for="sf-category">' + esc(T('f.category')) + '</label><div class="st-catrow"><select class="st-in" id="sf-category">' + catOptions(sel) + '</select>' +
-      '<button type="button" class="st-btn st-ghost" data-act="cat-manage" aria-expanded="false" aria-controls="st-catman">' + esc(T('cat.manage')) + '</button></div><div id="st-catman"></div></div>';
+    return '<div class="st-f full"><label for="sf-category">' + esc(T('f.category')) + '</label><select class="st-in" id="sf-category">' + catOptions(sel) + '</select>' +
+      '<button type="button" class="st-linkb st-catlink" data-act="cat-manage" aria-expanded="false" aria-controls="st-catman">' + esc(T('cat.manage')) + '</button><div id="st-catman"></div></div>';
   }
   function catManHtml() {
     var cs = (S.cats || []).slice().sort(function (a, b) { return (a.sort - b.sort) || (a.key < b.key ? -1 : 1); });
@@ -696,7 +705,7 @@
   function catToggle() {
     var box = $('#st-catman'), b = $('[data-act="cat-manage"][aria-controls]'); if (!box) return;
     var open = !box.innerHTML; box.innerHTML = open ? catManHtml() : ''; if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) { var f = $('#st-catman .st-in'); if (f) f.focus(); } else if (b) b.focus();
+    if (!open && b) b.focus();   // opening leaves the focus on the link: typing never lands in a rename field by surprise
   }
   function catRefresh(keepFocusKey) {   // after a change: redraw the panel and the select, keep the chosen category
     var sel = $('#sf-category'), v = sel ? sel.value : ''; if (sel) sel.innerHTML = catOptions(v);
@@ -1028,18 +1037,21 @@
     var head = '<div class="st-dhead">' + (photo ? '<div class="st-dphoto"><img class="st-ph" src="' + esc(it.image_url) + '" alt="' + esc(T('detail.photo')) + '" decoding="async" referrerpolicy="no-referrer"></div>' : tileHtml(it.title, null)) +
       '<div class="st-dhead-t"><div class="st-dtags">' + tags + '</div><p class="st-d" id="st-dmeta">' + meta + '</p></div></div>';
     // timeline: bought -> listed -> reserved -> sold from the item's own dates, "+Nd" between the dates that exist
-    var prev = null, steps = [['dt.s.bought', it.bought_on], ['dt.s.listed', it.listed_on], ['dt.s.reserved', it.reserved_on], ['dt.s.sold', it.status === 'sold' ? it.sold_on : null]].map(function (s, i) {
+    var next = (it.status === 'stock' || it.status === 'returned') ? 1 : ((it.status === 'listed' || it.status === 'reserved') ? 3 : -1);
+    var stepList = [['dt.s.bought', it.bought_on], ['dt.s.listed', it.listed_on], ['dt.s.reserved', it.reserved_on], ['dt.s.sold', it.status === 'sold' ? it.sold_on : null]].filter(function (s, i) { return s[1] || i === next; });
+    var prev = null, steps = stepList.map(function (s, i) {
       var gap = i === 0 ? '' : (s[1] && prev ? T('dt.gap', { n: C.daysBetween(s[1], prev) }) : '--'); if (s[1]) prev = s[1];
       return '<li class="' + (s[1] ? 'on' : '') + '"><span class="st-dstep"><i></i>' + (i ? '<em>' + esc(gap) + '</em>' : '') + '</span><b>' + esc(T(s[0])) + '</b><span>' + esc(s[1] ? fmtDate(s[1]) : '--') + '</span></li>';
     }).join('');
     var mrow = function (k, v, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th scope="row">' + esc(T(k)) + '</th><td class="st-num">' + v + '</td></tr>'; };
     var listShown = it.list_cents != null && (it.status === 'listed' || it.status === 'reserved' || it.status === 'sold');
-    var noteKey = it.status !== 'sold' ? 'dt.note.open' : (profit == null ? 'dt.note.nocost' : (it.platform && it.platform !== 'vinted' && !it.fee_cents ? 'dt.note.nofee' : null));
+    var sold = it.status === 'sold', noteKey = it.status === 'written_off' ? null : (!sold ? 'dt.note.open' : (profit == null ? 'dt.note.nocost' : (it.platform && it.platform !== 'vinted' && !it.fee_cents ? 'dt.note.nofee' : null)));
+    // live check 5 Nov 2026: only the rows that apply (an unsold item showed 5 rows of which 4 were "--"); a missing buy price stays visible because it blocks the profit
     var money = '<table class="st-dmoney" id="st-dmoney"><tbody>' +
-      mrow('f.buy', it.buy_cents == null ? dash : esc(M(it.buy_cents))) + mrow('f.extra', it.extra_cents ? esc(M(it.extra_cents)) : dash) + mrow('f.list', listShown ? esc(M(it.list_cents)) : dash) +
-      mrow('f.sold', it.status === 'sold' && it.sold_cents != null ? esc(M(it.sold_cents)) : dash) + mrow('dt.fee', it.fee_cents ? esc(M(it.fee_cents)) : dash) +
+      mrow('f.buy', it.buy_cents == null ? dash : esc(M(it.buy_cents))) + (it.extra_cents ? mrow('f.extra', esc(M(it.extra_cents))) : '') + (listShown ? mrow('f.list', esc(M(it.list_cents))) : '') +
+      (sold ? mrow('f.sold', it.sold_cents != null ? esc(M(it.sold_cents)) : dash) : '') + (it.fee_cents ? mrow('dt.fee', esc(M(it.fee_cents))) : '') +
       (it.ship_paid_cents ? mrow('f.ship', esc(M(it.ship_paid_cents))) : '') +
-      mrow('dt.net', profit == null ? dash : '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>', 'st-dnet') + '</tbody></table>' +
+      (sold ? mrow('dt.net', profit == null ? dash : '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>', 'st-dnet') : '') + '</tbody></table>' +
       (noteKey ? '<p class="st-hint" id="st-dmnote">' + esc(T(noteKey)) + '</p>' : '');
     var other = actionsFor(it).filter(function (a) { return a !== 'sold'; });
     var acts = other.length ? '<div class="st-acts">' + other.map(function (a) {
@@ -1056,10 +1068,15 @@
     var extra = (it.returned_on ? '<p class="st-note">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '') + (it.claim_id ? '<p class="st-note">' + esc(T('detail.claim')) + '</p>' : '');
     var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('close')) + '</button>' + (actionsFor(it).indexOf('sold') >= 0 ? '<button type="button" class="st-btn st-prim" data-act="do" data-do="sold" data-id="' + esc(it.id) + '">' + esc(T('act.sold')) + '</button>' : '');
     mountSheet(it.title, '<div id="st-sheet-err"></div>' + head +
-      '<div class="st-dsec"><span class="st-lbl">' + esc(T('dt.timeline')) + '</span><ol class="st-steps" id="st-steps">' + steps + '</ol></div>' +
+      '<div class="st-dsec"><span class="st-lbl">' + esc(T('dt.timeline')) + '</span><ol class="st-steps" id="st-steps" style="grid-template-columns:repeat(' + stepList.length + ', minmax(0, 1fr))">' + steps + '</ol></div>' +
       '<div class="st-dsec"><span class="st-lbl">' + esc(T('dt.money')) + '</span>' + money + '</div>' + acts + extra +
-      '<div class="st-dsec"><span class="st-lbl">' + esc(T('detail.history')) + '</span><ul class="st-tl" id="st-tl"><li>...</li></ul></div>' + form, foot);
-    S.api.itemHistory(it.id).then(function (h) { if (!S.sheet || S.sheet.item.id !== it.id) return; var ul = $('#st-tl'); if (ul) ul.innerHTML = h.length ? h.map(histHtml).join('') : '<li>' + esc(T('detail.history.none')) + '</li>'; }).catch(function () { var ul = $('#st-tl'); if (ul) ul.innerHTML = '<li>' + esc(T('err.load')) + '</li>'; });
+      '<details class="st-dsec st-histbox" id="st-histbox"><summary class="st-lbl">' + esc(T('detail.history')) + ' <span id="st-histn"></span></summary><ul class="st-tl" id="st-tl"><li>...</li></ul></details>' + form, foot);
+    // history repeats the timeline for a plain bought / listed / sold item, so it starts folded; a return or a write-off (the reversal amounts live only here) opens it
+    S.api.itemHistory(it.id).then(function (h) {
+      if (!S.sheet || S.sheet.item.id !== it.id) return; var ul = $('#st-tl'), n = $('#st-histn'), box = $('#st-histbox');
+      if (ul) ul.innerHTML = h.length ? h.map(histHtml).join('') : '<li>' + esc(T('detail.history.none')) + '</li>'; if (n) n.textContent = '(' + h.length + ')';
+      if (box && h.some(function (x) { return x.kind === 'return' || x.kind === 'write_off'; })) box.open = true;
+    }).catch(function () { var ul = $('#st-tl'); if (ul) ul.innerHTML = '<li>' + esc(T('err.load')) + '</li>'; });
     var f = $('.st-sheet .st-btn'); if (f) f.focus();
   }
   function histHtml(h) {

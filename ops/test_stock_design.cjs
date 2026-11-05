@@ -60,6 +60,12 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   // ---- 4. display font + green profit
   let pg = await open('en');
   eq(await pg.$eval('#st-hero-net', e => [e.textContent.trim(), e.classList.contains('st-pos'), /Cabinet Grotesk/.test(getComputedStyle(e).fontFamily)]), ['€612.40', true, true], 'gap 4: hero net profit €612.40 in green, Cabinet Grotesk first in the font stack');
+  ok(!!(await pg.$('#st-curnote')), 'fix 7: the currency note shows on the first visit');
+  ok(await pg.evaluate(() => { localStorage.setItem('snypd_stock_curnote', '2026-01-01'); return true; }), 'set an earlier first-seen day');
+  await pg.evaluate(() => document.querySelector('#stock-panel [data-act="period"][data-days="7"]').click()); await wait(700);
+  eq(await pg.$('#st-curnote'), null, 'fix 7: after its first day the note is gone (Settings keeps the explanation)');
+  await pg.evaluate(() => { localStorage.removeItem('snypd_stock_curnote'); document.querySelector('#stock-panel [data-act="period"][data-days="30"]').click(); }); await wait(700);
+  await pg.act('cur-ok'); eq([await pg.$('#st-curnote'), await pg.evaluate(() => localStorage.getItem('snypd_stock_curnote'))], [null, 'off'], 'fix 7: OK hides it for good');
   ok(await pg.evaluate(async () => { await document.fonts.ready; return [...document.fonts].some(f => f.family.replace(/["']/g, '') === 'Cabinet Grotesk' && f.weight === '900' && f.status === 'loaded'); }), 'gap 4: the self-hosted Cabinet Grotesk Black face loaded');
 
   // ---- 5. Items values (design Ca): BOUGHT = buy price, PRICE "--" for items not on sale
@@ -74,11 +80,12 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   eq(await pg.txt('#st-dmeta'), 'Carhartt WIP · M · Vinted', 'gap 3: brand · size · platform');
   eq(await pg.$$eval('#st-steps li', l => l.map(x => [x.querySelector('b').innerText.trim().toUpperCase(), (x.querySelector('em') || { innerText: '' }).innerText.trim(), x.querySelector('span:last-child').innerText.trim(), x.className])),
     [['BOUGHT', '', '29 Sept 2026', 'on'], ['LISTED', '+1d', '30 Sept 2026', 'on'], ['RESERVED', '+26d', '26 Oct 2026', 'on'], ['SOLD', '--', '--', '']], 'gap 3: timeline bought -> listed +1d -> reserved +26d -> sold --');
-  eq(await pg.$$eval('#st-dmoney tr', r => r.map(x => x.innerText.replace(/\s+/g, ' ').trim())), ['Buy price €26.50', 'Extra costs --', 'List price €92.00', 'Sold price --', 'Platform fee --', 'Net profit --'], 'gap 3: money table');
+  eq(await pg.$$eval('#st-dmoney tr', r => r.map(x => x.innerText.replace(/\s+/g, ' ').trim())), ['Buy price €26.50', 'List price €92.00'], 'fix 4: money table of a reserved item = only the rows that apply (no extras, not sold yet)');
+  ok(/Net profit appears when you mark it sold/.test(await pg.txt('#st-dmnote')), 'fix 4: the note says when net profit appears');
   eq(await pg.$eval('#st-editbox', e => e.open), false, 'gap 3: the edit form starts closed');
   eq(await pg.$$eval('.st-sheet-ft .st-btn', b => b.map(x => x.innerText.trim().toUpperCase())), ['CLOSE', 'MARK SOLD'], 'gap 3: one primary action, Mark sold');
   await pg.waitForFunction(() => document.querySelectorAll('#st-tl li.bought').length === 1, { timeout: 5000 });
-  ok(true, 'gap 3: the history list still loads');
+  eq(await pg.$eval('#st-histbox', e => [e.open, e.querySelector('#st-histn').textContent]), [false, '(2)'], 'fix 5: history starts folded with its count (it repeats the timeline)');
   await pg.act('close');
 
   // ---- 2. write off (design Ib): reasons as 4 buttons, real numbers
@@ -100,7 +107,7 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   const money = c => '€' + (Math.abs(c) / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 });
   const rev = sold.cost - sold.sold, net = 61240 + rev, sign = c => (c < 0 ? '−' : '+') + money(c);
   { const L = await pg.$$eval('#st-effect li', l => l.map(x => x.innerText.trim()));
-    eq([L[0], L[L.length - 1]], ['On 27 Oct 2026: revenue −' + money(sold.sold) + ', profit ' + sign(rev) + '.', 'Net profit, last 30 days: €612.40 → ' + money(net) + ', write-offs included and labelled.'], 'gap 2: return effect = reversal (cost - refund) and the new 30-day net'); }
+    eq([L[0], L[L.length - 1]], ['On 27 Oct 2026: revenue −' + money(sold.sold) + ', profit ' + sign(rev) + '.', 'Net profit, last 30 days: €612.40 → ' + money(net) + '.'], 'fix 2 + gap 2: return effect = reversal (cost - refund) and the new 30-day net'); }
   eq(await pg.$eval('#sf-reason-wrap', e => getComputedStyle(e).display), 'none', 'gap 2: no reason while it goes back to stock');
   await pg.evaluate(() => document.querySelector('.st-dest input[value="wo"]').click()); await wait(200);
   eq(await pg.$eval('#sf-reason-wrap', e => getComputedStyle(e).display !== 'none' && e.querySelectorAll('[data-act="wo-reason"]').length), 4, 'gap 2: "Write off instead" shows the 4 reason buttons');
@@ -115,6 +122,8 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   ok(await pg.$$eval('[data-act="cond-pick"]', b => b.every(x => x.getAttribute('aria-checked') === 'false')), 'gap 6: and unpresses every button');
   await pg.act('cat-manage');
   ok(await pg.$('#st-catman .st-catline') !== null && /Rename, add or hide/.test(await pg.txt('#st-catman')), 'gap 6: Manage categories opens the panel');
+  eq(await pg.evaluate(() => !!document.activeElement && document.activeElement.hasAttribute('data-cat')), false, 'fix 10: opening the panel never puts the cursor in a rename field');
+  ok(await pg.$eval('[data-act="cat-manage"][aria-controls]', e => e.classList.contains('st-linkb')), 'fix 10: Manage categories is a small link in Add item, not a button beside the select');
   await pg.$eval('#st-catman [data-cat="tops"]', e => { e.value = 'Hoodies'; e.dispatchEvent(new Event('change', { bubbles: true })); }); await wait(300);
   eq(await pg.evaluate(() => [window.__qaStock.state.categories.find(c => c.key === 'tops').name, [...document.querySelectorAll('#sf-category option')].find(o => o.value === 'tops').textContent]), ['Hoodies', 'Hoodies'], 'gap 6: rename saves to the account and relabels the select');
   await pg.act('cat-hide', '[data-key="shoes"]');
@@ -125,9 +134,33 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   eq(await pg.evaluate(() => [!!document.querySelector('.st-sheet'), (window.__qaStock.state.categories.find(c => c.name === 'Vintage tees') || {}).key, document.getElementById('sf-category').value]), [true, 'c-vintage-tees', 'c-vintage-tees'], 'gap 6: Enter adds the category (sheet stays open) and selects it');
   await pg.$eval('#st-catman [data-cat="tops"]', e => { e.value = ' '; e.dispatchEvent(new Event('change', { bubbles: true })); }); await wait(200);
   eq(await pg.evaluate(() => window.__qaStock.state.categories.find(c => c.key === 'tops').name), 'Hoodies', 'gap 6: an empty rename is ignored');
+  eq(await pg.$$eval('.st-sheet .st-form [id^="sf-"]', l => l.map(e => e.id.slice(3)).filter(x => ['title', 'brand', 'size', 'buy', 'bought', 'condition', 'category', 'quantity', 'extra', 'source'].includes(x))),
+    ['title', 'brand', 'size', 'buy', 'bought', 'condition', 'category', 'quantity', 'extra', 'source'], 'fix 9: buy price and date come right after title, brand and size');
+  eq(await pg.$$eval('.st-sheet-bd .st-hint:not(.st-bopen)', l => l.map(x => x.id)), ['st-addlog'], 'fix 8: one hint line under the form');
+  eq(await pg.txt('#st-addlog'), 'Enter adds the next one · Esc clears', 'fix 8: the keys line, which turns into the log after the first add');
   await pg.act('cond-pick', '[data-c="good"]'); await pg.type('#sf-title', 'Design check tee'); await pg.type('#sf-buy', '7');
+  await pg.$eval('#sf-bought', e => { e.value = '2026-10-26'; });
   await pg.act('submit'); await wait(500);
   eq(await pg.evaluate(() => { const i = window.__qaStock.state.items.find(x => x.title === 'Design check tee'); return i && [i.condition, i.category, i.buy_cents]; }), ['good', 'c-vintage-tees', 700], 'gap 6: the item is saved with the picked condition and the new category');
+  { const tid = await pg.evaluate(() => window.__qaStock.state.items.find(x => x.title === 'Design check tee').id); await pg.items(); await pg.act('chip', '[data-status=""]'); await wait(500); await pg.find('Design check tee'); await pg.openItem(tid);
+    eq(await pg.$$eval('#st-steps b', b => b.map(x => x.innerText.trim().toUpperCase())), ['BOUGHT', 'LISTED'], 'fix 4: a not-listed item shows Bought and the next step only');
+    eq(await pg.$$eval('#st-dmoney tr', r => r.map(x => x.innerText.replace(/\s+/g, ' ').trim())), ['Buy price €7.00'], 'fix 4: and one money row instead of five dashes');
+    await pg.act('do', '[data-do="wo"]'); ok(/in stock 1 day ·/.test(await pg.txt('#st-woctx')), 'fix 1: "in stock 1 day", not "1 days": ' + await pg.txt('#st-woctx')); await pg.act('close'); }
+  // fix 5 + 4: a sold item that skipped Reserved, and a returned item whose history opens by itself
+  await pg.act('chip', '[data-status=""]'); await wait(500); await pg.find('Patagonia Retro-X fleece, M'); await pg.openItem('062c8069-9bc3-fa09-484c-cf3f462131af');
+  eq(await pg.$$eval('#st-steps b', b => b.map(x => x.innerText.trim().toUpperCase())), ['BOUGHT', 'LISTED', 'SOLD'], 'fix 4: a sold item that was never reserved has no empty Reserved step');
+  ok((await pg.$$eval('#st-dmoney tr', r => r.map(x => x.innerText.replace(/\s+/g, ' ').trim()))).some(x => /^Net profit [+−]€/.test(x)), 'fix 4: a sold item keeps its net profit row');
+  await pg.act('close'); await pg.find('Ralph Lauren cable knit jumper, cream, M'); await pg.openItem('419fb88c-445b-693f-905d-d7816b7d3319');
+  await pg.waitForFunction(() => document.querySelectorAll('#st-tl li.return').length > 0, { timeout: 5000 });
+  eq(await pg.$eval('#st-histbox', e => e.open), true, 'fix 5: a history with a return opens by itself (the reversal lives there)');
+  await pg.act('close');
+  // fix 10: Manage categories also lives in Settings
+  await pg.act('settings'); await pg.act('cat-manage');
+  ok(await pg.$('.st-sheet #st-catman .st-catline') !== null && /save right away/.test(await pg.txt('#st-catman')), 'fix 10: Settings has Manage categories, and says changes save right away');
+  await pg.act('close');
+  // fix 3: no running-total line on a hidden scale; the total is text
+  await pg.evaluate(() => document.querySelector('#stock-panel .st-navb[data-view="overview"]').click()); await pg.waitForSelector('#st-hero-net'); await wait(600);
+  eq(await pg.evaluate(() => [document.querySelectorAll('#stock-panel polyline, #stock-panel .st-cumline').length, (document.querySelector('#stock-panel .st-cumt') || {}).textContent]), [0, 'Total ' + await pg.$eval('#st-hero-net', e => e.textContent.trim())], 'fix 3: no cumulative line, the total as text');
   await pg.close();
 
   // ---- 1. phone cards (390): full title, price on the right, 16 px gutter; edit sheet keeps the condition buttons
@@ -143,6 +176,16 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   eq(await pg.$eval('#sf-condition', e => e.value), 'good', 'detail edit form: condition buttons start on the item\'s condition');
   await pg.act('cond-pick', '[data-c="very_good"]'); await pg.act('save-detail'); await wait(400);
   eq(await pg.evaluate(id => window.__qaStock.state.items.find(i => i.id === id).condition, H54), 'very_good', 'detail edit form: a new condition saves');
+  await pg.close();
+
+  // ---- fix 6: Today with nothing to do is one line (fresh account, one item bought today)
+  pg = await browser.newPage(); await pg.setViewport({ width: 1440, height: 900 }); pg.on('pageerror', e => errors.push('fresh pageerror: ' + e.message));
+  await pg.goto(base + '/dashboard.html?boot=1&plan=elite&stock=all&stock_claims=0&stock_today=2026-10-27&lang=en', { waitUntil: 'domcontentloaded' });
+  await pg.waitForFunction(() => { const t = document.getElementById('view-tab-stock'); return t && getComputedStyle(t).display !== 'none'; }, { timeout: 10000 });
+  await pg.evaluate(() => document.getElementById('view-tab-stock').click()); await pg.waitForSelector('#stock-panel [data-act="add"]', { timeout: 10000 }); await wait(400);
+  await pg.evaluate(() => document.querySelector('#stock-panel [data-act="add"]').click()); await pg.waitForSelector('#sf-title'); await pg.type('#sf-title', 'Fresh item'); await pg.type('#sf-buy', '10');
+  await pg.evaluate(() => document.querySelector('#stock-panel [data-act="submit"]').click()); await pg.waitForSelector('#st-hero-held', { timeout: 8000 }); await wait(800);
+  eq(await pg.evaluate(() => [(document.getElementById('st-lanes-none') || {}).textContent, document.querySelectorAll('.st-lane').length, !!document.getElementById('st-lanes-sub')]), ['Nothing needs you today.', 0, false], 'fix 6: no lanes to work on = one line, no three empty cards');
   await pg.close();
 
   // ---- French

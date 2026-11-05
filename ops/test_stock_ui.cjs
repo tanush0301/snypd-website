@@ -143,7 +143,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
   eq(await page.evaluate(() => window.__qaErrors.length), 0, 'no window errors in the mock');
   // ---- 2a. step 5: Quick add keys + log, Mark sold context / preview / sold elsewhere, Import drop step (design Cc, Bb)
   await act('add');
-  ok(/nothing added yet/.test(await text('#st-addlog')) && /Enter adds the next one \u00b7 Esc clears/.test(await text('.st-sheet')) && /ADD AND NEXT/i.test(await text('.st-sheet-ft')) && /ADD AND CLOSE/i.test(await text('.st-sheet-ft')), 'Quick add: design copy (log line, keys line, Add and next / Add and close)');
+  ok(/Enter adds the next one \u00b7 Esc clears/.test(await text('#st-addlog')) && /ADD AND NEXT/i.test(await text('.st-sheet-ft')) && /ADD AND CLOSE/i.test(await text('.st-sheet-ft')), 'Quick add: design copy (log line, keys line, Add and next / Add and close)');
   await setv('#sf-title', 'Step5 jacket'); await setv('#sf-buy', '12'); await page.focus('#sf-title'); await page.keyboard.press('Enter'); await wait(800);
   ok(!!(await page.$('.st-sheet')) && /Added: Step5 jacket\./.test(await text('#st-addlog')) && (await page.$eval('#sf-title', e => e.value)) === '', 'Enter adds and keeps the sheet open for the next one, with the log line: ' + await text('#st-addlog'));
   await setv('#sf-title', 'half typed'); await page.focus('#sf-title'); await page.keyboard.press('Escape'); await wait(250);
@@ -338,7 +338,7 @@ const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); passed++; };
     eq(plat, ['Vinted \u20ac292.90 \u00b7 16 sold', 'Facebook Marketplace \u20ac116.70 \u00b7 6 sold', 'Marktplaats \u20ac103.80 \u00b7 3 sold', 'Vestiaire Collective \u20ac46.00 \u00b7 2 sold', 'eBay \u20ac34.50 \u00b7 3 sold', 'Depop \u20ac18.50 \u00b7 1 sold'], 'chart: net profit by platform = the design numbers');
     ok(/Platforms are tracked by hand\. SNYPD isn.t connected to any of them\./.test(await tc(pg, '#st-ch-plat')), 'chart: the honesty line');
     const bars = await pg.$$eval('#st-ch-day svg rect', r => r.length), svgText = await pg.$eval('#st-ch-day svg', e => e.textContent), aria = await pg.$eval('#st-ch-day svg', e => e.getAttribute('aria-label'));
-    ok(bars >= 20 && bars <= 30, 'chart: one bar per day with sales (' + bars + ' of 30)'); ok(/cumulative \u20ac612\.40/.test(svgText), 'chart: cumulative \u20ac612.40 on the line: ' + svgText.slice(0, 80)); ok(/\u20ac612\.40/.test(aria) && /28 Sept?|28 Sep/.test(aria), 'chart: accessible summary: ' + aria);
+    ok(bars >= 20 && bars <= 30, 'chart: one bar per day with sales (' + bars + ' of 30)'); ok(/Total .612\.40/.test(svgText) && !/cumulative/i.test(svgText), 'chart: the period total as text, no cumulative line (live check 5 Nov): ' + svgText.slice(0, 80)); ok(/\u20ac612\.40/.test(aria) && /28 Sept?|28 Sep/.test(aria), 'chart: accessible summary: ' + aria);
     ok(/30D \u00b7 daily/.test(await tc(pg, '#st-ch-day .st-secsub')), 'chart: 30D . daily');
     await clickBy(pg, '#st-ch-plat [data-act="chart-table"]'); await wait5(250);
     eq(await pg.$$eval('#st-ch-plat table tbody tr', r => r.length), 6, 'chart: the Table toggle shows the same 6 platform rows as a real table');

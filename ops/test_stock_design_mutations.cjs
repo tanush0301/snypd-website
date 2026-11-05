@@ -19,7 +19,21 @@ const M = [
   ['assets/stock.js', 'C.daysBetween(t0, d) >= 0 && C.daysBetween(t0, d) < 30) L.push(T(\'wo.e4\', { a: M(v.netCents), b: M(v.netCents - cst) }));', ') L.push(T(\'wo.e4\', { a: M(v.netCents), b: M(v.netCents - cst) }));', 'write-off net line ignores the date'],
   ['assets/stock.css', '#stock-panel.panel { margin-left: -20px; margin-right: -20px; border-left: 0; border-right: 0; }', '', 'phone frame back'],
   ['assets/stock.css', "@font-face { font-family: 'Cabinet Grotesk';", "@font-face { font-family: 'Cabinet Grotesk X';", 'display font not loaded'],
-  ['assets/stock.js', "'<div class=\"st-f full\">' + condButtons(it.condition) + '</div>'", "'<div class=\"st-f full\">' + condButtons('') + '</div>'", 'edit form forgets the condition']
+  ['assets/stock.js', "'<div class=\"st-f full\">' + condButtons(it.condition) + '</div>'", "'<div class=\"st-f full\">' + condButtons('') + '</div>'", 'edit form forgets the condition'],
+  // live-check fixes 1-10 (5 Nov 2026)
+  ['assets/stock.js', "T(wag === 1 ? 'dt.day1' : 'dt.days', { n: wag })", "T('dt.days', { n: wag })", 'fix 1: "1 days" is back'],
+  ['assets/stock.js', "T(wo ? 'wo.e4' : 'ret.e4',", "T('wo.e4',", 'fix 2: the return talks about write-offs'],
+  ['assets/stock.js', "if (n > 1) svg += '<text x=", "if (n > 1) svg += '<polyline class=\"st-cumline\" points=\"0,0\"/><text x=", 'fix 3: a running-total line is drawn'],
+  ['assets/stock.js', "return s[1] || i === next; });", "return true; });", 'fix 4: every timeline step, dates or not'],
+  ['assets/stock.js', "(sold ? mrow('dt.net',", "(true ? mrow('dt.net',", 'fix 4: net profit row on unsold items'],
+  ['assets/stock.js', '<details class="st-dsec st-histbox" id="st-histbox">', '<details class="st-dsec st-histbox" id="st-histbox" open>', 'fix 5: history always open'],
+  ['assets/stock.js', "if (box && h.some(function (x) { return x.kind === 'return' || x.kind === 'write_off'; })) box.open = true;", '', 'fix 5: a return does not open the history'],
+  ['assets/stock.js', "(o.lanes && !worth ?", "(false ?", 'fix 6: three empty lane cards are back'],
+  ['assets/stock.js', "return v === today(); } catch (e) { return true; } }", "return true; } catch (e) { return true; } }", 'fix 7: the currency note on every visit'],
+  ['assets/stock.js', "'</div><p class=\"st-hint\" id=\"st-addlog\" aria-live=\"polite\">' + esc(T('sheet.add.keys')) + '</p>';", "'</div><p class=\"st-hint\" id=\"st-addlog\" aria-live=\"polite\">' + esc(T('sheet.add.keys')) + '</p><p class=\"st-hint\">' + esc(T('sheet.add.hint')) + '</p>';", 'fix 8: the extra hint lines are back'],
+  ['assets/stock.js', "fld('buy', T('f.buy'), mny('buy')) + fld('bought', T('f.bought'), dat('bought', t0, t0)) +" + String.fromCharCode(10) + "        '<div class=\"st-f full\">' + condButtons('') + '</div>'", "'<div class=\"st-f full\">' + condButtons('') + '</div>' + fld('buy', T('f.buy'), mny('buy')) + fld('bought', T('f.bought'), dat('bought', t0, t0))", 'fix 9: buy price after the condition again'],
+  ['assets/stock.js', "if (!open && b) b.focus();", "if (open) { var f = $('#st-catman .st-in'); if (f) f.focus(); } else if (b) b.focus();", 'fix 10: the cursor jumps into the first rename field'],
+  ['assets/stock.js', 'st-catset" data-act="cat-manage"', 'st-catset" data-act="cat-manage-x"', 'fix 10: Settings cannot manage categories']
 ];
 let caught = 0;
 for (const [file, from, to, name] of M) {
