@@ -578,7 +578,9 @@ window.SNYPD_STOCK_STR = {
   "ch.total": "Total {amount}",
   "ov.lanes.none": "Nothing needs you today.",
   "ov.cur.ok": "OK",
-  "cat.note": "Rename, add or hide. Changes save right away; hidden categories keep their items."
+  "cat.note": "Rename, add or hide. Changes save right away; hidden categories keep their items.",
+  "act.details": "Details",
+  "age.soldin": "sold in {n} d"
  },
  "fr": {
   "tab": "Stock",
@@ -1158,6 +1160,8 @@ window.SNYPD_STOCK_STR = {
   "ch.total": "Total\u00a0: {amount}",
   "ov.lanes.none": "Rien ne t\u2019attend aujourd\u2019hui.",
   "ov.cur.ok": "OK",
-  "cat.note": "Renomme, ajoute ou masque. Les changements sont enregistr\u00e9s tout de suite\u00a0; les cat\u00e9gories masqu\u00e9es gardent leurs articles."
+  "cat.note": "Renomme, ajoute ou masque. Les changements sont enregistr\u00e9s tout de suite\u00a0; les cat\u00e9gories masqu\u00e9es gardent leurs articles.",
+  "act.details": "D\u00e9tails",
+  "age.soldin": "vendu en {n} j"
  }
 };

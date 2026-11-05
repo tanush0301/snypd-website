@@ -33,7 +33,16 @@ const M = [
   ['assets/stock.js', "'</div><p class=\"st-hint\" id=\"st-addlog\" aria-live=\"polite\">' + esc(T('sheet.add.keys')) + '</p>';", "'</div><p class=\"st-hint\" id=\"st-addlog\" aria-live=\"polite\">' + esc(T('sheet.add.keys')) + '</p><p class=\"st-hint\">' + esc(T('sheet.add.hint')) + '</p>';", 'fix 8: the extra hint lines are back'],
   ['assets/stock.js', "fld('buy', T('f.buy'), mny('buy')) + fld('bought', T('f.bought'), dat('bought', t0, t0)) +" + String.fromCharCode(10) + "        '<div class=\"st-f full\">' + condButtons('') + '</div>'", "'<div class=\"st-f full\">' + condButtons('') + '</div>' + fld('buy', T('f.buy'), mny('buy')) + fld('bought', T('f.bought'), dat('bought', t0, t0))", 'fix 9: buy price after the condition again'],
   ['assets/stock.js', "if (!open && b) b.focus();", "if (open) { var f = $('#st-catman .st-in'); if (f) f.focus(); } else if (b) b.focus();", 'fix 10: the cursor jumps into the first rename field'],
-  ['assets/stock.js', 'st-catset" data-act="cat-manage"', 'st-catset" data-act="cat-manage-x"', 'fix 10: Settings cannot manage categories']
+  ['assets/stock.js', 'st-catset" data-act="cat-manage"', 'st-catset" data-act="cat-manage-x"', 'fix 10: Settings cannot manage categories'],
+  // polish 11-14 (5 Nov 2026)
+  ['assets/stock.js', "var nextAct = (r.status === 'stock' || r.status === 'returned') ? 'list' :", "var nextAct = (r.status === 'stock' || r.status === 'returned') ? 'sold' :", 'polish 11: not-listed cards offer Mark sold again'],
+  ['assets/stock.js', "esc(T('act.details'))", "esc(T('act.edit'))", 'polish 11: the card button says Edit again'],
+  ['assets/stock.css', '@media (max-width: 720px) { .st-row > .c-pop.st-nopop { display: none; } }', '', 'polish 11: lone "--" on phone cards'],
+  ['assets/stock.js', "if (back && k !== 'detail' && findRow(back)) openDetail(back);", '', 'polish 12: Cancel drops to the list'],
+  ['assets/stock.js', "S.sheet = null; S.returnTo = null;", "S.sheet = null;", 'polish 12: a stale way back survives a saved action'],
+  ['assets/stock.js', "(soldIn != null ? esc(T('age.soldin', { n: soldIn })) : '<span class=\"st-miss\">--</span>')", "'<span class=\"st-miss\">--</span>'", 'polish 13: sold rows show "--" again'],
+  ['assets/stock.js', "ab.className = 'st-btn ' + (v === 'money' ? 'st-ghost' : 'st-prim');", "ab.className = 'st-btn st-prim';", 'polish 14: two purple buttons on Money'],
+  ['assets/stock.js', "canRepeat = !!mo.pnl && (pm ? pm.expenses > 0 : true);", "canRepeat = true;", 'polish 14: Repeat last month with nothing to repeat']
 ];
 let caught = 0;
 for (const [file, from, to, name] of M) {
