@@ -66,6 +66,8 @@ function toFrench(s) {
     .replace(/ & (\d+) more$/, ' et $1 de plus')
     .replace(/(^|\u2014 )New listing\b/, '$1Nouvelle annonce')
     .replace(/^A new listing matched your search\.$/, 'Une nouvelle annonce correspond \u00e0 ta recherche.')
+    .replace(/^1 new match overnight$/, '1 nouvelle annonce cette nuit')
+    .replace(/^(\d+) new matches overnight$/, '$1 nouvelles annonces cette nuit')
     .replace(/^1 new match - /, '1 nouvelle annonce - ')
     .replace(/^(\d+) new matches - /, '$1 nouvelles annonces - ')
     .replace(/^From (.+)\. Tap to see them\.$/, 'D\u00e8s $1. Touche pour les voir.')

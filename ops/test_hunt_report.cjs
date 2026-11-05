@@ -62,7 +62,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       hunts: [...box.querySelectorAll('.hr-h')].map(h => ({
         name: h.querySelector('.hr-name').innerText, nameHtml: h.querySelector('.hr-name').innerHTML,
         top: h.querySelector('.hr-h__top').innerText.replace(/\s+/g, ' '),
-        cheap: (h.querySelector('.hr-cheap') || {}).innerText,
+        cheap: (h.querySelector('.hr-cheap') || {}).innerText, thin: (h.querySelector('.hr-thin') || {}).innerText || '',
         link: (h.querySelector('.hr-cheap a') || {}).href || null,
         linkAttrs: h.querySelector('.hr-cheap a') ? [h.querySelector('.hr-cheap a').target, h.querySelector('.hr-cheap a').rel] : null,
         conds: [...h.querySelectorAll('.hr-c')].map(c => c.innerText.replace(/\s+/g, ' ').trim()),
@@ -81,7 +81,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(s.hunts[0].top, 'carhartt 213 new listings +52% vs last week', 'count + change vs last week');
   ok(/^Cheapest find \u20AC9 \u00b7 Good/.test(s.hunts[0].cheap), 'cheapest find with price + condition: ' + s.hunts[0].cheap);
   eq([s.hunts[0].link, s.hunts[0].linkAttrs], ['https://www.vinted.fr/items/10300009001', ['_blank', 'noopener noreferrer']], 'cheapest find opens on Vinted in a new tab');
-  eq(s.hunts[0].conds, ['Very good 210 listings typical \u20AC27.50 \u00b7 \u20AC19.50\u2013\u20AC33 +8% vs last week', 'Good 3 listings Too few to price yet'], 'per condition: typical, range, change; thin one says so');
+  eq(s.hunts[0].conds, ['Very good 210 listings typical \u20AC27.50 \u00b7 \u20AC19.50\u2013\u20AC33 +8% vs last week'], 'per condition: typical, range, change; thin conditions are not listed one by one');
+  eq(s.hunts[0].thin, '3 more listings in other conditions: too few to price yet.', 'thin conditions folded into one line');
   ok(/\u00a3/.test(s.hunts[1].conds.join(' ')) && s.hunts[1].link === null, 'GBP prices on a UK hunt; no link for a bad id');
   eq(s.hunts[1].conds[0], 'Muy bueno 40 listings Too mixed for one price', 'mixed condition: no single price, Vinted name kept');
   ok(s.hunts[1].top.endsWith('75 new listings'), 'no change shown without last week: ' + s.hunts[1].top);
@@ -119,7 +120,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(s.hunts[0].top, 'carhartt 213 nouvelles annonces +52 % vs semaine derni\u00e8re', 'French count + change');
   ok(await page.$eval('#hr-box .hr-d', e => e.textContent.includes('+52\u00a0%')), 'French: no-break space before %');
   ok(/^Trouvaille la moins ch\u00e8re 9\s\u20AC \u00b7 Bon \u00e9tat Ouvrir sur Vinted$/.test(s.hunts[0].cheap), 'French cheapest line (French money format): ' + s.hunts[0].cheap);
-  ok(/^Tr\u00e8s bon \u00e9tat 210 annonces typique 27,50\s\u20AC/.test(s.hunts[0].conds[0]) && s.hunts[0].conds[1].endsWith('Encore trop peu pour un prix'), 'French conditions: ' + s.hunts[0].conds.join(' | '));
+  ok(/^Tr\u00e8s bon \u00e9tat 210 annonces typique 27,50\s\u20AC/.test(s.hunts[0].conds[0]) && s.hunts[0].conds.length === 1 && /^3 autres annonces dans d’autres états\s: encore trop peu pour un prix\.$/.test(s.hunts[0].thin), 'French conditions + folded line: ' + s.hunts[0].conds.join(' | ') + ' / ' + s.hunts[0].thin);
   ok(/pas les prix r\u00e9ellement pay\u00e9s/.test(s.text) && !/prix de vente/i.test(s.text), 'French note, never "prix de vente"');
   ok(s.overflow <= 0, '390 px: no horizontal overflow (' + s.overflow + ')');
   await page.close();

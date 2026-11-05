@@ -134,6 +134,7 @@ const EUR = '\u20AC', MINUS = '\u2212';
   await tap(page, '.mb-col [data-mb-q="longchamp bag"]'); await wait(400);
   let sh = await sheet(page);
   ok(sh && sh.title === 'Longchamp bag', 'sheet opens on the item');
+  ok(await page.evaluate(() => { const x = document.querySelector('.mr-sheet.on .mr-sheet__x'); const r = x.getBoundingClientRect(); return [0.15, 0.5, 0.85].every(f => document.elementFromPoint(r.x + r.width / 2, r.y + r.height * f) === x); }), 'sheet close button is on top everywhere (not under the top bar)');
   ok(/Bags \u00b7 EU asking prices \(EUR\) \u00b7 Search words: longchamp bag \u00b7 \u221221%/.test(sh.text), 'sheet header: ' + sh.text.slice(0, 90));
   ok(sh.dots >= 20 && sh.dots <= 38 && sh.bars >= 30 && sh.bands >= 1, 'chart: typical dots, listings bars, range band (' + [sh.dots, sh.bars, sh.bands] + ')');
   eq(sh.nums.slice(0, 3), [EUR + '55 Typical now', EUR + '32–' + EUR + '90 Normal range', '159 Listings (7 days)'], 'numbers: typical, range (p25-p75 of today), listings');
@@ -151,10 +152,11 @@ const EUR = '\u20AC', MINUS = '\u2212';
   let fs1 = await page.evaluate(() => ({
     open: document.getElementById('filter-sheet-overlay') && getComputedStyle(document.getElementById('filter-sheet-overlay')).display !== 'none',
     words: document.getElementById('fs-q-words').value, max: document.getElementById('fs-q-max').value, site: document.getElementById('fs-q-site').value,
-    url: document.getElementById('filter-new-url').value, name: document.getElementById('filter-new-name').value,
+    url: document.getElementById('filter-new-url').value, name: document.getElementById('filter-new-name').value, min: document.getElementById('filter-new-minprice').value,
     sheetClosed: !document.querySelector('.mr-sheet.on'),
   }));
   ok(fs1.open && fs1.sheetClosed, 'hunt sheet opens, chart sheet closes');
+  eq(fs1.min, '', 'the default minimum is cleared (EUR30 min + a lower max would watch almost nothing)');
   eq([fs1.words, fs1.max, fs1.site, fs1.name], ['longchamp bag', maxEur, 'vinted.be', 'longchamp bag'], 'filled: words, max, the first hunt\'s site, name');
   ok(/^https:\/\/www\.vinted\.be\/catalog\?search_text=longchamp\+bag&price_to=\d+&order=newest_first$/.test(fs1.url), 'link built by the quick search: ' + fs1.url);
   await page.close();
@@ -292,6 +294,28 @@ const EUR = '\u20AC', MINUS = '\u2212';
     return [...document.querySelectorAll('#mb-box .mb-col')].map(c => c.querySelectorAll('.mb-row').length);
   });
   eq(cap, [1, 1], 'teaser: at most 1 rising + 1 falling drawn');
+  await page.close();
+
+  // ---- 10. What hunters watch: top 8, then Show all
+  page = await open('plan=elite&lang=en');
+  const hn = await page.evaluate(async () => {
+    const f = window.fetch;
+    window.fetch = async (u, o) => {
+      const r = await f(u, o);
+      if (!String(u).includes('/market-board')) return r;
+      const b = await r.json();
+      b.hunters = Array.from({ length: 12 }, (_, k) => ({ brand: 'Brand ' + k, hunters: 40 - k }));
+      return new Response(JSON.stringify(b), { status: 200 });
+    };
+    await window.SNYPD.loadBoard(true);
+    await new Promise(r => setTimeout(r, 300));
+    const rows = () => document.querySelectorAll('#mb-box .mb-hunt__r').length;
+    const before = [rows(), (document.querySelector('[data-mb-hunters]') || {}).textContent];
+    document.querySelector('[data-mb-hunters]').click();
+    await new Promise(r => setTimeout(r, 100));
+    return before.concat([rows(), document.querySelector('[data-mb-hunters]').textContent]);
+  });
+  eq(hn, [8, 'Show all 12 brands', 12, 'Show fewer'], 'hunters: top 8, Show all, Show fewer');
   await page.close();
 
   eq(errors, [], 'no page errors');

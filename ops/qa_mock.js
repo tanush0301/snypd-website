@@ -523,6 +523,13 @@
       }
       // Stock RPCs (migrations 065-068) -> the in-memory port, see ops/stock_engine.js. Everything else keeps the old "not implemented" answer.
       if (STOCK && /^stock_/.test(name)) return stockReady.then(function () { return STOCK.rpc(name, args); });
+      // Quiet hours (migration 077): own-row RPC, same effect on the users row as the SQL function.
+      if (name === 'set_push_quiet_hours') {
+        var qu = DB.users[0] || {};
+        qu.push_quiet_hours_start = args.p_on ? 23 : null; qu.push_quiet_hours_end = args.p_on ? 8 : null; qu.push_quiet_tz = args.p_on ? args.p_tz : null;
+        window.__quietRpc = (window.__quietRpc || []).concat([args]);
+        return Promise.resolve({ data: null, error: null });
+      }
       return Promise.resolve({ data: null, error: { message: 'QA mock: rpc not implemented, falls back to plan table' } });
     },
   };
@@ -547,8 +554,11 @@
     if (u.indexOf('/api/v1/push/key') !== -1) {
       return Promise.resolve(new Response(JSON.stringify({ vapid_public_key: 'QA_FAKE_KEY' }), { status: 200 }));
     }
+    if (u.indexOf('/api/v1/push/subscribe') !== -1 || u.indexOf('/api/v1/push/unsubscribe') !== -1) {
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    }
     if (u.indexOf('/api/v1/push/status') !== -1) {
-      return Promise.resolve(new Response(JSON.stringify({ status: 'ready' }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ status: 'ready', ready: true }), { status: 200 }));
     }
     // Market board (Session 67): ?mb=full | teaser | empty | error, else full for elite / pro / a running trial (?trial=1), teaser otherwise
     if (u.indexOf('/api/v1/market-board') !== -1) {

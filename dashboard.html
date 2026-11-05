@@ -795,6 +795,17 @@ body {
 .hr-c__p b { color: var(--text-primary); font-weight: 400; }
 .hr-note { margin-top: 12px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
 .hr-teaser { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+/* Live review fixes (Session 67): an element with the hidden attribute stays hidden even when a class (.btn = flex) sets display */
+[hidden] { display: none !important; }
+#btn-start:disabled { display: none; }
+.status-more { display: none; }
+a.chip { text-decoration: none; }
+.hr-thin { margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+.prof-mini { margin-top: 4px; padding: 0; min-height: 0; font: inherit; font-size: 12px; color: var(--success); background: none; border: 0; cursor: pointer; text-decoration: underline; }
+@media (max-width: 767px) {
+  .status-more { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; font: inherit; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); background: transparent; border: 1px solid var(--border3); cursor: pointer; }
+  #dashboard-panel:not(.status-open) #plan-banner, #dashboard-panel:not(.status-open) #tick-chip, #dashboard-panel:not(.status-open) #feed-stats { display: none; }
+}
 /* Market board (Session 67, outreach/37) */
 .hr--top { margin: 24px 24px 0; }
 .mb { margin-top: 18px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; }
@@ -854,7 +865,7 @@ body {
 .mr-src { margin-top: 10px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
 .mr-cond-row.is-mine .mr-cond-name { color: var(--text-primary); }
 .mr-cond-row .mine { color: var(--text-muted); }
-.mr-sheet { position: fixed; inset: 0; z-index: 90; display: none; align-items: flex-start; justify-content: center; background: rgba(0, 0, 0, 0.6); overflow-y: auto; padding: 40px 16px; }
+.mr-sheet { position: fixed; inset: 0; z-index: 500; display: none; align-items: flex-start; justify-content: center; background: rgba(0, 0, 0, 0.6); overflow-y: auto; padding: 40px 16px; }
 .mr-sheet.on { display: flex; }
 .mr-sheet__box { width: 100%; max-width: 640px; background: var(--panel); border: 1px solid var(--border3); }
 .mr-sheet__hd { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
@@ -2075,13 +2086,15 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 <div class="chip neutral" id="tick-chip">Last check: —</div>
 <div class="chip err" id="err-chip" style="display:none"></div>
 <div class="chip neutral" id="feed-refreshing" style="display:none"><span class="feed-spinner"></span>Refreshing</div>
+<a class="chip ok" id="alerts-chip" hidden></a>
+<button class="status-more" id="status-more" type="button" aria-expanded="false" aria-controls="feed-stats">Details</button>
 </div>
 <div class="controls">
 <button class="btn btn-prim" id="btn-start">Start Sniping</button>
 <button class="btn btn-ghost" id="btn-stop">Stop</button>
 <button class="btn btn-ghost" id="btn-notify" style="display:none">Enable alerts</button>
 <button class="btn btn-ghost" id="btn-notify-test" type="button" hidden data-i18n-skip>Test this device</button>
-<a class="btn btn-ghost" id="alerts-guide-link" href="/vinted-alerts-on-your-phone" data-i18n-skip>Alert setup guide</a>
+<a class="btn btn-ghost" id="alerts-guide-link" href="/vinted-alerts-on-your-phone" data-i18n-skip hidden>Alert setup guide</a>
 </div>
 <p id="notify-note" style="display:none;margin:8px 0 0;font-size:13px;color:#8A8A8A;line-height:1.5;max-width:56ch"></p>
 </div>
@@ -2095,9 +2108,10 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 <div class="elite-banner" id="alerts-setup-card" style="display:none" aria-labelledby="alerts-setup-title">
   <div>
     <div class="elite-banner__title" id="alerts-setup-title">Finish setting up alerts on this device</div>
-    <div class="elite-banner__text">Your hunt is saved. Set up notifications so you can hear about matching listings without watching the feed.</div>
+    <div class="elite-banner__text">Get a push when your hunts find something, without keeping SNYPD open.</div>
   </div>
-  <button class="btn btn-prim" id="alerts-setup-resume" type="button">Set up alerts</button>
+  <div class="controls" style="margin:0;flex-wrap:wrap"><button class="btn btn-prim" id="alerts-setup-resume" type="button">Set up alerts</button>
+  <button class="btn btn-ghost" id="alerts-setup-later" type="button">Not now</button></div>
 </div>
 <!-- Marketing-email consent, asked once (19 Oct 2026). Shown only to accounts with no
      recorded choice: Google sign-ups never see the sign-up checkbox, and accounts from
@@ -2341,13 +2355,15 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       <div>
         <div class="wiz-alert-row__title" id="prof-label-push">Push alerts</div>
         <div class="wiz-alert-row__note" id="prof-push-note">Checking this device...</div>
+        <button type="button" class="prof-mini" id="prof-push-test" hidden>Send a test notification</button>
+        <a class="prof-mini" id="prof-alerts-guide" href="/vinted-alerts-on-your-phone" hidden>Alert setup guide</a>
       </div>
       <button type="button" class="toggle-switch is-disabled" id="prof-toggle-push" disabled role="switch" aria-checked="false" aria-labelledby="prof-label-push"><span class="toggle-switch__knob"></span></button>
     </div>
     <div class="wiz-alert-row">
       <div>
         <div class="wiz-alert-row__title" id="prof-label-quiet">Quiet hours</div>
-        <div class="wiz-alert-row__note">Hold alerts 23:00 - 08:00 UTC</div>
+        <div class="wiz-alert-row__note" id="prof-quiet-note">No alerts 23:00 - 08:00 your time, then one summary.</div>
       </div>
       <button type="button" class="toggle-switch" id="prof-toggle-quiet" role="switch" aria-checked="false" aria-labelledby="prof-label-quiet"><span class="toggle-switch__knob"></span></button>
     </div>
@@ -3470,6 +3486,7 @@ const HEARTBEAT_URL = (() => {
       const eurSite = (SITE_CURRENCY[qSite.value] || 'EUR') === 'EUR';
       qWords.value = String(o.words || '').slice(0, 80);
       if (qMax) qMax.value = (eurSite && Number(o.maxEur) > 0) ? String(Math.floor(Number(o.maxEur))) : '';
+      if (minPriceInput && qMax && qMax.value) { minPriceInput.value = ''; minPriceInput.dispatchEvent(new Event('input')); }
       nameInput.value = ''; nameInput.dataset.auto = '1';
       fillFromQuick();
       const box = document.getElementById('filter-sheet-new');
@@ -3700,13 +3717,22 @@ const HEARTBEAT_URL = (() => {
       const setupCard = document.getElementById('alerts-setup-card');
       const resumeSetup = document.getElementById('alerts-setup-resume');
       if (resumeSetup) resumeSetup.addEventListener('click', window.SNYPD.showAlertsStep);
+      const SNOOZE_KEY = 'snypd_alerts_card_snooze';
+      function cardSnoozed() { try { return Number(localStorage.getItem(SNOOZE_KEY) || 0) > Date.now(); } catch (e) { return false; } }
+      const laterSetup = document.getElementById('alerts-setup-later');
+      if (laterSetup) laterSetup.addEventListener('click', () => {
+        try { localStorage.setItem(SNOOZE_KEY, String(Date.now() + 30 * 86400000)); } catch (e) {}
+        if (setupCard) setupCard.style.display = 'none';
+      });
       let paintVersion = 0;
       async function paintAlertSetup() {
         const version = ++paintVersion;
         if (!setupCard || !hasSavedHunt || !window.SNYPD.alertsStatus) return;
         const status = await window.SNYPD.alertsStatus();
         if (version !== paintVersion) return;
-        setupCard.style.display = status.state === 'on' ? 'none' : '';
+        // Only states the user can act on here; blocked = the chip, on = nothing, a browser without push = its own note.
+        const actionable = status.state === 'off' || status.state === 'error' || status.state === 'ios-install';
+        setupCard.style.display = (actionable && !cardSnoozed()) ? '' : 'none';
       }
       window.addEventListener('snypd:alerts-changed', () => { paintAlertSetup().catch(console.error); });
       window.addEventListener('snypd:hunts-changed', () => {
@@ -4034,12 +4060,16 @@ const HEARTBEAT_URL = (() => {
     // reasoning as everywhere else in this ledger. Goes straight to
     // xp_events rather than through awardXP(), since a debit must never be
     // clamped by the daily-earning ceiling that exists to stop over-awarding.
+    const reversingItems = new Set();
     async function reverseClaimXPIfWithin24h(itemId, claimedAtIso) {
       if (!itemId || !claimedAtIso) return;
       const ageMs = Date.now() - new Date(claimedAtIso).getTime();
       if (!(ageMs >= 0) || ageMs > 24 * 60 * 60 * 1000) return;
+      if (reversingItems.has(itemId)) return;
+      reversingItems.add(itemId);
       try {
-        const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).in('event_type', ['claim', 'deal_quality_bonus', 'first_claim']).eq('item_id', itemId);
+        // Net of earlier reversals and corrections for this item, so a repeated unclaim never takes back more than the claim gave.
+        const { data, error } = await sb.from('xp_events').select('xp').eq('user_id', uid).in('event_type', ['claim', 'deal_quality_bonus', 'first_claim', 'unclaim_reversal', 'reconcile']).eq('item_id', itemId);
         if (error) throw error;
         const claimXp = (data || []).reduce((s, r) => s + (Number(r.xp) || 0), 0);
         if (claimXp > 0) {
@@ -4050,6 +4080,8 @@ const HEARTBEAT_URL = (() => {
         }
       } catch (e) {
         console.error('SNYPD XP: could not reverse claim award', e);
+      } finally {
+        reversingItems.delete(itemId);
       }
     }
 
@@ -4516,9 +4548,22 @@ const HEARTBEAT_URL = (() => {
             ? 'On for this device'
             : (usable ? 'Off for this device' : 'Not available on this device');
         }
+        const testLink = document.getElementById('prof-push-test');
+        if (testLink) testLink.hidden = !on;
+        const guide = document.getElementById('prof-alerts-guide');
+        if (guide) guide.hidden = on;
         showResult(usable ? '' : (message || ''));
       }
       paintPush(st.state, st.message);
+
+      const profTest = document.getElementById('prof-push-test');
+      if (!notifyPrefsWired && profTest) profTest.addEventListener('click', async () => {
+        if (!window.SNYPD || !window.SNYPD.testDevice) return;
+        profTest.disabled = true;
+        const r = await window.SNYPD.testDevice();
+        profTest.disabled = false;
+        showResult(r && r.ok ? 'Test sent. Check this device\u2019s notifications.' : 'The test could not be shown. Check this device\u2019s notification settings.');
+      });
 
       if (!notifyPrefsWired) pushToggle.addEventListener('click', async () => {
         if (pushToggle.disabled) return;
@@ -4546,11 +4591,13 @@ const HEARTBEAT_URL = (() => {
       try {
         const { data, error } = await sb
           .from('users')
-          .select('push_quiet_hours_start,push_quiet_hours_end')
+          .select('push_quiet_hours_start,push_quiet_hours_end,push_quiet_tz')
           .eq('id', uid)
           .maybeSingle();
         if (error) throw error;
         quietOn = !!(data && data.push_quiet_hours_start !== null && data.push_quiet_hours_start !== undefined);
+        const qn = document.getElementById('prof-quiet-note');
+        if (qn && quietOn && data.push_quiet_tz) qn.textContent = 'No alerts 23:00 - 08:00 (' + data.push_quiet_tz + '), then one summary.';
       } catch (e) {
         console.error('SNYPD profile: could not read quiet hours', e);
       }
@@ -4562,11 +4609,13 @@ const HEARTBEAT_URL = (() => {
         quietToggle.classList.toggle('is-on', next);
         quietToggle.setAttribute('aria-checked', next ? 'true' : 'false');
         try {
-          const { error } = await sb.from('users').update({
-            push_quiet_hours_start: next ? 23 : null,
-            push_quiet_hours_end: next ? 8 : null,
-          }).eq('id', uid);
+          // Users can only read public.users (RLS), so the old direct update never saved: migration 077 adds an own-row RPC.
+          let tz = 'UTC';
+          try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (er) {}
+          const { error } = await sb.rpc('set_push_quiet_hours', { p_on: next, p_tz: tz });
           if (error) throw error;
+          const qn = document.getElementById('prof-quiet-note');
+          if (qn) qn.textContent = next ? 'No alerts 23:00 - 08:00 (' + tz + '), then one summary.' : 'No alerts 23:00 - 08:00 your time, then one summary.';
         } catch (e) {
           // Put the switch back: a toggle that stays flipped after a failed
           // write is the same lie the wizard was telling.
@@ -6596,6 +6645,8 @@ const HEARTBEAT_URL = (() => {
   var guideLink = document.getElementById('alerts-guide-link');
   function pushFrench() { return document.documentElement && document.documentElement.lang === 'fr'; }
   if (guideLink && pushFrench()) { guideLink.href = '/fr/alertes-vinted-telephone'; guideLink.textContent = 'Guide de configuration des alertes'; }
+  var profGuide = document.getElementById('prof-alerts-guide');
+  if (profGuide && pushFrench()) { profGuide.href = '/fr/alertes-vinted-telephone'; }
   if (!btn) { return; }
 
   var sb = (window.SNYPD && window.SNYPD.supabase) || null;
@@ -6613,9 +6664,35 @@ const HEARTBEAT_URL = (() => {
   // report the real outcome instead of assuming one.
   var pushState = { ready: false, state: 'pending', message: 'Still setting up alerts.' };
 
+  /* What the Feed shows about alerts (live review 5 Nov 2026: "I don't always want to see that button"):
+     one chip for the state; "Test this device" only until a test succeeded on this device; turning alerts on/off and
+     the guide live in Profile; the setup card (other block) only while there is something to set up. */
+  var TESTED_KEY = 'snypd_push_tested';
+  function testedHere() { try { return localStorage.getItem(TESTED_KEY) === '1'; } catch (e) { return false; } }
+  var alertsChip = document.getElementById('alerts-chip');
+  function paintAlertControls() {
+    var st = pushState.state;
+    var busy = btn.textContent === 'Working...';
+    btn.hidden = !(busy || st === 'error');
+    if (guideLink) { guideLink.hidden = true; }
+    if (testBtn) {
+      testBtn.hidden = st !== 'on' || testedHere();
+      testBtn.textContent = pushFrench() ? 'Tester cet appareil' : 'Test this device';
+    }
+    if (alertsChip) {
+      var href = pushFrench() ? '/fr/alertes-vinted-telephone' : '/vinted-alerts-on-your-phone';
+      if (st === 'on') {
+        alertsChip.className = 'chip ok'; alertsChip.textContent = 'Alerts on'; alertsChip.removeAttribute('href'); alertsChip.hidden = false;
+      } else if (st === 'denied') {
+        alertsChip.className = 'chip warn'; alertsChip.textContent = 'Alerts blocked: how to fix'; alertsChip.setAttribute('href', href); alertsChip.hidden = false;
+      } else {
+        alertsChip.hidden = true;
+      }
+    }
+  }
   function setPushState(value) {
     pushState = value;
-    if (testBtn) { testBtn.hidden = value.state !== 'on'; testBtn.textContent = pushFrench() ? 'Tester cet appareil' : 'Test this device'; }
+    paintAlertControls();
     window.dispatchEvent(new Event('snypd:alerts-changed'));
   }
 
@@ -6628,6 +6705,7 @@ const HEARTBEAT_URL = (() => {
     btn.style.display = '';
     btn.textContent = label;
     btn.disabled = !!disabled;
+    paintAlertControls();
   }
 
   // iOS only delivers push to a PWA that has been added to the Home Screen.
@@ -6741,6 +6819,8 @@ const HEARTBEAT_URL = (() => {
           'Local test: this device can display a notification. This does not test server delivery.',
         tag: 'snypd-device-test', data: { url: '/dashboard' }
       });
+      try { localStorage.setItem(TESTED_KEY, '1'); } catch (er) {}
+      paintAlertControls();
       say(pushFrench() ? 'Test local demandé. Vérifie les notifications de cet appareil. Les alertes de nouvelles annonces doivent être vérifiées séparément.' :
         'Local test requested. Check this device’s notifications. New-listing delivery must be checked separately.');
       return { ok: true };
@@ -6751,6 +6831,15 @@ const HEARTBEAT_URL = (() => {
     } finally { if (testBtn) testBtn.disabled = false; }
   }
   if (testBtn) testBtn.addEventListener('click', testDevice);
+  window.SNYPD = window.SNYPD || {};
+  window.SNYPD.testDevice = testDevice;
+  var moreBtn = document.getElementById('status-more'), dashPanel = document.getElementById('dashboard-panel');
+  if (moreBtn && dashPanel) moreBtn.addEventListener('click', function () {
+    var open = !dashPanel.classList.contains('status-open');
+    dashPanel.classList.toggle('status-open', open);
+    moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    moreBtn.textContent = open ? 'Hide details' : 'Details';
+  });
 
   async function disable() {
     show('Working...', true);
@@ -6852,8 +6941,6 @@ const HEARTBEAT_URL = (() => {
 
     if (Notification.permission === 'denied') {
       show('Alerts blocked', true);
-      say('Notifications are blocked for snypd.store in this browser. Re-allow '
-        + 'them in your browser settings to use alerts.');
       setPushState({ ready: false, state: 'denied', message: 'Your browser has blocked notifications for snypd.store. Re-allow them in browser settings, then try again.' });
       return;
     }
@@ -6870,7 +6957,6 @@ const HEARTBEAT_URL = (() => {
         if (registration.status !== 200) throw new Error('subscription not confirmed');
         setPushState({ ready: true, state: 'on', message: '' });
         show('Alerts on - turn off', false);
-        say('Alerts are set up on this device. Background monitoring depends on your plan or trial.');
       } catch (e) {
         setPushState({ ready: true, state: 'error', message: 'Your alert registration could not be confirmed. Try again.' });
         show('Enable alerts', false);
@@ -7550,12 +7636,19 @@ const HEARTBEAT_URL = (() => {
         html += '<div class="hr-cheap">' + sp('Cheapest find') + ' <b>' + money(h.cheapest.price_cents, h.currency) + '</b> &middot; ' + sp(h.cheapest.condition)
           + (h.cheapest.url ? ' <a href="' + escapeHtml(h.cheapest.url) + '" target="_blank" rel="noopener noreferrer">' + sp('Open on Vinted') + '</a>' : '') + '</div>';
       }
+      var thinN = 0, shownC = 0;
       (h.conditions || []).forEach(function (c) {
+        if (c.status !== 'ok' && c.status !== 'mixed') { thinN += c.finds || 0; return; }
+        shownC++;
         html += '<div class="hr-c"><span class="hr-c__name">' + sp(c.condition) + '</span><span class="hr-c__n">' + sp(count(c.finds || 0, '1 listing', 'listings')) + '</span>'
           + '<span class="hr-c__p">' + (c.status === 'ok'
             ? sp('typical') + ' <b>' + money(c.typical_cents, h.currency) + '</b> &middot; ' + money(c.low_cents, h.currency) + '&ndash;' + money(c.high_cents, h.currency) + change(c.typical_change_pct)
-            : sp(c.status === 'mixed' ? 'Too mixed for one price' : 'Too few to price yet')) + '</span></div>';
+            : sp('Too mixed for one price')) + '</span></div>';
       });
+      if (thinN) {
+        html += '<div class="hr-thin">' + sp(shownC ? (thinN === 1 ? '1 more listing in other conditions: too few to price yet.' : thinN + ' more listings in other conditions: too few to price yet.')
+          : 'Too few listings yet to price by condition.') + '</div>';
+      }
       html += '</div>';
     });
     return html + '<p class="hr-note">' + sp('Asking prices of the new listings your hunts found in the last 7 days (UTC days), not sold prices. The cheapest find comes from the prices we keep: up to 400 a day per condition.') + '</p>';
@@ -7592,7 +7685,7 @@ const HEARTBEAT_URL = (() => {
      running trial = every item with its 5-week series + what hunters watch; others = the top rising and top falling
      item) and builds one board for everyone at most every 30 min; this only draws it. Loaded when the Market tab
      opens, at most once every 30 min per page; redrawn on every visit (language). Prices: EU site (vinted.be), EUR. */
-  var mbBox = document.getElementById('mb-box'), mbAt = 0, mbBusy = false, mbData = null, mbCat = '', mbAllOpen = false;
+  var mbBox = document.getElementById('mb-box'), mbAt = 0, mbBusy = false, mbData = null, mbCat = '', mbAllOpen = false, mbHuntAll = false;
   var MB_CATS = ['sneakers', 'jackets', 'tops', 'trousers', 'bags', 'accessories'];
   var MB_CAT_EN = { sneakers: 'Sneakers', jackets: 'Jackets & coats', tops: 'Tops & knitwear', trousers: 'Trousers', bags: 'Bags', accessories: 'Accessories' };
   function mbFr() { return (window.SNYPD_I18N && window.SNYPD_I18N.lang) === 'fr'; }
@@ -7658,10 +7751,11 @@ const HEARTBEAT_URL = (() => {
       if (hs.length) {
         var top = hs[0].hunters || 1;
         html += '<div class="mb-hunt"><div class="mb-col__t">' + sp('What hunters watch') + '</div>'
-          + hs.map(function (h) {
+          + (mbHuntAll ? hs : hs.slice(0, 8)).map(function (h) {
             return '<div class="mb-hunt__r"><span data-i18n-skip>' + escapeHtml(h.brand) + '</span><span class="mb-hunt__n">' + sp(h.hunters + ' hunters') + '</span>'
               + '<span class="mb-bar"><i style="width:' + Math.max(2, Math.round(h.hunters / top * 100)) + '%"></i></span></div>';
           }).join('')
+          + (hs.length > 8 ? '<button type="button" class="mb-more" data-mb-hunters>' + sp(mbHuntAll ? 'Show fewer' : 'Show all ' + hs.length + ' brands') + '</button>' : '')
           + '<p class="mb-note">' + sp('Brands that 5 or more SNYPD users hunt right now, counted once per user.') + '</p></div>';
       }
     }
@@ -7793,6 +7887,7 @@ const HEARTBEAT_URL = (() => {
     if (!t) { return; }
     var all = t.closest('[data-mb-all]');
     if (all) { mbAllOpen = !mbAllOpen; mbPaint(); return; }
+    if (t.closest('[data-mb-hunters]')) { mbHuntAll = !mbHuntAll; mbPaint(); return; }
     var cat = t.closest('[data-mb-cat]');
     if (cat) { mbCat = cat.getAttribute('data-mb-cat') || ''; mbPaint(); return; }
     var row = t.closest('[data-mb-q]');

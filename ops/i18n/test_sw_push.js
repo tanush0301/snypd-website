@@ -41,6 +41,10 @@ async function fire(payload, { stored, navLang, cachesBroken }) {
       '12 nouvelles annonces - jordan 1', 'Dès 45.0 EUR. Touche pour les voir.'],
     [{ title: '1 new match - New listing hunt', body: 'Tap to see them.' }, { stored: 'fr' },
       '1 nouvelle annonce - New listing hunt', 'Touche pour les voir.'],
+    [{ title: '7 new matches overnight', body: 'From 12.5 EUR. Tap to see them.' }, { stored: 'fr' },
+      '7 nouvelles annonces cette nuit', 'D\u00e8s 12.5 EUR. Touche pour les voir.'],
+    [{ title: '1 new match overnight', body: 'Tap to see them.' }, { stored: 'fr' },
+      '1 nouvelle annonce cette nuit', 'Touche pour les voir.'],
     [{ title: '12 new matches - jordan 1', body: 'From 45.0 EUR. Tap to see them.' }, { stored: 'en' },
       '12 new matches - jordan 1', 'From 45.0 EUR. Tap to see them.'],
     // Price check (push.py "rank", Session 66): worded in the user's language, only for 50-100 integers.

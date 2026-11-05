@@ -1230,3 +1230,27 @@ FR_PATTERNS += [
     (r'^(\d+)% of listings had a price cut this week: buyers are taking their time\.$',
      '$1' + NB + '% des annonces ont baissé leur prix cette semaine' + NB + ': les acheteurs prennent leur temps.'),
 ]
+
+# ---------------------------------------------------------------- Live review fixes (Session 67, 5 Nov 2026)
+FR.update({
+    'Alerts on': 'Alertes activées',
+    'Alerts blocked: how to fix': 'Alertes bloquées' + NB + ': comment corriger',
+    'Details': 'Détails', 'Hide details': 'Masquer les détails',
+    'Get a push when your hunts find something, without keeping SNYPD open.':
+        'Reçois une notification quand tes recherches trouvent quelque chose, sans garder SNYPD ouvert.',
+    'Not now': 'Pas maintenant',
+    'Send a test notification': 'Envoyer une notification de test',
+    'Alert setup guide': 'Guide de configuration des alertes',
+    'No alerts 23:00 - 08:00 your time, then one summary.': 'Aucune alerte de 23:00 à 08:00 (ton heure), puis un résumé.',
+    'Test sent. Check this device’s notifications.': 'Test envoyé. Vérifie les notifications de cet appareil.',
+    'The test could not be shown. Check this device’s notification settings.':
+        'Le test n’a pas pu s’afficher. Vérifie les réglages de notification de cet appareil.',
+    '1 more listing in other conditions: too few to price yet.': '1 autre annonce dans d’autres états' + NB + ': encore trop peu pour un prix.',
+    'Too few listings yet to price by condition.': 'Encore trop peu d’annonces pour un prix par état.',
+    'Show fewer': 'Voir moins',
+})
+FR_PATTERNS += [
+    (r'^No alerts 23:00 - 08:00 \((.+)\), then one summary\.$', 'Aucune alerte de 23:00 à 08:00 ($1), puis un résumé.'),
+    (r'^(\d+) more listings in other conditions: too few to price yet\.$', '$1 autres annonces dans d’autres états' + NB + ': encore trop peu pour un prix.'),
+    (r'^Show all (\d+) brands$', 'Voir les $1 marques'),
+]

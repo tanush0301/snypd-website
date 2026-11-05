@@ -28,6 +28,7 @@ class Element {
   addEventListener(type, cb) { (this.listeners[type] ||= []).push(cb); }
   setAttribute(k, v) { this.attrs[k] = v; }
   getAttribute(k) { return this.attrs[k]; }
+  removeAttribute(k) { delete this.attrs[k]; }
   querySelectorAll() { return []; }
   focus() {}
   async click() { if (!this.disabled) for (const cb of this.listeners.click || []) await cb({}); }
@@ -38,7 +39,7 @@ function base() {
   const g = { console: { error() {}, warn() {}, log() {} }, Date, Promise, Number, String, Uint8Array,
     Event: class { constructor(type) { this.type = type; } },
     document: { getElementById: el, querySelectorAll: () => [] },
-    localStorage: { getItem: () => null, removeItem() {} },
+    localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
     addEventListener: (name, cb) => (events[name] ||= []).push(cb),
     dispatchEvent: event => { for (const cb of events[event.type] || []) cb(event); },
     SNYPD: {}, navigator: { userAgent: 'QA desktop', platform: 'Linux', maxTouchPoints: 0 },
