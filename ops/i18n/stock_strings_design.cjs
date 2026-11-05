@@ -19,7 +19,8 @@ const en = {
   'ch.total': 'Total {amount}',
   'ov.lanes.none': 'Nothing needs you today.',
   'ov.cur.ok': 'OK',
-  'cat.note': 'Rename, add or hide. Changes save right away; hidden categories keep their items.'
+  'cat.note': 'Rename, add or hide. Changes save right away; hidden categories keep their items.',
+  'act.details': 'Details', 'age.soldin': 'sold in {n} d'
 };
 const fr = {
   'ret.eRevP': 'Le {date} : chiffre d’affaires −{refund}, bénéfice {p}.',
@@ -38,6 +39,7 @@ const fr = {
   'ch.total': 'Total : {amount}',
   'ov.lanes.none': 'Rien ne t’attend aujourd’hui.',
   'ov.cur.ok': 'OK',
-  'cat.note': 'Renomme, ajoute ou masque. Les changements sont enregistrés tout de suite ; les catégories masquées gardent leurs articles.'
+  'cat.note': 'Renomme, ajoute ou masque. Les changements sont enregistrés tout de suite ; les catégories masquées gardent leurs articles.',
+  'act.details': 'Détails', 'age.soldin': 'vendu en {n} j'
 };
 module.exports = { en, fr };

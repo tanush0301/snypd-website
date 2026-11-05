@@ -142,6 +142,7 @@
     var over = $('#st-over'), items = $('#st-items'), money = $('#st-money'); if (!over || !items) return;
     over.style.display = v === 'overview' ? '' : 'none'; items.style.display = v === 'items' ? '' : 'none'; if (money) money.style.display = v === 'money' ? '' : 'none';
     Array.prototype.forEach.call(S.panel.querySelectorAll('.st-navb'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false'); });
+    var ab = $('.st-navr [data-act="add"]'); if (ab) ab.className = 'st-btn ' + (v === 'money' ? 'st-ghost' : 'st-prim');   // 14: one primary button per screen
     if (v === 'overview') { if (!S.ov.data || S.ov.stale) loadOverview(); else renderOverview(); }
     else if (v === 'money') loadMoney();
     else if (!S.itemsLoaded) { S.itemsLoaded = true; load(true); loadCounts(); } else if (S.ov.stale) refresh();
@@ -446,19 +447,22 @@
   function rowHtml(r, t0) {
     var cost = C.costCents(r), profit = C.saleProfitCents(r), held = C.isHeld({ status: r.status, deleted_at: null });
     var price = r.status === 'sold' ? r.sold_cents : r.list_cents, age = held ? C.ageDays(r, t0) : null;
+    var soldIn = r.status === 'sold' && r.sold_on && (r.returned_on || r.bought_on) ? Math.max(0, C.daysBetween(r.sold_on, r.returned_on || r.bought_on)) : null;   // 13: days to sell
     var oldAfter = (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault, stale = held && age != null && age >= oldAfter;
     var sub = [r.brand, r.size].filter(Boolean).map(esc).join(' &middot; ');
     var pTxt = profit == null ? '<span class="st-miss">--</span>' : '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>';
     // design Ca: PRICE shows only for listed / reserved items; "--" for anything not on sale (an old list price is not a price)
     var pop = r.status === 'sold' ? pTxt : ((r.status === 'listed' || r.status === 'reserved') && r.list_cents != null ? esc(M(r.list_cents)) : '<span class="st-miss">--</span>');
+    // live check 5 Nov 2026 (11): the card button is the item's next step; a not-listed item gets List, not Mark sold
+    var nextAct = (r.status === 'stock' || r.status === 'returned') ? 'list' : ((r.status === 'listed' || r.status === 'reserved') ? 'sold' : null);
     var last = S.f.deleted ? '<button type="button" class="st-btn st-ghost" data-act="restore" data-id="' + esc(r.id) + '">' + esc(T('act.restore')) + '</button>' : esc(r.platform ? T('plat.' + r.platform) : '--');
     return '<div class="st-row" role="row" tabindex="0" data-act="open" data-id="' + esc(r.id) + '">' +
       '<div class="c-item st-itemc">' + tileHtml(r.title, r.image_url) + '<span class="st-item"><b>' + esc(r.title) + '</b>' + (sub ? '<span class="st-sub">' + sub + '</span>' : '') + '</span></div>' +
       '<div class="c-status"><span class="st-tag ' + esc(r.status) + '">' + esc(statusLabel(r.status)) + '</span>' + (stale ? ' <span class="st-tag stale">' + esc(T('tag.stale')) + '</span>' : '') + '</div>' +
       '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + (r.buy_cents == null ? '<span class="st-miss">--</span>' : esc(M(r.buy_cents))) + '</div>' +
-      '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-pop st-num">' + pop + '</div>' +
-      '<div class="c-acts">' + (held ? '<button type="button" class="st-btn st-ghost" data-act="lane-act" data-do="sold" data-id="' + esc(r.id) + '">' + esc(T('act.sold')) + '</button>' : '') + '<button type="button" class="st-btn st-tert" data-act="open" data-id="' + esc(r.id) + '">' + esc(T('act.edit')) + '</button></div>' +
-      '<div class="c-meta"><span>' + esc(T('meta.bought', { c: r.buy_cents == null ? '--' : M(r.buy_cents) })) + '</span>' + /* price / profit sits on the right of the phone card (design Cd), not repeated here */ (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
+      '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age != null ? esc(T('age.days', { n: age })) : (soldIn != null ? esc(T('age.soldin', { n: soldIn })) : '<span class="st-miss">--</span>')) + '</div><div class="c-pop st-num' + (/st-miss/.test(pop) ? ' st-nopop' : '') + '">' + pop + '</div>' +
+      '<div class="c-acts">' + (nextAct ? '<button type="button" class="st-btn st-ghost" data-act="lane-act" data-do="' + nextAct + '" data-id="' + esc(r.id) + '">' + esc(T('act.' + nextAct)) + '</button>' : '') + '<button type="button" class="st-btn st-tert" data-act="open" data-id="' + esc(r.id) + '">' + esc(T('act.details')) + '</button></div>' +
+      '<div class="c-meta"><span>' + esc(T('meta.bought', { c: r.buy_cents == null ? '--' : M(r.buy_cents) })) + '</span>' + /* price / profit sits on the right of the phone card (design Cd), not repeated here */ (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : (soldIn != null ? '<span>' + esc(T('age.soldin', { n: soldIn })) + '</span>' : '')) + '</div></div>';
   }
 
   // ------------------------------------------------------------------ events
@@ -502,13 +506,13 @@
       case 'more': load(false); break;
       case 'retry': load(true); break;
       case 'open': S.opener = el; openDetail(id); break;
-      case 'close': case 'scrim': closeSheet(); break;
+      case 'close': case 'scrim': cancelSheet(); break;
       case 'undo': doUndo(); break;
       case 'qty-': case 'qty+': { var q = $('#sf-quantity'); if (q) { q.value = Math.max(1, Math.min(C.CAPS.quantityPerAdd, (parseInt(q.value, 10) || 1) + (act === 'qty+' ? 1 : -1))); } break; }
       case 'submit': submitSheet(false); break;
       case 'submit-next': submitSheet(true); break;
       case 'submit-noprice': submitSheet(false, true); break;
-      case 'do': runDetailAction(el.getAttribute('data-do'), id); break;
+      case 'do': { var fromDetail = !!(S.sheet && S.sheet.kind === 'detail'); runDetailAction(el.getAttribute('data-do'), id); if (fromDetail && S.sheet && S.sheet.kind !== 'detail') S.returnTo = id; break; }
       case 'save-detail': saveDetail(id); break;
       case 'view': showView(el.getAttribute('data-view')); break;
       case 'settings': openSettings(el); break;
@@ -540,7 +544,7 @@
     if (ev.key === 'Enter' && ev.target.hasAttribute && ev.target.hasAttribute('data-cat')) { ev.preventDefault(); catRename(ev.target); return; }
     if (ev.key === 'Escape' && ev.target.closest && ev.target.closest('#st-catman')) { ev.stopPropagation(); catToggle(); return; }
     if (ev.key === 'Enter' && S.sheet && S.sheet.kind === 'bundle' && ev.target.tagName === 'INPUT') { ev.preventDefault(); bundleEnter(ev.target); return; }
-    if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); if (S.sheet.kind === 'add' && clearAdd()) return; closeSheet(); return; }
+    if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); if (S.sheet.kind === 'add' && clearAdd()) return; cancelSheet(); return; }
     if (ev.key === 'Enter' && ev.target.closest('.st-row') && ev.target.classList.contains('st-row')) { S.opener = ev.target; openDetail(ev.target.getAttribute('data-id')); return; }
     if (ev.key === 'Enter' && S.sheet && S.sheet.kind !== 'detail' && ev.target.tagName === 'INPUT') { ev.preventDefault(); submitSheet(!ev.shiftKey && S.sheet.kind === 'add'); }
     if (ev.key === 'Tab' && S.sheet) trapFocus(ev);
@@ -610,8 +614,12 @@
     var chips = []; for (var i = 0; i < 13; i++) chips.push('<span class="st-mapc">' + esc(T('imp.need.c' + i)) + '</span>');
     return '<div class="st-need"><span class="st-lbl">' + esc(T('imp.need.title')) + '</span><p>' + esc(T('imp.need.body')) + '</p><div class="st-map">' + chips.join('') + '</div><p class="st-hint">' + esc(T('imp.need.priv')) + '</p></div>';
   }
+  function cancelSheet() {   // 12: back to the item the sheet came from, if it is still in the list
+    var back = S.returnTo, k = S.sheet && S.sheet.kind; closeSheet();
+    if (back && k !== 'detail' && findRow(back)) openDetail(back);
+  }
   function closeSheet() {
-    S.sheet = null; var ov = $('#st-ov'); if (ov) ov.innerHTML = '';
+    S.sheet = null; S.returnTo = null; var ov = $('#st-ov'); if (ov) ov.innerHTML = '';
     if (S.opener && document.body.contains(S.opener)) S.opener.focus();
   }
   function retEffect(it, t0) {
@@ -839,10 +847,12 @@
   function renderMoney() {
     var el = $('#st-money'); if (!el || !S.mo) return;
     var mo = S.mo, cur = monthStart(today()), ml = monthLabel(mo.month), h = '';
+    // 14: offer "Repeat last month" only when the month before the one shown had expenses (unknown = older than the 12-month P&L: still offered)
+    var prevM = monthShift(mo.month, -1).slice(0, 7), pm = ((mo.pnl && mo.pnl.months) || []).filter(function (m) { return m.month === prevM; })[0], canRepeat = !!mo.pnl && (pm ? pm.expenses > 0 : true);
     h += '<section class="st-sec" aria-labelledby="st-h-money"><div class="st-sechd"><h2 class="st-h2" id="st-h-money">' + esc(T('mo.title')) + '</h2><span class="st-secsub">' + esc(T('mo.sub')) + '</span></div>';
     h += '<div class="st-motools"><div class="st-monav"><button type="button" class="st-btn st-ghost" data-act="mo-prev" aria-label="' + esc(T('mo.prev')) + '">&lsaquo;</button><b id="st-mo-month">' + esc(ml) + '</b>' +
       '<button type="button" class="st-btn st-ghost" data-act="mo-next" aria-label="' + esc(T('mo.next')) + '"' + (mo.month >= cur ? ' disabled' : '') + '>&rsaquo;</button></div>' +
-      '<div class="st-moacts"><button type="button" class="st-btn st-ghost" data-act="mo-repeat">' + esc(T('mo.repeat')) + '</button><button type="button" class="st-btn st-prim" data-act="exp-add">' + esc(T('mo.add')) + '</button></div></div>';
+      '<div class="st-moacts">' + (canRepeat ? '<button type="button" class="st-btn st-ghost" data-act="mo-repeat">' + esc(T('mo.repeat')) + '</button>' : '') + '<button type="button" class="st-btn st-prim" data-act="exp-add">' + esc(T('mo.add')) + '</button></div></div>';
     if (mo.err) h += '<div class="st-err">' + esc(errMsg(mo.err)) + ' <button type="button" class="st-btn st-ghost" data-act="view" data-view="money">' + esc(T('err.retry')) + '</button></div>';
     if (!mo.data) { el.innerHTML = h + '<div class="st-skel"></div><div class="st-skel"></div></section>'; return; }
     var d = mo.data;

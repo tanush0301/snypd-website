@@ -468,3 +468,5 @@ select.st-in { padding-right: 8px; }
 .st-histbox[open] > summary { margin-bottom: 0; }
 .st-histbox > summary:focus-visible { outline: 2px solid var(--st-text); outline-offset: 2px; }
 @media (max-width: 720px) { .st-catlink { min-height: 44px; } }
+/* live check 5 Nov 2026, polish 11: no lone "--" price on the phone card */
+@media (max-width: 720px) { .st-row > .c-pop.st-nopop { display: none; } }

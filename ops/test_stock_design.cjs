@@ -73,6 +73,22 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   await pg.find('Detroit jacket, brown');
   eq(await pg.row(H0), { cost: '€49.00', pop: '--' }, 'gap 5: a not-listed item shows its buy price (not 53.40 with extras) and "--" (not its old 88.00 list price)');
   eq(await pg.row(H54), { cost: '€26.50', pop: '€92.00' }, 'gap 5: a reserved item keeps its list price');
+  const acts = id => pg.$eval('#stock-panel .st-row[data-id="' + id + '"] .c-acts', e => [...e.querySelectorAll('button')].map(b => (b.getAttribute('data-do') || b.getAttribute('data-act')) + ':' + b.innerText.trim()));
+  eq(await acts(H0), ['list:List', 'open:Details'], 'polish 11: a not-listed item offers List (its next step) and Details');
+  eq(await acts(H54), ['sold:Mark sold', 'open:Details'], 'polish 11: a reserved item offers Mark sold');
+  // polish 12: Cancel / Esc on a sheet opened from the detail goes back to that item
+  await pg.openItem(H54); await pg.act('do', '[data-do="wo"]'); ok(!!(await pg.$('#st-woctx')), 'the write-off sheet opened from the detail');
+  await pg.act('close'); await wait(300);
+  ok(!!(await pg.$('.st-sheet #st-dmoney')) && /brown, M/.test(await pg.txt('.st-sheet-hd')), 'polish 12: Cancel returns to the item detail, not the list');
+  await pg.act('do', '[data-do="wo"]'); await pg.keyboard.press('Escape'); await wait(300);
+  ok(!!(await pg.$('.st-sheet #st-dmoney')), 'polish 12: Esc does the same');
+  await pg.act('close'); await wait(250); eq(await pg.$('.st-sheet'), null, 'polish 12: closing the detail itself closes everything');
+  await pg.act('lane-act', '[data-id="' + H54 + '"][data-do="sold"]'); await wait(400); await pg.act('close'); await wait(250);
+  eq(await pg.$('.st-sheet'), null, 'polish 12: a sheet opened from the list card closes back to the list');
+  // polish 13: sold rows show how long they took to sell
+  await pg.act('chip', '[data-status="sold"]'); await wait(500); await pg.find('Patagonia Retro-X fleece, M');
+  eq(await pg.$eval('#stock-panel .st-row[data-id="062c8069-9bc3-fa09-484c-cf3f462131af"] .c-age', e => e.innerText.trim()), 'sold in 7 d', 'polish 13: a sold row says "sold in 7 d" (bought 20 Oct, sold 27 Oct), not "--"');
+  await pg.act('chip', '[data-status=""]'); await wait(500); await pg.find('Detroit jacket, brown');
 
   // ---- 3. item detail (design Cb)
   await pg.openItem(H54);
@@ -161,6 +177,12 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
   // fix 3: no running-total line on a hidden scale; the total is text
   await pg.evaluate(() => document.querySelector('#stock-panel .st-navb[data-view="overview"]').click()); await pg.waitForSelector('#st-hero-net'); await wait(600);
   eq(await pg.evaluate(() => [document.querySelectorAll('#stock-panel polyline, #stock-panel .st-cumline').length, (document.querySelector('#stock-panel .st-cumt') || {}).textContent]), [0, 'Total ' + await pg.$eval('#st-hero-net', e => e.textContent.trim())], 'fix 3: no cumulative line, the total as text');
+  // polish 14: Money has one primary button; "Repeat last month" only when that month had expenses
+  await pg.evaluate(() => document.querySelector('#stock-panel .st-navb[data-view="money"]').click()); await pg.waitForSelector('#st-pnl', { timeout: 6000 }); await wait(400);
+  eq(await pg.evaluate(() => [document.querySelector('.st-navr [data-act="add"]').className, document.querySelectorAll('#stock-panel .st-prim').length, !!document.querySelector('[data-act="mo-repeat"]')]), ['st-btn st-ghost', 1, false],
+    'polish 14: on Money, Add item steps back (one purple button) and Repeat last month is hidden while September had no expenses');
+  await pg.evaluate(() => document.querySelector('#stock-panel .st-navb[data-view="overview"]').click()); await wait(500);
+  eq(await pg.$eval('.st-navr [data-act="add"]', e => e.className), 'st-btn st-prim', 'polish 14: back on the Overview, Add item is primary again');
   await pg.close();
 
   // ---- 1. phone cards (390): full title, price on the right, 16 px gutter; edit sheet keeps the condition buttons
@@ -170,6 +192,9 @@ const H54 = 'f2746a6a-e221-9c43-6122-221fd0982af6';  // design h54: reserved, bo
     eq([r.x, r.right, r.cut, r.pop], [16, 16, false, true], 'gap 1: 16 px gutters, title not cut, price on the right: ' + JSON.stringify(r)); eq(r.ws, 'normal', 'gap 1: titles wrap instead of an ellipsis'); }
   { const cut = await pg.$$eval('#stock-panel .st-row .st-item b', l => l.filter(b => b.scrollHeight > b.clientHeight + 1).length); eq(cut, 0, 'gap 1: no title on the page is cut'); }
   eq(await pg.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, 'gap 1: no horizontal page scroll at 390');
+  await pg.find('Detroit jacket, brown, L');
+  eq(await pg.$eval('#stock-panel .st-row[data-id="' + H0 + '"] .c-pop', e => [e.classList.contains('st-nopop'), getComputedStyle(e).display]), [true, 'none'], 'polish 11: no lone "--" price on a phone card');
+  await pg.find('');
   await pg.find('Detroit jacket, brown, M'); await pg.openItem(H54);
   ok(await pg.$$eval('#stock-panel .st-sheet button, #stock-panel .st-sheet summary', b => b.filter(x => x.offsetParent !== null).every(x => x.getBoundingClientRect().height >= 44)), 'phone: every visible control in the detail is at least 44 px tall');
   await pg.evaluate(() => { document.getElementById('st-editbox').open = true; }); await wait(150);
