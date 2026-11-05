@@ -363,3 +363,96 @@ select.st-in { padding-right: 8px; }
 .st-pnlcards li { padding: 10px 0; border-bottom: 1px solid var(--st-line); } .st-pnlcards .t { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; text-transform: capitalize; }
 .st-pnlcards .t small { color: var(--st-muted); text-transform: none; } .st-pnlcards li > small { color: var(--st-muted); font-size: 12px; }
 @media (max-width: 720px) { .st-pnlwrap { display: none; } .st-pnlcards { display: block; } }
+/* design check 5 Nov 2026, gap 1: phone cards wrap the full title; tags under it, price on the right */
+@media (max-width: 720px) {
+  .st-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "item item" "status pop" "meta meta" "acts acts"; }
+  .st-row > .c-status { justify-self: start; display: flex; flex-wrap: wrap; gap: 6px; }
+  .st-row > .c-pop { display: block; grid-area: pop; justify-self: end; align-self: center; font-size: 15px; }
+  .st-item b { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; }
+}
+/* design check 5 Nov 2026, gap 2: reason buttons + "What this changes" panel on Write off / Mark returned */
+.st-reasons { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--st-line); margin-top: 6px; }
+.st-reasons .st-segb { border: 1px solid transparent; margin: 0; padding: 0 8px; min-height: 44px; }
+.st-reasons .st-segb[aria-checked="true"] { border-color: var(--st-text); color: var(--st-text); background: rgba(255,255,255,.06); }
+.st-effect { margin-top: 16px; border: 1px solid var(--st-line); padding: 14px 16px; background: rgba(255,255,255,.02); }
+.st-effect .st-list { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--st-text2); line-height: 1.5; }
+#st-woctx, #st-retctx { margin: 0 0 14px; }
+
+/* design check 5 Nov 2026, gap 2b: "Where the item goes" as two tap segments (radios kept for the form) */
+.st-dest { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--st-line); margin-top: 6px; }
+.st-dest label { position: relative; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 10px; text-align: center; font-size: 12px; letter-spacing: .03em; color: var(--st-text2); cursor: pointer; border: 1px solid transparent; }
+.st-dest input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.st-dest label:has(input:checked) { border-color: var(--st-text); color: var(--st-text); background: rgba(255,255,255,.06); }
+.st-dest label:has(input:focus-visible) { outline: 2px solid var(--st-text); outline-offset: -2px; }
+/* gap 4: the design's display figures in Cabinet Grotesk Black (self-hosted, Fontshare ITF free licence), profit in green */
+@font-face { font-family: 'Cabinet Grotesk'; src: url('fonts/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+.st-hero, .st-prev strong, .st-dnet td { font-family: 'Cabinet Grotesk', var(--font-mono, 'DM Mono'), monospace; font-weight: 900; letter-spacing: -.01em; }
+.st-hero.st-pos { color: var(--st-ok); }
+/* gap 3: item detail = summary (tile, tags, timeline, money), history, then a closed "Edit details" */
+.st-dhead { display: flex; gap: 14px; align-items: flex-start; margin: 0 0 18px; }
+.st-dhead .st-tile2, .st-dhead .st-dphoto { flex: none; width: 56px; height: 56px; margin: 0; aspect-ratio: auto; max-width: none; font-size: 13px; }
+.st-dhead-t { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.st-dtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.st-dhead .st-d { margin: 0; font-size: 12px; color: var(--st-text2); }
+.st-dsec { border-top: 1px solid var(--st-line); padding: 16px 0; display: flex; flex-direction: column; gap: 12px; }
+.st-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.st-steps li { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.st-steps b { font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase; color: var(--st-text2); }
+.st-steps li > span:last-child { font-size: 12px; color: var(--st-muted); }
+.st-steps li.on > span:last-child { color: var(--st-text); }
+.st-dstep { display: flex; align-items: center; gap: 6px; height: 14px; }
+.st-dstep i { flex: none; width: 8px; height: 8px; border: 1px solid var(--st-line2); }
+.st-steps li.on .st-dstep i { background: var(--st-text); border-color: var(--st-text); }
+.st-dstep em { flex: 1; font-style: normal; font-size: 11px; color: var(--st-text2); white-space: nowrap; text-align: center; display: flex; align-items: center; gap: 6px; padding-right: 6px; }
+.st-dstep em::before, .st-dstep em::after { content: ''; flex: 1; height: 1px; background: var(--st-line2); }
+.st-dmoney { width: 100%; border-collapse: collapse; font-size: 13px; }
+.st-dmoney th { text-align: left; font-weight: 400; font-size: 12px; color: var(--st-text2); padding: 7px 0; border-bottom: 1px solid var(--st-line); }
+.st-dmoney td { padding: 7px 0; border-bottom: 1px solid var(--st-line); color: var(--st-text); }
+.st-dmoney td .st-miss { color: var(--st-muted); }
+.st-dmoney tr.st-dnet th, .st-dmoney tr.st-dnet td { border-bottom: 0; padding-top: 10px; }
+.st-dmoney tr.st-dnet th { color: var(--st-text); }
+.st-dmoney tr.st-dnet td { font-size: 22px; }
+.st-dmoney tr.st-dnet td .st-miss { font-family: inherit; font-weight: 400; font-size: 13px; }
+.st-hero .st-miss { font-family: var(--font-mono, 'DM Mono'), monospace; font-weight: 400; }
+#st-dmnote { margin: 0; }
+.st-sheet .st-acts { margin: 4px 0 16px; }
+.st-editbox { border-top: 1px solid var(--st-line); padding-top: 14px; }
+.st-editbox > summary { cursor: pointer; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--st-text); min-height: 44px; display: flex; align-items: center; }
+.st-editbox > summary:focus-visible { outline: 2px solid var(--st-text); outline-offset: 2px; }
+.st-editbox .st-acts { margin-top: 14px; }
+/* gap 6: condition as 5 tap buttons with Clear; category + Manage categories */
+.st-condhd { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.st-condhd .st-linkb { font-size: 12px; min-height: 32px; }
+.st-conds { display: flex; flex-wrap: wrap; border: 1px solid var(--st-line); margin-top: 6px; }
+.st-conds .st-segb { flex: 1 1 auto; white-space: nowrap; }
+.st-conds .st-segb { margin: 0; height: auto; min-height: 44px; padding: 6px 8px; border: 1px solid transparent; font-size: 12px; letter-spacing: .02em; line-height: 1.25; }
+.st-conds .st-segb[aria-checked="true"] { border-color: var(--st-text); color: var(--st-text); background: rgba(255,255,255,.06); }
+.st-catrow { display: flex; gap: 8px; }
+.st-catrow .st-in { flex: 1; min-width: 0; }
+.st-catrow .st-btn { flex: none; padding: 0 14px; }
+.st-catman { margin-top: 8px; border: 1px solid var(--st-line2); background: var(--bg, #0B0C0D); }
+.st-catman-hd { padding: 12px 14px; border-bottom: 1px solid var(--st-line); display: flex; flex-direction: column; gap: 4px; }
+.st-catman-hd small { font-size: 12px; color: var(--st-muted); line-height: 1.5; }
+.st-catline { display: grid; grid-template-columns: minmax(0, 1fr) auto 88px; gap: 8px; align-items: center; padding: 6px 14px; border-bottom: 1px solid var(--st-line); }
+.st-catline.off .st-in { opacity: .55; }
+.st-catline .st-btn, .st-catadd .st-btn { height: 36px; padding: 0 12px; }
+.st-catline .st-in, .st-catadd .st-in { height: 36px; font-size: 12px; }
+.st-catadd { display: flex; gap: 8px; padding: 10px 14px; }
+.st-catadd .st-in { flex: 1; }
+#st-caterr { margin: 0; padding: 0 14px 10px; }
+#st-caterr:empty { display: none; }
+@media (max-width: 720px) {
+  .st-conds { flex-direction: column; }
+  .st-conds .st-segb { text-align: left; padding: 0 14px; border-bottom-color: var(--st-line); }
+  .st-conds .st-segb[aria-checked="true"]::after { content: '\2713'; float: right; }
+  .st-catrow { flex-direction: column; }
+  .st-catline .st-btn, .st-catadd .st-btn, .st-catline .st-in, .st-catadd .st-in { height: 44px; }
+  .st-steps b { font-size: 10px; letter-spacing: .04em; }
+}
+/* gap 1b: on phones the Stock panel goes edge to edge (only #stock-panel; the Feed keeps its frame): 16 px gutter, rows without side padding */
+@media (max-width: 720px) {
+  #stock-panel.panel { margin-left: -20px; margin-right: -20px; border-left: 0; border-right: 0; }
+  #stock-panel .st-wrap { padding-left: 16px; padding-right: 16px; }
+  #stock-panel .st-table { border-left: 0; border-right: 0; }
+  #stock-panel .st-row { padding-left: 0; padding-right: 0; }
+}

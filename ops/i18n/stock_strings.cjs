@@ -24,6 +24,8 @@ const en = {
   'plat.vinted': 'Vinted', 'plat.ebay': 'eBay', 'plat.depop': 'Depop', 'plat.vestiaire': 'Vestiaire Collective', 'plat.marktplaats': 'Marktplaats', 'plat.facebook': 'Facebook Marketplace', 'plat.other': 'Other',
   'plat.none': 'Not set',
   'reason.lost': 'Lost', 'reason.damaged': 'Damaged', 'reason.unsellable': 'Unsellable', 'reason.given_away': 'Given away',
+  'wo.effect': 'What this changes', 'wo.line': '{st} · in stock {days} days · cost {cost}', 'wo.e1': '{cost} counted as a loss on {date}, on its own Write-offs line.', 'wo.e2': 'Leaves In stock: held {a} → {b}, cash tied up {c} → {d}.', 'wo.e3old': 'Old ({n}+ days): {a} → {b}. Leaves aging and the Today lanes.', 'wo.e3': 'Leaves aging and the Today lanes.', 'wo.e4': 'Net profit, last 30 days: {a} → {b}, write-offs included and labelled.', 'wo.nocost': 'No buy price, so no loss is counted.',
+  'ret.line': 'sold {price} on {date} · {plat} · profit {p}', 'ret.eRev': 'On {date}: revenue −{refund}.', 'ret.eHist': 'The original sale on {sd} stays in the item’s history.', 'ret.eBack': 'Back in stock with a RETURNED tag: held {a} → {b}, cash tied up {c} → {d}.', 'ret.eThenWo': 'Then written off: {cost} counted as a loss under Write-offs. It does not go back in stock.',
   'cat.tops': 'Tops', 'cat.bottoms': 'Bottoms', 'cat.outerwear': 'Outerwear', 'cat.shoes': 'Shoes', 'cat.bags': 'Bags and accessories', 'cat.electronics': 'Electronics', 'cat.home': 'Home', 'cat.collect': 'Collectibles and games', 'cat.other': 'Other',
   'cat.none': 'No category',
   'col.item': 'Item', 'col.status': 'Status', 'col.cost': 'Cost', 'col.price': 'Price', 'col.profit': 'Profit', 'col.age': 'Age', 'col.platform': 'Platform',
@@ -141,6 +143,8 @@ const frTable = fr({
   'plat.vinted': 'Vinted', 'plat.ebay': 'eBay', 'plat.depop': 'Depop', 'plat.vestiaire': 'Vestiaire Collective', 'plat.marktplaats': 'Marktplaats', 'plat.facebook': 'Facebook Marketplace', 'plat.other': 'Autre',
   'plat.none': 'Non défini',
   'reason.lost': 'Perdu', 'reason.damaged': 'Abîmé', 'reason.unsellable': 'Invendable', 'reason.given_away': 'Donné',
+  'wo.effect': 'Ce que ça change', 'wo.line': '{st} · en stock depuis {days} jours · coût {cost}', 'wo.e1': '{cost} compté comme perte le {date}, sur une ligne Pertes à part.', 'wo.e2': 'Sort du stock : en stock {a} → {b}, argent immobilisé {c} → {d}.', 'wo.e3old': 'Anciens ({n} jours et +) : {a} → {b}. Sort de l’âge du stock et des listes du jour.', 'wo.e3': 'Sort de l’âge du stock et des listes du jour.', 'wo.e4': 'Bénéfice net, 30 derniers jours : {a} → {b}, pertes incluses et indiquées.', 'wo.nocost': 'Pas de prix d’achat, donc aucune perte comptée.',
+  'ret.line': 'vendu {price} le {date} · {plat} · bénéfice {p}', 'ret.eRev': 'Le {date} : chiffre d’affaires −{refund}.', 'ret.eHist': 'La vente d’origine du {sd} reste dans l’historique de l’article.', 'ret.eBack': 'De retour en stock avec l’étiquette RETOURNÉ : en stock {a} → {b}, argent immobilisé {c} → {d}.', 'ret.eThenWo': 'Puis passé en perte : {cost} compté comme perte dans Pertes. Il ne revient pas en stock.',
   'cat.tops': 'Hauts', 'cat.bottoms': 'Bas', 'cat.outerwear': 'Vestes et manteaux', 'cat.shoes': 'Chaussures', 'cat.bags': 'Sacs et accessoires', 'cat.electronics': 'Électronique', 'cat.home': 'Maison', 'cat.collect': 'Objets de collection et jeux', 'cat.other': 'Autre',
   'cat.none': 'Sans catégorie',
   'col.item': 'Article', 'col.status': 'Statut', 'col.cost': 'Coût', 'col.price': 'Prix', 'col.profit': 'Bénéfice', 'col.age': 'Âge', 'col.platform': 'Plateforme',
@@ -244,5 +248,7 @@ const home = require('./stock_strings_home.cjs');   // step 5: Overview, lanes, 
 Object.assign(en, home.en); Object.assign(frTable, fr(home.fr));
 const review = require('./stock_strings_review.cjs');   // review 3 Nov 2026: wording fixes, fee field, records to fix
 Object.assign(en, review.en); Object.assign(frTable, fr(review.fr));
+const design = require('./stock_strings_design.cjs');   // design check 5 Nov 2026: gaps 1-6 of outreach/38
+Object.assign(en, design.en); Object.assign(frTable, fr(design.fr));
 
 module.exports = { en, fr: frTable };

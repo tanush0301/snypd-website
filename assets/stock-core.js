@@ -196,6 +196,14 @@
         if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
         return list.length;
       },
+      // Manage categories (design Ia): rename / hide one of your own categories; a direct UPDATE allowed by the own-row policy of 065, the name CHECK answers stock_check_violation.
+      // Items keep their category key, so a rename relabels them and a hidden category keeps its items.
+      updateCategory: async (key, patch) => {
+        const row = {}; if (patch.name !== undefined) row.name = String(patch.name).trim(); if (patch.hidden !== undefined) row.hidden = !!patch.hidden;
+        let r; try { r = await client.from('stock_categories').update(row).eq('key', key); } catch (e) { throw parseError(e); }
+        if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
+        return row;
+      },
       // account settings (currency, persona, tab_hidden, old_after_days): own-row insert/update policies on stock_settings (065), so one upsert; the CHECKs answer stock_check_violation.
       // Changing the currency relabels the numbers and never converts them.
       saveSettings: async patch => {

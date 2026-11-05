@@ -197,7 +197,7 @@
     return '<section class="st-sec" aria-labelledby="st-h-num"><div class="st-sechd"><h2 class="st-h2" id="st-h-num">' + esc(T('ov.numbers')) + '</h2><span class="st-secsub" id="st-num-sub">' + esc(T('per.' + pk) + (o.days != null ? ' \u00b7 ' + T('ov.vs', { n: o.days }) : '')) + '</span>' +
       '<div class="st-chips" role="group" aria-label="' + esc(T('per.label')) + '">' + PERIODS.map(function (d) { return '<button type="button" class="st-chip" data-act="period" data-days="' + perKey(d) + '" aria-pressed="' + (d === o.days ? 'true' : 'false') + '">' + esc(T('per.btn.' + perKey(d))) + '</button>'; }).join('') + '</div></div>' +
       '<div class="st-numgrid"><div class="st-herocard"><span class="st-lbl">' + esc(T('ov.net') + ' \u00b7 ' + T('per.' + pk)) + '</span>' +
-      '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : '') + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(M(v.netCents))) + '</span></div>' +
+      '<div class="st-heroline"><span class="st-hero' + (v.netCents != null && v.netCents < 0 ? ' st-neg' : (v.netCents > 0 ? ' st-pos' : '')) + '" id="st-hero-net">' + (v.netCents == null ? '<span class="st-miss">--</span>' : esc(M(v.netCents))) + '</span></div>' +
       (o.series && o.series.expenses > 0 && v.netCents != null ? '<p class="st-delta" id="st-after">' + esc(T('ov.after', { exp: M(o.series.expenses), after: MS(v.netCents - o.series.expenses) })) + ' <button type="button" class="st-linkb" data-act="view" data-view="money">' + esc(T('ov.after.link')) + '</button></p>' : '') +
       (v.deltaNetCents != null && o.days != null ? '<p class="st-delta" id="st-delta">' + (dir ? '<span class="' + (dir > 0 ? 'st-pos' : 'st-neg') + '">' + (dir > 0 ? ARROW_UP : ARROW_DN) + '</span> ' : '') + esc(T(pctTxt == null ? 'ov.delta.nopct' : 'ov.delta', deltaP)) + '</p>' : '') +
       (v.hasEvents ? '' : '<p class="st-split">' + esc(T('ov.net.empty')) + '</p>') +
@@ -446,15 +446,16 @@
     var oldAfter = (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault, stale = held && age != null && age >= oldAfter;
     var sub = [r.brand, r.size].filter(Boolean).map(esc).join(' &middot; ');
     var pTxt = profit == null ? '<span class="st-miss">--</span>' : '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>';
-    var pop = r.status === 'sold' ? pTxt : (r.list_cents != null ? esc(M(r.list_cents)) : '<span class="st-miss">--</span>');
+    // design Ca: PRICE shows only for listed / reserved items; "--" for anything not on sale (an old list price is not a price)
+    var pop = r.status === 'sold' ? pTxt : ((r.status === 'listed' || r.status === 'reserved') && r.list_cents != null ? esc(M(r.list_cents)) : '<span class="st-miss">--</span>');
     var last = S.f.deleted ? '<button type="button" class="st-btn st-ghost" data-act="restore" data-id="' + esc(r.id) + '">' + esc(T('act.restore')) + '</button>' : esc(r.platform ? T('plat.' + r.platform) : '--');
     return '<div class="st-row" role="row" tabindex="0" data-act="open" data-id="' + esc(r.id) + '">' +
       '<div class="c-item st-itemc">' + tileHtml(r.title, r.image_url) + '<span class="st-item"><b>' + esc(r.title) + '</b>' + (sub ? '<span class="st-sub">' + sub + '</span>' : '') + '</span></div>' +
       '<div class="c-status"><span class="st-tag ' + esc(r.status) + '">' + esc(statusLabel(r.status)) + '</span>' + (stale ? ' <span class="st-tag stale">' + esc(T('tag.stale')) + '</span>' : '') + '</div>' +
-      '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + esc(M(cost)) + '</div>' +
+      '<div class="c-plat">' + last + '</div><div class="c-cost st-num">' + (r.buy_cents == null ? '<span class="st-miss">--</span>' : esc(M(r.buy_cents))) + '</div>' +
       '<div class="c-age st-num' + (stale ? ' st-warnv' : '') + '">' + (age == null ? '<span class="st-miss">--</span>' : esc(T('age.days', { n: age }))) + '</div><div class="c-pop st-num">' + pop + '</div>' +
       '<div class="c-acts">' + (held ? '<button type="button" class="st-btn st-ghost" data-act="lane-act" data-do="sold" data-id="' + esc(r.id) + '">' + esc(T('act.sold')) + '</button>' : '') + '<button type="button" class="st-btn st-tert" data-act="open" data-id="' + esc(r.id) + '">' + esc(T('act.edit')) + '</button></div>' +
-      '<div class="c-meta"><span>' + esc(T('lane.meta.cost', { c: M(cost) })) + '</span><span>' + esc(T(r.status === 'sold' ? 'meta.profit' : 'meta.price', { v: pop.replace(/<[^>]*>/g, '') })) + '</span>' + (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
+      '<div class="c-meta"><span>' + esc(T('meta.bought', { c: r.buy_cents == null ? '--' : M(r.buy_cents) })) + '</span>' + /* price / profit sits on the right of the phone card (design Cd), not repeated here */ (age != null ? '<span>' + esc(T('age.days', { n: age })) + '</span>' : '') + '</div></div>';
   }
 
   // ------------------------------------------------------------------ events
@@ -486,6 +487,11 @@
       case 'im-resume': imRun(true); break;
       case 'im-undo': imUndo(); break;
       case 'im-again': openImport(); break;
+      case 'cond-pick': case 'cond-clear': { var cv = act === 'cond-pick' ? el.getAttribute('data-c') : ''; Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act=cond-pick]'), function (b) { b.setAttribute('aria-checked', b.getAttribute('data-c') === cv ? 'true' : 'false'); }); $('#sf-condition').value = cv; break; }
+      case 'cat-manage': catToggle(); break;
+      case 'cat-hide': { var hk = el.getAttribute('data-key'), hc = (S.cats || []).filter(function (x) { return x.key === hk; })[0]; if (hc) catSave(hk, { hidden: !hc.hidden }, hk); break; }
+      case 'cat-add': catAdd(); break;
+      case 'wo-reason': { Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act=wo-reason]'), function (b) { b.setAttribute('aria-checked', b === el ? 'true' : 'false'); }); $('#sf-reason').value = el.getAttribute('data-r'); break; }
       case 'chip': { var st = el.getAttribute('data-status'); S.f.fix = false; S.f.old = st === 'old'; S.f.status = (st === '' || st === 'old') ? null : (st === 'stock' ? ['stock', 'returned'] : (st === 'held' ? HELD.slice() : [st])); load(true); break; }
       case 'deleted': S.f.deleted = !S.f.deleted; S.f.status = null; load(true); break;
       case 'clear': S.f = { status: null, q: '', condition: '', category: '', platform: '', deleted: false, old: false, fix: false }; $('#st-q').value = ''; $('#st-cond').value = ''; $('#st-cat').value = ''; $('#st-plat').value = ''; load(true); break;
@@ -526,6 +532,9 @@
     var top = $('#st-items'); if (top && top.scrollIntoView) top.scrollIntoView({ block: 'start' });
   }
   function onKey(ev) {
+    if (ev.key === 'Enter' && ev.target.id === 'st-catnew') { ev.preventDefault(); catAdd(); return; }   // Manage categories: Enter adds / renames, never submits the sheet
+    if (ev.key === 'Enter' && ev.target.hasAttribute && ev.target.hasAttribute('data-cat')) { ev.preventDefault(); catRename(ev.target); return; }
+    if (ev.key === 'Escape' && ev.target.closest && ev.target.closest('#st-catman')) { ev.stopPropagation(); catToggle(); return; }
     if (ev.key === 'Enter' && S.sheet && S.sheet.kind === 'bundle' && ev.target.tagName === 'INPUT') { ev.preventDefault(); bundleEnter(ev.target); return; }
     if (ev.key === 'Escape' && S.sheet) { ev.stopPropagation(); if (S.sheet.kind === 'add' && clearAdd()) return; closeSheet(); return; }
     if (ev.key === 'Enter' && ev.target.closest('.st-row') && ev.target.classList.contains('st-row')) { S.opener = ev.target; openDetail(ev.target.getAttribute('data-id')); return; }
@@ -579,8 +588,10 @@
     mountSheet(T(title) + (item ? (lang === 'fr' ? String.fromCharCode(160) : '') + ': ' + item.title : ''), '<div id="st-sheet-err"></div>' + body, foot);
     var first = $('.st-sheet input:not([type=hidden]), .st-sheet select'); if (first) first.focus();
     if (kind === 'sold') { var upd = function () { previewSold(); }; Array.prototype.forEach.call(S.panel.querySelectorAll('#sf-sold, #sf-ship, #sf-fee'), function (i) { i.addEventListener('input', upd); }); $('#sf-platform').addEventListener('change', upd); upd(); }
-    if (kind === 'returned') { var dest = function () { var wo = S.panel.querySelector('input[name=dest]:checked').value === 'wo'; $('#sf-reason-wrap').style.display = wo ? '' : 'none'; }; Array.prototype.forEach.call(S.panel.querySelectorAll('input[name=dest]'), function (i) { i.addEventListener('change', dest); }); dest(); }
+    if (kind === 'wo') woDateHook(item);
+    if (kind === 'returned') { var dest = function () { var wo = S.panel.querySelector('input[name=dest]:checked').value === 'wo'; $('#sf-reason-wrap').style.display = wo ? '' : 'none'; var ef = $('#st-effect'); if (ef) ef.innerHTML = retEffect(item, today()); }; Array.prototype.forEach.call(S.panel.querySelectorAll('input[name=dest]'), function (i) { i.addEventListener('change', dest); }); ['#sf-refund', '#sf-returnedon', '#sf-retship'].forEach(function (q) { var e = $(q); if (e) e.addEventListener('input', dest); }); dest(); }
   }
+  function woDateHook(item) { var d = $('#sf-date'); if (d) d.addEventListener('input', function () { var e = $('#st-effect'); if (e) e.innerHTML = woEffect(item, today()); }); }
   function mountSheet(title, bodyHtml, footHtml) {
     $('#st-ov').innerHTML = '<div class="st-scrim" data-act="scrim"></div><div class="st-sheet" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><div class="st-sheet-hd"><h2>' + esc(title) + '</h2><button type="button" class="st-x" data-act="close" aria-label="' + esc(T('close')) + '">&times;</button></div><div class="st-sheet-bd">' + bodyHtml + '</div>' + (footHtml ? '<div class="st-sheet-ft">' + footHtml + '</div>' : '') + '</div>';
   }
@@ -599,6 +610,32 @@
     S.sheet = null; var ov = $('#st-ov'); if (ov) ov.innerHTML = '';
     if (S.opener && document.body.contains(S.opener)) S.opener.focus();
   }
+  function retEffect(it, t0) {
+    var o = S.ov && S.ov.data, cst = C.costCents(it), d = ($('#sf-returnedon') && $('#sf-returnedon').value) || t0, rf = $('#sf-refund') ? C.parseMoneyInput($('#sf-refund').value, lang) : null;
+    var rc = rf && rf.ok && rf.cents != null ? rf.cents : (it.sold_cents || 0), wo = !!S.panel.querySelector('input[name=dest][value=wo]:checked'), L = [];
+    var rs = $('#sf-retship') ? C.parseMoneyInput($('#sf-retship').value, lang) : null, sc = rs && rs.ok && rs.cents ? rs.cents : 0;
+    var rev = cst == null ? null : cst - rc - sc;   // the reversal stock_mark_returned books (066): cost - refund - return shipping
+    L.push(rev == null ? T('ret.eRev', { date: fmtDate(d), refund: M(rc) }) : T('ret.eRevP', { date: fmtDate(d), refund: M(rc), p: MS(rev) }));
+    if (it.sold_on) L.push(T('ret.eHist', { sd: fmtDate(it.sold_on) }));
+    var v = o ? C.viewOverview(o) : null;
+    if (wo) L.push(cst == null ? T('wo.nocost') : T('ret.eThenWo', { cost: M(cst) }));
+    else if (v && !v.empty) L.push(T('ret.eBack', { a: v.held.count, b: v.held.count + 1, c: M(v.held.cashCents), d: M(v.held.cashCents + (cst || 0)) }));
+    // the Overview's net (sales profit + return reversals - write-off costs) moves only when the return date sits inside the period on screen
+    if (v && S.ov.days === 30 && v.netCents != null && rev != null && C.daysBetween(t0, d) >= 0 && C.daysBetween(t0, d) < 30) L.push(T('wo.e4', { a: M(v.netCents), b: M(v.netCents + rev - (wo ? cst : 0)) }));
+    return '<span class="st-lbl">' + esc(T('wo.effect')) + '</span><ul class="st-list">' + L.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+  }
+  function woEffect(it, t0) {
+    var o = S.ov && S.ov.data, cst = C.costCents(it), dEl = $('#sf-date'), d = (dEl && dEl.value) || t0, L = [];
+    L.push(cst == null ? T('wo.nocost') : T('wo.e1', { cost: M(cst), date: fmtDate(d) }));
+    var v = o ? C.viewOverview(o) : null;
+    if (v && !v.empty) {
+      var od = o.old_after_days || (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault, wasOld = C.ageDays(it, t0) >= od;
+      L.push(T('wo.e2', { a: v.held.count, b: v.held.count - 1, c: M(v.held.cashCents), d: M(v.held.cashCents - (cst || 0)) }));
+      L.push(wasOld ? T('wo.e3old', { n: od, a: v.held.old, b: v.held.old - 1 }) : T('wo.e3'));
+      if (S.ov.days === 30 && v.netCents != null && cst != null && C.daysBetween(t0, d) >= 0 && C.daysBetween(t0, d) < 30) L.push(T('wo.e4', { a: M(v.netCents), b: M(v.netCents - cst) }));
+    } else L.push(T('wo.e3'));
+    return '<span class="st-lbl">' + esc(T('wo.effect')) + '</span><ul class="st-list">' + L.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+  }
   function fld(name, label, control, cls) { return '<div class="st-f' + (cls ? ' ' + cls : '') + '"><label for="sf-' + name + '">' + esc(label) + '</label>' + control + '<div class="st-fe" data-for="' + name + '"></div></div>'; }
   function txt(name, val, ph, extra) { return '<input class="st-in" id="sf-' + name + '" name="' + name + '" value="' + esc(val == null ? '' : val) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + (extra || '') + ' autocomplete="off">'; }
   function mny(name, cents) { return txt(name, moneyText(cents), T('ph.money', { v: moneyExample() }), ' inputmode="decimal"'); }
@@ -607,7 +644,7 @@
     var t0 = today();
     if (kind === 'add') {
       return '<p class="st-hint st-bopen"><button type="button" class="st-linkb" data-act="bundle">' + esc(T('bundle.open')) + '</button></p><div class="st-form">' + fld('title', T('f.title'), txt('title', '', '', ' maxlength="140"'), 'full') + fld('brand', T('f.brand'), txt('brand', '', '', ' maxlength="60"')) + fld('size', T('f.size'), txt('size', '', '', ' maxlength="20"')) +
-        fld('condition', T('f.condition'), '<select class="st-in" id="sf-condition">' + condOptions('') + '</select>') + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions('') + '</select>') +
+        '<div class="st-f full">' + condButtons('') + '</div>' + catField('') +
         fld('quantity', T('f.quantity'), '<div class="st-qty"><button type="button" data-act="qty-" aria-label="' + esc(T('qty.dec')) + '">-</button><input class="st-in" id="sf-quantity" value="1" inputmode="numeric" maxlength="2"><button type="button" data-act="qty+" aria-label="' + esc(T('qty.inc')) + '">+</button></div>') +
         fld('bought', T('f.bought'), dat('bought', t0, t0)) + fld('buy', T('f.buy'), mny('buy')) + fld('extra', T('f.extra'), mny('extra')) + fld('source', T('f.source'), txt('source', '', T('f.source.ph'), ' maxlength="80"'), 'full') + '</div><p class="st-hint" id="st-addlog" aria-live="polite">' + esc(T('sheet.add.log0')) + '</p><p class="st-hint">' + esc(T('sheet.add.keys')) + '</p><p class="st-hint">' + esc(T('sheet.add.hint')) + '</p>';
     }
@@ -623,12 +660,78 @@
       return '<p class="st-d" id="st-soldctx">' + esc(soldCtx(it)) + '</p><div class="st-form">' + fld('sold', T('f.sold'), mny('sold', it.list_cents), 'full') + fld('soldon', T('f.soldon'), dat('soldon', t0, t0)) + fld('platform', T('f.platform'), '<select class="st-in" id="sf-platform">' + platOptions(plat0) + '</select>') + fld('fee', T('f.fee.sale'), mny('fee'), 'full') + fld('ship', T('f.ship'), mny('ship'), 'full') + '</div><div class="st-prev" id="st-prev" style="margin-top:14px"></div><p class="st-hint" id="st-feenote"></p><p class="st-hint">' + esc(T('sold.formula')) + '</p>';
     }
     if (kind === 'returned') {
-      return '<div class="st-form">' + fld('returnedon', T('f.returnedon'), dat('returnedon', t0, t0)) + fld('refund', T('f.refund'), mny('refund', it.sold_cents)) + fld('retship', T('f.retship'), mny('retship'), 'full') +
-        '<div class="st-f full"><span class="st-lbl">' + esc(T('f.dest')) + '</span><div class="st-radios"><label><input type="radio" name="dest" value="stock" checked> ' + esc(T('f.dest.stock')) + '</label><label><input type="radio" name="dest" value="wo"> ' + esc(T('f.dest.wo')) + '</label></div></div>' +
-        '<div class="st-f full" id="sf-reason-wrap" style="display:none"><label for="sf-reason">' + esc(T('f.reason')) + '</label><select class="st-in" id="sf-reason">' + C.WRITE_OFF_REASONS.map(function (r) { return option(r, T('reason.' + r)); }).join('') + '</select></div></div>';
+      var rpf = C.saleProfitCents(it);
+      return '<p class="st-d" id="st-retctx">' + esc(T('ret.line', { price: it.sold_cents == null ? '--' : M(it.sold_cents), date: it.sold_on ? fmtDate(it.sold_on) : '--', plat: it.platform ? T('plat.' + it.platform) : '--', p: rpf == null ? '--' : MS(rpf) })) + '</p><div class="st-form">' + fld('returnedon', T('f.returnedon'), dat('returnedon', t0, t0)) + fld('refund', T('f.refund'), mny('refund', it.sold_cents)) + fld('retship', T('f.retship'), mny('retship'), 'full') +
+        '<div class="st-f full"><span class="st-lbl">' + esc(T('f.dest')) + '</span><div class="st-dest" role="radiogroup" aria-label="' + esc(T('f.dest')) + '"><label><input type="radio" name="dest" value="stock" checked><span>' + esc(T('f.dest.stock')) + '</span></label><label><input type="radio" name="dest" value="wo"><span>' + esc(T('f.dest.wo')) + '</span></label></div></div>' +
+        '<div class="st-f full" id="sf-reason-wrap" style="display:none">' + reasonButtons() + '</div></div><div class="st-effect" id="st-effect">' + retEffect(it, t0) + '</div>';
     }
-    if (kind === 'wo') return '<div class="st-form">' + fld('reason', T('f.reason'), '<select class="st-in" id="sf-reason">' + C.WRITE_OFF_REASONS.map(function (r) { return option(r, T('reason.' + r)); }).join('') + '</select>') + fld('date', T('f.date'), dat('date', t0, t0)) + '</div><p class="st-hint">' + esc(T('sheet.wo.note')) + '</p>';
+    if (kind === 'wo') {
+      var wcst = C.costCents(it), wag = C.ageDays(it, t0);
+      return '<p class="st-d" id="st-woctx">' + esc(T('wo.line', { st: statusLabel(it.status), days: wag, cost: wcst == null ? '--' : M(wcst) })) + '</p><div class="st-form"><div class="st-f full">' + reasonButtons() + '</div>' + fld('date', T('f.date'), dat('date', t0, t0)) + '</div><div class="st-effect" id="st-effect">' + woEffect(it, t0) + '</div><p class="st-hint">' + esc(T('sheet.wo.note')) + '</p>';
+    }
     return '';
+  }
+  // design Ia: condition as 5 tap buttons (best to worst) with Clear; the value lives in a hidden #sf-condition ('' = not set)
+  function condButtons(sel) {
+    return '<div class="st-condhd"><span class="st-lbl" id="st-condlbl">' + esc(T('f.condition.opt')) + '</span><button type="button" class="st-linkb" data-act="cond-clear">' + esc(T('cond.clear')) + '</button></div>' +
+      '<div class="st-conds" role="radiogroup" aria-labelledby="st-condlbl">' + C.CONDITIONS.map(function (c) { return '<button type="button" class="st-segb" role="radio" data-act="cond-pick" data-c="' + c + '" aria-checked="' + (sel === c) + '">' + esc(T('cond.' + c)) + '</button>'; }).join('') +
+      '</div><input type="hidden" id="sf-condition" value="' + esc(sel || '') + '">';
+  }
+  // design Ia: category select + "Manage categories" (rename, add, hide; hidden categories keep their items)
+  function catField(sel) {
+    return '<div class="st-f full"><label for="sf-category">' + esc(T('f.category')) + '</label><div class="st-catrow"><select class="st-in" id="sf-category">' + catOptions(sel) + '</select>' +
+      '<button type="button" class="st-btn st-ghost" data-act="cat-manage" aria-expanded="false" aria-controls="st-catman">' + esc(T('cat.manage')) + '</button></div><div id="st-catman"></div></div>';
+  }
+  function catManHtml() {
+    var cs = (S.cats || []).slice().sort(function (a, b) { return (a.sort - b.sort) || (a.key < b.key ? -1 : 1); });
+    return '<div class="st-catman"><div class="st-catman-hd"><span class="st-lbl">' + esc(T('cat.title')) + '</span><small>' + esc(T('cat.note')) + '</small></div>' +
+      cs.map(function (c) {
+        return '<div class="st-catline' + (c.hidden ? ' off' : '') + '"><input class="st-in" data-cat="' + esc(c.key) + '" value="' + esc(catName(c.key)) + '" maxlength="40" aria-label="' + esc(catName(c.key)) + '">' +
+          (c.hidden ? '<span class="st-tag">' + esc(T('cat.hiddenTag')) + '</span>' : '<span></span>') +
+          '<button type="button" class="st-btn st-ghost" data-act="cat-hide" data-key="' + esc(c.key) + '">' + esc(T(c.hidden ? 'cat.show' : 'cat.hide')) + '</button></div>';
+      }).join('') +
+      '<div class="st-catadd"><input class="st-in" id="st-catnew" maxlength="40" placeholder="' + esc(T('cat.ph')) + '" aria-label="' + esc(T('cat.ph')) + '"><button type="button" class="st-btn st-ghost" data-act="cat-add">' + esc(T('cat.add')) + '</button><button type="button" class="st-btn st-tert" data-act="cat-manage">' + esc(T('cat.done')) + '</button></div>' +
+      '<p class="st-fe" id="st-caterr" aria-live="polite"></p></div>';
+  }
+  function catToggle() {
+    var box = $('#st-catman'), b = $('[data-act="cat-manage"][aria-controls]'); if (!box) return;
+    var open = !box.innerHTML; box.innerHTML = open ? catManHtml() : ''; if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) { var f = $('#st-catman .st-in'); if (f) f.focus(); } else if (b) b.focus();
+  }
+  function catRefresh(keepFocusKey) {   // after a change: redraw the panel and the select, keep the chosen category
+    var sel = $('#sf-category'), v = sel ? sel.value : ''; if (sel) sel.innerHTML = catOptions(v);
+    var box = $('#st-catman'); if (box && box.innerHTML) box.innerHTML = catManHtml();
+    if (keepFocusKey) { var f = S.panel.querySelector('#st-catman [data-key="' + keepFocusKey + '"]'); if (f) f.focus(); }
+  }
+  function catErr(e) { var x = $('#st-caterr'); if (x) x.textContent = e ? errMsg(e) : ''; }
+  function catSave(key, patch, focusKey) {
+    var c = (S.cats || []).filter(function (x) { return x.key === key; })[0]; if (!c) return;
+    var before = { name: c.name, hidden: c.hidden }; Object.assign(c, patch); catRefresh(focusKey); catErr(null);
+    S.api.updateCategory(key, patch).catch(function (e) { Object.assign(c, before); catRefresh(focusKey); catErr(e); });
+  }
+  function catRename(input) {
+    var key = input.getAttribute('data-cat'), v = (input.value || '').trim(), c = (S.cats || []).filter(function (x) { return x.key === key; })[0]; if (!c) return;
+    if (!v) { input.value = catName(key); return; }
+    if (v === catName(key)) return;
+    catSave(key, { name: v });
+  }
+  function catAdd() {
+    var inp = $('#st-catnew'), v = inp ? (inp.value || '').trim() : ''; if (!v) { if (inp) inp.focus(); return; }
+    // same key scheme as the importer (c-<slug>, -2, -3 on a clash)
+    var base = 'c-' + v.toLowerCase().normalize('NFD').replace(new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36f) + ']', 'g'), '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 34), key = base === 'c-' ? 'c-cat' : base, i = 2;
+    while ((S.cats || []).some(function (x) { return x.key === key; }) && i < 100) key = base.slice(0, 36) + '-' + i++;
+    var taken = (S.cats || []).filter(function (x) { return x.key === key || catName(x.key).toLowerCase() === v.toLowerCase(); })[0];
+    if (taken) { if (taken.hidden) catSave(taken.key, { hidden: false }); var sel0 = $('#sf-category'); if (sel0) { sel0.innerHTML = catOptions(taken.key); sel0.value = taken.key; } inp.value = ''; return; }
+    S.api.addCategories([{ key: key, name: v }]).then(function () {
+      S.cats = (S.cats || []).concat([{ key: key, name: v, hidden: false, sort: 100 }]); inp.value = ''; catErr(null);
+      var sel = $('#sf-category'); if (sel) { sel.innerHTML = catOptions(key); sel.value = key; } catRefresh(); var n = $('#st-catnew'); if (n) n.focus();
+    }).catch(catErr);
+  }
+  // design Ib: the reason is 4 tap buttons (2 x 2), the value lives in a hidden #sf-reason
+  function reasonButtons() {
+    return '<span class="st-lbl">' + esc(T('f.reason')) + '</span><div class="st-reasons" role="radiogroup" aria-label="' + esc(T('f.reason')) + '">' +
+      C.WRITE_OFF_REASONS.map(function (r, i) { return '<button type="button" class="st-segb" role="radio" data-act="wo-reason" data-r="' + r + '" aria-checked="' + (i ? 'false' : 'true') + '">' + esc(T('reason.' + r)) + '</button>'; }).join('') +
+      '</div><input type="hidden" id="sf-reason" value="' + C.WRITE_OFF_REASONS[0] + '">';
   }
   function soldCtx(it) {
     var parts = [], cost = C.costCents(it), MN = String.fromCharCode(0xb7);
@@ -815,7 +918,7 @@
     var t0 = today();
     var body = '<div id="st-sheet-err"></div><div class="st-form">' + fld('btotal', T('bundle.total'), mny('btotal'), 'full') + fld('bought', T('f.bought'), dat('bought', keep.bought || t0, t0)) +
       fld('source', T('f.source'), txt('source', keep.src, T('f.source.ph'), ' maxlength="80"')) +
-      fld('condition', T('f.condition'), '<select class="st-in" id="sf-condition">' + condOptions('') + '</select>') + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions('') + '</select>') + '</div>' +
+      '<div class="st-f full">' + condButtons('') + '</div>' + catField('') + '</div>' +
       '<div class="st-h3">' + esc(T('bundle.items')) + '</div><div id="b-rows"></div>' +
       '<p><button type="button" class="st-btn st-ghost" data-act="b-add">' + esc(T('bundle.addrow')) + '</button></p>' +
       '<p class="st-note" id="b-sum" aria-live="polite"></p><p class="st-hint">' + esc(T('bundle.hint')) + '</p>';
@@ -915,23 +1018,47 @@
   function openDetail(id) {
     var it = findRow(id); if (!it) return;
     S.sheet = { kind: 'detail', item: it };
-    var cost = C.costCents(it), profit = C.saleProfitCents(it), held = C.isHeld(it), t0 = today();
-    var facts = '<div class="st-facts"><div class="st-fact"><span>' + esc(T('detail.cost')) + '</span><b>' + esc(M(cost)) + '</b></div><div class="st-fact"><span>' + esc(T(it.status === 'sold' ? 'f.sold' : 'f.list')) + '</span><b>' + esc(M(it.status === 'sold' ? it.sold_cents : it.list_cents)) + '</b></div><div class="st-fact"><span>' + esc(T(profit != null ? 'detail.profit' : 'detail.age')) + '</span><b>' + (profit != null ? '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>' : (held ? esc(T('age.days', { n: C.ageDays(it, t0) })) : '--')) + '</b></div></div>';
-    var acts = '<div class="st-acts">' + actionsFor(it).map(function (a) {
-      var cls = a === 'delete' ? 'st-btn st-ghost st-danger' : (a === 'sold' ? 'st-btn st-prim' : 'st-btn st-ghost');
-      return '<button type="button" class="' + cls + '" data-act="do" data-do="' + a + '" data-id="' + esc(it.id) + '">' + esc(T('act.' + (a === 'wo' ? 'wo' : a))) + '</button>';
-    }).join('') + '</div>';
-    var form = '<div class="st-h3">' + esc(T('detail.edit')) + '</div><div class="st-form">' +
+    var profit = C.saleProfitCents(it), held = C.isHeld(it), t0 = today(), dash = '<span class="st-miss">--</span>';
+    var oldAfter = (S.boot && S.boot.old_after_days) || C.CAPS.oldAfterDefault, stale = held && C.ageDays(it, t0) >= oldAfter;
+    // design Cb: tile + title, tags (status, stale, condition, category), then "brand . size . platform"
+    var tags = '<span class="st-tag ' + esc(it.status) + '">' + esc(statusLabel(it.status)) + '</span>' + (stale ? '<span class="st-tag stale">' + esc(T('tag.stale')) + '</span>' : '') +
+      (it.condition ? '<span class="st-tag">' + esc(T('cond.' + it.condition)) + '</span>' : '') + (it.category ? '<span class="st-tag">' + esc(catName(it.category)) + '</span>' : '');
+    var meta = [it.brand, it.size, it.platform ? T('plat.' + it.platform) : T('dt.notlisted')].filter(Boolean).map(esc).join(' &middot; ');
+    var photo = it.image_url && /^https:\/\/images[0-9]*\.vinted\.net\//.test(it.image_url);
+    var head = '<div class="st-dhead">' + (photo ? '<div class="st-dphoto"><img class="st-ph" src="' + esc(it.image_url) + '" alt="' + esc(T('detail.photo')) + '" decoding="async" referrerpolicy="no-referrer"></div>' : tileHtml(it.title, null)) +
+      '<div class="st-dhead-t"><div class="st-dtags">' + tags + '</div><p class="st-d" id="st-dmeta">' + meta + '</p></div></div>';
+    // timeline: bought -> listed -> reserved -> sold from the item's own dates, "+Nd" between the dates that exist
+    var prev = null, steps = [['dt.s.bought', it.bought_on], ['dt.s.listed', it.listed_on], ['dt.s.reserved', it.reserved_on], ['dt.s.sold', it.status === 'sold' ? it.sold_on : null]].map(function (s, i) {
+      var gap = i === 0 ? '' : (s[1] && prev ? T('dt.gap', { n: C.daysBetween(s[1], prev) }) : '--'); if (s[1]) prev = s[1];
+      return '<li class="' + (s[1] ? 'on' : '') + '"><span class="st-dstep"><i></i>' + (i ? '<em>' + esc(gap) + '</em>' : '') + '</span><b>' + esc(T(s[0])) + '</b><span>' + esc(s[1] ? fmtDate(s[1]) : '--') + '</span></li>';
+    }).join('');
+    var mrow = function (k, v, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th scope="row">' + esc(T(k)) + '</th><td class="st-num">' + v + '</td></tr>'; };
+    var listShown = it.list_cents != null && (it.status === 'listed' || it.status === 'reserved' || it.status === 'sold');
+    var noteKey = it.status !== 'sold' ? 'dt.note.open' : (profit == null ? 'dt.note.nocost' : (it.platform && it.platform !== 'vinted' && !it.fee_cents ? 'dt.note.nofee' : null));
+    var money = '<table class="st-dmoney" id="st-dmoney"><tbody>' +
+      mrow('f.buy', it.buy_cents == null ? dash : esc(M(it.buy_cents))) + mrow('f.extra', it.extra_cents ? esc(M(it.extra_cents)) : dash) + mrow('f.list', listShown ? esc(M(it.list_cents)) : dash) +
+      mrow('f.sold', it.status === 'sold' && it.sold_cents != null ? esc(M(it.sold_cents)) : dash) + mrow('dt.fee', it.fee_cents ? esc(M(it.fee_cents)) : dash) +
+      (it.ship_paid_cents ? mrow('f.ship', esc(M(it.ship_paid_cents))) : '') +
+      mrow('dt.net', profit == null ? dash : '<span class="' + (profit < 0 ? 'st-neg' : 'st-pos') + '">' + esc(MS(profit)) + '</span>', 'st-dnet') + '</tbody></table>' +
+      (noteKey ? '<p class="st-hint" id="st-dmnote">' + esc(T(noteKey)) + '</p>' : '');
+    var other = actionsFor(it).filter(function (a) { return a !== 'sold'; });
+    var acts = other.length ? '<div class="st-acts">' + other.map(function (a) {
+      return '<button type="button" class="' + (a === 'delete' ? 'st-btn st-ghost st-danger' : 'st-btn st-ghost') + '" data-act="do" data-do="' + a + '" data-id="' + esc(it.id) + '">' + esc(T('act.' + a)) + '</button>';
+    }).join('') + '</div>' : '';
+    var form = '<details class="st-editbox" id="st-editbox"><summary>' + esc(T('dt.edit')) + '</summary><div class="st-form">' +
       fld('title', T('f.title'), txt('title', it.title, '', ' maxlength="140"'), 'full') + fld('brand', T('f.brand'), txt('brand', it.brand, '', ' maxlength="60"')) + fld('size', T('f.size'), txt('size', it.size, '', ' maxlength="20"')) +
-      fld('condition', T('f.condition'), '<select class="st-in" id="sf-condition">' + condOptions(it.condition) + '</select>') + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions(it.category) + '</select>') +
+      '<div class="st-f full">' + condButtons(it.condition) + '</div>' + fld('category', T('f.category'), '<select class="st-in" id="sf-category">' + catOptions(it.category) + '</select>', 'full') +
       fld('buy', T('f.buy'), mny('buy', it.buy_cents)) + fld('extra', T('f.extra'), mny('extra', it.extra_cents)) + fld('bought', T('f.bought'), dat('bought', it.bought_on, t0)) +
       (it.status === 'sold' ? fld('sold', T('f.sold'), mny('sold', it.sold_cents)) + fld('soldon', T('f.soldon'), dat('soldon', it.sold_on, t0)) : fld('list', T('f.list'), mny('list', it.list_cents))) +
       fld('source', T('f.source'), txt('source', it.src === 'SNYPD alert' ? T('src.alert') : it.src, '', ' maxlength="80"' + (it.src === 'SNYPD alert' ? ' disabled' : '')), 'full') +
-      fld('link', T('f.link'), txt('link', it.link, '', ' maxlength="500"'), 'full') + fld('notes', T('f.notes'), '<textarea class="st-in" id="sf-notes" rows="3" maxlength="2000" style="height:auto;padding:8px 12px">' + esc(it.notes || '') + '</textarea>', 'full') + '</div>';
-    var extra = (it.returned_on ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '') + (it.claim_id ? '<p class="st-note" style="margin-top:12px">' + esc(T('detail.claim')) + '</p>' : '');
-    var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('close')) + '</button><button type="button" class="st-btn st-prim" data-act="save-detail" data-id="' + esc(it.id) + '" id="st-go">' + esc(T('save')) + '</button>';
-    var photo = it.image_url && /^https:\/\/images[0-9]*\.vinted\.net\//.test(it.image_url) ? '<div class="st-dphoto" data-ini=""><img class="st-ph" src="' + esc(it.image_url) + '" alt="' + esc(T('detail.photo')) + '" decoding="async" referrerpolicy="no-referrer"></div>' : '';
-    mountSheet(it.title, '<div id="st-sheet-err"></div>' + photo + '<span class="st-tag ' + esc(it.status) + '" style="margin-bottom:12px">' + esc(statusLabel(it.status)) + '</span>' + facts + acts + form + extra + '<div class="st-h3">' + esc(T('detail.history')) + '</div><ul class="st-tl" id="st-tl"><li>...</li></ul>', foot);
+      fld('link', T('f.link'), txt('link', it.link, '', ' maxlength="500"'), 'full') + fld('notes', T('f.notes'), '<textarea class="st-in" id="sf-notes" rows="3" maxlength="2000" style="height:auto;padding:8px 12px">' + esc(it.notes || '') + '</textarea>', 'full') +
+      '</div><div class="st-acts"><button type="button" class="st-btn st-ghost" data-act="save-detail" data-id="' + esc(it.id) + '" id="st-go">' + esc(T('dt.save')) + '</button></div></details>';
+    var extra = (it.returned_on ? '<p class="st-note">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '') + (it.claim_id ? '<p class="st-note">' + esc(T('detail.claim')) + '</p>' : '');
+    var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('close')) + '</button>' + (actionsFor(it).indexOf('sold') >= 0 ? '<button type="button" class="st-btn st-prim" data-act="do" data-do="sold" data-id="' + esc(it.id) + '">' + esc(T('act.sold')) + '</button>' : '');
+    mountSheet(it.title, '<div id="st-sheet-err"></div>' + head +
+      '<div class="st-dsec"><span class="st-lbl">' + esc(T('dt.timeline')) + '</span><ol class="st-steps" id="st-steps">' + steps + '</ol></div>' +
+      '<div class="st-dsec"><span class="st-lbl">' + esc(T('dt.money')) + '</span>' + money + '</div>' + acts + extra +
+      '<div class="st-dsec"><span class="st-lbl">' + esc(T('detail.history')) + '</span><ul class="st-tl" id="st-tl"><li>...</li></ul></div>' + form, foot);
     S.api.itemHistory(it.id).then(function (h) { if (!S.sheet || S.sheet.item.id !== it.id) return; var ul = $('#st-tl'); if (ul) ul.innerHTML = h.length ? h.map(histHtml).join('') : '<li>' + esc(T('detail.history.none')) + '</li>'; }).catch(function () { var ul = $('#st-tl'); if (ul) ul.innerHTML = '<li>' + esc(T('err.load')) + '</li>'; });
     var f = $('.st-sheet .st-btn'); if (f) f.focus();
   }
@@ -1059,6 +1186,7 @@
     imShell(h, foot);
   }
   function onChange(ev) {
+    if (ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-cat')) { catRename(ev.target); return; }   // Manage categories: a rename saves on leaving the field
     var t = ev.target, k = t && t.getAttribute && t.getAttribute('data-im'); if (!k || !IM || IM.step !== 'review') return;
     if (k === 'sheet') { IM.sheetIx = parseInt(t.value, 10) || 0; IM.condMap = {}; IM.catMap = {}; IM.dateOrder = null; }
     else if (k === 'order') IM.dateOrder = t.value;

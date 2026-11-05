@@ -536,6 +536,14 @@
         });
       } catch (e) { S.categories = before; throw e; }
     }
+    function updateCategories(key, patch) {   // the direct UPDATE of stock_categories (own-row update policy of 065; name CHECK 1-40 after trim); 0 rows = no error, like PostgREST
+      const c = S.categories.find(x => x.key === key); if (!c) return 0;
+      const n = Object.assign({}, c);
+      Object.keys(patch).forEach(k => { if (!['name', 'hidden', 'sort'].includes(k)) raise(`column "${k}" can not be updated here`, null, '42501'); n[k] = patch[k]; });
+      if (n.name == null || btrim(n.name).length < 1 || btrim(n.name).length > 40) raise('new row for relation "stock_categories" violates check constraint "stock_categories_name_check"', null, '23514');
+      if (typeof n.hidden !== 'boolean') raise('invalid input syntax for type boolean', null, '22P02');
+      Object.assign(c, n); return 1;
+    }
     function mirrorClaimUpdate(c, oldBoughtPrice) {   // 067 UPDATE branch: never overwrites what the user did to the item in Stock
       const it = S.items.find(i => i.claim_id === c.id && i.deleted_at == null);
       if (!it) return mirrorClaim(c);
@@ -553,7 +561,7 @@
       const it = S.items.find(i => i.claim_id === claimId && i.deleted_at == null && i.status === 'stock');
       if (it) { it.deleted_at = new Date(nowMs()).toISOString(); touch(it); }
     }
-    return { rpc, state: S, agg, loadFixture, addCategories, mirrorClaim, mirrorClaimUpdate, mirrorClaimDelete, setMode: m => { S.mode = m; }, mode: stockMode, tabHidden: () => stockMode() !== 'off' && !!(S.settings && S.settings.tab_hidden), settingsRow: () => (S.settings ? Object.assign({ user_id: S.uid }, S.settings) : null), setPaid: p => { S.paid = !!p; }, setSettings: s => { const n = Object.assign({}, S.settings, s); const bad = nm => raise(`new row for relation "stock_settings" violates check constraint "stock_settings_${nm}_check"`, null, '23514'); if (n.currency != null && !ENUMS.currency.includes(n.currency)) bad('currency'); if (n.persona != null && !ENUMS.persona.includes(n.persona)) bad('persona'); if (n.old_after_days != null && !(n.old_after_days >= 7 && n.old_after_days <= 365)) bad('old_after_days'); if (n.weekly_email != null && typeof n.weekly_email !== 'boolean') raise('invalid input syntax for type boolean', null, '22P02'); S.settings = n; },
+    return { rpc, state: S, agg, loadFixture, addCategories, updateCategories, mirrorClaim, mirrorClaimUpdate, mirrorClaimDelete, setMode: m => { S.mode = m; }, mode: stockMode, tabHidden: () => stockMode() !== 'off' && !!(S.settings && S.settings.tab_hidden), settingsRow: () => (S.settings ? Object.assign({ user_id: S.uid }, S.settings) : null), setPaid: p => { S.paid = !!p; }, setSettings: s => { const n = Object.assign({}, S.settings, s); const bad = nm => raise(`new row for relation "stock_settings" violates check constraint "stock_settings_${nm}_check"`, null, '23514'); if (n.currency != null && !ENUMS.currency.includes(n.currency)) bad('currency'); if (n.persona != null && !ENUMS.persona.includes(n.persona)) bad('persona'); if (n.old_after_days != null && !(n.old_after_days >= 7 && n.old_after_days <= 365)) bad('old_after_days'); if (n.weekly_email != null && typeof n.weekly_email !== 'boolean') raise('invalid input syntax for type boolean', null, '22P02'); S.settings = n; },
       setSearches: s => { S.searches = s; }, today, helpers: { diffDays, addDays, isoDate } };
   }
 

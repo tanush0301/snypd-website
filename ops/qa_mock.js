@@ -423,6 +423,10 @@
       if (STOCK && table === 'stock_categories' && op === 'insert') {   // own-row insert policy + the 30-category trigger live in the engine
         try { STOCK.addCategories(Array.isArray(payload) ? payload : [payload]); return { data: payload, error: null }; } catch (e) { return { data: null, error: e.pg || { message: String(e) } }; }
       }
+      if (STOCK && table === 'stock_categories' && op === 'update') {   // own-row update policy (065): rename / hide
+        var ck = (filters.filter(function (f) { return f.col === 'key' && f.op === 'eq'; })[0] || {}).val;
+        try { var cp = Object.assign({}, payload); delete cp.user_id; var cn = STOCK.updateCategories(ck, cp); return { data: null, error: null, count: cn }; } catch (e) { return { data: null, error: e.pg || { message: String(e) } }; }
+      }
       if (op === 'insert') {
         var toInsert = Array.isArray(payload) ? payload : [payload];
         var inserted = toInsert.map(function (r) {
