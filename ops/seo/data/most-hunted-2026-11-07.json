@@ -1,0 +1,101 @@
+{
+ "generated_at": "2026-11-07T13:37:34Z",
+ "min_users": 10,
+ "active_hunts": 517,
+ "hunters": 505,
+ "sites": {
+  "vinted.fr": 284,
+  "vinted.co.uk": 42,
+  "vinted.de": 37,
+  "vinted.be": 22,
+  "vinted.com": 22,
+  "vinted.it": 16,
+  "vinted.pl": 16,
+  "vinted.nl": 15,
+  "vinted.es": 13,
+  "vinted.se": 13
+ },
+ "rows": [
+  {
+   "key": "Nike",
+   "name_en": "Nike",
+   "name_fr": "Nike",
+   "type": "brand",
+   "hunters": 126,
+   "with_max_eur": 89,
+   "typical_max_eur": 20.0
+  },
+  {
+   "key": "Ralph Lauren",
+   "name_en": "Ralph Lauren",
+   "name_fr": "Ralph Lauren",
+   "type": "brand",
+   "hunters": 101,
+   "with_max_eur": 64,
+   "typical_max_eur": 20.0
+  },
+  {
+   "key": "Nike running clothing",
+   "name_en": "Nike running clothing",
+   "name_fr": "Vêtements de running Nike",
+   "type": "model",
+   "hunters": 38,
+   "with_max_eur": 24,
+   "typical_max_eur": 25.0
+  },
+  {
+   "key": "Nike Tech",
+   "name_en": "Nike Tech",
+   "name_fr": "Nike Tech",
+   "type": "model",
+   "hunters": 23,
+   "with_max_eur": 21,
+   "typical_max_eur": 20.0
+  },
+  {
+   "key": "Stone Island",
+   "name_en": "Stone Island",
+   "name_fr": "Stone Island",
+   "type": "brand",
+   "hunters": 20,
+   "with_max_eur": 15,
+   "typical_max_eur": 30.0
+  },
+  {
+   "key": "Adidas",
+   "name_en": "Adidas",
+   "name_fr": "Adidas",
+   "type": "brand",
+   "hunters": 18,
+   "with_max_eur": 10,
+   "typical_max_eur": 22.5
+  },
+  {
+   "key": "Lacoste",
+   "name_en": "Lacoste",
+   "name_fr": "Lacoste",
+   "type": "brand",
+   "hunters": 13,
+   "with_max_eur": 10,
+   "typical_max_eur": 16.0
+  },
+  {
+   "key": "Apple (iPhone)",
+   "name_en": "Apple (iPhone)",
+   "name_fr": "Apple (iPhone)",
+   "type": "brand",
+   "hunters": 10,
+   "with_max_eur": 8,
+   "typical_max_eur": null
+  },
+  {
+   "key": "PlayStation",
+   "name_en": "PlayStation",
+   "name_fr": "PlayStation",
+   "type": "brand",
+   "hunters": 10,
+   "with_max_eur": 4,
+   "typical_max_eur": null
+  }
+ ]
+}

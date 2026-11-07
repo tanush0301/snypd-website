@@ -15,6 +15,7 @@ ROOT = Path(g.ROOT)
 
 def render():
     index = json.loads((ROOT / 'assets/data/price-index.json').read_text(encoding='utf-8'))
+    hunted = content.hunted_data(ROOT)
     pages = {}
     for key, langs in content.SLUGS.items():
         for lang, path in langs.items():
@@ -27,11 +28,16 @@ def render():
                 title, desc, h1, lead, sections, extra_ld = content.tools(lang, index, g)
             elif key == 'money':
                 title, desc, h1, lead, sections, extra_ld = content.money(lang, index, g)
+            elif key == 'hunted':
+                title, desc, h1, lead, sections, extra_ld = content.hunted(lang, hunted, g)
             else:
                 title, desc, h1, lead, sections = content.calculator(lang)
             body = ''.join('<section id="%s"><h2>%s</h2>%s</section>' % section for section in sections)
             body += content.related(lang)
-            body += content.tools_sources(lang) if key == 'tools' else content.sources(lang, fees=key in ('profit', 'money'))
+            if key == 'tools':
+                body += content.tools_sources(lang)
+            elif key != 'hunted':   # SNYPD's own data: its method section replaces the Vinted help sources
+                body += content.sources(lang, fees=key in ('profit', 'money'))
             body += '<section id="start"><h2>%s</h2>%s</section>' % (
                 'Surveille ta recherche' if lang == 'fr' else 'Monitor your search', g.cta(lang))
             text = g.page(key, lang, title, desc, 'VINTED · REVENTE' if lang == 'fr' else 'VINTED · RESELLING',

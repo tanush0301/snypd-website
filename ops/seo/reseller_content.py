@@ -13,14 +13,16 @@ SLUGS = {
     # 7 Nov 2026 (GEO priority: "best Vinted reselling tool", "how to make money on Vinted")
     'tools': {'en': '/best-vinted-reselling-tools', 'fr': '/fr/meilleurs-outils-revente-vinted'},
     'money': {'en': '/how-to-make-money-on-vinted', 'fr': '/fr/gagner-argent-vinted'},
+    # 7 Nov 2026: monthly snapshot of what SNYPD users hunt (outreach/46; data ops/seo/data/most-hunted-*.json)
+    'hunted': {'en': '/vinted-most-hunted', 'fr': '/fr/vinted-les-plus-recherches'},
 }
 # First publication per page; pages not listed were published on UPDATED.
-PUBLISHED = {'tools': '2026-11-07', 'money': '2026-11-07'}
+PUBLISHED = {'tools': '2026-11-07', 'money': '2026-11-07', 'hunted': '2026-11-07'}
 LABELS = {
     'en': ['How to resell on Vinted', 'Brands and models to research', 'Resale profit calculator',
-           'Best Vinted reselling tools', 'How to make money on Vinted'],
+           'Best Vinted reselling tools', 'How to make money on Vinted', 'What Vinted resellers hunt'],
     'fr': ['Achat-revente sur Vinted', 'Marques et modèles à étudier', 'Calculateur de marge',
-           'Meilleurs outils de revente Vinted', 'Gagner de l’argent sur Vinted'],
+           'Meilleurs outils de revente Vinted', 'Gagner de l’argent sur Vinted', 'Ce que chassent les revendeurs Vinted'],
 }
 # Competitor facts on /best-vinted-reselling-tools: each from the tool's own site, read on TOOLS_CHECKED.
 # Re-read every site before changing the date. Never type a SNYPD price: use plans.py tokens.
@@ -627,3 +629,146 @@ def calculator(lang):
             ('utiliser', 'Applique ton plafond dans une recherche', '<p>Compare un modèle et un état précis dans l’<a href="/fr/estimer-prix-vinted">outil de prix</a>. Ses repères sont des prix demandés : choisis une recette prudente au lieu de prendre la médiane pour un prix de vente garanti.</p><p>Règle ton prix maximum et tes autres filtres sur Vinted, contrôle le total à payer, puis enregistre cette recherche dans SNYPD pour surveiller les nouvelles annonces. Aucun montant ni devise n’est copié automatiquement ; l’outil ne modifie aucune annonce et n’achète rien. Les calculs restent dans ton navigateur : le calculateur n’envoie pas les montants à un serveur ou aux outils de mesure SNYPD.</p>'),
         ]
     return title, desc, h1, lead, sections
+
+
+# ---------------------------------------------------------------- /vinted-most-hunted (7 Nov 2026, website outreach/46)
+# Monthly snapshot of what SNYPD users hunt, from ops/seo/data/most-hunted-<date>.json (ops/seo/most_hunted_batch.py,
+# run read-only in the backend container). Public bar: 10 distinct users per row (Tanush, 7 Nov 2026); typical max shown
+# only from 10 users who set one on a euro site. Never search words, sizes or anyone's own settings.
+HUNTED_EDITIONS = ['most-hunted-2026-11-07.json']   # newest last; the page shows the newest
+ELECTRONICS = {'Apple (iPhone)', 'PlayStation', 'Nintendo'}
+
+
+def hunted_data(root):
+    import json as _json
+    from pathlib import Path as _P
+    return _json.loads((_P(root) / 'ops/seo/data' / HUNTED_EDITIONS[-1]).read_text(encoding='utf-8'))
+
+
+def _num(n, lang):
+    return ('{:,}'.format(n)).replace(',', ' ' if lang == 'fr' else ',')
+
+
+def hunted(lang, data, g):
+    """/vinted-most-hunted: brands and models SNYPD users hunt, with the max price they set. Returns 6 values like tools()."""
+    fr = lang == 'fr'
+    rows = data['rows']
+    when = g.date_txt(data['generated_at'][:10], lang)
+    month = g.MONTHS_TXT[lang][int(data['generated_at'][5:7]) - 1] + ' ' + data['generated_at'][:4]
+    k = data['min_users']
+    hunts, people = _num(data['active_hunts'], lang), _num(data['hunters'], lang)
+    sites = data.get('sites') or {}
+    top_site, top_n = (next(iter(sites.items())) if sites else ('', 0))
+    name = (lambda r: html.escape(r['name_fr'] if fr else r['name_en']))
+    na = 'pas assez de données' if fr else 'not enough data'
+    table_rows = [[str(i + 1), name(r), _num(r['hunters'], lang),
+                   g.money(int(round(r['typical_max_eur'] * 100)), lang) if r.get('typical_max_eur') is not None else na]
+                  for i, r in enumerate(rows)]
+    with_max = [r['typical_max_eur'] for r in rows if r.get('typical_max_eur') is not None]
+    lo_max, hi_max = (g.money(int(min(with_max) * 100), lang), g.money(int(max(with_max) * 100), lang)) if with_max else ('', '')
+    n_models = sum(1 for r in rows if r['type'] == 'model')
+    elec = [name(r) for r in rows if r['key'] in ELECTRONICS]
+    top3 = ', '.join(name(r) for r in rows[:3])
+    first = rows[0] if rows else None
+    if not fr:
+        title = 'What Vinted resellers hunt (%s)' % month
+        desc = ('The brands and models SNYPD users hunt on Vinted, counted from %s active searches on %s, with the maximum price '
+                'they usually set. Updated monthly.' % (hunts, when))
+        h1 = 'What Vinted resellers hunt'
+        lead = ('Counted on %s from %s active searches by %s SNYPD users: which brands and models they watch on Vinted, and the '
+                'maximum price they usually set.' % (when, hunts, people))
+        table = g.table(['#', 'BRAND OR MODEL', 'HUNTERS', 'TYPICAL MAX PRICE (EURO SITES)'], table_rows)
+        faq = [
+            ('What do people look for most on Vinted?',
+             'Vinted does not publish what people search for. Among SNYPD users on %s, the most hunted were %s.' % (when, top3)),
+            ('Is this Vinted’s own data?',
+             'No. It counts the searches SNYPD users save to get alerts, not searches on Vinted itself, and not sales.'),
+            ('Why do some rows have no max price?',
+             'A typical max is shown only when %d or more hunters of that row set a maximum price on a euro Vinted site.' % k),
+            ('How often is this updated?', 'Once a month. Numbers move as users join, change or stop their searches.'),
+        ]
+        sections = [
+            ('list', 'The list (%s)' % month,
+             table + '<p>A hunter is one SNYPD user with at least one active search whose words name the brand or model, counted once '
+             'however many searches they run. A row appears only when %d or more users hunt it. The typical max is the median of each '
+             'hunter’s own maximum price on euro Vinted sites, shown only when %d or more of them set one. Users who left hunter '
+             'statistics in their settings are not counted.</p>' % (k, k)),
+            ('read', 'What the list says',
+             '<ul><li><strong>Brands first.</strong> %d of the %d rows are brands; resellers mostly watch a whole brand and filter by '
+             'price rather than one model.</li>'
+             '<li><strong>Low ceilings.</strong> Where enough hunters set one, the typical max runs from %s to %s. People hunt the cheap end '
+             'of a brand. For typical asking prices by condition, see the <a href="/vinted-price-guide">Vinted price guide</a>.</li>'
+             '%s</ul>' % (len(rows) - n_models, len(rows), lo_max, hi_max,
+                          ('<li><strong>Not only clothes.</strong> %s also made the list.</li>' % ' and '.join(elec)) if elec else '')),
+            ('use', 'How to use it',
+             '<p>If you buy these brands to resell, you are not alone: %s SNYPD users watch %s. The cheapest new listings tend to go to whoever '
+             'opens them first. %s</p>'
+             '<p>Set your own maximum from your margin, not from this list: the <a href="/vinted-profit-calculator">profit calculator</a> '
+             'turns your resale price and costs into the most you should pay. A brand with fewer hunters can mean less competition, or less '
+             'demand: check its asking prices before buying.</p>' % (_num(first['hunters'], 'en'), name(first), g.SPEED_MEASURED['en'])
+             if first else ''),
+            ('method', 'Method and limits',
+             '<p>This is SNYPD data, not Vinted’s. It covers searches saved by SNYPD users, mostly on %s (%s hunters); sites with fewer '
+             'than %d hunters are not broken out. Words are matched against a fixed list of brands and models, so a search that names two '
+             'brands counts for both. It shows what people watch, not what sells: Vinted publishes no sales data, and SNYPD does not see '
+             'sales.</p>' % (top_site, _num(top_n, 'en'), k)),
+            ('questions', 'Questions', g.faq_html(faq)),
+        ]
+    else:
+        title = 'Ce que chassent les revendeurs Vinted (%s)' % month
+        desc = ('Les marques et modèles que les utilisateurs de SNYPD chassent sur Vinted, comptés sur %s recherches actives le %s, '
+                'avec le prix maximum qu’ils fixent en général. Mis à jour chaque mois.' % (hunts, when))
+        h1 = 'Ce que chassent les revendeurs Vinted'
+        lead = ('Compté le %s sur %s recherches actives de %s utilisateurs de SNYPD : les marques et modèles qu’ils surveillent '
+                'sur Vinted, et le prix maximum qu’ils fixent en général.' % (when, hunts, people))
+        table = g.table(['#', 'MARQUE OU MODÈLE', 'CHASSEURS', 'PRIX MAX TYPIQUE (SITES EN EURO)'], table_rows)
+        faq = [
+            ('Que cherchent le plus les gens sur Vinted ?',
+             'Vinted ne publie pas ce que les gens recherchent. Chez les utilisateurs de SNYPD, le %s, les plus chassés étaient %s.' % (when, top3)),
+            ('Est-ce que ce sont les données de Vinted ?',
+             'Non. Ce sont les recherches que les utilisateurs de SNYPD enregistrent pour recevoir des alertes, pas les recherches faites sur '
+             'Vinted, ni des ventes.'),
+            ('Pourquoi certaines lignes n’ont pas de prix max ?',
+             'Un prix max typique n’apparaît que si au moins %d chasseurs de la ligne ont fixé un prix maximum sur un site Vinted en euro.' % k),
+            ('À quelle fréquence est-ce mis à jour ?', 'Une fois par mois. Les chiffres bougent quand des utilisateurs arrivent, changent ou arrêtent leurs recherches.'),
+        ]
+        sections = [
+            ('liste', 'La liste (%s)' % month,
+             table + '<p>Un chasseur est un utilisateur de SNYPD qui a au moins une recherche active dont les mots citent la marque ou le '
+             'modèle, compté une seule fois quel que soit le nombre de ses recherches. Une ligne n’apparaît que si au moins %d utilisateurs '
+             'la chassent. Le prix max typique est la médiane du prix maximum de chaque chasseur sur les sites Vinted en euro, affichée '
+             'seulement si au moins %d d’entre eux en ont fixé un. Les utilisateurs qui ont quitté les statistiques des chasseurs dans '
+             'leurs réglages ne sont pas comptés.</p>' % (k, k)),
+            ('lecture', 'Ce que dit la liste',
+             '<ul><li><strong>Les marques d’abord.</strong> %d des %d lignes sont des marques : les revendeurs surveillent surtout '
+             'une marque entière et filtrent par prix plutôt qu’un seul modèle.</li>'
+             '<li><strong>Des plafonds bas.</strong> Quand assez de chasseurs en fixent un, le prix max typique va de %s à %s. On chasse le bas '
+             'de gamme d’une marque. Pour les prix demandés typiques par état, vois le <a href="/fr/guide-prix-vinted">guide des prix Vinted</a>.</li>'
+             '%s</ul>' % (len(rows) - n_models, len(rows), lo_max, hi_max,
+                          ('<li><strong>Pas que des vêtements.</strong> %s sont aussi dans la liste.</li>' % ' et '.join(elec)) if elec else '')),
+            ('utiliser', 'Comment s’en servir',
+             '<p>Si tu achètes ces marques pour les revendre, tu n’es pas seul : %s utilisateurs de SNYPD surveillent %s. Les nouvelles '
+             'annonces les moins chères partent souvent chez celui qui les ouvre le premier. %s</p>'
+             '<p>Fixe ton propre maximum à partir de ta marge, pas à partir de cette liste : le <a href="/fr/calculateur-marge-vinted">'
+             'calculateur de marge</a> transforme ton prix de revente et tes coûts en prix d’achat maximum. Une marque moins chassée peut '
+             'vouloir dire moins de concurrence, ou moins de demande : vérifie ses prix demandés avant d’acheter.</p>'
+             % (_num(first['hunters'], 'fr'), name(first), g.SPEED_MEASURED['fr']) if first else ''),
+            ('methode', 'Méthode et limites',
+             '<p>Ce sont les données de SNYPD, pas celles de Vinted. Elles couvrent les recherches enregistrées par les utilisateurs de SNYPD, '
+             'surtout sur %s (%s chasseurs) ; les sites de moins de %d chasseurs ne sont pas détaillés. Les mots sont comparés à une liste '
+             'fixe de marques et de modèles : une recherche qui cite deux marques compte pour les deux. Elles montrent ce que les gens '
+             'surveillent, pas ce qui se vend : Vinted ne publie aucune donnée de vente, et SNYPD ne voit pas les ventes.</p>'
+             % (top_site, _num(top_n, 'fr'), k)),
+            ('questions', 'Questions', g.faq_html(faq)),
+        ]
+    ds = {'@context': 'https://schema.org', '@type': 'Dataset',
+          'name': ('What Vinted resellers hunt, %s' % month) if not fr else ('Ce que chassent les revendeurs Vinted, %s' % month),
+          'description': ('Brands and models hunted by %d or more SNYPD users, counted from %s active saved Vinted searches on %s, with the '
+                          'median maximum price they set on euro sites. Saved searches, not sales.' % (k, hunts, when)) if not fr else
+                         ('Marques et modèles chassés par au moins %d utilisateurs de SNYPD, comptés sur %s recherches Vinted actives le %s, '
+                          'avec le prix maximum médian fixé sur les sites en euro. Des recherches enregistrées, pas des ventes.' % (k, hunts, when)),
+          'url': g.SITE + SLUGS['hunted'][lang], 'creator': g.DATASET_CREATOR, 'license': g.DATASET_LICENSE, 'inLanguage': lang,
+          'isAccessibleForFree': True, 'temporalCoverage': data['generated_at'][:10],
+          'variableMeasured': ['hunters (distinct SNYPD users)', 'typical maximum price set (EUR)'] if not fr else
+                              ['chasseurs (utilisateurs SNYPD distincts)', 'prix maximum typique fixé (EUR)']}
+    return title, desc, h1, lead, sections, [g.faq_ld(faq), ds]

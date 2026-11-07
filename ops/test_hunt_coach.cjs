@@ -139,6 +139,23 @@ const URL0 = 'https://www.vinted.be/catalog?search_text=jordan%20travis%20scott'
   ok(c.apply === null && c.edit && c.keep, 'widen: Edit hunt + Keep it');
   await p.ctx.close();
 
+  // ---- 5b. hours wording for a trial's first days (7 Nov 2026) + list hunts left to the words card
+  p = await open('coach=quiethours');
+  c = await card(p);
+  eq(c.spans[0], '"jordan <b>travis</b>" found nothing new in 21 hours.', 'quiet hours: under 48 h says hours');
+  eq(c.apply, 'Raise max to ' + EUR + '20', 'quiet hours: raise button');
+  await p.ctx.close();
+  p = await open('coach=quiethours&lang=fr');
+  await wait(400);
+  c = await card(p);
+  ok(c.text.startsWith('\u00ab' + NB + 'jordan <b>travis</b>' + NB + '\u00bb n\u2019a rien trouv\u00e9 de nouveau en 21 heures.'), 'quiet hours: French (' + c.text.slice(0, 70) + ')');
+  await p.ctx.close();
+  p = await open('coach=quietlist');
+  c = await card(p);
+  ok(!c.shown, 'quiet list hunt: the coach stays silent');
+  ok(await p.evaluate(() => document.getElementById('words-card').style.display !== 'none'), 'quiet list hunt: the words card shows instead');
+  await p.ctx.close();
+
   // ---- 6. never shown: min price would invert the range, stale link, backend error, no advice
   for (const q of ['coach=minblock', 'coach=stale', 'coach=error', 'coach=none', '']) {
     p = await open(q);

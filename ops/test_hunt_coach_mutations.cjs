@@ -11,13 +11,15 @@ const TEST = path.join(__dirname, 'test_hunt_coach.cjs');
 const M = [
   ['max price added twice', 'if (/[?&]price_to=[^&]*/.test(base)) return', 'if (false) return'],
   ['range can invert', 'if (min !== null && min >= a.suggest.max) return;', ''],
-  ['advice for a changed link shown', 'return row && row.is_active === true && row.vinted_url === x.url && !coachDismissed(x);', 'return row && row.is_active === true && !coachDismissed(x);'],
+  ['advice for a changed link shown', 'if (!(row && row.is_active === true && row.vinted_url === x.url && !coachDismissed(x))) return false;', 'if (!(row && row.is_active === true && !coachDismissed(x))) return false;'],
   ['applied advice comes back', "      coachRemember(a);\r\n      coachPaint(['Done:", "      coachPaint(['Done:"],
   ['hunt name not escaped', 'sp.textContent = t;', 'sp.innerHTML = t;'],
   ['undo writes the new link again', 'try { await coachWrite(a.id, before); }', 'try { await coachWrite(a.id, after); }'],
   ['notice for new accounts too', 'if (seen || !(joined < STATS_POLICY_AT)) return;', 'if (seen) return;'],
   ['switch writes the opposite', "sb.rpc('set_hunter_stats_opt_out', { p_out: !counted })", "sb.rpc('set_hunter_stats_opt_out', { p_out: counted })"],
   ['failed save leaves the switch flipped', "          paint(!counted);\r\n", ''],
+  ['coach talks over the words card', "if (k === 'list' || k === 'brands' || k === 'long') return false;", ''],
+  ['hours never said', "const span = (a.hours && a.hours < 48) ? a.hours + ' hours' : a.days + ' days';", "const span = a.days + ' days';"],
   ['opted-out account shown as counted', 'paint(!(data && data.hunter_stats_opt_out === true));', 'paint(true);'],
 ];
 const orig = fs.readFileSync(FILE);

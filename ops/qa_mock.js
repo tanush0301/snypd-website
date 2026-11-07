@@ -573,7 +573,9 @@
   // default so other suites never see the card. Advice points at the first hunt (search-1) and its exact link.
   window.__qaDB = DB;   // tests read what the page wrote
   var COACH = params.get('coach');
-  if (COACH === 'quiet' && DB.user_searches && DB.user_searches[0]) DB.user_searches[0].vinted_url += '&price_to=8';
+  if ((COACH === 'quiet' || COACH === 'quiethours') && DB.user_searches && DB.user_searches[0]) DB.user_searches[0].vinted_url += '&price_to=8';
+  // ?coach=quietlist: the hunt asks Vinted for a list (hunt-words card's job; the coach must stay silent)
+  if (COACH === 'quietlist' && DB.user_searches && DB.user_searches[0]) DB.user_searches[0].vinted_url = 'https://www.vinted.be/catalog?search_text=ralph%20lauren%2C%20nike%2C%20adidas';
   if (COACH === 'minblock' && DB.user_searches && DB.user_searches[0]) DB.user_searches[0].vinted_url += '&price_from=30';
   if (params.get('statsout') === '1' && DB.users && DB.users[0]) DB.users[0].hunter_stats_opt_out = true;
   function coachBody() {
@@ -587,6 +589,8 @@
     if (COACH === 'peers') a = Object.assign(base, { verdict: 'busy', per_day: 4517, per_day_lower_bound: true, peers: Object.assign({}, peers, { typical_max: 20 }), suggest: { max: 20, source: 'peers' } });
     if (COACH === 'quiet') a = Object.assign(base, { verdict: 'quiet', finds: 1, days: 3, current_max: 8, peers: Object.assign({}, peers, { typical_max: 20 }), suggest: { max: 20, source: 'peers' } });
     if (COACH === 'widen') a = Object.assign(base, { verdict: 'quiet', finds: 0, days: 4, peers: null, suggest: null });
+    if (COACH === 'quiethours') a = Object.assign(base, { verdict: 'quiet', finds: 0, hours: 21, days: 1, current_max: 8, peers: Object.assign({}, peers, { typical_max: 20 }), suggest: { max: 20, source: 'peers' } });
+    if (COACH === 'quietlist') a = Object.assign(base, { verdict: 'quiet', finds: 0, hours: 40, days: 2, peers: null, suggest: null });
     return { generated_at: '2026-11-07T12:00:00Z', hunts: a ? [a] : [], cached: false };
   }
   // ---- fetch() interception for the backend API ----

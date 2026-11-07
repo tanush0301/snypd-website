@@ -6485,10 +6485,12 @@ const HEARTBEAT_URL = (() => {
         out.push(a.peers.hunters + ' other hunters of ' + kind + ' set a max price of about ' + fmtMoney(a.suggest.max, cur) + '.');
       }
     } else {
+      // Under 48 h of 24/7 running (a trial's first days, 7 Nov 2026) the backend sends hours; say hours then.
+      const span = (a.hours && a.hours < 48) ? a.hours + ' hours' : a.days + ' days';
       out.push(a.finds === 0
-        ? '"' + name + '" found nothing new in ' + a.days + ' days.'
-        : (a.finds === 1 ? '"' + name + '" found 1 new listing in ' + a.days + ' days.'
-                         : '"' + name + '" found ' + a.finds + ' new listings in ' + a.days + ' days.'));
+        ? '"' + name + '" found nothing new in ' + span + '.'
+        : (a.finds === 1 ? '"' + name + '" found 1 new listing in ' + span + '.'
+                         : '"' + name + '" found ' + a.finds + ' new listings in ' + span + '.'));
       if (a.suggest && a.peers && a.current_max) {
         out.push(a.peers.hunters + ' other hunters of ' + kind + ' set a max price of about ' + fmtMoney(a.suggest.max, cur) + '; yours is ' + fmtMoney(a.current_max, cur) + '.');
       } else {
@@ -6521,9 +6523,19 @@ const HEARTBEAT_URL = (() => {
     if (!card || !title || !apply || !Array.isArray(coachList) || !coachList.length) return;
     let rows = [];
     try { rows = await huntModes(); } catch (e) { console.error('SNYPD: hunt coach could not read hunts', e); return; }
+    const hw = window.SNYPD && window.SNYPD.hw;
     const a = coachList.find(x => {
       const row = rows.find(r => String(r.id) === String(x.id));
-      return row && row.is_active === true && row.vinted_url === x.url && !coachDismissed(x);
+      if (!(row && row.is_active === true && row.vinted_url === x.url && !coachDismissed(x))) return false;
+      // A quiet hunt whose words the hunt-words check flags (a list, several brands, too long) is the words card's job:
+      // it offers the real fix (split it), so the coach stays silent there.
+      if (x.verdict === 'quiet' && hw) {
+        let q = '';
+        try { q = (new URL(x.url).searchParams.get('search_text') || '').trim(); } catch (e) {}
+        const k = q ? (hw.check(q) || {}).kind : '';
+        if (k === 'list' || k === 'brands' || k === 'long') return false;
+      }
+      return true;
     });
     if (!a) return;
     if (a.suggest) {
