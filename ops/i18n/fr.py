@@ -1254,3 +1254,49 @@ FR_PATTERNS += [
     (r'^(\d+) more listings in other conditions: too few to price yet\.$', '$1 autres annonces dans d’autres états' + NB + ': encore trop peu pour un prix.'),
     (r'^Show all (\d+) brands$', 'Voir les $1 marques'),
 ]
+
+# ---------------------------------------------------------------- Hunt coach + hunter statistics (7 Nov 2026, outreach/41)
+FR.update({
+    'Hunter statistics': 'Statistiques des chasseurs',
+    "SNYPD now shows anonymous totals, such as how many users hunt a brand and the max price they usually set. A total appears only when 5 or more users hunt it, never anyone's search words. You can leave these statistics in Profile.":
+        'SNYPD affiche maintenant des totaux anonymes, comme le nombre d’utilisateurs qui cherchent une marque et le prix max qu’ils fixent en général. Un total n’apparaît que si au moins 5 utilisateurs la cherchent, jamais les mots de recherche de quelqu’un. Tu peux sortir de ces statistiques dans ton profil.',
+    'OK': 'OK',
+    'Open Profile': 'Ouvrir le profil',
+    'Privacy policy': 'Politique de confidentialité',
+    'Count my hunts in hunter statistics': 'Compter mes recherches dans les statistiques des chasseurs',
+    'Anonymous totals, shown only when 5 or more users hunt the same kind of item. Never your search words.':
+        'Des totaux anonymes, affichés seulement quand au moins 5 utilisateurs cherchent le même type d’article. Jamais tes mots de recherche.',
+    'Could not load this setting. Try again later.': 'Impossible de charger ce réglage. Réessaie plus tard.',
+    'Your hunts count again in hunter statistics.': 'Tes recherches comptent de nouveau dans les statistiques des chasseurs.',
+    'Done: your hunts are left out of hunter statistics from the next update (within an hour).':
+        'C’est fait' + NB + ': tes recherches sortent des statistiques des chasseurs à la prochaine mise à jour (dans l’heure).',
+    'Could not save this setting. Try again.': 'Impossible d’enregistrer ce réglage. Réessaie.',
+    'This hunt finds too much': 'Cette recherche trouve trop',
+    'This hunt finds almost nothing': 'Cette recherche ne trouve presque rien',
+    'Undo': 'Annuler',
+    'Widen it: fewer words, fewer sizes or a higher max price.':
+        'Élargis-la' + NB + ': moins de mots, moins de tailles ou un prix max plus haut.',
+    'New matches can take a few minutes to show.': 'Les nouvelles annonces peuvent mettre quelques minutes à apparaître.',
+    'Could not change this hunt. Try again, or change it in Filters.':
+        'Impossible de modifier cette recherche. Réessaie, ou change-la dans Filtres.',
+    'Could not undo. Change the max price in Filters.': 'Impossible d’annuler. Change le prix max dans Filtres.',
+})
+FR_PATTERNS += [
+    (r'^About (\d+) new listings a day match "(.+)": too many to open\.$',
+     'Environ $1 nouvelles annonces par jour correspondent à «' + NB + '$2' + NB + '»' + NB + ': trop pour tout ouvrir.'),
+    (r'^At least (\d+) new listings a day matched "(.+)" while it was paused: too many to open\.$',
+     'Au moins $1 nouvelles annonces par jour ont correspondu à «' + NB + '$2' + NB + '» pendant la pause' + NB + ': trop pour tout ouvrir.'),
+    (r'^A max price of (.+) keeps its cheapest (\d+)%, about (\d+) a day\.$',
+     'Un prix max de $1 garde ses $2' + NB + '% les moins chers, environ $3 par jour.'),
+    (r'^(\d+) other hunters of (.+) set a max price of about (.+); yours is (.+)\.$',
+     '$1 autres chasseurs de $2 fixent un prix max d’environ $3' + NB + '; le tien est de $4.'),
+    (r'^(\d+) other hunters of (.+) set a max price of about (.+)\.$',
+     '$1 autres chasseurs de $2 fixent un prix max d’environ $3.'),
+    (r'^"(.+)" found nothing new in (\d+) days\.$', '«' + NB + '$1' + NB + '» n’a rien trouvé de nouveau en $2 jours.'),
+    (r'^"(.+)" found 1 new listing in (\d+) days\.$', '«' + NB + '$1' + NB + '» a trouvé 1 nouvelle annonce en $2 jours.'),
+    (r'^"(.+)" found (\d+) new listings in (\d+) days\.$', '«' + NB + '$1' + NB + '» a trouvé $2 nouvelles annonces en $3 jours.'),
+    (r'^Set max (.+)$', 'Prix max $1'),
+    (r'^Raise max to (.+)$', 'Monter le max à $1'),
+    (r'^Done: "(.+)" now has a max price of (.+)\.$', 'C’est fait' + NB + ':' + NB + '«' + NB + '$1' + NB + '» a maintenant un prix max de $2.'),
+    (r'^Undone: "(.+)" is back as it was\.$', 'Annulé' + NB + ':' + NB + '«' + NB + '$1' + NB + '» est revenue comme avant.'),
+]

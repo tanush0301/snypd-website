@@ -7,7 +7,9 @@ import sys, os
 REPO, MODE = sys.argv[1], sys.argv[2]
 LIVE = MODE == 'live'
 UPDATED = '9 October 2026'
-EMAIL = 'snypd@gmail.com'
+# A page whose text changed later carries its own date (privacy: hunter statistics, 7 Nov 2026).
+UPDATED_BY_SLUG = {'privacy': '7 November 2026'}
+EMAIL = 'help@snypd.store'   # = the live pages since 1 Nov 2026 (c537565 edited the HTML by hand)
 DISCORD = 'https://discord.gg/gjKD4auXhK'
 
 CSS = r"""
@@ -158,7 +160,7 @@ def page(slug, title, desc, h1, lead, toc, body):
     <div class="lg-wrap lg-head-in">
       <span class="lg-eyebrow">LEGAL</span>
       <h1 class="lg-h1">{h1}</h1>
-      <span class="lg-meta">Last updated {UPDATED}</span>
+      <span class="lg-meta">Last updated {UPDATED_BY_SLUG.get(slug, UPDATED)}</span>
       <p class="lg-lead">{lead}</p>
     </div>
   </div>

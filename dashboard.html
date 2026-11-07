@@ -2134,12 +2134,27 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
 </div>
+<!-- Hunter statistics notice (7 Nov 2026, privacy page "Why, and the legal basis"): shown once to accounts that signed up
+     before the policy changed; OK remembers it on this device. -->
+<div class="elite-banner" id="stats-note" style="display:none">
+  <div>
+    <div class="elite-banner__title">Hunter statistics</div>
+    <div class="elite-banner__text">SNYPD now shows anonymous totals, such as how many users hunt a brand and the max price they usually set. A total appears only when 5 or more users hunt it, never anyone's search words. You can leave these statistics in Profile.</div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="stats-note-ok" type="button">OK</button>
+    <button class="btn btn-ghost" id="stats-note-profile" type="button">Open Profile</button>
+    <a class="btn btn-ghost" href="/privacy#why">Privacy policy</a>
+  </div>
+</div>
 <div class="elite-banner" id="broad-hunt" style="display:none">
   <div>
-    <div class="elite-banner__title">This hunt is very broad</div>
+    <div class="elite-banner__title" id="broad-hunt-title">This hunt is very broad</div>
     <div class="elite-banner__text" id="broad-hunt-text"></div>
   </div>
   <div class="email-optin__actions">
+    <button class="btn btn-prim" id="broad-hunt-apply" type="button" style="display:none"></button>
+    <button class="btn btn-prim" id="broad-hunt-undo" type="button" style="display:none">Undo</button>
     <button class="btn btn-prim" id="broad-hunt-calm" type="button" style="display:none">Switch to Calm</button>
     <button class="btn btn-ghost" id="broad-hunt-edit" type="button">Edit hunt</button>
     <button class="btn btn-ghost" id="broad-hunt-keep" type="button">Keep it</button>
@@ -2369,6 +2384,22 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     </div>
   </div>
   <p class="wiz-alert-result" id="prof-notify-result" style="display:none"></p>
+</div>
+<!-- Hunter statistics (migration 079): the switch is ON while this account's hunts are counted. Written through
+     set_hunter_stats_opt_out(), read from the own users row. -->
+<div class="prof-notify-block" id="prof-stats-block">
+  <div class="prof-notify-head">Privacy</div>
+  <div class="wiz-alert-rows">
+    <div class="wiz-alert-row">
+      <div>
+        <div class="wiz-alert-row__title" id="prof-label-stats">Count my hunts in hunter statistics</div>
+        <div class="wiz-alert-row__note" id="prof-stats-note">Anonymous totals, shown only when 5 or more users hunt the same kind of item. Never your search words.</div>
+        <a class="prof-mini" href="/privacy#why">Privacy policy</a>
+      </div>
+      <button type="button" class="toggle-switch is-disabled" id="prof-toggle-stats" disabled role="switch" aria-checked="true" aria-labelledby="prof-label-stats"><span class="toggle-switch__knob"></span></button>
+    </div>
+  </div>
+  <p class="wiz-alert-result" id="prof-stats-result" style="display:none"></p>
 </div>
 <!-- Dev notes (kept out of the UI): Elite's own streak condition (always-on monitoring, no tab-open
      requirement) isn't wired up yet - streak tracking is Free-tier only. Per-category alert settings from
@@ -2820,6 +2851,21 @@ const HEARTBEAT_URL = (() => {
     return 'Free 24/7 trial: ' + d + (d === 1 ? ' day' : ' days') + ' left';
   }
   const uiFr = () => !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
+  (function statsNote() {
+    const STATS_POLICY_AT = Date.parse('2026-11-08T00:00:00Z');   // privacy page change (hunter statistics)
+    const note = document.getElementById('stats-note');
+    if (!note) return;
+    let seen = false;
+    try { seen = !!localStorage.getItem('snypd_stats_note_v1'); } catch (e) {}
+    const joined = Date.parse(joinedAt || '');
+    if (seen || !(joined < STATS_POLICY_AT)) return;
+    note.style.display = '';
+    const done = () => { try { localStorage.setItem('snypd_stats_note_v1', String(Date.now())); } catch (e) {} note.style.display = 'none'; };
+    const okB = document.getElementById('stats-note-ok');
+    const prB = document.getElementById('stats-note-profile');
+    if (okB) okB.addEventListener('click', done);
+    if (prB) prB.addEventListener('click', () => { done(); const t = document.querySelector('[data-view="profile"]'); if (t) t.click(); });
+  })();
   // Free 24/7 trial. During it, "Free only checks while this tab is open" would be false.
   if (eliteBanner && effectivePlan === 'free' && profile.free_trial_started_at) {
     const trialLeftMs = trialEndMs(profile) - Date.now();
@@ -4629,8 +4675,46 @@ const HEARTBEAT_URL = (() => {
       notifyPrefsWired = true;
     }
 
+    // Hunter statistics switch (migration 079). ON = counted. A failed read leaves it disabled rather than guessing.
+    let statsPrefWired = false;
+    async function loadStatsPref() {
+      const tg = document.getElementById('prof-toggle-stats');
+      const res = document.getElementById('prof-stats-result');
+      if (!tg) return;
+      const paint = (counted) => { tg.classList.toggle('is-on', counted); tg.setAttribute('aria-checked', counted ? 'true' : 'false'); };
+      try {
+        const { data, error } = await sb.from('users').select('hunter_stats_opt_out').eq('id', uid).maybeSingle();
+        if (error) throw error;
+        paint(!(data && data.hunter_stats_opt_out === true));
+        tg.disabled = false; tg.classList.remove('is-disabled');
+      } catch (e) {
+        console.error('SNYPD profile: could not read the hunter statistics setting', e);
+        if (res) { res.textContent = 'Could not load this setting. Try again later.'; res.style.display = ''; }
+        return;
+      }
+      if (statsPrefWired) return;
+      statsPrefWired = true;
+      tg.addEventListener('click', async () => {
+        if (tg.disabled) return;
+        const counted = !tg.classList.contains('is-on');
+        paint(counted);
+        tg.disabled = true;
+        try {
+          const { error } = await sb.rpc('set_hunter_stats_opt_out', { p_out: !counted });
+          if (error) throw error;
+          if (res) { res.textContent = counted ? 'Your hunts count again in hunter statistics.' : 'Done: your hunts are left out of hunter statistics from the next update (within an hour).'; res.style.display = ''; }
+        } catch (e) {
+          console.error('SNYPD profile: could not save the hunter statistics setting', e);
+          paint(!counted);
+          if (res) { res.textContent = 'Could not save this setting. Try again.'; res.style.display = ''; }
+        }
+        tg.disabled = false;
+      });
+    }
+
     async function loadProfile() {
       loadNotificationPrefs();
+      loadStatsPref();
       set('prof-email', email);
       if (joinedAt) {
         const d = new Date(joinedAt);
@@ -6191,9 +6275,167 @@ const HEARTBEAT_URL = (() => {
       return q || url.hostname.replace(/^www\./, '');
     } catch (e) { return 'this hunt'; }
   }
+  // Hunt coach (7 Nov 2026, website outreach/41): GET /api/v1/hunt-coach once per page load. The backend sends advice
+  // only with a concrete change (a busy hunt's new max price) or for a hunt that found almost nothing while it ran 24/7.
+  // It uses the same card as the feed-based "very broad" estimate below and wins over it; that estimate stays the
+  // fallback for busy hunts the coach has nothing concrete for. Applying = rewrite price_to in the hunt's own link
+  // (nothing else in the link changes), Undo for 10 s. Advice for a link that has changed since is ignored.
+  let coachList = null, coachShown = null, coachUndo = null;
+  function coachKey(a) { return a.id + ':' + a.verdict + ':' + ((a.suggest && a.suggest.max) || ''); }
+  function coachDismissed(a) {
+    try { return !!(JSON.parse(localStorage.getItem('snypd_coach_ok') || '{}') || {})[coachKey(a)]; } catch (e) { return false; }
+  }
+  function coachRemember(a) {
+    try {
+      const kept = JSON.parse(localStorage.getItem('snypd_coach_ok') || '{}') || {};
+      kept[coachKey(a)] = Date.now();
+      localStorage.setItem('snypd_coach_ok', JSON.stringify(kept));
+    } catch (e) {}
+  }
+  function linkWithMax(url, max) {
+    const u = String(url || '');
+    const hash = u.indexOf('#') >= 0 ? u.slice(u.indexOf('#')) : '';
+    let base = hash ? u.slice(0, u.indexOf('#')) : u;
+    if (/[?&]price_to=[^&]*/.test(base)) return base.replace(/([?&])price_to=[^&]*/, '$1price_to=' + max) + hash;
+    return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'price_to=' + max + hash;
+  }
+  function linkMin(url) {
+    const m = /[?&]price_from=([^&#]*)/.exec(String(url || ''));
+    const v = m ? parseFloat(decodeURIComponent(m[1]).replace(',', '.')) : NaN;
+    return isFinite(v) ? v : null;
+  }
+  function coachSentences(a) {
+    const fr = uiFr();
+    const cur = a.currency || 'EUR';
+    const name = a.name || 'this hunt';
+    const kind = a.peers ? (fr ? a.peers.fr : a.peers.en) : '';
+    const out = [];
+    if (a.verdict === 'busy') {
+      out.push(a.per_day_lower_bound
+        ? 'At least ' + a.per_day + ' new listings a day matched "' + name + '" while it was paused: too many to open.'
+        : 'About ' + a.per_day + ' new listings a day match "' + name + '": too many to open.');
+      if (a.suggest && a.suggest.source === 'own') {
+        out.push('A max price of ' + fmtMoney(a.suggest.max, cur) + ' keeps its cheapest ' + a.suggest.keeps_pct + '%, about ' + a.suggest.per_day + ' a day.');
+        if (a.peers) out.push(a.peers.hunters + ' other hunters of ' + kind + ' set a max price of about ' + fmtMoney(a.peers.typical_max, cur) + '.');
+      } else if (a.suggest && a.peers) {
+        out.push(a.peers.hunters + ' other hunters of ' + kind + ' set a max price of about ' + fmtMoney(a.suggest.max, cur) + '.');
+      }
+    } else {
+      out.push(a.finds === 0
+        ? '"' + name + '" found nothing new in ' + a.days + ' days.'
+        : (a.finds === 1 ? '"' + name + '" found 1 new listing in ' + a.days + ' days.'
+                         : '"' + name + '" found ' + a.finds + ' new listings in ' + a.days + ' days.'));
+      if (a.suggest && a.peers && a.current_max) {
+        out.push(a.peers.hunters + ' other hunters of ' + kind + ' set a max price of about ' + fmtMoney(a.suggest.max, cur) + '; yours is ' + fmtMoney(a.current_max, cur) + '.');
+      } else {
+        out.push('Widen it: fewer words, fewer sizes or a higher max price.');
+      }
+    }
+    return out;
+  }
+  function coachPaint(sentences) {
+    const text = document.getElementById('broad-hunt-text');
+    if (!text) return;
+    text.textContent = '';
+    sentences.forEach((t, i) => {
+      const sp = document.createElement('span');
+      sp.textContent = t;
+      if (i) text.appendChild(document.createTextNode(' '));
+      text.appendChild(sp);
+    });
+  }
+  function coachButtons(show) {
+    ['broad-hunt-apply', 'broad-hunt-undo', 'broad-hunt-calm', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) { b.style.display = show.indexOf(id) >= 0 ? '' : 'none'; b.disabled = false; }
+    });
+  }
+  async function showCoach() {
+    const card = document.getElementById('broad-hunt');
+    const title = document.getElementById('broad-hunt-title');
+    const apply = document.getElementById('broad-hunt-apply');
+    if (!card || !title || !apply || !Array.isArray(coachList) || !coachList.length) return;
+    let rows = [];
+    try { rows = await huntModes(); } catch (e) { console.error('SNYPD: hunt coach could not read hunts', e); return; }
+    const a = coachList.find(x => {
+      const row = rows.find(r => String(r.id) === String(x.id));
+      return row && row.is_active === true && row.vinted_url === x.url && !coachDismissed(x);
+    });
+    if (!a) return;
+    if (a.suggest) {
+      const min = linkMin(a.url);
+      if (min !== null && min >= a.suggest.max) return;   // never invert the range (the backend checks too)
+    }
+    coachShown = a;
+    title.textContent = a.verdict === 'busy' ? 'This hunt finds too much' : 'This hunt finds almost nothing';
+    coachPaint(coachSentences(a));
+    if (a.suggest) {
+      apply.textContent = (a.verdict === 'busy' ? 'Set max ' : 'Raise max to ') + fmtMoney(a.suggest.max, a.currency || 'EUR');
+      coachButtons(['broad-hunt-apply', 'broad-hunt-keep']);
+    } else {
+      coachButtons(['broad-hunt-edit', 'broad-hunt-keep']);
+    }
+    card.style.display = '';
+  }
+  async function loadCoach() {
+    if (coachList) return;
+    coachList = [];
+    try {
+      const { data: { session: s } } = await sb.auth.getSession();
+      const t = s && s.access_token;
+      if (!t) return;
+      const res = await fetch('https://api.snypd.store/api/v1/hunt-coach', { headers: { Authorization: 'Bearer ' + t } });
+      if (!res.ok) return;
+      const body = await res.json();
+      coachList = (body && Array.isArray(body.hunts)) ? body.hunts : [];
+    } catch (e) { console.error('SNYPD: hunt coach failed', e); return; }
+    await showCoach();
+  }
+  async function coachWrite(id, url) {
+    const { error } = await sb.from('user_searches').update({ vinted_url: url }).eq('id', id).eq('user_id', uid);
+    broadModes = null;
+    if (error) throw error;
+    window.dispatchEvent(new Event('snypd:hunts-changed'));
+  }
+  (function wireCoach() {
+    const apply = document.getElementById('broad-hunt-apply');
+    const undo = document.getElementById('broad-hunt-undo');
+    const card = document.getElementById('broad-hunt');
+    if (apply) apply.addEventListener('click', async () => {
+      const a = coachShown;
+      if (!a || !a.suggest) return;
+      apply.disabled = true;
+      const before = a.url, after = linkWithMax(a.url, a.suggest.max);
+      try { await coachWrite(a.id, after); } catch (e) {
+        console.error('SNYPD: hunt coach could not change the hunt', e);
+        coachPaint(['Could not change this hunt. Try again, or change it in Filters.']);
+        apply.disabled = false;
+        return;
+      }
+      coachRemember(a);
+      coachPaint(['Done: "' + (a.name || 'this hunt') + '" now has a max price of ' + fmtMoney(a.suggest.max, a.currency || 'EUR') + '.', 'New matches can take a few minutes to show.']);
+      coachButtons(['broad-hunt-undo']);
+      clearTimeout(coachUndo);
+      coachUndo = setTimeout(() => { if (card) card.style.display = 'none'; coachShown = null; }, 10000);
+      undo.onclick = async () => {
+        clearTimeout(coachUndo);
+        undo.disabled = true;
+        try { await coachWrite(a.id, before); } catch (e) {
+          console.error('SNYPD: hunt coach undo failed', e);
+          coachPaint(['Could not undo. Change the max price in Filters.']);
+          return;
+        }
+        coachPaint(['Undone: "' + (a.name || 'this hunt') + '" is back as it was.']);
+        coachButtons([]);
+        coachUndo = setTimeout(() => { if (card) card.style.display = 'none'; coachShown = null; }, 4000);
+      };
+    });
+  })();
+
   async function noteBroadHunt(feed) {
     const card = document.getElementById('broad-hunt');
     const text = document.getElementById('broad-hunt-text');
+    if (coachShown) return;   // the hunt coach has the card
     if (!card || !text || !feed || !Array.isArray(feed.rows) || !feed.rows.length) return;
     if (!(feed.eligibleCount >= BROAD_PER_30MIN)) return;
     const counts = new Map();
@@ -6221,6 +6463,11 @@ const HEARTBEAT_URL = (() => {
     if (row && (row.push_mode === 'calm' || row.push_mode === 'cheap')) return;
     broadSig = top;
     broadHunt = row && ('push_mode' in row) ? row : null;
+    const bt = document.getElementById('broad-hunt-title');
+    if (bt) bt.textContent = 'This hunt is very broad';
+    ['broad-hunt-apply', 'broad-hunt-undo'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; });
+    const be = document.getElementById('broad-hunt-edit'), bk = document.getElementById('broad-hunt-keep');
+    if (be) be.style.display = ''; if (bk) bk.style.display = '';
     text.textContent = 'About ' + (topN * 2) + ' new listings an hour match "' + (url ? huntLabel(url) : 'this hunt')
       + '": more than anyone can open, so alerts become noise. On Vinted, add a size or a max price, copy the link and paste it into this hunt.';
     const calmBtn = document.getElementById('broad-hunt-calm');
@@ -6260,8 +6507,10 @@ const HEARTBEAT_URL = (() => {
       const pill = document.getElementById('filter-pill');
       if (pill) pill.click();
       if (card) card.style.display = 'none';
+      coachShown = null;
     });
     if (keep) keep.addEventListener('click', () => {
+      if (coachShown) { coachRemember(coachShown); coachShown = null; if (card) card.style.display = 'none'; return; }
       try {
         const kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {};
         if (broadSig) kept[broadSig] = Date.now();
@@ -6291,6 +6540,7 @@ const HEARTBEAT_URL = (() => {
 
       hasActiveHunts = feed.huntCount > 0;
       feedEligibleCount = feed.eligibleCount;
+      if (!coachList) loadCoach().catch(e => console.error('SNYPD: hunt coach failed', e));
       noteBroadHunt(feed).catch(e => console.error('SNYPD: broad-hunt check failed', e));
       const activeSearches = feed.activeSearches;
 

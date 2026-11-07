@@ -112,7 +112,8 @@
   try { QA_META = JSON.parse(params.get('meta') || '{}'); } catch (e) {}
   window.__qa_auth_updates = [];
   function qaUser() {
-    return { id: UID, email: 'qa-test@example.com', created_at: new Date(Date.now() - 40 * 86400000).toISOString(),
+    // ?joined=new: an account created after the 7 Nov 2026 privacy change (no hunter-statistics notice)
+    return { id: UID, email: 'qa-test@example.com', created_at: new Date(params.get('joined') === 'new' ? Date.parse('2026-11-09T10:00:00Z') : Date.now() - 40 * 86400000).toISOString(),
       user_metadata: JSON.parse(JSON.stringify(QA_META)) };
   }
 
@@ -397,8 +398,12 @@
       update: function (data) { op = 'update'; payload = data; return builder; },
       delete: function () { op = 'delete'; return builder; },
       upsert: function (data) { op = 'upsert'; payload = data; return builder; },
+      // Returns a real promise like supabase-js does, so builder.then(fn).catch(fn) chains work (the dashboard's
+      // snypd:hunts-changed listener uses that form; before 7 Nov 2026 it threw here in the mock only).
       then: function (resolve, reject) {
-        try { resolve(execute()); } catch (e) { if (reject) reject(e); else throw e; }
+        var r;
+        try { r = Promise.resolve(execute()); } catch (e) { r = Promise.reject(e); }
+        return r.then(resolve, reject);
       },
     };
 
@@ -411,6 +416,10 @@
         return (r.push_mode !== undefined && ['every', 'calm', 'cheap'].indexOf(r.push_mode) < 0) ||
           (r.push_calm_minutes !== undefined && [15, 30].indexOf(r.push_calm_minutes) < 0);
       };
+      // ?coachwrite=error: changing a hunt's link fails (hunt coach apply / undo)
+      if (table === 'user_searches' && op === 'update' && payload && 'vinted_url' in payload && params.get('coachwrite') === 'error') {
+        return { data: null, error: { message: 'QA mock: link change failed' } };
+      }
       if (table === 'user_searches' && (op === 'insert' || op === 'update') && badPush(payload || {})) {
         return { data: null, error: { code: '23514', message: 'new row violates check constraint (push_mode / push_calm_minutes)' } };
       }
@@ -530,6 +539,13 @@
         window.__quietRpc = (window.__quietRpc || []).concat([args]);
         return Promise.resolve({ data: null, error: null });
       }
+      // Hunter statistics (migration 079): own-row switch; ?statsrpc=error makes the save fail.
+      if (name === 'set_hunter_stats_opt_out') {
+        window.__statsRpc = (window.__statsRpc || []).concat([args]);
+        if (params.get('statsrpc') === 'error') return Promise.resolve({ data: null, error: { message: 'QA mock: save failed' } });
+        (DB.users[0] || {}).hunter_stats_opt_out = !!args.p_out;
+        return Promise.resolve({ data: !!args.p_out, error: null });
+      }
       return Promise.resolve({ data: null, error: { message: 'QA mock: rpc not implemented, falls back to plan table' } });
     },
   };
@@ -542,6 +558,26 @@
   var MB_TEASER = {"asof":"2026-11-05","source":{"site":"vinted.be","pool":"EU","currency":"EUR","window_days":7},"counts":{"tracked":98,"shown":9,"rising":1,"falling":4,"mix":1},"tier":"teaser","items":[{"q":"ralph lauren polo bear","name":"Ralph Lauren Polo Bear","name_fr":"Ralph Lauren Polo Bear","cat":"tops","typical_cents":5999,"change_pct":14.6,"signal":"rising","cutting":false},{"q":"longchamp bag","name":"Longchamp bag","name_fr":"Sac Longchamp","cat":"bags","typical_cents":5500,"change_pct":-21.4,"signal":"falling","cutting":false}],"rising":["ralph lauren polo bear"],"falling":["longchamp bag"]};
   // ?mbsite=uk: the account's first hunt is on vinted.co.uk (Market board: no EUR maximum is filled in for a non-euro site)
   if (params.get('mbsite') === 'uk' && DB.user_searches && DB.user_searches[0]) { DB.user_searches[0].vinted_url = DB.user_searches[0].vinted_url.replace('www.vinted.be', 'www.vinted.co.uk'); }
+  // Hunt coach (7 Nov 2026, website outreach/41): ?coach=busy | peers | quiet | widen | minblock | stale | error; none by
+  // default so other suites never see the card. Advice points at the first hunt (search-1) and its exact link.
+  window.__qaDB = DB;   // tests read what the page wrote
+  var COACH = params.get('coach');
+  if (COACH === 'quiet' && DB.user_searches && DB.user_searches[0]) DB.user_searches[0].vinted_url += '&price_to=8';
+  if (COACH === 'minblock' && DB.user_searches && DB.user_searches[0]) DB.user_searches[0].vinted_url += '&price_from=30';
+  if (params.get('statsout') === '1' && DB.users && DB.users[0]) DB.users[0].hunter_stats_opt_out = true;
+  function coachBody() {
+    var h = (DB.user_searches || [])[0];
+    if (!h || !COACH || COACH === 'none') return { generated_at: '2026-11-07T12:00:00Z', hunts: [], cached: false };
+    var base = { id: h.id, name: 'jordan <b>travis</b>', url: h.vinted_url, site: 'vinted.be', currency: 'EUR', current_max: null, current_min: null };
+    var peers = { kind: 'jordan', en: 'Jordan', fr: 'Jordan', hunters: 9, typical_max: 30 };
+    var a;
+    if (COACH === 'busy' || COACH === 'minblock') a = Object.assign(base, { verdict: 'busy', per_day: 2400, per_day_lower_bound: false, peers: peers, suggest: { max: 25, keeps_pct: 26, per_day: 624, source: 'own' } });
+    if (COACH === 'stale') a = Object.assign(base, { url: h.vinted_url + '&old=1', verdict: 'busy', per_day: 2400, per_day_lower_bound: false, peers: null, suggest: { max: 25, keeps_pct: 26, per_day: 624, source: 'own' } });
+    if (COACH === 'peers') a = Object.assign(base, { verdict: 'busy', per_day: 4517, per_day_lower_bound: true, peers: Object.assign({}, peers, { typical_max: 20 }), suggest: { max: 20, source: 'peers' } });
+    if (COACH === 'quiet') a = Object.assign(base, { verdict: 'quiet', finds: 1, days: 3, current_max: 8, peers: Object.assign({}, peers, { typical_max: 20 }), suggest: { max: 20, source: 'peers' } });
+    if (COACH === 'widen') a = Object.assign(base, { verdict: 'quiet', finds: 0, days: 4, peers: null, suggest: null });
+    return { generated_at: '2026-11-07T12:00:00Z', hunts: a ? [a] : [], cached: false };
+  }
   // ---- fetch() interception for the backend API ----
   var realFetch = window.fetch.bind(window);
   window.fetch = function (url, opts) {
@@ -559,6 +595,11 @@
     }
     if (u.indexOf('/api/v1/push/status') !== -1) {
       return Promise.resolve(new Response(JSON.stringify({ status: 'ready', ready: true }), { status: 200 }));
+    }
+    if (u.indexOf('/api/v1/hunt-coach') !== -1) {
+      window.__coachRequests = (window.__coachRequests || 0) + 1;
+      if (COACH === 'error') return Promise.resolve(new Response(JSON.stringify({ detail: 'could not check your hunts right now' }), { status: 503 }));
+      return Promise.resolve(new Response(JSON.stringify(coachBody()), { status: 200 }));
     }
     // Market board (Session 67): ?mb=full | teaser | empty | error, else full for elite / pro / a running trial (?trial=1), teaser otherwise
     if (u.indexOf('/api/v1/market-board') !== -1) {
