@@ -1,11 +1,11 @@
 {
- "measured_from": "2026-10-08T21:38Z",
- "measured_to": "2026-10-09T10:51Z",
- "hunts": 35,
- "checks": 32469,
- "median_seconds": 30,
- "p90_seconds": 60,
- "max_seconds": 530,
- "share_within_60s": 87,
- "share_within_120s": 93
+ "measured_from": "2026-11-06T08:07Z",
+ "measured_to": "2026-11-07T08:06Z",
+ "hunts": 110,
+ "checks": 68388,
+ "median_seconds": 60,
+ "p90_seconds": 120,
+ "max_seconds": 47184,
+ "share_within_60s": 16,
+ "share_within_120s": 88
 }

@@ -31,12 +31,12 @@ T = {
     'en': dict(
         path='/start', out='start.html',
         title='SNYPD - Push alerts for new Vinted listings',
-        desc=('Paste a Vinted search link with your filters. SNYPD checks it about every 30 seconds '
+        desc=('Paste a Vinted search link with your filters. SNYPD checks it about once a minute '
               'and sends a push notification when a new listing matches. Free plan: 1 search, no card, 24/7 for the first @@trial_days@@ days.'),
         steps=[
             ('Copy your search', 'On Vinted, set your filters (brand, size, price, condition) and copy the link from the address bar.'),
             ('Paste it into SNYPD', 'Every filter in the link is kept. A link SNYPD cannot read in full is refused, not trimmed.'),
-            ('Get a push', 'SNYPD checks the search about every 30 seconds and sends a push notification when a new '
+            ('Get a push', 'SNYPD checks the search about once a minute and sends a push notification when a new '
                            'listing matches. You open it on Vinted and decide.'),
         ],
         never=[
@@ -53,19 +53,19 @@ T = {
         who2='SNYPD is independent and not affiliated with or endorsed by Vinted.',
         eyebrow='FOR VINTED BUYERS AND RESELLERS',
         h1='A push alert when a new listing matches your Vinted search',
-        lead='Paste a Vinted search link with your filters. SNYPD checks it about every 30 seconds and sends a push notification to your phone or computer when a new listing matches. Free plan: 1 search, no card, 24/7 for the first @@trial_days@@ days.',
+        lead='Paste a Vinted search link with your filters. SNYPD checks it about once a minute and sends a push notification to your phone or computer when a new listing matches. Free plan: 1 search, no card, 24/7 for the first @@trial_days@@ days.',
         foot='SNYPD &middot; NOT AFFILIATED WITH VINTED',
         legal=('Privacy', 'Terms', 'Contact', 'Cookies', 'Cookie settings'),
     ),
     'fr': dict(
         path='/fr/start', out=os.path.join('fr', 'start.html'),
         title='SNYPD - Alertes push pour les nouvelles annonces Vinted',
-        desc=('Colle le lien d’une recherche Vinted avec tes filtres. SNYPD la vérifie environ toutes les 30 secondes '
+        desc=('Colle le lien d’une recherche Vinted avec tes filtres. SNYPD la vérifie environ une fois par minute '
               'et envoie une notification push quand une nouvelle annonce correspond. Plan gratuit' + NB + ': 1 recherche, sans carte, 24h/24 les @@trial_days@@ premiers jours.'),
         steps=[
             ('Copie ta recherche', 'Sur Vinted, règle tes filtres (marque, taille, prix, état) et copie le lien dans la barre d’adresse.'),
             ('Colle-la dans SNYPD', 'Tous les filtres du lien sont conservés. Un lien que SNYPD ne peut pas lire en entier est refusé, pas tronqué.'),
-            ('Reçois une notification push', 'SNYPD vérifie la recherche environ toutes les 30 secondes et envoie une notification push '
+            ('Reçois une notification push', 'SNYPD vérifie la recherche environ une fois par minute et envoie une notification push '
                                              'quand une nouvelle annonce correspond. Tu l’ouvres sur Vinted et tu décides.'),
         ],
         never=[
@@ -87,7 +87,7 @@ T = {
         who2='SNYPD est indépendant, sans lien avec Vinted et non approuvé par Vinted.',
         eyebrow='POUR LES ACHETEURS ET REVENDEURS VINTED',
         h1='Une notification push quand une nouvelle annonce correspond à ta recherche Vinted',
-        lead=('Colle le lien d’une recherche Vinted avec tes filtres. SNYPD la vérifie environ toutes les 30 secondes et envoie une '
+        lead=('Colle le lien d’une recherche Vinted avec tes filtres. SNYPD la vérifie environ une fois par minute et envoie une '
               'notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. Plan gratuit' + NB + ': 1 recherche, sans carte, 24h/24 les @@trial_days@@ premiers jours.'),
         foot='SNYPD &middot; NON AFFILIÉ À VINTED',
         legal=('Confidentialité', 'Conditions', 'Contact', 'Cookies', 'Paramètres des cookies'),

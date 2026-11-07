@@ -231,8 +231,8 @@ FR = {
     'Got it': 'Compris',
     'No results yet. Press “Start Sniping Now”.': 'Aucun résultat pour l’instant. Appuie sur «' + NB + 'Démarrer' + NB + '».',
     'No results yet. Sniping is running…': 'Aucun résultat pour l’instant. La recherche tourne…',
-    'A hunt is one saved Vinted search. SNYPD checks it every 30 seconds to 5 minutes and every new match lands here, newest first.':
-        'Une recherche SNYPD, c’est une recherche Vinted enregistrée. SNYPD la vérifie toutes les 30 secondes à 5 minutes et chaque nouvelle annonce arrive ici, la plus récente en premier.',
+    'A hunt is one saved Vinted search. SNYPD checks it every 1 to 5 minutes and every new match lands here, newest first.':
+        'Une recherche SNYPD, c’est une recherche Vinted enregistrée. SNYPD la vérifie toutes les 1 à 5 minutes et chaque nouvelle annonce arrive ici, la plus récente en premier.',
     'Add your first hunt': 'Ajoute ta première recherche',
     'No hunts yet': 'Aucune recherche pour l’instant',
     'No hunts yet. Add one below.': 'Aucune recherche pour l’instant. Ajoutes-en une ci-dessous.',
@@ -317,7 +317,7 @@ FR = {
     'I have a Vinted link': 'J’ai un lien Vinted',
     'Type at least one word, for example a brand.': 'Tape au moins un mot, par exemple une marque.',
     'How should we tell you?': 'Comment te prévenir' + NB + '?',
-    'We check your hunt every 30 s to 5 min and send a push when a new listing matches.': 'On vérifie ta recherche toutes les 30 s à 5 min et on t’envoie une notification push quand une nouvelle annonce correspond.',
+    'We check your hunt every 1 to 5 min and send a push when a new listing matches.': 'On vérifie ta recherche toutes les 1 à 5 min et on t’envoie une notification push quand une nouvelle annonce correspond.',
     'Push notification': 'Notification push',
     'on your phone or computer': 'sur ton téléphone ou ton ordinateur',
     'Turn on alerts & start hunting': 'Activer les alertes et démarrer',
@@ -662,8 +662,8 @@ FR.update({
     'Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.':
         'Free' + NB + ': 24h/24 pendant les 3 premiers jours après ta première recherche enregistrée, puis seulement tant que ton tableau de bord est ouvert.',
     'Check speed': 'Vitesse de vérification',
-    'About every 30 s (measured median), up to 5 min on quiet searches. Same on every plan.':
-        'Environ toutes les 30 s (médiane mesurée), jusqu’à 5 min sur les recherches calmes. Pareil sur tous les plans.',
+    'About every 60 s (measured median), up to 5 min on quiet searches. Same on every plan.':
+        'Environ toutes les 60 s (médiane mesurée), jusqu’à 5 min sur les recherches calmes. Pareil sur tous les plans.',
     'Same': 'Pareil',
     'Push notifications': 'Notifications push',
     'Phone and desktop. On iPhone, add SNYPD to your Home Screen first.': 'Téléphone et ordinateur. Sur iPhone, ajoute d’abord SNYPD à ton écran d’accueil.',
@@ -733,8 +733,8 @@ FR.update({
     'Yes. Free runs your first search 24/7 with alerts for 3 days (72 h), counted from when you save it, with no card. If it finds nothing in that time, we add 2 more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.':
         'Oui. Free fait tourner ta première recherche 24h/24 avec les alertes pendant 3 jours (72' + NB + 'h), à compter de son enregistrement, sans carte. Si elle ne trouve rien pendant ce temps, on ajoute 2 jours de plus, une seule fois. Ensuite, Free garde cette recherche aussi longtemps que tu veux, vérifiée tant que ton tableau de bord est ouvert.',
     'Do paid plans find listings faster?': 'Les plans payants trouvent-ils les annonces plus vite' + NB + '?',
-    'No. Every plan checks about every 30 seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.':
-        'Non. Tous les plans vérifient environ toutes les 30 secondes (médiane mesurée), jusqu’à 5 minutes sur les recherches calmes. Les plans payants ajoutent des recherches et continuent de vérifier tableau de bord fermé.',
+    'No. Every plan checks about every 60 seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.':
+        'Non. Tous les plans vérifient environ toutes les 60 secondes (médiane mesurée), jusqu’à 5 minutes sur les recherches calmes. Les plans payants ajoutent des recherches et continuent de vérifier tableau de bord fermé.',
     'Do you need my Vinted login?': 'Vous avez besoin de mes identifiants Vinted' + NB + '?',
     'Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.': 'Jamais. SNYPD lit uniquement les annonces publiques. Il ne se connecte jamais, n’achète rien et n’écrit à personne.',
     'How do I pay?': 'Comment je paie' + NB + '?',
@@ -1020,8 +1020,8 @@ FR.update({
     'Step 2 / 3': 'Étape 2 / 3',
     'Step 3 / 3': 'Étape 3 / 3',
     'How should we alert you?': 'Comment veux-tu être prévenu' + NB + '?',
-    'We still check this hunt every 30 s to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.':
-        'On vérifie toujours ta recherche toutes les 30 s à 5 min. Ce choix règle seulement la fréquence des notifications. Tu peux le changer à tout moment dans Filtres.',
+    'We still check this hunt every 1 to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.':
+        'On vérifie toujours ta recherche toutes les 1 à 5 min. Ce choix règle seulement la fréquence des notifications. Tu peux le changer à tout moment dans Filtres.',
     'Alert style': 'Type d’alerte',
     'Every match': 'Chaque annonce',
     'Be first on every new listing. Best for resellers.': 'Sois le premier sur chaque nouvelle annonce. Idéal pour les revendeurs.',

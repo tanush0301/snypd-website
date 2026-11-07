@@ -195,7 +195,7 @@ NOTIFY = {
         h_alerts='Kiedy potrzebujesz prawdziwych alertów',
         alerts_intro='Resellerzy tracą najlepsze okazje zwykle między dwoma spojrzeniami na licznik. Narzędzie do alertów sprawdza wyszukiwanie za ciebie i daje znać, gdy tylko pojawi się coś nowego i pasującego. W SNYPD to to samo wyszukiwanie, które masz na Vinted:',
         steps=['Otwórz wyszukiwanie na Vinted w przeglądarce, z filtrami (marka, rozmiar, cena, stan).', 'Skopiuj adres z paska przeglądarki. Zawiera <code>/catalog?</code>.',
-               'Wklej go do SNYPD i włącz wyszukiwanie.', 'SNYPD sprawdza je mniej więcej co 30 sekund i wysyła push na telefon albo komputer, gdy tylko pojawi się nowe pasujące ogłoszenie. Powiadomienie otwiera ogłoszenie na Vinted.'],
+               'Wklej go do SNYPD i włącz wyszukiwanie.', 'SNYPD sprawdza je mniej więcej co minutę i wysyła push na telefon albo komputer, gdy tylko pojawi się nowe pasujące ogłoszenie. Powiadomienie otwiera ogłoszenie na Vinted.'],
         after='SNYPD nigdy nie prosi o hasło do Vinted, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy sprawdza jedno wyszukiwanie: przez pierwsze @@trial_days@@ dni 24/7, potem gdy masz otwarty panel; plany płatne od @@price:solo@@ miesięcznie sprawdzają 24/7. Więcej: <a href="{bot}">SNYPD, bot Vinted do powiadomień</a>.',
         faq=[('Czy Vinted powiadamia mnie o nowych przedmiotach z zapisanego wyszukiwania?',
               'Według pomocy Vinted nie przez push: widzisz licznik „+N” przy następnym otwarciu paska wyszukiwania. Vinted opisuje powiadomienia o obserwowanych użytkownikach, polubionych przedmiotach, wiadomościach i opiniach.'),
@@ -225,7 +225,7 @@ NOTIFY = {
         h_alerts='När du behöver riktig bevakning',
         alerts_intro='Den som säljer vidare missar oftast de bästa fynden mellan två kontroller av räknaren. Ett bevakningsverktyg kontrollerar sökningen åt dig och säger till så fort något nytt matchar. Med SNYPD är det samma sökning som du har på Vinted:',
         steps=['Öppna sökningen på Vinted i webbläsaren, med dina filter (märke, storlek, pris, skick).', 'Kopiera adressen i adressfältet. Den innehåller <code>/catalog?</code>.',
-               'Klistra in den i SNYPD och slå på sökningen.', 'SNYPD kontrollerar den ungefär var 30:e sekund och skickar en push till mobilen eller datorn så fort en ny annons matchar. Notisen öppnar annonsen på Vinted.'],
+               'Klistra in den i SNYPD och slå på sökningen.', 'SNYPD kontrollerar den ungefär en gång i minuten och skickar en push till mobilen eller datorn så fort en ny annons matchar. Notisen öppnar annonsen på Vinted.'],
         after='SNYPD frågar aldrig efter ditt Vinted-lösenord, köper ingenting och skriver inte till säljare. Gratisplanen kontrollerar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan medan din panel är öppen; betalda abonnemang från @@price:solo@@ i månaden kontrollerar dygnet runt. Mer: <a href="{bot}">SNYPD, Vinted boten för bevakning</a>.',
         faq=[('Meddelar Vinted mig om nya artiklar i en sparad sökning?',
               'Enligt Vinteds hjälp inte med en push: du ser en räknare ”+N” nästa gång du öppnar sökfältet. Vinted beskriver notiser för medlemmar du följer, favoritmarkerade artiklar, meddelanden och omdömen.'),
@@ -247,8 +247,8 @@ def _bot_copy(lang):
         faq = [
             ('Czy SNYPD kupuje za mnie?', 'Nie. SNYPD znajduje nowe ogłoszenia i cię powiadamia. Otwierasz ogłoszenie na Vinted i sam kupujesz albo składasz ofertę, przez zwykłą płatność Vinted.'),
             ('Czy muszę podać SNYPD hasło do Vinted?', 'Nie. SNYPD nigdy nie prosi o dane logowania do Vinted i nigdy nie loguje się na twoje konto. Do konta SNYPD potrzebujesz tylko adresu e-mail.'),
-            ('Czy Vinted sam nie powiadamia o nowych ogłoszeniach?', 'Według centrum pomocy Vinted zapisane wyszukiwanie pokazuje liczbę z plusem („+N”) przy następnym otwarciu paska wyszukiwania, a licznik zeruje się, gdy obejrzysz wyniki. Vinted wysyła powiadomienia m.in. wtedy, gdy obserwowany użytkownik doda nowe ogłoszenie. SNYPD sprawdza twoje wyszukiwanie mniej więcej co 30 sekund i wysyła push przy nowych pasujących ogłoszeniach. Szczegóły: <a href="%s">powiadomienia Vinted o nowych ogłoszeniach</a>.' % notify),
-            ('Jak często SNYPD sprawdza moje wyszukiwanie?', 'Mniej więcej co 30 sekund. ' + S + ' Spokojne wyszukiwania zwalniają, maksymalnie do 5 minut. Tempo jest takie samo we wszystkich planach.'),
+            ('Czy Vinted sam nie powiadamia o nowych ogłoszeniach?', 'Według centrum pomocy Vinted zapisane wyszukiwanie pokazuje liczbę z plusem („+N”) przy następnym otwarciu paska wyszukiwania, a licznik zeruje się, gdy obejrzysz wyniki. Vinted wysyła powiadomienia m.in. wtedy, gdy obserwowany użytkownik doda nowe ogłoszenie. SNYPD sprawdza twoje wyszukiwanie mniej więcej co minutę i wysyła push przy nowych pasujących ogłoszeniach. Szczegóły: <a href="%s">powiadomienia Vinted o nowych ogłoszeniach</a>.' % notify),
+            ('Jak często SNYPD sprawdza moje wyszukiwanie?', 'Mniej więcej co minutę. ' + S + ' Spokojne wyszukiwania zwalniają, maksymalnie do 5 minut. Tempo jest takie samo we wszystkich planach.'),
             ('Czy działa na iPhonie?', 'Tak, gdy SNYPD jest na ekranie początkowym: otwórz snypd.store w Safari, stuknij Udostępnij, potem „Do ekranu początkowego”, i włącz powiadomienia w zainstalowanej aplikacji. Apple pozwala na powiadomienia web tylko w aplikacjach z ekranu początkowego. Na Androidzie, Windowsie i Macu powiadomienia działają prosto z przeglądarki.'),
             ('Czy jest darmowy plan?', 'Tak. Free obejmuje jedno wyszukiwanie, bez limitu czasu i bez karty. ' + T + ' Potem sprawdza, gdy masz otwarty panel SNYPD; plany płatne od @@price:solo@@ miesięcznie sprawdzają 24/7, także przy zamkniętym panelu.'),
             ('Czy działa z vinted.pl?', 'Tak. SNYPD działa ze wszystkimi serwisami Vinted w Europie i USA, łącznie 26, w tym vinted.pl, vinted.cz, vinted.lt, vinted.de i vinted.fr. Wklej link do wyszukiwania z serwisu, na którym kupujesz; ceny pojawiają się w walucie tego serwisu, na vinted.pl w złotych.'),
@@ -256,7 +256,7 @@ def _bot_copy(lang):
         body = f"""
 <section id="podsumowanie">
   <h2>SNYPD w jednym akapicie</h2>
-  <div class="lg-box lg-mint"><p>SNYPD to bot Vinted do powiadomień, nazywany też monitorem Vinted, dla resellerów. Wklejasz link do wyszukiwania na Vinted ze swoimi filtrami (marka, rozmiar, cena, stan), a SNYPD sprawdza to wyszukiwanie mniej więcej co 30 sekund. Gdy pojawi się nowe pasujące ogłoszenie, trafia do twojego panelu, a ty dostajesz powiadomienie push na telefon albo komputer. SNYPD nigdy nie prosi o hasło do Vinted, nigdy nie loguje się na twoje konto, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy obsługuje jedno wyszukiwanie: 24/7 przez pierwsze @@trial_days@@ dni, potem tak długo, jak masz otwarty panel. Plany płatne, od @@price:solo@@ miesięcznie, pilnują 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD to bot Vinted do powiadomień, nazywany też monitorem Vinted, dla resellerów. Wklejasz link do wyszukiwania na Vinted ze swoimi filtrami (marka, rozmiar, cena, stan), a SNYPD sprawdza to wyszukiwanie mniej więcej co minutę. Gdy pojawi się nowe pasujące ogłoszenie, trafia do twojego panelu, a ty dostajesz powiadomienie push na telefon albo komputer. SNYPD nigdy nie prosi o hasło do Vinted, nigdy nie loguje się na twoje konto, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy obsługuje jedno wyszukiwanie: 24/7 przez pierwsze @@trial_days@@ dni, potem tak długo, jak masz otwarty panel. Plany płatne, od @@price:solo@@ miesięcznie, pilnują 24/7.</p></div>
 </section>
 <section id="rodzaje">
   <h2>Trzy rodzaje botów Vinted</h2>
@@ -280,14 +280,14 @@ def _bot_copy(lang):
     <li>W przeglądarce wyszukaj na swoim Vinted (na przykład vinted.pl) i ustaw filtry: marka, rozmiar, cena, stan.</li>
     <li>Skopiuj adres z paska przeglądarki. Adres wyszukiwania zawiera <code>/catalog?</code>.</li>
     <li>Wklej go do SNYPD, nadaj krótką nazwę i włącz.</li>
-    <li>SNYPD sprawdza je mniej więcej co 30 sekund. Nowe wyniki trafiają do twojego panelu, a jeśli włączysz powiadomienia, także na telefon albo komputer. Kilka znalezisk w krótkim czasie przychodzi w jednym powiadomieniu.</li>
+    <li>SNYPD sprawdza je mniej więcej co minutę. Nowe wyniki trafiają do twojego panelu, a jeśli włączysz powiadomienia, także na telefon albo komputer. Kilka znalezisk w krótkim czasie przychodzi w jednym powiadomieniu.</li>
     <li>Stuknij powiadomienie. Otworzy ogłoszenie na Vinted, gdzie kupujesz albo składasz ofertę.</li>
   </ol>
   {G['figure']('feed', 'pl')}
 </section>
 <section id="szybkosc">
   <h2>Jak szybko to działa?</h2>
-  <p>SNYPD sprawdza każde aktywne wyszukiwanie mniej więcej co 30 sekund. {S} {L} Wyszukiwania, które często znajdują nowe przedmioty, utrzymują to tempo; te, które ucichną, są sprawdzane rzadziej, maksymalnie co około 5 minut, i przyspieszają, gdy tylko coś znajdą. Tempo jest takie samo we wszystkich planach: płacąc, dostajesz więcej wyszukiwań i pilnowanie 24/7, a nie szybsze sprawdzanie.</p>
+  <p>SNYPD sprawdza każde aktywne wyszukiwanie mniej więcej co minutę. {S} {L} Wyszukiwania, które często znajdują nowe przedmioty, utrzymują to tempo; te, które ucichną, są sprawdzane rzadziej, maksymalnie co około 5 minut, i przyspieszają, gdy tylko coś znajdą. Tempo jest takie samo we wszystkich planach: płacąc, dostajesz więcej wyszukiwań i pilnowanie 24/7, a nie szybsze sprawdzanie.</p>
   <p>Niektóre narzędzia reklamują powiadomienia w milisekundach. SNYPD tego nie obiecuje. Obiecuje coś innego: płatne wyszukiwanie działa dalej, gdy laptop jest zamknięty, a telefon w kieszeni, czyli wtedy, gdy przepada najwięcej okazji.</p>
 </section>
 <section id="cena">
@@ -317,8 +317,8 @@ def _bot_copy(lang):
     faq = [
         ('Köper SNYPD åt mig?', 'Nej. SNYPD hittar nya annonser och säger till. Du öppnar annonsen på Vinted och köper eller lägger ett bud själv, via Vinteds vanliga betalning.'),
         ('Måste jag ge SNYPD mitt Vinted-lösenord?', 'Nej. SNYPD frågar aldrig efter dina inloggningsuppgifter till Vinted och loggar aldrig in på ditt konto. För ditt SNYPD-konto behöver du bara en e-postadress.'),
-        ('Har inte Vinted redan bevakning av nya annonser?', 'Enligt Vinteds hjälpcenter visar en sparad sökning ett nummer med ett plustecken (”+N”) nästa gång du öppnar sökfältet, och räknaren nollställs när du tittar. Vinted skickar notiser bland annat när en medlem du följer laddar upp nya artiklar. SNYPD kontrollerar din sökning ungefär var 30:e sekund och skickar en push för nya matchande annonser. Mer om det: <a href="%s">Vinted bevakning av nya annonser</a>.' % notify),
-        ('Hur ofta kontrollerar SNYPD min sökning?', 'Ungefär var 30:e sekund. ' + S + ' Lugna sökningar saktar ner, som mest till 5 minuter. Takten är densamma i alla abonnemang.'),
+        ('Har inte Vinted redan bevakning av nya annonser?', 'Enligt Vinteds hjälpcenter visar en sparad sökning ett nummer med ett plustecken (”+N”) nästa gång du öppnar sökfältet, och räknaren nollställs när du tittar. Vinted skickar notiser bland annat när en medlem du följer laddar upp nya artiklar. SNYPD kontrollerar din sökning ungefär en gång i minuten och skickar en push för nya matchande annonser. Mer om det: <a href="%s">Vinted bevakning av nya annonser</a>.' % notify),
+        ('Hur ofta kontrollerar SNYPD min sökning?', 'Ungefär en gång i minuten. ' + S + ' Lugna sökningar saktar ner, som mest till 5 minuter. Takten är densamma i alla abonnemang.'),
         ('Fungerar det på iPhone?', 'Ja, när SNYPD ligger på hemskärmen: öppna snypd.store i Safari, tryck på Dela och sedan ”Lägg till på hemskärmen”, och slå på notiser i den installerade appen. Apple tillåter webbnotiser bara för appar på hemskärmen. På Android, Windows och Mac fungerar notiserna direkt i webbläsaren.'),
         ('Finns det en gratisplan?', 'Ja. Free ger en sökning, utan tidsgräns och utan kort. ' + T + ' Därefter kontrollerar den medan din SNYPD-panel är öppen; betalda abonnemang från @@price:solo@@ i månaden kontrollerar dygnet runt även när den är stängd.'),
         ('Fungerar det med vinted.se?', 'Ja. SNYPD fungerar med alla Vinted-sajter i Europa och USA, 26 totalt, bland annat vinted.se, vinted.dk, vinted.fi, vinted.de och vinted.fr. Klistra in en söklänk från sajten du handlar på; priserna visas i den sajtens valuta, på vinted.se i kronor.'),
@@ -326,7 +326,7 @@ def _bot_copy(lang):
     body = f"""
 <section id="sammanfattning">
   <h2>SNYPD i ett stycke</h2>
-  <div class="lg-box lg-mint"><p>SNYPD är en Vinted bot för bevakning, även kallad Vinted monitor, för dig som köper för att sälja vidare. Du klistrar in en söklänk från Vinted med dina filter (märke, storlek, pris, skick) och SNYPD kontrollerar sökningen ungefär var 30:e sekund. När en ny annons matchar dyker den upp i din panel och du får en pushnotis i mobilen eller datorn. SNYPD frågar aldrig efter ditt Vinted-lösenord, loggar aldrig in på ditt konto, köper ingenting och skriver inte till säljare. Gratisplanen bevakar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan så länge din panel är öppen. Betalda abonnemang, från @@price:solo@@ i månaden, bevakar dygnet runt.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD är en Vinted bot för bevakning, även kallad Vinted monitor, för dig som köper för att sälja vidare. Du klistrar in en söklänk från Vinted med dina filter (märke, storlek, pris, skick) och SNYPD kontrollerar sökningen ungefär en gång i minuten. När en ny annons matchar dyker den upp i din panel och du får en pushnotis i mobilen eller datorn. SNYPD frågar aldrig efter ditt Vinted-lösenord, loggar aldrig in på ditt konto, köper ingenting och skriver inte till säljare. Gratisplanen bevakar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan så länge din panel är öppen. Betalda abonnemang, från @@price:solo@@ i månaden, bevakar dygnet runt.</p></div>
 </section>
 <section id="typer">
   <h2>Tre sorters Vinted botar</h2>
@@ -350,14 +350,14 @@ def _bot_copy(lang):
     <li>Sök på din Vinted-sajt (till exempel vinted.se) i webbläsaren och ställ in filtren: märke, storlek, pris, skick.</li>
     <li>Kopiera adressen i adressfältet. En sökadress innehåller <code>/catalog?</code>.</li>
     <li>Klistra in den i SNYPD, ge den ett kort namn och slå på den.</li>
-    <li>SNYPD kontrollerar den ungefär var 30:e sekund. Nya träffar hamnar i din panel och, om du slagit på notiser, i mobilen eller datorn. Flera träffar tätt efter varandra kommer i en enda notis.</li>
+    <li>SNYPD kontrollerar den ungefär en gång i minuten. Nya träffar hamnar i din panel och, om du slagit på notiser, i mobilen eller datorn. Flera träffar tätt efter varandra kommer i en enda notis.</li>
     <li>Tryck på notisen. Den öppnar annonsen på Vinted, där du köper eller lägger ett bud.</li>
   </ol>
   {G['figure']('feed', 'sv')}
 </section>
 <section id="hastighet">
   <h2>Hur snabbt går det?</h2>
-  <p>SNYPD kontrollerar varje aktiv sökning ungefär var 30:e sekund. {S} {L} Sökningar som ofta hittar nya artiklar behåller den takten; de som blir lugna kontrolleras mer sällan, som mest ungefär var 5:e minut, och snabbar upp igen så fort de hittar något. Takten är densamma i alla abonnemang: betalar du får du fler sökningar och bevakning dygnet runt, inte snabbare kontroller.</p>
+  <p>SNYPD kontrollerar varje aktiv sökning ungefär en gång i minuten. {S} {L} Sökningar som ofta hittar nya artiklar behåller den takten; de som blir lugna kontrolleras mer sällan, som mest ungefär var 5:e minut, och snabbar upp igen så fort de hittar något. Takten är densamma i alla abonnemang: betalar du får du fler sökningar och bevakning dygnet runt, inte snabbare kontroller.</p>
   <p>Vissa verktyg lovar notiser på millisekunder. Det lovar inte SNYPD. Det SNYPD lovar: en betald sökning fortsätter när datorn är stängd och mobilen ligger i fickan, alltså just när flest fynd går förlorade.</p>
 </section>
 <section id="pris">

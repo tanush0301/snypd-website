@@ -341,8 +341,8 @@ def meta_prices(content):
 
 BRAND = json.load(open(os.path.join(HERE, 'data', 'brand.json'), encoding='utf-8'))
 _interval = json.load(open(os.path.join(HERE, 'data', 'check-interval.json'), encoding='utf-8'))
-if '30 seconds' in BRAND['boilerplate'] and _interval['median_seconds'] != 30:
-    sys.exit('gen_regions: the boilerplate says "about every 30 seconds" but check-interval.json median is %s s'
+if 'once a minute' in BRAND['boilerplate'] and _interval['median_seconds'] != 60:
+    sys.exit('gen_regions: the boilerplate says "about once a minute" but check-interval.json median is %s s'
              % _interval['median_seconds'])
 ORG_RE = re.compile(r'("@type": "Organization",\s*"@id": "https://www\.snypd\.store/#org",)((?:\s*"description": "(?:[^"\\]|\\.)*",)?)(\s*"name")')
 

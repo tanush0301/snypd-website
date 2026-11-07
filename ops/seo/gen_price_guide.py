@@ -261,7 +261,7 @@ def page_item(it, lang):
 </section>
 <section id="alert">
   <h2>Get an alert for a cheap {esc(name)}</h2>
-  <p>SNYPD checks a Vinted search about every 30 seconds and sends new matches to your phone, so you don't have to keep refreshing Vinted. Start the search below with a maximum of {money(lo, 'en')}, the cheapest quarter, and change it any time.</p>
+  <p>SNYPD checks a Vinted search about once a minute and sends new matches to your phone, so you don't have to keep refreshing Vinted. Start the search below with a maximum of {money(lo, 'en')}, the cheapest quarter, and change it any time.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">ALERT ME UNDER {money(lo, 'en')}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['en']}">HOW SNYPD WORKS</a></div>
   <p class="ct-note">Free: one search, 24/7 for the first @@trial_days@@ days. No card.</p>
 </section>
@@ -324,7 +324,7 @@ def page_item(it, lang):
 </section>
 <section id="alerte">
   <h2>Reçois une alerte pour {esc(name)} pas cher</h2>
-  <p>SNYPD vérifie une recherche Vinted environ toutes les 30 secondes et envoie les nouvelles annonces sur ton téléphone, sans que tu aies à rafraîchir Vinted. Lance la recherche ci-dessous avec un maximum de {money(lo, 'fr')}, le quart le moins cher, et change-le quand tu veux.</p>
+  <p>SNYPD vérifie une recherche Vinted environ une fois par minute et envoie les nouvelles annonces sur ton téléphone, sans que tu aies à rafraîchir Vinted. Lance la recherche ci-dessous avec un maximum de {money(lo, 'fr')}, le quart le moins cher, et change-le quand tu veux.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">M’ALERTER SOUS {money(lo, 'fr')}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['fr']}">COMMENT MARCHE SNYPD</a></div>
   <p class="ct-note">Gratuit{nb}: une recherche, 24h/24 pendant les @@trial_days@@ premiers jours. Sans carte. Inscription et paiement en français.</p>
 </section>
@@ -437,7 +437,7 @@ def _page_hub_estimates(lang):
         intro = ('<section id="about"><h2>What this guide is</h2>' + checker_box('en') + '<div class="lg-box lg-mint"><p>Typical Vinted asking prices for %d popular items, from %s vinted.be listings that SNYPD saw %s. '
                  'Each item page shows the median asking price, the middle half of listings and prices by condition. Asking prices, not sale prices: Vinted does not publish what items sell for. '
                  'Only items with at least %d listings and a clear price are included. Updated monthly; free to reuse with a link (CC BY 4.0). Trends, condition premium and price cuts: <a href="/vinted-market-report">the monthly Vinted Market Report</a>.</p></div></section>' % (len(PUB), num(total, 'en'), win, MIN_LISTINGS))
-        tail = ('<section id="alerts"><h2>Found your price?</h2><p>A good price only helps if you see the listing first. SNYPD checks your Vinted search about every 30 seconds and sends new matches to your phone. '
+        tail = ('<section id="alerts"><h2>Found your price?</h2><p>A good price only helps if you see the listing first. SNYPD checks your Vinted search about once a minute and sends new matches to your phone. '
                 'Each item page has a button that starts that search with the cheapest-quarter price as the maximum.</p>%s</section>' % gc.cta('en'))
         title = 'Vinted price guide: typical prices for %d items (%s) | SNYPD' % (len(PUB), month_year('en'))
         desc = 'How much things cost on Vinted: typical asking prices and price ranges by condition for %d popular sneakers, clothes and accessories, from %s vinted.be listings.' % (len(PUB), num(total, 'en'))
@@ -447,7 +447,7 @@ def _page_hub_estimates(lang):
     intro = ('<section id="about"><h2>Ce qu’est ce guide</h2>' + checker_box('fr') + '<div class="lg-box lg-mint"><p>Les prix demandés typiques sur Vinted pour %d articles populaires, à partir de %s annonces vinted.be vues par SNYPD %s. '
              'Chaque page article montre le prix demandé médian, la moitié centrale des annonces et les prix selon l’état. Ce sont des prix demandés, pas des prix de vente%s: Vinted ne publie pas le prix auquel les articles se vendent. '
              'Seuls les articles avec au moins %d annonces et un prix clair sont inclus. Mis à jour chaque mois%s; libre de réutilisation avec un lien (CC BY 4.0). Écart selon l’état et baisses de prix%s: <a href="/fr/rapport-marche-vinted">le rapport mensuel du marché Vinted</a>.</p></div></section>' % (len(PUB), num(total, 'fr'), win, nb, MIN_LISTINGS, nb, nb))
-    tail = ('<section id="alertes"><h2>Tu as trouvé ton prix%s?</h2><p>Un bon prix ne sert que si tu vois l’annonce en premier. SNYPD vérifie ta recherche Vinted environ toutes les 30 secondes et envoie les nouvelles annonces sur ton téléphone. '
+    tail = ('<section id="alertes"><h2>Tu as trouvé ton prix%s?</h2><p>Un bon prix ne sert que si tu vois l’annonce en premier. SNYPD vérifie ta recherche Vinted environ une fois par minute et envoie les nouvelles annonces sur ton téléphone. '
             'Chaque page article a un bouton qui lance cette recherche avec le prix du quart le moins cher comme maximum.</p>%s</section>' % (nb, gc.cta('fr')))
     title = 'Guide des prix Vinted%s: prix typiques de %d articles (%s) | SNYPD' % (nb, len(PUB), month_year('fr'))
     desc = 'Combien coûtent les articles sur Vinted%s: prix demandés typiques et fourchettes selon l’état pour %d sneakers, vêtements et accessoires populaires, à partir de %s annonces vinted.be.' % (nb, len(PUB), num(total, 'fr').replace(' ', nb))
@@ -496,7 +496,7 @@ def page_item_nl(it, v, name, url, rows, fee, win):
 </section>
 <section id="melding">
   <h2>Krijg een melding bij een lage prijs voor {esc(name)}</h2>
-  <p>SNYPD controleert een Vinted-zoekopdracht ongeveer elke 30 seconden en stuurt nieuwe resultaten naar je telefoon, zodat je Vinted niet steeds hoeft te vernieuwen. Start de zoekopdracht hieronder met een maximum van {m(lo)}, het goedkoopste kwart, en pas het aan wanneer je wilt.</p>
+  <p>SNYPD controleert een Vinted-zoekopdracht ongeveer elke minuut en stuurt nieuwe resultaten naar je telefoon, zodat je Vinted niet steeds hoeft te vernieuwen. Start de zoekopdracht hieronder met een maximum van {m(lo)}, het goedkoopste kwart, en pas het aan wanneer je wilt.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">MELD ME ONDER {m(lo)}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['nl']}">HOE SNYPD WERKT</a></div>
   <p class="ct-note">Gratis: één zoekopdracht, 24/7 tijdens de eerste @@trial_days@@ dagen. Geen kaart. Registreren en betalen gaan voorlopig in het Engels.</p>
 </section>
@@ -554,7 +554,7 @@ def page_hub_nl(sections, toc, total, win):
              'Elke artikelpagina toont de mediane vraagprijs, de middelste helft van de advertenties en de prijzen per staat. Dit zijn vraagprijzen, geen verkoopprijzen: Vinted publiceert niet voor welke prijs artikelen verkocht worden. '
              'Alleen artikelen met minstens %d advertenties en een duidelijke prijs staan erin. Maandelijks bijgewerkt; vrij te hergebruiken met een link (CC BY 4.0). Trends, het verschil per staat en prijsverlagingen: <a href="/vinted-market-report">het maandelijkse Vinted-marktrapport</a> (Engels).</p></div></section>'
              % (len(PUB), num(total, 'nl'), win, MIN_LISTINGS))
-    tail = ('<section id="meldingen"><h2>Je prijs gevonden?</h2><p>Een goede prijs helpt alleen als je de advertentie als eerste ziet. SNYPD controleert je Vinted-zoekopdracht ongeveer elke 30 seconden en stuurt nieuwe resultaten naar je telefoon. '
+    tail = ('<section id="meldingen"><h2>Je prijs gevonden?</h2><p>Een goede prijs helpt alleen als je de advertentie als eerste ziet. SNYPD controleert je Vinted-zoekopdracht ongeveer elke minuut en stuurt nieuwe resultaten naar je telefoon. '
             'Op elke artikelpagina staat een knop die die zoekopdracht start met de prijs van het goedkoopste kwart als maximum.</p>%s</section>' % gc.cta('nl'))
     title = 'Vinted-prijzen: typische prijzen van %d artikelen (%s) | SNYPD' % (len(PUB), month_year('nl'))
     desc = 'Wat dingen kosten op Vinted: typische vraagprijzen en prijsklassen per staat voor %d populaire sneakers, kleding en accessoires, uit %s vinted.be-advertenties.' % (len(PUB), num(total, 'nl'))
@@ -603,7 +603,7 @@ def page_item_de(it, v, name, url, rows, fee, win):
 </section>
 <section id="benachrichtigung">
   <h2>Benachrichtigung bei günstigen Angeboten für {esc(name)}</h2>
-  <p>SNYPD prüft eine Vinted-Suche etwa alle 30 Sekunden und schickt neue Treffer auf dein Handy, damit du Vinted nicht ständig neu laden musst. Starte die Suche unten mit einem Höchstpreis von {m(lo)}, dem günstigsten Viertel, und änder ihn, wann du willst.</p>
+  <p>SNYPD prüft eine Vinted-Suche etwa einmal pro Minute und schickt neue Treffer auf dein Handy, damit du Vinted nicht ständig neu laden musst. Starte die Suche unten mit einem Höchstpreis von {m(lo)}, dem günstigsten Viertel, und änder ihn, wann du willst.</p>
   <div class="ct-actions"><a class="ct-btn" href="{esc(alert_href(it, lo))}">BENACHRICHTIGE MICH UNTER {m(lo)}</a><a class="ct-btn ct-ghost" href="{SLUGS['bot']['de']}">SO FUNKTIONIERT SNYPD</a></div>
   <p class="ct-note">Kostenlos: eine Suche, rund um die Uhr in den ersten @@trial_days@@ Tagen. Keine Karte. Anmeldung und Bezahlung sind vorerst auf Englisch.</p>
 </section>
@@ -662,7 +662,7 @@ def page_hub_de(sections, toc, total, win):
              'Jede Artikelseite zeigt den Median der verlangten Preise, die mittlere Hälfte der Angebote und die Preise nach Zustand. Das sind verlangte Preise, keine Verkaufspreise: Vinted veröffentlicht nicht, zu welchem Preis Artikel verkauft werden. '
              'Dabei sind nur Artikel mit mindestens %d Angeboten und einem klaren Preis. Monatlich aktualisiert; mit einem Link frei weiterverwendbar (CC BY 4.0). Trends, Preisunterschiede nach Zustand und Preissenkungen: <a href="/vinted-market-report">der monatliche Vinted Market Report</a> (auf Englisch).</p></div></section>'
              % (len(PUB), num(total, 'de'), win, MIN_LISTINGS))
-    tail = ('<section id="benachrichtigungen"><h2>Deinen Preis gefunden?</h2><p>Ein guter Preis hilft nur, wenn du das Angebot als Erster siehst. SNYPD prüft deine Vinted-Suche etwa alle 30 Sekunden und schickt neue Treffer auf dein Handy. '
+    tail = ('<section id="benachrichtigungen"><h2>Deinen Preis gefunden?</h2><p>Ein guter Preis hilft nur, wenn du das Angebot als Erster siehst. SNYPD prüft deine Vinted-Suche etwa einmal pro Minute und schickt neue Treffer auf dein Handy. '
             'Auf jeder Artikelseite gibt es einen Button, der diese Suche mit dem Preis des günstigsten Viertels als Höchstpreis startet.</p>%s</section>' % gc.cta('de'))
     title = 'Vinted-Preise: typische Preise für %d Artikel (%s) | SNYPD' % (len(PUB), month_year('de'))
     desc = 'Was Artikel auf Vinted kosten: typische verlangte Preise und Preisspannen nach Zustand für %d beliebte Sneaker, Kleidungsstücke und Accessoires, aus %s Angeboten auf vinted.be.' % (len(PUB), num(total, 'de'))

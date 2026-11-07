@@ -282,7 +282,7 @@ def page_edition(ed, lang):
 </section>
 <section id="alerts">
   <h2>Catch the cheapest quarter</h2>
-  <p>SNYPD checks your Vinted search about every 30 seconds and sends new matches to your phone. Every item page in the price guide has a button that starts that search with its cheapest-quarter price as the maximum.</p>
+  <p>SNYPD checks your Vinted search about once a minute and sends new matches to your phone. Every item page in the price guide has a button that starts that search with its cheapest-quarter price as the maximum.</p>
   {gc.cta('en')}
 </section>"""
         title = 'Vinted Market Report %s: asking prices in Belgium | SNYPD' % ed['name']['en']
@@ -330,7 +330,7 @@ def page_edition(ed, lang):
 </section>
 <section id="alertes">
   <h2>Attrape le quart le moins cher</h2>
-  <p>SNYPD vérifie ta recherche Vinted environ toutes les 30 secondes et envoie les nouvelles annonces sur ton téléphone. Chaque page du guide des prix a un bouton qui lance cette recherche avec le prix du quart le moins cher comme maximum.</p>
+  <p>SNYPD vérifie ta recherche Vinted environ une fois par minute et envoie les nouvelles annonces sur ton téléphone. Chaque page du guide des prix a un bouton qui lance cette recherche avec le prix du quart le moins cher comme maximum.</p>
   {gc.cta('fr')}
 </section>"""
         title = 'Rapport du marché Vinted %s%s: prix demandés en Belgique | SNYPD' % (ed['name']['fr'], NB)

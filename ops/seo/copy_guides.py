@@ -108,7 +108,7 @@ GUIDES = {
              '<ol><li>Open your search on Vinted in a browser, with your filters (brand, size, price, condition).</li>'
              '<li>Copy the address from the address bar. It contains <code>/catalog?</code>.</li>'
              '<li>Paste it into SNYPD and switch the search on.</li>'
-             '<li>SNYPD checks it about every 30 seconds and sends a push when a new listing matches. The alert opens the listing on Vinted.</li></ol>'
+             '<li>SNYPD checks it about once a minute and sends a push when a new listing matches. The alert opens the listing on Vinted.</li></ol>'
              '<p>That is how often SNYPD looks, not a delivery time: Vinted itself shows a new listing in search a few minutes after it is posted. SNYPD never logs in to your Vinted account, never buys and never messages sellers.</p>'
              '<p>Free: 1 search, 24/7 with alerts for the first @@trial_days@@ days after your first search in SNYPD, then only while the dashboard is open. Paid plans from @@price:solo@@ per month run 24/7. On iPhone, add SNYPD to the Home Screen first (Apple allows web push only there). More: <a href="{bot}">SNYPD, the Vinted bot for alerts</a>.</p>'),
         ],
@@ -163,7 +163,7 @@ GUIDES = {
              '<ol><li>Ouvre ta recherche sur Vinted dans un navigateur, avec tes filtres (marque, taille, prix, état).</li>'
              '<li>Copie l’adresse dans la barre d’adresse. Elle contient <code>/catalog?</code>.</li>'
              '<li>Colle-la dans SNYPD et active la recherche.</li>'
-             '<li>SNYPD la vérifie environ toutes les 30 secondes et t’envoie un push dès qu’une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li></ol>'
+             '<li>SNYPD la vérifie environ une fois par minute et t’envoie un push dès qu’une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li></ol>'
              '<p>C’est la fréquence à laquelle SNYPD regarde, pas un délai de livraison\xa0: Vinted lui-même affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne. SNYPD ne se connecte jamais à ton compte Vinted, n’achète rien et n’écrit pas aux vendeurs.</p>'
              '<p>Gratuit\xa0: 1 recherche, 24/7 avec alertes pendant les @@trial_days@@ premiers jours après ta première recherche dans SNYPD, puis seulement quand le tableau de bord est ouvert. Plans payants dès @@price:solo@@ par mois, 24/7. Sur iPhone, ajoute d’abord SNYPD à l’écran d’accueil (Apple n’autorise les notifications web que là). En savoir plus\xa0: <a href="{bot}">SNYPD, le bot Vinted d’alertes</a>.</p>'),
         ],
@@ -218,7 +218,7 @@ GUIDES = {
              '<ol><li>Öffne die Suche auf Vinted im Browser, mit deinen Filtern (Marke, Größe, Preis, Zustand).</li>'
              '<li>Kopiere die Adresse aus der Adresszeile. Sie enthält <code>/catalog?</code>.</li>'
              '<li>Füge sie in SNYPD ein und schalte die Suche ein.</li>'
-             '<li>SNYPD prüft sie etwa alle 30 Sekunden und schickt einen Push, sobald ein neuer Artikel passt. Die Benachrichtigung öffnet die Anzeige auf Vinted.</li></ol>'
+             '<li>SNYPD prüft sie etwa einmal pro Minute und schickt einen Push, sobald ein neuer Artikel passt. Die Benachrichtigung öffnet die Anzeige auf Vinted.</li></ol>'
              '<p>So oft schaut SNYPD nach, das ist keine Lieferzeit: Vinted selbst zeigt einen neuen Artikel erst einige Minuten nach dem Einstellen in der Suche. SNYPD meldet sich nie in deinem Vinted-Konto an, kauft nichts und schreibt keinen Verkäufern.</p>'
              '<p>Kostenlos: 1 Suche, rund um die Uhr mit Benachrichtigungen in den ersten @@trial_days@@ Tagen nach deiner ersten Suche in SNYPD, danach nur bei geöffnetem Dashboard. Bezahlte Tarife ab @@price:solo@@ im Monat laufen rund um die Uhr. Auf dem iPhone legst du SNYPD zuerst auf den Home-Bildschirm (nur dort erlaubt Apple Web-Push). Mehr dazu: <a href="{bot}">SNYPD, der Vinted Bot für Benachrichtigungen</a>.</p>'),
         ],
@@ -273,7 +273,7 @@ GUIDES = {
              '<ol><li>Open je zoekopdracht op Vinted in je browser, met je filters (merk, maat, prijs, staat).</li>'
              '<li>Kopieer het adres uit de adresbalk. Daar staat <code>/catalog?</code> in.</li>'
              '<li>Plak het in SNYPD en zet de zoekopdracht aan.</li>'
-             '<li>SNYPD controleert hem ongeveer elke 30 seconden en stuurt een push zodra een nieuwe advertentie past. De melding opent de advertentie op Vinted.</li></ol>'
+             '<li>SNYPD controleert hem ongeveer elke minuut en stuurt een push zodra een nieuwe advertentie past. De melding opent de advertentie op Vinted.</li></ol>'
              '<p>Zo vaak kijkt SNYPD; het is geen levertijd: Vinted toont een nieuwe advertentie zelf pas een paar minuten na het plaatsen in de zoekresultaten. SNYPD logt nooit in op je Vinted-account, koopt niets en stuurt geen berichten naar verkopers.</p>'
              '<p>Gratis: 1 zoekopdracht, 24/7 met meldingen in de eerste @@trial_days@@ dagen na je eerste zoekopdracht in SNYPD, daarna alleen zolang het dashboard open staat. Betaalde abonnementen vanaf @@price:solo@@ per maand werken 24/7. Op een iPhone zet je SNYPD eerst op je beginscherm (alleen daar staat Apple webpush toe). Meer daarover: <a href="{bot}">SNYPD, de Vinted bot voor meldingen</a>.</p>'),
         ],
@@ -328,7 +328,7 @@ GUIDES = {
              '<ol><li>Apri la ricerca su Vinted nel browser, con i tuoi filtri (marca, taglia, prezzo, condizioni).</li>'
              '<li>Copia l’indirizzo dalla barra del browser. Contiene <code>/catalog?</code>.</li>'
              '<li>Incollalo in SNYPD e attiva la ricerca.</li>'
-             '<li>SNYPD la controlla circa ogni 30 secondi e invia un push quando un nuovo annuncio corrisponde. La notifica apre l’annuncio su Vinted.</li></ol>'
+             '<li>SNYPD la controlla circa una volta al minuto e invia un push quando un nuovo annuncio corrisponde. La notifica apre l’annuncio su Vinted.</li></ol>'
              '<p>È la frequenza con cui SNYPD guarda, non un tempo di consegna: Vinted stesso mostra un nuovo annuncio nella ricerca qualche minuto dopo la pubblicazione. SNYPD non accede mai al tuo account Vinted, non compra nulla e non scrive ai venditori.</p>'
              '<p>Gratis: 1 ricerca, 24 ore su 24 con notifiche nei primi @@trial_days@@ giorni dopo la tua prima ricerca in SNYPD, poi solo mentre la dashboard è aperta. I piani a pagamento da @@price:solo@@ al mese funzionano 24 ore su 24. Su iPhone aggiungi prima SNYPD alla schermata Home (Apple consente le notifiche web solo lì). Per saperne di più: <a href="{bot}">SNYPD, il bot Vinted per le notifiche</a>.</p>'),
         ],
@@ -383,7 +383,7 @@ GUIDES = {
              '<ol><li>Abre tu búsqueda en Vinted en el navegador, con tus filtros (marca, talla, precio, estado).</li>'
              '<li>Copia la dirección de la barra del navegador. Contiene <code>/catalog?</code>.</li>'
              '<li>Pégala en SNYPD y activa la búsqueda.</li>'
-             '<li>SNYPD la revisa aproximadamente cada 30 segundos y envía un push cuando un anuncio nuevo coincide. El aviso abre el anuncio en Vinted.</li></ol>'
+             '<li>SNYPD la revisa aproximadamente una vez por minuto y envía un push cuando un anuncio nuevo coincide. El aviso abre el anuncio en Vinted.</li></ol>'
              '<p>Es la frecuencia con la que SNYPD mira, no un tiempo de entrega: el propio Vinted muestra un anuncio nuevo en su búsqueda unos minutos después de publicarse. SNYPD nunca inicia sesión en tu cuenta de Vinted, no compra nada y no escribe a los vendedores.</p>'
              '<p>Gratis: 1 búsqueda, 24/7 con avisos durante los primeros @@trial_days@@ días tras tu primera búsqueda en SNYPD, y después solo mientras el panel esté abierto. Los planes de pago desde @@price:solo@@ al mes funcionan 24/7. En iPhone, añade primero SNYPD a la pantalla de inicio (Apple solo permite notificaciones web ahí). Más información: <a href="{bot}">SNYPD, el bot de Vinted para alertas</a>.</p>'),
         ],
@@ -438,7 +438,7 @@ GUIDES = {
              '<ol><li>Otwórz wyszukiwanie na Vinted w przeglądarce, z filtrami (marka, rozmiar, cena, stan).</li>'
              '<li>Skopiuj adres z paska przeglądarki. Zawiera <code>/catalog?</code>.</li>'
              '<li>Wklej go do SNYPD i włącz wyszukiwanie.</li>'
-             '<li>SNYPD sprawdza je mniej więcej co 30 sekund i wysyła push, gdy pojawi się nowe pasujące ogłoszenie. Powiadomienie otwiera ogłoszenie na Vinted.</li></ol>'
+             '<li>SNYPD sprawdza je mniej więcej co minutę i wysyła push, gdy pojawi się nowe pasujące ogłoszenie. Powiadomienie otwiera ogłoszenie na Vinted.</li></ol>'
              '<p>To częstotliwość sprawdzania, a nie czas dostarczenia: sam Vinted pokazuje nowe ogłoszenie w wyszukiwarce kilka minut po jego dodaniu. SNYPD nigdy nie loguje się na twoje konto Vinted, niczego nie kupuje i nie pisze do sprzedających.</p>'
              '<p>Za darmo: 1 wyszukiwanie, 24/7 z powiadomieniami przez pierwsze @@trial_days@@ dni od pierwszego wyszukiwania w SNYPD, potem tylko przy otwartym panelu. Plany płatne od @@price:solo@@ miesięcznie działają 24/7. Na iPhonie najpierw dodaj SNYPD do ekranu początkowego (tylko tam Apple pozwala na powiadomienia web). Więcej: <a href="{bot}">SNYPD, bot Vinted do powiadomień</a>.</p>'),
         ],
@@ -493,7 +493,7 @@ GUIDES = {
              '<ol><li>Öppna sökningen på Vinted i webbläsaren, med dina filter (märke, storlek, pris, skick).</li>'
              '<li>Kopiera adressen i adressfältet. Den innehåller <code>/catalog?</code>.</li>'
              '<li>Klistra in den i SNYPD och slå på sökningen.</li>'
-             '<li>SNYPD kontrollerar den ungefär var 30:e sekund och skickar en push när en ny annons matchar. Notisen öppnar annonsen på Vinted.</li></ol>'
+             '<li>SNYPD kontrollerar den ungefär en gång i minuten och skickar en push när en ny annons matchar. Notisen öppnar annonsen på Vinted.</li></ol>'
              '<p>Så ofta tittar SNYPD, det är ingen leveranstid: Vinted visar själv en ny annons i sökningen några minuter efter att den lagts upp. SNYPD loggar aldrig in på ditt Vinted-konto, köper ingenting och skriver inte till säljare.</p>'
              '<p>Gratis: 1 sökning, dygnet runt med notiser de första @@trial_days@@ dagarna efter din första sökning i SNYPD, sedan bara medan panelen är öppen. Betalda abonnemang från @@price:solo@@ i månaden körs dygnet runt. På iPhone lägger du först till SNYPD på hemskärmen (bara där tillåter Apple webbnotiser). Mer: <a href="{bot}">SNYPD, Vinted boten för bevakning</a>.</p>'),
         ],
@@ -541,8 +541,8 @@ GUIDES = {
              '<ol><li>Search for the item on Vinted in a browser and set the maximum of the price filter to 40, plus size and condition if you like.</li>'
              '<li>Copy the address from the address bar. It contains <code>/catalog?</code> and the price you set (<code>price_to=40</code>).</li>'
              '<li>Paste it into SNYPD and switch the search on.</li>'
-             '<li>SNYPD checks the search about every 30 seconds and sends a push to your phone or computer for each new listing that matches, price included.</li></ol>'
-             '<p>About every 30 seconds is how often SNYPD looks, not how fast a listing reaches you: Vinted itself shows a new listing in search a few minutes after it is posted. SNYPD never logs in to your Vinted account, never buys and never messages sellers. Free: 1 search, 24/7 with alerts for the first @@trial_days@@ days after you save your first search in SNYPD, then only while the dashboard is open; paid plans from @@price:solo@@ per month run 24/7. More: <a href="{bot}">SNYPD, the Vinted bot for alerts</a>.</p>'),
+             '<li>SNYPD checks the search about once a minute and sends a push to your phone or computer for each new listing that matches, price included.</li></ol>'
+             '<p>About once a minute is how often SNYPD looks, not how fast a listing reaches you: Vinted itself shows a new listing in search a few minutes after it is posted. SNYPD never logs in to your Vinted account, never buys and never messages sellers. Free: 1 search, 24/7 with alerts for the first @@trial_days@@ days after you save your first search in SNYPD, then only while the dashboard is open; paid plans from @@price:solo@@ per month run 24/7. More: <a href="{bot}">SNYPD, the Vinted bot for alerts</a>.</p>'),
             ('which', 'Which one to use',
              '<ul><li><strong>One item you are waiting on:</strong> favourite it. Vinted tells you when its price is reduced or when it sells.</li>'
              '<li><strong>Any new listing of a model under your price:</strong> a Vinted search with a maximum price, watched by SNYPD.</li>'
@@ -586,8 +586,8 @@ GUIDES = {
              '<ol><li>Cherche l’article sur Vinted dans un navigateur et mets le maximum du filtre de prix à 40, plus la taille et l’état si tu veux.</li>'
              '<li>Copie l’adresse dans la barre d’adresse. Elle contient <code>/catalog?</code> et le prix choisi (<code>price_to=40</code>).</li>'
              '<li>Colle-la dans SNYPD et active la recherche.</li>'
-             '<li>SNYPD vérifie la recherche environ toutes les 30 secondes et t’envoie un push sur ton téléphone ou ton ordinateur pour chaque nouvelle annonce qui correspond, prix compris.</li></ol>'
-             '<p>Environ toutes les 30 secondes, c’est la fréquence à laquelle SNYPD regarde, pas le temps qu’une annonce met à t’arriver\xa0: Vinted lui-même affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne. SNYPD ne se connecte jamais à ton compte Vinted, n’achète rien et n’écrit pas aux vendeurs. Gratuit\xa0: 1 recherche, 24/7 avec alertes pendant les @@trial_days@@ premiers jours après ta première recherche enregistrée dans SNYPD, puis seulement quand le tableau de bord est ouvert\xa0; plans payants dès @@price:solo@@ par mois, 24/7. En savoir plus\xa0: <a href="{bot}">SNYPD, le bot Vinted d’alertes</a>.</p>'),
+             '<li>SNYPD vérifie la recherche environ une fois par minute et t’envoie un push sur ton téléphone ou ton ordinateur pour chaque nouvelle annonce qui correspond, prix compris.</li></ol>'
+             '<p>Environ une fois par minute, c’est la fréquence à laquelle SNYPD regarde, pas le temps qu’une annonce met à t’arriver\xa0: Vinted lui-même affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne. SNYPD ne se connecte jamais à ton compte Vinted, n’achète rien et n’écrit pas aux vendeurs. Gratuit\xa0: 1 recherche, 24/7 avec alertes pendant les @@trial_days@@ premiers jours après ta première recherche enregistrée dans SNYPD, puis seulement quand le tableau de bord est ouvert\xa0; plans payants dès @@price:solo@@ par mois, 24/7. En savoir plus\xa0: <a href="{bot}">SNYPD, le bot Vinted d’alertes</a>.</p>'),
             ('choisir', 'Quoi utiliser',
              '<ul><li><strong>Un article précis que tu attends\xa0:</strong> ajoute-le à tes favoris. Vinted te prévient quand son prix baisse ou quand il est vendu.</li>'
              '<li><strong>Toute nouvelle annonce d’un modèle sous ton prix\xa0:</strong> une recherche Vinted avec un prix maximum, surveillée par SNYPD.</li>'
@@ -631,8 +631,8 @@ GUIDES = {
              '<ol><li>Such den Artikel auf Vinted im Browser und setz den Höchstwert im Preisfilter auf 40, dazu Größe und Zustand, wenn du willst.</li>'
              '<li>Kopiere die Adresse aus der Adresszeile. Sie enthält <code>/catalog?</code> und deinen Preis (<code>price_to=40</code>).</li>'
              '<li>Füge sie in SNYPD ein und schalte die Suche ein.</li>'
-             '<li>SNYPD prüft die Suche etwa alle 30 Sekunden und schickt dir für jede neue passende Anzeige eine Push-Nachricht aufs Handy oder den Computer, mit Preis.</li></ol>'
-             '<p>Etwa alle 30 Sekunden ist, wie oft SNYPD nachschaut, nicht, wie schnell eine Anzeige bei dir ankommt: Vinted selbst zeigt einen neuen Artikel erst einige Minuten nach dem Einstellen in der Suche. SNYPD meldet sich nie in deinem Vinted-Konto an, kauft nichts und schreibt keinen Verkäufern. Kostenlos: 1 Suche, rund um die Uhr mit Benachrichtigungen in den ersten @@trial_days@@ Tagen, nachdem du deine erste Suche in SNYPD gespeichert hast, danach nur bei geöffnetem Dashboard; bezahlte Tarife ab @@price:solo@@ im Monat laufen rund um die Uhr. Mehr dazu: <a href="{bot}">SNYPD, der Vinted Bot für Benachrichtigungen</a>.</p>'),
+             '<li>SNYPD prüft die Suche etwa einmal pro Minute und schickt dir für jede neue passende Anzeige eine Push-Nachricht aufs Handy oder den Computer, mit Preis.</li></ol>'
+             '<p>Etwa einmal pro Minute ist, wie oft SNYPD nachschaut, nicht, wie schnell eine Anzeige bei dir ankommt: Vinted selbst zeigt einen neuen Artikel erst einige Minuten nach dem Einstellen in der Suche. SNYPD meldet sich nie in deinem Vinted-Konto an, kauft nichts und schreibt keinen Verkäufern. Kostenlos: 1 Suche, rund um die Uhr mit Benachrichtigungen in den ersten @@trial_days@@ Tagen, nachdem du deine erste Suche in SNYPD gespeichert hast, danach nur bei geöffnetem Dashboard; bezahlte Tarife ab @@price:solo@@ im Monat laufen rund um die Uhr. Mehr dazu: <a href="{bot}">SNYPD, der Vinted Bot für Benachrichtigungen</a>.</p>'),
             ('welches', 'Was du wofür nutzt',
              '<ul><li><strong>Ein bestimmter Artikel, auf den du wartest:</strong> speichere ihn als Favorit. Vinted meldet sich, wenn sein Preis gesenkt oder er verkauft wurde.</li>'
              '<li><strong>Jede neue Anzeige eines Modells unter deinem Preis:</strong> eine Vinted-Suche mit Höchstpreis, geprüft von SNYPD.</li>'
@@ -676,8 +676,8 @@ GUIDES = {
              '<ol><li>Zoek het artikel op Vinted in je browser en zet het maximum van het prijsfilter op 40, eventueel met maat en staat erbij.</li>'
              '<li>Kopieer het adres uit de adresbalk. Daar staan <code>/catalog?</code> en je prijs in (<code>price_to=40</code>).</li>'
              '<li>Plak het in SNYPD en zet de zoekopdracht aan.</li>'
-             '<li>SNYPD controleert de zoekopdracht ongeveer elke 30 seconden en stuurt je voor elke nieuwe advertentie die past een pushmelding op je telefoon of computer, met de prijs erbij.</li></ol>'
-             '<p>Ongeveer elke 30 seconden is hoe vaak SNYPD kijkt, niet hoe snel een advertentie bij je is: Vinted toont een nieuwe advertentie zelf pas een paar minuten na het plaatsen in de zoekresultaten. SNYPD logt nooit in op je Vinted-account, koopt niets en stuurt geen berichten naar verkopers. Gratis: 1 zoekopdracht, 24/7 met meldingen in de eerste @@trial_days@@ dagen nadat je je eerste zoekopdracht in SNYPD hebt opgeslagen, daarna alleen zolang het dashboard open staat; betaalde abonnementen vanaf @@price:solo@@ per maand werken 24/7. Meer daarover: <a href="{bot}">SNYPD, de Vinted bot voor meldingen</a>.</p>'),
+             '<li>SNYPD controleert de zoekopdracht ongeveer elke minuut en stuurt je voor elke nieuwe advertentie die past een pushmelding op je telefoon of computer, met de prijs erbij.</li></ol>'
+             '<p>Ongeveer elke minuut is hoe vaak SNYPD kijkt, niet hoe snel een advertentie bij je is: Vinted toont een nieuwe advertentie zelf pas een paar minuten na het plaatsen in de zoekresultaten. SNYPD logt nooit in op je Vinted-account, koopt niets en stuurt geen berichten naar verkopers. Gratis: 1 zoekopdracht, 24/7 met meldingen in de eerste @@trial_days@@ dagen nadat je je eerste zoekopdracht in SNYPD hebt opgeslagen, daarna alleen zolang het dashboard open staat; betaalde abonnementen vanaf @@price:solo@@ per maand werken 24/7. Meer daarover: <a href="{bot}">SNYPD, de Vinted bot voor meldingen</a>.</p>'),
             ('welke', 'Wat gebruik je waarvoor',
              '<ul><li><strong>Eén artikel waar je op wacht:</strong> markeer het als favoriet. Vinted laat het weten als de prijs is verlaagd of als het verkocht is.</li>'
              '<li><strong>Elke nieuwe advertentie van een model onder jouw prijs:</strong> een Vinted-zoekopdracht met een maximumprijs, gecontroleerd door SNYPD.</li>'

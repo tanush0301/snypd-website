@@ -161,8 +161,8 @@ proxies). UNCLEAR: whether that re-read is monthly; nothing in the code says so.
 ```
 ssh snypd-vps "docker logs --since 24h snypd-scraper-worker-2 2>&1 | grep '\"QUEUE_CONSUME\"'" | python ops/seo/check_interval.py > ops/seo/data/check-interval.json.new
 ```
-Keep it only if it exits 0 and `median_seconds` is 30: `mv ops/seo/data/check-interval.json.new ops/seo/data/check-interval.json`.
-Otherwise delete the `.new` and tell Tanush (the "about every 30 seconds" copy would be wrong).
+Keep it only if it exits 0 and `median_seconds` is 60 (30 before the 19 Oct 2026 poll change; the copy says "about once a minute"): `mv ops/seo/data/check-interval.json.new ops/seo/data/check-interval.json`.
+Otherwise delete the `.new` and tell Tanush (the "about once a minute" copy would be wrong).
 Comparison: re-check every vendor fact on its own site, write the evidence file
 (`C:\Users\Tanus\website\outreach\research-2026-11-XX-competitors.md`), fix `COMPETITORS` / `ALERT_WAYS` in
 `compare_data.py` (and `WAY_CELLS` prices in `copy_pl_sv.py`), then set `COMPARE_CHECKED` + `COMPARE_CHECKED_SHORT`

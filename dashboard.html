@@ -1950,7 +1950,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
         <span class="wiz-progress__bar"></span>
       </div>
       <h2 class="wiz-title">How should we alert you?</h2>
-      <p class="wiz-sub">We still check this hunt every 30 s to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.</p>
+      <p class="wiz-sub">We still check this hunt every 1 to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.</p>
       <div class="wiz-presets" role="radiogroup" aria-label="Alert style">
         <button type="button" class="wiz-mode" data-mode="every" role="radio" aria-checked="false">
           <span class="wiz-mode__title">Every match</span>
@@ -1980,7 +1980,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
         <span class="wiz-progress__bar"></span>
       </div>
       <h2 class="wiz-title">How should we tell you?</h2>
-      <p class="wiz-sub">We check your hunt every 30 s to 5 min and send a push when a new listing matches.</p>
+      <p class="wiz-sub">We check your hunt every 1 to 5 min and send a push when a new listing matches.</p>
       <!-- RISK 15: each toggle's only content is a decorative knob span, so
            without an explicit name a screen reader announces "switch, on"
            with no subject. aria-labelledby points at the visible label that
@@ -5359,7 +5359,7 @@ const HEARTBEAT_URL = (() => {
     if (hasActiveHunts === false) {
       empty.innerHTML = EMPTY_ICON
         + '<div style="font-size:15px;color:var(--text-primary);margin-bottom:8px">No hunts yet</div>'
-        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD checks it every 30 seconds to 5 minutes and every new match lands here, newest first.</div>'
+        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD checks it every 1 to 5 minutes and every new match lands here, newest first.</div>'
         + '<div style="margin-top:18px"><button class="btn btn-prim" type="button" id="empty-add-hunt">Add your first hunt</button></div>';
       empty.style.display = 'block';
       const zeroPill = document.getElementById('filter-pill');

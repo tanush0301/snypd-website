@@ -165,7 +165,7 @@ def terms_body(email, discord):
   <ul>
     <li>SNYPD <strong>never</strong> asks for your Vinted password, logs into your Vinted account, buys, makes offers or messages sellers. Every purchase is yours to make on Vinted, under Vinted's own terms.</li>
     <li>SNYPD is independent and <strong>not affiliated with or endorsed by Vinted</strong>.</li>
-    <li>Searches are checked between every 30 seconds and every few minutes, faster for busier searches. We work hard to catch every new listing quickly, but we cannot guarantee that you see every listing or that you see it before anyone else. Vinted can change or limit its website at any time, which can slow or interrupt SNYPD.</li>
+    <li>Searches are checked between about once a minute and every few minutes, faster for busier searches. We work hard to catch every new listing quickly, but we cannot guarantee that you see every listing or that you see it before anyone else. Vinted can change or limit its website at any time, which can slow or interrupt SNYPD.</li>
   </ul>
 </section>
 <section id="account">
