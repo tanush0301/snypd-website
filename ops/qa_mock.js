@@ -128,8 +128,13 @@
         whop_product_id: (PLAN === 'elite' || params.get('active') === '1') ? 'prod_test123' : null,
         whop_manage_url: (PLAN === 'elite' || params.get('active') === '1') ? 'https://whop.com/manage' : null,
         // ?trial=1: a running 72 h trial (migration 061 columns), 2 days left.
-        free_trial_started_at: params.get('trial') === '1' ? new Date(now - 86400000).toISOString() : null,
-        trial_ends_at: params.get('trial') === '1' ? new Date(now + 2 * 86400000).toISOString() : null,
+        // ?trial=ending: 6 h left; ?trial=ended: ended 20 h ago (trial-end summary, Session 70).
+        free_trial_started_at: params.get('trial') === '1' ? new Date(now - 86400000).toISOString()
+          : params.get('trial') === 'ending' ? new Date(now - 66 * 3600000).toISOString()
+          : params.get('trial') === 'ended' ? new Date(now - 92 * 3600000).toISOString() : null,
+        trial_ends_at: params.get('trial') === '1' ? new Date(now + 2 * 86400000).toISOString()
+          : params.get('trial') === 'ending' ? new Date(now + 6 * 3600000).toISOString()
+          : params.get('trial') === 'ended' ? new Date(now - 20 * 3600000).toISOString() : null,
         is_founding_member: true,
         founding_number: 7,
       },
@@ -618,8 +623,20 @@
     // Weekly hunt report (Session 66 P6): ?hr=teaser | empty | error, else the full report for paid/trial plans
     if (u.indexOf('/api/v1/hunt-report') !== -1) {
       var hrq = new URLSearchParams(location.search).get('hr');
+      window.__hrRequests = (window.__hrRequests || 0) + 1;
       if (hrq === 'error') return Promise.resolve(new Response(JSON.stringify({ detail: 'could not build your report right now' }), { status: 503 }));
       var hrBase = { days: 7, since: '2026-11-12', until: '2026-11-18', generated_at: '2026-11-18T15:00:00Z', cached: false };
+      // Trial-end summary (Session 70): ?trial=ending|ended adds trial_recap like the backend's window does;
+      // ?tr=noprice | busy | gbp | noname | smallgap | none vary it.
+      var trq = new URLSearchParams(location.search).get('tr'), trw = params.get('trial');
+      if ((trw === 'ending' || trw === 'ended') && trq !== 'none') {
+        var rcp = { hunt_name: trq === 'noname' ? 'Vinted search' : 'nike <i>running</i>', site: trq === 'gbp' ? 'vinted.co.uk' : 'vinted.fr',
+          currency: trq === 'gbp' ? 'GBP' : 'EUR', days: 4, since: '20261104', finds: trq === 'busy' ? 14108 : 1892, busy: trq === 'busy',
+          trial_ends_at: '2026-11-07T21:30:00Z',
+          price: trq === 'noprice' ? null : { condition: trq === 'noname' ? 'Other condition' : 'Very good', condition_raw: 'Tres bon etat', finds: 940,
+            typical_cents: trq === 'smallgap' ? 3300 : 4900, low_cents: trq === 'smallgap' ? 3150 : 3050 } };
+        hrBase.trial_recap = rcp;
+      }
       if (hrq === 'teaser' || (PLAN !== 'elite' && PLAN !== 'pro' && hrq !== 'full')) {
         return Promise.resolve(new Response(JSON.stringify(Object.assign({ tier: 'teaser', teaser: { finds: 288, hunts: 3, cheapest_cents: 900, currency: 'EUR', hunt_name: 'carhartt' } }, hrBase)), { status: 200 }));
       }

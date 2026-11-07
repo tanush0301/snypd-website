@@ -1133,6 +1133,20 @@ FR.update({
     'typical': 'typique',
     'Too mixed for one price': 'Trop mélangé pour un seul prix',
     'Too few to price yet': 'Encore trop peu pour un prix',
+    # Trial-end summary (Session 70, outreach/42)
+    'Your trial in numbers': 'Ton essai en chiffres',
+    'Your hunt': 'Ta recherche',
+    'Typical asking price': 'Prix demandé typique',
+    'the cheapest quarter': 'le quart le moins cher',
+    'or less': 'ou moins',
+    'about': 'environ',
+    'under typical': 'de moins que le prix typique',
+    'With this many finds, Solo can alert you only for the cheapest quarter (Only the cheap ones).':
+        'Avec autant d’annonces, Solo peut t’alerter seulement pour le quart le moins cher (Seulement les moins chères).',
+    'SNYPD rated each find against these prices. Solo or a Hunt Pass keeps that price check on every find and in your alerts; Pro adds the weekly hunt report and the Market board.':
+        'SNYPD a comparé chaque annonce à ces prix. Solo ou un Pass 30 jours garde ce contrôle de prix sur chaque annonce et dans tes alertes' + NB + '; Pro ajoute le rapport hebdo de tes recherches et le tableau du marché.',
+    'Keep it: Solo €5.99/month': 'Le garder' + NB + ': Solo 5,99' + NB + '€/mois',
+    'Hunt Pass €3.99 once': 'Pass 30 jours 3,99' + NB + '€ une fois',
     'Other condition': 'Autre état',
     'No new listings this week yet.': 'Pas encore de nouvelle annonce cette semaine.',
     'No active hunts. Start a hunt to get this report.': 'Aucune recherche active. Lance une recherche pour avoir ce rapport.',

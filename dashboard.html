@@ -1314,6 +1314,14 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 .elite-banner__text { font-size: 11.5px; color: var(--text-muted); }
 /* What the user's own hunt caught (migration 061 my_trial_stats): the reason to keep it running. */
 .elite-banner__value { font-size: 13px; color: var(--text-primary); margin-top: 6px; }
+/* Trial-end summary (Session 70, outreach/42): what the trial's own finds asked, in money. */
+.trial-recap { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,229,160,0.2); }
+.trial-recap__k { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--success); }
+.trial-recap__h { font-size: 12px; color: var(--text-secondary); margin-top: 3px; overflow-wrap: anywhere; }
+.trial-recap__p { font-size: 14px; color: var(--text-primary); margin-top: 4px; line-height: 1.45; }
+.trial-recap__t { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
+.trial-recap__a { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.trial-recap__a .btn { height: 32px; padding: 0 12px; font-size: 11px; }
 .email-optin__actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* Offline / can't-reach-backend state - amber per Ledger 2e: this is a
@@ -2131,6 +2139,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <div class="elite-banner__title">Paid plans hunt while you're away</div>
     <div class="elite-banner__text">Free only checks while this tab is open. Paid plans keep hunting 24/7, tab closed or not.</div>
     <div class="elite-banner__value" id="trial-value" style="display:none"></div>
+    <div class="trial-recap" id="trial-recap" style="display:none"></div>
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
 </div>
@@ -2956,6 +2965,55 @@ const HEARTBEAT_URL = (() => {
     if (line && !window.SNYPD_ACTIVATING) { el.textContent = line; el.style.display = ''; }
   }
   paintTrialValue().catch(console.error);
+
+  // Trial-end summary (Session 70, outreach/42): from 24 h before the trial ends until 72 h after it, what the trial's
+  // own finds asked in its busiest condition: typical asking price and the cheapest quarter (GET /api/v1/hunt-report
+  // -> trial_recap; the backend decides the window and never sends a single listing). Prices only: the count is the
+  // line above (my_trial_stats). Any error -> nothing is drawn.
+  async function paintTrialRecap() {
+    const box = document.getElementById('trial-recap');
+    if (!box || !eliteBanner || effectivePlan !== 'free' || !profile.free_trial_started_at) return;
+    const end = trialEndMs(profile);
+    if (!(Date.now() >= end - 864e5 && Date.now() < end + 3 * 864e5)) return;
+    let rc = null;
+    try {
+      const s = await sb.auth.getSession();
+      const tok = s && s.data && s.data.session && s.data.session.access_token;
+      if (!tok) return;
+      const res = await fetch('https://api.snypd.store/api/v1/hunt-report', { headers: { Authorization: 'Bearer ' + tok } });
+      if (res.ok) rc = ((await res.json()) || {}).trial_recap || null;
+    } catch (e) { console.error('SNYPD: trial recap failed', e); }
+    const p = rc && rc.price;
+    if (!p || !(p.typical_cents > 0) || !(p.low_cents > 0) || p.low_cents > p.typical_cents) return;
+    if (window.SNYPD_ACTIVATING || window.SNYPD_PLAN_PROMPT) return;
+    const fr = uiFr();
+    const h = t => String(t == null ? '' : t).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    const sp = t => '<span>' + h(t) + '</span>';
+    const money = cents => {
+      const v = cents / 100;
+      try {
+        return new Intl.NumberFormat(fr ? 'fr-FR' : 'en-GB', { style: 'currency', currency: rc.currency || 'EUR',
+          minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 }).format(v);
+      } catch (e) { return v + ' ' + (rc.currency || ''); }
+    };
+    const gap = p.typical_cents - p.low_cents;
+    const showGap = gap >= 200 && gap * 10 >= p.typical_cents;   // at least 2 units and 10% of typical
+    const name = rc.hunt_name && rc.hunt_name !== 'Vinted search' ? rc.hunt_name : '';
+    const cond = p.condition && p.condition !== 'Other condition' ? p.condition : '';
+    box.innerHTML = '<div class="trial-recap__k">' + sp('Your trial in numbers') + '</div>'
+      + '<div class="trial-recap__h">' + (name ? '<span data-i18n-skip>' + h(name) + '</span>' : sp('Your hunt'))
+      + (cond ? ' &middot; ' + sp(cond) : '') + '</div>'
+      + '<div class="trial-recap__p">' + sp('Typical asking price') + ' <b>' + h(money(p.typical_cents)) + '</b> &middot; '
+      + sp('the cheapest quarter') + ' <b>' + h(money(p.low_cents)) + '</b> ' + sp('or less')
+      + (showGap ? ' (' + sp('about') + ' <b>' + h(money(gap)) + '</b> ' + sp('under typical') + ')' : '') + '</div>'
+      + (rc.busy ? '<div class="trial-recap__t">' + sp('With this many finds, Solo can alert you only for the cheapest quarter (Only the cheap ones).') + '</div>' : '')
+      + '<div class="trial-recap__t">' + sp('SNYPD rated each find against these prices. Solo or a Hunt Pass keeps that price check on every find and in your alerts; Pro adds the weekly hunt report and the Market board.') + '</div>'
+      + '<div class="trial-recap__a"><a class="btn btn-prim" href="/plans?checkout=solo"><span>Keep it: Solo &euro;5.99/month</span></a>'
+      + '<a class="btn btn-ghost" href="/plans?checkout=pass"><span>Hunt Pass &euro;3.99 once</span></a></div>';
+    box.style.display = '';
+    eliteBanner.style.display = '';
+  }
+  paintTrialRecap().catch(console.error);
 
   // Hunt Pass (migration 063): a one-time Whop plan of the SOLO product, so the account is plan 'solo' with an end
   // in users.pass_expires_at (Postgres switches it to free at that time). Name it, and from 5 days before the end
