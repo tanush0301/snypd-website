@@ -5,6 +5,7 @@
 <head>
 <script src="/assets/i18n.js"></script>
 <script src="/assets/search-contract.js"></script>
+<script src="/assets/hunt-words.js"></script>
 <script>
   /* Plan intent: a visitor who clicked START KICKSTART / PRO / ELITE on the
      homepage signed up via /signup?plan=<plan>. Once they are signed in, send
@@ -1741,6 +1742,16 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     .wiz-quick { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
     .wiz-quick__note { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin: 0; }
     .wiz-quick__err { font-size: 12px; color: var(--warning); line-height: 1.5; margin: 0; }
+    /* Hunt words check (Session 70, outreach/43): Vinted needs every word in one listing. */
+    .hw-box { border: 1px solid rgba(245,158,11,0.45); background: rgba(245,158,11,0.06); padding: 12px 14px; margin-top: 10px; text-align: left; }
+    .hw-box__t { font-size: 13px; color: var(--text-primary); margin-bottom: 4px; }
+    .hw-box__x { font-size: 12px; color: var(--text-secondary); line-height: 1.5; overflow-wrap: anywhere; }
+    .hw-box__x b { color: var(--text-primary); font-weight: 600; }
+    .hw-box__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .hw-box__chips .btn { height: 32px; padding: 0 12px; font-size: 11px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; }
+    .hw-box__plan { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
+    .hw-box__keep { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .hw-box__keep .btn { height: 30px; padding: 0 12px; font-size: 11px; }
     .wiz-preset {
       display: flex; flex-direction: column; gap: 4px;
       text-align: left; width: 100%; padding: 14px 16px;
@@ -1907,6 +1918,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
           <select id="fs-q-site" aria-label="Which Vinted country"></select>
           <input type="number" id="fs-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
         </div>
+        <div class="hw-box" id="fs-q-hw" role="status" style="display:none"></div>
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
         <p class="vq-or">or paste a Vinted search link</p>
         <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
@@ -1936,7 +1948,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       <h2 class="wiz-title">What are you hunting?</h2>
       <p class="wiz-sub">Type what you want. SNYPD runs that search on Vinted for you, no link needed. You can add more from Filters anytime.</p>
       <div class="wiz-quick">
-        <input type="text" class="vq-input" id="wiz-q-words" placeholder="e.g. ralph lauren, jordan 4, carhartt jacket" autocomplete="off" autocapitalize="none" aria-label="What are you looking for?" />
+        <input type="text" class="vq-input" id="wiz-q-words" placeholder="e.g. ralph lauren jumper" autocomplete="off" autocapitalize="none" aria-label="What are you looking for?" />
         <div class="vq-row">
           <select id="wiz-q-site" aria-label="Which Vinted country"></select>
           <input type="number" id="wiz-q-max" min="0" step="0.01" inputmode="decimal" placeholder="Max price" aria-label="Maximum price (optional)" />
@@ -1945,6 +1957,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
         <input type="number" class="vq-input" id="wiz-q-min" min="0" step="0.01" inputmode="decimal" value="30" aria-describedby="wiz-q-note" />
         <p class="wiz-quick__note" id="wiz-q-note">Lower or clear the minimum to include cheaper items. Like Vinted's search, matches can include words in the description.</p>
         <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
+        <div class="hw-box" id="wiz-q-hw" role="status" style="display:none"></div>
       </div>
       <div class="wiz-actions">
         <button class="btn btn-prim" id="wiz-q-save" type="button">Start this hunt</button>
@@ -2154,6 +2167,12 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <button class="btn btn-prim" id="stats-note-ok" type="button">OK</button>
     <button class="btn btn-ghost" id="stats-note-profile" type="button">Open Profile</button>
     <a class="btn btn-ghost" href="/privacy#why">Privacy policy</a>
+  </div>
+</div>
+<div class="elite-banner" id="words-card" style="display:none">
+  <div style="flex:1;min-width:0">
+    <div class="elite-banner__title" id="words-card-title">This search needs every word in one listing</div>
+    <div class="hw-box__x" id="words-card-body"></div>
   </div>
 </div>
 <div class="elite-banner" id="broad-hunt" style="display:none">
@@ -3301,6 +3320,59 @@ const HEARTBEAT_URL = (() => {
         sel.appendChild(o);
       });
     }
+    // Hunt words check (Session 70, outreach/43; assets/hunt-words.js). Vinted only returns listings that contain
+    // EVERY word, so "Ralph Lauren, Nike, Adidas" finds almost nothing. Before a quick search is saved: say why and
+    // offer one-tap alternatives; "Keep as typed" always saves the words unchanged. Never blocks.
+    function hwEsc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
+    function hwSpan(t) { return '<span>' + hwEsc(t) + '</span>'; }
+    function hwCheck(words) {
+      try { return (window.SnypdHuntWords && window.SnypdHuntWords.check(words)) || { kind: '' }; } catch (e) { return { kind: '' }; }
+    }
+    function hwSmallPlan() { const p = document.body.dataset.plan || 'free'; return p === 'free' || p === 'solo'; }
+    // body HTML for kind list | brands | typo | long; chips get data-hw-pick, buttons data-hw-act
+    function hwHtml(r, opts) {
+      opts = opts || {};
+      const all = (r.kind === 'list' ? r.options : (r.kind === 'brands' ? r.brands : []))
+        .map(x => '<b data-i18n-skip>' + hwEsc(x) + '</b>').join(' + ');
+      let h = '';
+      if (r.kind === 'list' || r.kind === 'brands') {
+        if (!opts.noTitle) h += '<div class="hw-box__t">' + hwSpan('This search needs every word in one listing') + '</div>';
+        h += '<div class="hw-box__x">' + hwSpan('Vinted only shows listings that contain all of:') + ' ' + all + '. '
+          + hwSpan('That finds almost nothing.') + '</div>'
+          + '<div class="hw-box__x" style="margin-top:6px">' + hwSpan('Watch one of them:') + '</div>';
+      } else if (r.kind === 'typo') {
+        if (!opts.noTitle) h += '<div class="hw-box__t">' + hwSpan('Check the spelling') + '</div>';
+        h += '<div class="hw-box__x">' + hwSpan('Did you mean:') + '</div>';
+      } else if (r.kind === 'long') {
+        if (!opts.noTitle) h += '<div class="hw-box__t">' + hwSpan('Long searches find little') + '</div>';
+        h += '<div class="hw-box__x">' + hwSpan('Vinted only shows listings that contain every word. Try 2 or 3 words, for example a brand and an item.') + '</div>';
+      }
+      if (r.options && r.options.length) {
+        h += '<div class="hw-box__chips">' + r.options.map(o => '<button class="btn btn-prim" type="button" data-hw-pick="' + hwEsc(o) + '"><span data-i18n-skip>' + hwEsc(o) + '</span></button>').join('') + '</div>';
+      }
+      if ((r.kind === 'list' || r.kind === 'brands') && hwSmallPlan()) {
+        h += '<div class="hw-box__plan">' + hwSpan('Want several? Kickstart watches 2 searches, Pro 5.') + ' <a href="/plans">' + hwSpan('See plans') + '</a></div>';
+      }
+      h += '<div class="hw-box__keep">' + (opts.extra || '')
+        + '<button class="btn btn-ghost" type="button" data-hw-act="keep">' + hwSpan(opts.keepLabel || 'Keep as typed') + '</button></div>';
+      return h;
+    }
+    // box: the panel element; onPick(words), onKeep(); returns nothing. Clicks are wired once per box.
+    function hwShow(box, r, onPick, onKeep) {
+      if (!box) return;
+      box.innerHTML = hwHtml(r);
+      box.style.display = '';
+      box.onclick = e => {
+        const pick = e.target.closest('[data-hw-pick]');
+        if (pick) { box.style.display = 'none'; onPick(pick.getAttribute('data-hw-pick')); return; }
+        const act = e.target.closest('[data-hw-act="keep"]');
+        if (act) { box.style.display = 'none'; onKeep(); }
+      };
+    }
+    function hwHide(box) { if (box) { box.style.display = 'none'; box.innerHTML = ''; } }
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.hw = { check: hwCheck, html: hwHtml, show: hwShow, hide: hwHide, esc: hwEsc, smallPlan: hwSmallPlan };
+
     // floor: number or null. price_from is left out when it would sit at or
     // above the max price, which would return nothing.
     function vqBuild(site, words, max, floor) {
@@ -3361,6 +3433,9 @@ const HEARTBEAT_URL = (() => {
         // (catalogue_contract.build_catalogue_request) sets currency from the
         // marketplace and REJECTS a search whose currency disagrees with it.
         if (x.searchParams.has('price_from')) return u;
+        // Never at or above the link's own max price: "min 30, max 30" finds almost nothing (Session 70).
+        const maxTo = Number(String(x.searchParams.get('price_to') || '').replace(',', '.'));
+        if (x.searchParams.has('price_to') && isFinite(maxTo) && maxTo > 0 && floor >= maxTo) return u;
         x.searchParams.set('price_from', String(floor));
         return x.toString();
       } catch (e) { return u; }
@@ -3479,6 +3554,7 @@ const HEARTBEAT_URL = (() => {
       siteNote.textContent = msg;
       siteNote.style.display = msg ? '' : 'none';
     }
+    let hwKeptUrl = null;   // the link the user chose to keep as typed after the words check
     async function addHunt() {
       let url = urlInput.value.trim();
       // A link copied without its scheme ("vinted.fr/catalog?...") is still a link.
@@ -3492,6 +3568,26 @@ const HEARTBEAT_URL = (() => {
       if (!vintedSiteSupported(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
       if (contractProblem(url)) { urlInput.style.borderColor = 'var(--danger)'; paintSiteNote(); return; }
       urlInput.style.borderColor = '';
+      {
+        let st = '';
+        try { st = (new URL(url).searchParams.get('search_text') || '').trim(); } catch (e) { st = ''; }
+        const hwBox = document.getElementById('fs-q-hw');
+        const r = st ? hwCheck(st) : { kind: '' };
+        if (r.kind && hwKeptUrl !== url) {
+          hwShow(hwBox, r, words => {
+            try {
+              const x = new URL(url);
+              x.searchParams.set('search_text', words);
+              urlInput.value = x.toString();
+              if (qWords && qWords.value.trim() === st) qWords.value = words;
+              if (!nameInput.value.trim() || nameInput.dataset.auto === '1' || nameInput.value.trim() === st) { nameInput.value = words; nameInput.dataset.auto = '1'; }
+            } catch (e) { return; }
+            addHunt();
+          }, () => { hwKeptUrl = url; addHunt(); });
+          return;
+        }
+        hwHide(hwBox);
+      }
       saveBtn.disabled = true;
       const wasFirst = rows.length === 0;
       try {
@@ -3951,6 +4047,7 @@ const HEARTBEAT_URL = (() => {
             }
           }
         } catch (e) {} finally { try { localStorage.removeItem('snypd_hunt_intent'); } catch (ignored) {} }
+        let wqKept = null;   // words the user chose to keep as typed after the words check
         wqSave.addEventListener('click', async () => {
           const words = wqWords.value.trim();
           if (!words) {
@@ -3977,8 +4074,17 @@ const HEARTBEAT_URL = (() => {
             return;
           }
           wqErr.style.display = 'none';
+          const hwBox = document.getElementById('wiz-q-hw');
+          const hw = window.SNYPD.hw;
+          const r = hw ? hw.check(words) : { kind: '' };
+          if (r.kind && wqKept !== words) {
+            hw.show(hwBox, r, pick => { wqWords.value = pick; wqKept = null; wqSave.click(); }, () => { wqKept = words; wqSave.click(); });
+            return;
+          }
+          if (hw) hw.hide(hwBox);
           await saveSearch(words, vq.build(wqSite.value, words, maxText, min));
         });
+        wqWords.addEventListener('input', () => { wqKept = null; if (window.SNYPD.hw) window.SNYPD.hw.hide(document.getElementById('wiz-q-hw')); });
         wqWords.addEventListener('keydown', e => { if (e.key === 'Enter') wqSave.click(); });
       }
 
@@ -6490,6 +6596,77 @@ const HEARTBEAT_URL = (() => {
     });
   })();
 
+  // Hunt words card (Session 70, outreach/43): saved hunts that ask Vinted for several brands or things at once.
+  let wordsShown = null, wordsUndo = null;
+  function wordsKey(h, q) { return h.id + ':' + q; }
+  function wordsDismissed(k) { try { return !!(JSON.parse(localStorage.getItem('snypd_hw_ok') || '{}') || {})[k]; } catch (e) { return false; } }
+  function wordsRemember(k) {
+    try { const o = JSON.parse(localStorage.getItem('snypd_hw_ok') || '{}') || {}; o[k] = Date.now(); localStorage.setItem('snypd_hw_ok', JSON.stringify(o)); } catch (e) {}
+  }
+  function linkWithWords(u, words) { const x = new URL(u); x.searchParams.set('search_text', words); return x.toString(); }
+  async function noteHuntWords() {
+    const card = document.getElementById('words-card');
+    const body = document.getElementById('words-card-body');
+    const hw = window.SNYPD && window.SNYPD.hw;
+    if (!card || !body || !hw || wordsUndo) return;
+    let rows = [];
+    try { rows = await huntModes(); } catch (e) { console.error('SNYPD: words card could not read hunts', e); return; }
+    let hit = null;
+    for (const h of rows) {
+      if (h.is_active !== true) continue;
+      let q = '';
+      try { q = (new URL(h.vinted_url).searchParams.get('search_text') || '').trim(); } catch (e) { continue; }
+      if (!q) continue;
+      const r = hw.check(q);
+      if ((r.kind === 'list' || r.kind === 'brands' || r.kind === 'long') && !wordsDismissed(wordsKey(h, q))) { hit = { h: h, q: q, r: r }; break; }
+    }
+    if (!hit) { card.style.display = 'none'; wordsShown = null; return; }
+    wordsShown = hit;
+    const name = hit.h.search_name || hit.q;
+    body.innerHTML = '<div class="hw-box__x" style="margin-bottom:6px">&ldquo;<b data-i18n-skip>' + hw.esc(name) + '</b>&rdquo;</div>'
+      + hw.html(hit.r, { noTitle: true, keepLabel: 'Keep it',
+      extra: '<button class="btn btn-ghost" type="button" data-hw-act="edit"><span>Edit hunt</span></button>' });
+    card.style.display = '';
+    body.onclick = async e => {
+      const pick = e.target.closest('[data-hw-pick]');
+      const act = e.target.closest('[data-hw-act]');
+      const a = wordsShown;
+      if (!a) return;
+      if (act && act.getAttribute('data-hw-act') === 'keep') { wordsRemember(wordsKey(a.h, a.q)); card.style.display = 'none'; wordsShown = null; return; }
+      if (act && act.getAttribute('data-hw-act') === 'edit') { const pill = document.getElementById('filter-pill'); if (pill) pill.click(); return; }
+      if (!pick) return;
+      const words = pick.getAttribute('data-hw-pick');
+      const before = { url: a.h.vinted_url, name: a.h.search_name };
+      const upd = { vinted_url: linkWithWords(a.h.vinted_url, words) };
+      if (!a.h.search_name || a.h.search_name.trim() === a.q) upd.search_name = words;
+      body.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      const { error } = await sb.from('user_searches').update(upd).eq('id', a.h.id).eq('user_id', uid);
+      broadModes = null;
+      if (error) {
+        console.error('SNYPD: words card could not change the hunt', error);
+        body.innerHTML = '<span>Could not change this hunt. Try again, or change it in Filters.</span>';
+        return;
+      }
+      window.dispatchEvent(new Event('snypd:hunts-changed'));
+      body.innerHTML = '<span>Done: this hunt now watches</span> <b data-i18n-skip>' + hw.esc(words) + '</b>. <span>New matches can take a few minutes to show.</span>'
+        + '<div class="hw-box__keep"><button class="btn btn-prim" type="button" data-hw-act="undo"><span>Undo</span></button></div>';
+      wordsUndo = setTimeout(() => { card.style.display = 'none'; wordsShown = null; wordsUndo = null; }, 10000);
+      body.onclick = async ev => {
+        if (!ev.target.closest('[data-hw-act="undo"]')) return;
+        clearTimeout(wordsUndo);
+        const back = { vinted_url: before.url };
+        if (upd.search_name) back.search_name = before.name;
+        const r2 = await sb.from('user_searches').update(back).eq('id', a.h.id).eq('user_id', uid);
+        broadModes = null;
+        if (r2.error) { body.innerHTML = '<span>Could not undo. Change the hunt in Filters.</span>'; wordsUndo = null; return; }
+        window.dispatchEvent(new Event('snypd:hunts-changed'));
+        body.innerHTML = '<span>Undone: the hunt is back as it was.</span>';
+        wordsUndo = setTimeout(() => { card.style.display = 'none'; wordsShown = null; wordsUndo = null; }, 4000);
+      };
+    };
+  }
+  if (typeof window.addEventListener === 'function') window.addEventListener('snypd:hunts-changed', () => { if (!wordsUndo) setTimeout(() => noteHuntWords().catch(console.error), 300); });
+
   async function noteBroadHunt(feed) {
     const card = document.getElementById('broad-hunt');
     const text = document.getElementById('broad-hunt-text');
@@ -6599,6 +6776,7 @@ const HEARTBEAT_URL = (() => {
       hasActiveHunts = feed.huntCount > 0;
       feedEligibleCount = feed.eligibleCount;
       if (!coachList) loadCoach().catch(e => console.error('SNYPD: hunt coach failed', e));
+      if (!wordsShown && !wordsUndo) noteHuntWords().catch(e => console.error('SNYPD: words card failed', e));
       noteBroadHunt(feed).catch(e => console.error('SNYPD: broad-hunt check failed', e));
       const activeSearches = feed.activeSearches;
 

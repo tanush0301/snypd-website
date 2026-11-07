@@ -311,7 +311,7 @@ FR = {
     'What are you hunting?': 'Que cherches-tu' + NB + '?',
     'Type what you want. SNYPD runs that search on Vinted for you, no link needed. You can add more from Filters anytime.':
         'Tape ce que tu veux. SNYPD lance cette recherche sur Vinted pour toi, sans lien. Tu peux en ajouter d’autres depuis Filtres à tout moment.',
-    'e.g. ralph lauren, jordan 4, carhartt jacket': 'ex. ralph lauren, jordan 4, veste carhartt',
+    'e.g. ralph lauren jumper': 'ex. pull ralph lauren',
     'What are you looking for?': 'Que cherches-tu' + NB + '?',
     'Start this hunt': 'Lancer cette recherche',
     'I have a Vinted link': 'J’ai un lien Vinted',
@@ -1133,6 +1133,21 @@ FR.update({
     'typical': 'typique',
     'Too mixed for one price': 'Trop mélangé pour un seul prix',
     'Too few to price yet': 'Encore trop peu pour un prix',
+    # Hunt words check (Session 70, outreach/43)
+    'This search needs every word in one listing': 'Il faut tous les mots dans une seule annonce',
+    'Vinted only shows listings that contain all of:': 'Vinted ne montre que les annonces qui contiennent tous ces mots' + NB + ':',
+    'That finds almost nothing.': 'Cela ne trouve presque rien.',
+    'Watch one of them:': 'Surveille-en un seul' + NB + ':',
+    'Check the spelling': 'Vérifie l’orthographe',
+    'Did you mean:': 'Tu voulais dire' + NB + ':',
+    'Long searches find little': 'Une longue recherche trouve peu',
+    'Vinted only shows listings that contain every word. Try 2 or 3 words, for example a brand and an item.':
+        'Vinted ne montre que les annonces qui contiennent tous les mots. Essaie 2 ou 3 mots, par exemple une marque et un article.',
+    'Want several? Kickstart watches 2 searches, Pro 5.': 'Tu en veux plusieurs' + NB + '? Kickstart surveille 2 recherches, Pro 5.',
+    'Keep as typed': 'Garder tel quel',
+    'Done: this hunt now watches': 'C’est fait' + NB + ': cette recherche surveille maintenant',
+    'Undone: the hunt is back as it was.': 'Annulé' + NB + ': la recherche est revenue comme avant.',
+    'Could not undo. Change the hunt in Filters.': 'Impossible d’annuler. Modifie la recherche dans Filtres.',
     # Trial-end summary (Session 70, outreach/42)
     'Your trial in numbers': 'Ton essai en chiffres',
     'Your hunt': 'Ta recherche',

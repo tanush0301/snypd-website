@@ -280,6 +280,12 @@
   };
 
   if (NO_HUNTS) { DB.user_searches = []; DB.user_claims = []; DB.xp_events = []; }
+  // ?badhunt=list|brands|long: the active hunt asks Vinted for several things at once (hunt words card, Session 70).
+  if (params.get('badhunt')) {
+    var bhq = { list: 'Ralph Lauren, Nike, Adidas', brands: 'ralph loren pull nike', long: 'jujutsu kaisen tome 20 a 30' }[params.get('badhunt')] || 'Ralph Lauren, Nike, Adidas';
+    DB.user_searches.unshift({ id: 'search-bad', user_id: UID, search_name: bhq, vinted_url: 'https://www.vinted.fr/catalog?search_text=' + encodeURIComponent(bhq) + '&price_to=40&order=newest_first',
+      is_active: true, push_mode: 'every', push_calm_minutes: 15, created_at: new Date(now - 86400000).toISOString() });
+  }
   if (params.get('stock_claims') === '0') DB.user_claims = [];   // an account that never claimed anything: Stock's first-run screen
 
   // ?broad=1: 40 fresh listings stamped for the active seeded hunt (search-1), enough for the dashboard's
