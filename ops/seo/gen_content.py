@@ -2443,7 +2443,7 @@ import reseller_content  # noqa: E402
 import expansion_content  # noqa: E402
 SLUGS.update(reseller_content.SLUGS)
 SLUGS.update(expansion_content.SLUGS)
-PAGE_MODIFIED.update({key: reseller_content.UPDATED for key in reseller_content.SLUGS})
+PAGE_MODIFIED.update({key: reseller_content.PUBLISHED.get(key, reseller_content.UPDATED) for key in reseller_content.SLUGS})
 PAGE_MODIFIED.update({key: expansion_content.UPDATED for key in expansion_content.SLUGS})
 GUIDE_FAQ_H = {'en': 'Questions', 'fr': 'Questions', 'de': 'Fragen', 'nl': 'Vragen', 'it': 'Domande', 'es': 'Preguntas',
                'pl': 'Pytania', 'sv': 'Frågor'}

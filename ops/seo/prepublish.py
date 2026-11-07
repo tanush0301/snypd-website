@@ -49,6 +49,8 @@ PAGES = [
     ('/how-to-resell-on-vinted', 'how-to-resell-on-vinted.html', None),
     ('/best-brands-to-resell-on-vinted', 'best-brands-to-resell-on-vinted.html', None),
     ('/vinted-profit-calculator', 'vinted-profit-calculator.html', None),
+    ('/best-vinted-reselling-tools', 'best-vinted-reselling-tools.html', None),
+    ('/how-to-make-money-on-vinted', 'how-to-make-money-on-vinted.html', None),
     ('/vinted-search-builder', 'vinted-search-builder.html', None),
     ('/vinted-alerts-on-your-phone', 'vinted-alerts-on-your-phone.html', None),
     ('/vinted-saved-searches',      'vinted-saved-searches.html',      None),

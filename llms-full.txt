@@ -1,6 +1,6 @@
 # SNYPD
 
-> Public Vinted search monitoring and alerts for new matching listings.
+> Vinted reselling tool for sourcing: public Vinted search monitoring and alerts for new matching listings.
 
 SNYPD is independent of Vinted. It does not log into Vinted accounts, buy items,
 message sellers, or monitor price drops on existing listings.
@@ -15,6 +15,8 @@ This optional navigation summary is not an access policy or a promise of search 
 - [Reselling workflow](https://www.snypd.store/how-to-resell-on-vinted)
 - [Brand and model research](https://www.snypd.store/best-brands-to-resell-on-vinted)
 - [Resale profit calculator](https://www.snypd.store/vinted-profit-calculator)
+- [Vinted reselling tools by job (sourcing, pricing, crosslisting, bookkeeping)](https://www.snypd.store/best-vinted-reselling-tools)
+- [How to make money on Vinted: selling vs reselling](https://www.snypd.store/how-to-make-money-on-vinted)
 - [Search link builder](https://www.snypd.store/vinted-search-builder)
 - [Phone alert setup and local device test](https://www.snypd.store/vinted-alerts-on-your-phone)
 - [German price checker](https://www.snypd.store/de/vinted-preis-checker)

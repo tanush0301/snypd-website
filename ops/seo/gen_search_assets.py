@@ -29,6 +29,8 @@ def render():
         ('Reselling workflow', '/how-to-resell-on-vinted'),
         ('Brand and model research', '/best-brands-to-resell-on-vinted'),
         ('Resale profit calculator', '/vinted-profit-calculator'),
+        ('Vinted reselling tools by job (sourcing, pricing, crosslisting, bookkeeping)', '/best-vinted-reselling-tools'),
+        ('How to make money on Vinted: selling vs reselling', '/how-to-make-money-on-vinted'),
         ('Search link builder', '/vinted-search-builder'),
         ('Phone alert setup and local device test', '/vinted-alerts-on-your-phone'),
         ('German price checker', '/de/vinted-preis-checker'),
@@ -39,7 +41,7 @@ def render():
         ('Support', '/support'),
     ]
     text = ('# SNYPD\n\n'
-            '> Public Vinted search monitoring and alerts for new matching listings.\n\n'
+            '> Vinted reselling tool for sourcing: public Vinted search monitoring and alerts for new matching listings.\n\n'
             'SNYPD is independent of Vinted. It does not log into Vinted accounts, buy items,\n'
             'message sellers, or monitor price drops on existing listings.\n'
             'This optional navigation summary is not an access policy or a promise of search inclusion.\n\n'
