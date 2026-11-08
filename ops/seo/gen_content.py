@@ -1392,6 +1392,7 @@ def page_compare(lang):
 </section>
 <section id="fit">
   <h2>Is SNYPD right for you?</h2>
+  <p>If you also need to price stock or list it across marketplaces, <a href="/best-vinted-reselling-tools">compare Vinted reselling tools by job</a>.</p>
   <ul class="fit-list">
     <li class="fit-yes"><strong>Yes, if you want to judge every deal yourself.</strong>You see the listing first, check it against real Vinted price data, and buy it on Vinted without handing over your account.</li>
     <li><strong>Not if you want a bot to buy for you.</strong>Automatic buying needs a tool that operates your Vinted account, such as Souk, V-Tools, Resell Reserve, Resell Vault or VINTI.</li>
@@ -1442,6 +1443,7 @@ def page_compare(lang):
 </section>
 <section id="pour-qui">
   <h2>SNYPD est-il fait pour toi ?</h2>
+  <p>Pour estimer ton stock ou publier sur plusieurs plateformes, <a href="/fr/meilleurs-outils-revente-vinted">compare les outils de revente Vinted par usage</a>.</p>
   <ul class="fit-list">
     <li class="fit-yes"><strong>Oui, si tu veux juger chaque affaire toi-même.</strong>Tu vois l’annonce en premier, tu la compares aux vrais prix Vinted, et tu achètes sur Vinted sans confier ton compte.</li>
     <li><strong>Non, si tu veux qu’un bot achète à ta place.</strong>L’achat automatique demande un outil qui utilise ton compte Vinted, comme Souk, V-Tools, Resell Reserve, Resell Vault ou VINTI.</li>
