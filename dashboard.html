@@ -2079,6 +2079,13 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       <div style="font-size:11px;color:var(--text-muted)">Profit — not yet</div>
     </div>
     <div style="font-size:13px;color:var(--success)" id="claim-receipt-xp"></div>
+    <div id="claim-referral" style="display:none;border:1px solid var(--border);padding:14px;flex-direction:column;gap:8px">
+      <div style="font-size:13px;color:var(--text-primary)">Nice find. Give a friend 2 extra days of 24/7 hunting, and get 7 days yourself when they save a hunt.</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="claim-referral-link" readonly style="flex:1;min-width:0;font-size:12px;padding:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted)">
+        <button class="btn btn-ghost" id="claim-referral-share" type="button">Share</button>
+      </div>
+    </div>
     <div class="filter-sheet__footer">
       <button class="btn btn-ghost" id="claim-receipt-mark-sold" type="button" style="flex:1">Mark sold</button>
       <button class="btn btn-prim" id="claim-receipt-done" type="button" style="flex:1">Done</button>
@@ -6030,6 +6037,22 @@ const HEARTBEAT_URL = (() => {
 
     overlay.style.display = 'flex';
     overlay.dataset.claimId = claimId || '';
+    // Referral (migration 080): own code via RPC; hidden when the RPC is missing or fails.
+    const refBox = document.getElementById('claim-referral');
+    if (refBox) {
+      refBox.style.display = 'none';
+      try {
+        const { data: code, error } = await sb.rpc('my_referral_code');
+        if (!error && code && /^[a-z2-9]{6}$/.test(code)) {
+          const link = 'https://www.snypd.store/?ref=' + code;
+          document.getElementById('claim-referral-link').value = link;
+          refBox.dataset.link = link;
+          refBox.dataset.text = 'Found it for ' + fmtPrice(amount, currency) + ' with SNYPD. Get Vinted alerts too:';
+          refBox.style.display = 'flex';
+          if (window.gtag) try { gtag('event', 'referral_shown'); } catch (e) {}
+        }
+      } catch (e) { /* referral is optional, never blocks the receipt */ }
+    }
   }
 
   (function claimReceiptButtons() {
@@ -6039,6 +6062,16 @@ const HEARTBEAT_URL = (() => {
     if (!overlay || !doneBtn || !soldBtn) return;
     const close = () => { overlay.style.display = 'none'; };
     doneBtn.addEventListener('click', close);
+    const shareBtn = document.getElementById('claim-referral-share');
+    if (shareBtn) shareBtn.addEventListener('click', async () => {
+      const box = document.getElementById('claim-referral');
+      const link = box && box.dataset.link; if (!link) return;
+      try {
+        if (navigator.share) { await navigator.share({ text: box.dataset.text, url: link }); }
+        else { await navigator.clipboard.writeText(link); shareBtn.textContent = 'Copied'; setTimeout(() => { shareBtn.textContent = 'Share'; }, 2000); }
+        if (window.gtag) try { gtag('event', 'referral_share'); } catch (e) {}
+      } catch (e) { const i = document.getElementById('claim-referral-link'); if (i) i.select(); }
+    });
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
     soldBtn.addEventListener('click', () => {
       // Hands off to History's own, already-tested inline sale-form for this
