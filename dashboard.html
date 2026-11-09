@@ -6,6 +6,7 @@
 <script src="/assets/i18n.js"></script>
 <script src="/assets/search-contract.js"></script>
 <script src="/assets/hunt-words.js"></script>
+<script src="/assets/feedback.js"></script>
 <script>
   /* Plan intent: a visitor who clicked START KICKSTART / PRO / ELITE on the
      homepage signed up via /signup?plan=<plan>. Once they are signed in, send
@@ -2859,6 +2860,8 @@ const HEARTBEAT_URL = (() => {
   // behaviour wanted here too.
   document.body.dataset.plan = effectivePlan;
   document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
+  // Feedback questions (outreach/47, migration 081; assets/feedback.js): shows nothing until dashboard_boot carries feedback_done.
+  try { if (boot && boot.data && window.SnypdFeedback) window.SnypdFeedback.mount({ sb: sb, boot: boot.data, plan: effectivePlan, profile: profile }); } catch (e) { console.error('SNYPD feedback', e); }
 
   const eliteBanner = document.getElementById('elite-banner');
   // All paid plans run 24/7 (PAID_PLANS-gated), so this is a Free-only nudge.
