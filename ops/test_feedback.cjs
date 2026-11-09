@@ -145,6 +145,16 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   s = await p.evaluate(() => window.SnypdFeedback.pick({ done: [], plan: 'pro', profile: {}, activeDays14: 3 }).id);
   eq(s, 'D', 'signals: active pro -> D');
 
+  // 12. already answered + forced ?fb=C (the reported repeat): nothing shown, nothing saved
+  p = await open('plan=free&fb=C&fbdone=C');
+  s = await state(p);
+  ok(!s.shown && s.rpc.length === 0, 'answered C + ?fb=C: no popup');
+
+  // 13. URL cleaned once the popup opens, so a reload or tab restore cannot ask again
+  p = await open('plan=free&fb=C&a=one_item&src=email');
+  eq(await p.evaluate(() => /[?&](fb|a|src)=/.test(location.search)), false, 'fb/a/src removed from URL');
+  ok(/boot=1/.test(await p.evaluate(() => location.search)), 'other params kept');
+
   eq(errors, [], 'no page errors');
   console.log('test_feedback: ' + passed + ' checks passed');
   await browser.close(); server.close();

@@ -57,7 +57,7 @@
   function pick(s) {
     if (!s || !Array.isArray(s.done)) return null;               // migration 081 not live: show nothing
     var done = s.done, now = s.now || Date.now(), p = s.profile || {};
-    if (s.force && Q[s.force]) return { id: s.force, qs: s.force === 'D' ? ['D', 'D_text'] : [s.force] };
+    if (s.force && Q[s.force]) return (has(done, s.force) && !s.fromEmail) ? null : { id: s.force, qs: s.force === 'D' ? ['D', 'D_text'] : [s.force] };
     var plan = String(s.plan || 'free').toLowerCase();
     var paying = plan !== 'free';
     var start = Date.parse(p.free_trial_started_at || '');
@@ -136,7 +136,7 @@
     var st = {
       done: o.boot.feedback_done, plan: o.plan, profile: o.profile || o.boot.profile || {},
       firstFindAt: (o.boot.feedback_signals || {}).first_find_at, activeDays14: (o.boot.feedback_signals || {}).active_days_14,
-      lastRoundAt: Number(store('snypd_fb_round_at')) || 0, force: force, now: Date.now()
+      lastRoundAt: Number(store('snypd_fb_round_at')) || 0, force: force, fromEmail: !!params && params.get('src') === 'email', now: Date.now()
     };
     var choice = pick(st);
     if (!choice) return;
@@ -156,6 +156,8 @@
 
   function show(sb, choice, preset, fromEmail) {
     seen(true);
+    // Drop ?fb / ?a / ?src so a reload or tab restore cannot ask again.
+    try { var cu = new URL(location.href); ['fb', 'a', 'src'].forEach(function (k) { cu.searchParams.delete(k); }); history.replaceState(history.state, '', cu.pathname + cu.search + cu.hash); } catch (e) {}
     if (!document.getElementById('fb-css')) { var s = el('style'); s.id = 'fb-css'; s.textContent = CSS; document.head.appendChild(s); }
     var ov = el('div', 'fb-ov'); ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
     var box = el('div', 'fb-box'); ov.appendChild(box);
