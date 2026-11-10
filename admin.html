@@ -219,6 +219,18 @@
 <div id="entResult"></div>
 </div>
 
+<div class="mr-section" id="feedbackSection">
+<h2>Feedback <button class="btn ghost" id="fbRefresh" style="margin-left:auto;font-size:12px;padding:6px 12px;" type="button">Refresh</button></h2>
+<p class="sdesc">Answers to the in-app questions (outreach/47). Counts and written answers only, no names or emails.</p>
+<p class="sdesc" id="fbStats" style="margin-top:10px;"></p>
+<div id="fbScore"></div>
+<div style="overflow-x:auto;margin-top:14px;">
+<table class="sm-table" id="fbTable"></table>
+</div>
+<h2 style="margin-top:22px;font-size:15px;">Newest written answers</h2>
+<div id="fbTexts"></div>
+</div>
+
 <div class="mr-section">
 <h2>Market Research AI <span class="tag fallback">preview</span></h2>
 <p class="sdesc">Internal only &mdash; not linked from the real site, no customer sees this. Price lookup by condition, plus the automatic new-search tracking.</p>
@@ -478,6 +490,51 @@
     render(res.body);
     show('stateOk');
     loadSearchMonitor();
+    loadFeedback();
+  }
+
+  // ---- Feedback (outreach/47, GET /api/v1/admin/feedback) ----------------
+  var FB_NAMES = { A: 'What they want SNYPD for', B1: 'How they would find items without SNYPD', C: 'Why not upgraded',
+    B2: 'Worth per month', D: 'Disappointed without SNYPD', D_text: 'Main benefit', E1: 'Matters most', E2: 'Build next',
+    G: 'Almost stopped buying', F: 'Who benefits most', H: 'Pay more for price check', I: 'How they track buying' };
+  var FB_ORDER = ['C', 'B2', 'A', 'B1', 'D', 'D_text', 'E1', 'E2', 'G', 'F', 'H', 'I'];
+  function fbRender(d) {
+    var qs = d.questions || {};
+    el('fbStats').textContent = (d.total_rows || 0) + ' rows in total.';
+    var ds = d.d_score || {};
+    el('fbScore').innerHTML = ds.answers
+      ? '<div class="mr-badge ' + (ds.reliable ? (ds.very_pct >= 40 ? 'ok' : 'bad') : '') + '" style="margin-top:10px;">'
+        + 'D score: ' + ds.very_pct + '% very disappointed of ' + ds.answers + ' answers'
+        + (ds.reliable ? '' : ' (needs 40+ to mean anything)') + '</div>'
+      : '';
+    var ids = FB_ORDER.filter(function (q) { return qs[q]; });
+    if (!ids.length) {
+      el('fbTable').innerHTML = '<tr><td class="sdesc" style="padding:10px 0;border:0;">No answers yet.</td></tr>';
+    } else {
+      el('fbTable').innerHTML = '<tr><th>Question</th><th>Answered</th><th>Skipped</th><th>Answer rate</th><th>Answers (most first)</th></tr>'
+        + ids.map(function (q) {
+          var r = qs[q], shown = r.answered + r.skipped;
+          var ans = Object.keys(r.answers || {}).sort(function (a, b) { return r.answers[b] - r.answers[a]; })
+            .map(function (k) { return escapeHtml(k) + ' <b>' + r.answers[k] + '</b>'; }).join(' &middot; ');
+          return '<tr><td>' + escapeHtml(q + ' - ' + (FB_NAMES[q] || '')) + '</td><td>' + r.answered
+            + (r.via_email ? ' (' + r.via_email + ' email)' : '') + '</td><td>' + r.skipped + '</td><td>'
+            + (shown ? Math.round(100 * r.answered / shown) + '%' : '-') + '</td><td>' + (ans || '-') + '</td></tr>';
+        }).join('');
+    }
+    var t = d.texts || [];
+    el('fbTexts').innerHTML = t.length ? t.map(function (x) {
+      return '<div class="mr-card" style="margin-top:8px;"><p class="sdesc">' + escapeHtml(x.question + (x.answer ? ' / ' + x.answer : '')
+        + ' / ' + (x.plan || '?') + (x.source === 'email' ? ' / email' : '') + ' / ' + String(x.at || '').slice(0, 10)) + '</p>'
+        + '<p class="mr-headline" style="font-size:14px;">' + escapeHtml(x.text) + '</p></div>';
+    }).join('') : '<p class="sdesc">No written answers yet.</p>';
+  }
+  async function loadFeedback() {
+    el('fbStats').textContent = 'Loading...';
+    try {
+      var res = await api('/api/v1/admin/feedback');
+      if (res.status !== 200 || !res.body) { el('fbStats').textContent = 'Could not load feedback (status ' + res.status + ').'; return; }
+      fbRender(res.body);
+    } catch (e) { el('fbStats').textContent = 'Could not reach the server.'; }
   }
 
   // ---- Search Monitor -----------------------------------------------------
@@ -725,6 +782,7 @@
   el('mrQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { runMarketResearch(); } });
 
   el('smRefresh').addEventListener('click', loadSearchMonitor);
+  el('fbRefresh').addEventListener('click', loadFeedback);
   el('entGo').addEventListener('click', runEntitlementCheck);
   el('entUserId').addEventListener('keydown', function (e) { if (e.key === 'Enter') { runEntitlementCheck(); } });
 
