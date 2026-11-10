@@ -103,8 +103,6 @@ def cmp_groups():
         ('COMMUNITY', [
             ('Free Discord community', '', [Y] * n),
             ('Paid Discord channels', '', discord),
-            ('Founding member', 'First %d accounts, free included. Keep Pro at %s a month for life.'
-             % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False)), [Y] * n, 'founding'),
         ]),
         ('BILLING', [
             ('Price per month', 'VAT included.', price),
@@ -134,9 +132,8 @@ def cmp_html():
         out.append('<tr class="grp"><th scope="colgroup" colspan="%d">%s</th></tr>' % (len(plans.ORDER) + 1, title))
         for r in rows:
             label, note, cells = r[0], r[1], r[2]
-            attr = ' data-founding-row hidden' if len(r) > 3 else ''
-            out.append('<tr%s><th scope="row"><span class="fl">%s</span>%s</th>%s</tr>' % (
-                attr, esc(label), '<span class="fn">%s</span>' % esc(note) if note else '',
+            out.append('<tr><th scope="row"><span class="fl">%s</span>%s</th>%s</tr>' % (
+                esc(label), '<span class="fn">%s</span>' % esc(note) if note else '',
                 ''.join(cell(c, i) for i, c in enumerate(cells))))
     return '\r\n'.join(out)
 
@@ -156,7 +153,7 @@ def faqs():
         ('What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'),
         ('Can I get a refund?', 'Yes. Email help@snypd.store within %d days of your first payment for a plan and we refund that payment in full.' % r),
         ('Can I change plan later?', 'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email help@snypd.store and we will help you switch.'),
-        ('What is a founding member?', 'The first %d SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at %s a month for as long as their account exists.'
+        ('What is a founding member?', 'The first %d SNYPD accounts, free accounts included. All of those places are taken. If the Pro price ever goes up, founding members can keep Pro at %s a month for as long as their account exists.'
          % (plans.DATA['founding']['accounts'], plans.price('founding', 'en', entities=False))),
         ('Do you need my Vinted login?', 'Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.'),
     ]

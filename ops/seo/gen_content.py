@@ -1100,7 +1100,7 @@ def page_notify(lang):
 # Economic Law VI.17) allow naming competitors only when each comparison is
 # objective, verifiable and not misleading: keep every claim checkable, write
 # "not stated" (never "no") when a site is silent, and re-check before changing
-# the date. Tanush chose the eight reasons on 2026-10-01; none use testimonials
+# the date. Tanush chose the eight reasons on 2026-10-01 (seven since 10 Nov 2026: the founding price went when all 100 places were taken); none use testimonials
 # because none exist yet.
 # COMPARE_CHECKED, COMPETITORS, YES, HELP435/HELP433: ops/seo/compare_data.py (six languages).
 COMPARE_CSS = r"""
@@ -1293,9 +1293,6 @@ def reasons(lang):
             ('Made by a reseller',
              'SNYPD is built by a Belgian sneaker reseller with 150+ sales and 3.8k Instagram followers, and run in the open with resellers in its Discord.',
              'Questions go to a person: <a href="mailto:%s">%s</a> or the <a href="%s">Discord</a>.' % (EMAIL, EMAIL, DISCORD)),
-            ('A founding price, for life',
-             'The first 100 accounts, free accounts included, keep Pro at @@founding_price@@ a month for life.',
-             'The number of places left is counted live on the <a href="/">homepage</a>.'),
         ]
     else:
         R = [
@@ -1320,9 +1317,6 @@ def reasons(lang):
             ('Créé par un revendeur',
              'SNYPD est créé par un revendeur de sneakers belge, avec plus de 150 ventes et 3,8k abonnés Instagram, et développé au grand jour avec des revendeurs sur son Discord.',
              'Tes questions arrivent à une vraie personne : <a href="mailto:%s">%s</a> ou le <a href="%s">Discord</a>.' % (EMAIL, EMAIL, DISCORD)),
-            ('Un prix fondateur, à vie',
-             'Les 100 premiers comptes, gratuits compris, gardent Pro à @@founding_price@@ par mois à vie.',
-             'Le nombre de places restantes est affiché en direct sur la <a href="/">page d’accueil</a>.'),
         ]
     cards = ''.join('<div class="rs-card"><span class="rs-num">%02d</span><h3 class="rs-title">%s</h3><p>%s</p><p class="rs-proof">%s</p></div>' % (i + 1, t, b, p)
                     for i, (t, b, p) in enumerate(R))
@@ -1366,7 +1360,7 @@ def page_compare(lang):
   <div class="lg-box lg-mint"><p><strong>We make SNYPD, so we&rsquo;re not neutral.</strong> Every fact about another tool on this page comes from that tool&rsquo;s own website, checked on {COMPARE_CHECKED['en']}, and is linked in the table. Prices change: check before you pay. Spotted something out of date? Email <a href="mailto:{EMAIL}">{EMAIL}</a> and it gets fixed.</p></div>
 </section>
 <section id="reasons">
-  <h2>8 reasons resellers choose SNYPD</h2>
+  <h2>7 reasons resellers choose SNYPD</h2>
   {reasons('en')}
   <div class="fig-row">{figure('market', 'en')}{figure('hunts', 'en')}</div>
 </section>
@@ -1417,7 +1411,7 @@ def page_compare(lang):
   <div class="lg-box lg-mint"><p><strong>SNYPD est notre outil, donc cette page n’est pas neutre.</strong> Chaque information sur un autre outil vient du site de cet outil, vérifié le {COMPARE_CHECKED['fr']}, avec un lien dans le tableau. Les prix changent : vérifie avant de payer. Une info n’est plus à jour ? Écris à <a href="mailto:{EMAIL}">{EMAIL}</a> et elle sera corrigée.</p></div>
 </section>
 <section id="raisons">
-  <h2>8 raisons de choisir SNYPD</h2>
+  <h2>7 raisons de choisir SNYPD</h2>
   {reasons('fr')}
   <div class="fig-row">{figure('market', 'fr')}{figure('hunts', 'fr')}</div>
 </section>

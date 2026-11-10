@@ -827,8 +827,8 @@ FR.update({
     'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email': 'Passe à un plan supérieur ici à tout moment. Pour changer entre plans payants, gère ton abonnement dans Whop, ou écris à',
     'and we will help you switch.': 'et on t’aidera à changer.',
     'What is a founding member?': 'C’est quoi un membre fondateur' + NB + '?',
-    'The first 100 SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at €24.99 a month for as long as their account exists.':
-        'Les 100 premiers comptes SNYPD, comptes gratuits compris. Si le prix de Pro augmente un jour, les membres fondateurs peuvent garder Pro à 24,99' + NB + '€ par mois aussi longtemps que leur compte existe.',
+    'The first 100 SNYPD accounts, free accounts included. All of those places are taken. If the Pro price ever goes up, founding members can keep Pro at €24.99 a month for as long as their account exists.':
+        'Les 100 premiers comptes SNYPD, comptes gratuits compris. Toutes ces places sont prises. Si le prix de Pro augmente un jour, les membres fondateurs peuvent garder Pro à 24,99' + NB + '€ par mois aussi longtemps que leur compte existe.',
     'Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment.':
         'Les plans payants se renouvellent chaque mois jusqu’à ta résiliation. Résiliable à tout moment. Remboursement intégral dans les 14 jours suivant ton premier paiement.',
     'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email help@snypd.store.':

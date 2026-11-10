@@ -522,7 +522,6 @@
     </div>
     <div class="under">
       <span class="muted"><!--plans:plans-under-->Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment. The Hunt Pass is paid once and does not renew.<!--/plans:plans-under--></span>
-      <span style="color:#00E5A0;letter-spacing:.06em;" id="founding-line" hidden></span>
     </div>
     <p class="proof" id="proof" hidden><b id="proof-n"></b> Vinted listings matched for SNYPD hunters so far.</p>
   </section>
@@ -567,7 +566,6 @@
 <tr class="grp"><th scope="colgroup" colspan="6">COMMUNITY</th></tr>
 <tr><th scope="row"><span class="fl">Free Discord community</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr><th scope="row"><span class="fl">Paid Discord channels</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
-<tr data-founding-row hidden><th scope="row"><span class="fl">Founding member</span><span class="fn">First 100 accounts, free included. Keep Pro at &#8364;24.99 a month for life.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr class="grp"><th scope="colgroup" colspan="6">BILLING</th></tr>
 <tr><th scope="row"><span class="fl">Price per month</span><span class="fn">VAT included.</span></th><td class="pc c0">&#8364;0</td><td class="pc c1">&#8364;5.99</td><td class="pc c2">&#8364;14.99</td><td class="pc c3 is-pro">&#8364;24.99</td><td class="pc c4">&#8364;34.99</td></tr>
 <tr><th scope="row"><span class="fl">Card needed</span></th><td class="pc c0">No</td><td class="pc c1">Yes</td><td class="pc c2">Yes</td><td class="pc c3 is-pro">Yes</td><td class="pc c4">Yes</td></tr>
@@ -620,7 +618,7 @@
 <details><summary>What happens when I cancel?</summary><p>Your plan keeps running to the end of the month you paid for, then your account goes back to Free.</p></details>
 <details><summary>Can I get a refund?</summary><p>Yes. Email <a href="mailto:help@snypd.store">help@snypd.store</a> within 14 days of your first payment for a plan and we refund that payment in full.</p></details>
 <details><summary>Can I change plan later?</summary><p>Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email <a href="mailto:help@snypd.store">help@snypd.store</a> and we will help you switch.</p></details>
-<details><summary>What is a founding member?</summary><p>The first 100 SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at &#8364;24.99 a month for as long as their account exists.</p></details>
+<details><summary>What is a founding member?</summary><p>The first 100 SNYPD accounts, free accounts included. All of those places are taken. If the Pro price ever goes up, founding members can keep Pro at &#8364;24.99 a month for as long as their account exists.</p></details>
 <details><summary>Do you need my Vinted login?</summary><p>Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.</p></details><!--/plans:plans-faq--></div>
     </div>
   </section>
@@ -696,7 +694,6 @@
   var MANAGE = 'https://whop.com/@me/settings/orders/';
   var ACTIVE = ['active', 'trialing', 'past_due', 'unpaid'];
   var DISCORD = 'https://discord.gg/gjKD4auXhK';
-  var FOUNDING_ENDPOINT = 'https://api.snypd.store/api/v1/founding-members';
 
   // The comparison table and the FAQ are static HTML, written from
   // ops/seo/data/plans.json by ops/seo/gen_regions.py (crawlers that do not
@@ -1173,23 +1170,6 @@
       }, function () {});
   });
 
-  // ----- Founding counter ---------------------------------------------------
-  fetch(FOUNDING_ENDPOINT)
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) {
-      if (!d || !Number.isInteger(d.remaining) || d.remaining < 0 || d.remaining > 100) return;
-      var left = d.remaining;
-      if (left > 0) {
-        $('founding-line').textContent = 'FOUNDING · ' + left + ' OF 100 SPOTS LEFT · PRO PRICING FOR LIFE';
-        $('founding-line').hidden = false;
-        var row = document.querySelector('[data-founding-row]'); if (row) row.hidden = false;
-      } else {
-        // The offer is gone: stop advertising it.
-        $('founding-line').textContent = '';
-        var row = document.querySelector('[data-founding-row]'); if (row) row.hidden = true;
-      }
-    })
-    .catch(function () {});
 })();
 </script>
 </body>

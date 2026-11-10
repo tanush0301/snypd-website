@@ -190,7 +190,7 @@
         </div>
         <p id="hero-trial" style="margin:-10px 0 0;font-size:14px;line-height:1.55;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--></p>
         <p style="margin:0;border-top:1px solid #1D1D20;padding-top:16px;font-size:12.5px;line-height:1.55;color:#8B9094;"><span style="color:#00E5A0;">&#10003;</span> Never asks for your Vinted password. Reads public listings only.</p>
-        <span id="founding-line" style="font-size:11px;letter-spacing:.06em;color:#8B9094;">Free plan, no card.</span>
+        <span style="font-size:11px;letter-spacing:.06em;color:#8B9094;">Free plan, no card.</span>
       </div>
     </div>
   </div>
@@ -237,9 +237,9 @@
   <div style="max-width:1320px;margin:0 auto;padding:14px 20px 0;">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
       <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
-        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;" id="stat-listings">13,332,441</span>
+        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;" id="stat-listings">14,058,361</span>
         <span style="font-size:12.5px;line-height:1.5;color:#E8EAEB;">Vinted listings matched to users' searches since 17 Sept 2026</span>
-        <span style="font-size:12px;color:#8B9094;" id="stat-listings-asof">As of 7 Nov 2026</span>
+        <span style="font-size:12px;color:#8B9094;" id="stat-listings-asof">As of 10 Nov 2026</span>
       </div>
       <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
         <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;">150+ sales</span>
@@ -351,10 +351,6 @@
           <div style="background:#121214;padding:14px 15px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;"><span style="font-size:12px;color:#8B9094;">Price checks</span><span style="font-size:12px;color:#00E5A0;">included</span></div>
         </div>
         <span style="font-size:12px;color:#8B9094;line-height:1.7;">Cancel any time.</span>
-        <div id="founding-offer" hidden style="margin-top:auto;border:1px solid rgba(0,229,160,.38);background:rgba(0,229,160,.06);padding:14px 15px;display:flex;flex-direction:column;gap:6px;">
-          <span id="founding-badge" style="font-size:11px;letter-spacing:.12em;color:#00E5A0;"></span>
-          <span id="founding-detail" style="font-size:12px;color:#8B9094;line-height:1.6;"></span>
-        </div>
       </div>
     </div>
     <div id="price-rest" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(215px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
@@ -439,7 +435,6 @@
 /* Homepage v5 - vanilla port of the Claude Design component (SNYPD Homepage v5.dc.html).
    Markup and styles are the design's own; this only replaces its template runtime. */
 (function () {
-  var FOUNDING_ENDPOINT = 'https://api.snypd.store/api/v1/founding-members';
   var WALL = ['so89','at41','ehdt','fm52','9f56','d046','jx9i','ohpf'].map(function (id) { return '/assets/home/wall/' + id + '.webp'; });
   var HUNTS = {
     travis: { name: 'JORDAN 1 TRAVIS SCOTT', meta: 'Sneakers · from €150', short: 'jordan 1 travis scott', title: 'Jordan 1 Travis Scott Velvet Brown', price: '€225', img: '/assets/home/catch-jordan1-travis-velvet.jpg', where: '42,5 • vinted.be' },
@@ -450,7 +445,7 @@
   var LABELS = ['HUNT', 'WATCH', 'MATCH', 'CLAIM', 'PRICE'];
 
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var s = { step: 0, hunt: 'travis', paid: true, tabClosed: false, clean: true, claimed: null, menuOpen: false, pastHero: false, countT: null };
+  var s = { step: 0, hunt: 'travis', paid: true, tabClosed: false, clean: true, menuOpen: false, pastHero: false, countT: null };
   var prevStep = 0, focusNext = false, started = false, completed = false, raf = 0, countTimer = 0;
   var $ = function (id) { return document.getElementById(id); };
   var isMobile = function () { return window.innerWidth > 0 ? window.innerWidth < 700 : false; };
@@ -779,24 +774,6 @@
     else if (act === 'cta') ga('demo_cta_click', { step: 5, source: 'demo' });
   }
 
-  /* ---------- founding counter ---------- */
-  // Same promise as signup.html and account.html ("keep Pro pricing for
-  // life"). Once all 100 are taken the offer is gone, so stop advertising it.
-  function paintFounding() {
-    var c = s.claimed, known = Number.isInteger(c) && c >= 0, full = known && c >= 100;
-    // An unavailable counter is not evidence of available places.
-    $('founding-offer').hidden = !known;
-    $('founding-badge').textContent = full ? 'FOUNDING · ALL 100 TAKEN' : known ? 'FOUNDING · ' + (100 - c) + ' OF 100 SPOTS LEFT' : '';
-    $('founding-detail').textContent = full
-      ? 'All 100 founding accounts are taken.'
-      : known ? 'The first 100 accounts keep Pro pricing for life, free accounts included.' : '';
-    $('founding-line').textContent = full
-      ? 'Free plan, no card.'
-      : known
-        ? 'Free plan, no card · ' + (100 - c) + ' of the first 100 spots left, Pro pricing for life'
-        : 'Free plan, no card.';
-  }
-
   /* ---------- nav: mobile menu, scroll state, sticky bar ---------- */
   var menuBtn, menu, nav, inner, bar, lastMob = null, navOn = false;
   function setMenu(open) {
@@ -855,7 +832,6 @@
   $('demo-steps').addEventListener('click', onDemoClick);
   $('demo-stage').addEventListener('click', onDemoClick);
   renderDemo();
-  paintFounding();
 
   if (ref) document.querySelectorAll('a[href^="/signup"]').forEach(function (a) { a.setAttribute('href', withRef(a.getAttribute('href'))); });
   document.addEventListener('click', function (e) {
@@ -871,11 +847,6 @@
   if (typeof ResizeObserver === 'function') new ResizeObserver(function () { onResize(); onScroll(); }).observe(document.documentElement);
   onResize(); onScroll();
   setupReveal();
-
-  fetch(FOUNDING_ENDPOINT)
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) { if (d && typeof d.claimed === 'number') { s.claimed = d.claimed; paintFounding(); } })
-    .catch(function () {});
 
   /* ---------- listings counter ----------
      public_stats is one cached row per figure, refreshed every 15 min by

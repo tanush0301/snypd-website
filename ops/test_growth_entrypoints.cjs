@@ -4,66 +4,43 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const root = path.join(__dirname, '..');
-const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const plans = fs.readFileSync(path.join(root, 'plans.html'), 'utf8');
+const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const home = read('index.html');
+const plans = read('plans.html');
 let passed = 0;
-const tick = () => new Promise(resolve => setImmediate(resolve));
-function section(text, start, end) {
-  const a = text.indexOf(start), b = text.indexOf(end, a);
-  assert(a >= 0 && b > a); return text.slice(a, b);
+
+/* The founding counter is gone (10 Nov 2026): all 100 numbers were issued, and the endpoint kept
+   answering "4 remaining" because it counts rows and 4 founding accounts were deleted. No public
+   page may advertise places or call the endpoint again. */
+const COUNTER = /founding-members|SPOTS LEFT|spots left|paintFounding|FOUNDING_ENDPOINT|FOUNDING_URL|founding-offer|founding-line|data-founding-row|places sur les 100/;
+for (const file of ['index.html', 'plans.html', 'signup.html', 'login.html', 'assets/auth.js', 'ops/seo/gen_regions.py',
+  'vinted-bot-comparison.html', 'fr/comparatif-bot-vinted.html']) {
+  assert.doesNotMatch(read(file), COUNTER, file + ' still carries the founding counter'); passed++;
 }
-function elements() {
-  const map = new Map();
-  return id => { if (!map.has(id)) map.set(id, { hidden: true, textContent: '' }); return map.get(id); };
-}
-const paint = section(home, '  function paintFounding() {', '  /* ---------- nav:');
-for (const claimed of [null, undefined, NaN, Infinity, -1, 0.5, '20']) {
-  const $ = elements(); vm.runInNewContext(paint + '\npaintFounding();', { $, s: {claimed} });
-  assert.equal($('founding-offer').hidden, true);
-  assert.equal($('founding-line').textContent, 'Free plan, no card.'); passed++;
-}
-for (const claimed of [0, 50, 99]) {
-  const $ = elements(); vm.runInNewContext(paint + '\npaintFounding();', { $, s: {claimed} });
-  assert.equal($('founding-offer').hidden, false);
-  assert.match($('founding-badge').textContent, new RegExp((100-claimed) + ' OF 100 SPOTS LEFT')); passed++;
-}
-for (const claimed of [100, 329]) {
-  const $ = elements(); vm.runInNewContext(paint + '\npaintFounding();', { $, s: {claimed} });
-  assert.equal($('founding-line').textContent, 'Free plan, no card.');
-  assert.equal($('founding-badge').textContent, 'FOUNDING · ALL 100 TAKEN'); passed++;
-}
-assert.match(home, /id="founding-offer" hidden/);
+assert.match(home, /<span style="font-size:11px;letter-spacing:\.06em;color:#8B9094;">Free plan, no card\.<\/span>/); passed++;
 assert.doesNotMatch(home, /FOUNDING STATUS OPEN/);
-assert.match(plans, /id="founding-line" hidden><\/span>/);
-assert.match(plans, /<tr data-founding-row hidden>/);
-assert.match(fs.readFileSync(path.join(root,'ops/seo/gen_regions.py'),'utf8'), /data-founding-row hidden/);
-passed++;
+// The FAQ still explains the promise to the people who hold it, and says the places are gone.
+assert.match(plans, /What is a founding member\?<\/summary><p>The first 100 SNYPD accounts, free accounts included\. All of those places are taken\./); passed++;
+assert.doesNotMatch(read('vinted-bot-comparison.html'), /counted live on the/);
+assert.doesNotMatch(read('fr/comparatif-bot-vinted.html'), /affiché en direct sur la/); passed++;
+// The heading must state the number of reason cards actually on the page.
+for (const [file, re] of [['vinted-bot-comparison.html', /<h2>(\d+) reasons resellers choose SNYPD<\/h2>/], ['fr/comparatif-bot-vinted.html', /<h2>(\d+) raisons de choisir SNYPD<\/h2>/]]) {
+  const html = read(file), m = html.match(re);
+  assert(m, file + ': reasons heading not found');
+  assert.equal((html.match(/class="rs-card"/g) || []).length, Number(m[1]), file + ': heading count != cards'); passed++;
+}
+
 assert(plans.indexOf('data-section="chooser"') < plans.indexOf('data-section="cards"'));
 assert.equal((plans.match(/id="q-goal"/g) || []).length, 1); passed++;
-const counter = section(plans, '  // ----- Founding counter', '\n})();');
-(async () => {
-  for (const data of [null, {}, {remaining:-1}, {remaining:101}, {remaining:'5'}, {remaining:1.5}, {remaining:0}, {remaining:15}]) {
-    const $ = elements(); const row = {hidden:true};
-    vm.runInNewContext(counter, { $, Number, document:{querySelector:()=>row}, FOUNDING_ENDPOINT:'test',
-      fetch:async()=>({ok:true,json:async()=>data}) });
-    await tick();
-    const available = data && data.remaining === 15;
-    assert.equal($('founding-line').hidden, !available); assert.equal(row.hidden, !available); passed++;
+
+for (const file of ['index.html', 'plans.html', 'dashboard.html']) {
+  const html = read(file);
+  for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    if (/\bsrc\s*=|application\/ld\+json/i.test(match[1])) continue;
+    new vm.Script(match[2], { filename: file });
   }
-  for (const fail of [true, false]) {
-    const $ = elements(); const row={hidden:true};
-    vm.runInNewContext(counter, { $, Number, document:{querySelector:()=>row}, FOUNDING_ENDPOINT:'test',
-      fetch:async()=>{ if(fail) throw Error('offline'); return {ok:false}; } });
-    await tick(); assert.equal($('founding-line').hidden,true); assert.equal(row.hidden,true); passed++;
-  }
-  for (const file of ['index.html','plans.html','dashboard.html']) {
-    const html=fs.readFileSync(path.join(root,file),'utf8');
-    for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-      if (/\bsrc\s*=|application\/ld\+json/i.test(match[1])) continue;
-      new vm.Script(match[2], {filename:file});
-    }
-  }
-  new vm.Script(fs.readFileSync(path.join(root,'assets/i18n.js'),'utf8'));
-  passed++;
-  console.log(`PASS: ${passed} growth entry-point checks, including inline-script parsing.`);
-})().catch(error=>{console.error(error);process.exitCode=1;});
+}
+new vm.Script(read('assets/i18n.js'));
+new vm.Script(read('assets/auth.js'));
+passed++;
+console.log(`PASS: ${passed} growth entry-point checks, including inline-script parsing.`);
