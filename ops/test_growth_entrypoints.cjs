@@ -17,7 +17,10 @@ for (const file of ['index.html', 'plans.html', 'signup.html', 'login.html', 'as
   'vinted-bot-comparison.html', 'fr/comparatif-bot-vinted.html']) {
   assert.doesNotMatch(read(file), COUNTER, file + ' still carries the founding counter'); passed++;
 }
-assert.match(home, /<span style="font-size:11px;letter-spacing:\.06em;color:#8B9094;">Free plan, no card\.<\/span>/); passed++;
+// Homepage v6: the hero carries the search box, whose button is a real link to sign-up (works without script).
+assert.match(home, /<form id="qs" class="hp-qs" action="\/signup" method="get"/);
+assert.match(home, /<input id="qs-words" name="hunt"[^>]*maxlength="80"/);
+assert.match(home, /<a id="qs-go" class="hp-btn" href="\/signup">/); passed++;
 assert.doesNotMatch(home, /FOUNDING STATUS OPEN/);
 // The FAQ still explains the promise to the people who hold it, and says the places are gone.
 assert.match(plans, /What is a founding member\?<\/summary><p>The first 100 SNYPD accounts, free accounts included\. All of those places are taken\./); passed++;

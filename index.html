@@ -62,6 +62,146 @@
   #hero.motion-off #hero-wall > div > div, #hero.motion-off #hero-scan { animation-play-state: paused !important; }
   #hero-motion:hover { color: #FFFFFF; border-color: #55555C; }
   #hero-motion:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+  /* ---- Homepage v6 (10 Nov 2026, outreach/54): class-based layout; colours and type are the v5 system. ---- */
+  .hp { background: #0A0A0B; font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; min-height: 100vh; }
+  .hp-wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+  .hp-display { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; color: #FFFFFF; }
+  .hp-eyebrow { display: block; font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+  .hp-eyebrow.mint { color: #00E5A0; }
+  .hp-h2 { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(32px, 5vw, 50px); line-height: 1; letter-spacing: -.04em; color: #FFFFFF; text-wrap: balance; }
+  .hp-lead { margin: 0; font-size: 16px; line-height: 1.6; color: #A6ADB1; max-width: 62ch; text-wrap: pretty; }
+  .hp-sec { border-top: 1px solid #1D1D20; }
+  .hp-sec.alt { background: #0C0C0D; }
+  .hp-sec > .hp-wrap { padding-top: 72px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 30px; }
+  .hp-head { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+  .hp-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; font-size: 13px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; border: 0; cursor: pointer; text-align: center; }
+  .hp-btn:hover { color: #FFFFFF; }
+  .hp-btn.ghost { background: #141416; border: 1px solid #26262A; color: #E8EAEB; }
+  .hp-btn.block { display: flex; width: 100%; box-sizing: border-box; }
+  @media (hover: hover) and (pointer: fine) {
+    .hp-btn { transition: filter .15s ease, background-color .15s ease, border-color .15s ease; }
+    .hp-btn:hover { filter: brightness(1.18); }
+    .hp-btn.ghost:hover { filter: none; background: #1C1C1F; border-color: #3A3A40; }
+  }
+  .hp-tick { color: #00E5A0; }
+
+  /* hero */
+  .hp-hero { position: relative; overflow: hidden; border-bottom: 1px solid #1D1D20; }
+  .hp-hero-wall { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; padding: 0 10px; opacity: .22; pointer-events: none; overflow: hidden; }
+  .hp-hero-in { position: relative; max-width: 1320px; margin: 0 auto; padding: 64px 20px 72px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 36px; align-items: center; }
+  .hp-hero-card { background: #0A0A0B; border: 1px solid #1D1D20; padding: clamp(22px, 4.4vw, 44px); display: flex; flex-direction: column; gap: 22px; box-shadow: 0 20px 70px rgba(0, 0, 0, .7); }
+  .hp-h1 { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(40px, 6.2vw, 72px); line-height: .96; letter-spacing: -.045em; color: #FFFFFF; text-wrap: balance; }
+  .hp-h1 em { font-style: normal; color: #00E5A0; }
+  .hp-sub { margin: 0; font-size: 17px; line-height: 1.6; color: #A6ADB1; max-width: 50ch; text-wrap: pretty; }
+  .hp-qs { display: flex; flex-direction: column; gap: 10px; border: 1px solid #26262A; background: #121214; padding: 16px; }
+  .hp-qs-label { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-qs-row { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 10px; }
+  .hp-qs input { box-sizing: border-box; width: 100%; min-height: 52px; padding: 0 14px; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #33333A; border-radius: 0; -webkit-appearance: none; appearance: none; }
+  .hp-qs input::placeholder { color: #6E7377; }
+  .hp-qs input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+  .hp-qs-note { margin: 0; font-size: 12px; line-height: 1.5; color: #8B9094; }
+  .hp-checks { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .hp-checks li { font-size: 13.5px; line-height: 1.5; color: #E8EAEB; }
+  .hp-checks li.dim { color: #8B9094; font-size: 12.5px; }
+
+  /* sample alerts */
+  .hp-alerts { display: flex; flex-direction: column; gap: 12px; }
+  .hp-alerts-top { display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .14em; color: #A6ADB1; background: rgba(10, 10, 11, .88); border: 1px solid #1D1D20; padding: 10px 12px; }
+  .hp-alerts-top b { font-weight: 400; color: #FFB020; letter-spacing: .1em; }
+  .hp-alert { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start; background: rgba(18, 18, 20, .96); border: 1px solid #2A2A2F; border-radius: 16px; padding: 14px; box-shadow: 0 14px 40px rgba(0, 0, 0, .6); }
+  .hp-alert img { width: 38px; height: 38px; border-radius: 9px; background: #0A0A0B; object-fit: contain; display: block; }
+  .hp-alert-meta { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; letter-spacing: .08em; color: #8B9094; }
+  .hp-alert-title { display: block; margin-top: 4px; font-size: 14px; color: #FFFFFF; }
+  .hp-alert-body { display: block; margin-top: 2px; font-size: 13px; line-height: 1.45; color: #C9CED1; }
+  .hp-alert-body i { font-style: normal; color: #00E5A0; }
+
+  /* proof strip */
+  .hp-proof { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .hp-proof > div { background: #0C0C0D; padding: 22px 20px; display: flex; flex-direction: column; gap: 7px; }
+  .hp-proof .n { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 36px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; }
+  .hp-proof .t { font-size: 12.5px; line-height: 1.5; color: #E8EAEB; }
+  .hp-proof .s { font-size: 12px; color: #8B9094; }
+
+  /* how it works */
+  .hp-how { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 40px; align-items: start; }
+  .hp-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid #1D1D20; }
+  .hp-steps li { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 16px; padding: 22px 20px; border-bottom: 1px solid #1D1D20; background: #0C0C0D; }
+  .hp-steps li:last-child { border-bottom: 0; }
+  .hp-steps .k { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 34px; line-height: 1; color: #00E5A0; letter-spacing: -.03em; }
+  .hp-steps h3 { margin: 0 0 6px; font-size: 16px; font-weight: 500; color: #FFFFFF; letter-spacing: 0; }
+  .hp-steps p { margin: 0; font-size: 13.5px; line-height: 1.65; color: #A6ADB1; }
+  .hp-shot { margin: 0; border: 1px solid #1D1D20; background: #0C0C0D; padding: 12px; }
+  .hp-shot img { width: 100%; height: auto; display: block; }
+  .hp-shot figcaption { font-size: 12px; line-height: 1.5; color: #8B9094; padding: 10px 2px 0; }
+
+  /* never does */
+  .hp-never { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 24px; }
+  .hp-never span { font-size: 13px; color: #E8EAEB; }
+  .hp-never .hp-eyebrow { color: #8B9094; font-size: 11px; }
+  .hp-built { margin: 0; font-size: 13px; line-height: 1.6; color: #8B9094; }
+  .hp-built b { font-weight: 400; color: #E8EAEB; }
+
+  /* plans */
+  .hp-free { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; border: 1px solid rgba(0, 229, 160, .38); background: rgba(0, 229, 160, .05); padding: 20px; }
+  .hp-free .a { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1 1 320px; }
+  .hp-free .a b { font-weight: 400; font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-free .a span { font-size: 14px; line-height: 1.55; color: #E8EAEB; }
+  .hp-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .hp-plan { background: #121214; border: 1px solid #1D1D20; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .hp-plan .for { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-plan .q { margin: 0; font-size: 13.5px; line-height: 1.55; color: #A6ADB1; min-height: 3.1em; }
+  .hp-plan .name { font-size: 11px; letter-spacing: .14em; color: #8B9094; }
+  .hp-plan .price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; }
+  .hp-plan .price small { font-family: 'DM Mono', ui-monospace, monospace; font-weight: 400; font-size: 12px; letter-spacing: 0; color: #8B9094; }
+  .hp-plan ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .hp-plan li { font-size: 13px; line-height: 1.5; color: #E8EAEB; }
+  .hp-plan li.dim { color: #8B9094; font-size: 12.5px; }
+  .hp-plan li a { color: #00E5A0; }
+  .hp-foot-note { display: flex; gap: 10px 24px; flex-wrap: wrap; align-items: baseline; font-size: 12px; color: #8B9094; }
+  .hp-foot-note a { font-size: 12px; letter-spacing: .05em; padding: 12px 0; }
+
+  /* faq */
+  .hp-faq { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 28px 32px; }
+  .hp-faq > div { display: flex; flex-direction: column; gap: 8px; }
+  .hp-faq h3 { margin: 0; font-size: 14.5px; font-weight: 500; color: #FFFFFF; }
+  .hp-faq p { margin: 0; font-size: 13.5px; line-height: 1.6; color: #A6ADB1; }
+
+  /* closing */
+  .hp-close { display: flex; justify-content: space-between; align-items: flex-end; gap: 26px; flex-wrap: wrap; flex-direction: row !important; }
+  .hp-close .l { display: flex; flex-direction: column; gap: 14px; }
+  .hp-close .r { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  @media (max-width: 959.98px) {
+    .hp-hero-in { grid-template-columns: minmax(0, 1fr); padding: 28px 16px 44px; gap: 22px; }
+    .hp-how { grid-template-columns: minmax(0, 1fr); }
+    .hp-shot { max-width: 320px; }
+    .hp-plans { grid-template-columns: minmax(0, 1fr); }
+    .hp-plan .q { min-height: 0; }
+    .hp-proof { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-sec > .hp-wrap { padding-top: 52px; padding-bottom: 52px; gap: 24px; }
+    .hp-hero-in { padding: 16px 12px 36px; }
+    .hp-hero-card { gap: 16px; padding: 20px 18px 22px; }
+    .hp-h1 { font-size: clamp(31px, 9.2vw, 40px); }
+    .hp-sub { font-size: 15px; line-height: 1.55; }
+    .hp-qs { padding: 14px; }
+    .hp-qs-row { grid-template-columns: minmax(0, 1fr); }
+    .hp-proof .n { font-size: 30px; }
+    .hp-steps li { grid-template-columns: 40px minmax(0, 1fr); padding: 18px 16px; }
+    .hp-steps .k { font-size: 28px; }
+    .hp-btn { min-height: 54px; }
+    .hp-qs .hp-btn { width: 100%; box-sizing: border-box; }
+  }
+  @media (max-width: 699.98px) {
+    .hp-proof > div { padding: 16px 14px; }
+    .hp-proof .t { font-size: 12px; }
+    .hp-shot { max-width: 250px; }
+  }
+  @media (max-width: 339.98px) {
+    .hp-proof { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hp-btn { transition: none !important; } }
 </style>
 
 <!-- Supabase REST. This page makes two public calls (the listings counter and
@@ -144,7 +284,7 @@
 </head>
 <body>
 
-<div style="background:#0A0A0B;font-family:'DM Mono',ui-monospace,monospace;color:#E8EAEB;min-height:100vh;">
+<div class="hp">
 
   <div id="site-nav" style="position:sticky;top:0;z-index:30;background:rgba(10,10,11,.82);border-bottom:1px solid #1D1D20;transition:background .25s ease, box-shadow .25s ease;">
     <div id="site-nav-inner" style="max-width:1320px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:10px 18px;transition:padding .25s ease;">
@@ -170,137 +310,163 @@
       </nav>
   </div>
 
-  <div id="hero" style="position:relative;overflow:hidden;border-bottom:1px solid #1D1D20;">
-    <div aria-hidden="true" style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:0 10px;opacity:.25;pointer-events:none;overflow:hidden;" id="hero-wall"></div>
+  <div id="hero" class="hp-hero">
+    <div aria-hidden="true" id="hero-wall" class="hp-hero-wall"></div>
 
-    <div style="position:relative;max-width:1320px;margin:0 auto;padding:72px 20px 80px;">
-      <div style="max-width:780px;background:#0A0A0B;border:1px solid #1D1D20;padding:clamp(24px,5vw,44px);display:flex;flex-direction:column;gap:24px;box-shadow:0 20px 70px rgba(0,0,0,.7);">
-        <h1 style="margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:clamp(42px,7.4vw,80px);line-height:.95;letter-spacing:-.045em;color:#FFFFFF;">You're not slow.<br>You're outnumbered.</h1>
-          <div id="hero-alert" class="dc-mob" style="background:#121214;border:1px solid rgba(0,229,160,.42);padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 10px 40px rgba(0,0,0,.8);">
-            <span style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;letter-spacing:.12em;color:#8B9094;">SNYPD · PUSH ALERT</span>
-              <span style="font-size:11px;letter-spacing:.1em;color:#FFB020;">SAMPLE</span>
-            </span>
-            <span style="font-size:12px;color:#E8EAEB;line-height:1.45;">2 new finds on <span style="color:#00E5A0;">jordan 1 travis scott</span> — from €225</span>
+    <div class="hp-hero-in">
+      <div class="hp-hero-card">
+        <span class="hp-eyebrow mint">VINTED ALERTS &middot; 26 VINTED SITES</span>
+        <h1 class="hp-h1">Stop refreshing Vinted.<br><em>We watch it for you.</em></h1>
+        <p class="hp-sub">Tell SNYPD what you're hunting. It checks Vinted about once a minute and alerts you on your phone when a new listing matches. You buy on Vinted yourself.</p>
+        <form id="qs" class="hp-qs" action="/signup" method="get" novalidate>
+          <label class="hp-qs-label" for="qs-words">WHAT ARE YOU HUNTING?</label>
+          <div class="hp-qs-row">
+            <input id="qs-words" name="hunt" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="e.g. ralph lauren jumper">
+            <input id="qs-max" name="max" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="go" placeholder="Max price" aria-label="Maximum price (optional)">
           </div>
-        <p style="margin:0;font-size:17px;line-height:1.6;color:#A6ADB1;max-width:46ch;text-wrap:pretty;">SNYPD is a Vinted bot and monitor: we watch your searches and alert you to new matches.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a href="/signup" style="font-size:13px;letter-spacing:.09em;color:#FFFFFF;background:#A200FF;padding:17px 28px;">START FREE</a>
-          <a href="#how" style="font-size:13px;letter-spacing:.09em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:17px 24px;">SEE HOW IT WORKS</a>
-        </div>
-        <p id="hero-trial" style="margin:-10px 0 0;font-size:14px;line-height:1.55;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--></p>
-        <p style="margin:0;border-top:1px solid #1D1D20;padding-top:16px;font-size:12.5px;line-height:1.55;color:#8B9094;"><span style="color:#00E5A0;">&#10003;</span> Never asks for your Vinted password. Reads public listings only.</p>
-        <span style="font-size:11px;letter-spacing:.06em;color:#8B9094;">Free plan, no card.</span>
+          <a id="qs-go" class="hp-btn" href="/signup">WATCH IT FOR ME</a>
+          <p class="hp-qs-note">Free account, no card. Have a Vinted link with your own filters? Paste it after sign-up.</p>
+        </form>
+        <ul class="hp-checks">
+          <li id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--></li>
+          <li class="dim"><span class="hp-tick">&#10003;</span> Never asks for your Vinted password. Reads public listings only.</li>
+        </ul>
       </div>
-    </div>
-  </div>
 
-  <div style="max-width:1320px;margin:0 auto;padding:40px 20px 8px;">
-    <div style="border:1px solid #1D1D20;background:#0C0C0D;">
-      <div style="padding:13px 18px;border-bottom:1px solid #1D1D20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">EXAMPLE FINDS</span>
-        <span style="flex:1;"></span>
-        <span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">DASHBOARD LAYOUT · SAMPLE LISTINGS</span>
-      </div>
-      <div id="finds-grid" style="padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
-        <div style="background:#121214;border:1px solid #1D1D20;display:flex;flex-direction:column;">
-          <span style="position:relative;display:block;">
-            <img src="/assets/home/catch-jordan1-travis-velvet.jpg" alt="Air Jordan 1 Travis Scott Velvet Brown" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">
-            <span style="position:absolute;top:8px;left:8px;font-size:11px;letter-spacing:.1em;color:#0A0A0B;background:#00E5A0;padding:3px 7px;">NEW</span>
-          </span>
-          <span style="padding:13px 14px 14px;display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:12.5px;color:#E8EAEB;line-height:1.35;">Jordan 1 Travis Scott Velvet Brown</span>
-            <span style="font-size:17px;color:#FFFFFF;">€225</span>
-            <span style="font-size:12px;color:#8B9094;line-height:1.5;">Jordan • 42,5 • vinted.be</span>
+      <div id="hero-alerts" class="hp-alerts" role="img" aria-label="Three sample alerts: one new find, several new finds, and a summary for a busy search">
+        <div class="hp-alerts-top"><span>WHAT AN ALERT LOOKS LIKE</span><b>SAMPLE</b></div>
+        <div class="hp-alert">
+          <img src="/assets/home/logo.png" alt="" width="38" height="38">
+          <span>
+            <span class="hp-alert-meta"><span>SNYPD</span><span>now</span></span>
+            <span class="hp-alert-title">New find</span>
+            <span class="hp-alert-body">Amazon Kindle Paperwhite &mdash; <i>&euro;45</i></span>
           </span>
         </div>
-        <div style="background:#121214;border:1px solid #1D1D20;display:flex;flex-direction:column;">
-          <img src="/assets/home/catch-jordan4-bred.jpeg" alt="Jordan 4 Bred OG" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">
-          <span style="padding:13px 14px 14px;display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:12.5px;color:#E8EAEB;line-height:1.35;">Jordan 4 Bred OG</span>
-            <span style="font-size:17px;color:#FFFFFF;">€140</span>
-            <span style="font-size:12px;color:#8B9094;line-height:1.5;">Jordan • 42 • vinted.be</span>
+        <div class="hp-alert">
+          <img src="/assets/home/logo.png" alt="" width="38" height="38">
+          <span>
+            <span class="hp-alert-meta"><span>SNYPD</span><span>4 min ago</span></span>
+            <span class="hp-alert-title">3 new finds</span>
+            <span class="hp-alert-body">Ralph Lauren cable knit jumper &mdash; <i>&euro;18</i> &amp; 2 more</span>
           </span>
         </div>
-        <div style="background:#121214;border:1px solid #1D1D20;display:flex;flex-direction:column;">
-          <img src="/assets/home/catch-supreme-99.webp" alt="Supreme 99 Football Top" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">
-          <span style="padding:13px 14px 14px;display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:12.5px;color:#E8EAEB;line-height:1.35;">Supreme 99 Football Top</span>
-            <span style="font-size:17px;color:#FFFFFF;">€120</span>
-            <span style="font-size:12px;color:#8B9094;line-height:1.5;">Supreme • L • vinted.be</span>
+        <div class="hp-alert">
+          <img src="/assets/home/logo.png" alt="" width="38" height="38">
+          <span>
+            <span class="hp-alert-meta"><span>SNYPD</span><span>15 min ago</span></span>
+            <span class="hp-alert-title">12 new matches - nike dunk low</span>
+            <span class="hp-alert-body">From <i>&euro;15</i>. Tap to see them.</span>
           </span>
         </div>
       </div>
     </div>
   </div>
 
-  <div style="max-width:1320px;margin:0 auto;padding:14px 20px 0;">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
-      <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
-        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;" id="stat-listings">14,058,361</span>
-        <span style="font-size:12.5px;line-height:1.5;color:#E8EAEB;">Vinted listings matched to users' searches since 17 Sept 2026</span>
-        <span style="font-size:12px;color:#8B9094;" id="stat-listings-asof">As of 10 Nov 2026</span>
+  <div class="hp-wrap" style="padding-top:32px;padding-bottom:8px;">
+    <div id="proof" class="hp-proof">
+      <div>
+        <span class="n" id="stat-listings">14,058,361</span>
+        <span class="t">Vinted listings matched to users' searches since 17 Sept 2026</span>
+        <span class="s" id="stat-listings-asof">As of 10 Nov 2026</span>
       </div>
-      <div style="background:#0C0C0D;padding:20px;display:flex;flex-direction:column;gap:7px;">
-        <span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:#FFFFFF;">150+ sales</span>
-        <span style="font-size:12.5px;line-height:1.5;color:#E8EAEB;">Built by a Belgian sneaker reseller (SNYPD's founder) · 4.5k followers</span>
+      <div>
+        <span class="n">~1 min</span>
+        <span class="t">between checks of a search (measured median)</span>
+        <span class="s">Up to 5 min when a search is quiet</span>
+      </div>
+      <div>
+        <span class="n">26</span>
+        <span class="t">Vinted sites: Europe and the US</span>
+        <span class="s">Prices in each site's own currency</span>
+      </div>
+      <div>
+        <span class="n">0</span>
+        <span class="t">Vinted logins needed</span>
+        <span class="s">SNYPD reads public listings only</span>
       </div>
     </div>
   </div>
 
-  <div style="max-width:1320px;margin:0 auto;padding:14px 20px 0;">
-    <div style="border:1px solid #1D1D20;background:#0C0C0D;padding:16px 20px;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 22px;">
-      <span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">WHAT SNYPD NEVER DOES</span>
-      <span style="font-size:12.5px;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> Never asks for your Vinted password</span>
-      <span style="font-size:12.5px;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> Never logs into your account</span>
-      <span style="font-size:12.5px;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> Never buys or messages sellers for you</span>
-      <span style="font-size:12.5px;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> Only reads public listings</span>
-      <span style="font-size:12.5px;color:#E8EAEB;"><span style="color:#00E5A0;">&#10003;</span> Cancel any time</span>
+  <div id="how" class="hp-sec" style="border-top:0;">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">HOW IT WORKS</span>
+        <h2 class="hp-h2">Three steps. Then your phone does the watching.</h2>
+      </div>
+      <div class="hp-how">
+        <ol class="hp-steps">
+          <li><span class="k">1</span><div><h3>Say what you want</h3><p>Type a few words and a maximum price, or paste any Vinted search link. Every filter you set on Vinted is kept: brand, size, condition, colour.</p></div></li>
+          <li><span class="k">2</span><div><h3>SNYPD checks Vinted for you</h3><p>About once a minute. During your free trial and on paid plans it keeps checking around the clock, with your phone in your pocket.</p></div></li>
+          <li><span class="k">3</span><div><h3>You get the alert and buy on Vinted</h3><p>Tap it, open the listing on Vinted and buy it yourself. SNYPD never buys and never messages sellers for you.</p></div></li>
+        </ol>
+        <figure class="hp-shot">
+          <img src="/assets/seo/snypd-feed-phone.webp" alt="A matched listing in the SNYPD dashboard, with its price and buttons to open it on Vinted or claim it" width="396" height="650" loading="lazy" decoding="async">
+          <figcaption>A match in your dashboard. The listing's photo is blurred here.</figcaption>
+        </figure>
+      </div>
+      <div class="hp-never">
+        <span class="hp-eyebrow">WHAT SNYPD NEVER DOES</span>
+        <span><span class="hp-tick">&#10003;</span> Never asks for your Vinted password</span>
+        <span><span class="hp-tick">&#10003;</span> Never logs into your account</span>
+        <span><span class="hp-tick">&#10003;</span> Never buys or messages sellers for you</span>
+        <span><span class="hp-tick">&#10003;</span> Only reads public listings</span>
+      </div>
+      <p class="hp-built"><b>Built by a Belgian sneaker reseller</b> (SNYPD's founder: 150+ sales, 4.5k followers), in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
     </div>
   </div>
 
-  <div id="how" style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;flex-direction:column;gap:26px;">
-    <div style="display:flex;flex-direction:column;gap:12px;max-width:680px;">
-      <span style="font-size:11px;letter-spacing:.16em;color:#00E5A0;">HOW IT WORKS · WALKTHROUGH</span>
-      <h2 style="margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;">See exactly how it works.</h2>
-      <p style="margin:0;font-size:16px;line-height:1.6;color:#A6ADB1;">Five taps. Sample data, no real account.</p>
-    </div>
-
-    <div style="border:1px solid #1D1D20;background:#0C0C0D;">
-      <div style="padding:12px 16px;border-bottom:1px solid #1D1D20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#0A0A0B;">
-        <span style="font-size:11px;letter-spacing:.14em;color:#FFB020;border:1px solid rgba(255,176,32,.4);padding:5px 9px;">WALKTHROUGH · SAMPLE DATA, NOT YOUR ACCOUNT</span>
+  <div id="pricing" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">PRICING</span>
+        <h2 class="hp-h2">Start free. Pay for how much you hunt.</h2>
+        <p class="hp-lead">Same check speed on every plan. Paid plans keep watching when your dashboard is closed.</p>
       </div>
-
-      <div role="group" aria-label="Walkthrough steps" id="demo-steps" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid #1D1D20;"></div>
-
-      <div id="demo-stage" aria-live="polite" style="padding:clamp(18px,4vw,34px);"></div>
-    </div>
-    <span style="font-size:12px;color:#8B9094;">Rather skip the walkthrough? <a href="/signup">Start free, no card</a> · or ask in the <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</span>
-  </div>
-
-  <div style="border-top:1px solid #1D1D20;">
-    <div style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;flex-direction:column;gap:28px;">
-      <div style="display:flex;flex-direction:column;gap:12px;max-width:720px;">
-        <span style="font-size:11px;letter-spacing:.16em;color:#8B9094;">WHY SNYPD</span>
-        <h2 style="margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;text-wrap:balance;">Stop refreshing. Get alerted.</h2>
+      <div id="price-free" class="hp-free">
+        <div class="a"><b>FREE &middot; <!--plans:price:free-->&euro;0<!--/plans:price:free--></b><span><!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line--></span></div>
+        <a class="hp-btn" href="/signup">START FREE</a>
       </div>
-      <div style="border:1px solid #1D1D20;display:flex;flex-direction:column;">
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:#0C0C0D;border-bottom:1px solid #1D1D20;">
-          <span style="padding:12px 16px;font-size:11px;letter-spacing:.14em;color:#8B9094;">CHECKING BY HAND</span>
-          <span style="padding:12px 16px;font-size:11px;letter-spacing:.14em;color:#00E5A0;border-left:1px solid #1D1D20;">SNYPD</span>
+      <div id="price-rest" class="hp-plans">
+        <div class="hp-plan">
+          <span class="for">ONE ITEM, THEN DONE</span>
+          <p class="q">A console, a jacket in your size: find it and stop.</p>
+          <span class="name">HUNT PASS</span>
+          <span class="price"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once &middot; VAT incl.</small></span>
+          <ul>
+            <li><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></li>
+            <li class="dim">Nothing to cancel.</li>
+          </ul>
+          <a class="hp-btn ghost block" href="/signup?plan=pass">GET HUNT PASS</a>
         </div>
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid #1D1D20;">
-          <span style="padding:16px;font-size:12px;line-height:1.6;color:#8B9094;">Refresh the search yourself, again and again.</span>
-          <span style="padding:16px;font-size:12px;line-height:1.6;color:#E8EAEB;border-left:1px solid #1D1D20;">Checks about once a minute, up to 5 min. One batched alert.</span>
+        <div class="hp-plan">
+          <span class="for">ONE SEARCH, ALWAYS ON</span>
+          <p class="q">Keep watching the same search, month after month.</p>
+          <span class="name">SOLO</span>
+          <span class="price"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo &middot; VAT incl.</small></span>
+          <ul>
+            <li><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></li>
+            <li class="dim">Cancel any time.</li>
+          </ul>
+          <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
         </div>
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid #1D1D20;">
-          <span style="padding:16px;font-size:12px;line-height:1.6;color:#8B9094;">Stops when you put your phone down.</span>
-          <span style="padding:16px;font-size:12px;line-height:1.6;color:#E8EAEB;border-left:1px solid #1D1D20;">Paid keeps watching, dashboard closed.</span>
+        <div class="hp-plan" id="price-pro">
+          <span class="for">STOCK TO RESELL</span>
+          <p class="q">Several searches at once, with a price check before you buy.</p>
+          <span class="name">PRO</span>
+          <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
+          <ul>
+            <li><!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
+            <li>Market Report: the typical asking price by condition</li>
+            <li class="dim">Fewer or more: <a href="/signup?plan=kickstart">Kickstart</a> (<!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line-->, <!--plans:price-mo:kickstart-->&euro;14.99 / mo<!--/plans:price-mo:kickstart-->) &middot; <a href="/signup?plan=elite">Elite</a> (<!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line-->, <!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite-->)</li>
+          </ul>
+          <a class="hp-btn ghost block" href="/signup?plan=pro">START PRO</a>
         </div>
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);">
-          <span style="padding:16px;font-size:12px;line-height:1.6;color:#8B9094;">Scroll other listings, guess if it's cheap.</span>
-          <span style="padding:16px;font-size:12px;line-height:1.6;color:#E8EAEB;border-left:1px solid #1D1D20;">Pro and up: typical asking price, range, sample size. Or no price if the data is weak.</span>
-        </div>
+      </div>
+      <div class="hp-foot-note">
+        <a href="/plans">Compare all 5 plans side by side &rarr;</a>
+        <a href="https://discord.gg/gjKD4auXhK">Questions first? Ask in the Discord &rarr;</a>
+        <span>Prices per month, VAT included; the Hunt Pass is paid once. Card &middot; Apple Pay &middot; Google Pay.</span>
       </div>
     </div>
   </div>
@@ -322,93 +488,33 @@
   <!--/plans:home-data-->
   </div>
 
-  <div id="pricing" style="border-top:1px solid #1D1D20;background:#0C0C0D;">
-  <div style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;flex-direction:column;gap:26px;">
-    <h2 style="margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;">Simple, transparent pricing</h2>
-    <div id="price-pro" style="background:#121214;border:1px solid #A200FF;display:flex;flex-wrap:wrap;">
-      <div style="flex:1 1 320px;min-width:0;padding:32px 26px;display:flex;flex-direction:column;gap:20px;">
-        <div style="display:flex;flex-direction:column;gap:11px;">
-          <span style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
-            <span style="font-size:11px;letter-spacing:.14em;color:#FFFFFF;">PRO</span>
-            <span style="font-size:11px;letter-spacing:.1em;color:#FFFFFF;background:#A200FF;padding:4px 8px;">BUILT FOR DAILY SOURCING</span>
-          </span>
-          <span class="dc-price" style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:64px;line-height:1;color:#FFFFFF;letter-spacing:-.04em;"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--><span style="font-family:'DM Mono',monospace;font-weight:400;font-size:13px;color:#8B9094;letter-spacing:0;white-space:nowrap;"> / mo incl. VAT</span></span>
-          <span style="font-size:12.5px;color:#8B9094;line-height:1.6;">Five searches, around the clock. For daily sourcing.</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <span style="font-size:12px;color:#E8EAEB;"><!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches--></span>
-          <span style="font-size:12px;color:#E8EAEB;">Runs 24/7, even with your dashboard closed</span>
-          <span style="font-size:12px;color:#00E5A0;">Market Report price checks</span>
-          <span style="font-size:12px;color:#E8EAEB;">Paid Discord access</span>
-        </div>
-        <a href="/signup?plan=pro" style="margin-top:auto;text-align:center;font-size:12.5px;letter-spacing:.08em;color:#FFFFFF;background:#A200FF;padding:17px;">START PRO</a>
+  <div id="faq" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">QUESTIONS</span>
+        <h2 class="hp-h2">Before you start.</h2>
       </div>
-      <div style="flex:1 1 280px;min-width:0;border-left:1px solid rgba(162,0,255,.3);background:#0C0C0D;padding:32px 26px;display:flex;flex-direction:column;gap:16px;">
-        <span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">WHAT PRO CHANGES</span>
-        <div style="display:flex;flex-direction:column;gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
-          <div style="background:#121214;padding:14px 15px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;"><span style="font-size:12px;color:#8B9094;">Searches watched</span><span style="font-size:12px;color:#FFFFFF;"><!--plans:home-pro-change-->1 &rarr; 5<!--/plans:home-pro-change--></span></div>
-          <div style="background:#121214;padding:14px 15px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;"><span style="font-size:12px;color:#8B9094;">Dashboard closed</span><span style="font-size:12px;color:#00E5A0;">still hunting</span></div>
-          <div style="background:#121214;padding:14px 15px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;"><span style="font-size:12px;color:#8B9094;">Price checks</span><span style="font-size:12px;color:#00E5A0;">included</span></div>
-        </div>
-        <span style="font-size:12px;color:#8B9094;line-height:1.7;">Cancel any time.</span>
+      <div class="hp-faq">
+        <div><h3>Does SNYPD touch my Vinted account?</h3><p>No. It reads public listings only. It never logs in, buys or messages.</p></div>
+        <div><h3><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></h3><p><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></p></div>
+        <div><h3>How fast are alerts?</h3><p><!--plans:home-faq-speed-a-->About every 60 s (measured median), up to 5 min on quiet searches. Same on every plan. One batched push.<!--/plans:home-faq-speed-a--></p></div>
+        <div><h3>Which markets?</h3><p>Every Vinted site in Europe and the US, 26 in all. Prices in that site's currency.</p></div>
+        <div><h3>How long do matches stay?</h3><p>About 30 minutes while listed. The alert on your phone keeps what the feed drops.</p></div>
+        <div><h3>Alerts on iPhone?</h3><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></div>
+        <div><h3>Something else?</h3><p>Ask the community on <a href="https://discord.gg/gjKD4auXhK">Discord</a>, or read the <a href="/faq">full FAQ</a>.</p></div>
       </div>
-    </div>
-    <div id="price-rest" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(215px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">
-      <div style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">FREE</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;"><!--plans:price:free-->&euro;0<!--/plans:price:free--></span></div>
-        <span style="font-size:12px;color:#8B9094;line-height:1.6;"><!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line--></span>
-        <a href="/signup" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START FREE</a>
-      </div>
-      <div style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">SOLO</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--></span></div>
-        <span style="font-size:12px;color:#8B9094;line-height:1.6;"><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></span>
-        <a href="/signup?plan=solo" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START SOLO</a>
-      </div>
-      <div id="price-pass" style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">HUNT PASS</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;white-space:nowrap;"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--><span style="font-size:11px;color:#8B9094;letter-spacing:0;"> once</span></span></div>
-        <span style="font-size:12px;color:#8B9094;line-height:1.6;"><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></span>
-        <a href="/signup?plan=pass" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">GET HUNT PASS</a>
-      </div>
-      <div style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">KICKSTART</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;"><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--></span></div>
-        <span style="font-size:12px;color:#8B9094;line-height:1.6;"><!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line--></span>
-        <a href="/signup?plan=kickstart" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START KICKSTART</a>
-      </div>
-      <div style="background:#0A0A0B;padding:20px;display:flex;flex-direction:column;gap:13px;">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;"><span style="font-size:11px;letter-spacing:.14em;color:#8B9094;">ELITE</span><span style="font-size:20px;color:#FFFFFF;letter-spacing:-.02em;"><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--></span></div>
-        <span style="font-size:12px;color:#8B9094;line-height:1.6;"><!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line--></span>
-        <a href="/signup?plan=elite" style="margin-top:auto;text-align:center;font-size:11px;letter-spacing:.08em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:13px;min-height:48px;display:flex;align-items:center;justify-content:center;">START ELITE</a>
-      </div>
-    </div>
-    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;">
-      <a href="/plans" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Compare all 5 plans side by side →</a>
-      <a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Questions first? Ask in the Discord →</a>
-      <span style="font-size:12px;color:#8B9094;">Prices per month, VAT included; the Hunt Pass is paid once. Card · Apple Pay · Google Pay.</span>
-    </div>
-  </div>
-  </div>
-
-  <div style="border-top:1px solid #1D1D20;">
-    <div style="max-width:1320px;margin:0 auto;padding:54px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:26px;">
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Does SNYPD touch my Vinted account?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">No. Reads public listings only. Never logs in, buys or messages.</span></div>
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;"><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></span><span style="font-size:12px;line-height:1.55;color:#8B9094;"><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></span></div>
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">How fast are alerts?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;"><!--plans:home-faq-speed-a-->About every 60 s (measured median), up to 5 min on quiet searches. Same on every plan. One batched push.<!--/plans:home-faq-speed-a--></span></div>
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Which markets?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Every Vinted site in Europe and the US, 26 in all. Prices in that site's currency.</span></div>
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">How long do matches stay?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">~30 minutes while listed. Push catches what the feed drops.</span></div>
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Alerts on iPhone?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Add to home screen from Safari first. iOS requires it.</span></div>
-      <div style="display:flex;flex-direction:column;gap:7px;"><span style="font-size:12.5px;color:#FFFFFF;">Something else?</span><span style="font-size:12px;line-height:1.55;color:#8B9094;">Ask the community on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</span></div>
     </div>
   </div>
 
-  <div style="border-top:1px solid #1D1D20;background:#0C0C0D;">
-    <div style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;justify-content:space-between;align-items:flex-end;gap:26px;flex-wrap:wrap;">
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <h2 style="margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;max-width:18ch;text-wrap:balance;">Let it watch for you.</h2>
-        <span style="font-size:12px;color:#8B9094;line-height:1.6;max-width:52ch;">Built with resellers, in the open. The founding circle is on Discord. Be early.</span>
+  <div id="closing" class="hp-sec">
+    <div class="hp-wrap hp-close">
+      <div class="l">
+        <h2 class="hp-h2" style="max-width:18ch;">Let it watch for you.</h2>
+        <p class="hp-lead" style="font-size:14px;">Free account, no card. Type what you want and SNYPD starts checking.</p>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="/signup" style="font-size:13px;letter-spacing:.09em;color:#FFFFFF;background:#A200FF;padding:17px 28px;">START FREE</a>
-        <a href="https://discord.gg/gjKD4auXhK" style="font-size:13px;letter-spacing:.09em;color:#E8EAEB;background:#141416;border:1px solid #26262A;padding:17px 24px;">JOIN THE DISCORD</a>
+      <div class="r">
+        <a class="hp-btn" href="/signup">START FREE</a>
+        <a class="hp-btn ghost" href="https://discord.gg/gjKD4auXhK">JOIN THE DISCORD</a>
       </div>
     </div>
   </div>
@@ -432,24 +538,14 @@
     </div>
 </div>
 <script>
-/* Homepage v5 - vanilla port of the Claude Design component (SNYPD Homepage v5.dc.html).
-   Markup and styles are the design's own; this only replaces its template runtime. */
+/* Homepage v6 (10 Nov 2026, outreach/54). Plain script, no framework: the hero photo wall, the menu and the
+   sticky bar, the "what are you hunting?" box, sign-up click events and the live listings figure. */
 (function () {
   var WALL = ['so89','at41','ehdt','fm52','9f56','d046','jx9i','ohpf'].map(function (id) { return '/assets/home/wall/' + id + '.webp'; });
-  var HUNTS = {
-    travis: { name: 'JORDAN 1 TRAVIS SCOTT', meta: 'Sneakers · from €150', short: 'jordan 1 travis scott', title: 'Jordan 1 Travis Scott Velvet Brown', price: '€225', img: '/assets/home/catch-jordan1-travis-velvet.jpg', where: '42,5 • vinted.be' },
-    offwhite: { name: 'OFF-WHITE', meta: 'Streetwear · from €150', short: 'off-white', title: 'Off-White Arrows Hoodie', price: '€180', img: null, where: 'M • vinted.be' },
-    jordanall: { name: 'JORDAN (ALL)', meta: 'Sneakers · broadest · from €150', short: 'jordan (all)', title: 'Jordan 1 Travis Scott Velvet Brown', price: '€225', img: '/assets/home/catch-jordan1-travis-velvet.jpg', where: '42,5 • vinted.be' },
-    link: { name: 'YOUR VINTED LINK', meta: '', short: 'your vinted link', title: 'Jordan 4 Bred OG', price: '€140', img: '/assets/home/catch-jordan4-bred.jpeg', where: '42 • vinted.be' }
-  };
-  var LABELS = ['HUNT', 'WATCH', 'MATCH', 'CLAIM', 'PRICE'];
-
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var s = { step: 0, hunt: 'travis', paid: true, tabClosed: false, clean: true, menuOpen: false, pastHero: false, countT: null };
-  var prevStep = 0, focusNext = false, started = false, completed = false, raf = 0, countTimer = 0;
+  var s = { menuOpen: false, pastHero: false };
   var $ = function (id) { return document.getElementById(id); };
   var isMobile = function () { return window.innerWidth > 0 ? window.innerWidth < 700 : false; };
-  function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
   /* ---------- referral code (?r=) carried onto sign-up links ---------- */
   var ref = null;
@@ -465,13 +561,8 @@
       if (typeof window.snypdTrack === 'function') window.snypdTrack(name, params || {});
     } catch (e) {}
   }
-  function start() { if (!started) { started = true; ga('demo_start', { step: s.step + 1 }); } }
-  function anim(el, kf, opts) {
-    if (!el || reduce || typeof el.animate !== 'function') return;
-    try { el.animate(kf, Object.assign({ fill: 'backwards' }, opts)); } catch (e) {}
-  }
 
-  /* ---------- hero wall + scan line ---------- */
+  /* ---------- hero photo wall (decorative; pausable, and paused off-screen) ---------- */
   function buildWall() {
     var wall = $('hero-wall'); if (!wall) return;
     var speeds = [64, 82, 56, 74, 90, 60], html = '';
@@ -485,293 +576,59 @@
       html += '</div></div>';
     });
     wall.innerHTML = html;
-    if (!reduce) {
-      var sc = document.createElement('div');
-      sc.className = 'dc-desk';
-      sc.id = 'hero-scan';
-      sc.setAttribute('aria-hidden', 'true');
-      sc.style.cssText = 'position:absolute;left:0;right:0;top:-200px;height:200px;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(to bottom, rgba(0,229,160,0), rgba(0,229,160,.14) 75%, rgba(0,229,160,.5) 99%, #00E5A0 100%);animation:scanY 9s linear infinite;';
-      wall.parentNode.insertBefore(sc, wall.nextSibling);
-      var hero = $('hero'), btn = document.createElement('button');
-      btn.type = 'button';
-      btn.id = 'hero-motion';
-      btn.textContent = 'PAUSE MOTION';
-      btn.style.cssText = 'position:absolute;right:12px;bottom:12px;z-index:2;min-height:44px;padding:0 14px;font-family:inherit;font-size:11px;letter-spacing:.1em;color:#8B9094;background:rgba(10,10,11,.88);border:1px solid #26262A;cursor:pointer;';
-      btn.addEventListener('click', function () {
-        var paused = !hero.classList.contains('motion-paused');
-        hero.classList.toggle('motion-paused', paused);
-        btn.textContent = paused ? 'PLAY MOTION' : 'PAUSE MOTION';
-        ga('hero_motion', { paused: paused });
-      });
-      hero.appendChild(btn);
-      var onScreen = true;
-      var idle = function () { hero.classList.toggle('motion-off', !onScreen || document.hidden); };
-      if (typeof IntersectionObserver === 'function') {
-        new IntersectionObserver(function (es) { onScreen = es[es.length - 1].isIntersecting; idle(); }).observe(hero);
+    if (reduce) return;
+    var hero = $('hero'), btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'hero-motion';
+    btn.className = 'dc-desk';
+    btn.textContent = 'PAUSE MOTION';
+    btn.style.cssText = 'position:absolute;right:12px;bottom:12px;z-index:2;min-height:44px;padding:0 14px;font-family:inherit;font-size:11px;letter-spacing:.1em;color:#8B9094;background:rgba(10,10,11,.88);border:1px solid #26262A;cursor:pointer;';
+    btn.addEventListener('click', function () {
+      var paused = !hero.classList.contains('motion-paused');
+      hero.classList.toggle('motion-paused', paused);
+      btn.textContent = paused ? 'PLAY MOTION' : 'PAUSE MOTION';
+      ga('hero_motion', { paused: paused });
+    });
+    hero.appendChild(btn);
+    var onScreen = true;
+    var idle = function () { hero.classList.toggle('motion-off', !onScreen || document.hidden); };
+    if (typeof IntersectionObserver === 'function') {
+      new IntersectionObserver(function (es) { onScreen = es[es.length - 1].isIntersecting; idle(); }).observe(hero);
+    }
+    document.addEventListener('visibilitychange', idle);
+    idle();
+  }
+
+  /* ---------- "What are you hunting?": carries the words (and a price limit) to sign-up ----------
+     /signup?hunt=<words>&max=<price> is the address the price guide's "Alert me" buttons already use:
+     the sign-up page keeps it for a day and the first-hunt wizard opens with it filled in. The button is
+     a real link, so the campaign and entry-page tags that consent.js adds to links apply to it too. */
+  function setupQuickStart() {
+    var form = $('qs'), words = $('qs-words'), max = $('qs-max'), go = $('qs-go');
+    if (!form || !words || !go) return;
+    function target() {
+      var w = words.value.trim().replace(/\s+/g, ' ').slice(0, 80);
+      var m = max ? Math.round(Number(max.value)) : 0;
+      var u = new URL('/signup', location.origin);
+      if (w) {
+        u.searchParams.set('hunt', w);
+        if (m > 0 && m < 100000) u.searchParams.set('max', String(m));
       }
-      document.addEventListener('visibilitychange', idle);
-      idle();
+      return withRef(u.pathname + u.search);
     }
-  }
-
-  /* ---------- walkthrough ---------- */
-  var ST = {
-    wrap: 'display:flex;flex-wrap:wrap;gap:28px;',
-    left: 'flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:12px;',
-    kick: 'font-size:11px;letter-spacing:.14em;color:#00E5A0;',
-    h3: "margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:30px;line-height:1.05;letter-spacing:-.03em;color:#FFFFFF;",
-    p: 'margin:0;font-size:12.5px;line-height:1.65;color:#8B9094;',
-    panel: 'flex:1.3 1 320px;min-width:0;background:#121214;border:1px solid #1D1D20;padding:20px;display:flex;flex-direction:column;gap:14px;'
-  };
-  function intro(n, title, text) {
-    return '<div style="' + ST.left + '"><span style="' + ST.kick + '">STEP 0' + (n + 1) + '</span>' +
-      '<h3 id="demo-h-' + n + '" tabindex="-1" style="' + ST.h3 + '">' + title + '</h3>' +
-      '<p style="' + ST.p + '">' + text + '</p></div>';
-  }
-  function counts() {
-    var ct = s.countT == null ? 1 : s.countT, ease = 1 - Math.pow(1 - ct, 3);
-    return {
-      median: '€' + (45 * ease).toFixed(2),
-      clean: Math.round(3526 * ease).toLocaleString('en-US'),
-      ref: Math.round(176 * ease).toLocaleString('en-US')
-    };
-  }
-
-  function stepsHTML() {
-    return LABELS.map(function (l, i) {
-      var cur = i === s.step;
-      var bg = cur ? '#121214' : '#0C0C0D';
-      var bar = cur ? '#00E5A0' : (i < s.step ? '#26262A' : 'transparent');
-      var color = cur ? '#FFFFFF' : (i < s.step ? '#E8EAEB' : '#8B9094');
-      return '<button type="button" data-act="go" data-n="' + i + '" data-fk="tab' + i + '"' + (cur ? ' aria-current="step"' : '') +
-        ' style="min-height:52px;background:' + bg + ';border:none;border-right:1px solid #1D1D20;border-bottom:2px solid ' + bar + ';color:' + color + ';font-size:11px;letter-spacing:.1em;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;">' +
-        '<span>0' + (i + 1) + '</span><span style="font-size:11px;letter-spacing:.08em;">' + l + '</span></button>';
-    }).join('');
-  }
-
-  function stageHTML() {
-    var b = HUNTS[s.hunt], c = counts();
-    if (s.step === 0) {
-      var hunts = ['travis', 'offwhite', 'jordanall'].map(function (k) {
-        var on = s.hunt === k;
-        return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" data-act="hunt" data-k="' + k + '" data-fk="hunt-' + k + '" style="min-height:56px;background:' + (on ? '#1A1A1D' : '#0A0A0B') + ';border:none;border-left:2px solid ' + (on ? '#00E5A0' : 'transparent') + ';text-align:left;padding:11px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;">' +
-          '<span style="font-size:12.5px;letter-spacing:.06em;color:#FFFFFF;">' + esc(HUNTS[k].name) + '</span>' +
-          '<span style="font-size:12px;color:#8B9094;">' + esc(HUNTS[k].meta) + '</span></button>';
-      }).join('');
-      var lk = s.hunt === 'link';
-      return '<div style="' + ST.wrap + '">' + intro(0, 'Pick a hunt.', 'Choose a ready-made hunt, or paste any Vinted search link.') +
-        '<div style="' + ST.panel + '">' +
-          '<span style="font-size:11px;letter-spacing:.12em;color:#8B9094;">READY-MADE HUNTS</span>' +
-          '<div role="radiogroup" aria-label="Ready-made hunts" style="display:flex;flex-direction:column;gap:1px;background:#1D1D20;border:1px solid #1D1D20;">' + hunts + '</div>' +
-          '<span style="font-size:11px;letter-spacing:.12em;color:#8B9094;">OR PASTE A VINTED LINK</span>' +
-          '<div style="display:flex;flex-wrap:wrap;gap:1px;background:#26262A;border:1px solid #26262A;">' +
-            '<span style="flex:1 1 200px;min-width:0;background:#0A0A0B;color:#8B9094;font-size:12px;padding:14px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">vinted.be/catalog?search_text=jordan+4</span>' +
-            '<button type="button" role="radio" aria-checked="' + (lk ? 'true' : 'false') + '" data-act="link" data-fk="link" style="min-height:46px;background:' + (lk ? '#E8EAEB' : '#141416') + ';border:none;color:' + (lk ? '#0A0A0B' : '#E8EAEB') + ';font-size:11px;letter-spacing:.08em;padding:0 16px;cursor:pointer;">USE LINK</button>' +
-          '</div>' +
-          '<button type="button" data-act="go" data-n="1" style="min-height:48px;background:#A200FF;color:#FFFFFF;border:none;font-size:12px;letter-spacing:.08em;padding:14px;cursor:pointer;">START HUNT</button>' +
-        '</div></div>';
-    }
-    if (s.step === 1) {
-      var closedFree = s.tabClosed && !s.paid;
-      var w = !s.tabClosed
-        ? { t: 'WATCHING', sub: 'Checking about once a minute.', c: '#00E5A0' }
-        : s.paid
-          ? { t: 'STILL WATCHING · DASHBOARD CLOSED', sub: 'Runs on our servers, 24/7. Go to sleep.', c: '#00E5A0' }
-          : { t: 'STOPPED · TAB CLOSED', sub: /*plans:home-walk-stopped*/'After the 3-day trial, Free only watches while the dashboard is open.'/*/plans:home-walk-stopped*/, c: '#8B9094' };
-      var dot = closedFree || reduce ? '' : 'animation:pulseDot 2.2s ease infinite;';
-      return '<div style="' + ST.wrap + '">' + intro(1, 'It watches.', /*plans:home-walk-intro*/'After your 3-day trial, Free stops when you close the tab. Paid doesn\'t.'/*/plans:home-walk-intro*/) +
-        '<div style="' + ST.panel + '">' +
-          '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;">' +
-            '<span style="font-size:12px;color:#E8EAEB;">' + esc(b.name + (b.meta ? ' · ' + b.meta : '')) + '</span>' +
-            '<div role="group" aria-label="Plan" style="display:flex;border:1px solid #26262A;">' +
-              '<button type="button" data-act="free" data-fk="free" aria-pressed="' + (!s.paid) + '" style="min-height:44px;min-width:64px;border:none;background:' + (s.paid ? 'transparent' : '#E8EAEB') + ';color:' + (s.paid ? '#8B9094' : '#0A0A0B') + ';font-size:11px;letter-spacing:.1em;padding:0 12px;cursor:pointer;">FREE</button>' +
-              '<button type="button" data-act="paid" data-fk="paid" aria-pressed="' + s.paid + '" style="min-height:44px;min-width:64px;border:none;border-left:1px solid #26262A;background:' + (s.paid ? '#E8EAEB' : 'transparent') + ';color:' + (s.paid ? '#0A0A0B' : '#8B9094') + ';font-size:11px;letter-spacing:.1em;padding:0 12px;cursor:pointer;">PAID</button>' +
-            '</div>' +
-          '</div>' +
-          '<div role="status" style="border:1px solid ' + (closedFree ? '#26262A' : 'rgba(0,229,160,.42)') + ';background:#0A0A0B;padding:16px;display:flex;flex-direction:column;gap:6px;">' +
-            '<span style="display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.1em;color:' + w.c + ';"><span style="font-size:12px;' + dot + '">■</span>' + w.t + '</span>' +
-            '<span style="font-size:12px;line-height:1.6;color:#8B9094;">' + w.sub + '</span>' +
-          '</div>' +
-          '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-            '<button type="button" data-act="tab" data-fk="tab" style="flex:1 1 150px;min-height:48px;background:#141416;border:1px solid #26262A;color:#E8EAEB;font-size:11.5px;letter-spacing:.08em;padding:12px;cursor:pointer;">' + (s.tabClosed ? 'REOPEN THE TAB' : 'CLOSE THE TAB') + '</button>' +
-            '<button type="button" data-act="go" data-n="2" style="flex:1 1 150px;min-height:48px;background:#A200FF;border:none;color:#FFFFFF;font-size:11.5px;letter-spacing:.08em;padding:12px;cursor:pointer;">SHOW ME A MATCH</button>' +
-          '</div>' +
-        '</div></div>';
-    }
-    if (s.step === 2) {
-      var img = b.img
-        ? '<img src="' + b.img + '" alt="' + esc(b.title) + '" style="width:120px;height:120px;object-fit:cover;display:block;background:#0A0A0B;">'
-        : '<span style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;background:#0A0A0B;border:1px solid #1D1D20;font-size:11px;letter-spacing:.1em;color:#8B9094;">NO PHOTO</span>';
-      return '<div style="' + ST.wrap + '">' +
-        '<div style="' + ST.left + '"><span style="' + ST.kick + '">STEP 03</span>' +
-          '<h3 id="demo-h-2" tabindex="-1" style="' + ST.h3 + '">A match lands. Your phone buzzes.</h3>' +
-          '<p style="' + ST.p + '">Real checks: about once a minute, up to 5 min. Finds batched into one alert.</p>' +
-          '<div style="border:1px solid #26262A;background:#121214;padding:14px;display:flex;flex-direction:column;gap:6px;">' +
-            '<span style="font-size:11px;letter-spacing:.12em;color:#E8EAEB;">ON IPHONE</span>' +
-            '<span style="font-size:12px;line-height:1.6;color:#8B9094;">Alerts need SNYPD on your home screen. Safari → Share → Add to Home Screen.</span>' +
-          '</div></div>' +
-        '<div style="flex:1.3 1 320px;min-width:0;display:flex;flex-direction:column;gap:12px;">' +
-          '<span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">02:14 → 02:31 · TIME COMPRESSED FOR THE WALKTHROUGH</span>' +
-          '<div id="demo-alert" style="background:#121214;border:1px solid rgba(0,229,160,.42);padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 10px 40px rgba(0,0,0,.8);">' +
-            '<span style="display:flex;justify-content:space-between;align-items:center;">' +
-              '<span style="font-size:11px;letter-spacing:.12em;color:#8B9094;">SNYPD · PUSH ALERT</span>' +
-              '<span style="font-size:12px;color:#8B9094;">now</span>' +
-            '</span>' +
-            '<span style="font-size:12px;color:#E8EAEB;line-height:1.45;">2 new finds on <span style="color:#00E5A0;">' + esc(b.short) + '</span> — from ' + esc(b.price) + '</span>' +
-          '</div>' +
-          '<div style="background:#121214;border:1px solid #1D1D20;display:flex;gap:14px;padding:12px;flex-wrap:wrap;">' +
-            '<span style="position:relative;display:block;width:120px;flex-shrink:0;">' + img +
-              '<span style="position:absolute;top:6px;left:6px;font-size:11px;letter-spacing:.1em;color:#0A0A0B;background:#00E5A0;padding:3px 7px;">NEW</span>' +
-            '</span>' +
-            '<div style="flex:1 1 160px;min-width:0;display:flex;flex-direction:column;gap:7px;">' +
-              '<span style="font-size:12.5px;color:#E8EAEB;line-height:1.35;">' + esc(b.title) + '</span>' +
-              '<span style="font-size:17px;color:#FFFFFF;">' + esc(b.price) + '</span>' +
-              '<span style="font-size:12px;color:#8B9094;">' + esc(b.where) + '</span>' +
-              '<button type="button" data-act="go" data-n="3" style="margin-top:auto;min-height:44px;background:#A200FF;border:none;color:#FFFFFF;font-size:11.5px;letter-spacing:.08em;padding:11px;cursor:pointer;">CLAIM</button>' +
-            '</div>' +
-          '</div>' +
-        '</div></div>';
-    }
-    if (s.step === 3) {
-      var thumb = b.img
-        ? '<img src="' + b.img + '" alt="" style="width:56px;height:56px;object-fit:cover;display:block;flex-shrink:0;background:#0A0A0B;">'
-        : '<span style="width:56px;height:56px;flex-shrink:0;background:#0A0A0B;border:1px solid #1D1D20;"></span>';
-      return '<div style="' + ST.wrap + '">' + intro(3, 'Claim it.', 'You buy on Vinted. Claim logs it in History until sold.') +
-        '<div style="flex:1.3 1 320px;min-width:0;background:#121214;border:1px solid #1D1D20;display:flex;flex-direction:column;">' +
-          '<div style="display:flex;border-bottom:1px solid #1D1D20;">' +
-            '<span style="flex:1;text-align:center;font-size:11px;letter-spacing:.1em;color:#FFFFFF;padding:13px;border-bottom:2px solid #00E5A0;">HOLDING · 1</span>' +
-            '<span style="flex:1;text-align:center;font-size:11px;letter-spacing:.1em;color:#8B9094;padding:13px;">SOLD · 0</span>' +
-          '</div>' +
-          '<div style="padding:14px;display:flex;gap:12px;align-items:center;">' + thumb +
-            '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">' +
-              '<span style="font-size:12px;color:#E8EAEB;line-height:1.35;">' + esc(b.title) + '</span>' +
-              '<span style="font-size:12px;color:#8B9094;">Bought ' + esc(b.price) + ' · claimed just now</span>' +
-            '</div>' +
-            '<span style="font-size:11px;letter-spacing:.1em;color:#00E5A0;border:1px solid rgba(0,229,160,.42);padding:4px 7px;">HOLDING</span>' +
-          '</div>' +
-          '<div style="padding:0 14px 14px;">' +
-            '<button type="button" data-act="go" data-n="4" style="width:100%;min-height:48px;background:#A200FF;border:none;color:#FFFFFF;font-size:11.5px;letter-spacing:.08em;padding:12px;cursor:pointer;">NEXT: IS IT ACTUALLY CHEAP?</button>' +
-          '</div>' +
-        '</div></div>';
-    }
-    // step 4
-    var result = s.clean
-      ? '<div style="display:flex;flex-direction:column;gap:14px;">' +
-          '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">' +
-            '<span data-count="median" style="font-size:34px;color:#FFFFFF;letter-spacing:-.02em;font-variant-numeric:tabular-nums;">' + c.median + '</span>' +
-            '<span style="font-size:11px;letter-spacing:.12em;color:#8B9094;">MEDIAN</span>' +
-          '</div>' +
-          '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span data-count="clean" style="font-size:14px;color:#FFFFFF;font-variant-numeric:tabular-nums;">' + c.clean + '</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">COMPARABLES</span></div>' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span style="font-size:14px;color:#FFFFFF;">€30–€70</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">RANGE</span></div>' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span style="font-size:14px;color:#00E5A0;">OK</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">VERDICT</span></div>' +
-          '</div>' +
-        '</div>'
-      : '<div style="display:flex;flex-direction:column;gap:14px;">' +
-          '<div style="display:flex;flex-direction:column;gap:7px;">' +
-            '<span style="font-size:24px;letter-spacing:-.015em;color:#FFB020;line-height:1.1;">NO PRICE SHOWN</span>' +
-            '<span style="font-size:12px;line-height:1.55;color:#8B9094;">"Good" listings sit 31% above "New". A worse condition can\'t cost more, so no median.</span>' +
-          '</div>' +
-          '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span data-count="ref" style="font-size:14px;color:#FFFFFF;font-variant-numeric:tabular-nums;">' + c.ref + '</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">COMPARABLES</span></div>' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span style="font-size:14px;color:#FFFFFF;">158</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">SELLERS</span></div>' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span style="font-size:14px;color:#FFFFFF;">€120–€260</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">RANGE SEEN</span></div>' +
-            '<div style="background:#0C0C0D;padding:12px;display:flex;flex-direction:column;gap:5px;"><span style="font-size:14px;color:#FFB020;">—</span><span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">MEDIAN WITHHELD</span></div>' +
-          '</div>' +
-        '</div>';
-    return '<div style="' + ST.wrap + '">' +
-        '<div style="' + ST.left + '">' +
-          '<span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
-            '<span style="' + ST.kick + '">STEP 05</span>' +
-            '<span style="font-size:11px;letter-spacing:.1em;color:#E8EAEB;border:1px solid #26262A;padding:3px 7px;">PRO · ELITE</span>' +
-          '</span>' +
-          '<h3 id="demo-h-4" tabindex="-1" style="' + ST.h3 + '">Is it actually cheap?</h3>' +
-          '<p style="' + ST.p + '">Median asking price, range, sample size, by condition. Unclear? It says so.</p>' +
-        '</div>' +
-        '<div style="flex:1.3 1 320px;min-width:0;background:#121214;border:1px solid #1D1D20;padding:20px;display:flex;flex-direction:column;gap:16px;">' +
-          '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">' +
-            '<span style="flex:1 1 180px;font-size:12.5px;color:#E8EAEB;background:#0A0A0B;border:1px solid #26262A;padding:13px 12px;">' + (s.clean ? 'jordan 1 mid' : 'jordan 4 red thunder') + '</span>' +
-            '<button type="button" data-act="another" data-fk="another" style="min-height:46px;background:#141416;border:1px solid #26262A;color:#E8EAEB;font-size:11px;letter-spacing:.08em;padding:0 16px;cursor:pointer;">TRY ANOTHER</button>' +
-          '</div>' + result +
-          '<span style="font-size:11px;letter-spacing:.1em;color:#FFB020;border-top:1px solid #1D1D20;padding-top:14px;">SAMPLE FIGURES · NOT LIVE MARKET DATA</span>' +
-        '</div>' +
-      '</div>' +
-      '<div style="margin-top:28px;border-top:1px solid #1D1D20;padding-top:24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">' +
-        '<span style="font-size:12px;color:#8B9094;line-height:1.6;max-width:52ch;">' + /*plans:home-walk-foot*/'Free: one search, 24/7 for 3 days, then dashboard open. Price checks: Pro and Elite.'/*/plans:home-walk-foot*/ + '</span>' +
-        '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-          '<a href="' + withRef('/signup') + '" data-act="cta" style="font-size:13px;letter-spacing:.09em;color:#FFFFFF;background:#A200FF;padding:17px 28px;">START FREE</a>' +
-          '<button type="button" data-act="restart" style="min-height:52px;background:#141416;border:1px solid #26262A;color:#E8EAEB;font-size:11.5px;letter-spacing:.08em;padding:0 18px;cursor:pointer;">START OVER</button>' +
-        '</div>' +
-      '</div>';
-  }
-
-  function renderDemo() {
-    var a = document.activeElement, fk = a && a.getAttribute && a.getAttribute('data-fk');
-    $('demo-steps').innerHTML = stepsHTML();
-    $('demo-stage').innerHTML = stageHTML();
-    if (fk && !(focusNext && prevStep !== s.step)) { var el = document.querySelector('[data-fk="' + fk + '"]'); if (el) el.focus({ preventScroll: true }); }
-    if (prevStep !== s.step) {
-      var dir = s.step > prevStep ? 1 : -1;
-      anim($('demo-stage'), [{ opacity: 0, transform: 'translateX(' + (14 * dir) + 'px)' }, { opacity: 1, transform: 'none' }],
-        { duration: 260, easing: 'cubic-bezier(.4,0,.2,1)' });
-      if (s.step === 2) {
-        var al = $('demo-alert');
-        anim(al, [{ opacity: 0, transform: 'translateY(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
-        anim(al, [
-          { boxShadow: '0 0 0 0 rgba(0,229,160,0), 0 10px 40px rgba(0,0,0,.8)', borderColor: 'rgba(0,229,160,.42)' },
-          { boxShadow: '0 0 0 4px rgba(0,229,160,.28), 0 10px 40px rgba(0,0,0,.8)', borderColor: '#00E5A0', offset: .45 },
-          { boxShadow: '0 0 0 0 rgba(0,229,160,0), 0 10px 40px rgba(0,0,0,.8)', borderColor: 'rgba(0,229,160,.42)' }
-        ], { duration: 340, delay: 200, easing: 'ease-out' });
-      }
-      if (focusNext) {
-        var h = $('demo-h-' + s.step);
-        if (h) h.focus({ preventScroll: true });
-      }
-    }
-    focusNext = false;
-    prevStep = s.step;
-  }
-  function paintCounts() {
-    var c = counts();
-    document.querySelectorAll('#demo-stage [data-count]').forEach(function (el) { el.textContent = c[el.getAttribute('data-count')]; });
-  }
-  function runCount() {
-    cancelAnimationFrame(raf); clearTimeout(countTimer);
-    if (reduce) { s.countT = 1; paintCounts(); return; }
-    countTimer = setTimeout(function () { cancelAnimationFrame(raf); s.countT = 1; paintCounts(); }, 650);
-    var t0 = performance.now(), D = 500;
-    var tick = function (now) {
-      var t = Math.min(1, (now - t0) / D);
-      s.countT = t; paintCounts();
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    s.countT = 0; paintCounts();
-    raf = requestAnimationFrame(tick);
-  }
-  function go(n) {
-    start();
-    if (n !== s.step) ga('demo_step', { step: n + 1 });
-    if (n === 4 && !completed) { completed = true; ga('demo_complete', { step: 5 }); }
-    var countNow = n === 4 && s.step !== 4;
-    focusNext = true;
-    s.step = n;
-    renderDemo();
-    if (countNow) runCount();
-  }
-
-  function onDemoClick(e) {
-    var t = e.target.closest && e.target.closest('[data-act]');
-    if (!t) return;
-    var act = t.getAttribute('data-act');
-    if (act === 'go') go(+t.getAttribute('data-n'));
-    else if (act === 'hunt') { start(); s.hunt = t.getAttribute('data-k'); renderDemo(); }
-    else if (act === 'link') { start(); s.hunt = 'link'; renderDemo(); }
-    else if (act === 'free') { start(); s.paid = false; renderDemo(); }
-    else if (act === 'paid') { start(); s.paid = true; renderDemo(); }
-    else if (act === 'tab') { start(); s.tabClosed = !s.tabClosed; renderDemo(); }
-    else if (act === 'another') { s.clean = !s.clean; renderDemo(); runCount(); }
-    else if (act === 'restart') { s.tabClosed = false; s.clean = true; go(0); }
-    else if (act === 'cta') ga('demo_cta_click', { step: 5, source: 'demo' });
+    function sync() { go.setAttribute('href', target()); }
+    words.addEventListener('input', sync);
+    if (max) max.addEventListener('input', sync);
+    // The address is kept current on every keystroke; consent.js then adds its tags when the link is used.
+    go.addEventListener('click', function () {
+      ga('hero_quickstart', { words: words.value.trim() ? 1 : 0, max: max && Number(max.value) > 0 ? 1 : 0 });
+    });
+    // Enter in either field does what the button does (a form with two fields and a link has no submit of its own).
+    var enter = function (e) { if (e.key === 'Enter') { e.preventDefault(); sync(); go.click(); } };
+    words.addEventListener('keydown', enter);
+    if (max) max.addEventListener('keydown', enter);
+    form.addEventListener('submit', function (e) { e.preventDefault(); sync(); go.click(); });
+    sync();
   }
 
   /* ---------- nav: mobile menu, scroll state, sticky bar ---------- */
@@ -791,7 +648,10 @@
   function onScroll() {
     var hero = $('hero');
     var ok = hero && hero.offsetHeight > 100;
-    var c = !!(ok && window.scrollY > 0 && window.scrollY > hero.offsetTop + hero.offsetHeight - 60);
+    // The bar's job is to bring the sign-up button back once the hero's own button has scrolled away.
+    var card = hero && hero.querySelector('.hp-hero-card');
+    var edge = card ? card.getBoundingClientRect().bottom + window.scrollY : (hero ? hero.offsetTop + hero.offsetHeight : 0);
+    var c = !!(ok && window.scrollY > 0 && window.scrollY > edge - 60);
     if (c !== s.pastHero) { s.pastHero = c; bar.hidden = !(isMobile() && c); }
     if (c === navOn) return; navOn = c;
     nav.style.background = c ? '#0A0A0B' : 'rgba(10,10,11,.82)';
@@ -799,39 +659,13 @@
     inner.style.paddingTop = inner.style.paddingBottom = c ? '4px' : '8px';
   }
 
-  function setupReveal() {
-    if (reduce || typeof IntersectionObserver !== 'function') return;
-    var rise = function (el, delay) {
-      anim(el, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 380, delay: delay, easing: 'cubic-bezier(.2,.8,.2,1)' });
-    };
-    var plays = {
-      'finds-grid': function (el) { Array.prototype.forEach.call(el.children, function (c, i) { rise(c, i * 70); }); },
-      'price-pro': function (el) {
-        rise(el, 0);
-        var rest = $('price-rest');
-        if (rest) Array.prototype.forEach.call(rest.children, function (c, i) { rise(c, 140 + i * 50); });
-      }
-    };
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        io.unobserve(e.target);
-        if (e.boundingClientRect.top < window.innerHeight * .6) return;
-        plays[e.target.id] && plays[e.target.id](e.target);
-      });
-    }, { threshold: 0 });
-    Object.keys(plays).forEach(function (id) { var el = $(id); if (el) io.observe(el); });
-  }
-
   /* ---------- boot ---------- */
   buildWall();
+  setupQuickStart();
   menuBtn = $('menu-btn'); menu = $('mobile-menu'); nav = $('site-nav'); inner = $('site-nav-inner'); bar = $('sticky-bar');
   if (reduce) { nav.style.transition = 'none'; inner.style.transition = 'none'; }
   menuBtn.addEventListener('click', function () { setMenu(!s.menuOpen); });
   menu.addEventListener('click', function (e) { if (e.target.closest('[data-close-menu]')) setMenu(false); });
-  $('demo-steps').addEventListener('click', onDemoClick);
-  $('demo-stage').addEventListener('click', onDemoClick);
-  renderDemo();
 
   if (ref) document.querySelectorAll('a[href^="/signup"]').forEach(function (a) { a.setAttribute('href', withRef(a.getAttribute('href'))); });
   document.addEventListener('click', function (e) {
@@ -846,7 +680,6 @@
   ['load', 'pageshow', 'visibilitychange', 'focus'].forEach(function (ev) { window.addEventListener(ev, function () { onResize(); onScroll(); }); });
   if (typeof ResizeObserver === 'function') new ResizeObserver(function () { onResize(); onScroll(); }).observe(document.documentElement);
   onResize(); onScroll();
-  setupReveal();
 
   /* ---------- listings counter ----------
      public_stats is one cached row per figure, refreshed every 15 min by
