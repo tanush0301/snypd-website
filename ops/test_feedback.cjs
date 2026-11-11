@@ -155,6 +155,26 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(await p.evaluate(() => /[?&](fb|a|src)=/.test(location.search)), false, 'fb/a/src removed from URL');
   ok(/boot=1/.test(await p.evaluate(() => location.search)), 'other params kept');
 
+  // 14. GA4 events (consent-gated: only when gtag exists), question id only
+  async function openGa(q, withGtag) {
+    const ctx = await browser.createBrowserContext();
+    const pg = await ctx.newPage();
+    await pg.setViewport(DESK);
+    pg.on('pageerror', e => errors.push(q + ': ' + e.message));
+    await pg.evaluateOnNewDocument(w => { window.__ga = []; if (w) window.gtag = function (a, ev, o) { if (a === 'event' && /^feedback_/.test(ev)) window.__ga.push([ev, o && o.question]); }; }, withGtag);
+    await pg.goto(base + '/dashboard.html?boot=1&' + q, { waitUntil: 'domcontentloaded' });
+    await wait(1800);
+    return pg;
+  }
+  p = await openGa('plan=free&fb=C', true);
+  await pickA(p, 'found_it'); await send(p); await wait(300);
+  eq(await p.evaluate(() => window.__ga), [['feedback_shown', 'C'], ['feedback_answered', 'C']], 'ga: shown + answered');
+  p = await openGa('plan=free&fb=A', true);
+  await p.click('.fb-x'); await wait(300);
+  eq(await p.evaluate(() => window.__ga), [['feedback_shown', 'A'], ['feedback_skipped', 'A']], 'ga: shown + skipped');
+  p = await openGa('plan=free&fb=C', false);
+  ok((await state(p)).shown && (await p.evaluate(() => window.__ga.length)) === 0, 'ga: no consent -> popup works, no events');
+
   eq(errors, [], 'no page errors');
   console.log('test_feedback: ' + passed + ' checks passed');
   await browser.close(); server.close();

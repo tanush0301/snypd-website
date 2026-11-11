@@ -154,8 +154,11 @@
     setTimeout(go, force ? 300 : 20000);
   }
 
+  function track(ev, q) { try { if (typeof window.gtag === 'function') window.gtag('event', ev, { question: q }); } catch (e) {} }
+
   function show(sb, choice, preset, fromEmail) {
     seen(true);
+    track('feedback_shown', choice.id);
     // Drop ?fb / ?a / ?src so a reload or tab restore cannot ask again.
     try { var cu = new URL(location.href); ['fb', 'a', 'src'].forEach(function (k) { cu.searchParams.delete(k); }); history.replaceState(history.state, '', cu.pathname + cu.search + cu.hash); } catch (e) {}
     if (!document.getElementById('fb-css')) { var s = el('style'); s.id = 'fb-css'; s.textContent = CSS; document.head.appendChild(s); }
@@ -169,7 +172,7 @@
         .catch(function (e) { console.error('SNYPD feedback: save failed', e); return null; });
     }
     function close(skip) {
-      if (skip && !answeredAny) send(queue[0] || lead, null, null, true);
+      if (skip && !answeredAny) { send(queue[0] || lead, null, null, true); track('feedback_skipped', queue[0] || lead); }
       if (LEAD.indexOf(lead) >= 0 && ['D', 'E1', 'G', 'H', 'F'].indexOf(lead) >= 0) store('snypd_fb_round_at', String(Date.now()));
       if (ov.parentNode) ov.parentNode.removeChild(ov);
       document.removeEventListener('keydown', esc);
@@ -222,6 +225,7 @@
         ok.disabled = true;
         var detail = ta && ta.style.display !== 'none' ? ta.value.trim() : '';
         var first = !answeredAny; answeredAny = true;
+        if (first) track('feedback_answered', q);
         send(q, def.free ? null : sel, detail, false).then(function (r) {
           queue.shift();
           var xp = first && r && r.xp ? r.xp : 0;
