@@ -12,6 +12,7 @@ using the page's own <html lang>, so a price change is one edit in plans.json:
     @@refund_days@@       refund window (14)
     @@median_s@@          measured median check gap in seconds (30)
     @@mr_hour@@ @@mr_day@@ Market Report price checks per hour / per day (20 / 100)
+    @@trial_checks@@      price checks a Free trial gets in total (10; backend MARKET_TRIAL_CHECKS)
     @@founding_price@@    the founding promise (Pro price for life), formatted like @@price@@;
                           it stays put when Pro's price changes
 
@@ -68,7 +69,7 @@ def price(key, lang, entities=True):
     return n + nb + eur
 
 
-TOKEN = re.compile(r'@@(price|num|searches|whop):([a-z]+)@@|@@(trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|founding_price|pass_days)@@')
+TOKEN = re.compile(r'@@(price|num|searches|whop):([a-z]+)@@|@@(trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|trial_checks|founding_price|pass_days)@@')
 
 
 LD_BLOCK = re.compile(r'(<script type="application/ld\+json">)(.*?)(</script>)', re.S)
@@ -91,7 +92,8 @@ def _fill(text, lang, entities):
         if m.group(3):
             return str({'trial_days': TRIAL_DAYS, 'trial_hours': TRIAL_HOURS, 'trial_ext_days': TRIAL_EXT_DAYS,
                         'refund_days': REFUND_DAYS, 'median_s': MEDIAN_S,
-                        'mr_hour': MR['per_hour'], 'mr_day': MR['per_day'], 'pass_days': PASS_DAYS}[m.group(3)])
+                        'mr_hour': MR['per_hour'], 'mr_day': MR['per_day'], 'trial_checks': MR['trial_checks'],
+                        'pass_days': PASS_DAYS}[m.group(3)])
         kind, key = m.group(1), m.group(2)
         if key not in PRICED:
             raise KeyError(f'unknown plan in token {m.group(0)}')

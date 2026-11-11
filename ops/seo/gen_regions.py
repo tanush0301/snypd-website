@@ -338,6 +338,11 @@ TEMPLATES = {
     'home-kickstart-line': '@@searches:kickstart@@ searches &middot; runs 24/7, even with your dashboard closed',
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
     'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). No card.',
+    # Trial price checks (11 Nov 2026): the number comes from plans.json market_report.trial_checks.
+    'home-trial-checks': 'Your trial includes @@trial_checks@@ price checks for any item you type. A check that finds nothing is not counted. After that, Check a price is part of Pro and Elite.',
+    'home-trial-checks-tag': 'PRO &middot; ELITE &middot; @@trial_checks@@ IN THE TRIAL',
+    'home-trial-checks-short': 'A free trial includes @@trial_checks@@ in total.',
+    'home-trial-checks-demo': 'During the free trial you get @@trial_checks@@ of these.',
     'home-data': home_data,
     'home-demo': home_demo,
     'home-market': home_market,

@@ -43,6 +43,9 @@ STALE = [
     (r"(?<!trial, )Free only watches while the dashboard is open", 'say "after the %d-day trial"' % plans.TRIAL_DAYS),
     (r'Free: one search, dashboard open', _TRIAL),
     (r'There is no trial', 'there is a %d-day trial' % plans.TRIAL_DAYS),
+    # Since 11 Nov 2026 a running trial includes price checks (plans.json market_report.trial_checks).
+    (r'Check a price for any item is Pro and Elite only',
+     'a Free trial includes %d price checks (use the home-trial-checks region)' % plans.MR['trial_checks']),
     (r'[Ii]nscription(?! en français)[^.<]{0,60}en anglais', 'sign-up is in French since 9 Oct 2026 (only Whop checkout is English)'),
     (r'tarifs</a> \(en anglais\)', '/plans is in French for French browsers since 9 Oct 2026'),
     (r'paiement \(Whop\) est en anglais', 'the Whop checkout is French for French users since 18 Oct 2026 (site 5ad832b)'),
@@ -62,7 +65,7 @@ OLD_TRIAL = re.compile(r'(?i)\b(?:first|for) 7 days\b|\bseven[- ]day\b|\b7-day t
 # Old trial wording that another change owns (19 Oct 2026): reported as a warning, not an error, so this release
 # can go out. (file, exact text around the hit). Remove each line once that change lands.
 OLD_TRIAL_PENDING = []  # (file, context) pairs allowed to keep old trial wording for now; empty since 19 Oct 2026
-UNFILLED_TOKEN = re.compile(r'@@(?:price|num|searches|whop):[a-z]+@@|@@(?:trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|founding_price|pass_days)@@')
+UNFILLED_TOKEN = re.compile(r'@@(?:price|num|searches|whop):[a-z]+@@|@@(?:trial_days|trial_hours|trial_ext_days|refund_days|median_s|mr_hour|mr_day|trial_checks|founding_price|pass_days)@@')
 PLACEHOLDER_COUNTER = re.compile(r'id="(?:stat-listings|au-listings)"[^>]*>\s*(?:&mdash;|—|-)?\s*<')
 ASOF = re.compile(r'id="(?:stat-listings-asof|au-asof)"[^>]*>([^<]*)<')
 MONTHS = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'June': 6, 'July': 7, 'Aug': 8, 'Sept': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}

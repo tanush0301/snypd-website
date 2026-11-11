@@ -25,6 +25,6 @@
     "card": false
   },
   "refund": {"days": 14, "on": "first payment of a plan", "full": true},
-  "market_report": {"plans": ["pro", "elite"], "per_hour": 20, "per_day": 100},
+  "market_report": {"plans": ["pro", "elite"], "per_hour": 20, "per_day": 100, "trial_checks": 10, "_trial_checks": "Price checks a running Free trial gets IN TOTAL (not per day); a check whose lookup fails or finds nothing useful is handed back. Source: backend market_trial.py, env MARKET_TRIAL_CHECKS (default 10), live since 11 Nov 2026. Change the backend and this number together."},
   "founding": {"accounts": 100, "keeps": "pro", "price": "24.99"}
 }

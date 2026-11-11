@@ -1,6 +1,7 @@
 /*
- * Homepage v6/v7 (outreach/54, 55): the hero search box and worked example, the price-check demo, the Market board
- * sample, plan order and links, layout at phone and desktop width.
+ * Homepage v6/v7/v8 (outreach/54, 55, 57): the hero search box and worked example, the price-check demo, the Market
+ * board sample, plan order and links, layout at phone and desktop width. v8: the phone's first screen with the
+ * cookie bar showing, trial price checks from plans.json, honest wording about the rating, FAQ, events.
  *   node ops/test_homepage.cjs   (needs Google Chrome at CHROME_PATH or the default Windows path)
  * Serves the repo's own files; every request to another host is blocked, so nothing reaches production.
  */
@@ -32,7 +33,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const base = 'http://127.0.0.1:' + server.address().port;
   const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox'] });
   const errors = [];
-  async function open(q, vp) {
+  async function open(q, vp, init) {
     const ctx = await browser.createBrowserContext();
     const page = await ctx.newPage();
     await page.setViewport(vp || { width: 1440, height: 900 });
@@ -40,9 +41,15 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await page.setRequestInterception(true);
     // Stay on the homepage: a navigation to /signup is recorded and stopped, other hosts are blocked.
     page.__went = null;
+    page.__outside = [];
+    if (init) await page.evaluateOnNewDocument(init);
+    page.__ev = [];   // the page's own events (snypd:track), kept on this side so they survive a navigation
+    await page.exposeFunction('__snypdRec', j => { page.__ev.push(JSON.parse(j)); });
+    await page.evaluateOnNewDocument(() => window.addEventListener('snypd:track', e => { try { window.__snypdRec(JSON.stringify(e.detail)); } catch (x) {} }));
     page.on('request', r => {
       const u = r.url();
       if (r.isNavigationRequest() && r.frame() === page.mainFrame() && /\/signup(\?|$)/.test(u)) { page.__went = u.slice(base.length); return r.abort(); }
+      if (!(u.startsWith(base) || u.startsWith('data:'))) page.__outside.push(u);
       return u.startsWith(base) || u.startsWith('data:') ? r.continue() : r.abort();
     });
     await page.goto(base + '/' + (q || ''), { waitUntil: 'domcontentloaded' });
@@ -110,8 +117,26 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     const order = await page.$$eval('#pricing .hp-plan', ps => ps.map(p => p.querySelector('.name').textContent.trim()));
     eq(order, ['PRO', 'FREE', 'HUNT PASS', 'SOLO'], 'plan order: Pro first');
     ok(await page.$eval('#price-pro a.hp-btn', a => !a.classList.contains('ghost') && a.getAttribute('href') === '/signup?plan=pro'), 'the Pro card has the solid button');
-    ok(/Check a price for any item is Pro and Elite only/.test(await page.$eval('#price-free', e => e.innerText)), 'the Free card says what the trial does not include');
-    ok(!/\b(instant|real-time|fastest|undetectable|sold prices)\b/i.test(text), 'no banned claim on the page');
+    // v8: trial price checks, the number from plans.json
+    const tc = JSON.parse(fs.readFileSync(path.join(root, 'ops/seo/data/plans.json'), 'utf8')).market_report.trial_checks;
+    ok(Number.isInteger(tc) && tc > 0, 'plans.json carries the trial price checks');
+    ok(new RegExp('Your trial includes ' + tc + ' price checks for any item you type').test(await page.$eval('#free-trial-checks', e => e.innerText)), 'the Free card says how many price checks the trial includes');
+    ok(new RegExp('PRO . ELITE . ' + tc + ' IN THE TRIAL').test(await page.$eval('#research', e => e.innerText)), 'the Check a price card carries the trial tag');
+    ok(new RegExp('During the free trial you get ' + tc + ' of these').test(await page.$eval('#pc', e => e.innerText)), 'the demo says the trial includes checks');
+    const all = await page.evaluate(() => document.querySelector('.hp').textContent);   // includes folded FAQ answers
+    ok(!/Pro and Elite only/i.test(all), 'nothing still says Check a price is Pro and Elite only');
+    // v8: the rating is promised for busy searches only
+    ok(!/every (new )?(find|alert)\b/i.test(all), 'the page never promises a rating on "every find" or "every alert"');
+    ok(/On busy searches, new finds come with a price rating/.test(await page.$eval('.hp-sub', e => e.textContent)), 'the hero line limits the rating to busy searches');
+    ok(/needs 30 finds in the same condition/.test(await page.$eval('#hero-ex-note', e => e.textContent)), 'the worked example says what the rating needs');
+    const fq = await page.$eval('#faq-rating', e => e.textContent);
+    ok(/Why does an alert have no price rating\?/.test(fq) && /30 finds in the same condition/.test(fq) && /alert still arrives/.test(fq), 'the FAQ explains an alert without a rating');
+    ok(!/\b(instant|real-time|fastest|undetectable|sold prices|the only|nobody else)\b/i.test(all), 'no banned claim on the page (folded answers included)');
+    ok(!/\b(make|earn) (€|EUR)\s?\d|per month profit|income/i.test(all), 'no income or profit promise');
+    // FAQ folds: the first answer is open, the others open on a tap
+    eq(await page.$$eval('#faq-list details', d => d.map(x => x.open)).then(a => [a[0], a.slice(1).some(Boolean)]), [true, false], 'FAQ: first answer open, the rest folded');
+    await page.$eval('#faq-rating summary', e => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await wait(250); await page.click('#faq-rating summary'); await wait(200);
+    ok(await page.$eval('#faq-rating', d => d.open && d.querySelector('p').getClientRects().length > 0), 'FAQ: a tap opens the answer');
     const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
     ok(!/demo-steps|renderDemo|Homepage v5/.test(html), 'the walkthrough code is gone');
     for (const m of html.matchAll(/<img[^>]+src="(\/[^"]+)"/g)) ok(fs.existsSync(path.join(root, m[1])), 'image exists: ' + m[1]);
@@ -194,13 +219,62 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     const m = await page.evaluate(() => {
       const r = id => document.getElementById(id).getBoundingClientRect();
       return { sw: document.documentElement.scrollWidth, iw: innerWidth, go: Math.round(r('qs-go').bottom), h1: Math.round(r('qs-words').top), ih: innerHeight,
-        tap: [...document.querySelectorAll('.hp-btn, #qs-words, #qs-max, #pc-item, #pc-margin, #pc-chips button')].filter(e => e.getClientRects().length).map(e => Math.round(e.getBoundingClientRect().height)) };
+        tap: [...document.querySelectorAll('.hp-btn, #qs-words, #qs-max, #pc-item, #pc-margin, #pc-chips button, #faq-list summary')].filter(e => e.getClientRects().length).map(e => Math.round(e.getBoundingClientRect().height)) };
     });
     ok(m.sw <= m.iw + 1, name + ': no sideways scroll (' + m.sw + ' vs ' + m.iw + ')');
     ok(m.go <= m.ih, name + ': the "Watch it for me" button is on the first screen (' + m.go + ' of ' + m.ih + ')');
     ok(Math.min(...m.tap) >= 44, name + ': buttons and fields are at least 44 px tall');
     await ctx.close();
   }
+  // ---- v8: a phone's first screen WITH the cookie bar: headline, sample alert and the main button all show ------
+  {
+    const { page, ctx } = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
+    await page.waitForSelector('.snc-bar', { timeout: 6000 }); await wait(300);
+    const m = await page.evaluate(() => {
+      const r = s => document.querySelector(s).getBoundingClientRect(), shown = s => getComputedStyle(document.querySelector(s)).display !== 'none';
+      return { bar: Math.round(r('.snc-bar').top), ih: innerHeight, h1: Math.round(r('.hp-h1').top), sub: Math.round(r('.hp-sub').bottom), aTop: Math.round(r('#hero-alert-phone').top), aBot: Math.round(r('#hero-alert-phone').bottom),
+        go: Math.round(r('#qs-go').bottom), text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: shown('#hero-ex') };
+    });
+    ok(m.bar < m.ih && m.ih - m.bar <= 170, 'phone: the cookie bar is showing and compact (' + (m.ih - m.bar) + ' px)');
+    ok(m.h1 >= 0 && m.sub <= m.aTop, 'phone: headline and its line come first, then the sample alert');
+    ok(m.aTop >= 0 && m.aBot <= m.bar, 'phone: the sample alert is on the first screen above the cookie bar (' + m.aTop + '-' + m.aBot + ' of ' + m.bar + ')');
+    ok(m.go <= m.bar, 'phone: the main button is on the first screen above the cookie bar (' + m.go + ' of ' + m.bar + ')');
+    ok(/SAMPLE/.test(m.text) && /Cheaper than 76% of this week's finds . Jordan 1 Low Travis Scott . €180/.test(m.text), 'phone: the alert is the Travis Scott sample with its price line: ' + m.text);
+    eq([m.main, m.max, m.ex], [false, false, true], 'phone: one copy of the alert, no max-price field, the explanation still below');
+    await page.type('#qs-words', 'nike tech fleece');
+    eq(await page.$eval('#qs-go', a => a.getAttribute('href')), '/signup?hunt=nike+tech+fleece', 'phone: the words alone are carried to sign-up');
+    await ctx.close();
+    const d = await open('', { width: 1440, height: 900 });
+    eq(await d.page.evaluate(() => ['#hero-alert-phone', '#hero-alert-main', '#qs-max'].map(s => getComputedStyle(document.querySelector(s)).display !== 'none')), [false, true, true], 'desktop: claim left, proof right, as before');
+    await d.ctx.close();
+  }
+
+  // ---- v8: events. They go through the page's ga(); nothing leaves the browser before a cookie choice ----------
+  {
+    const { page, ctx } = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
+    const names = n => page.__ev.filter(e => e.name === n).map(e => e.params);
+    // a click that leaves for /signup is stopped by the harness and leaves an error page behind: load the page again
+    const again = async () => { await page.goto(base + '/', { waitUntil: 'domcontentloaded' }); await wait(900); await page.waitForFunction(() => !document.getElementById('pc-item').disabled, { timeout: 8000 }); };
+    await page.waitForFunction(() => !document.getElementById('pc-item').disabled, { timeout: 8000 });
+    const total = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+    for (const f of [0.3, 0.55, 0.8, 1, 0.4, 1]) { await page.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), Math.round(total * f)); await wait(150); }
+    eq(names('home_scroll').map(p => p.percent), [25, 50, 75, 100], 'scroll depth: 25, 50, 75 and 100 %, each once');
+    ok(await page.evaluate(() => (window.dataLayer || []).some(a => a && a[0] === 'event' && a[1] === 'home_scroll')), 'the events wait in the page for the analytics tag, which loads only after consent');
+    await page.select('#pc-item', 'adidas-samba'); await page.select('#pc-item', 'adidas-samba'); await wait(300);
+    eq(names('home_demo_item'), [{ item: 'adidas-samba' }], 'picking a demo item is recorded once per item');
+    await page.$eval('#pc-alert', e => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await wait(250); await page.click('#pc-alert'); await went(page);
+    eq(names('home_demo_alert'), [{ item: 'adidas-samba' }], 'the demo alert button is recorded');
+    await again();
+    await page.$eval('#price-pro a.hp-btn', e => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await wait(250); await page.click('#price-pro a.hp-btn'); await went(page);
+    eq(names('home_plan_click'), [{ plan: 'pro' }], 'a plan button is recorded with its plan');
+    await again();
+    await page.type('#qs-words', 'lego'); await page.click('#qs-go'); await went(page);
+    eq(names('home_hero_submit'), [{ words: 1, max: 0 }], 'the hero button is recorded (whether words were typed, never the words)');
+    eq(names('home_plan_click'), [{ plan: 'pro' }], 'the hero button is not counted as a plan click');
+    eq(page.__outside.filter(u => /google|facebook|whop/.test(u)), [], 'with no cookie choice made, nothing was requested from Google, Meta or Whop');
+    await ctx.close();
+  }
+
   // sticky bar on a phone appears once the hero button has scrolled away
   {
     const { page, ctx } = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
