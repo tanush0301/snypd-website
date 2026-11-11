@@ -637,6 +637,16 @@ FR.update({
     'No listings matching': 'Aucune annonce pour',
     'yet. We are not going to invent a price -- if this is a real item, we have started watching it and data should build up.':
         'pour l’instant. On ne va pas inventer un prix -- si c’est un vrai article, on a commencé à le surveiller et les données vont arriver.',
+    # Trial price checks + honest zero-result copy + badge (11 Nov 2026)
+    'yet. We are not going to invent a price -- we have started watching this search, so data should build up over the next days.':
+        'pour l’instant. On ne va pas inventer un prix -- on a commencé à surveiller cette recherche, les données vont arriver dans les prochains jours.',
+    'yet. We are not going to invent a price -- try a brand and model, for example "nike p6000". Our prices come from EU listings on vinted.be.':
+        'pour l’instant. On ne va pas inventer un prix -- essaie une marque et un modèle, par exemple «' + NB + 'nike p6000' + NB + '». Nos prix viennent des annonces UE de vinted.be.',
+    'Trial: 10 price checks': 'Essai' + NB + ': 10 vérifications de prix',
+    'Check the warning below': 'Lis l’avertissement ci-dessous',
+    'You have used your 10 trial price checks': 'Tu as utilisé tes 10 vérifications de prix d’essai',
+    'Pro and Elite check prices for any item, 20 an hour, with the condition ladder, where your price would sit and how often sellers cut their price.':
+        'Pro et Elite vérifient le prix de n’importe quel article, 20 par heure, avec le prix par état, la position de ton prix et la fréquence des baisses de prix des vendeurs.',
     'listing to go on, running from': 'annonce pour se faire une idée, de',
     'listings to go on, running from': 'annonces pour se faire une idée, de',
     'listing to go on. Rare items are thin here because they are rare on Vinted, so this is a starting point rather than a settled price.':
@@ -929,6 +939,11 @@ FR_PATTERNS += [
     (r'^(\d+) of (\d+) price check left this hour$', 'encore $1 vérification de prix sur $2 cette heure-ci'),
     (r'^(\d+) price checks left this hour$', 'encore $1 vérifications de prix cette heure-ci'),
     (r'^(\d+) price check left this hour$', 'encore $1 vérification de prix cette heure-ci'),
+    # Trial price checks + non-EU note (11 Nov 2026)
+    (r'^(\d+) of (\d+) trial price checks left$', 'encore $1 vérifications de prix d’essai sur $2'),
+    (r'^(\d+) of (\d+) trial price check left$', 'encore $1 vérification de prix d’essai sur $2'),
+    (r'^This listing is priced in ([A-Z]{3}), on a Vinted site outside the EU euro market\. These prices come from the EU site and may differ\.$',
+     'Cette annonce est en $1, sur un site Vinted hors de la zone euro UE. Ces prix viennent du site UE et peuvent différer.'),
     (r'^Found (\d[\d,]*) listings, but$', 'On a trouvé $1 annonces, mais'),
     (r'^Most sit between (.+) and (.+)$', 'La plupart entre $1 et $2'),
     (r'^· (\d[\d,]*) listings$', '· $1 annonces'),
