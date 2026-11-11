@@ -510,6 +510,12 @@ body {
   transition: border-color 0.2s var(--smooth);
 }
 .snypd-topbar__right:hover { border-color: var(--border); }
+/* Referral entry (migration 085): quiet, always there, opens the Invite friends hub on /account. */
+.ref-gift { margin-left: auto; display: inline-flex; align-items: center; min-height: 32px; padding: 6px 10px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--success); text-decoration: none; border: 1px solid var(--border); white-space: nowrap; }
+.ref-gift:hover, .ref-gift:focus-visible { border-color: var(--success); }
+.ref-gift + .snypd-topbar__right { margin-left: 0; }
+.ref-gift__short { display: none; }
+@media (max-width: 767px) { .ref-gift { padding: 4px 8px; min-height: 30px; } .ref-gift__long { display: none; } .ref-gift__short { display: inline; } }
 .snypd-topbar__status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
 .snypd-topbar .snypd-orb { width: 6px; height: 6px; background: var(--text-muted); flex: 0 0 auto; }
 .snypd-topbar[data-state="running"] .snypd-orb { background: var(--success); animation: pulseDot 2.2s ease infinite; }
@@ -1866,6 +1872,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <button class="view-tab" type="button" data-view="stock" id="view-tab-stock" style="display:none">Stock</button>
     <button class="view-tab" type="button" data-view="market">Market Insights</button>
   </nav>
+  <a class="ref-gift" id="ref-gift" href="/account?src=hub#ref-card" style="display:none" aria-label="Get free days: invite friends"><span class="ref-gift__long">Get free days</span><span class="ref-gift__short">Free days</span></a>
   <div class="snypd-topbar__right" id="topbar-profile-trigger" role="button" tabindex="0" aria-label="Open profile">
     <span class="snypd-topbar__status">
       <span class="snypd-orb" data-snypd-status-label=""></span>
@@ -2165,6 +2172,18 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <div class="trial-recap" id="trial-recap" style="display:none"></div>
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
+</div>
+<!-- Referral, "plan is live" moment (migration 085): shown ONCE on the load right after the activation
+     poller confirms a paid plan (sessionStorage snypd_just_activated). Logic: referralPlanLiveCard(). -->
+<div class="elite-banner" id="ref-live-card" style="display:none" aria-labelledby="ref-live-title">
+  <div>
+    <div class="elite-banner__title" id="ref-live-title">Your plan is live</div>
+    <div class="elite-banner__text">Every friend who subscribes through your link gets you 30% off a renewal. 5 paying friends = 1 free month.</div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="ref-live-share" type="button">Share my link</button>
+    <button class="btn btn-ghost" id="ref-live-close" type="button">Got it</button>
+  </div>
 </div>
 <!-- Hunter statistics notice (7 Nov 2026, privacy page "Why, and the legal basis"): shown once to accounts that signed up
      before the policy changed; OK remembers it on this device. -->
@@ -3051,7 +3070,10 @@ const HEARTBEAT_URL = (() => {
       + (rc.busy ? '<div class="trial-recap__t">' + sp('With this many finds, Solo can alert you only for the cheapest quarter (Only the cheap ones).') + '</div>' : '')
       + '<div class="trial-recap__t">' + sp('SNYPD rated each find against these prices. Solo or a Hunt Pass keeps that price check on every find and in your alerts; Pro adds the weekly hunt report and the Market board.') + '</div>'
       + '<div class="trial-recap__a"><a class="btn btn-prim" href="/plans?checkout=solo"><span>Keep it: Solo &euro;5.99/month</span></a>'
-      + '<a class="btn btn-ghost" href="/plans?checkout=pass"><span>Hunt Pass &euro;3.99 once</span></a></div>';
+      + '<a class="btn btn-ghost" href="/plans?checkout=pass"><span>Hunt Pass &euro;3.99 once</span></a></div>'
+      // Referral (migration 085): one quiet line under the paid options, never above them.
+      + '<div class="trial-recap__t"><a href="/account?src=trial#ref-card" style="color:var(--success);text-decoration:none">'
+      + sp('Or invite a friend: you get 3 extra days of 24/7 when their hunt finds a listing.') + '</a></div>';
     box.style.display = '';
     eliteBanner.style.display = '';
   }
@@ -3143,6 +3165,8 @@ const HEARTBEAT_URL = (() => {
       const plan = r.data && String(r.data.subscription_plan || '').toLowerCase();
       if (plan && plan !== 'free' && ACTIVE_STATUSES.has(String(r.data.sub_status || '').toLowerCase())) {
         clearInterval(timer);
+        // One-time marker for the "plan is live" referral line (read + cleared on the next load).
+        try { sessionStorage.setItem('snypd_just_activated', plan); } catch (e) {}
         location.replace('/dashboard');
       } else if (Date.now() - started > 120000) {
         clearInterval(timer);
@@ -6055,19 +6079,29 @@ const HEARTBEAT_URL = (() => {
 
     overlay.style.display = 'flex';
     overlay.dataset.claimId = claimId || '';
-    // Referral (migration 080): own code via RPC; hidden when the RPC is missing or fails.
+    // Referral (migration 085): own code via RPC; hidden when the RPC is missing or fails, or after
+    // 2 closes without sharing (hidden 30 days; a share resets it). Link carries src=receipt.
     const refBox = document.getElementById('claim-referral');
     if (refBox) {
       refBox.style.display = 'none';
+      refBox.dataset.shown = '';
+      let muted = false;
       try {
-        const { data: code, error } = await sb.rpc('my_referral_code');
+        const st = JSON.parse(localStorage.getItem('snypd_ref_receipt') || 'null');
+        muted = !!(st && st.n >= 2 && Date.now() - Number(st.t) < 30 * 864e5);
+      } catch (e) {}
+      try {
+        const { data: code, error } = muted ? { data: null, error: 'muted' } : await sb.rpc('my_referral_code');
         if (!error && code && /^[a-z2-9]{6}$/.test(code)) {
-          const link = 'https://www.snypd.store/?ref=' + code;
+          const link = 'https://www.snypd.store/?ref=' + code + '&src=receipt';
           document.getElementById('claim-referral-link').value = link;
           refBox.dataset.link = link;
-          refBox.dataset.text = 'Found it for ' + fmtPrice(amount, currency) + ' with SNYPD. Get Vinted alerts too:';
+          const what = String(title || '').trim().slice(0, 60);
+          refBox.dataset.text = (what ? 'Found ' + what + ' for ' : 'Found it for ') + fmtPrice(amount, currency)
+            + ' on Vinted with SNYPD. You get 2 extra days of 24/7 alerts:';
+          refBox.dataset.shown = '1';
           refBox.style.display = 'flex';
-          if (window.gtag) try { gtag('event', 'referral_shown'); } catch (e) {}
+          if (window.gtag) try { gtag('event', 'referral_shown', { src: 'receipt' }); } catch (e) {}
         }
       } catch (e) { /* referral is optional, never blocks the receipt */ }
     }
@@ -6078,7 +6112,19 @@ const HEARTBEAT_URL = (() => {
     const doneBtn = document.getElementById('claim-receipt-done');
     const soldBtn = document.getElementById('claim-receipt-mark-sold');
     if (!overlay || !doneBtn || !soldBtn) return;
-    const close = () => { overlay.style.display = 'none'; };
+    // Referral dismissal count (snypd_ref_receipt = {n, t}): a close while the share box was showing and
+    // nothing was shared counts once; 2 = hidden 30 days (see showClaimReceipt). A share resets it.
+    const refState = (n) => { try { localStorage.setItem('snypd_ref_receipt', JSON.stringify({ n, t: Date.now() })); } catch (e) {} };
+    const close = () => {
+      const box = document.getElementById('claim-referral');
+      if (box && box.dataset.shown === '1' && box.dataset.shared !== '1') {
+        let n = 0;
+        try { const st = JSON.parse(localStorage.getItem('snypd_ref_receipt') || 'null'); n = st ? Number(st.n) || 0 : 0; } catch (e) {}
+        refState(n + 1);
+      }
+      if (box) { box.dataset.shown = ''; box.dataset.shared = ''; }
+      overlay.style.display = 'none';
+    };
     doneBtn.addEventListener('click', close);
     const shareBtn = document.getElementById('claim-referral-share');
     if (shareBtn) shareBtn.addEventListener('click', async () => {
@@ -6086,8 +6132,10 @@ const HEARTBEAT_URL = (() => {
       const link = box && box.dataset.link; if (!link) return;
       try {
         if (navigator.share) { await navigator.share({ text: box.dataset.text, url: link }); }
-        else { await navigator.clipboard.writeText(link); shareBtn.textContent = 'Copied'; setTimeout(() => { shareBtn.textContent = 'Share'; }, 2000); }
-        if (window.gtag) try { gtag('event', 'referral_share'); } catch (e) {}
+        else { await navigator.clipboard.writeText(box.dataset.text + ' ' + link); shareBtn.textContent = 'Copied'; setTimeout(() => { shareBtn.textContent = 'Share'; }, 2000); }
+        box.dataset.shared = '1';
+        refState(0);
+        if (window.gtag) try { gtag('event', 'referral_share', { src: 'receipt' }); } catch (e) {}
       } catch (e) { const i = document.getElementById('claim-referral-link'); if (i) i.select(); }
     });
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
@@ -6100,6 +6148,45 @@ const HEARTBEAT_URL = (() => {
       const historyTab = document.querySelector('.view-tab[data-view="history"]');
       if (historyTab) historyTab.click();
     });
+  })();
+
+  // Referral, "plan is live" (migration 085): once, on the load right after the activation poller
+  // confirmed a paid plan. The marker is cleared before anything else so a reload never shows it again.
+  (async function referralPlanLiveCard() {
+    let plan = null;
+    try { plan = sessionStorage.getItem('snypd_just_activated'); sessionStorage.removeItem('snypd_just_activated'); } catch (e) {}
+    const card = document.getElementById('ref-live-card');
+    if (!plan || !card) return;
+    try {
+      const { data: code, error } = await sb.rpc('my_referral_code');
+      if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
+      const link = 'https://www.snypd.store/?ref=' + code + '&src=success';
+      const text = 'I use SNYPD for Vinted alerts. With my link you get 2 extra days of 24/7 alerts:';
+      const shareBtn = document.getElementById('ref-live-share');
+      shareBtn.addEventListener('click', async () => {
+        try {
+          if (navigator.share) await navigator.share({ text, url: link });
+          else { await navigator.clipboard.writeText(text + ' ' + link); shareBtn.textContent = 'Copied'; }
+          if (window.gtag) try { gtag('event', 'referral_share', { src: 'success' }); } catch (e) {}
+        } catch (e) { /* share cancelled */ }
+      });
+      document.getElementById('ref-live-close').addEventListener('click', () => { card.style.display = 'none'; });
+      card.style.display = '';
+      if (window.gtag) try { gtag('event', 'referral_shown', { src: 'success' }); } catch (e) {}
+    } catch (e) { /* referral is optional */ }
+  })();
+
+  // Referral entry in the top bar (migration 085): shown only when the user's own code can be read,
+  // so a signed-out page or a missing RPC never shows a dead link.
+  (async function referralGiftEntry() {
+    const a = document.getElementById('ref-gift');
+    if (!a) return;
+    try {
+      const { data: code, error } = await sb.rpc('my_referral_code');
+      if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
+      a.style.display = '';
+      a.addEventListener('click', () => { if (window.gtag) try { gtag('event', 'referral_hub_open', { src: 'hub' }); } catch (e) {} });
+    } catch (e) { /* referral is optional */ }
   })();
 
   // lastMatchTs comes from main's empty-state work (see loadAds) - kept
@@ -8241,7 +8328,10 @@ const HEARTBEAT_URL = (() => {
       }
       html += '</div>';
     });
-    return html + '<p class="hr-note">' + sp('Asking prices of the new listings your hunts found in the last 7 days (UTC days), not sold prices. The cheapest find comes from the prices we keep: up to 400 a day per condition.') + '</p>';
+    return html + '<p class="hr-note">' + sp('Asking prices of the new listings your hunts found in the last 7 days (UTC days), not sold prices. The cheapest find comes from the prices we keep: up to 400 a day per condition.') + '</p>'
+      // Referral (migration 085): one line, full report only (paid + trial readers with hunts).
+      + '<p class="hr-note"><a href="/account?src=report#ref-card" style="color:var(--success);text-decoration:none">'
+      + sp('Know someone who hunts on Vinted? Share your link: you get 30% off a renewal when they subscribe.') + '</a></p>';
   }
   async function loadHuntReport(force) {
     if (!hrBox || hrBusy) { return; }

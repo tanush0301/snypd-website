@@ -409,17 +409,22 @@
    they clicked for, so /cookies lists it as functional. Key snypd_refer = {c, t},
    read for 60 days by assets/auth.js. First touch wins: an unexpired stored code is
    never replaced. Separate from the outreach ?r= / snypd_ref tracking in index.html
-   and plans.html, which is untouched. */
+   and plans.html, which is untouched. Optional &src=<placement> (fixed list) is kept
+   as {s} so sign-ups can be counted per placement; anything else is dropped. */
 (function () {
-  var c;
-  try { c = new URLSearchParams(location.search).get('ref'); } catch (e) { return; }
+  var c, s;
+  try { var q = new URLSearchParams(location.search); c = q.get('ref'); s = q.get('src'); } catch (e) { return; }
   if (!c) return;
   c = String(c).toLowerCase();
   if (!/^[a-z2-9]{6}$/.test(c)) return;
+  s = String(s || '').toLowerCase();
+  if (!/^(receipt|success|hub|trial|report|home|account|stock)$/.test(s)) s = '';
   try {
     var old = JSON.parse(localStorage.getItem('snypd_refer') || 'null');
     if (old && old.c && Date.now() - Number(old.t) < 60 * 864e5) return;
-    localStorage.setItem('snypd_refer', JSON.stringify({ c: c, t: Date.now() }));
+    var v = { c: c, t: Date.now() };
+    if (s) v.s = s;
+    localStorage.setItem('snypd_refer', JSON.stringify(v));
   } catch (e) {}
 })();
 

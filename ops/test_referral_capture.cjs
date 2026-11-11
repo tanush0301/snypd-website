@@ -54,6 +54,18 @@ assert.equal(saved(r).c, 'ab23cd', 'first touch wins inside 60 days'); passed++;
 r = run({ url: '/?ref=zz99zz', local: { snypd_refer: JSON.stringify({ c: 'ab23cd', t: 1e12 - 61 * DAY }) } });
 assert.equal(saved(r).c, 'zz99zz', 'expired code replaced'); passed++;
 
+// placement tag (&src=)
+r = run({ url: '/?ref=ab23cd&src=receipt' });
+assert.equal(saved(r).s, 'receipt', 'known src kept'); passed++;
+r = run({ url: '/?ref=ab23cd&src=SUCCESS' });
+assert.equal(saved(r).s, 'success', 'src lowercased'); passed++;
+for (const bad of ['evil', '<x>', 'receipt2', '']) {
+  r = run({ url: '/?ref=ab23cd&src=' + encodeURIComponent(bad) });
+  assert.equal(saved(r).s, undefined, 'unknown src dropped: ' + bad); assert.equal(saved(r).c, 'ab23cd'); passed++;
+}
+r = run({ url: '/?ref=zz99zz&src=hub', local: { snypd_refer: JSON.stringify({ c: 'ab23cd', s: 'receipt', t: 1e12 - DAY }) } });
+assert.equal(saved(r).s, 'receipt', 'first touch keeps its src'); passed++;
+
 // invite bar
 const fresh = { snypd_refer: JSON.stringify({ c: 'ab23cd', t: 1e12 - DAY }) };
 for (const p of ['/', '/index.html', '/signup', '/signup.html']) {
