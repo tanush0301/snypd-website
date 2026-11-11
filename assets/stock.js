@@ -536,6 +536,14 @@
       case 'export': exportItems(el); break;
       case 'welcome-ok': dismissWelcome(); break;
       case 'welcome-weekly': welcomeWeekly(); break;
+      case 'cond-quick': {   // one tap sets the condition of a held item (market step 1); same RPC as the Edit form
+        var qid = el.getAttribute('data-id'), qc = el.getAttribute('data-c');
+        Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act=cond-quick]'), function (b) { b.disabled = true; });
+        S.api.editItem(qid, { condition: qc }).then(function () { return reloadKeep(); }).then(function () {
+          var box = $('#st-condask'); if (box) box.remove(); showBar(T('dt.cond.saved', { c: T('cond.' + qc) }), false); track('stock_condition_set', { from: 'quick' });
+        }).catch(function (e) { Array.prototype.forEach.call(S.panel.querySelectorAll('[data-act=cond-quick]'), function (b) { b.disabled = false; }); sheetError(e); });
+        break;
+      }
       case 'im-pick': { var fi = $('#im-file'); if (fi) fi.click(); break; }
       case 'im-go': imRun(false); break;
       case 'im-resume': imRun(true); break;
@@ -1126,6 +1134,10 @@
       fld('link', T('f.link'), txt('link', it.link, '', ' maxlength="500"'), 'full') + fld('notes', T('f.notes'), '<textarea class="st-in" id="sf-notes" rows="3" maxlength="2000" style="height:auto;padding:8px 12px">' + esc(it.notes || '') + '</textarea>', 'full') +
       '</div><div class="st-acts"><button type="button" class="st-btn st-ghost" data-act="save-detail" data-id="' + esc(it.id) + '" id="st-go">' + esc(T('dt.save')) + '</button></div></details>';
     var extra = (it.returned_on ? '<p class="st-note">' + esc(T('detail.returned', { date: fmtDate(it.returned_on) })) + '</p>' : '') + (it.claim_id ? '<p class="st-note">' + esc(T('detail.claim')) + '</p>' : '');
+    // market step 1 (Nov 2026): a market price compares the EXACT same item, so a held item without a condition asks for it once, one tap, same save as the Edit form
+    if (held && !it.condition) extra = '<div class="st-note st-condask" id="st-condask"><b>' + esc(T('dt.cond.ask')) + '</b><div class="st-condq">' +
+      C.CONDITIONS.map(function (c) { return '<button type="button" class="st-btn st-ghost" data-act="cond-quick" data-c="' + c + '" data-id="' + esc(it.id) + '">' + esc(T('cond.' + c)) + '</button>'; }).join('') +
+      '</div></div>' + extra;
     var foot = '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('close')) + '</button>' + (actionsFor(it).indexOf('sold') >= 0 ? '<button type="button" class="st-btn st-prim" data-act="do" data-do="sold" data-id="' + esc(it.id) + '">' + esc(T('act.sold')) + '</button>' : '');
     mountSheet(it.title, '<div id="st-sheet-err"></div>' + head +
       '<div class="st-dsec"><span class="st-lbl">' + esc(T('dt.timeline')) + '</span><ol class="st-steps" id="st-steps" style="grid-template-columns:repeat(' + stepList.length + ', minmax(0, 1fr))">' + steps + '</ol></div>' +

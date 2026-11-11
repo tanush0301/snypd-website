@@ -36,7 +36,10 @@ const en = {
   'welcome.title': 'History is now Stock.', 'welcome.body': 'Items you claimed through SNYPD are already in here: check their prices once. Add the rest by hand or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
   'welcome.body.new': 'Track what you buy and sell in one place: add your first item, or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
   'welcome.weekly': 'Email me a Monday summary',
-  'welcome.ok': 'Got it'
+  'welcome.ok': 'Got it',
+  // market step 1: a held item without a condition asks for it once (a market price only compares the exact same item: brand, size AND condition)
+  'dt.cond.ask': 'What condition is it in? We need it to compare this item with identical listings.',
+  'dt.cond.saved': 'Condition saved: {c}'
 };
 const fr = {
   'f.fee': 'Frais', 'imp.btn': 'Importer', 'imp.title': 'Importer ton stock', 'imp.pick': 'Choisir un fichier CSV ou Excel', 'imp.drop': 'ou le déposer ici',
@@ -74,6 +77,8 @@ const fr = {
   'welcome.title': 'L’historique est maintenant le Stock.', 'welcome.body': 'Les articles que tu as réclamés via SNYPD sont déjà ici : vérifie leurs prix une fois. Ajoute le reste à la main ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
   'welcome.body.new': 'Suis ce que tu achètes et vends au même endroit : ajoute ton premier article, ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
   'welcome.weekly': 'M’envoyer un résumé le lundi',
-  'welcome.ok': 'Compris'
+  'welcome.ok': 'Compris',
+  'dt.cond.ask': 'Dans quel état est-il ? On en a besoin pour le comparer avec des annonces identiques.',
+  'dt.cond.saved': 'État enregistré : {c}'
 };
 module.exports = { en, fr };
