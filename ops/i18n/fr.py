@@ -186,6 +186,11 @@ FR = {
     'Push alerts': 'Alertes push',
     'Sold': 'Vendu',
     'Quiet hours': 'Heures calmes',
+    # Discord alerts row in Profile (11 Nov 2026, outreach/47)
+    'Discord alerts': 'Alertes Discord',
+    'Connect Discord': 'Connecter Discord',
+    'Get your finds in a private thread in the SNYPD Discord. Works on Android, iPhone and PC.':
+        'Reçois tes trouvailles dans un fil privé du Discord SNYPD. Marche sur Android, iPhone et PC.',
     'Not available on this device': 'Indisponible sur cet appareil',
     'Yes': 'Oui',
     'No': 'Non',
