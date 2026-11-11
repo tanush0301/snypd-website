@@ -202,6 +202,152 @@
     .hp-proof { grid-template-columns: minmax(0, 1fr); }
   }
   @media (prefers-reduced-motion: reduce) { .hp-btn { transition: none !important; } }
+
+  /* ---- v7 (11 Nov 2026, outreach/55): worked alert example, price-check demo, price research, Pro-first plans ---- */
+  .hp-alert.big { border-color: rgba(0, 229, 160, .55); background: #101412; }
+  .hp-alert-body .rank { font-weight: 400; color: #00E5A0; }
+  .hp-ex { background: rgba(10, 10, 11, .92); border: 1px solid #1D1D20; padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 9px; }
+  .hp-ex-h { font-size: 11px; letter-spacing: .14em; color: #8B9094; }
+  .hp-ex-bar { position: relative; height: 10px; margin-top: 26px; background: linear-gradient(90deg, #00E5A0 0, #00E5A0 25%, #3A3F43 25%, #3A3F43 75%, #5A4A2A 75%); }
+  .hp-ex-bar .mark { position: absolute; left: 24%; top: -6px; width: 2px; height: 22px; background: #FFFFFF; }
+  .hp-ex-bar .mark b { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); font-weight: 400; font-size: 12px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #33333A; padding: 2px 6px; white-space: nowrap; }
+  .hp-ex-scale { display: flex; justify-content: space-between; font-size: 11px; color: #8B9094; }
+  .hp-ex p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #A6ADB1; }
+
+  /* price-check demo */
+  .hp-pc { border: 1px solid #26262A; background: #0C0C0D; padding: 22px; display: flex; flex-direction: column; gap: 18px; max-width: 980px; }
+  .hp-pc-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .hp-pc-pick label { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-pc select { box-sizing: border-box; min-height: 52px; min-width: min(320px, 100%); padding: 0 40px 0 14px; font-family: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238B9094' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center; border: 1px solid #33333A; border-radius: 0; -webkit-appearance: none; appearance: none; }
+  .hp-pc select:focus, .hp-pc input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+  .hp-pc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hp-pc-chips button { min-height: 44px; padding: 0 14px; font-family: inherit; font-size: 12.5px; color: #C9CED1; background: #141416; border: 1px solid #26262A; cursor: pointer; }
+  .hp-pc-chips button[aria-pressed="true"] { color: #0A0A0B; background: #00E5A0; border-color: #00E5A0; }
+  .hp-pc-res { display: flex; flex-direction: column; gap: 16px; }
+  .hp-pc-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+  .hp-pc-name b { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 28px; line-height: 1; letter-spacing: -.02em; color: #FFFFFF; }
+  .hp-pc-name span { font-size: 12.5px; color: #8B9094; }
+  .hp-pc-three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .hp-pc-three > div { background: #0A0A0B; padding: 18px 16px; display: flex; flex-direction: column; gap: 7px; }
+  .hp-pc-three .mid { background: #101412; }
+  .hp-pc-three .k { font-size: 11px; letter-spacing: .14em; color: #8B9094; }
+  .hp-pc-three .mid .k { color: #00E5A0; }
+  .hp-pc-three .v { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 40px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-pc-three .d { font-size: 12px; line-height: 1.45; color: #8B9094; }
+  .hp-pc-pay { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 14px; color: #E8EAEB; }
+  .hp-pc-pay input { box-sizing: border-box; width: 84px; min-height: 48px; padding: 0 10px; font-family: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #33333A; border-radius: 0; }
+  .hp-pc-pay .arrow { color: #8B9094; }
+  .hp-pc-pay .out b { font-weight: 400; color: #00E5A0; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .hp-pc-go { display: flex; flex-wrap: wrap; gap: 10px; }
+  #pc-alert { gap: .6ch; }
+  .hp-pc-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 22px; font-size: 12px; color: #8B9094; }
+  .hp-pc-links a { font-size: 12.5px; letter-spacing: .04em; padding: 10px 0; color: #00E5A0; }
+  .hp-pc-foot { margin: 0; font-size: 12.5px; line-height: 1.6; color: #8B9094; max-width: 78ch; }
+
+  /* price research */
+  .hp-rs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .hp-rs-card { background: #121214; border: 1px solid #1D1D20; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .hp-rs-card.wide { grid-column: 1 / -1; }
+  .hp-rs-top { display: flex; align-items: center; gap: 12px; }
+  .hp-rs-top .num { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; color: #00E5A0; }
+  .hp-rs-top .tag { font-size: 11px; letter-spacing: .12em; color: #C9CED1; border: 1px solid #33333A; padding: 5px 9px; }
+  .hp-rs-card h3 { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 26px; line-height: 1.05; letter-spacing: -.02em; color: #FFFFFF; text-wrap: balance; }
+  .hp-rs-card p { margin: 0; font-size: 14px; line-height: 1.65; color: #A6ADB1; max-width: 70ch; }
+  .hp-rs-card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .hp-rs-card li { position: relative; padding-left: 16px; font-size: 13px; line-height: 1.55; color: #C9CED1; }
+  .hp-rs-card li::before { content: ''; position: absolute; left: 0; top: .6em; width: 6px; height: 6px; background: #00E5A0; }
+  .hp-rs-card-ex { border: 1px solid #26262A; background: #0A0A0B; padding: 14px; display: flex; flex-direction: column; gap: 5px; }
+  .hp-rs-card-ex .l1 { font-size: 13.5px; color: #E8EAEB; }
+  .hp-rs-card-ex .l1 b { font-weight: 400; color: #FFFFFF; font-size: 18px; margin-right: 6px; }
+  .hp-rs-card-ex .l2 { font-size: 13.5px; color: #00E5A0; }
+  .hp-rs-card-ex .l3 { font-size: 12px; color: #8B9094; }
+  .hp-rs-link { font-size: 12.5px; letter-spacing: .05em; color: #00E5A0; padding: 10px 0; margin-top: auto; }
+  .hp-rs-foot { margin: 0; font-size: 13px; line-height: 1.6; color: #8B9094; max-width: 82ch; }
+
+  /* market board sample + chart */
+  .hp-mb { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: start; }
+  .hp-mb-list, .hp-chart { margin: 0; border: 1px solid #26262A; background: #0A0A0B; padding: 16px; min-width: 0; }
+  .hp-mb-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; margin-bottom: 12px; }
+  .hp-mb-top b { font-weight: 400; font-size: 15px; color: #FFFFFF; }
+  .hp-mb-top span { font-size: 12px; color: #8B9094; }
+  .hp-mb-h { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; padding: 10px 0 6px; border-bottom: 1px solid #1D1D20; }
+  .hp-mb ul { list-style: none; margin: 0; padding: 0; display: block; }
+  .hp-mb li { display: grid; grid-template-columns: minmax(0, 1fr) auto 52px; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #1D1D20; font-size: 13.5px; color: #FFFFFF; }
+  .hp-mb li::before { content: none; }
+  .hp-mb li .n small { display: block; font-size: 11.5px; color: #8B9094; }
+  .hp-mb li .p { color: #C9CED1; font-variant-numeric: tabular-nums; }
+  .hp-mb li .c { text-align: right; font-variant-numeric: tabular-nums; }
+  .hp-mb .up { color: #00E5A0; } .hp-mb .down { color: #FFB020; }
+  .hp-mb-h.up, .hp-mb-h.down { color: #8B9094; }
+  .hp-mb-note { margin: 12px 0 0 !important; font-size: 12px !important; line-height: 1.5 !important; color: #8B9094 !important; }
+  .hp-chart figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; margin-bottom: 10px; }
+  .hp-chart figcaption b { font-weight: 400; font-size: 15px; color: #FFFFFF; }
+  .hp-chart figcaption span { font-size: 12px; color: #8B9094; }
+  .hp-chart figcaption i { font-style: normal; }
+  .hp-chart svg { display: block; width: 100%; height: 200px; }
+  .hp-chart .band { fill: #23262A; }
+  .hp-chart .bars rect { fill: #33373B; }
+  .hp-chart .line { fill: none; stroke: #FFFFFF; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .hp-chart-axis { display: flex; justify-content: space-between; font-size: 11.5px; color: #8B9094; padding-top: 4px; }
+  .hp-chart-key { margin: 8px 0 0 !important; font-size: 12px !important; line-height: 1.5 !important; color: #8B9094 !important; }
+  .hp-chart-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin-top: 12px; }
+  .hp-chart-tiles > div { background: #0C0C0D; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .hp-chart-tiles b { font-weight: 400; font-size: 15px; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-chart-tiles span { font-size: 11.5px; color: #8B9094; }
+  .hp-chart-say { margin: 12px 0 0 !important; font-size: 13.5px !important; line-height: 1.55 !important; color: #E8EAEB !important; }
+
+  /* Pro-first plans */
+  .hp-top2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
+  .hp-plan.pro { border-color: #A200FF; background: #15101A; box-shadow: 0 0 0 1px rgba(162, 0, 255, .35); }
+  .hp-plan.pro .for { color: #D9A6FF; }
+  .hp-plan.free { border-color: rgba(0, 229, 160, .38); background: rgba(0, 229, 160, .04); }
+  .hp-plan .under { font-size: 12.5px; line-height: 1.5; color: #8B9094; }
+  .hp-plan .under a { color: #00E5A0; }
+  .hp-plan.pro li, .hp-plan.free li { font-size: 13.5px; }
+  .hp-plans.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hp-plan .price.sm { font-size: 34px; }
+
+  /* the three small motions: each plays once; all off under reduced motion */
+  @keyframes hpAlertIn { from { opacity: 0; transform: translateY(-14px) scale(.98); } to { opacity: 1; transform: none; } }
+  @keyframes hpMarkIn { from { left: 88%; } to { left: 24%; } }
+  .hp-alert.big { animation: hpAlertIn .5s cubic-bezier(.2, .8, .2, 1) .25s both; }
+  .hp-ex-bar .mark { animation: hpMarkIn .9s cubic-bezier(.2, .8, .2, 1) .8s both; }
+  .hp-chart .line { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .hp-chart.wait .line { stroke-dashoffset: 1; }
+  .hp-chart.draw .line { transition: stroke-dashoffset 1.4s ease-out; stroke-dashoffset: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    .hp-alert.big, .hp-ex-bar .mark { animation: none; }
+    .hp-chart.draw .line, .hp-chart.wait .line { transition: none; stroke-dashoffset: 0; }
+  }
+
+  @media (max-width: 959.98px) {
+    .hp-rs { grid-template-columns: minmax(0, 1fr); }
+    .hp-mb { grid-template-columns: minmax(0, 1fr); }
+    .hp-top2 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-pc { padding: 16px 14px; }
+    .hp-pc select { width: 100%; }
+    .hp-pc-three { grid-template-columns: minmax(0, 1fr); }
+    .hp-pc-three > div { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px; }
+    .hp-pc-three .k { flex: 0 0 104px; }
+    .hp-pc-three .v { font-size: 30px; }
+    .hp-pc-three .d { flex: 1 1 100%; }
+    .hp-pc-go .hp-btn { width: 100%; box-sizing: border-box; }
+    .hp-rs-card { padding: 20px 16px; }
+    .hp-rs-card h3 { font-size: 23px; }
+    .hp-plans.two { grid-template-columns: minmax(0, 1fr); }
+    .hp-chart-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hp-chart svg { height: 170px; }
+    #how .hp-shot { display: none; }
+    #pc-chips { display: none; }
+    .hp-pc-pay .arrow { display: none; }
+    .hp-alerts .hp-alert:not(.big) { display: none; }
+    .hp-mb-note, .hp-chart-key { display: none; }
+    .hp-sec > .hp-wrap { padding-top: 44px; padding-bottom: 44px; }
+    .hp-plans.two .hp-plan .q { display: none; }
+    .hp-plans.two .hp-plan { padding: 18px 16px; gap: 10px; }
+  }
 </style>
 
 <!-- Supabase REST. This page makes two public calls (the listings counter and
@@ -315,13 +461,13 @@
 
     <div class="hp-hero-in">
       <div class="hp-hero-card">
-        <span class="hp-eyebrow mint">VINTED ALERTS &middot; 26 VINTED SITES</span>
-        <h1 class="hp-h1">Stop refreshing Vinted.<br><em>We watch it for you.</em></h1>
-        <p class="hp-sub">Tell SNYPD what you're hunting. It checks Vinted about once a minute and alerts you on your phone when a new listing matches. You buy on Vinted yourself.</p>
+        <span class="hp-eyebrow mint">VINTED ALERTS + PRICE CHECK &middot; 26 SITES</span>
+        <h1 class="hp-h1">Vinted alerts that tell you <em>if the price is good.</em></h1>
+        <p class="hp-sub">SNYPD checks your Vinted searches about once a minute and rates every new find against what the same search found this week. You buy on Vinted yourself.</p>
         <form id="qs" class="hp-qs" action="/signup" method="get" novalidate>
           <label class="hp-qs-label" for="qs-words">WHAT ARE YOU HUNTING?</label>
           <div class="hp-qs-row">
-            <input id="qs-words" name="hunt" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="e.g. ralph lauren jumper">
+            <input id="qs-words" name="hunt" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="e.g. jordan 1 travis scott">
             <input id="qs-max" name="max" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="go" placeholder="Max price" aria-label="Maximum price (optional)">
           </div>
           <a id="qs-go" class="hp-btn" href="/signup">WATCH IT FOR ME</a>
@@ -333,22 +479,28 @@
         </ul>
       </div>
 
-      <div id="hero-alerts" class="hp-alerts" role="img" aria-label="Three sample alerts: one new find, several new finds, and a summary for a busy search">
+      <div id="hero-alerts" class="hp-alerts" role="img" aria-label="A sample alert for a Jordan 1 Low Travis Scott at 180 euros, cheaper than 76 percent of this week's finds of the same search, followed by two more sample alerts">
         <div class="hp-alerts-top"><span>WHAT AN ALERT LOOKS LIKE</span><b>SAMPLE</b></div>
-        <div class="hp-alert">
+        <div class="hp-alert big" id="hero-alert-main">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
             <span class="hp-alert-meta"><span>SNYPD</span><span>now</span></span>
             <span class="hp-alert-title">New find</span>
-            <span class="hp-alert-body">Amazon Kindle Paperwhite &mdash; <i>&euro;45</i></span>
+            <span class="hp-alert-body"><b class="rank">Cheaper than 76% of this week's finds</b> &middot; Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i></span>
           </span>
+        </div>
+        <div class="hp-ex" id="hero-ex">
+          <span class="hp-ex-h">HOW THAT LINE IS MADE</span>
+          <div class="hp-ex-bar" aria-hidden="true"><span class="fill"></span><span class="mark" id="hero-ex-mark"><b>&euro;180</b></span></div>
+          <div class="hp-ex-scale" aria-hidden="true"><span>cheapest</span><span>typical &euro;250</span><span>dearest</span></div>
+          <p>This search found 62 listings in the same condition this week. Most ask &euro;182 to &euro;350. This one asks less than three quarters of them.</p>
         </div>
         <div class="hp-alert">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
             <span class="hp-alert-meta"><span>SNYPD</span><span>4 min ago</span></span>
-            <span class="hp-alert-title">3 new finds</span>
-            <span class="hp-alert-body">Ralph Lauren cable knit jumper &mdash; <i>&euro;18</i> &amp; 2 more</span>
+            <span class="hp-alert-title">New find</span>
+            <span class="hp-alert-body">Amazon Kindle Paperwhite &mdash; <i>&euro;45</i></span>
           </span>
         </div>
         <div class="hp-alert">
@@ -388,10 +540,111 @@
     </div>
   </div>
 
-  <div id="how" class="hp-sec" style="border-top:0;">
+  <div id="try" class="hp-sec" style="border-top:0;">
     <div class="hp-wrap">
       <div class="hp-head">
-        <span class="hp-eyebrow">HOW IT WORKS</span>
+        <span class="hp-eyebrow mint">TRY IT &middot; NO SIGN-UP</span>
+        <h2 class="hp-h2">What is it worth on Vinted? Check a price.</h2>
+        <p class="hp-lead">Pick an item and see what sellers ask for it. Real numbers from the Vinted listings SNYPD saw. Set your margin and it tells you the most you should pay.</p>
+      </div>
+      <div class="hp-pc" id="pc">
+        <div class="hp-pc-pick">
+          <label for="pc-item">ITEM</label>
+          <select id="pc-item" disabled><option>Nike Dunk Low</option></select>
+          <div class="hp-pc-chips" id="pc-chips" hidden></div>
+        </div>
+        <!--plans:home-demo-->
+          <div class="hp-pc-res" id="pc-res" data-id="nike-dunk-low" data-n-items="34">
+            <div class="hp-pc-name"><b id="pc-name">Nike Dunk Low</b><span id="pc-meta">3,941 listings &middot; vinted.be &middot; 18 October to 1 November 2026</span></div>
+            <div class="hp-pc-three">
+              <div><span class="k">QUICK SALE</span><span class="v" id="pc-lo">&euro;17</span><span class="d">a quarter of listings ask less</span></div>
+              <div class="mid"><span class="k">TYPICAL</span><span class="v" id="pc-mid">&euro;26</span><span class="d">half ask less, half ask more</span></div>
+              <div><span class="k">PATIENT</span><span class="v" id="pc-hi">&euro;50</span><span class="d">a quarter of listings ask more</span></div>
+            </div>
+            <div class="hp-pc-pay"><label for="pc-margin">Your margin</label><input id="pc-margin" type="number" inputmode="numeric" min="0" max="90" step="5" value="40"><span>%</span><span class="arrow">&rarr;</span><span class="out">Pay at most <b id="pc-pay">&euro;15.60</b></span></div>
+            <div class="hp-pc-go"><a class="hp-btn" id="pc-alert" href="/signup?hunt=nike+dunk+low&amp;max=17">ALERT ME UNDER <span id="pc-alert-p">&euro;17</span></a><a class="hp-btn ghost" id="pc-more" href="/vinted-price-guide/nike-dunk-low">PRICES BY CONDITION</a></div>
+          </div>
+          <!--/plans:home-demo-->
+<!--plans:home-data-->
+        <div class="hp-pc-links"><a href="/vinted-price-guide">All 34 items in the free Vinted price guide &rarr;</a><a href="/vinted-market-report/november-2026">Vinted Market Report, November 2026: 629,839 listings &rarr;</a><span>95,367 listings behind the guide&rsquo;s prices, vinted.be, 18 October to 1 November 2026.</span></div>
+        <!--/plans:home-data-->
+        <p class="hp-pc-foot"><span id="pc-count">This demo covers the items of the free price guide.</span> On Pro and Elite you type any item and get its price by condition. Asking prices of live listings, not sale prices: Vinted does not publish what items sell for.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="research" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">HOW THE PRICE RESEARCH WORKS</span>
+        <h2 class="hp-h2">Three ways SNYPD tells you what a price means.</h2>
+        <p class="hp-lead">Each one says what it is built on, so you know how far to trust it.</p>
+      </div>
+
+      <div class="hp-rs">
+        <div class="hp-rs-card">
+          <div class="hp-rs-top"><span class="num">1</span><span class="tag">EVERY PAID PLAN &middot; FREE TRIAL</span></div>
+          <h3>A price check on every find</h3>
+          <p>SNYPD remembers what your search found in the last 7 days. Each new find is placed in that list, next to listings in the same condition. You read the answer on the card and in the alert.</p>
+          <div class="hp-rs-card-ex" role="img" aria-label="Sample of a find in the dashboard: Ralph Lauren, size M, very good, 12 euros, cheaper than 82 percent of this hunt's finds this week, 412 finds compared">
+            <span class="l1"><b>&euro;12</b> Ralph Lauren &middot; M &middot; Very good</span>
+            <span class="l2">Cheaper than 82% of this hunt's finds this week</span>
+            <span class="l3">same condition &middot; 412 finds compared &middot; sample</span>
+          </div>
+          <ul>
+            <li>Works for any search, on all 26 Vinted sites, in that site's currency.</li>
+            <li>Shown once your search has 30 finds in that condition. Before that it says nothing rather than guess.</li>
+          </ul>
+        </div>
+
+        <div class="hp-rs-card">
+          <div class="hp-rs-top"><span class="num">2</span><span class="tag">PRO &middot; ELITE</span></div>
+          <h3>Check a price: any item you type</h3>
+          <p>Type a brand and a model. You get the quick-sale, typical and patient asking price, split by condition, and the most to pay for the margin you want.</p>
+          <ul>
+            <li>From the last 14 days of EU listings, in euros.</li>
+            <li>When listings are too mixed for one honest price, it tells you instead of making one up.</li>
+            <li><!--plans:plans-pro-mr-day-->Up to 100 price checks a day<!--/plans:plans-pro-mr-day-->.</li>
+          </ul>
+          <a class="hp-rs-link" href="#try">Try the demo above &uarr;</a>
+        </div>
+
+        <div class="hp-rs-card wide">
+          <div class="hp-rs-top"><span class="num">3</span><span class="tag">PRO &middot; ELITE &middot; FREE TRIAL</span></div>
+          <h3>What's moving: prices that rise or fall</h3>
+          <p>SNYPD follows about 200 popular items every day and shows where sellers now ask more, or less. Each item has a 5-week chart and the most to pay for your margin.</p>
+          <!--plans:home-market-->
+        <div class="hp-mb" id="mb-sample" data-date="2026-11-11">
+          <div class="hp-mb-list">
+            <div class="hp-mb-top"><b>What&rsquo;s moving</b><span>EU asking prices (EUR) &middot; board of 11 Nov 2026</span></div>
+            <span class="hp-mb-h up">ASKING PRICES RISING</span><ul><li><span class="n">Palace hoodie<small>Tops &amp; knitwear</small></span><span class="p">&euro;70</span><span class="c up">+18%</span></li><li><span class="n">Stone Island hoodie<small>Tops &amp; knitwear</small></span><span class="p">&euro;105</span><span class="c up">+16%</span></li><li><span class="n">Yeezy Foam Runner<small>Sneakers</small></span><span class="p">&euro;45</span><span class="c up">+13%</span></li></ul>
+            <span class="hp-mb-h down">ASKING PRICES FALLING</span><ul><li><span class="n">Adidas Handball<small>Sneakers</small></span><span class="p">&euro;40</span><span class="c down">&minus;20%</span></li><li><span class="n">Adidas Spezial<small>Sneakers</small></span><span class="p">&euro;40</span><span class="c down">&minus;18%</span></li><li><span class="n">Levi&#x27;s 501<small>Trousers</small></span><span class="p">&euro;20.50</span><span class="c down">&minus;16%</span></li></ul>
+            <p class="hp-mb-note">75 items were on the board that day; 4 more were hidden because their mix of listings changed too much to call a direction.</p>
+          </div>
+          <figure class="hp-chart">
+            <figcaption><b>Adidas Handball</b><span>2 Oct 2026 to 11 Nov 2026 &middot; <i class="down">&minus;20%</i></span></figcaption>
+            <svg viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="Adidas Handball: typical asking price per day from 2 Oct 2026 to 11 Nov 2026, with the normal range and the number of listings"><path class="band" d="M0.0,8.0 L15.0,11.4 L30.0,11.4 L45.0,28.1 L60.0,11.4 L75.0,11.4 L90.0,28.1 L105.0,28.1 L120.0,28.1 L135.0,28.1 L150.0,28.1 L165.0,28.1 L180.0,28.1 L195.0,28.1 L210.0,11.4 L225.0,28.1 L240.0,28.1 L255.0,28.1 L270.0,28.1 L285.0,28.1 L300.0,11.4 L315.0,28.1 L330.0,11.4 L345.0,11.4 L360.0,11.4 L375.0,11.4 L390.0,11.4 L405.0,28.1 L420.0,28.1 L435.0,28.1 L450.0,28.1 L465.0,44.9 L480.0,44.9 L495.0,61.6 L510.0,61.6 L525.0,61.6 L540.0,61.6 L555.0,95.1 L570.0,78.4 L585.0,78.4 L600.0,78.4 L600.0,132.0 L585.0,132.0 L570.0,132.0 L555.0,132.0 L540.0,132.0 L525.0,132.0 L510.0,132.0 L495.0,132.0 L480.0,132.0 L465.0,132.0 L450.0,132.0 L435.0,128.6 L420.0,132.0 L405.0,132.0 L390.0,132.0 L375.0,145.4 L360.0,145.4 L345.0,142.0 L330.0,145.4 L315.0,145.4 L300.0,145.4 L285.0,145.4 L270.0,145.4 L255.0,145.4 L240.0,145.4 L225.0,145.4 L210.0,145.4 L195.0,145.4 L180.0,150.0 L165.0,148.7 L150.0,145.4 L135.0,148.7 L120.0,145.4 L105.0,145.4 L90.0,145.4 L75.0,145.4 L60.0,145.4 L45.0,145.4 L30.0,145.4 L15.0,145.4 L0.0,145.4 Z"/><g class="bars"><rect x="-4.5" y="166.6" width="9.0" height="25.4"/><rect x="10.5" y="166.7" width="9.0" height="25.3"/><rect x="25.5" y="166.4" width="9.0" height="25.6"/><rect x="40.5" y="168.2" width="9.0" height="23.8"/><rect x="55.5" y="166.0" width="9.0" height="26.0"/><rect x="70.5" y="166.0" width="9.0" height="26.0"/><rect x="85.5" y="164.9" width="9.0" height="27.1"/><rect x="100.5" y="162.6" width="9.0" height="29.4"/><rect x="115.5" y="162.0" width="9.0" height="30.0"/><rect x="130.5" y="164.1" width="9.0" height="27.9"/><rect x="145.5" y="162.0" width="9.0" height="30.0"/><rect x="160.5" y="166.4" width="9.0" height="25.6"/><rect x="175.5" y="164.5" width="9.0" height="27.5"/><rect x="190.5" y="164.6" width="9.0" height="27.4"/><rect x="205.5" y="167.3" width="9.0" height="24.7"/><rect x="220.5" y="166.7" width="9.0" height="25.3"/><rect x="235.5" y="166.3" width="9.0" height="25.7"/><rect x="250.5" y="165.6" width="9.0" height="26.4"/><rect x="265.5" y="165.9" width="9.0" height="26.1"/><rect x="280.5" y="165.4" width="9.0" height="26.6"/><rect x="295.5" y="166.3" width="9.0" height="25.7"/><rect x="310.5" y="166.2" width="9.0" height="25.8"/><rect x="325.5" y="166.4" width="9.0" height="25.6"/><rect x="340.5" y="164.8" width="9.0" height="27.2"/><rect x="355.5" y="168.1" width="9.0" height="23.9"/><rect x="370.5" y="165.7" width="9.0" height="26.3"/><rect x="385.5" y="166.2" width="9.0" height="25.8"/><rect x="400.5" y="166.8" width="9.0" height="25.2"/><rect x="415.5" y="164.5" width="9.0" height="27.5"/><rect x="430.5" y="166.9" width="9.0" height="25.1"/><rect x="445.5" y="166.3" width="9.0" height="25.7"/><rect x="460.5" y="163.0" width="9.0" height="29.0"/><rect x="475.5" y="165.6" width="9.0" height="26.4"/><rect x="490.5" y="166.1" width="9.0" height="25.9"/><rect x="505.5" y="164.1" width="9.0" height="27.9"/><rect x="520.5" y="166.3" width="9.0" height="25.7"/><rect x="535.5" y="163.7" width="9.0" height="28.3"/><rect x="550.5" y="162.9" width="9.0" height="29.1"/><rect x="565.5" y="165.8" width="9.0" height="26.2"/><rect x="580.5" y="162.3" width="9.0" height="29.7"/><rect x="595.5" y="163.4" width="9.0" height="28.6"/></g><path class="line" pathLength="1" d="M0.0,78.4 L15.0,78.4 L30.0,95.1 L45.0,95.1 L60.0,83.4 L75.0,78.4 L90.0,95.1 L105.0,95.1 L120.0,95.1 L135.0,95.3 L150.0,95.1 L165.0,101.8 L180.0,100.1 L195.0,95.5 L210.0,95.1 L225.0,111.9 L240.0,111.9 L255.0,111.9 L270.0,97.3 L285.0,101.8 L300.0,95.1 L315.0,101.8 L330.0,95.1 L345.0,95.1 L360.0,78.4 L375.0,78.4 L390.0,78.4 L405.0,95.1 L420.0,95.1 L435.0,95.1 L450.0,111.9 L465.0,128.6 L480.0,128.6 L495.0,128.6 L510.0,128.6 L525.0,128.6 L540.0,128.6 L555.0,128.6 L570.0,128.6 L585.0,128.6 L600.0,128.6"/></svg>
+            <div class="hp-chart-axis"><span>2 Oct 2026</span><span>11 Nov 2026</span></div>
+            <p class="hp-chart-key">Line: typical asking price. Band: normal range (the middle half of asking prices). Bars: listings seen.</p>
+            <div class="hp-chart-tiles"><div><b>&euro;40</b><span>Typical now</span></div><div><b>&euro;39&ndash;&euro;55</b><span>Normal range</span></div><div><b>942</b><span>Listings (7 days)</span></div><div><b>463</b><span>Sellers</span></div></div>
+            <p class="hp-chart-say">Sellers now ask 20% less than 8 to 21 days ago. Cheaper to source than it was; harder to sell at the old price.</p>
+          </figure>
+        </div>
+        <!--/plans:home-market-->
+          <ul>
+            <li>EU listings, in euros. Rising or falling = the last 3 days against 8 to 21 days ago, by 10% or more.</li>
+            <li>Plus a weekly report on your own searches: new listings, cheapest find, typical price by condition.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="hp-rs-foot">All of it is built on asking prices of real listings. Vinted does not publish what items sold for, so SNYPD never shows &ldquo;sold&rdquo; numbers.</p>
+    </div>
+  </div>
+
+  <div id="how" class="hp-sec">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">HOW ALERTS WORK</span>
         <h2 class="hp-h2">Three steps. Then your phone does the watching.</h2>
       </div>
       <div class="hp-how">
@@ -420,22 +673,45 @@
     <div class="hp-wrap">
       <div class="hp-head">
         <span class="hp-eyebrow">PRICING</span>
-        <h2 class="hp-h2">Start free. Pay for how much you hunt.</h2>
+        <h2 class="hp-h2">Made for people who resell. Free to start.</h2>
         <p class="hp-lead">Same check speed on every plan. Paid plans keep watching when your dashboard is closed.</p>
       </div>
-      <div id="price-free" class="hp-free">
-        <div class="a"><b>FREE &middot; <!--plans:price:free-->&euro;0<!--/plans:price:free--></b><span><!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line--></span></div>
-        <a class="hp-btn" href="/signup">START FREE</a>
+      <div class="hp-top2">
+        <div class="hp-plan pro" id="price-pro">
+          <span class="for">FOR RESELLERS &middot; MOST COMPLETE</span>
+          <span class="name">PRO</span>
+          <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
+          <ul>
+            <li><span class="hp-tick">&#10003;</span> <!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
+            <li><span class="hp-tick">&#10003;</span> A price check on every find, and &ldquo;only the cheap ones&rdquo; alerts</li>
+            <li><span class="hp-tick">&#10003;</span> What's moving: rising and falling prices, with charts</li>
+            <li><span class="hp-tick">&#10003;</span> Check a price: any item, by condition</li>
+            <li><span class="hp-tick">&#10003;</span> A weekly report on your own searches</li>
+          </ul>
+          <a class="hp-btn block" href="/signup?plan=pro">START PRO</a>
+          <span class="under">Need 10 searches? <a href="/signup?plan=elite">Elite</a>: <!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line-->, <!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite-->.</span>
+        </div>
+        <div class="hp-plan free" id="price-free">
+          <span class="for">TRY IT FIRST</span>
+          <span class="name">FREE</span>
+          <span class="price"><!--plans:price:free-->&euro;0<!--/plans:price:free--> <small>no card</small></span>
+          <ul>
+            <li><span class="hp-tick">&#10003;</span> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line--></li>
+            <li><span class="hp-tick">&#10003;</span> During those days you also get the price check on every find, What's moving and the weekly report</li>
+            <li class="dim">Check a price for any item is Pro and Elite only. The demo above is open to everyone.</li>
+          </ul>
+          <a class="hp-btn ghost block" href="/signup">START FREE</a>
+        </div>
       </div>
-      <div id="price-rest" class="hp-plans">
+      <div id="price-rest" class="hp-plans two">
         <div class="hp-plan">
           <span class="for">ONE ITEM, THEN DONE</span>
           <p class="q">A console, a jacket in your size: find it and stop.</p>
           <span class="name">HUNT PASS</span>
-          <span class="price"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once &middot; VAT incl.</small></span>
+          <span class="price sm"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once &middot; VAT incl.</small></span>
           <ul>
             <li><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></li>
-            <li class="dim">Nothing to cancel.</li>
+            <li class="dim">With the price check on every find. Nothing to cancel.</li>
           </ul>
           <a class="hp-btn ghost block" href="/signup?plan=pass">GET HUNT PASS</a>
         </div>
@@ -443,24 +719,12 @@
           <span class="for">ONE SEARCH, ALWAYS ON</span>
           <p class="q">Keep watching the same search, month after month.</p>
           <span class="name">SOLO</span>
-          <span class="price"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo &middot; VAT incl.</small></span>
+          <span class="price sm"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo &middot; VAT incl.</small></span>
           <ul>
             <li><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></li>
-            <li class="dim">Cancel any time.</li>
+            <li class="dim">With the price check on every find. Two searches: <a href="/signup?plan=kickstart">Kickstart</a>, <!--plans:price-mo:kickstart-->&euro;14.99 / mo<!--/plans:price-mo:kickstart-->.</li>
           </ul>
           <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
-        </div>
-        <div class="hp-plan" id="price-pro">
-          <span class="for">STOCK TO RESELL</span>
-          <p class="q">Several searches at once, with a price check before you buy.</p>
-          <span class="name">PRO</span>
-          <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
-          <ul>
-            <li><!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
-            <li>Market Report: the typical asking price by condition</li>
-            <li class="dim">Fewer or more: <a href="/signup?plan=kickstart">Kickstart</a> (<!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line-->, <!--plans:price-mo:kickstart-->&euro;14.99 / mo<!--/plans:price-mo:kickstart-->) &middot; <a href="/signup?plan=elite">Elite</a> (<!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line-->, <!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite-->)</li>
-          </ul>
-          <a class="hp-btn ghost block" href="/signup?plan=pro">START PRO</a>
         </div>
       </div>
       <div class="hp-foot-note">
@@ -471,23 +735,6 @@
     </div>
   </div>
 
-  <div id="prices" style="border-top:1px solid #1D1D20;">
-<!--plans:home-data-->
-  <div style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;flex-direction:column;gap:22px;">
-    <div style="display:flex;flex-direction:column;gap:12px;max-width:760px;">
-      <span style="font-size:11px;letter-spacing:.16em;color:#00E5A0;">FREE PRICE DATA</span>
-      <h2 style="margin:0;font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;text-wrap:balance;">What things cost on Vinted, from 95,367 listings</h2>
-      <p style="margin:0;font-size:16px;line-height:1.6;color:#A6ADB1;">Typical asking prices for 34 popular items, from vinted.be listings SNYPD saw from 18 October to 1 November 2026. Asking prices, not sale prices: Vinted does not publish what items sell for.</p>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;"><a href="/vinted-price-guide/nike-dunk-low" style="background:#0A0A0B;padding:18px;display:flex;flex-direction:column;gap:8px;color:#E8EAEB;"><span style="font-size:12.5px;color:#E8EAEB;">Nike Dunk Low</span><span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:30px;line-height:1;letter-spacing:-.02em;color:#FFFFFF;">&euro;26</span><span style="font-size:12px;color:#8B9094;line-height:1.5;">middle half &euro;17&ndash;&euro;50 &middot; 3,941 listings</span></a><a href="/vinted-price-guide/nike-air-force-1" style="background:#0A0A0B;padding:18px;display:flex;flex-direction:column;gap:8px;color:#E8EAEB;"><span style="font-size:12.5px;color:#E8EAEB;">Nike Air Force 1</span><span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:30px;line-height:1;letter-spacing:-.02em;color:#FFFFFF;">&euro;20</span><span style="font-size:12px;color:#8B9094;line-height:1.5;">middle half &euro;14&ndash;&euro;33 &middot; 3,242 listings</span></a><a href="/vinted-price-guide/new-balance-550" style="background:#0A0A0B;padding:18px;display:flex;flex-direction:column;gap:8px;color:#E8EAEB;"><span style="font-size:12.5px;color:#E8EAEB;">New Balance 550</span><span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:30px;line-height:1;letter-spacing:-.02em;color:#FFFFFF;">&euro;30</span><span style="font-size:12px;color:#8B9094;line-height:1.5;">middle half &euro;20&ndash;&euro;40 &middot; 1,914 listings</span></a><a href="/vinted-price-guide/adidas-samba" style="background:#0A0A0B;padding:18px;display:flex;flex-direction:column;gap:8px;color:#E8EAEB;"><span style="font-size:12.5px;color:#E8EAEB;">Adidas Samba</span><span style="font-family:'Cabinet Grotesk','DM Mono',sans-serif;font-weight:900;font-size:30px;line-height:1;letter-spacing:-.02em;color:#FFFFFF;">&euro;50</span><span style="font-size:12px;color:#8B9094;line-height:1.5;">middle half &euro;35&ndash;&euro;79 &middot; 463 listings</span></a></div>
-    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;">
-      <a href="/vinted-price-guide" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">All 34 items in the Vinted price guide &rarr;</a>
-      <a href="/vinted-market-report/november-2026" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Vinted Market Report, November 2026: 629,839 listings, condition premium, price cuts &rarr;</a>
-    </div>
-  </div>
-  <!--/plans:home-data-->
-  </div>
-
   <div id="faq" class="hp-sec alt">
     <div class="hp-wrap">
       <div class="hp-head">
@@ -496,9 +743,10 @@
       </div>
       <div class="hp-faq">
         <div><h3>Does SNYPD touch my Vinted account?</h3><p>No. It reads public listings only. It never logs in, buys or messages.</p></div>
+        <div><h3>Are these the prices items sold for?</h3><p>No. They are asking prices of listings SNYPD saw. Vinted does not publish what items sell for, so SNYPD does not show sale prices or guess them.</p></div>
         <div><h3><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></h3><p><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></p></div>
         <div><h3>How fast are alerts?</h3><p><!--plans:home-faq-speed-a-->About every 60 s (measured median), up to 5 min on quiet searches. Same on every plan. One batched push.<!--/plans:home-faq-speed-a--></p></div>
-        <div><h3>Which markets?</h3><p>Every Vinted site in Europe and the US, 26 in all. Prices in that site's currency.</p></div>
+        <div><h3>Which markets?</h3><p>Alerts and the price check on every find: every Vinted site in Europe and the US, 26 in all. What's moving and Check a price: EU listings, in euros.</p></div>
         <div><h3>How long do matches stay?</h3><p>About 30 minutes while listed. The alert on your phone keeps what the feed drops.</p></div>
         <div><h3>Alerts on iPhone?</h3><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></div>
         <div><h3>Something else?</h3><p>Ask the community on <a href="https://discord.gg/gjKD4auXhK">Discord</a>, or read the <a href="/faq">full FAQ</a>.</p></div>
@@ -509,12 +757,12 @@
   <div id="closing" class="hp-sec">
     <div class="hp-wrap hp-close">
       <div class="l">
-        <h2 class="hp-h2" style="max-width:18ch;">Let it watch for you.</h2>
+        <h2 class="hp-h2" style="max-width:20ch;">Let it watch. Know what the price means.</h2>
         <p class="hp-lead" style="font-size:14px;">Free account, no card. Type what you want and SNYPD starts checking.</p>
       </div>
       <div class="r">
         <a class="hp-btn" href="/signup">START FREE</a>
-        <a class="hp-btn ghost" href="https://discord.gg/gjKD4auXhK">JOIN THE DISCORD</a>
+        <a class="hp-btn ghost" href="/signup?plan=pro">START PRO</a>
       </div>
     </div>
   </div>
@@ -631,6 +879,110 @@
     sync();
   }
 
+  /* ---------- v7: "Check a price" demo ----------
+     Reads /assets/data/price-index.json (public, written by ops/seo/gen_price_guide.py: only the items the price
+     guide publishes). The first item is already in the HTML (region home-demo), so the numbers show without this
+     script. Nothing typed or picked leaves the browser; one event per item picked (item id only). */
+  function money(cents) {
+    var v = cents % 100 === 0 ? String(Math.floor(cents / 100)) : (cents / 100).toFixed(2);
+    var p = v.split('.');
+    return '€' + p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (p[1] ? '.' + p[1] : '');
+  }
+  var MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function windowText(w) {
+    try {
+      var a = w.from.split('-'), b = w.to.split('-');
+      return Number(a[2]) + ' ' + MON[Number(a[1]) - 1] + ' to ' + Number(b[2]) + ' ' + MON[Number(b[1]) - 1] + ' ' + b[0];
+    } catch (e) { return ''; }
+  }
+  // Numbers run to their new value once (0.4 s); with reduced motion they are simply set.
+  function setMoney(el, cents) {
+    if (!el) return;
+    var from = Number(el.getAttribute('data-c'));
+    el.setAttribute('data-c', String(cents));
+    if (reduce || !isFinite(from) || !el.hasAttribute('data-ready') || typeof requestAnimationFrame !== 'function') {
+      el.setAttribute('data-ready', '1'); el.textContent = money(cents); return;
+    }
+    var t0 = null, dur = 400;
+    (function step(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / dur), now = Math.round((from + (cents - from) * (1 - Math.pow(1 - k, 3))) / 100) * 100;
+      if (Number(el.getAttribute('data-c')) !== cents) return;   // a newer value took over
+      el.textContent = money(k < 1 ? now : cents);
+      if (k < 1) requestAnimationFrame(step);
+    })(typeof performance !== 'undefined' ? performance.now() : 0);
+  }
+  function setupPriceDemo() {
+    var box = $('pc'), res = $('pc-res'), sel = $('pc-item'), chips = $('pc-chips'), margin = $('pc-margin');
+    if (!box || !res || !sel || !margin || !window.fetch) return;
+    var items = [], cur = null, win = '', picked = {};
+    function pay() {
+      if (!cur) return;
+      var m = Math.max(0, Math.min(90, Math.round(Number(margin.value)) || 0));
+      setMoney($('pc-pay'), Math.round(cur.typical * (100 - m) / 100));
+    }
+    function show(it, byUser) {
+      cur = it;
+      $('pc-name').textContent = it.name.en;
+      $('pc-meta').textContent = String(it.n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' listings · vinted.be' + (win ? ' · ' + win : '');
+      setMoney($('pc-lo'), it.p25); setMoney($('pc-mid'), it.typical); setMoney($('pc-hi'), it.p75);
+      pay();
+      var cap = Math.max(1, Math.floor(it.p25 / 100));
+      $('pc-alert-p').textContent = money(cap * 100);
+      var u = new URL('/signup', location.origin);
+      u.searchParams.set('hunt', it.q); u.searchParams.set('max', String(cap));
+      $('pc-alert').setAttribute('href', withRef(u.pathname + u.search));
+      $('pc-more').setAttribute('href', it.url.en);
+      res.setAttribute('data-id', it.id);
+      if (sel.value !== it.id) sel.value = it.id;
+      Array.prototype.forEach.call(chips.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-id') === it.id ? 'true' : 'false'); });
+      if (byUser && !picked[it.id]) { picked[it.id] = 1; ga('home_price_demo', { item: it.id }); }
+    }
+    // the item already in the HTML: read its numbers so the first change can run from them
+    ['pc-lo', 'pc-mid', 'pc-hi', 'pc-pay'].forEach(function (id) { var e = $(id); if (e) e.setAttribute('data-ready', '1'); });
+    margin.addEventListener('input', function () { pay(); });
+    fetch('/assets/data/price-index.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !d.items || !d.items.length) return;
+      items = d.items.slice().sort(function (a, b) { return a.name.en < b.name.en ? -1 : 1; });
+      win = windowText(d.window || {});
+      var groups = {}, order = [], LABEL = { sneakers: 'Sneakers', clothing: 'Clothing', accessories: 'Bags, watches, jewellery' };
+      items.forEach(function (it) { if (!groups[it.cat]) { groups[it.cat] = []; order.push(it.cat); } groups[it.cat].push(it); });
+      sel.textContent = '';
+      order.forEach(function (cat) {
+        var g = document.createElement('optgroup'); g.label = LABEL[cat] || cat;
+        groups[cat].forEach(function (it) { var o = document.createElement('option'); o.value = it.id; o.textContent = it.name.en; g.appendChild(o); });
+        sel.appendChild(g);
+      });
+      sel.disabled = false;
+      var byId = {}; items.forEach(function (it) { byId[it.id] = it; });
+      ['nike-dunk-low', 'adidas-samba', 'carhartt-detroit-jacket', 'ralph-lauren-quarter-zip', 'the-north-face-nuptse'].forEach(function (id) {
+        if (!byId[id]) return;
+        var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-id', id); b.textContent = byId[id].name.en;
+        b.addEventListener('click', function () { show(byId[id], true); });
+        chips.appendChild(b);
+      });
+      chips.hidden = !chips.children.length;
+      sel.addEventListener('change', function () { if (byId[sel.value]) show(byId[sel.value], true); });
+      var first = byId[res.getAttribute('data-id')] || items[0];
+      ['pc-lo', 'pc-mid', 'pc-hi', 'pc-pay'].forEach(function (id) { var e = $(id); if (e) e.removeAttribute('data-ready'); });
+      show(first, false);
+      $('pc-count').textContent = 'This demo covers ' + items.length + ' items of the free price guide.';
+    }, function () {});
+  }
+
+  /* ---------- v7: the chart line draws once when it scrolls into view ---------- */
+  function setupChart() {
+    var fig = document.querySelector('.hp-chart');
+    if (!fig || reduce || typeof IntersectionObserver !== 'function') return;
+    fig.classList.add('wait');
+    var io = new IntersectionObserver(function (es) {
+      if (!es[es.length - 1].isIntersecting) return;
+      io.disconnect();
+      fig.classList.add('draw'); fig.classList.remove('wait');
+    }, { threshold: 0.35 });
+    io.observe(fig);
+  }
+
   /* ---------- nav: mobile menu, scroll state, sticky bar ---------- */
   var menuBtn, menu, nav, inner, bar, lastMob = null, navOn = false;
   function setMenu(open) {
@@ -662,6 +1014,8 @@
   /* ---------- boot ---------- */
   buildWall();
   setupQuickStart();
+  setupPriceDemo();
+  setupChart();
   menuBtn = $('menu-btn'); menu = $('mobile-menu'); nav = $('site-nav'); inner = $('site-nav-inner'); bar = $('sticky-bar');
   if (reduce) { nav.style.transition = 'none'; inner.style.transition = 'none'; }
   menuBtn.addEventListener('click', function () { setMenu(!s.menuOpen); });

@@ -184,45 +184,20 @@ def faq_html():
 
 # ----------------------------------------------------------------- homepage price data
 # A few items from the price guide (ops/seo/data/price-guide.json via gen_price_guide.py) and the
-# latest Market Report edition. Numbers only from those generators; the item list is a choice.
-HOME_ITEMS = ['nike-dunk-low', 'nike-air-force-1', 'new-balance-550', 'adidas-samba']
+# latest Market Report edition, as two links under the homepage's price-check demo (v7; the demo shows the items).
 
 
 def home_data():
     import gen_price_guide as pg
     import gen_market_report as mr
-    from gen_content import money, num
-    items = [it for slug in HOME_ITEMS for it in pg.PUB if it['slug'] == slug]
-    if len(items) < 3:
-        sys.exit('gen_regions: fewer than 3 homepage items are published in the price guide; edit HOME_ITEMS')
+    from gen_content import num
     total = sum(pg.V[it['slug']]['sample_size'] for it in pg.PUB)
     ed = mr.EDITIONS[-1]
     listings = mr.load(ed)[1]['listings']
-    cards = ''.join(
-        '<a href="%s" style="background:#0A0A0B;padding:18px;display:flex;flex-direction:column;gap:8px;color:#E8EAEB;">'
-        '<span style="font-size:12.5px;color:#E8EAEB;">%s</span>'
-        '<span style="font-family:\'Cabinet Grotesk\',\'DM Mono\',sans-serif;font-weight:900;font-size:30px;line-height:1;letter-spacing:-.02em;color:#FFFFFF;">%s</span>'
-        '<span style="font-size:12px;color:#8B9094;line-height:1.5;">middle half %s&ndash;%s &middot; %s listings</span></a>'
-        % (pg.item_url(it, 'en'), html.escape(it['name']), money(pg.V[it['slug']]['typical_cents'], 'en'),
-           money(pg.V[it['slug']]['range_cents']['low'], 'en'), money(pg.V[it['slug']]['range_cents']['high'], 'en'),
-           num(pg.V[it['slug']]['sample_size'], 'en')) for it in items)
-    report = ('<a href="%s/%s" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">Vinted Market Report, %s%s &rarr;</a>'
-              % (mr.HUB['en'], ed['slug']['en'], ed['name']['en'], ': %s listings, condition premium, price cuts' % num(listings, 'en')))
-    return (
-        '\r\n  <div style="max-width:1320px;margin:0 auto;padding:64px 20px;display:flex;flex-direction:column;gap:22px;">\r\n'
-        '    <div style="display:flex;flex-direction:column;gap:12px;max-width:760px;">\r\n'
-        '      <span style="font-size:11px;letter-spacing:.16em;color:#00E5A0;">FREE PRICE DATA</span>\r\n'
-        '      <h2 style="margin:0;font-family:\'Cabinet Grotesk\',\'DM Mono\',sans-serif;font-weight:900;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.04em;color:#FFFFFF;text-wrap:balance;">'
-        'What things cost on Vinted, from %s listings</h2>\r\n'
-        '      <p style="margin:0;font-size:16px;line-height:1.6;color:#A6ADB1;">Typical asking prices for %d popular items, from vinted.be listings SNYPD saw from %s. '
-        'Asking prices, not sale prices: Vinted does not publish what items sell for.</p>\r\n'
-        '    </div>\r\n'
-        '    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%%),1fr));gap:1px;background:#1D1D20;border:1px solid #1D1D20;">%s</div>\r\n'
-        '    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;">\r\n'
-        '      <a href="%s" style="font-size:12px;letter-spacing:.05em;padding:14px 0;">All %d items in the Vinted price guide &rarr;</a>\r\n'
-        '      %s\r\n'
-        '    </div>\r\n'
-        '  </div>\r\n  ' % (num(total, 'en'), len(pg.PUB), pg.window('en'), cards, pg.HUB['en'], len(pg.PUB), report))
+    return ('\r\n        <div class="hp-pc-links"><a href="%s">All %d items in the free Vinted price guide &rarr;</a>'
+            '<a href="%s/%s">Vinted Market Report, %s: %s listings &rarr;</a>'
+            '<span>%s listings behind the guide&rsquo;s prices, vinted.be, %s.</span></div>\r\n        '
+            % (pg.HUB['en'], len(pg.PUB), mr.HUB['en'], ed['slug']['en'], ed['name']['en'], num(listings, 'en'), num(total, 'en'), pg.window('en')))
 
 
 # ----------------------------------------------------------------- homepage footer links
@@ -248,6 +223,106 @@ def home_foot_links():
     return ''.join(out)
 
 
+# ----------------------------------------------------------------- homepage: Check a price demo + Market board sample
+# home-demo: the price-check demo's first item, written into the HTML so the numbers are on the page without
+# JavaScript (the page script then lets the visitor pick any item of assets/data/price-index.json).
+# home-market: a dated sample of the Market board with one real chart, from ops/seo/data/home-market-sample.json
+# (ops/seo/home_market_sample.sql + the board as the dashboard showed it that day). Numbers only from those files.
+HOME_DEMO_ITEM = 'nike-dunk-low'
+HOME_DEMO_MARGIN = 40
+
+
+def _day(iso):
+    y, m, d = iso.split('-')
+    return '%d %s %s' % (int(d), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'][int(m) - 1], y)
+
+
+def home_demo():
+    import gen_price_guide as pg
+    from gen_content import money, num
+    it = next((x for x in pg.PUB if x['slug'] == HOME_DEMO_ITEM), None)
+    if it is None:
+        sys.exit('gen_regions: the homepage demo item is not published in the price guide; edit HOME_DEMO_ITEM')
+    v = pg.V[it['slug']]
+    lo, mid, hi = v['range_cents']['low'], v['typical_cents'], v['range_cents']['high']
+    pay = int(round(mid * (100 - HOME_DEMO_MARGIN) / 100.0))
+    alert = '/signup?hunt=%s&amp;max=%d' % (it['query'].replace(' ', '+'), max(1, lo // 100))
+    return (
+        '\r\n          <div class="hp-pc-res" id="pc-res" data-id="%s" data-n-items="%d">\r\n'
+        '            <div class="hp-pc-name"><b id="pc-name">%s</b><span id="pc-meta">%s listings &middot; vinted.be &middot; %s</span></div>\r\n'
+        '            <div class="hp-pc-three">\r\n'
+        '              <div><span class="k">QUICK SALE</span><span class="v" id="pc-lo">%s</span><span class="d">a quarter of listings ask less</span></div>\r\n'
+        '              <div class="mid"><span class="k">TYPICAL</span><span class="v" id="pc-mid">%s</span><span class="d">half ask less, half ask more</span></div>\r\n'
+        '              <div><span class="k">PATIENT</span><span class="v" id="pc-hi">%s</span><span class="d">a quarter of listings ask more</span></div>\r\n'
+        '            </div>\r\n'
+        '            <div class="hp-pc-pay"><label for="pc-margin">Your margin</label><input id="pc-margin" type="number" inputmode="numeric" min="0" max="90" step="5" value="%d"><span>%%</span>'
+        '<span class="arrow">&rarr;</span><span class="out">Pay at most <b id="pc-pay">%s</b></span></div>\r\n'
+        '            <div class="hp-pc-go"><a class="hp-btn" id="pc-alert" href="%s">ALERT ME UNDER <span id="pc-alert-p">%s</span></a>'
+        '<a class="hp-btn ghost" id="pc-more" href="%s">PRICES BY CONDITION</a></div>\r\n'
+        '          </div>\r\n          '
+        % (it['slug'], len(pg.PUB), html.escape(it['name']), num(v['sample_size'], 'en'), pg.window('en'),
+           money(lo, 'en'), money(mid, 'en'), money(hi, 'en'), HOME_DEMO_MARGIN, money(pay, 'en'),
+           alert, money((lo // 100) * 100, 'en'), pg.item_url(it, 'en')))
+
+
+def home_market():
+    from gen_content import money, num
+    d = json.load(open(os.path.join(HERE, 'data', 'home-market-sample.json'), encoding='utf-8'))
+    b, c = d['board'], d['chart']
+    ser = c['series']
+    if len(ser) < 21 or ser[-1][0] != b['date']:
+        sys.exit('gen_regions: home-market-sample.json: chart and board are not from the same day')
+    # chart geometry: 600 x 200 plot, band = middle half, line = typical asking price, bars = listings
+    W, H, PAD_T, PAD_B = 600.0, 150.0, 8.0, 46.0
+    lo = min(r[2] for r in ser)
+    hi = max(r[3] for r in ser)
+    span = float(hi - lo) or 1.0
+    n_max = float(max(r[4] for r in ser)) or 1.0
+    step = W / (len(ser) - 1)
+    x = lambda i: round(i * step, 1)
+    y = lambda cents: round(PAD_T + (hi - cents) / span * (H - PAD_T), 1)
+    line = ' '.join('%s%s,%s' % ('M' if i == 0 else 'L', x(i), y(r[1])) for i, r in enumerate(ser))
+    band = ('M' + ' L'.join('%s,%s' % (x(i), y(r[3])) for i, r in enumerate(ser))
+            + ' L' + ' L'.join('%s,%s' % (x(i), y(r[2])) for i, r in reversed(list(enumerate(ser)))) + ' Z')
+    bw = max(2.0, round(step * 0.6, 1))
+    bars = ''.join('<rect x="%s" y="%s" width="%s" height="%s"/>' % (round(x(i) - bw / 2, 1), round(H + PAD_B - 4 - r[4] / n_max * 30, 1), bw, round(r[4] / n_max * 30, 1))
+                   for i, r in enumerate(ser))
+    last = ser[-1]
+
+    def rows(items, cls):
+        return ''.join('<li><span class="n">%s<small>%s</small></span><span class="p">%s</span><span class="c %s">%s%d%%</span></li>'
+                       % (html.escape(i['name']), html.escape(i['cat']), money(i['typical_cents'], 'en'), cls,
+                          '+' if i['change_pct'] > 0 else '&minus;', abs(i['change_pct'])) for i in items)
+    sign = '+' if c['change_pct'] > 0 else '&minus;'
+    return (
+        '\r\n        <div class="hp-mb" id="mb-sample" data-date="%s">\r\n'
+        '          <div class="hp-mb-list">\r\n'
+        '            <div class="hp-mb-top"><b>What&rsquo;s moving</b><span>EU asking prices (EUR) &middot; board of %s</span></div>\r\n'
+        '            <span class="hp-mb-h up">ASKING PRICES RISING</span><ul>%s</ul>\r\n'
+        '            <span class="hp-mb-h down">ASKING PRICES FALLING</span><ul>%s</ul>\r\n'
+        '            <p class="hp-mb-note">%d items were on the board that day; %d more were hidden because their mix of listings changed too much to call a direction.</p>\r\n'
+        '          </div>\r\n'
+        '          <figure class="hp-chart">\r\n'
+        '            <figcaption><b>%s</b><span>%s to %s &middot; <i class="%s">%s%d%%</i></span></figcaption>\r\n'
+        '            <svg viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="%s: typical asking price per day from %s to %s, with the normal range and the number of listings">'
+        '<path class="band" d="%s"/><g class="bars">%s</g><path class="line" pathLength="1" d="%s"/></svg>\r\n'
+        '            <div class="hp-chart-axis"><span>%s</span><span>%s</span></div>\r\n'
+        '            <p class="hp-chart-key">Line: typical asking price. Band: normal range (the middle half of asking prices). Bars: listings seen.</p>\r\n'
+        '            <div class="hp-chart-tiles"><div><b>%s</b><span>Typical now</span></div><div><b>%s&ndash;%s</b><span>Normal range</span></div>'
+        '<div><b>%s</b><span>Listings (7 days)</span></div><div><b>%s</b><span>Sellers</span></div></div>\r\n'
+        '            <p class="hp-chart-say">%s</p>\r\n'
+        '          </figure>\r\n'
+        '        </div>\r\n        '
+        % (b['date'], _day(b['date']), rows(b['rising'], 'up'), rows(b['falling'], 'down'), b['items_on_board'], b['hidden_mixed'],
+           html.escape(c['name']), _day(ser[0][0]), _day(last[0]), 'up' if c['change_pct'] > 0 else 'down', sign, abs(c['change_pct']),
+           html.escape(c['name']), _day(ser[0][0]), _day(last[0]), band, bars, line,
+           _day(ser[0][0]), _day(last[0]),
+           money(last[1], 'en'), money(last[2], 'en'), money(last[3], 'en'), num(last[4], 'en'), num(last[5], 'en'),
+           ('Sellers now ask %d%% more than 8 to 21 days ago. Good time to list if you hold some; sourcing costs more than it did.'
+            if c['change_pct'] > 0 else
+            'Sellers now ask %d%% less than 8 to 21 days ago. Cheaper to source than it was; harder to sell at the old price.') % abs(c['change_pct'])))
+
+
 # ----------------------------------------------------------------- templates
 TEMPLATES = {
     'home-foot-links': home_foot_links,
@@ -264,6 +339,8 @@ TEMPLATES = {
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
     'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). No card.',
     'home-data': home_data,
+    'home-demo': home_demo,
+    'home-market': home_market,
     'home-faq-free-q': 'Does it run with my laptop closed?',
     'home-faq-free-a': 'Paid plans, always. Free: 24/7 for the first @@trial_days@@ days after you save your first search, then only while your dashboard is open.',
     'home-faq-speed-a': 'About every @@median_s@@ s (measured median), up to 5 min on quiet searches. Same on every plan. One batched push.',
