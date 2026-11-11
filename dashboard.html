@@ -7,6 +7,7 @@
 <script src="/assets/search-contract.js"></script>
 <script src="/assets/hunt-words.js"></script>
 <script src="/assets/feedback.js"></script>
+<script src="/assets/first-session.js"></script>
 <script>
   /* Plan intent: a visitor who clicked START KICKSTART / PRO / ELITE on the
      homepage signed up via /signup?plan=<plan>. Once they are signed in, send
@@ -2612,6 +2613,94 @@ const HEARTBEAT_URL = (() => {
     window.SNYPD_I18N.fromUser(session.user);
   }
 
+  // First-session measurement (assets/first-session.js; outreach/53, release R1). New accounts only, for 7 days
+  // from the first record. Stored on the account's own Auth metadata (user_metadata.fs): device type and which
+  // set-up steps were reached. It shows nothing, changes nothing and can never block the page.
+  (function firstSessionMeasure() {
+    try {
+      const FS = window.SnypdFirstSession;
+      if (!FS) return;
+      const stored = (u) => (u && u.user_metadata && u.user_metadata.fs) || null;
+      const prev = stored(session.user);
+      if (!FS.shouldTrack(joinedAt, prev, Date.now())) return;
+      const standalone = window.navigator.standalone === true
+        || !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+      const t = FS.create({
+        prev,
+        device: FS.device(navigator.userAgent, navigator.platform, navigator.maxTouchPoints, standalone),
+        load: () => sb.auth.getUser().then((r) => stored(r && r.data && r.data.user)),
+        save: (fs) => sb.auth.updateUser({ data: { fs } }),
+      });
+      window.SNYPD = window.SNYPD || {};
+      window.SNYPD.fs = t.track;
+      t.track({});
+      const $id = (id) => document.getElementById(id);
+      const seen = (el) => !!el && !el.hidden && el.getClientRects().length > 0;
+      const watch = (el, fn) => {
+        if (!el) return;
+        if (window.MutationObserver) new MutationObserver(fn).observe(el, { attributes: true, attributeFilter: ['style', 'hidden', 'class'] });
+        fn();
+      };
+      // Wizard: the highest step that was on screen.
+      const wiz = () => {
+        if (!seen($id('wiz-overlay'))) return;
+        if (seen($id('wiz-step-2'))) t.track({ wz: 3 });
+        else if (seen($id('wiz-step-mode'))) t.track({ wz: 2 });
+        else if (seen($id('wiz-step-1'))) t.track({ wz: 1 });
+      };
+      ['wiz-overlay', 'wiz-step-1', 'wiz-step-mode', 'wiz-step-2'].forEach((id) => watch($id(id), wiz));
+      // Step 1 refusing the form (for example a minimum above the maximum) and the words warning: counted each
+      // time they appear, not while they stay on screen.
+      [['wiz-q-err', 'werr'], ['wiz-q-hw', 'hw']].forEach(([id, key]) => {
+        const el = $id(id);
+        let was = false;
+        watch(el, () => { const now = seen(el); if (now && !was) t.track({ [key]: 1 }); was = now; });
+      });
+      // Alerts: what this device ended up with, read from the page's own status. Before anyone tried, only
+      // "on" is worth recording (a device that never asked is not a refusal).
+      const AL = { on: 'on', denied: 'denied', 'ios-install': 'ios', unsupported: 'unsup', error: 'err' };
+      let tried = false;
+      const readAlerts = () => {
+        if (!window.SNYPD.alertsStatus) return;
+        window.SNYPD.alertsStatus().then((s) => {
+          const al = s && AL[s.state];
+          if (al && (tried || al === 'on')) t.track({ al });
+        }).catch(() => {});
+      };
+      window.addEventListener('snypd:alerts-changed', readAlerts);
+      const enable = $id('wiz-enable-alerts');
+      if (enable) enable.addEventListener('click', () => {
+        const toggle = $id('wiz-toggle-push');
+        if (toggle && !toggle.classList.contains('is-on')) { t.track({ later: 1 }); return; }
+        tried = true;
+        t.track({ al_try: 1 });
+        setTimeout(readAlerts, 2500);
+      });
+      const later = $id('wiz-finish');
+      if (later) later.addEventListener('click', () => t.track({ later: 1 }));
+      setTimeout(readAlerts, 4000);
+      // The set-up card, and the "too broad" / coach card (one element, two uses).
+      // A card counts as shown only when the wizard is not covering it.
+      const card = $id('alerts-setup-card');
+      const broad = $id('broad-hunt');
+      const cards = () => {
+        if (seen($id('wiz-overlay'))) return;
+        if (seen(card)) t.track({ card: 'shown' });
+        if (seen(broad)) t.track({ vol: 'shown', vol_k: seen($id('broad-hunt-apply')) ? 'coach' : 'broad' });
+      };
+      watch(card, cards);
+      watch(broad, cards);
+      watch($id('wiz-overlay'), cards);
+      [['alerts-setup-resume', 'resume'], ['alerts-setup-later', 'snooze']].forEach(([id, v]) => {
+        const b = $id(id);
+        if (b) b.addEventListener('click', () => t.track({ card: v }));
+      });
+      [['broad-hunt-apply', 'apply'], ['broad-hunt-calm', 'calm'], ['broad-hunt-edit', 'edit'], ['broad-hunt-keep', 'keep'], ['broad-hunt-undo', 'undo']]
+        .forEach(([id, v]) => { const b = $id(id); if (b) b.addEventListener('click', () => t.track({ vol: v })); });
+      window.addEventListener('pagehide', () => t.flush());
+    } catch (e) { console.error('SNYPD first-session measure', e); }
+  })();
+
   // Marketing-email consent card (19 Oct 2026). Either answer is saved to user_metadata,
   // so the card never returns; resend-contacts-sync (Supabase cron) mirrors it to Resend
   // hourly. The same wording/version is used by the sign-up checkbox and /account.
@@ -3659,6 +3748,7 @@ const HEARTBEAT_URL = (() => {
         window.dispatchEvent(new Event('snypd:hunts-changed'));
         // First hunt from the sheet ("I have a Vinted link"): that path used to
         // skip the alerts step entirely, so nobody was ever asked.
+        if (wasFirst && window.SNYPD && window.SNYPD.fs) window.SNYPD.fs({ hunt: inserted && inserted.vinted_url, src: 'sheet' });
         if (wasFirst && window.SNYPD && typeof window.SNYPD.showModeStep === 'function') {
           closeSheet();
           window.SNYPD.showModeStep(inserted);
@@ -3891,6 +3981,7 @@ const HEARTBEAT_URL = (() => {
           if (save) { save.disabled = false; save.textContent = 'Start this hunt'; }
         }
         hasSavedHunt = true;
+        if (window.SNYPD.fs) window.SNYPD.fs({ hunt: url, src: 'quick' });
         // Optional XP must not delay successful setup or make an accepted
         // insert look like a failure that the user should repeat.
         Promise.resolve().then(async () => {

@@ -115,7 +115,7 @@
   window.__qa_auth_updates = [];
   function qaUser() {
     // ?joined=new: an account created after the 7 Nov 2026 privacy change (no hunter-statistics notice)
-    return { id: UID, email: 'qa-test@example.com', created_at: new Date(params.get('joined') === 'new' ? Date.parse('2026-11-09T10:00:00Z') : Date.now() - 40 * 86400000).toISOString(),
+    return { id: UID, email: 'qa-test@example.com', created_at: new Date(params.get('joined') === 'fresh' ? Date.now() - 3600000 : params.get('joined') === 'new' ? Date.parse('2026-11-09T10:00:00Z') : Date.now() - 40 * 86400000).toISOString(),
       user_metadata: JSON.parse(JSON.stringify(QA_META)) };
   }
 
@@ -619,7 +619,7 @@
       return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     }
     if (u.indexOf('/api/v1/push/key') !== -1) {
-      return Promise.resolve(new Response(JSON.stringify({ vapid_public_key: 'QA_FAKE_KEY' }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ key: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U', vapid_public_key: 'QA_FAKE_KEY' }), { status: 200 }));
     }
     if (u.indexOf('/api/v1/push/subscribe') !== -1 || u.indexOf('/api/v1/push/unsubscribe') !== -1) {
       return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
