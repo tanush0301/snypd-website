@@ -35,6 +35,7 @@ const en = {
   // one-time notice in the Stock tab (it replaces History; claims are mirrored in by migration 067). Kept here so the generator merges it with the rest.
   'welcome.title': 'History is now Stock.', 'welcome.body': 'Items you claimed through SNYPD are already in here: check their prices once. Add the rest by hand or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
   'welcome.body.new': 'Track what you buy and sell in one place: add your first item, or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
+  'welcome.weekly': 'Email me a Monday summary',
   'welcome.ok': 'Got it'
 };
 const fr = {
@@ -72,6 +73,7 @@ const fr = {
   'imp.resume': 'Reprendre', 'imp.failed': 'L’import s’est arrêté après {done} articles. Rien n’est perdu : reprends, ou annule cet import.', 'imp.again': 'Importer un autre fichier',
   'welcome.title': 'L’historique est maintenant le Stock.', 'welcome.body': 'Les articles que tu as réclamés via SNYPD sont déjà ici : vérifie leurs prix une fois. Ajoute le reste à la main ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
   'welcome.body.new': 'Suis ce que tu achètes et vends au même endroit : ajoute ton premier article, ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
+  'welcome.weekly': 'M’envoyer un résumé le lundi',
   'welcome.ok': 'Compris'
 };
 module.exports = { en, fr };

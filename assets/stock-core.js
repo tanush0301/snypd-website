@@ -207,7 +207,7 @@
       // account settings (currency, persona, tab_hidden, old_after_days): own-row insert/update policies on stock_settings (065), so one upsert; the CHECKs answer stock_check_violation.
       // Changing the currency relabels the numbers and never converts them.
       saveSettings: async patch => {
-        const row = {}; ['currency', 'persona', 'tab_hidden', 'old_after_days', 'weekly_email'].forEach(k => { if (patch[k] !== undefined) row[k] = patch[k]; });   // weekly_email: 073
+        const row = {}; ['currency', 'persona', 'tab_hidden', 'old_after_days', 'weekly_email', 'weekly_opt_in'].forEach(k => { if (patch[k] !== undefined) row[k] = patch[k]; });   // weekly_email: 073, weekly_opt_in: 084
         let u; try { u = await client.auth.getUser(); } catch (e) { throw parseError(e); }
         const uid = u && u.data && u.data.user && u.data.user.id; if (!uid) throw parseError('not authenticated 401');
         row.user_id = uid;
@@ -221,6 +221,8 @@
         if (!r || r.error) throw parseError(r && r.error ? r.error : 'empty response');
         return r.data || null;
       },
+      // 084: will this user really get the Monday email? {on, opt_in, used}. Before 084 the function is missing and this throws (callers fall back to settingsRow).
+      weeklyState: () => call('stock_weekly_state'),
       // one item by id (a Today lane opens its item without paging through the list); select-own through RLS
       itemById: async id => {
         let r; try { r = await client.from('stock_items').select('*').eq('id', id).maybeSingle(); } catch (e) { throw parseError(e); }

@@ -120,12 +120,22 @@
     var replaces = !!(window.SNYPD && window.SNYPD.stockReplacesHistory && window.SNYPD.stockReplacesHistory());
     if (seen || !replaces) { el.innerHTML = ''; return; }
     // only accounts that really have mirrored claims (src 'SNYPD alert', migration 067) are told so; any failure = the neutral text, never a false claim
-    var draw = function (hasClaims) {
+    // offerWeekly: 084 is live and the Monday email is not on yet for this account (before 084 the call fails = no button, never a dead one)
+    var draw = function (hasClaims, offerWeekly) {
       var cur = $('#st-welcome'); if (!cur) return;
       cur.innerHTML = '<div class="st-note st-welcome" role="status"><b>' + esc(T('welcome.title')) + '</b> ' + esc(T(hasClaims ? 'welcome.body' : 'welcome.body.new')) +
+        (offerWeekly ? ' <button type="button" class="st-btn st-ghost" data-act="welcome-weekly" id="st-welcome-weekly">' + esc(T('welcome.weekly')) + '</button>' : '') +
         ' <button type="button" class="st-btn st-tert" data-act="welcome-ok">' + esc(T('welcome.ok')) + '</button></div>';
     };
-    S.api.itemsPage({ src: 'SNYPD alert' }, 1).then(function (pg) { draw(!!(pg && pg.total > 0)); }).catch(function () { draw(false); });
+    var claimsP = S.api.itemsPage({ src: 'SNYPD alert' }, 1).then(function (pg) { return !!(pg && pg.total > 0); }).catch(function () { return false; });
+    var weeklyP = S.api.weeklyState().then(function (st) { return !!(st && !st.on); }).catch(function () { return false; });
+    Promise.all([claimsP, weeklyP]).then(function (r) { draw(r[0], r[1]); });
+  }
+  function welcomeWeekly() {   // opt in from the notice: the same two columns the Settings switch writes when it is turned on (084)
+    var b = $('#st-welcome-weekly'); if (b) b.disabled = true;
+    S.api.saveSettings({ weekly_email: true, weekly_opt_in: true }).then(function () {
+      var x = $('#st-welcome-weekly'); if (x) x.remove(); showBar(T('set.weekly.on'), false);
+    }).catch(function (e) { var x = $('#st-welcome-weekly'); if (x) x.disabled = false; showBar(errMsg(e), false); });
   }
   function dismissWelcome() { try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {} var el = $('#st-welcome'); if (el) el.innerHTML = ''; }
   var CHIP_KEY ={ held: 'held', '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
@@ -368,11 +378,15 @@
       '<div class="st-f full"><span class="st-lbl">' + esc(T('cat.title')) + '</span><button type="button" class="st-btn st-ghost st-catset" data-act="cat-manage" aria-expanded="false" aria-controls="st-catman">' + esc(T('cat.manage')) + '</button><div id="st-catman"></div></div></div>';
     mountSheet(T('set.title'), body, '<button type="button" class="st-btn st-tert" data-act="close">' + esc(T('cancel')) + '</button><button type="button" class="st-btn st-prim" data-act="submit" id="st-go">' + esc(T('set.save')) + '</button>');
     var f = $('#sf-cur'); if (f) f.focus();
-    S.api.settingsRow().then(function (r) {   // 073; before it the column does not exist and the switch simply stays hidden
+    // 084: the switch shows whether the Monday email will REALLY go out (opt-in or own Stock use). Before 084: the 073 column, as before; before 073: no switch.
+    var showWeekly = function (on, has084) {
       if (!S.sheet || S.sheet.kind !== 'settings') return;
-      var on = !r || r.weekly_email !== false, cb = $('#sf-weekly'), w = $('#sf-weekly-wrap'); if (!cb || !w) return;
-      cb.checked = on; S.sheet.weekly0 = on; w.style.display = '';
-    }).catch(function () { /* no switch */ });
+      var cb = $('#sf-weekly'), w = $('#sf-weekly-wrap'); if (!cb || !w) return;
+      cb.checked = on; S.sheet.weekly0 = on; S.sheet.has084 = has084; w.style.display = '';
+    };
+    S.api.weeklyState().then(function (st) { showWeekly(!!(st && st.on), true); }).catch(function () {
+      S.api.settingsRow().then(function (r) { showWeekly(!r || r.weekly_email !== false, false); }).catch(function () { /* no switch */ });
+    });
   }
   function saveSettingsSheet() {
     var b = S.boot, patch = {}, cur = $('#sf-cur').value, oldv = ($('#sf-old').value || '').trim();
@@ -381,13 +395,18 @@
     var pers = S.sheet.persona; if (pers && pers !== b.persona) patch.persona = pers;
     if (+oldv !== (b.old_after_days || C.CAPS.oldAfterDefault)) patch.old_after_days = +oldv;
     var hidden = !$('#sf-tab').checked; if (hidden !== !!b.tab_hidden) patch.tab_hidden = hidden;
-    var wk = $('#sf-weekly'); if (wk && S.sheet.weekly0 !== undefined && wk.checked !== S.sheet.weekly0) patch.weekly_email = wk.checked;
+    var wk = $('#sf-weekly');
+    if (wk && S.sheet.weekly0 !== undefined && wk.checked !== S.sheet.weekly0) {
+      patch.weekly_email = wk.checked;
+      if (wk.checked && S.sheet.has084) patch.weekly_opt_in = true;   // 084 only: before it the column is missing and the whole upsert would fail
+    }
     if (!Object.keys(patch).length) { closeSheet(); return; }
     var go = $('#st-go'); if (go) go.disabled = true;
     S.api.saveSettings(patch).then(function () {
       closeSheet(); S.ov.stale = true;
       if (patch.tab_hidden !== undefined) applyTab(patch.tab_hidden);
-      return reloadKeep().then(function () { showBar(patch.currency ? T('set.cur.saved', { cur: patch.currency }) : (Object.keys(patch).length === 1 && patch.weekly_email !== undefined ? T(patch.weekly_email ? 'set.weekly.on' : 'set.weekly.off') : T('set.saved')), false); });
+      var keys = Object.keys(patch).filter(function (k) { return k !== 'weekly_opt_in'; });   // the opt-in travels with weekly_email: still "only the email switch changed"
+      return reloadKeep().then(function () { showBar(patch.currency ? T('set.cur.saved', { cur: patch.currency }) : (keys.length === 1 && patch.weekly_email !== undefined ? T(patch.weekly_email ? 'set.weekly.on' : 'set.weekly.off') : T('set.saved')), false); });
     }).catch(function (e) { sheetError(e); });
   }
 
@@ -506,6 +525,7 @@
       case 'template': downloadFile(C.templateCsv(lang), lang === 'fr' ? 'snypd-modele-revendeur.csv' : 'snypd-reseller-template.csv'); break;
       case 'export': exportItems(el); break;
       case 'welcome-ok': dismissWelcome(); break;
+      case 'welcome-weekly': welcomeWeekly(); break;
       case 'im-pick': { var fi = $('#im-file'); if (fi) fi.click(); break; }
       case 'im-go': imRun(false); break;
       case 'im-resume': imRun(true); break;
