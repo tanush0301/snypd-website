@@ -65,6 +65,11 @@
     }
   }
 
+  // ------------------------------------------------------------------ activation analytics (Nov 2026, before stock_mode = all)
+  // Same pattern as feedback.js: GA4 only when consent.js loaded it; never throws; no titles, prices or emails, only coarse buckets.
+  function track(ev, params) { try { if (typeof window.gtag === 'function') window.gtag('event', ev, params || {}); } catch (e) {} }
+  function bucket(n) { return n <= 0 ? '0' : n <= 10 ? '1-10' : n <= 50 ? '11-50' : '51+'; }
+
   // ------------------------------------------------------------------ open / shell
   function open(opts) {
     if (S && S.panel === opts.panel) { refresh(); return; }
@@ -77,6 +82,7 @@
       if (b.mode === 'off') { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.disabled')) + '</div></div>'; return; }
       S.cur = b.currency || 'EUR'; S.cats = b.categories || [];
       shell(); showView('overview');
+      track('stock_opened', { mode: (window.SNYPD && window.SNYPD.stockMode) || 'unknown' });
       if (window.SNYPD && window.SNYPD.pendingStockSettings) { window.SNYPD.pendingStockSettings = false; openSettings(null); }
     }).catch(function (e) { S.panel.innerHTML = '<div class="st-wrap"><div class="st-err">' + esc(T('err.load')) + ' <button class="st-btn st-ghost" data-act="reopen">' + esc(T('err.retry')) + '</button></div></div>'; S.panel.onclick = function (ev) { if (ev.target.closest('[data-act="reopen"]')) { var p = S.panel, c = S.client; S = null; open({ client: c, panel: p }); } }; console.error('SNYPD Stock boot failed', e); });
   }
@@ -134,7 +140,7 @@
   function welcomeWeekly() {   // opt in from the notice: the same two columns the Settings switch writes when it is turned on (084)
     var b = $('#st-welcome-weekly'); if (b) b.disabled = true;
     S.api.saveSettings({ weekly_email: true, weekly_opt_in: true }).then(function () {
-      var x = $('#st-welcome-weekly'); if (x) x.remove(); showBar(T('set.weekly.on'), false);
+      var x = $('#st-welcome-weekly'); if (x) x.remove(); showBar(T('set.weekly.on'), false); track('stock_weekly_optin', { from: 'welcome' });
     }).catch(function (e) { var x = $('#st-welcome-weekly'); if (x) x.disabled = false; showBar(errMsg(e), false); });
   }
   function dismissWelcome() { try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {} var el = $('#st-welcome'); if (el) el.innerHTML = ''; }
@@ -153,6 +159,7 @@
     if (!m.limited) { el.innerHTML = ''; if (cm) cm.innerHTML = ''; return; }
     el.innerHTML = '<div class="st-meter' + (m.warn ? ' warn' : '') + '"><span class="st-meter-txt">' + esc(T('meter.label')) + ' <b>' + m.held + ' / ' + m.cap + '</b></span><span class="st-meter-bar"><span class="st-meter-fill" style="width:' + Math.min(100, Math.round(m.held / m.cap * 100)) + '%"></span></span></div>';
     if (cm) cm.innerHTML = m.atCap ? '<p class="st-note">' + esc(T('meter.limit', { cap: m.cap })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></p>' : '';
+    if (m.atCap && !S.capTracked) { S.capTracked = true; track('stock_cap_hit', { from: 'meter' }); }   // once per page load, not on every re-render
   }
 
   // ------------------------------------------------------------------ overview + Today lanes + first run + settings (step 5)
@@ -406,6 +413,7 @@
       closeSheet(); S.ov.stale = true;
       if (patch.tab_hidden !== undefined) applyTab(patch.tab_hidden);
       var keys = Object.keys(patch).filter(function (k) { return k !== 'weekly_opt_in'; });   // the opt-in travels with weekly_email: still "only the email switch changed"
+      if (patch.weekly_email !== undefined) track(patch.weekly_email ? 'stock_weekly_optin' : 'stock_weekly_optout', { from: 'settings' });
       return reloadKeep().then(function () { showBar(patch.currency ? T('set.cur.saved', { cur: patch.currency }) : (keys.length === 1 && patch.weekly_email !== undefined ? T(patch.weekly_email ? 'set.weekly.on' : 'set.weekly.off') : T('set.saved')), false); });
     }).catch(function (e) { sheetError(e); });
   }
@@ -502,6 +510,8 @@
 
   // ------------------------------------------------------------------ events
   function onClick(ev) {
+    var up = ev.target.closest && ev.target.closest('a[href="plans.html"]');   // upgrade links (meter, cap, import): count the click, the link still navigates
+    if (up) track('stock_upgrade_click', { from: up.closest('#st-capmsg') ? 'meter' : (up.closest('.st-sheet') ? 'sheet' : 'other') });
     var el = ev.target.closest('[data-act]'); if (!el || !S) return;
     var act = el.getAttribute('data-act'), id = el.getAttribute('data-id');
     if (act === 'restore') { ev.stopPropagation(); doRestore(id); return; }
@@ -855,6 +865,8 @@
     if (go) go.disabled = true;
     mutate(run, label).then(function (res) {
       if (!res.ok) { sheetError(res.e); return; }
+      if (sh.kind === 'add') track('stock_item_added', { qty: bucket(qty), source: 'form' });
+      else if (sh.kind === 'sold') track('stock_sale_marked', { with_price: sp.cents != null });
       if (sh.kind === 'add' && andNext) {   // keep brand, category, date and source for the next one
         var lg = $('#st-addlog'); if (lg) lg.textContent = T('sheet.add.log', { t: title }); $('#sf-title').value = ''; $('#sf-buy').value = ''; $('#sf-extra').value = ''; $('#sf-size').value = ''; $('#sf-quantity').value = '1'; if (go) go.disabled = false; $('#sf-title').focus();
       } else closeSheet();
@@ -1057,6 +1069,7 @@
       closeSheet();
       return reloadKeep().then(function () {
         showBar(T('bundle.added', { n: n, total: M(st.total) }), true, function () { return S.api.undoImport(importId).then(function () { return reloadKeep(); }).then(function () { showBar(T('bundle.undone'), false); }); });
+        track('stock_item_added', { qty: bucket(n), source: 'bundle' });
       });
     }).catch(function (e) { sheetError(e); });
   }
@@ -1295,7 +1308,10 @@
         (r.skipped || []).forEach(function (s) { IM.done.skipped.push({ n: b[s.index] ? b[s.index].n : '?', reason: s.reason }); });
         IM.done.batchIx++; imProgress(); return next();
       });
-    }).then(function () { return reloadKeep(); }).then(function () { IM.step = 'done'; renderImport(); }).catch(function (e) { IM.step = 'failed'; IM.failErr = e || null; renderImport(); console.error('SNYPD Stock import stopped', e); });
+    }).then(function () { return reloadKeep(); }).then(function () { IM.step = 'done'; renderImport(); track('stock_import_done', { items: bucket(IM.done.items), skipped: bucket(IM.done.skipped.length), cap: !!(IM.done.limit || IM.done.cap) }); }).catch(function (e) {
+      IM.step = 'failed'; IM.failErr = e || null; renderImport(); console.error('SNYPD Stock import stopped', e);
+      var k = e && e.kind; track('stock_import_failed', { reason: k === 'auth' || k === 'disabled' || k === 'network' ? k : (e && e.code === 'stock_item_cap' ? 'cap' : 'other') });
+    });
   }
   function skipReason(reason) { var m = /stock_[a-z_]+/.exec(reason || ''); var c = m && m[0]; return T(c === 'stock_title_required' ? 'imp.skip.title_required' : c === 'stock_free_limit' ? 'imp.skip.free_limit' : c === 'stock_item_cap' ? 'imp.skip.item_cap' : 'imp.skip.other'); }
   function imDone(close) {
