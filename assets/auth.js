@@ -281,6 +281,21 @@
     return null;
   }
 
+  /* Placement that brought the referral (consent.js keeps it as snypd_refer.s from &src=), else src= on
+     this page's address (Google return trip). Fixed list only; counted per placement in the admin metrics. */
+  function referralSrc(qsArg) {
+    var RE = /^(receipt|success|hub|trial|report|home|account|stock)$/;
+    try {
+      var s = JSON.parse(lsGet('snypd_refer') || 'null');
+      if (s && s.c && Date.now() - Number(s.t) < 60 * 864e5) return RE.test(String(s.s || '')) ? s.s : null;
+    } catch (e) {}
+    try {
+      var v = String((qsArg || new URLSearchParams(location.search)).get('src') || '').toLowerCase();
+      if (RE.test(v)) return v;
+    } catch (e) {}
+    return null;
+  }
+
   function signupData() {
     var data = { marketing_opt_in: !!S.marketing };
     var tags = campaignTags();
@@ -305,7 +320,11 @@
     if (oc && /^[a-z2-9]{4,8}$/.test(oc)) data.outreach_code = oc;
     /* Referral code (?ref=, snypd_refer, 60 days): read by migration 085's referral_process(). */
     var rc = referralCode();
-    if (rc) data.ref_code = rc;
+    if (rc) {
+      data.ref_code = rc;
+      var rs = referralSrc();
+      if (rs) data.ref_src = rs;
+    }
     try {
       var pi = JSON.parse(lsGet('snypd_plan_intent') || 'null');
       if (pi && pi.plan) data.plan_intent = pi.plan;
@@ -443,7 +462,11 @@
     if (Object.keys(landingData()).length) back.set('entry_basis', 'nav-v1');
     if (heardOk(S.heard)) back.set('heard', S.heard);
     var rc = referralCode();
-    if (rc) back.set('ref', rc);
+    if (rc) {
+      back.set('ref', rc);
+      var rsrc = referralSrc();
+      if (rsrc) back.set('src', rsrc);
+    }
     var backQs = back.toString();
     Promise.resolve().then(function () {
       return sb.auth.signInWithOAuth({
@@ -810,9 +833,14 @@
         var retHeard = heardOk(qs.get('heard'));
         if (retHeard && !md.heard_from) add.heard_from = retHeard;
         if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;
-        /* Referral code (082): from snypd_refer, else the ref= that rode on the return address (google()). */
+        /* Referral code (085): from snypd_refer, else the ref= that rode on the return address (google()).
+           The placement tag (ref_src) is saved only together with a new ref_code. */
         var retRef = referralCode(qs);
-        if (retRef && !md.ref_code) add.ref_code = retRef;
+        if (retRef && !md.ref_code) {
+          add.ref_code = retRef;
+          var retSrc = referralSrc(qs);
+          if (retSrc && !md.ref_src) add.ref_src = retSrc;
+        }
         if (Object.keys(add).length) { try { await sb.auth.updateUser({ data: add }); } catch (e) {} }
       }
       if (PAGE === 'signup') { if (sess.user.email) lsSet(LAST_EMAIL_KEY, sess.user.email); location.replace('/dashboard'); return; }

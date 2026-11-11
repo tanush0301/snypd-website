@@ -1032,7 +1032,13 @@
     } catch (e) { /* referral card is optional */ }
 
     function fill(s, code) {
-      const link = "https://www.snypd.store/?ref=" + code;
+      // Placement that opened this page (gift button, trial card, weekly report); else "account".
+      let src = "account";
+      try {
+        const q = String(new URLSearchParams(location.search).get("src") || "").toLowerCase();
+        if (/^(hub|trial|report|success|receipt|stock)$/.test(q)) src = q;
+      } catch (e) {}
+      const link = "https://www.snypd.store/?ref=" + code + "&src=" + src;
       const card = document.getElementById("ref-card");
       document.getElementById("ref-link").textContent = link;
       const n = (k) => Number(s[k] || 0);
