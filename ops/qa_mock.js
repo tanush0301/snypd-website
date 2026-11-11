@@ -102,6 +102,8 @@
   // ---- toggle plan via ?plan=free|elite in the test URL ----
   var params = new URLSearchParams(location.search);
   var PLAN = params.get('plan') || 'elite';
+  // Feedback questions (migration 081): ids already answered or skipped, from ?fbdone=A,B1 (empty by default).
+  var FB_DONE = (params.get('fbdone') || '').split(',').filter(Boolean);
   // ?hunts=0 seeds an account with no saved searches - the brand-new-user
   // path (first-run wizard, first-hunt empty state). Without this there was
   // no way to exercise either from QA at all.
@@ -539,7 +541,21 @@
             is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: u0.free_trial_started_at || null, trial_ends_at: u0.trial_ends_at || null, trial_extended_at: null, pass_expires_at: null },
           searches: searches, claims: (DB.user_claims || []).slice(), dq: [], xp_total: (DB.xp_events || []).reduce(function (a, x) { return a + (x.xp || 0); }, 0),
           streak: ((DB.user_streak_state || [])[0] || {}).current_streak || null, quota: { quota_limit: PLAN === 'free' ? 1 : 5, used: searches.length },
-          stock_mode: STOCK ? STOCK.mode() : undefined, stock_tab_hidden: STOCK ? STOCK.tabHidden() : false }, error: null });
+          stock_mode: STOCK ? STOCK.mode() : undefined, stock_tab_hidden: STOCK ? STOCK.tabHidden() : false,
+          feedback_done: params.get('fb081') === '0' ? undefined : FB_DONE.slice(),
+          // ?fbfind=<hours ago> = first find of the trial; ?fbactive=<n> = active days in the last 14 (migration 081 feedback_signals)
+          feedback_signals: params.get('fb081') === '0' ? undefined : { first_find_at: params.get('fbfind') ? new Date(Date.now() - Number(params.get('fbfind')) * 36e5).toISOString() : null, active_days_14: Number(params.get('fbactive') || 0) } }, error: null });
+      }
+      // Feedback questions (migration 081): ?fbdone=A,B1 seeds the answered ids; ?fb081=0 = migration not applied
+      // (no feedback_done key, RPC missing, the page must show nothing); ?fbrpc=error makes the save fail.
+      if (name === 'feedback_submit' && params.get('fb081') !== '0') {
+        window.__fbRpc = (window.__fbRpc || []).concat([args]);
+        if (params.get('fbrpc') === 'error') return Promise.resolve({ data: null, error: { message: 'QA mock: feedback save failed' } });
+        var fbNew = FB_DONE.indexOf(args.p_question) < 0;
+        if (fbNew) FB_DONE.push(args.p_question);
+        var fbXp = fbNew && !args.p_skipped && ['A', 'B1', 'C', 'D', 'E1', 'G', 'H'].indexOf(args.p_question) >= 0 ? 25 : 0;
+        if (fbXp) (DB.xp_events = DB.xp_events || []).push({ event_type: 'feedback', xp: 25, meta: { question: args.p_question } });
+        return Promise.resolve({ data: { saved: fbNew, xp: fbXp }, error: null });
       }
       // Stock RPCs (migrations 065-068) -> the in-memory port, see ops/stock_engine.js. Everything else keeps the old "not implemented" answer.
       if (STOCK && /^stock_/.test(name)) return stockReady.then(function () { return STOCK.rpc(name, args); });

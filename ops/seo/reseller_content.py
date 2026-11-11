@@ -32,7 +32,7 @@ TOOL_SOURCES = [
     ('Zipsale', 'https://zipsale.co.uk/pricing'),
     ('VintedCRM', 'https://vintedcrm.com/tarifs/'),
     ('Vendoo', 'https://www.vendoo.co/'),
-    ('Crosslist', 'https://crosslist.com/pricing'),
+    ('Crosslist', 'https://docs.crosslist.com/knowledge-base/settings-and-preferences/uk-canada-australia'),
     ('Relistly', 'https://www.relistly.com/'),
 ]
 # Models for the "cheapest quarter vs typical ask" table on /how-to-make-money-on-vinted (all in price-index.json).
@@ -159,6 +159,30 @@ def _help(lang):
     return host + '/help/1120', compare_data.HELP435[lang], compare_data.COMPARE_CHECKED[lang]
 
 
+def sourcing_example(lang, index):
+    item = next((row for row in index['items'] if row['id'] == 'nike-dunk-low'), None)
+    if item is None:
+        return ''
+    fr = lang == 'fr'
+    window = index['window']
+    sample = format(item['n'], ',').replace(',', ' ' if fr else ',')
+    median, ceiling = _eur(item['typical'], lang), _eur(item['p25'], lang)
+    url = html.escape(item['url'][lang], quote=True)
+    if fr:
+        return (f'<h3>Quel plafond choisir pour une Nike Dunk Low ?</h3>'
+                f'<p>Sur vinted.be, du {window["from"]} au {window["to"]}, le prix demandé médian '
+                f'était de {median} pour {sample} annonces. Un quart affichait {ceiling} ou moins. '
+                f'Pour essayer cette recherche, choisis ta pointure et l’état voulu, puis ajuste le plafond '
+                f'aux frais de port et à ton budget. Le prix de revente reste inconnu. '
+                f'<a href="{url}">Voir les prix et essayer l’alerte Nike Dunk Low</a>.</p>')
+    return (f'<h3>What price ceiling would you set for Nike Dunk Low?</h3>'
+            f'<p>Among {sample} listings on vinted.be from {window["from"]} to {window["to"]}, '
+            f'the median asking price was {median}. A quarter asked {ceiling} or less. '
+            f'Try that ceiling with your size and condition filters, then check shipping and photos '
+            f'before buying. UK prices can differ, and the resale price is unknown. '
+            f'<a href="{url}">See the Dunk Low prices and try the alert</a>.</p>')
+
+
 def tools(lang, index, g):
     """/best-vinted-reselling-tools: one tool per reselling job. Returns (title, desc, h1, lead, sections, extra_ld)."""
     fr = lang == 'fr'
@@ -183,7 +207,7 @@ def tools(lang, index, g):
              'Free plan; paid from €12.99 a month excl. VAT'],
             [_ext(src['Vendoo'], 'Vendoo'), 'Crosslisting', 'Vinted is not among the marketplaces named on its site', 'Not stated',
              '$14.99 a month billed monthly; 14-day free trial'],
-            [_ext(src['Crosslist'], 'Crosslist'), 'Crosslisting', 'No: says it does not support users residing in the European Union',
+            [_ext(src['Crosslist'], 'Crosslist'), 'Crosslisting', 'UK: existing Vinted connections still work. New accounts cannot connect Vinted (from 23 September 2026).',
              'Browser extension in your own browser for some marketplaces', '$29.99 a month; 20 free listings'],
             [_ext(src['Relistly'], 'Relistly'), 'Cross-posting browser extension', 'Not yet: Vinted is marked “Soon”',
              'Works through the marketplace sessions you are signed in to', 'No price shown; 7-day free trial'],
@@ -201,8 +225,7 @@ def tools(lang, index, g):
              'No. You can resell with Vinted’s own search and a spreadsheet. Tools save time on one job each: an alert tool watches your searches, '
              'a crosslister copies listings to other marketplaces. SNYPD only alerts; you open the listing and buy on Vinted yourself.'),
             ('Which crosslisting tools work with Vinted?',
-             'On %s, Zipsale named Vinted among its marketplaces, for UK sellers. Vendoo did not name Vinted, Crosslist said it does not support users '
-             'residing in the European Union, and Relistly showed Vinted as coming soon. Check the tool’s own site before you pay.' % d),
+             'On %s, Zipsale named Vinted among its marketplaces, for UK sellers. Vendoo did not name Vinted. Crosslist supports existing Vinted connections only. Relistly showed Vinted as coming soon. Check the tool’s own site before you pay.' % d),
         ]
         title = 'Best Vinted Reselling Tools 2026: Sourcing, Listing, Admin | SNYPD'
         desc = ('The best Vinted reselling tools for each job: finding underpriced items, price research, crosslisting and bookkeeping. '
@@ -216,8 +239,7 @@ def tools(lang, index, g):
              'alert when a new listing matches. Once a search has enough finds, it also shows how each new find’s price compares with that week’s finds. It never logs in to your Vinted account and never buys for you.</li>'
              '<li><strong>Price research:</strong> SNYPD’s free <a href="/vinted-price-guide">Vinted price guide</a> (asking prices for %d models) '
              'or ResellTrack (paid market research).</li>'
-             '<li><strong>Crosslisting to Vinted:</strong> Zipsale, for UK sellers. Check before paying for any crosslister: on %s, Vendoo, '
-             'Crosslist and Relistly did not offer Vinted as a live marketplace on their own sites.</li>'
+             '<li><strong>Crosslisting to Vinted:</strong> Zipsale, for UK sellers. Check before paying for any crosslister: on %s, Vendoo did not list Vinted and Relistly marked it as coming soon. Crosslist only supports existing Vinted connections.</li>'
              '<li><strong>Invoices and bookkeeping:</strong> VintedCRM (free plan) or a spreadsheet.</li></ul>' % (n, d)),
             ('compare', 'Vinted reselling tools compared', table +
              '<p class="ct-note">Each row except SNYPD’s is what the tool’s own website said on %s. Prices and features change: '
@@ -230,9 +252,9 @@ def tools(lang, index, g):
              '%s %s</p>'
              '<p>On paid plans, the Hunt Pass and the free trial, each find shows how its asking price compares with what the same search found that week, '
              'when there are enough finds in that condition to compare. You still open the listing and decide: SNYPD does not buy, message sellers or relist.</p>'
-             '<p>Other alert tools work differently: some buy through your account, some alert only in Telegram or Discord. '
+             '<p>For UK sourcing, <a href="https://www.dealradarapp.co.uk/" rel="nofollow noopener">DealRadar</a> shows a maximum buying price based on a target margin. With SNYPD you set the ceiling on your own filtered search. '
              'The <a href="/vinted-bot-comparison">Vinted bot comparison</a> puts them side by side, with sources.</p>'
-             % (_ext(h435, 'Vinted Help'), g.SPEED_MEASURED['en'], g.VINTED_LAG['en'])),
+             % (_ext(h435, 'Vinted Help'), g.SPEED_MEASURED['en'], g.VINTED_LAG['en']) + sourcing_example(lang, index)),
             ('pricing', 'Price research: asking prices or sales data',
              '<p>Vinted does not publish what items sell for, so price tools use one of two sources. SNYPD’s <a href="/vinted-price-guide">price guide</a> '
              'and <a href="/vinted-price-checker">price checker</a> are free and use asking prices: the typical price for %d models by condition, '
@@ -242,7 +264,7 @@ def tools(lang, index, g):
              '<a href="/vinted-profit-calculator">profit calculator</a>.</p>' % (n, a, b)),
             ('listing', 'Listing and crosslisting: check Vinted support first',
              '<p>Crosslisting tools post one listing to several marketplaces, and many are built for US marketplaces. On %s: Vendoo’s site did not '
-             'name Vinted among its marketplaces; Crosslist said it does not support users residing in the European Union; Relistly showed Vinted as '
+             'name Vinted among its marketplaces; Crosslist supports UK sellers but closed new Vinted connections on 23 September 2026; Relistly showed Vinted as '
              '“Soon”. Zipsale named Vinted among its marketplaces, said it uses the Vinted API and said it is made for the UK.</p>'
              '<p>Relisting and auto-posting extensions work inside your logged-in Vinted session, so they act as you. Read Vinted’s terms for your '
              'country before you let any tool act on your account.</p>' % d),
@@ -277,7 +299,7 @@ def tools(lang, index, g):
              'Plan gratuit ; payant dès 12,99 € HT par mois'],
             [_ext(src['Vendoo'], 'Vendoo'), 'Multi-publication', 'Vinted ne figure pas parmi les plateformes citées sur son site', 'Non précisé',
              '14,99 $ par mois en mensuel ; essai gratuit de 14 jours'],
-            [_ext(src['Crosslist'], 'Crosslist'), 'Multi-publication', 'Non : dit ne pas accepter les utilisateurs résidant dans l’Union européenne',
+            [_ext(src['Crosslist'], 'Crosslist'), 'Multi-publication', 'Royaume-Uni : les connexions Vinted existantes fonctionnent. Depuis le 23 septembre 2026, les nouveaux comptes ne peuvent plus connecter Vinted.',
              'Extension dans ton propre navigateur pour certaines plateformes', '29,99 $ par mois ; 20 annonces gratuites'],
             [_ext(src['Relistly'], 'Relistly'), 'Extension de publication croisée', 'Pas encore : Vinted est indiqué « Soon » (bientôt)',
              'Passe par les sessions de plateformes où tu es connecté', 'Pas de prix affiché ; essai gratuit de 7 jours'],
@@ -297,8 +319,7 @@ def tools(lang, index, g):
              'surveille tes recherches, un outil de multi-publication copie tes annonces sur d’autres plateformes. SNYPD alerte seulement ; tu ouvres '
              'l’annonce et tu achètes toi-même sur Vinted.'),
             ('Quels outils de multi-publication fonctionnent avec Vinted ?',
-             'Le %s, Zipsale citait Vinted parmi ses plateformes, pour les vendeurs au Royaume-Uni. Vendoo ne citait pas Vinted, Crosslist indiquait ne pas '
-             'accepter les utilisateurs résidant dans l’Union européenne et Relistly affichait Vinted comme bientôt disponible. Vérifie le site de l’outil '
+             'Le %s, Zipsale citait Vinted parmi ses plateformes, pour les vendeurs au Royaume-Uni. Vendoo ne citait pas Vinted. Crosslist maintient les connexions Vinted existantes. Relistly annonçait une intégration à venir. Vérifie le site de l’outil '
              'avant de payer.' % d),
         ]
         title = 'Meilleurs outils de revente Vinted 2026 : sourcing, annonces | SNYPD'
@@ -317,7 +338,7 @@ def tools(lang, index, g):
              '<li><strong>Étude des prix :</strong> le <a href="/fr/guide-prix-vinted">guide des prix Vinted</a> gratuit de SNYPD (prix demandés '
              'pour %d modèles) ou ResellTrack (étude de marché payante).</li>'
              '<li><strong>Publier sur Vinted et ailleurs :</strong> Zipsale, pour les vendeurs au Royaume-Uni. Vérifie avant de payer un outil de '
-             'multi-publication : le %s, Vendoo, Crosslist et Relistly ne proposaient pas Vinted comme plateforme active sur leur propre site.</li>'
+             'multi-publication : le %s, Vendoo ne citait pas Vinted et Relistly annonçait une intégration à venir. Crosslist maintient uniquement les connexions Vinted existantes.</li>'
              '<li><strong>Factures et comptabilité :</strong> VintedCRM (plan gratuit) ou un tableur.</li></ul>' % (n, d)),
             ('comparatif', 'Outils de revente Vinted comparés', table +
              '<p class="ct-note">Chaque ligne, sauf celle de SNYPD, reprend ce que le site de l’outil indiquait le %s. Prix et fonctions évoluent : '
@@ -331,9 +352,9 @@ def tools(lang, index, g):
              '<p>Avec un plan payant, le Pass 30 jours et l’essai gratuit, chaque trouvaille indique où se situe son prix demandé par rapport à ce que '
              'la même recherche a trouvé dans la semaine, quand il y a assez d’annonces dans cet état pour comparer. Tu ouvres l’annonce et tu décides : '
              'SNYPD n’achète pas, n’écrit pas aux vendeurs et ne republie pas.</p>'
-             '<p>D’autres outils d’alerte fonctionnent autrement : certains achètent via ton compte, d’autres alertent seulement dans Telegram ou Discord. '
+             '<p>Pour le marché britannique, <a href="https://www.dealradarapp.co.uk/" rel="nofollow noopener">DealRadar</a> affiche un plafond d’achat selon la marge visée. Avec SNYPD, tu fixes le plafond de ta recherche. '
              'Le <a href="/fr/comparatif-bot-vinted">comparatif des bots Vinted</a> les met côte à côte, avec les sources.</p>'
-             % (_ext(h435, 'aide Vinted'), g.SPEED_MEASURED['fr'], g.VINTED_LAG['fr'])),
+             % (_ext(h435, 'aide Vinted'), g.SPEED_MEASURED['fr'], g.VINTED_LAG['fr']) + sourcing_example(lang, index)),
             ('prix', 'Étudier les prix : prix demandés ou données de ventes',
              '<p>Vinted ne publie pas le prix final des ventes : les outils de prix s’appuient donc sur l’une de deux sources. Le '
              '<a href="/fr/guide-prix-vinted">guide des prix</a> et l’<a href="/fr/estimer-prix-vinted">outil de prix</a> de SNYPD sont gratuits et '
@@ -343,8 +364,7 @@ def tools(lang, index, g):
              '<a href="/fr/calculateur-marge-vinted">calculateur de marge</a>.</p>' % (n, a, b)),
             ('publication', 'Publier et multi-publier : vérifie d’abord la prise en charge de Vinted',
              '<p>Les outils de multi-publication diffusent une annonce sur plusieurs plateformes, et beaucoup sont conçus pour les plateformes américaines. '
-             'Le %s : le site de Vendoo ne citait pas Vinted parmi ses plateformes ; Crosslist indiquait ne pas accepter les utilisateurs résidant dans '
-             'l’Union européenne ; Relistly affichait Vinted avec la mention « Soon ». Zipsale citait Vinted parmi ses plateformes, disait utiliser '
+             'Le %s : le site de Vendoo ne citait pas Vinted parmi ses plateformes ; Crosslist accepte les vendeurs au Royaume-Uni, mais les nouveaux comptes ne peuvent plus connecter Vinted depuis le 23 septembre 2026 ; Relistly affichait Vinted avec la mention « Soon ». Zipsale citait Vinted parmi ses plateformes, disait utiliser '
              'l’API Vinted et être conçu pour le Royaume-Uni.</p>'
              '<p>Les extensions de republication et de publication automatique travaillent dans ta session Vinted connectée : elles agissent en ton nom. '
              'Lis les conditions de Vinted dans ton pays avant de laisser un outil agir sur ton compte.</p>' % d),

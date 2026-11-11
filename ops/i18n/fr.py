@@ -378,11 +378,81 @@ FR = {
         'Astuce' + NB + ': ajoute SNYPD à ton écran d’accueil (Partager -> Sur l’écran d’accueil) pour que les alertes arrivent même Safari fermé.',
     'Add SNYPD to your Home Screen to get alerts.': 'Ajoute SNYPD à ton écran d’accueil pour recevoir les alertes.',
     'Alerts could not be set up on this device.': 'Impossible de configurer les alertes sur cet appareil.',
-    # Referral card on /account (migration 082)
+    # Referral card on /account (migration 085)
     'Invite friends': 'Invite des amis',
     'Copy link': 'Copier le lien',
     "When a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3 (up to 4 times). If they subscribe, you get 30% off a renewal. 5 paying friends = 1 free month.":
         "Quand la recherche d'un ami trouve sa première annonce, il reçoit 2 jours de plus de recherche 24h/24 et toi 3 (jusqu'à 4 fois). S'il s'abonne, tu as 30" + NB + '% de réduction sur un renouvellement. 5 amis abonnés = 1 mois offert.',
+    # ---------------------------------------------------------------- feedback questions (assets/feedback.js, outreach/47)
+    'Quick question': 'Petite question',
+    'Send': 'Envoyer',
+    'Thank you': 'Merci',
+    'Saved': 'Enregistré',
+    'Your answer': 'Ta réponse',
+    'What do you want SNYPD to do for you?': 'Qu’attends-tu de SNYPD' + NB + '?',
+    'Find one specific item': 'Trouver un article précis',
+    'Good deals for myself': 'De bonnes affaires pour moi',
+    'Reselling': 'La revente',
+    'Just looking': 'Je regarde juste',
+    "If SNYPD didn't exist, how would you find these items?": 'Si SNYPD n’existait pas, comment trouverais-tu ces articles' + NB + '?',
+    'Vinted saved searches': 'Les recherches enregistrées de Vinted',
+    'Refresh Vinted myself': 'En actualisant Vinted moi-même',
+    'Another app or bot': 'Une autre appli ou un bot',
+    "Wouldn't bother": 'Je ne chercherais pas',
+    'Which one?': 'Laquelle' + NB + '?',
+    "What's the main reason you haven't upgraded?": 'Quelle est la raison principale pour laquelle tu n’es pas passé à un plan payant' + NB + '?',
+    'Too expensive': 'Trop cher',
+    'Only needed one item': 'Je voulais un seul article',
+    "Didn't get alerts": 'Je n’ai pas reçu d’alertes',
+    "Didn't find anything": 'Rien trouvé',
+    'Already found it': 'Déjà trouvé',
+    'Using another app': 'J’utilise une autre appli',
+    'Other': 'Autre',
+    'What would make it worth paying for? (optional)': 'Qu’est-ce qui le rendrait digne d’être payé' + NB + '? (facultatif)',
+    'What would SNYPD be worth to you per month?': 'Combien SNYPD vaudrait-il pour toi par mois' + NB + '?',
+    'How would you feel if you could no longer use SNYPD?': 'Que ressentirais-tu si tu ne pouvais plus utiliser SNYPD' + NB + '?',
+    'Very disappointed': 'Très déçu',
+    'Somewhat disappointed': 'Un peu déçu',
+    'Not disappointed': 'Pas déçu',
+    "What's the main benefit you get from SNYPD?": 'Quel est le principal avantage que SNYPD t’apporte' + NB + '?',
+    'Which matters most to you?': 'Qu’est-ce qui compte le plus pour toi' + NB + '?',
+    'Alert speed': 'La vitesse des alertes',
+    'Price check on each find': 'Le contrôle du prix sur chaque trouvaille',
+    'Market board': 'Le tableau du marché',
+    'Weekly hunt report': 'Le rapport hebdomadaire de recherche',
+    'Calm or cheap-only alerts': 'Les alertes calmes ou petits prix',
+    'What should we build next?': 'Que devrions-nous construire ensuite' + NB + '?',
+    'Phone app': 'Une appli mobile',
+    'Stock & profit tracker': 'Un suivi du stock et des bénéfices',
+    'Telegram alerts': 'Des alertes Telegram',
+    'Price-drop alerts': 'Des alertes de baisse de prix',
+    'What almost stopped you from buying?': 'Qu’est-ce qui a failli t’empêcher d’acheter' + NB + '?',
+    'Price': 'Le prix',
+    'Unsure it works': 'Pas sûr que ça marche',
+    'Checkout': 'Le paiement',
+    'Trial too short': 'Essai trop court',
+    'Nothing': 'Rien',
+    'What type of people would benefit most from SNYPD?': 'Quel type de personnes profiterait le plus de SNYPD' + NB + '?',
+    'Would you pay more for a price check on any Vinted item, without a hunt?': 'Paierais-tu plus pour vérifier le prix de n’importe quel article Vinted, sans recherche' + NB + '?',
+    'Maybe': 'Peut-être',
+    'How do you track what you buy and sell?': 'Comment suis-tu ce que tu achètes et vends' + NB + '?',
+    'Spreadsheet': 'Un tableur',
+    'Notes': 'Des notes',
+    'An app': 'Une appli',
+    'Not at all': 'Pas du tout',
+    'Thank you, this helps us a lot.': 'Merci, ça nous aide beaucoup.',
+    'Solo keeps one search running 24/7. With code STAY50 your first month is half price.':
+        'Solo garde une recherche active 24h/24. Avec le code STAY50, ton premier mois est à moitié prix.',
+    'See Solo with STAY50': 'Voir Solo avec STAY50',
+    'For one item, a 30-day Hunt Pass is €3.99 once, no subscription.':
+        'Pour un seul article, le Pass 30 jours coûte 3,99' + NB + '€ en une fois, sans abonnement.',
+    'See the Hunt Pass': 'Voir le Pass 30 jours',
+    'Alerts need permission on this device. Turn them on here, it takes a few seconds.':
+        'Les alertes ont besoin d’une autorisation sur cet appareil. Active-les ici, ça prend quelques secondes.',
+    'Turn on alerts': 'Activer les alertes',
+    'Vinted only shows listings that contain every word you typed. A quick check of your hunt words often fixes this.':
+        'Vinted n’affiche que les annonces qui contiennent tous les mots tapés. Vérifier les mots de ta recherche règle souvent ça.',
+    'Check my hunt words': 'Vérifier mes mots de recherche',
 }
 
 _MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
@@ -391,7 +461,7 @@ _MONTHS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août'
 # (JS regex on the collapsed text, replacement with $1..). They run in order and each one sees the
 # previous result, so later ones can finish what an earlier one left in English.
 FR_PATTERNS = [
-    # referral card on /account (migration 082)
+    # referral card on /account (migration 085)
     (r'^(\d+) joined · (\d+) found a listing · (\d+) subscribed · (\d+) days earned \((\d+) rewards left\)$',
      '$1 inscrit(s) · $2 avec une annonce trouvée · $3 abonné(s) · $4 jours gagnés (encore $5 récompense(s))'),
     (r'^24/7 bonus active until (.+)$', 'Bonus 24h/24 actif jusqu’au $1'),
@@ -769,8 +839,8 @@ FR.update({
     'Upgrade here any time. To move between paid plans, manage your subscription in Whop, or email': 'Passe à un plan supérieur ici à tout moment. Pour changer entre plans payants, gère ton abonnement dans Whop, ou écris à',
     'and we will help you switch.': 'et on t’aidera à changer.',
     'What is a founding member?': 'C’est quoi un membre fondateur' + NB + '?',
-    'The first 100 SNYPD accounts, free accounts included. If the Pro price ever goes up, founding members can keep Pro at €24.99 a month for as long as their account exists.':
-        'Les 100 premiers comptes SNYPD, comptes gratuits compris. Si le prix de Pro augmente un jour, les membres fondateurs peuvent garder Pro à 24,99' + NB + '€ par mois aussi longtemps que leur compte existe.',
+    'The first 100 SNYPD accounts, free accounts included. All of those places are taken. If the Pro price ever goes up, founding members can keep Pro at €24.99 a month for as long as their account exists.':
+        'Les 100 premiers comptes SNYPD, comptes gratuits compris. Toutes ces places sont prises. Si le prix de Pro augmente un jour, les membres fondateurs peuvent garder Pro à 24,99' + NB + '€ par mois aussi longtemps que leur compte existe.',
     'Paid plans renew every month until you cancel. Cancel any time. Full refund within 14 days of your first payment.':
         'Les plans payants se renouvellent chaque mois jusqu’à ta résiliation. Résiliable à tout moment. Remboursement intégral dans les 14 jours suivant ton premier paiement.',
     'Renews every month until you cancel. Cancel any time in your Whop account. Full refund within 14 days of your first payment: email help@snypd.store.':

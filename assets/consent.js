@@ -388,7 +388,7 @@
   ['pointerdown', 'focusin', 'click'].forEach(function (t) { document.addEventListener(t, onUse, true); });
 })();
 
-/* Referral link (?ref=<6-char code>, migration 082). Stored WITHOUT waiting for consent
+/* Referral link (?ref=<6-char code>, migration 085). Stored WITHOUT waiting for consent
    (Tanush's decision 10 Nov 2026): the code exists only to give the friend the bonus
    they clicked for, so /cookies lists it as functional. Key snypd_refer = {c, t},
    read for 60 days by assets/auth.js. First touch wins: an unexpired stored code is

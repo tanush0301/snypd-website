@@ -843,7 +843,7 @@
 </div>
 <p class="mini-p" data-snypd="billingCopy">Loading…</p>
 </div>
-<!-- Referral card (migration 082): hidden until my_referral_summary() answers. -->
+<!-- Referral card (migration 085): hidden until my_referral_summary() answers. -->
 <div class="mini" id="ref-card" style="display:none">
 <div class="mini-hd">
 <div class="mini-title">Invite friends</div>
@@ -1011,7 +1011,7 @@
     }
   });
 
-  /* Referral card (migration 082). Own block: any failure leaves the card hidden and never
+  /* Referral card (migration 085). Own block: any failure leaves the card hidden and never
      touches the rest of the account page. Values are set with textContent only. */
   (async () => {
     try {

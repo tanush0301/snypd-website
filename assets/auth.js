@@ -25,7 +25,6 @@
 
   var PROD = /(^|\.)snypd\.store$/i.test(location.hostname);
   var SITE = PROD ? 'https://www.snypd.store' : location.origin;
-  var FOUNDING_URL = 'https://api.snypd.store/api/v1/founding-members';
   var RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   var PLAN_NAMES = { solo: 'Solo', pro: 'Pro', kickstart: 'Kickstart', elite: 'Elite', pass: 'HUNT PASS' };
   var PLAN_TERMS = {
@@ -119,7 +118,7 @@
   var S = {
     view: PAGE === 'signup' ? 'signup' : PAGE === 'reset' ? 'reset' : 'login',
     status: 'idle', email: '', code: '', pw: '', pw2: '', show: false, errors: {},
-    cooldown: 0, founding: null, marketing: false, heard: '', errText: '', oauth: false, ready: PAGE !== 'reset'
+    cooldown: 0, marketing: false, heard: '', errText: '', oauth: false, ready: PAGE !== 'reset'
   };
 
   /* "How did you find SNYPD?" on /signup (optional, 27 Oct 2026): AI assistants
@@ -267,7 +266,7 @@
     } catch (e) { return null; }
   }
 
-  /* Referral code (migration 082): snypd_refer = {c, t} set by consent.js from ?ref=, read for 60 days;
+  /* Referral code (migration 085): snypd_refer = {c, t} set by consent.js from ?ref=, read for 60 days;
      else a ?ref= on this page's own address (the Google return trip carries it, see google()). */
   function referralCode(qsArg) {
     var RE = /^[a-z2-9]{6}$/;
@@ -304,7 +303,7 @@
     /* Outreach click code (?r=, snypd_ref, marketing consent): kept for DM attribution under its own name. */
     var oc = lsGet('snypd_ref');
     if (oc && /^[a-z2-9]{4,8}$/.test(oc)) data.outreach_code = oc;
-    /* Referral code (?ref=, snypd_refer, 60 days): read by migration 082's referral_process(). */
+    /* Referral code (?ref=, snypd_refer, 60 days): read by migration 085's referral_process(). */
     var rc = referralCode();
     if (rc) data.ref_code = rc;
     try {
@@ -524,12 +523,7 @@
 
     if (isLogin) out.push('<h1 style="margin:0 0 4px;' + H1 + 'font-size:clamp(40px,5vw,48px);">Log in</h1>');
     if (isSignup) {
-      var f = S.founding, founding = '';
-      if (typeof f === 'number') {
-        var pulse = f > 0 ? '<span aria-hidden="true" style="width:7px;height:7px;flex:0 0 auto;background:#00E5A0;animation:pulseDot 2.2s ease infinite;"></span>' : '';
-        founding = '<div style="display:flex;align-items:center;gap:8px;">' + pulse + '<span style="font-size:12px;letter-spacing:.06em;color:var(--text-secondary);">FOUNDING · ' + (f > 0 ? f + ' of the first 100 spots left' : 'all 100 founding spots claimed') + '</span></div>';
-      }
-      out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);text-wrap:balance;">Create your free account</h1><span style="font-size:13px;color:var(--text-secondary);">Free plan, no card.</span>' + founding + '</div>');
+      out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);text-wrap:balance;">Create your free account</h1><span style="font-size:13px;color:var(--text-secondary);">Free plan, no card.</span></div>');
     }
     if ((isSignup || isLogin || v === 'verify') && PLAN_NAMES[plan]) {
       out.push('<div data-selected-offer style="border:1px solid var(--border-hover);background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text-secondary);"><div style="font-size:10px;letter-spacing:.12em;color:var(--success);">SELECTED OFFER</div><div style="margin-top:4px;color:var(--text-primary);">' + PLAN_NAMES[plan] + '</div><div>' + PLAN_TERMS[plan] + '</div><div style="margin-top:8px;">Account first, then your hunt and secure checkout. Creating your account does not take a payment.</div></div>');
@@ -714,17 +708,6 @@
       }, function () {});
     } catch (e) {}
   })();
-
-  /* ---------- founding line (sign-up only; hidden if the endpoint doesn't answer) ---------- */
-  if (PAGE === 'signup') {
-    var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var ft = setTimeout(function () { if (ctl) ctl.abort(); }, 5000);
-    fetch(FOUNDING_URL, ctl ? { signal: ctl.signal } : undefined)
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) { if (d && typeof d.remaining === 'number') { S.founding = Math.max(0, d.remaining); if (S.view === 'signup') render(); } })
-      .catch(function () {})
-      .then(function () { clearTimeout(ft); });
-  }
 
   /* ---------- boot ---------- */
   function urlError() {
