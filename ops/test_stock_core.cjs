@@ -578,7 +578,7 @@ test('X CSV export + template: formula guard on text cells only, missing stays e
   assert(frl[2].startsWith('Loss, jacket;'), 'a comma needs no quotes when the separator is a semicolon: ' + frl[2]);
   assert.equal(core.exportCsv([], { lang: 'en' }), BOM + core.EXPORT_HEAD.en.join(',') + '\r\n', 'no rows: header only');
   // what the file says in its header must be readable by our own importer
-  const want = { 'Item': 'title', 'Brand': 'brand', 'Size': 'size', 'Condition': 'condition', 'Category': 'category', 'Buy price': 'buy', 'Extra costs': 'extra', 'Date bought': 'bought', 'Source': 'source', 'Platform': 'platform', 'List price': 'list', 'Sold price': 'sold', 'Date sold': 'soldon', 'Notes': 'notes', 'Status': null, 'Profit': null };
+  const want = { 'Item': 'title', 'Brand': 'brand', 'Size': 'size', 'Condition': 'condition', 'Category': 'category', 'Buy price': 'buy', 'Extra costs': 'extra', 'Date bought': 'bought', 'Source': 'source', 'Platform': 'platform', 'List price': 'list', 'Sold price': 'sold', 'Date sold': 'soldon', 'Notes': 'notes', 'Status': 'status', 'Profit': null };   // Status is read since Nov 2026 (SOLD/STOCK/LISTED decide; other values fall back to the price/date rule); Profit is computed, never imported
   for (const m of Imp.mapHeaders(core.EXPORT_HEAD.en)) assert.equal(m.field, want[m.header], 'import reads the export header ' + m.header);
   // the template: 17 columns, every one recognised by the importer, in both languages
   for (const lang of ['en', 'fr']) {

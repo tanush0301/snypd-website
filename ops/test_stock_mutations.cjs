@@ -22,7 +22,7 @@ const MUTATIONS = [
   ['import: day-first dates read month-first', 'assets/stock-import.js', "d = p.a; mo = p.b; }", "d = p.b; mo = p.a; }", 'ops/test_stock_import.cjs'],
   ['import: xlsx date styles ignored (serials stay numbers)', 'assets/stock-import.js', 'val = xfs[+a.s || 0] && isFinite(num) ?', 'val = false && isFinite(num) ?', 'ops/test_stock_import.cjs'],
   ['import: shared strings looked up off by one', 'assets/stock-import.js', "val = v ? (sst[+v[1]] || '') : '';", "val = v ? (sst[+v[1] + 1] || '') : '';", 'ops/test_stock_import.cjs'],
-  ['import: sold rows without a price and a date counted as stock', 'assets/stock-import.js', 'if (p.sold_cents != null || soldOn)', 'if (p.sold_cents != null)', 'ops/test_stock_import.cjs'],
+  ['import: sold rows without a price and a date counted as stock', 'assets/stock-import.js', '(!sv && (p.sold_cents != null || soldOn))', '(!sv && (p.sold_cents != null))', 'ops/test_stock_import.cjs'],
   ['import: Free-cap preview lets sold rows consume slots', 'assets/stock-import.js', "r.payload.status !== 'sold' && r.payload.quantity", 'r.payload.quantity', 'ops/test_stock_import.cjs'],
   ['series: write-offs are left out of the daily and platform net', 'ops/stock_engine.js', "- sum(ev.filter(e => e.t === 'wo'), e => e.cost);", ';'],
   ['series: a return is booked under no platform', 'ops/stock_engine.js', 'platform: lastSalePlatform(h), d: h.at,', "platform: '', d: h.at,"],
