@@ -87,7 +87,7 @@
       '<h1 class="st-sr">' + esc(T('title')) + '</h1>' +
       '<div class="st-navrow"><div class="st-nav" role="group" aria-label="' + esc(T('title')) + '"><button type="button" class="st-navb" data-act="view" data-view="overview" aria-pressed="true">' + esc(T('nav.overview')) + '</button><button type="button" class="st-navb" data-act="view" data-view="items" aria-pressed="false">' + esc(T('nav.items')) + ' <span id="st-navn"></span></button><button type="button" class="st-navb" data-act="view" data-view="money" aria-pressed="false" id="st-nav-money" style="display:none">' + esc(T('nav.money')) + '</button></div>' +
       '<div class="st-navr"><div id="st-meter"></div><button type="button" class="st-btn st-tert" data-act="settings">' + esc(T('set.btn')) + '</button><button type="button" class="st-btn st-prim" data-act="add">' + esc(T('add')) + '</button></div></div>' +
-      '<div id="st-capmsg"></div>' +
+      '<div id="st-capmsg"></div><div id="st-welcome"></div>' +
       '<div id="st-over"></div><div id="st-money" style="display:none"></div><div id="st-items" style="display:none">' +
       '<div class="st-itemshd"><h2 class="st-h2">' + esc(T('nav.items')) + '</h2><span class="st-secsub" id="st-itemssub"></span></div>' +
       '<div class="st-tools" id="st-tools">' +
@@ -110,9 +110,20 @@
     $('#st-sort').onchange = function () { S.f.sort = this.value; load(true); };
     // a claim photo that fails to load (deleted on Vinted, offline) turns back into the initials tile
     S.panel.addEventListener('error', function (ev) { var im = ev.target; if (im && im.tagName === 'IMG' && im.classList.contains('st-ph')) { var t = im.parentNode; if (t) { t.classList.remove('has-ph'); t.textContent = t.getAttribute('data-ini') || '--'; } } }, true);
-    renderMeter();
+    renderMeter(); renderWelcome();
   }
-  var CHIP_KEY = { held: 'held', '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
+  // one-time notice: Stock replaces the History tab, and claims made before are already inside (migration 067). Remembered per browser; blocked storage = it may show again, never an error.
+  var WELCOME_KEY = 'snypd_stock_welcome_v1';
+  function renderWelcome() {
+    var el = $('#st-welcome'); if (!el) return;
+    var seen = false; try { seen = localStorage.getItem(WELCOME_KEY) === '1'; } catch (e) {}
+    var replaces = !!(window.SNYPD && window.SNYPD.stockReplacesHistory && window.SNYPD.stockReplacesHistory());
+    if (seen || !replaces) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="st-note st-welcome" role="status"><b>' + esc(T('welcome.title')) + '</b> ' + esc(T('welcome.body')) +
+      ' <button type="button" class="st-btn st-tert" data-act="welcome-ok">' + esc(T('welcome.ok')) + '</button></div>';
+  }
+  function dismissWelcome() { try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {} var el = $('#st-welcome'); if (el) el.innerHTML = ''; }
+  var CHIP_KEY ={ held: 'held', '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
   function renderChipCounts() {
     Array.prototype.forEach.call(S.panel.querySelectorAll('#st-chips .st-chip'), function (b) { var n = b.querySelector('.st-cn'); if (n) n.textContent = S.counts ? String(S.counts[CHIP_KEY[b.getAttribute('data-status')]]) : ''; });
   }
@@ -489,6 +500,7 @@
       case 'import': S.opener = el; openImport(); break;
       case 'template': downloadFile(C.templateCsv(lang), lang === 'fr' ? 'snypd-modele-revendeur.csv' : 'snypd-reseller-template.csv'); break;
       case 'export': exportItems(el); break;
+      case 'welcome-ok': dismissWelcome(); break;
       case 'im-pick': { var fi = $('#im-file'); if (fi) fi.click(); break; }
       case 'im-go': imRun(false); break;
       case 'im-resume': imRun(true); break;
@@ -1141,7 +1153,7 @@
   function uuid() { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); var h = '0123456789abcdef', o = ''; for (var i = 0; i < 36; i++) o += (i === 8 || i === 13 || i === 18 || i === 23) ? '-' : (i === 14 ? '4' : h[Math.floor(Math.random() * 16)]); return o; }
   function openImport() {
     S.sheet = { kind: 'import' };
-    IM = { step: 'pick', file: null, sheets: [], sheetIx: 0, dateOrder: null, skipDups: false, condMap: {}, catMap: {}, plan: null, importId: null, done: null, err: null, rpc: [], batches: [], catsFailed: 0 };
+    IM = { step: 'pick', file: null, sheets: [], sheetIx: 0, dateOrder: null, skipDups: false, condMap: {}, catMap: {}, mapping: null, plan: null, importId: null, done: null, err: null, rpc: [], batches: [], catsFailed: 0 };
     renderImport();
   }
   function imShell(body, foot) {
@@ -1167,7 +1179,9 @@
     }
     if (IM.step === 'review') { imReview(close); return; }
     if (IM.step === 'running') { imShell('<div class="st-prev" id="im-prog" role="status"></div>', ''); imProgress(); return; }
-    if (IM.step === 'failed') { imShell('<div class="st-err">' + esc(T('imp.failed', { done: IM.done.items })) + '</div>', close + '<button type="button" class="st-btn st-ghost st-danger" data-act="im-undo">' + esc(T('imp.undo')) + '</button><button type="button" class="st-btn st-prim" data-act="im-resume">' + esc(T('imp.resume')) + '</button>'); return; }
+    if (IM.step === 'failed') {
+      var fe = IM.failErr, fk = fe && fe.kind, why = fk === 'auth' ? 'imp.err.auth' : fk === 'disabled' ? 'imp.err.disabled' : fk === 'network' ? 'imp.err.net' : (fe && fe.code === 'stock_item_cap') ? 'imp.err.cap' : null;
+      imShell('<div class="st-err">' + esc(T('imp.failed', { done: IM.done.items })) + (why ? '<br>' + esc(T(why)) : (fe && fe.code ? '<br>' + esc(errMsg(fe)) : '')) + '</div>', close +'<button type="button" class="st-btn st-ghost st-danger" data-act="im-undo">' + esc(T('imp.undo')) + '</button><button type="button" class="st-btn st-prim" data-act="im-resume">' + esc(T('imp.resume')) + '</button>'); return; }
     if (IM.step === 'done') imDone(close);
   }
   function imRead(file) {
@@ -1175,12 +1189,12 @@
     loadImportLib().then(function (L) { return L.readFile(file).then(function (r) { return [L, r]; }); }).then(function (x) {
       var L = x[0], r = x[1]; IM.file = file; IM.sheets = r.sheets; IM.sheetIx = 0;
       for (var i = 0; i < r.sheets.length; i++) { var rows = r.sheets[i].table.rows.filter(function (row) { return row.some(function (c) { return String(c == null ? '' : c).trim() !== ''; }); }); if (rows.length && L.mapHeaders(rows[0]).some(function (m) { return m.field === 'title'; })) { IM.sheetIx = i; break; } }
-      IM.dateOrder = null; IM.skipDups = false; IM.condMap = {}; IM.catMap = {}; imAnalyse(true);
+      IM.dateOrder = null; IM.skipDups = false; IM.condMap = {}; IM.catMap = {}; IM.mapping = null; imAnalyse(true);
     }).catch(function (e) { IM.step = 'pick'; IM.err = imErrText(e); renderImport(); });
   }
   function imPlan() {
     var L = window.SnypdStockImport, sh = IM.sheets[IM.sheetIx];
-    return L.buildPlan(sh.table, { lang: lang, currency: S.cur, categories: S.cats, freeLeft: freeLeft(), today: today(), dateOrder: IM.dateOrder || undefined, skipDuplicates: IM.skipDups, conditionMap: IM.condMap, categoryMap: IM.catMap });
+    return L.buildPlan(sh.table, { lang: lang, currency: S.cur, categories: S.cats, freeLeft: freeLeft(), today: today(), dateOrder: IM.dateOrder || undefined, skipDuplicates: IM.skipDups, conditionMap: IM.condMap, categoryMap: IM.catMap, mapping: IM.mapping || undefined });
   }
   function imAnalyse(first) {
     IM.plan = imPlan();
@@ -1193,11 +1207,15 @@
     h += '<p class="st-note"><b>' + esc(IM.file.name) + '</b>';
     if (IM.sheets.length > 1) h += ' &middot; ' + esc(T('imp.sheet')) + ' <select class="st-in" data-im="sheet" aria-label="' + esc(T('imp.sheet')) + '">' + IM.sheets.map(function (s, i) { return option(String(i), s.name, i === IM.sheetIx); }).join('') + '</select>';
     h += '</p>';
-    h += '<div class="st-h3">' + esc(T('imp.cols')) + '</div><div class="st-map">' + p.mapping.map(function (m) { return '<span class="st-mapc ' + (m.field ? 'ok' : 'no') + '">' + esc(m.header || '-') + ' &rarr; ' + esc(m.field ? T('f.' + ({ title: 'title', brand: 'brand', size: 'size', condition: 'condition', category: 'category', quantity: 'quantity', bought: 'bought', buy: 'buy', extra: 'extra', source: 'source', platform: 'platform', list: 'list', sold: 'sold', soldon: 'soldon', fee: 'fee', ship: 'ship', notes: 'notes', link: 'link' }[m.field])) : T('imp.cols.none')) + '</span>'; }).join('') + '</div>';
+    // every column gets a picker (was a read-only chip): a wrong or missing guess is fixed here, never by editing the file. Picking a meaning another column has MOVES it (no duplicates).
+    h += '<div class="st-h3">' + esc(T('imp.cols')) + '</div><p class="st-hint">' + esc(T('imp.cols.hint')) + '</p><div class="st-map">' + p.mapping.map(function (m) {
+      return '<label class="st-mapc ' + (m.field ? 'ok' : 'no') + '"><span>' + esc(m.header || '-') + ' &rarr;</span> <select class="st-in" data-im="map" data-col="' + m.col + '" aria-label="' + esc(m.header || '-') + '">' +
+        option('', T('imp.cols.none'), !m.field) + L.FIELDS.map(function (f) { return option(f, T('f.' + f), m.field === f); }).join('') + '</select></label>'; }).join('') + '</div>';
+    (rv.remapped || []).forEach(function (x) { h += '<p class="st-hint">' + esc(T('imp.remapped', { header: x.header })) + '</p>'; });
     h += '<p class="st-note" style="margin-top:12px">' + esc(T('imp.read_as', { cur: S.cur })) + '</p>';
     var notes = [T('imp.sum', { rows: st.rows - skippedTitle - badQty, items: items, held: st.held, sold: st.sold })];
     if (st.qtyRows) notes.push(T('imp.qty', { n: st.qtyRows })); if (st.noBuy) notes.push(T('imp.nobuy', { n: st.noBuy })); if (st.badMoney) notes.push(T('imp.badmoney', { n: st.badMoney }));
-    if (st.badDates) notes.push(T('imp.baddates', { n: st.badDates })); if (st.soldNoDate) notes.push(T('imp.sold_nodate', { n: st.soldNoDate }));
+    if (st.badDates) notes.push(T('imp.baddates', { n: st.badDates })); if (st.soldNoDate) notes.push(T('imp.sold_nodate', { n: st.soldNoDate })); if (st.soldNoPrice) notes.push(T('imp.sold_noprice', { n: st.soldNoPrice }));
     if (skippedTitle) notes.push(T('imp.notitle', { n: skippedTitle })); if (badQty) notes.push(T('imp.badqty', { n: badQty })); if (p.truncated) notes.push(T('imp.trunc', { n: p.truncated }));
     h += '<ul class="st-list">' + notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>';
     if (rv.mixedCurrencies && Object.keys(rv.mixedCurrencies).length) h += '<div class="st-err" style="border-color:rgba(255,176,32,.4);background:rgba(255,176,32,.06)">' + esc(T('imp.mixed', { n: st.mixedCells, cur: S.cur })) + '</div>';
@@ -1215,7 +1233,11 @@
   function onChange(ev) {
     if (ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-cat')) { catRename(ev.target); return; }   // Manage categories: a rename saves on leaving the field
     var t = ev.target, k = t && t.getAttribute && t.getAttribute('data-im'); if (!k || !IM || IM.step !== 'review') return;
-    if (k === 'sheet') { IM.sheetIx = parseInt(t.value, 10) || 0; IM.condMap = {}; IM.catMap = {}; IM.dateOrder = null; }
+    if (k === 'sheet') { IM.sheetIx = parseInt(t.value, 10) || 0; IM.condMap = {}; IM.catMap = {}; IM.dateOrder = null; IM.mapping = null; }
+    else if (k === 'map') {   // start from the plan's own mapping (keeps the 'Sold on' -> date switch), then move the chosen meaning to this column
+      var col = parseInt(t.getAttribute('data-col'), 10), f = t.value || null;
+      IM.mapping = IM.plan.mapping.map(function (m) { return { col: m.col, header: m.header, field: m.col === col ? f : (f && m.field === f ? null : m.field) }; });
+    }
     else if (k === 'order') IM.dateOrder = t.value;
     else if (k === 'dups') IM.skipDups = !!t.checked;
     else if (k === 'cond') IM.condMap[t.getAttribute('data-key')] = t.value;
@@ -1239,7 +1261,7 @@
         IM.catsFailed = cats.length; Object.keys(IM.plan.review.newCategories).forEach(function (n) { IM.catMap[L.norm(n)] = 'skip'; }); IM.plan = imPlan();   // the rows keep going, without those categories
       }).then(function () { IM.rpc = L.toRpcRows(IM.plan); IM.batches = L.batches(IM.rpc); });
     }
-    IM.step = 'running'; renderImport();
+    IM.step = 'running'; IM.failErr = null; renderImport();
     start.then(function next() {
       if (IM.done.batchIx >= IM.batches.length) return;
       var b = IM.batches[IM.done.batchIx];
@@ -1248,7 +1270,7 @@
         (r.skipped || []).forEach(function (s) { IM.done.skipped.push({ n: b[s.index] ? b[s.index].n : '?', reason: s.reason }); });
         IM.done.batchIx++; imProgress(); return next();
       });
-    }).then(function () { return reloadKeep(); }).then(function () { IM.step = 'done'; renderImport(); }).catch(function (e) { IM.step = 'failed'; renderImport(); console.error('SNYPD Stock import stopped', e); });
+    }).then(function () { return reloadKeep(); }).then(function () { IM.step = 'done'; renderImport(); }).catch(function (e) { IM.step = 'failed'; IM.failErr = e || null; renderImport(); console.error('SNYPD Stock import stopped', e); });
   }
   function skipReason(reason) { var m = /stock_[a-z_]+/.exec(reason || ''); var c = m && m[0]; return T(c === 'stock_title_required' ? 'imp.skip.title_required' : c === 'stock_free_limit' ? 'imp.skip.free_limit' : c === 'stock_item_cap' ? 'imp.skip.item_cap' : 'imp.skip.other'); }
   function imDone(close) {
@@ -1256,6 +1278,7 @@
     if (IM.catsFailed) h += '<p class="st-note" style="margin-top:12px">' + esc(T('imp.cat.notcreated', { n: IM.catsFailed })) + '</p>';
     if (d.skipped.length) h += '<div class="st-h3">' + esc(T('imp.done.skipped', { n: d.skipped.length })) + '</div><ul class="st-list">' + d.skipped.slice(0, 20).map(function (s) { return '<li>' + esc(T('imp.skipped.row', { n: s.n, reason: skipReason(s.reason) })) + '</li>'; }).join('') + '</ul>' + (d.skipped.length > 20 ? '<p class="st-hint">...</p>' : '');
     if (d.limit) h += '<div class="st-err">' + esc(T('err.free_limit', { cap: (S.boot.plan && S.boot.plan.free_cap) || C.CAPS.freeHeld })) + ' <a class="st-link" href="plans.html">' + esc(T('meter.upgrade')) + '</a></div>';
+    if (d.cap) h += '<div class="st-err">' + esc(T('imp.err.cap')) + '</div>';   // was silent: the server reported item_cap_hit but nothing showed it
     imShell(h, close + '<button type="button" class="st-btn st-ghost" data-act="im-again">' + esc(T('imp.again')) + '</button>' + (d.items ? '<button type="button" class="st-btn st-ghost st-danger" data-act="im-undo">' + esc(T('imp.undo')) + '</button>' : ''));
   }
   function imUndo() {

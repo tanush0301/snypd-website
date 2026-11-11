@@ -6,11 +6,19 @@ const en = {
   'imp.err.xls': 'Old .xls files are not supported. Save the file as .xlsx or CSV and try again.', 'imp.err.not': 'This does not look like a CSV or Excel file.',
   'imp.err.encrypted': 'The file is password protected. Remove the password and try again.', 'imp.err.big': 'The file is too big (10 MB maximum).',
   'imp.err.empty': 'The file has no rows.', 'imp.err.notitle': 'No column looks like the item title. Name it Item or Title and try again.', 'imp.err.read': 'This file could not be read.',
-  'imp.cols': 'Columns we recognised', 'imp.cols.none': 'ignored', 'imp.read_as': 'Amounts are read as {cur}. Nothing is converted.',
+  'imp.cols': 'What each column means', 'imp.cols.none': 'ignored', 'imp.read_as': 'Amounts are read as {cur}. Nothing is converted.',
+  'imp.cols.hint': 'We guessed from the column names. Wrong or ignored? Pick the right meaning here, no need to edit your file.',
+  'f.status': 'Status (sold / listed / in stock)',
+  'imp.remapped': 'The column "{header}" holds dates, so we read it as the sold date.',
+  'imp.sold_noprice': '{n} sold rows have no sold price: their profit shows -- until you add it.',
+  'imp.err.auth': 'Your session ended. Log in again, then resume: nothing imported so far is lost.',
+  'imp.err.disabled': 'Stock is switched off for your account right now. Nothing more was imported.',
+  'imp.err.net': 'The connection dropped. Check your internet and press Resume.',
+  'imp.err.cap': 'Your account reached the 5,000 item limit. Delete old items to import the rest.',
   'imp.mixed': 'This file mixes currency symbols ({n} amounts). Every amount is read as {cur}. Fix those cells in your file, or import anyway.',
   'imp.sum': '{rows} rows make {items} items: {held} held, {sold} sold.', 'imp.qty': '{n} rows have a quantity above 1. Each unit becomes its own item.',
   'imp.nobuy': '{n} rows have no buy price: their cost shows --.', 'imp.dups': '{n} rows look like duplicates and are kept.', 'imp.dups.skip': 'Skip the duplicates',
-  'imp.baddates': '{n} dates could not be read and were left empty. A missing purchase date becomes today.', 'imp.sold_nodate': '{n} sold rows have no sold date: the buy date is used.',
+  'imp.baddates': '{n} dates could not be read and were left empty. A missing purchase date becomes today.', 'imp.sold_nodate': '{n} sold rows have no sold date: the buy date is used (or today, when there is no buy date either).',
   'imp.notitle': '{n} rows without a title are skipped.', 'imp.badqty': '{n} rows with a quantity outside 1 to 50 are skipped.', 'imp.badmoney': '{n} amounts could not be read and were left empty.',
   'imp.trunc': 'Only the first 5,000 rows are imported. {n} more are left out.',
   'imp.dateorder': 'Dates like 03/04/2026 can be read two ways', 'imp.dateorder.dmy': 'Day first (3 April)', 'imp.dateorder.mdy': 'Month first (March 4)',
@@ -23,7 +31,10 @@ const en = {
   'imp.done': 'Imported {items} items', 'imp.done.rows': 'from {rows} rows', 'imp.done.skipped': '{n} rows were not imported', 'imp.skipped.row': 'Row {n}: {reason}',
   'imp.skip.title_required': 'no title', 'imp.skip.free_limit': 'over the Free plan limit', 'imp.skip.item_cap': 'over the 5,000 item limit', 'imp.skip.other': 'a value is not allowed',
   'imp.undo': 'Undo this import', 'imp.undo.confirm': 'Remove the {n} items of this import? Changes you made to them since are lost.', 'imp.undone': 'Import removed',
-  'imp.resume': 'Resume', 'imp.failed': 'The import stopped after {done} items. Nothing is lost: resume, or undo this import.', 'imp.again': 'Import another file'
+  'imp.resume': 'Resume', 'imp.failed': 'The import stopped after {done} items. Nothing is lost: resume, or undo this import.', 'imp.again': 'Import another file',
+  // one-time notice in the Stock tab (it replaces History; claims are mirrored in by migration 067). Kept here so the generator merges it with the rest.
+  'welcome.title': 'History is now Stock.', 'welcome.body': 'Items you claimed through SNYPD are already in here: check their prices once. Add the rest by hand or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
+  'welcome.ok': 'Got it'
 };
 const fr = {
   'f.fee': 'Frais', 'imp.btn': 'Importer', 'imp.title': 'Importer ton stock', 'imp.pick': 'Choisir un fichier CSV ou Excel', 'imp.drop': 'ou le déposer ici',
@@ -32,11 +43,19 @@ const fr = {
   'imp.err.xls': 'Les anciens fichiers .xls ne sont pas pris en charge. Enregistre le fichier en .xlsx ou en CSV et réessaie.', 'imp.err.not': 'Ce fichier ne ressemble pas à un CSV ou à un fichier Excel.',
   'imp.err.encrypted': 'Le fichier est protégé par un mot de passe. Retire le mot de passe et réessaie.', 'imp.err.big': 'Le fichier est trop gros (10 Mo au maximum).',
   'imp.err.empty': 'Le fichier ne contient aucune ligne.', 'imp.err.notitle': 'Aucune colonne ne ressemble au titre de l’article. Nomme-la Article ou Titre et réessaie.', 'imp.err.read': 'Ce fichier n’a pas pu être lu.',
-  'imp.cols': 'Colonnes reconnues', 'imp.cols.none': 'ignorée', 'imp.read_as': 'Les montants sont lus en {cur}. Rien n’est converti.',
+  'imp.cols': 'Ce que veut dire chaque colonne', 'imp.cols.none': 'ignorée', 'imp.read_as': 'Les montants sont lus en {cur}. Rien n’est converti.',
+  'imp.cols.hint': 'On a deviné à partir des noms de colonnes. Faux ou ignoré ? Choisis le bon sens ici, pas besoin de modifier ton fichier.',
+  'f.status': 'Statut (vendu / en vente / en stock)',
+  'imp.remapped': 'La colonne « {header} » contient des dates, on la lit donc comme date de vente.',
+  'imp.sold_noprice': '{n} lignes vendues n’ont pas de prix de vente : leur bénéfice s’affiche -- jusqu’à ce que tu l’ajoutes.',
+  'imp.err.auth': 'Ta session a expiré. Reconnecte-toi, puis reprends : rien de ce qui a déjà été importé n’est perdu.',
+  'imp.err.disabled': 'Le Stock est désactivé pour ton compte en ce moment. Rien de plus n’a été importé.',
+  'imp.err.net': 'La connexion a été coupée. Vérifie ton internet et appuie sur Reprendre.',
+  'imp.err.cap': 'Ton compte a atteint la limite de 5 000 articles. Supprime d’anciens articles pour importer le reste.',
   'imp.mixed': 'Ce fichier mélange des symboles de devise ({n} montants). Chaque montant est lu en {cur}. Corrige ces cellules dans ton fichier, ou importe quand même.',
   'imp.sum': '{rows} lignes donnent {items} articles : {held} en stock, {sold} vendus.', 'imp.qty': '{n} lignes ont une quantité supérieure à 1. Chaque unité devient un article à part.',
   'imp.nobuy': '{n} lignes n’ont pas de prix d’achat : leur coût s’affiche --.', 'imp.dups': '{n} lignes ressemblent à des doublons et sont gardées.', 'imp.dups.skip': 'Ignorer les doublons',
-  'imp.baddates': '{n} dates n’ont pas pu être lues et sont restées vides. Une date d’achat manquante devient aujourd’hui.', 'imp.sold_nodate': '{n} lignes vendues n’ont pas de date de vente : la date d’achat est utilisée.',
+  'imp.baddates': '{n} dates n’ont pas pu être lues et sont restées vides. Une date d’achat manquante devient aujourd’hui.', 'imp.sold_nodate': '{n} lignes vendues n’ont pas de date de vente : la date d’achat est utilisée (ou aujourd’hui, s’il n’y a pas non plus de date d’achat).',
   'imp.notitle': '{n} lignes sans titre sont ignorées.', 'imp.badqty': '{n} lignes avec une quantité hors de 1 à 50 sont ignorées.', 'imp.badmoney': '{n} montants n’ont pas pu être lus et sont restés vides.',
   'imp.trunc': 'Seules les 5 000 premières lignes sont importées. {n} de plus sont laissées de côté.',
   'imp.dateorder': 'Des dates comme 03/04/2026 se lisent de deux façons', 'imp.dateorder.dmy': 'Jour d’abord (3 avril)', 'imp.dateorder.mdy': 'Mois d’abord (4 mars)',
@@ -49,6 +68,8 @@ const fr = {
   'imp.done': '{items} articles importés', 'imp.done.rows': 'à partir de {rows} lignes', 'imp.done.skipped': '{n} lignes n’ont pas été importées', 'imp.skipped.row': 'Ligne {n} : {reason}',
   'imp.skip.title_required': 'pas de titre', 'imp.skip.free_limit': 'au-dessus de la limite du plan Free', 'imp.skip.item_cap': 'au-dessus de la limite de 5 000 articles', 'imp.skip.other': 'une valeur n’est pas autorisée',
   'imp.undo': 'Annuler cet import', 'imp.undo.confirm': 'Retirer les {n} articles de cet import ? Les modifications faites depuis sont perdues.', 'imp.undone': 'Import retiré',
-  'imp.resume': 'Reprendre', 'imp.failed': 'L’import s’est arrêté après {done} articles. Rien n’est perdu : reprends, ou annule cet import.', 'imp.again': 'Importer un autre fichier'
+  'imp.resume': 'Reprendre', 'imp.failed': 'L’import s’est arrêté après {done} articles. Rien n’est perdu : reprends, ou annule cet import.', 'imp.again': 'Importer un autre fichier',
+  'welcome.title': 'L’historique est maintenant le Stock.', 'welcome.body': 'Les articles que tu as réclamés via SNYPD sont déjà ici : vérifie leurs prix une fois. Ajoute le reste à la main ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
+  'welcome.ok': 'Compris'
 };
 module.exports = { en, fr };

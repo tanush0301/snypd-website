@@ -182,6 +182,43 @@ test('end to end: the French file through the engine (importRows, skipped report
   const r2 = await fapi.importRows('88888888-8888-4888-8888-888888888888', I.toRpcRows(big).map(r => r.row));
   assert.deepEqual([r2.rows_inserted, r2.skipped.length, r2.free_limit_hit], [25, 5, true]); assert.deepEqual(big.review.freeCap, { left: 25, fits: 25, over: 5 }, 'the preview said the same before sending');
 });
+// ------------------------------------------------------------------ Nov 2026: before opening Stock to everyone
+const planOf = (csv, o) => I.buildPlan(I.parseCsv(csv), Object.assign({ lang: 'en', currency: 'EUR', today: '2026-11-11' }, o || {}));
+test('Dutch and German sheets map (were refused with no_title_column); sharp s; Verkocht op is a date, never a platform', () => {
+  const nl = planOf('Artikel;Merk;Maat;Staat;Aankoopprijs;Verkoopprijs;Datum;Verkocht op\nNike Tech;Nike;L;Zeer goed;25,50;55;01-10-2026;20-10-2026\n');
+  assert.deepEqual(nl.errors, []);
+  assert.deepEqual(nl.mapping.map(m => m.field), ['title', 'brand', 'size', 'condition', 'buy', 'sold', 'bought', 'soldon']);
+  const r = nl.rows[0].payload; assert.deepEqual([r.status, r.buy_cents, r.sold_cents, r.bought_on, r.sold_on, r.condition], ['sold', 2550, 5500, '2026-10-01', '2026-10-20', 'very_good']);
+  const de = planOf('Artikel;Marke;Größe;Zustand;Einkaufspreis;Verkauft am;Plattform\nJacke;Zara;M;Sehr gut;12,00;19.10.2026;Vinted.de\n');
+  assert.deepEqual(de.mapping.map(m => m.field), ['title', 'brand', 'size', 'condition', 'buy', 'soldon', 'platform']);
+  assert.deepEqual([de.rows[0].payload.platform, de.rows[0].payload.condition, de.rows[0].payload.status], ['vinted', 'very_good', 'sold']);
+});
+test('platforms: domain spellings and 2dehands map to the 7 values the server accepts; unknown = other', () => {
+  const p = planOf('Item,Platform,List price\nA,eBay.com,10\nB,2dehands,10\nC,facebook mp,10\nD,Grailed,10\n');
+  assert.deepEqual(p.rows.map(r => r.payload.platform), ['ebay', 'marktplaats', 'facebook', 'other']);
+});
+test('conditions: NL/DE grades and like new/excellent map; ambiguous "used" still goes to review', () => {
+  const p = planOf('Item,Condition\nA,Nieuw met label\nB,Sehr gut\nC,Like new\nD,Redelijk\nE,used\n');
+  assert.deepEqual(p.rows.map(r => r.payload.condition), ['new_with_tag', 'very_good', 'very_good', 'satisfactory', null]);
+  assert.deepEqual(p.review.unrecognisedConditions, { used: [6] });
+});
+test('a Status column decides sold / listed / stock; sold without date gets a date, sold without price is counted', () => {
+  const p = planOf('Name,Buy,Status\nBag,15,Sold\nShoes,20,Listed\nCap,5,verkocht\nTee,3,op voorraad\nHat,4,whatever\n');
+  assert.deepEqual(p.rows.map(r => r.payload.status), ['sold', 'listed', 'sold', 'stock', 'stock']);
+  assert(p.rows.filter(r => r.payload.status === 'sold').every(r => r.payload.sold_on), 'a sold row is never sent without sold_on (the server refuses it)');
+  assert.deepEqual([p.stats.soldNoPrice, p.stats.statusUnknown], [2, 1]);
+});
+test('"Sold on" holding dates is read as the sold date (shown in review.remapped); a real platform column is untouched', () => {
+  const p = planOf('Item,Sold on,Status\nCarhartt jacket,12/10/2026,sold\nLevis,,in stock\n');
+  assert.equal(p.mapping[1].field, 'soldon'); assert.deepEqual(p.review.remapped, [{ header: 'Sold on', from: 'platform', to: 'soldon' }]);
+  assert.deepEqual([p.rows[0].payload.sold_on, p.rows[0].payload.platform], ['2026-10-12', null]);
+  const q = planOf('Item,Sold on,Sold price\nA,Vinted,10\nB,eBay,12\n'); assert.equal(q.mapping[1].field, 'platform'); assert.equal(q.review.remapped, undefined);
+});
+test('a user-picked mapping (the review pickers) overrides the guess: "Price" as sold price', () => {
+  const guess = planOf('Item,Price\nA,30\n'); assert.equal(guess.mapping[1].field, null, '"Price" alone is ambiguous and stays unmapped');
+  const p = planOf('Item,Price\nA,30\n', { mapping: [{ col: 0, header: 'Item', field: 'title' }, { col: 1, header: 'Price', field: 'sold' }] });
+  assert.deepEqual([p.rows[0].payload.sold_cents, p.rows[0].payload.status], [3000, 'sold']);
+});
 test('stock-import.js is pure ASCII and loads without stock-core in a sandbox', () => {
   const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'stock-import.js'), 'utf8');
   assert.equal((src.match(/[^\x20-\x7e\r\n]/g) || []).length, 0);

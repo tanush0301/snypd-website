@@ -16,41 +16,69 @@
   'use strict';
 
   const LIMITS = { fileBytes: 10 * 1024 * 1024, rows: 5000, batch: 500, quantity: 50, xlsxEntryBytes: 60 * 1024 * 1024, sheetRows: 20000 };
-  const FIELDS = ['title', 'brand', 'size', 'condition', 'category', 'quantity', 'bought', 'buy', 'extra', 'source', 'platform', 'list', 'sold', 'soldon', 'fee', 'ship', 'notes', 'link'];
-  // normalised header -> field. The template's 17 columns (EN) + French + the 8 aliases the landing page promises (handoff landing.importAliasesToAdd).
+  const FIELDS = ['title', 'brand', 'size', 'condition', 'category', 'quantity', 'bought', 'buy', 'extra', 'source', 'platform', 'list', 'sold', 'soldon', 'fee', 'ship', 'notes', 'link', 'status'];   // status last: it never takes a header an older field already matches
+  // normalised header -> field. The template's 17 columns (EN) + French + the 8 aliases the landing page promises (handoff landing.importAliasesToAdd)
+  // + Dutch and German (Nov 2026, before opening Stock to everyone: a Dutch sheet was refused with no_title_column). Ambiguous single words
+  // ('prijs', 'kosten', 'preis') are left out on purpose; 'verkocht op' / 'verkauft am' are dates, never a platform.
   const ALIASES = {
-    title: ['item', 'items', 'article', 'title', 'titre', 'name', 'nom', 'product', 'produit', 'description'],
-    brand: ['brand', 'marque'],
-    size: ['size', 'taille'],
-    condition: ['condition', 'etat', 'state'],
-    category: ['category', 'categorie', 'type'],
-    quantity: ['quantity', 'qty', 'quantite', 'qte', 'nombre', 'units'],
-    bought: ['bought', 'bought on', 'date bought', 'purchase date', 'date of purchase', 'date achat', 'date d achat', 'achete le', 'date'],
-    buy: ['buy price', 'buy', 'bought price', 'purchase price', 'cost', 'cost price', 'prix achat', 'prix d achat', 'cout', 'achat'],
-    extra: ['extra costs', 'extra cost', 'extra', 'frais en plus', 'frais supplementaires', 'additional costs'],
-    source: ['source', 'origin', 'origine', 'bought from', 'where', 'lieu', 'achete chez'],
-    platform: ['platform', 'plateforme', 'marketplace', 'sold on', 'sold via'],
-    list: ['list price', 'listed price', 'asking price', 'asking', 'prix affiche', 'prix demande', 'prix annonce'],
-    sold: ['sold price', 'sale price', 'selling price', 'sold for', 'prix de vente', 'prix vente', 'vendu a', 'sold'],
-    soldon: ['sold date', 'date sold', 'sale date', 'date of sale', 'date vente', 'date de vente', 'vendu le'],
-    fee: ['fees', 'fee', 'platform fees', 'frais', 'frais de plateforme', 'commission'],
-    ship: ['shipping paid', 'shipping', 'postage', 'envoi paye', 'envoi', 'frais d envoi', 'frais de port'],
-    notes: ['notes', 'note', 'comment', 'comments', 'commentaire', 'commentaires', 'remarks'],
-    link: ['link', 'url', 'lien']
+    title: ['item', 'items', 'article', 'title', 'titre', 'name', 'nom', 'product', 'produit', 'description',
+      'artikel', 'naam', 'omschrijving', 'beschrijving', 'produkt', 'bezeichnung', 'beschreibung', 'artikelname'],
+    brand: ['brand', 'marque', 'merk', 'marke'],
+    size: ['size', 'taille', 'maat', 'grosse', 'groesse', 'konfektionsgrosse'],
+    condition: ['condition', 'etat', 'state', 'staat', 'conditie', 'toestand', 'zustand'],
+    category: ['category', 'categorie', 'type', 'kategorie', 'soort'],
+    quantity: ['quantity', 'qty', 'quantite', 'qte', 'nombre', 'units', 'aantal', 'stuks', 'anzahl', 'menge', 'stuck', 'stueck'],
+    bought: ['bought', 'bought on', 'date bought', 'purchase date', 'date of purchase', 'date achat', 'date d achat', 'achete le', 'date',
+      'aankoopdatum', 'gekocht op', 'datum aankoop', 'inkoopdatum', 'datum', 'kaufdatum', 'gekauft am', 'einkaufsdatum'],
+    buy: ['buy price', 'buy', 'bought price', 'purchase price', 'cost', 'cost price', 'prix achat', 'prix d achat', 'cout', 'achat',
+      'aankoopprijs', 'aankoop', 'inkoopprijs', 'inkoop', 'kostprijs', 'betaald', 'einkaufspreis', 'einkauf', 'kaufpreis', 'ek', 'bezahlt'],
+    extra: ['extra costs', 'extra cost', 'extra', 'frais en plus', 'frais supplementaires', 'additional costs',
+      'extra kosten', 'bijkomende kosten', 'zusatzkosten', 'nebenkosten'],
+    source: ['source', 'origin', 'origine', 'bought from', 'where', 'lieu', 'achete chez', 'bron', 'herkomst', 'gekocht bij', 'quelle', 'gekauft bei', 'herkunft'],
+    platform: ['platform', 'plateforme', 'marketplace', 'sold on', 'sold via', 'verkocht via', 'plattform', 'verkauft uber', 'verkauft ueber'],
+    list: ['list price', 'listed price', 'asking price', 'asking', 'prix affiche', 'prix demande', 'prix annonce',
+      'vraagprijs', 'advertentieprijs', 'angebotspreis', 'inseratspreis', 'listenpreis'],
+    sold: ['sold price', 'sale price', 'selling price', 'sold for', 'prix de vente', 'prix vente', 'vendu a', 'sold',
+      'verkoopprijs', 'verkocht voor', 'verkaufspreis', 'verkauft fur', 'verkauft fuer', 'vk'],
+    soldon: ['sold date', 'date sold', 'sale date', 'date of sale', 'date vente', 'date de vente', 'vendu le',
+      'verkoopdatum', 'verkocht op', 'datum verkoop', 'verkaufsdatum', 'verkauft am'],
+    fee: ['fees', 'fee', 'platform fees', 'frais', 'frais de plateforme', 'commission', 'platformkosten', 'commissie', 'gebuhren', 'gebuehren', 'provision'],
+    ship: ['shipping paid', 'shipping', 'postage', 'envoi paye', 'envoi', 'frais d envoi', 'frais de port', 'verzendkosten', 'verzending', 'porto', 'versand', 'versandkosten'],
+    notes: ['notes', 'note', 'comment', 'comments', 'commentaire', 'commentaires', 'remarks', 'notities', 'opmerking', 'opmerkingen', 'notizen', 'bemerkung', 'kommentar'],
+    link: ['link', 'url', 'lien'],
+    status: ['status', 'statut', 'stage', 'verkoopstatus', 'verkaufsstatus', 'state of sale']
   };
+  // values of a Status column (normalised). Anything else = unknown -> the old price/date rule decides (counted in stats.statusUnknown).
+  const STATUS_MAP = {
+    'sold': 'sold', 'vendu': 'sold', 'vendue': 'sold', 'verkocht': 'sold', 'verkauft': 'sold', 'sale': 'sold', 'done': 'sold', 'gone': 'sold',
+    'listed': 'listed', 'online': 'listed', 'live': 'listed', 'active': 'listed', 'for sale': 'listed', 'en ligne': 'listed', 'en vente': 'listed', 'annonce': 'listed',
+    'te koop': 'listed', 'actief': 'listed', 'aangeboden': 'listed', 'inseriert': 'listed', 'aktiv': 'listed', 'zu verkaufen': 'listed',
+    'stock': 'stock', 'in stock': 'stock', 'en stock': 'stock', 'held': 'stock', 'unlisted': 'stock', 'not listed': 'stock', 'not for sale': 'stock', 'pas en vente': 'stock',
+    'voorraad': 'stock', 'op voorraad': 'stock', 'in voorraad': 'stock', 'niet online': 'stock', 'lager': 'stock', 'auf lager': 'stock', 'nicht inseriert': 'stock' };
+  function statusOf(raw) { return STATUS_MAP[norm(raw)] || null; }
   const COND_MAP = { 'new with tag': 'new_with_tag', 'new with tags': 'new_with_tag', 'nwt': 'new_with_tag', 'neuf avec etiquette': 'new_with_tag', 'neuf avec etiquettes': 'new_with_tag', 'new_with_tag': 'new_with_tag',
     'new no tag': 'new_no_tag', 'new without tag': 'new_no_tag', 'new without tags': 'new_no_tag', 'nwot': 'new_no_tag', 'neuf sans etiquette': 'new_no_tag', 'neuf sans etiquettes': 'new_no_tag', 'neuf': 'new_no_tag', 'new_no_tag': 'new_no_tag',
     'very good': 'very_good', 'tres bon etat': 'very_good', 'tres bon': 'very_good', 'tbe': 'very_good', 'very_good': 'very_good',
     'good': 'good', 'bon etat': 'good', 'bon': 'good',
-    'satisfactory': 'satisfactory', 'satisfaisant': 'satisfactory', 'etat satisfaisant': 'satisfactory' };
-  const PLAT_MAP = { 'vinted': 'vinted', 'ebay': 'ebay', 'depop': 'depop', 'vestiaire': 'vestiaire', 'vestiaire collective': 'vestiaire', 'marktplaats': 'marktplaats', 'facebook': 'facebook', 'facebook marketplace': 'facebook', 'fb marketplace': 'facebook', 'fb': 'facebook' };
+    'satisfactory': 'satisfactory', 'satisfaisant': 'satisfactory', 'etat satisfaisant': 'satisfactory',
+    // Dutch + German (Vinted's own labels) and common English words that used to fall into the manual review step
+    'nieuw met label': 'new_with_tag', 'nieuw met labels': 'new_with_tag', 'nieuw met kaartje': 'new_with_tag', 'neu mit etikett': 'new_with_tag', 'neu mit etiketten': 'new_with_tag',
+    'nieuw zonder label': 'new_no_tag', 'nieuw zonder labels': 'new_no_tag', 'nieuw': 'new_no_tag', 'neu ohne etikett': 'new_no_tag', 'neu ohne etiketten': 'new_no_tag', 'neu': 'new_no_tag',
+    'zeer goed': 'very_good', 'zeer goede staat': 'very_good', 'als nieuw': 'very_good', 'sehr gut': 'very_good', 'wie neu': 'very_good', 'like new': 'very_good', 'excellent': 'very_good', 'mint': 'very_good',
+    'goed': 'good', 'goede staat': 'good', 'gut': 'good',
+    // 'used' / 'gebruikt' / 'gebraucht' / 'porte' are left out on purpose: they can mean good OR satisfactory, so they go to the review step where the user picks once
+    'redelijk': 'satisfactory', 'zufriedenstellend': 'satisfactory', 'fair': 'satisfactory' };
+  const PLAT_MAP = { 'vinted': 'vinted', 'ebay': 'ebay', 'depop': 'depop', 'vestiaire': 'vestiaire', 'vestiaire collective': 'vestiaire', 'marktplaats': 'marktplaats', 'facebook': 'facebook', 'facebook marketplace': 'facebook', 'fb marketplace': 'facebook', 'fb': 'facebook',
+    '2dehands': 'marktplaats', '2ememain': 'marktplaats', 'tweedehands': 'marktplaats' };   // the server accepts only these 7 values (065 check); everything else = 'other'
+  function platformOf(raw) { const k = norm(raw); return PLAT_MAP[k] || PLAT_MAP[k.split(' ')[0]] || 'other'; }   // 'Vinted.be' / 'eBay.de' / 'facebook mp' -> first word
   const DEFAULT_CATS = { tops: ['tops', 'hauts'], bottoms: ['bottoms', 'bas'], outerwear: ['outerwear', 'vestes et manteaux'], shoes: ['shoes', 'chaussures'], bags: ['bags and accessories', 'sacs et accessoires', 'bags'], electronics: ['electronics', 'electronique'], home: ['home', 'maison'], collect: ['collectibles and games', 'objets de collection et jeux', 'collectibles'], other: ['other', 'autre'] };
   const MONTHS = { jan: 1, janv: 1, january: 1, janvier: 1, feb: 2, fev: 2, fevr: 2, february: 2, fevrier: 2, mar: 3, mars: 3, march: 3, apr: 4, avr: 4, april: 4, avril: 4, may: 5, mai: 5, jun: 6, juin: 6, june: 6, jul: 7, juil: 7, july: 7, juillet: 7,
     aug: 8, aout: 8, august: 8, sep: 9, sept: 9, september: 9, septembre: 9, oct: 10, october: 10, octobre: 10, nov: 11, november: 11, novembre: 11, dec: 12, december: 12, decembre: 12 };
   const SYMBOLS = { EUR: [String.fromCharCode(0x20ac), 'eur'], GBP: [String.fromCharCode(0xa3), 'gbp'], USD: ['$', 'usd'], SEK: ['kr', 'sek'], PLN: ['z' + String.fromCharCode(0x142), 'pln'], CZK: ['K' + String.fromCharCode(0x10d), 'czk'], RON: ['lei', 'ron'], HUF: ['Ft', 'huf'] };
 
   const DIACRITICS = new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36f) + ']', 'g');
-  function norm(v) { return String(v == null ? '' : v).toLowerCase().normalize('NFD').replace(DIACRITICS, '').replace(/[^a-z0-9_]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+  const SHARP_S = new RegExp(String.fromCharCode(0xdf), 'g');   // German sharp s has no NFD decomposition: Groesse / Grosse -> 'grosse'
+  function norm(v) { return String(v == null ? '' : v).toLowerCase().replace(SHARP_S, 'ss').normalize('NFD').replace(DIACRITICS, '').replace(/[^a-z0-9_]+/g, ' ').replace(/\s+/g, ' ').trim(); }
 
   // ------------------------------------------------------------------ CSV
   function detectDelimiter(text) {
@@ -220,6 +248,14 @@
     if (!rows.length) { plan.errors.push('empty'); return plan; }
 
     plan.mapping = opts.mapping || mapHeaders(rows[0]);
+    if (!opts.mapping) {   // 'Sold on' / 'Sold via' style header that holds DATES (>= 80% of filled cells): it is the sale date, not the platform. Shown in review.remapped.
+      const pm = plan.mapping.filter(m => m.field === 'platform')[0];
+      if (pm && !plan.mapping.some(m => m.field === 'soldon')) {
+        const vals = indexed.slice(1, 201).map(x => x.r[pm.col]).filter(v => v != null && String(v).trim() !== '');
+        const dated = vals.filter(v => !dateParts(v).bad).length;
+        if (vals.length && dated / vals.length >= 0.8) { pm.field = 'soldon'; plan.review.remapped = [{ header: pm.header, from: 'platform', to: 'soldon' }]; }
+      }
+    }
     const colOf = {}; plan.mapping.forEach(m => { if (m.field) colOf[m.field] = m.col; });
     if (colOf.title == null) { plan.errors.push('no_title_column'); return plan; }
     const data = indexed.slice(1, 1 + LIMITS.rows); plan.truncated = indexed.length - 1 > LIMITS.rows ? indexed.length - 1 - LIMITS.rows : 0;
@@ -234,7 +270,7 @@
     Object.keys(DEFAULT_CATS).forEach(k => { if (!cats.some(c => c.key === k)) cats.push({ key: k, names: DEFAULT_CATS[k] }); });
     const taken = new Set(cats.map(c => c.key)), newCats = {}, newKeys = {};
     const unrec = {}, condChoice = opts.conditionMap || {}, catChoice = opts.categoryMap || {};
-    const st = { rows: data.length, skippedNoTitle: 0, items: 0, held: 0, sold: 0, listed: 0, noBuy: 0, badDates: 0, soldNoDate: 0, qtyRows: 0, badMoney: 0, mixedCells: 0, moneyCells: 0, duplicates: 0, condSet: 0, condEmpty: 0 };
+    const st = { rows: data.length, skippedNoTitle: 0, items: 0, held: 0, sold: 0, listed: 0, noBuy: 0, badDates: 0, soldNoDate: 0, qtyRows: 0, badMoney: 0, mixedCells: 0, moneyCells: 0, duplicates: 0, condSet: 0, condEmpty: 0, soldNoPrice: 0, statusUnknown: 0 };
     const seen = {}, mixed = {};
     data.forEach(it => {
       const r = it.r, n = it.n;
@@ -266,10 +302,17 @@
         else { (newCats[kraw] = newCats[kraw] || []).push(n); if (!newKeys[key]) newKeys[key] = { key: slugKey(kraw, taken), name: kraw.slice(0, 40) }; p.category = newKeys[key].key; } }
       else p.category = null;
       // platform
-      const praw = text('platform'); p.platform = praw ? (PLAT_MAP[norm(praw)] || 'other') : null;
+      const praw = text('platform'); p.platform = praw ? platformOf(praw) : null;
       // status
-      if (p.sold_cents != null || soldOn) { p.status = 'sold'; if (!soldOn) { soldOn = p.bought_on; st.soldNoDate++; flags.push('sold_no_date'); } p.sold_on = soldOn; st.sold++; }
-      else if (p.list_cents != null || p.platform) { p.status = 'listed'; st.listed++; st.held += q || 0; }
+      // an explicit Status column wins; without one (or with a value we do not know) the old rule: a sale price/date = sold, a list price/platform = listed
+      const sraw = text('status'), sv = sraw ? statusOf(sraw) : null; if (sraw && !sv) st.statusUnknown++;
+      if (sv === 'sold' || (!sv && (p.sold_cents != null || soldOn))) {
+        p.status = 'sold';
+        if (!soldOn) { soldOn = p.bought_on || now; st.soldNoDate++; flags.push('sold_no_date'); }   // the server refuses a sold row without sold_on (066): never send null
+        p.sold_on = soldOn; st.sold++;
+        if (p.sold_cents == null) st.soldNoPrice++;   // counted for the review screen; no per-row flag (the UI has no label for one, and a date without a price is a valid sale)
+      }
+      else if (sv === 'listed' || (!sv && (p.list_cents != null || p.platform))) { p.status = 'listed'; st.listed++; st.held += q || 0; }
       else { p.status = 'stock'; st.held += q || 0; }
       if (p.status === 'sold') { /* sold rows keep platform; fee/ship stay */ } else { p.fee_cents = null; p.ship_paid_cents = null; }
       st.items += q || 0;
