@@ -571,9 +571,9 @@ body {
   .snypd-topbar__plan { display: none; }
   .snypd-topbar__streak { display: none !important; }
   #topbar-founding { display: none !important; }
-  /* Ledger 2a-2e's bottom bar, built for real at this breakpoint - see the
-     nav markup right after </header> for why Market Insights isn't a 4th
-     tab here. dash-wrap gets bottom padding so the bar never covers the
+  /* Ledger 2a-2e's bottom bar, built for real at this breakpoint (Market is
+     its second tab since 11 Nov 2026, see the nav markup right after
+     </header>). dash-wrap gets bottom padding so the bar never covers the
      last card/button on a long page. 148px, not 72px: the floating
      .filter-pill sits fixed at bottom:84px with its own ~43px height, so
      its top edge lands ~127px above the viewport bottom - well above the
@@ -1876,15 +1876,17 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <span class="snypd-topbar__plan" data-snypd-plan="">PLAN — ELITE</span>
   </div>
 </header>
-<!-- Ledger 2a-2e: mobile's own bottom tab bar, Feed/History/Profile (no
-     Market Insights - the mockup never shows a 4th bottom tab; it stays
-     reachable via the top row, which is still fully present on mobile,
-     just secondary now). Desktop never sees this - display:none until the
+<!-- Ledger 2a-2e: mobile's own bottom tab bar, Feed/Market/History/Profile.
+     Market joined on 11 Nov 2026: it was only in the top row, which scrolls
+     sideways on a phone, and a 25 h access log showed ~243 dashboard loads
+     against 11 Market board loads. Stock takes History's place when it is
+     on, so the bar never has more than four tabs. Desktop never sees this - display:none until the
      767px breakpoint. switchView() is the single source of truth for which
      button is active, same function the top tabs and the profile-trigger
      already both call. -->
 <nav class="snypd-bottombar" id="bottombar">
   <button class="bottombar-tab active" type="button" data-view="feed">Feed</button>
+  <button class="bottombar-tab" type="button" data-view="market">Market</button>
   <button class="bottombar-tab" type="button" data-view="history">History</button>
   <button class="bottombar-tab" type="button" data-view="stock" id="bottombar-tab-stock" style="display:none">Stock</button>
   <button class="bottombar-tab" type="button" data-view="profile">Profile</button>
