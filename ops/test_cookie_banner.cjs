@@ -126,6 +126,17 @@ const PHONE_MAX_FR = 190;   // French runs one line longer
     await ctx.close();
   }
 
+  // ---- wide screens, French: the two choices are the same size too (they were sized by their words) -----------
+  for (const w of [820, 1440]) {
+    const { page, ctx } = await open('/fr/bot-vinted', { width: w, height: 900 });
+    await wait(500);
+    const b = await bar(page);
+    eq([b.reject.text, b.accept.text], ['TOUT REFUSER', 'TOUT ACCEPTER'], 'French ' + w + ': buttons are in French');
+    ok(sameLook(b.reject, b.accept), 'French ' + w + ': Reject and Accept equal ' + JSON.stringify([b.reject.w, b.accept.w]));
+    ok(b.sw <= b.vw, 'French ' + w + ': no sideways scroll');
+    await ctx.close();
+  }
+
   // ---- behaviour: reject, accept, settings ------------------------------------------------------------------
   {
     const { page, ctx } = await open('/', { width: 390, height: 844 });

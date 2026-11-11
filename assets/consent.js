@@ -204,6 +204,8 @@
        Under 600 px it is one short sentence and one row: Reject and Accept the same size, Settings beside them
        (also under 360 px, with smaller type: a second row cost 45 px on the smallest phones). */
     '.snc-short{display:none;}' +
+    /* wide screens: the two choices share one width whatever the language (French Accept was the wider one) */
+    '@media (min-width:700px){.snc-btns .snc-btn{min-width:154px;}}' +
     '@media (max-width:599.98px){.snc-bar{padding:10px 16px calc(10px + env(safe-area-inset-bottom));}' +
       '.snc-in{gap:8px;}.snc-txt{flex:1 1 100%;font-size:12px;line-height:1.5;}' +
       '.snc-long{display:none;}.snc-short{display:inline;}' +
