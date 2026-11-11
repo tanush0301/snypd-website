@@ -200,6 +200,17 @@
     '.snc-sw input:disabled+span{opacity:.6;}' +
     '.snc-ft{display:flex;flex-wrap:wrap;gap:10px;padding:16px 22px 20px;}' +
     '@media (max-width:699.98px){.snc-btns{width:100%;}.snc-btns .snc-btn{flex:1 1 0;white-space:nowrap;}.snc-btns .snc-link{flex:1 1 100%;text-align:left;min-height:40px;padding:8px 0;}}' +
+    /* Phones (11 Nov 2026): the bar took about 260 px of an 844 px screen and covered the page's main button.
+       Under 600 px it is one short sentence and one row: Reject and Accept the same size, Settings beside them. */
+    '.snc-short{display:none;}' +
+    '@media (max-width:599.98px){.snc-bar{padding:10px 16px calc(10px + env(safe-area-inset-bottom));}' +
+      '.snc-in{gap:8px;}.snc-txt{flex:1 1 100%;font-size:12px;line-height:1.5;}' +
+      '.snc-long{display:none;}.snc-short{display:inline;}' +
+      '.snc-btns{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;}' +
+      '.snc-btns .snc-btn{min-height:44px;padding:10px 6px;letter-spacing:.04em;white-space:nowrap;}' +
+      '.snc-btns .snc-link{min-height:44px;padding:10px 2px 10px 6px;letter-spacing:.04em;text-align:right;white-space:nowrap;}}' +
+    '@media (max-width:349.98px){.snc-btns{grid-template-columns:1fr 1fr;}' +
+      '.snc-btns .snc-link{grid-column:1 / -1;text-align:left;min-height:36px;padding:6px 0;}}' +
     '@media (prefers-reduced-motion:reduce){.snc-bar,.snc-ov{transition:none;}}';
 
   var bar = null, ov = null, lastFocus = null;
@@ -227,8 +238,9 @@
     bar.setAttribute('aria-label', 'Cookie choices');
     bar.innerHTML =
       '<div class="snc-in">' +
-        '<p class="snc-txt"><b>Cookies.</b> SNYPD only stores what it needs to keep you signed in. ' +
-        'With your OK we also use Google Analytics to see how the site is used, and the Whop pixel and Meta Pixel to measure sign-ups from ads and partner links. ' +
+        '<p class="snc-txt"><b>Cookies.</b> <span class="snc-long">SNYPD only stores what it needs to keep you signed in. ' +
+        'With your OK we also use Google Analytics to see how the site is used, and the Whop pixel and Meta Pixel to measure sign-ups from ads and partner links.</span>' +
+        '<span class="snc-short">We only store what keeps you signed in. With your OK we also measure visits and sign-ups (Google, Whop, Meta).</span> ' +
         '<a href="/cookies">Cookie policy</a></p>' +
         '<div class="snc-btns">' +
           '<button type="button" class="snc-btn" data-snc="reject">REJECT ALL</button>' +
@@ -245,12 +257,14 @@
       else if (a === 'settings') openSettings();
     });
     document.body.appendChild(bar);
+    /* Remember the page's own padding BEFORE making room, so closing the bar gives it back (it used to
+       keep the bar's height as a blank strip under the footer until the next page load). */
+    prevPad = document.body.style.paddingBottom;
     // Room under the page so the bar never hides the last buttons (it covered
     // CREATE ACCOUNT on /signup at 390px, 2026-10-07).
     document.body.style.paddingBottom = bar.offsetHeight + 'px';
     /* The bar is fixed to the bottom, so without room for it the end of the
        page - including the footer's Privacy/Cookies links - sits under it. */
-    prevPad = document.body.style.paddingBottom;
     padForBar();
     window.addEventListener('resize', padForBar);
   }

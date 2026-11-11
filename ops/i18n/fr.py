@@ -132,6 +132,8 @@ FR = {
     'Cookies.': 'Cookies.',
     'SNYPD only stores what it needs to keep you signed in. With your OK we also use Google Analytics to see how the site is used, and the Whop pixel and Meta Pixel to measure sign-ups from ads and partner links.':
         'SNYPD n’enregistre que ce qu’il faut pour te garder connecté. Avec ton accord, on utilise aussi Google Analytics pour voir comment le site est utilisé, ainsi que le pixel Whop et le pixel Meta pour mesurer les inscriptions venues des pubs et des liens partenaires.',
+    'We only store what keeps you signed in. With your OK we also measure visits and sign-ups (Google, Whop, Meta).':
+        'On n’enregistre que ce qu’il faut pour te garder connecté. Avec ton accord, on mesure aussi les visites et les inscriptions (Google, Whop, Meta).',
     'Cookie policy': 'Politique cookies',
     'REJECT ALL': 'TOUT REFUSER',
     'ACCEPT ALL': 'TOUT ACCEPTER',
