@@ -31,6 +31,7 @@ def render():
         ('Resale profit calculator', '/vinted-profit-calculator'),
         ('Vinted reselling tools by job (sourcing, pricing, crosslisting, bookkeeping)', '/best-vinted-reselling-tools'),
         ('How to make money on Vinted: selling vs reselling', '/how-to-make-money-on-vinted'),
+        ('What Vinted resellers hunt: brands and models SNYPD users watch, with the max price they set (monthly)', '/vinted-most-hunted'),
         ('Search link builder', '/vinted-search-builder'),
         ('Phone alert setup and local device test', '/vinted-alerts-on-your-phone'),
         ('German price checker', '/de/vinted-preis-checker'),
