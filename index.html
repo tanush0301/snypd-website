@@ -398,6 +398,7 @@
     .hp-qs-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .hp-qs-row { flex: 1 1 auto; min-width: 0; }
     .hp-qs input { padding: 0 12px; }
+    .hp-qs input::placeholder { font-size: 14px; }
     .hp-qs .hp-btn { width: auto; flex: 0 0 auto; min-height: 52px; padding: 0 14px; }
     .go-l { display: none; } .go-s { display: inline; }
   }
@@ -931,7 +932,7 @@
     var form = $('qs'), words = $('qs-words'), max = $('qs-max'), go = $('qs-go');
     if (!form || !words || !go) return;
     // On a phone the box is one row (field + button) and its label is for screen readers only: the field says it.
-    if (isMobile()) words.setAttribute('placeholder', 'What are you hunting?');
+    if (isMobile()) words.setAttribute('placeholder', 'e.g. nike dunk');
     function target() {
       var w = words.value.trim().replace(/\s+/g, ' ').slice(0, 80);
       var m = max ? Math.round(Number(max.value)) : 0;

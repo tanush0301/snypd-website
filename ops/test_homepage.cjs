@@ -155,6 +155,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(d0, 'the item written into the HTML exists in the price index');
     eq([stat('pc-lo'), stat('pc-mid'), stat('pc-hi')], [euro(d0.p25), euro(d0.typical), euro(d0.p75)], 'HTML numbers of the first item equal the index (no script needed)');
     eq(stat('pc-pay'), euro(Math.round(d0.typical * 0.6)), 'HTML "pay at most" is the typical price less the 40% margin');
+    // the alert's limit: the lower of the quick-sale price and "pay at most", in whole euros (never below 1)
+    const cap = (i, m) => Math.max(1, Math.floor(Math.min(i.p25, Math.round(i.typical * (100 - m) / 100)) / 100));
+    const a0 = html.match(/id="pc-alert" href="\/signup\?hunt=[a-z0-9+]+&amp;max=(\d+)">ALERT ME UNDER <span id="pc-alert-p">&euro;(\d+)</) || [];
+    eq([a0[1], a0[2]], [String(cap(d0, 40)), String(cap(d0, 40))], 'HTML alert button: link and label carry min(quick sale, pay at most) at the 40% margin');
 
     const { page, ctx } = await open('');
     await page.waitForFunction(() => !document.getElementById('pc-item').disabled, { timeout: 8000 });
@@ -168,18 +172,28 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     eq([r.name, r.lo, r.mid, r.hi], [it.name.en, euro(it.p25), euro(it.typical), euro(it.p75)], 'picking an item shows its quick-sale, typical and patient price');
     eq(r.pay, euro(Math.round(it.typical * 0.6)), 'pay at most = typical less 40%');
     ok(r.meta.includes(it.n.toLocaleString('en-US') + ' listings') && /vinted\.be/.test(r.meta) && /2026/.test(r.meta), 'it says how many listings, where and when: ' + r.meta);
-    eq(r.alert, '/signup?hunt=adidas+samba&max=' + Math.floor(it.p25 / 100), 'the alert button carries the search and the quick-sale price as the limit');
-    ok(/ALERT ME UNDER €\d/.test(r.alertText), 'the button reads with a space before the price: ' + r.alertText);
+    eq(r.alert, '/signup?hunt=adidas+samba&max=' + cap(it, 40), 'the alert button carries the search and min(quick sale, pay at most) as the limit');
+    eq(r.alertText, 'ALERT ME UNDER €' + cap(it, 40), 'the button names the same limit, with a space before the price');
+    ok(cap(it, 40) * 100 <= Math.min(it.p25, Math.round(it.typical * 0.6)), 'the limit is never above the quick-sale price or above "pay at most"');
+    // a small margin: "pay at most" is above the quick-sale price, so the quick-sale price is the limit
+    await page.$eval('#pc-margin', e => { e.value = '0'; e.dispatchEvent(new Event('input', { bubbles: true })); }); await wait(700);
+    r = await read();
+    eq([r.alert, r.alertText], ['/signup?hunt=adidas+samba&max=' + Math.floor(it.p25 / 100), 'ALERT ME UNDER €' + Math.floor(it.p25 / 100)], 'margin 0: the limit is the quick-sale price');
     eq(r.more, it.url.en, 'the second button opens that item in the price guide');
     await page.$eval('#pc-margin', e => { e.value = '50'; e.dispatchEvent(new Event('input', { bubbles: true })); }); await wait(700);
-    eq((await read()).pay, euro(Math.round(it.typical * 0.5)), 'changing the margin changes "pay at most"');
+    r = await read();
+    eq(r.pay, euro(Math.round(it.typical * 0.5)), 'changing the margin changes "pay at most"');
+    eq([r.alert, r.alertText], ['/signup?hunt=adidas+samba&max=' + cap(it, 50), 'ALERT ME UNDER €' + cap(it, 50)], 'changing the margin changes the alert limit too');
+    ok(cap(it, 50) < Math.floor(it.p25 / 100), 'at a 50% margin "pay at most" is the lower one for this item (the case the rule exists for)');
     await page.$eval('#pc-margin', e => { e.value = '999'; e.dispatchEvent(new Event('input', { bubbles: true })); }); await wait(700);
-    eq((await read()).pay, euro(Math.round(it.typical * 0.1)), 'a silly margin is held at 90%');
+    r = await read();
+    eq(r.pay, euro(Math.round(it.typical * 0.1)), 'a silly margin is held at 90%');
+    eq(r.alert, '/signup?hunt=adidas+samba&max=' + cap(it, 90), 'and the alert limit follows it, never below 1');
     await page.click('#pc-chips button[data-id="nike-dunk-low"]'); await wait(700);
     eq((await read()).name, byId['nike-dunk-low'].name.en, 'the quick-pick buttons work');
     await page.click('#pc-alert');
     const u = await went(page);
-    eq(params(u), { hunt: 'nike dunk low', max: String(Math.floor(byId['nike-dunk-low'].p25 / 100)), from: 'home', entry_basis: 'nav-v1' }, 'the alert button goes to sign-up with the search, the limit and the entry-page tag');
+    eq(params(u), { hunt: 'nike dunk low', max: String(cap(byId['nike-dunk-low'], 90)), from: 'home', entry_basis: 'nav-v1' }, 'the alert button goes to sign-up with the search, the limit and the entry-page tag');
     await ctx.close();
   }
 
@@ -214,7 +228,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   }
 
   // ---- layout: no sideways scroll; on a phone the button is on the first screen ---------------------------------
-  for (const [name, vp] of [['phone', { width: 390, height: 844, isMobile: true, hasTouch: true }], ['small phone', { width: 320, height: 640, isMobile: true, hasTouch: true }], ['tablet', { width: 820, height: 1100 }], ['desktop', { width: 1440, height: 900 }]]) {
+  for (const [name, vp] of [['phone', { width: 390, height: 844, isMobile: true, hasTouch: true }], ['small phone', { width: 320, height: 568, isMobile: true, hasTouch: true }], ['tablet', { width: 820, height: 1100 }], ['desktop', { width: 1440, height: 900 }]]) {
     const { page, ctx } = await open('', vp);
     const m = await page.evaluate(() => {
       const r = id => document.getElementById(id).getBoundingClientRect();
@@ -227,25 +241,42 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ctx.close();
   }
   // ---- v8: a phone's first screen WITH the cookie bar: headline, sample alert and the main button all show ------
-  {
-    const { page, ctx } = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
+  // 320 x 568 is the smallest phone still in use; 390 x 664 is what Safari shows on an 844 px iPhone with its bars.
+  for (const [w, h] of [[320, 568], [360, 640], [375, 667], [390, 664], [390, 844], [412, 780]]) {
+    const name = 'phone ' + w + 'x' + h;
+    const { page, ctx } = await open('', { width: w, height: h, isMobile: true, hasTouch: true });
     await page.waitForSelector('.snc-bar', { timeout: 6000 }); await wait(300);
     const m = await page.evaluate(() => {
       const r = s => document.querySelector(s).getBoundingClientRect(), shown = s => getComputedStyle(document.querySelector(s)).display !== 'none';
+      const nav = document.getElementById('nav-start'), set = document.querySelector('.snc-bar [data-snc="settings"]').getBoundingClientRect(), rej = document.querySelector('.snc-bar [data-snc="reject"]').getBoundingClientRect();
       return { bar: Math.round(r('.snc-bar').top), ih: innerHeight, h1: Math.round(r('.hp-h1').top), sub: Math.round(r('.hp-sub').bottom), aTop: Math.round(r('#hero-alert-phone').top), aBot: Math.round(r('#hero-alert-phone').bottom),
-        go: Math.round(r('#qs-go').bottom), text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: shown('#hero-ex') };
+        goTop: Math.round(r('#qs-go').top), go: Math.round(r('#qs-go').bottom), goH: Math.round(r('#qs-go').height), field: Math.round(r('#qs-words').height), fieldW: Math.round(r('#qs-words').width),
+        text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: shown('#hero-ex'),
+        navText: nav.innerText.trim(), navH: Math.round(nav.getBoundingClientRect().height), navLine: Math.round(parseFloat(getComputedStyle(nav).lineHeight) || 0),
+        subText: document.querySelector('.hp-sub').innerText.trim(), goText: document.getElementById('qs-go').innerText.trim(),
+        settingsOnRow: Math.abs((set.top + set.height / 2) - (rej.top + rej.height / 2)) <= 2, sw: document.documentElement.scrollWidth, iw: innerWidth };
     });
-    ok(m.bar < m.ih && m.ih - m.bar <= 170, 'phone: the cookie bar is showing and compact (' + (m.ih - m.bar) + ' px)');
-    ok(m.h1 >= 0 && m.sub <= m.aTop, 'phone: headline and its line come first, then the sample alert');
-    ok(m.aTop >= 0 && m.aBot <= m.bar, 'phone: the sample alert is on the first screen above the cookie bar (' + m.aTop + '-' + m.aBot + ' of ' + m.bar + ')');
-    ok(m.go <= m.bar, 'phone: the main button is on the first screen above the cookie bar (' + m.go + ' of ' + m.bar + ')');
-    ok(/SAMPLE/.test(m.text) && /Cheaper than 76% of this week's finds . Jordan 1 Low Travis Scott . €180/.test(m.text), 'phone: the alert is the Travis Scott sample with its price line: ' + m.text);
-    eq([m.main, m.max, m.ex], [false, false, true], 'phone: one copy of the alert, no max-price field, the explanation still below');
+    ok(m.bar < m.ih && m.ih - m.bar <= 170, name + ': the cookie bar is showing and compact (' + (m.ih - m.bar) + ' px)');
+    ok(m.settingsOnRow, name + ': the bar keeps Settings on the button row');
+    ok(m.h1 >= 0 && m.sub <= m.aTop, name + ': headline and its line come first, then the sample alert');
+    ok(m.aTop >= 0 && m.aBot <= m.bar, name + ': the sample alert is on the first screen above the cookie bar (' + m.aTop + '-' + m.aBot + ' of ' + m.bar + ')');
+    ok(m.goTop >= m.aBot && m.go <= m.bar, name + ': the main button is on the first screen above the cookie bar (' + m.go + ' of ' + m.bar + ')');
+    ok(/SAMPLE/.test(m.text) && /Cheaper than 76% of this week's finds . Jordan 1 Low Travis Scott . €180/.test(m.text), name + ': the alert is the Travis Scott sample with its price line: ' + m.text);
+    ok(/busy searches/i.test(m.subText) && /price rating/.test(m.subText), name + ': the line under the headline still limits the rating to busy searches: ' + m.subText);
+    eq([m.main, m.max, m.ex], [false, false, true], name + ': one copy of the alert, no max-price field, the explanation still below');
+    ok(m.goH >= 44 && m.field >= 44 && m.fieldW >= 110, name + ': the field and the button are big enough to use (' + [m.fieldW, m.field, m.goH] + ')');
+    ok(m.sw <= m.iw + 1, name + ': no sideways scroll');
+    eq(m.navText, w < 360 ? 'START' : 'START FREE', name + ': header button label');
+    ok(m.navH <= 50, name + ': the header button is one line (' + m.navH + ' px)');
+    eq(m.goText, 'WATCH IT', name + ': the box is one row with a short button');
     await page.type('#qs-words', 'nike tech fleece');
-    eq(await page.$eval('#qs-go', a => a.getAttribute('href')), '/signup?hunt=nike+tech+fleece', 'phone: the words alone are carried to sign-up');
+    eq(await page.$eval('#qs-go', a => a.getAttribute('href')), '/signup?hunt=nike+tech+fleece', name + ': the words alone are carried to sign-up');
     await ctx.close();
+  }
+  {
     const d = await open('', { width: 1440, height: 900 });
     eq(await d.page.evaluate(() => ['#hero-alert-phone', '#hero-alert-main', '#qs-max'].map(s => getComputedStyle(document.querySelector(s)).display !== 'none')), [false, true, true], 'desktop: claim left, proof right, as before');
+    eq(await d.page.evaluate(() => [document.getElementById('nav-start').innerText.trim(), document.getElementById('qs-go').innerText.trim(), document.querySelector('.hp-sub').innerText.includes('You buy on Vinted yourself.')]), ['START FREE', 'WATCH IT FOR ME', true], 'desktop: full labels and the full line');
     await d.ctx.close();
   }
 
