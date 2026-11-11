@@ -34,6 +34,7 @@ const en = {
   'imp.resume': 'Resume', 'imp.failed': 'The import stopped after {done} items. Nothing is lost: resume, or undo this import.', 'imp.again': 'Import another file',
   // one-time notice in the Stock tab (it replaces History; claims are mirrored in by migration 067). Kept here so the generator merges it with the rest.
   'welcome.title': 'History is now Stock.', 'welcome.body': 'Items you claimed through SNYPD are already in here: check their prices once. Add the rest by hand or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
+  'welcome.body.new': 'Track what you buy and sell in one place: add your first item, or import a spreadsheet, and Stock shows what you hold, what sold and your profit.',
   'welcome.ok': 'Got it'
 };
 const fr = {
@@ -70,6 +71,7 @@ const fr = {
   'imp.undo': 'Annuler cet import', 'imp.undo.confirm': 'Retirer les {n} articles de cet import ? Les modifications faites depuis sont perdues.', 'imp.undone': 'Import retiré',
   'imp.resume': 'Reprendre', 'imp.failed': 'L’import s’est arrêté après {done} articles. Rien n’est perdu : reprends, ou annule cet import.', 'imp.again': 'Importer un autre fichier',
   'welcome.title': 'L’historique est maintenant le Stock.', 'welcome.body': 'Les articles que tu as réclamés via SNYPD sont déjà ici : vérifie leurs prix une fois. Ajoute le reste à la main ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
+  'welcome.body.new': 'Suis ce que tu achètes et vends au même endroit : ajoute ton premier article, ou importe un tableur, et le Stock montre ce que tu as, ce qui est vendu et ton bénéfice.',
   'welcome.ok': 'Compris'
 };
 module.exports = { en, fr };

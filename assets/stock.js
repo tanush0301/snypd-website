@@ -119,8 +119,13 @@
     var seen = false; try { seen = localStorage.getItem(WELCOME_KEY) === '1'; } catch (e) {}
     var replaces = !!(window.SNYPD && window.SNYPD.stockReplacesHistory && window.SNYPD.stockReplacesHistory());
     if (seen || !replaces) { el.innerHTML = ''; return; }
-    el.innerHTML = '<div class="st-note st-welcome" role="status"><b>' + esc(T('welcome.title')) + '</b> ' + esc(T('welcome.body')) +
-      ' <button type="button" class="st-btn st-tert" data-act="welcome-ok">' + esc(T('welcome.ok')) + '</button></div>';
+    // only accounts that really have mirrored claims (src 'SNYPD alert', migration 067) are told so; any failure = the neutral text, never a false claim
+    var draw = function (hasClaims) {
+      var cur = $('#st-welcome'); if (!cur) return;
+      cur.innerHTML = '<div class="st-note st-welcome" role="status"><b>' + esc(T('welcome.title')) + '</b> ' + esc(T(hasClaims ? 'welcome.body' : 'welcome.body.new')) +
+        ' <button type="button" class="st-btn st-tert" data-act="welcome-ok">' + esc(T('welcome.ok')) + '</button></div>';
+    };
+    S.api.itemsPage({ src: 'SNYPD alert' }, 1).then(function (pg) { draw(!!(pg && pg.total > 0)); }).catch(function () { draw(false); });
   }
   function dismissWelcome() { try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {} var el = $('#st-welcome'); if (el) el.innerHTML = ''; }
   var CHIP_KEY ={ held: 'held', '': 'all', stock: 'in_stock', listed: 'listed', reserved: 'reserved', sold: 'sold', returned: 'returned', written_off: 'written_off', old: 'old' };
