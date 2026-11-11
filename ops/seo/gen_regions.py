@@ -246,7 +246,10 @@ def home_demo():
     v = pg.V[it['slug']]
     lo, mid, hi = v['range_cents']['low'], v['typical_cents'], v['range_cents']['high']
     pay = int(round(mid * (100 - HOME_DEMO_MARGIN) / 100.0))
-    alert = '/signup?hunt=%s&amp;max=%d' % (it['query'].replace(' ', '+'), max(1, lo // 100))
+    # The alert's limit is the lower of the quick-sale price and "pay at most" (whole euros); the page's script keeps
+    # it in step with the margin field.
+    cap = max(1, min(lo, pay) // 100)
+    alert = '/signup?hunt=%s&amp;max=%d' % (it['query'].replace(' ', '+'), cap)
     return (
         '\r\n          <div class="hp-pc-res" id="pc-res" data-id="%s" data-n-items="%d">\r\n'
         '            <div class="hp-pc-name"><b id="pc-name">%s</b><span id="pc-meta">%s listings &middot; vinted.be &middot; %s</span></div>\r\n'
@@ -262,7 +265,7 @@ def home_demo():
         '          </div>\r\n          '
         % (it['slug'], len(pg.PUB), html.escape(it['name']), num(v['sample_size'], 'en'), pg.window('en'),
            money(lo, 'en'), money(mid, 'en'), money(hi, 'en'), HOME_DEMO_MARGIN, money(pay, 'en'),
-           alert, money((lo // 100) * 100, 'en'), pg.item_url(it, 'en')))
+           alert, money(cap * 100, 'en'), pg.item_url(it, 'en')))
 
 
 def home_market():

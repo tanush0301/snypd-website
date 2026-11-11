@@ -382,11 +382,39 @@
     .hp-chart-tiles { display: none; }
     .hp-sec > .hp-wrap { padding-top: 38px; padding-bottom: 38px; gap: 20px; }
   }
-  @media (max-width: 339.98px) {
-    /* very narrow phones: keep the button on the first screen */
+
+  /* Phones, first screen (v8 fix, 11 Nov 2026). A real phone browser shows less than the screen's height (about
+     390 x 664 on an 844 px iPhone with its bars), and the cookie bar takes 127 px of that on a first visit. So on
+     every phone the hero is compact: no eyebrow, the alert without its title line, the search box as one row.
+     Width rules only: a height rule would flip the layout when the browser's bars slide away. */
+  .sub-s, .go-s, .nav-s { display: none; }
+  #nav-start { white-space: nowrap; }
+  @media (max-width: 699.98px) {
+    .hp-hero-in { padding: 10px 10px 32px; }
+    .hp-hero-card { padding: 16px 16px 20px; gap: 12px; }
     .hp-hero-card .hp-eyebrow { display: none; }
-    #hero-alert-phone { grid-template-columns: minmax(0, 1fr); }
+    #hero-alert-phone .hp-alert-title { display: none; }
+    .hp-qs { flex-direction: row; align-items: stretch; gap: 8px; padding: 10px; }
+    .hp-qs-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .hp-qs-row { flex: 1 1 auto; min-width: 0; }
+    .hp-qs input { padding: 0 12px; }
+    .hp-qs .hp-btn { width: auto; flex: 0 0 auto; min-height: 52px; padding: 0 14px; }
+    .go-l { display: none; } .go-s { display: inline; }
+  }
+  /* Under 360 px (320 x 568 is the smallest phone still in use): shorter header button, smaller type, shorter line. */
+  @media (max-width: 359.98px) {
+    .nav-l { display: none; } .nav-s { display: inline; }
+    #site-nav-inner { padding: 4px 12px !important; }
+    .hp-hero-in { padding: 8px 8px 28px; }
+    .hp-hero-card { padding: 12px 14px 16px; gap: 9px; }
+    .hp-h1 { font-size: 28px; }
+    .hp-sub { font-size: 13.5px; line-height: 1.45; }
+    .sub-l { display: none; } .sub-s { display: inline; }
+    #hero-alert-phone { grid-template-columns: minmax(0, 1fr); padding: 9px 12px; }
     #hero-alert-phone img { display: none; }
+    .hp-qs { padding: 8px; }
+    .hp-qs input, .hp-qs .hp-btn { min-height: 48px; }
+    .hp-qs .hp-btn { padding: 0 12px; }
   }
 </style>
 
@@ -485,7 +513,7 @@
         </div>
         <a class="dc-desk" href="/login" style="font-size:12px;letter-spacing:.1em;color:#8B9094;padding:14px 10px;">LOG IN</a>
       <span class="dc-mob" style="flex:1;"></span>
-      <a href="/signup" style="font-size:12px;letter-spacing:.1em;color:#FFFFFF;background:#A200FF;padding:14px 16px;">START FREE</a>
+      <a href="/signup" style="font-size:12px;letter-spacing:.1em;color:#FFFFFF;background:#A200FF;padding:14px 16px;" id="nav-start"><span class="nav-l">START FREE</span><span class="nav-s">START</span></a>
         <button type="button" id="menu-btn" class="dc-mob" aria-expanded="false" aria-controls="mobile-menu" style="min-width:64px;min-height:46px;background:#141416;border:1px solid #26262A;color:#E8EAEB;font-size:12px;letter-spacing:.1em;padding:0 12px;cursor:pointer;">MENU</button>
     </div>
       <nav id="mobile-menu" class="dc-mob" hidden aria-label="Menu" style="border-top:1px solid #1D1D20;background:#0A0A0B;display:flex;flex-direction:column;">
@@ -503,7 +531,7 @@
       <div class="hp-hero-card">
         <span class="hp-eyebrow mint">VINTED ALERTS + PRICE CHECK &middot; 26 SITES</span>
         <h1 class="hp-h1">Vinted alerts that tell you <em>if the price is good.</em></h1>
-        <p class="hp-sub">SNYPD checks your Vinted searches about once a minute. On busy searches, new finds come with a price rating.<span class="hp-wide"> You buy on Vinted yourself.</span></p>
+        <p class="hp-sub"><span class="sub-l">SNYPD checks your Vinted searches about once a minute. On busy searches, new finds come with a price rating.</span><span class="sub-s">Checks your Vinted searches about once a minute. Busy searches get a price rating.</span><span class="hp-wide"> You buy on Vinted yourself.</span></p>
         <div class="hp-alert big hp-phone" id="hero-alert-phone" aria-hidden="true">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
@@ -518,7 +546,7 @@
             <input id="qs-words" name="hunt" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="e.g. jordan 1 travis scott">
             <input id="qs-max" name="max" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="go" placeholder="Max price" aria-label="Maximum price (optional)">
           </div>
-          <a id="qs-go" class="hp-btn" href="/signup">WATCH IT FOR ME</a>
+          <a id="qs-go" class="hp-btn" href="/signup"><span class="go-l">WATCH IT FOR ME</span><span class="go-s">WATCH IT</span></a>
           <p class="hp-qs-note">Free account, no card. Have a Vinted link with your own filters? Paste it after sign-up.</p>
         </form>
         <ul class="hp-checks">
@@ -611,7 +639,7 @@
               <div><span class="k">PATIENT</span><span class="v" id="pc-hi">&euro;50</span><span class="d">a quarter of listings ask more</span></div>
             </div>
             <div class="hp-pc-pay"><label for="pc-margin">Your margin</label><input id="pc-margin" type="number" inputmode="numeric" min="0" max="90" step="5" value="40"><span>%</span><span class="arrow">&rarr;</span><span class="out">Pay at most <b id="pc-pay">&euro;15.60</b></span></div>
-            <div class="hp-pc-go"><a class="hp-btn" id="pc-alert" href="/signup?hunt=nike+dunk+low&amp;max=17">ALERT ME UNDER <span id="pc-alert-p">&euro;17</span></a><a class="hp-btn ghost" id="pc-more" href="/vinted-price-guide/nike-dunk-low">PRICES BY CONDITION</a></div>
+            <div class="hp-pc-go"><a class="hp-btn" id="pc-alert" href="/signup?hunt=nike+dunk+low&amp;max=15">ALERT ME UNDER <span id="pc-alert-p">&euro;15</span></a><a class="hp-btn ghost" id="pc-more" href="/vinted-price-guide/nike-dunk-low">PRICES BY CONDITION</a></div>
           </div>
           <!--/plans:home-demo-->
 <!--plans:home-data-->
@@ -902,6 +930,8 @@
   function setupQuickStart() {
     var form = $('qs'), words = $('qs-words'), max = $('qs-max'), go = $('qs-go');
     if (!form || !words || !go) return;
+    // On a phone the box is one row (field + button) and its label is for screen readers only: the field says it.
+    if (isMobile()) words.setAttribute('placeholder', 'What are you hunting?');
     function target() {
       var w = words.value.trim().replace(/\s+/g, ' ').slice(0, 80);
       var m = max ? Math.round(Number(max.value)) : 0;
@@ -964,10 +994,18 @@
     var box = $('pc'), res = $('pc-res'), sel = $('pc-item'), chips = $('pc-chips'), margin = $('pc-margin');
     if (!box || !res || !sel || !margin || !window.fetch) return;
     var items = [], cur = null, win = '', picked = {};
+    // The alert's price limit is the lower of the quick-sale price and "pay at most", in whole euros, so the alert
+    // never asks for more than the margin allows. Both follow the margin field.
     function pay() {
       if (!cur) return;
       var m = Math.max(0, Math.min(90, Math.round(Number(margin.value)) || 0));
-      setMoney($('pc-pay'), Math.round(cur.typical * (100 - m) / 100));
+      var most = Math.round(cur.typical * (100 - m) / 100);
+      setMoney($('pc-pay'), most);
+      var cap = Math.max(1, Math.floor(Math.min(cur.p25, most) / 100));
+      $('pc-alert-p').textContent = money(cap * 100);
+      var u = new URL('/signup', location.origin);
+      u.searchParams.set('hunt', cur.q); u.searchParams.set('max', String(cap));
+      $('pc-alert').setAttribute('href', withRef(u.pathname + u.search));
     }
     function show(it, byUser) {
       cur = it;
@@ -975,11 +1013,6 @@
       $('pc-meta').textContent = String(it.n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' listings · vinted.be' + (win ? ' · ' + win : '');
       setMoney($('pc-lo'), it.p25); setMoney($('pc-mid'), it.typical); setMoney($('pc-hi'), it.p75);
       pay();
-      var cap = Math.max(1, Math.floor(it.p25 / 100));
-      $('pc-alert-p').textContent = money(cap * 100);
-      var u = new URL('/signup', location.origin);
-      u.searchParams.set('hunt', it.q); u.searchParams.set('max', String(cap));
-      $('pc-alert').setAttribute('href', withRef(u.pathname + u.search));
       $('pc-more').setAttribute('href', it.url.en);
       res.setAttribute('data-id', it.id);
       if (sel.value !== it.id) sel.value = it.id;
