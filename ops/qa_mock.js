@@ -684,6 +684,28 @@
       try { body = JSON.parse(opts && opts.body || '{}'); } catch (e) {}
       var q = (body.q || '').toLowerCase();
 
+      // Trial price checks (11 Nov 2026): ?plan=free&trial=1 gets 10 checks in total, like the backend
+      // (market_trial.py). ?trial_used=N starts the count at N. A found price uses one; 'zzz_nomatch' is handed back.
+      if (PLAN === 'free' && params.get('trial') === '1') {
+        if (window.__mrTrialUsed == null) { window.__mrTrialUsed = Math.max(0, parseInt(params.get('trial_used') || '0', 10) || 0); }
+        if (window.__mrTrialUsed >= 10) {
+          return Promise.resolve(new Response(JSON.stringify({ detail: { error: 'trial_checks_used',
+            message: 'You have used your 10 trial price checks. Price checks are part of Pro and Elite.',
+            trial: { used: 10, limit: 10, remaining: 0 } } }), { status: 403 }));
+        }
+        var trUseful = q.indexOf('zzz_nomatch') === -1;
+        if (trUseful) { window.__mrTrialUsed += 1; }
+        var trSum = { used: window.__mrTrialUsed, limit: 10, remaining: 10 - window.__mrTrialUsed };
+        return Promise.resolve(new Response(JSON.stringify(trUseful ? {
+          query: q, sample_size: 240, distinct_sellers: 180, display_verdict: 'ok', confidence: 'high', provisional: false,
+          show_headline: true, typical_cents: 8500, range_cents: { low: 6500, high: 11000 }, by_condition: [], flags: [],
+          source: { site: 'vinted.be', market: 'EU', currency: 'EUR', window_days: 14 },
+          quota: { hour_remaining: 19, hour_limit: 20 }, trial: trSum
+        } : {
+          query: q, sample_size: 0, display_verdict: 'too_thin', show_headline: false, flags: [],
+          quota: { hour_remaining: 19, hour_limit: 20 }, trial: trSum
+        }), { status: 200 }));
+      }
       if (PLAN !== 'elite') {
         return Promise.resolve(new Response(JSON.stringify({ detail: 'elite_required' }), { status: 403 }));
       }
@@ -693,6 +715,21 @@
       if (q.indexOf('zzz_nomatch') !== -1) {
         return Promise.resolve(new Response(JSON.stringify({
           query: q, sample_size: 0, display_verdict: 'too_thin', show_headline: false, quota: { hour_remaining: 19, hour_limit: 20 },
+        }), { status: 200 }));
+      }
+      // 11 Nov 2026: 'trackq' = nothing found but tracking started; 'medq' = an ok price with a warning (confidence medium).
+      if (q.indexOf('trackq') !== -1) {
+        return Promise.resolve(new Response(JSON.stringify({
+          query: q, sample_size: 0, display_verdict: 'too_thin', show_headline: false, tracking: { tracked: true, reason: 'registered' },
+          quota: { hour_remaining: 19, hour_limit: 20 },
+        }), { status: 200 }));
+      }
+      if (q.indexOf('medq') !== -1) {
+        return Promise.resolve(new Response(JSON.stringify({
+          query: q, sample_size: 900, distinct_sellers: 400, display_verdict: 'ok', confidence: 'medium', provisional: false,
+          show_headline: true, typical_cents: 12900, range_cents: { low: 9000, high: 18000 }, by_condition: [],
+          flags: [{ code: 'price_skew_high', message: 'Prices here skew heavily to the high side.' }],
+          quota: { hour_remaining: 19, hour_limit: 20 },
         }), { status: 200 }));
       }
       // Forgiving search (Session 66): the backend says what it compared on and what it ignored. Mirrors the

@@ -378,6 +378,11 @@ FR = {
         'Astuce' + NB + ': ajoute SNYPD à ton écran d’accueil (Partager -> Sur l’écran d’accueil) pour que les alertes arrivent même Safari fermé.',
     'Add SNYPD to your Home Screen to get alerts.': 'Ajoute SNYPD à ton écran d’accueil pour recevoir les alertes.',
     'Alerts could not be set up on this device.': 'Impossible de configurer les alertes sur cet appareil.',
+    # Referral card on /account (migration 085)
+    'Invite friends': 'Invite des amis',
+    'Copy link': 'Copier le lien',
+    "When a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3 (up to 4 times). If they subscribe, you get 30% off a renewal. 5 paying friends = 1 free month.":
+        "Quand la recherche d'un ami trouve sa première annonce, il reçoit 2 jours de plus de recherche 24h/24 et toi 3 (jusqu'à 4 fois). S'il s'abonne, tu as 30" + NB + '% de réduction sur un renouvellement. 5 amis abonnés = 1 mois offert.',
     # ---------------------------------------------------------------- feedback questions (assets/feedback.js, outreach/47)
     'Quick question': 'Petite question',
     'Send': 'Envoyer',
@@ -456,6 +461,13 @@ _MONTHS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août'
 # (JS regex on the collapsed text, replacement with $1..). They run in order and each one sees the
 # previous result, so later ones can finish what an earlier one left in English.
 FR_PATTERNS = [
+    # referral card on /account (migration 085)
+    (r'^(\d+) joined · (\d+) found a listing · (\d+) subscribed · (\d+) days earned \((\d+) rewards left\)$',
+     '$1 inscrit(s) · $2 avec une annonce trouvée · $3 abonné(s) · $4 jours gagnés (encore $5 récompense(s))'),
+    (r'^24/7 bonus active until (.+)$', 'Bonus 24h/24 actif jusqu’au $1'),
+    (r'^Your discount codes? \(use at checkout\): (.+)$', 'Ton code de réduction (à utiliser au paiement)' + NB + ': $1'),
+    (r'^(\d+) discount waiting: it is applied to your next renewal automatically\.$',
+     '$1 réduction en attente' + NB + ': elle s’applique automatiquement à ton prochain renouvellement.'),
     # numbers and plans
     (r'^Last check: (.+)$', 'Dernière vérification' + NB + ': $1'),
     (r'^Plan: (FREE|SOLO|KICKSTART|PRO|ELITE)$', 'Plan' + NB + ': $1'),
@@ -552,7 +564,7 @@ FR.update({
     'Claimed item': 'Article acheté',
     'Sold for': 'Vendu à',
     'Mark sold': 'Marquer vendu',
-    'Nice find. Give a friend 2 extra days of 24/7 hunting, and get 7 days yourself when they save a hunt.': 'Belle trouvaille' + NB + '! Offre à un ami 2 jours de plus de recherche 24h/24, et reçois 7 jours quand il enregistre une recherche.',
+    "Nice find. Share your link: when a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3. If they subscribe, you get 30% off a renewal.": 'Belle trouvaille' + NB + '! Partage ton lien' + NB + ": quand la recherche d'un ami trouve sa première annonce, il reçoit 2 jours de plus de recherche 24h/24 et toi 3. S'il s'abonne, tu as 30" + NB + '% de réduction sur un renouvellement.',
     'Share': 'Partager',
     'Copied': 'Copié',
     'Remove': 'Retirer',
@@ -625,6 +637,16 @@ FR.update({
     'No listings matching': 'Aucune annonce pour',
     'yet. We are not going to invent a price -- if this is a real item, we have started watching it and data should build up.':
         'pour l’instant. On ne va pas inventer un prix -- si c’est un vrai article, on a commencé à le surveiller et les données vont arriver.',
+    # Trial price checks + honest zero-result copy + badge (11 Nov 2026)
+    'yet. We are not going to invent a price -- we have started watching this search, so data should build up over the next days.':
+        'pour l’instant. On ne va pas inventer un prix -- on a commencé à surveiller cette recherche, les données vont arriver dans les prochains jours.',
+    'yet. We are not going to invent a price -- try a brand and model, for example "nike p6000". Our prices come from EU listings on vinted.be.':
+        'pour l’instant. On ne va pas inventer un prix -- essaie une marque et un modèle, par exemple «' + NB + 'nike p6000' + NB + '». Nos prix viennent des annonces UE de vinted.be.',
+    'Trial: 10 price checks': 'Essai' + NB + ': 10 vérifications de prix',
+    'Check the warning below': 'Lis l’avertissement ci-dessous',
+    'You have used your 10 trial price checks': 'Tu as utilisé tes 10 vérifications de prix d’essai',
+    'Pro and Elite check prices for any item, 20 an hour, with the condition ladder, where your price would sit and how often sellers cut their price.':
+        'Pro et Elite vérifient le prix de n’importe quel article, 20 par heure, avec le prix par état, la position de ton prix et la fréquence des baisses de prix des vendeurs.',
     'listing to go on, running from': 'annonce pour se faire une idée, de',
     'listings to go on, running from': 'annonces pour se faire une idée, de',
     'listing to go on. Rare items are thin here because they are rare on Vinted, so this is a starting point rather than a settled price.':
@@ -917,6 +939,11 @@ FR_PATTERNS += [
     (r'^(\d+) of (\d+) price check left this hour$', 'encore $1 vérification de prix sur $2 cette heure-ci'),
     (r'^(\d+) price checks left this hour$', 'encore $1 vérifications de prix cette heure-ci'),
     (r'^(\d+) price check left this hour$', 'encore $1 vérification de prix cette heure-ci'),
+    # Trial price checks + non-EU note (11 Nov 2026)
+    (r'^(\d+) of (\d+) trial price checks left$', 'encore $1 vérifications de prix d’essai sur $2'),
+    (r'^(\d+) of (\d+) trial price check left$', 'encore $1 vérification de prix d’essai sur $2'),
+    (r'^This listing is priced in ([A-Z]{3}), on a Vinted site outside the EU euro market\. These prices come from the EU site and may differ\.$',
+     'Cette annonce est en $1, sur un site Vinted hors de la zone euro UE. Ces prix viennent du site UE et peuvent différer.'),
     (r'^Found (\d[\d,]*) listings, but$', 'On a trouvé $1 annonces, mais'),
     (r'^Most sit between (.+) and (.+)$', 'La plupart entre $1 et $2'),
     (r'^· (\d[\d,]*) listings$', '· $1 annonces'),

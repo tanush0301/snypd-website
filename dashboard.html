@@ -2081,7 +2081,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     </div>
     <div style="font-size:13px;color:var(--success)" id="claim-receipt-xp"></div>
     <div id="claim-referral" style="display:none;border:1px solid var(--border);padding:14px;flex-direction:column;gap:8px">
-      <div style="font-size:13px;color:var(--text-primary)">Nice find. Give a friend 2 extra days of 24/7 hunting, and get 7 days yourself when they save a hunt.</div>
+      <div style="font-size:13px;color:var(--text-primary)">Nice find. Share your link: when a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3. If they subscribe, you get 30% off a renewal.</div>
       <div style="display:flex;gap:8px;align-items:center">
         <input id="claim-referral-link" readonly style="flex:1;min-width:0;font-size:12px;padding:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted)">
         <button class="btn btn-ghost" id="claim-referral-share" type="button">Share</button>
@@ -2859,6 +2859,10 @@ const HEARTBEAT_URL = (() => {
   // effectivePlan already degrades a lapsed paid plan to 'free', which is the
   // behaviour wanted here too.
   document.body.dataset.plan = effectivePlan;
+  // Trial price checks (11 Nov 2026): a running trial may use the Market tab's price check (10 in total, counted
+  // by the backend). Set before the event so the panel sees it when the plan arrives. Presentation only.
+  document.body.dataset.trial = (effectivePlan === 'free' && profile.free_trial_started_at &&
+    trialEndMs(profile) > Date.now()) ? '1' : '';
   document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
   // Feedback questions (outreach/47, migration 081; assets/feedback.js): shows nothing until dashboard_boot carries feedback_done.
   try { if (boot && boot.data && window.SnypdFeedback) window.SnypdFeedback.mount({ sb: sb, boot: boot.data, plan: effectivePlan, profile: profile }); } catch (e) { console.error('SNYPD feedback', e); }
@@ -5158,14 +5162,16 @@ const HEARTBEAT_URL = (() => {
       if (!slot) return;
       e.preventDefault();
       const _mcPlan = document.body.dataset.plan;
+      // Trial price checks (11 Nov 2026): a running trial may check too; the backend counts its 10.
+      const _mcOk = _mcPlan === 'elite' || _mcPlan === 'pro' || document.body.dataset.trial === '1';
       // Price fix (Session 66): one tap, no typing, answer in place. The title is cleaned by the backend
       // (sizes, colours, filler); the card's brand and condition ride along.
-      if ((_mcPlan === 'elite' || _mcPlan === 'pro') && window.SNYPD && window.SNYPD.marketCheckCard) {
-        window.SNYPD.marketCheckCard({ title: slot.dataset.marketCheck, brand: slot.dataset.marketBrand || '', cond: slot.dataset.marketCond || '' });
+      if (_mcOk && window.SNYPD && window.SNYPD.marketCheckCard) {
+        window.SNYPD.marketCheckCard({ title: slot.dataset.marketCheck, brand: slot.dataset.marketBrand || '', cond: slot.dataset.marketCond || '', cur: slot.dataset.marketCur || '' });
         return;
       }
       switchView('market');
-      if ((_mcPlan === 'elite' || _mcPlan === 'pro') && window.SNYPD && window.SNYPD.marketCheck) {
+      if (_mcOk && window.SNYPD && window.SNYPD.marketCheck) {
         window.SNYPD.marketCheck(slot.dataset.marketCheck);
       }
       const panel = document.getElementById('market-panel');
@@ -5846,7 +5852,7 @@ const HEARTBEAT_URL = (() => {
               ${isGone
                 ? `<div class="p-total p-gone">Gone &middot; may have sold</div>`
                 : (totalLabel ? `<div class="p-total">${totalLabel} incl. protection</div>` : '')}
-              ${isGone || !r.title ? '' : `<button class="mkt-check" type="button" data-market-check="${esc(r.title)}" data-market-brand="${esc(brand || '')}" data-market-cond="${esc(status || '')}">Check price</button>`}
+              ${isGone || !r.title ? '' : `<button class="mkt-check" type="button" data-market-check="${esc(r.title)}" data-market-brand="${esc(brand || '')}" data-market-cond="${esc(status || '')}" data-market-cur="${esc(currency || '')}">Check price</button>`}
             </div>
           </div>
           <div class="muted" title="${esc(fullLabel)}">
@@ -7691,7 +7697,9 @@ const HEARTBEAT_URL = (() => {
     var q = escapeHtml(d.query || '');
     if (n === 0) {
       return 'No listings matching <b>"' + q + '"</b> yet. We are not going to invent a price '
-           + '-- if this is a real item, we have started watching it and data should build up.';
+           + ((d.tracking && d.tracking.tracked)
+              ? '-- we have started watching this search, so data should build up over the next days.'
+              : '-- try a brand and model, for example "nike p6000". Our prices come from EU listings on vinted.be.');
     }
     if (d.display_verdict === 'too_thin') {
       /* Two different situations share this verdict. If a price is being shown
@@ -7852,9 +7860,12 @@ const HEARTBEAT_URL = (() => {
     var hosts = Object.keys(seen);
     return hosts.length ? ' Your feed has listings from ' + hosts.join(', ') + ': these prices are not from there.' : '';
   }
-  function sourceBlock(d) {
+  function sourceBlock(d, into) {
     var so = d.source || {};
-    return '<div class="mr-src">Asking prices on ' + escapeHtml(so.site || 'vinted.be') + ' (EU listings), in '
+    var cur = (into && into.__mrCur) || '';
+    return (cur ? '<div class="mr-nf" role="note">This listing is priced in ' + escapeHtml(cur)
+        + ', on a Vinted site outside the EU euro market. These prices come from the EU site and may differ.</div>' : '')
+      + '<div class="mr-src">Asking prices on ' + escapeHtml(so.site || 'vinted.be') + ' (EU listings), in '
       + escapeHtml(so.currency || 'EUR') + ', last ' + (so.window_days || 14) + ' days.' + otherMarketNote() + '</div>';
   }
 
@@ -7862,6 +7873,11 @@ const HEARTBEAT_URL = (() => {
     /* A thin result that still carries a price is its own state: the badge must
      * not say "not enough data" directly above a euro figure. */
     var b = badgeFor(d.provisional ? 'too_thin_shown' : d.display_verdict);
+    /* 11 Nov 2026: an 'ok' price that carries warnings (backend confidence 'medium') must not read "Trusted price"
+       in green above a contamination warning. */
+    if (d.display_verdict === 'ok' && !d.provisional && d.confidence === 'medium') {
+      b = { cls: 'warn', text: 'Check the warning below' };
+    }
     var html = '<div class="mr-card"><span class="mr-badge ' + b.cls + '">' + b.text + '</span>';
 
     if (d.show_headline && d.typical_cents != null) {
@@ -7889,7 +7905,7 @@ const HEARTBEAT_URL = (() => {
     if (d.coverage_note) {
       html += '<div class="mr-note">' + escapeHtml(d.coverage_note) + '</div>';
     }
-    html += sourceBlock(d);
+    html += sourceBlock(d, into);
     html += '</div>';
 
     /* The condition ladder comes before positioning and drift: it is the most
@@ -7956,6 +7972,21 @@ const HEARTBEAT_URL = (() => {
     quotaEl.style.display = '';
   }
 
+  /* Trial price checks (11 Nov 2026): the backend counts 10 per trial and answers trial {used, limit, remaining};
+     a lookup that found nothing is handed back, so only real answers use one up. */
+  function renderTrial(t) {
+    if (!quotaEl || !t || typeof t.remaining !== 'number') { return; }
+    var left = Math.max(0, t.remaining), lim = (typeof t.limit === 'number') ? t.limit : 10;
+    quotaEl.textContent = left + ' of ' + lim + ' trial price check' + (lim === 1 ? '' : 's') + ' left';
+    quotaEl.className = 'mr-quota' + (left <= 3 ? ' low' : '');
+    quotaEl.style.display = '';
+  }
+  function trialUsedHtml() {
+    return '<div class="mr-locked" style="display:block"><h3>You have used your 10 trial price checks</h3>'
+      + '<p>Pro and Elite check prices for any item, 20 an hour, with the condition ladder, where your price would sit '
+      + 'and how often sellers cut their price.</p><a class="btn btn-prim" href="/plans">See plans</a></div>';
+  }
+
   if (chipsBox) {
     chipsBox.addEventListener('click', function (e) {
       var chip = e.target.closest('[data-mr-chip]');
@@ -7987,7 +8018,11 @@ const HEARTBEAT_URL = (() => {
       if (res.status === 200 && res.body) {
         render(res.body, into, state.mine);
         if (into === result) { pushRecent(q); }
-        renderQuota(res.body.quota);
+        if (res.body.trial) { renderTrial(res.body.trial); } else { renderQuota(res.body.quota); }
+      } else if (res.status === 403 && res.body && res.body.detail && res.body.detail.error === 'trial_checks_used') {
+        /* Trial allowance spent (11 Nov 2026): say so and offer the plans, in the panel and in the Feed sheet. */
+        renderTrial(res.body.detail.trial || { used: 10, limit: 10, remaining: 0 });
+        into.innerHTML = trialUsedHtml();
       } else if (res.status === 403) {
         /* Mirrors the locked state, so a stale body[data-plan] cannot dead-end
          * a non-Elite user on a spinner. */
@@ -8037,7 +8072,15 @@ const HEARTBEAT_URL = (() => {
   }
 
   function applyPlan(plan) {
-    if (plan === 'elite' || plan === 'pro') { showUnlocked(); } else { showLocked(); }
+    if (plan === 'elite' || plan === 'pro') { showUnlocked(); return; }
+    /* A running trial gets 10 price checks in total (set by the plan block as body[data-trial]); the backend
+       counts and refuses, this only opens the panel. */
+    if (document.body.dataset.trial === '1') {
+      showUnlocked();
+      if (tierChip) { tierChip.textContent = 'Trial: 10 price checks'; }
+      return;
+    }
+    showLocked();
   }
 
   goBtn.addEventListener('click', function () { run(); });
@@ -8120,6 +8163,10 @@ const HEARTBEAT_URL = (() => {
     var brand = String(item.brand || '').trim();
     var q = (brand && title.toLowerCase().indexOf(brand.toLowerCase()) === -1) ? brand + ' ' + title : title;
     var into = openSheet('Price check');
+    /* Non-EU label (11 Nov 2026): a card priced in another currency (GBP, USD, PLN...) is from a Vinted site our
+       EU-euro prices do not cover; sourceBlock says so. Euro sites (fr, de, ...) get no label. */
+    var cur = String(item.cur || '').trim().toUpperCase();
+    into.__mrCur = (cur && cur !== 'EUR') ? cur : '';
     run({ q: q, keep: [], mine: condLabel(item.cond), into: into });
   };
   window.SNYPD.marketCheck = function (q) {
