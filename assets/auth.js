@@ -267,6 +267,21 @@
     } catch (e) { return null; }
   }
 
+  /* Referral code (migration 082): snypd_refer = {c, t} set by consent.js from ?ref=, read for 60 days;
+     else a ?ref= on this page's own address (the Google return trip carries it, see google()). */
+  function referralCode(qsArg) {
+    var RE = /^[a-z2-9]{6}$/;
+    try {
+      var s = JSON.parse(lsGet('snypd_refer') || 'null');
+      if (s && s.c && RE.test(s.c) && Date.now() - Number(s.t) < 60 * 864e5) return s.c;
+    } catch (e) {}
+    try {
+      var v = String((qsArg || new URLSearchParams(location.search)).get('ref') || '').toLowerCase();
+      if (RE.test(v)) return v;
+    } catch (e) {}
+    return null;
+  }
+
   function signupData() {
     var data = { marketing_opt_in: !!S.marketing };
     var tags = campaignTags();
@@ -286,8 +301,12 @@
     var landing = landingData();
     for (var key in landing) data[key] = landing[key];
     if (heardOk(S.heard)) data.heard_from = S.heard;
-    var ref = lsGet('snypd_ref');
-    if (ref && /^[a-z2-9]{4,8}$/.test(ref)) data.ref_code = ref;
+    /* Outreach click code (?r=, snypd_ref, marketing consent): kept for DM attribution under its own name. */
+    var oc = lsGet('snypd_ref');
+    if (oc && /^[a-z2-9]{4,8}$/.test(oc)) data.outreach_code = oc;
+    /* Referral code (?ref=, snypd_refer, 60 days): read by migration 082's referral_process(). */
+    var rc = referralCode();
+    if (rc) data.ref_code = rc;
     try {
       var pi = JSON.parse(lsGet('snypd_plan_intent') || 'null');
       if (pi && pi.plan) data.plan_intent = pi.plan;
@@ -424,6 +443,8 @@
     if (ep) back.set('from', ep);
     if (Object.keys(landingData()).length) back.set('entry_basis', 'nav-v1');
     if (heardOk(S.heard)) back.set('heard', S.heard);
+    var rc = referralCode();
+    if (rc) back.set('ref', rc);
     var backQs = back.toString();
     Promise.resolve().then(function () {
       return sb.auth.signInWithOAuth({
@@ -806,6 +827,9 @@
         var retHeard = heardOk(qs.get('heard'));
         if (retHeard && !md.heard_from) add.heard_from = retHeard;
         if (retAff && /^[A-Za-z0-9_.-]{1,60}$/.test(retAff) && !md.whop_aff) add.whop_aff = retAff;
+        /* Referral code (082): from snypd_refer, else the ref= that rode on the return address (google()). */
+        var retRef = referralCode(qs);
+        if (retRef && !md.ref_code) add.ref_code = retRef;
         if (Object.keys(add).length) { try { await sb.auth.updateUser({ data: add }); } catch (e) {} }
       }
       if (PAGE === 'signup') { if (sess.user.email) lsSet(LAST_EMAIL_KEY, sess.user.email); location.replace('/dashboard'); return; }

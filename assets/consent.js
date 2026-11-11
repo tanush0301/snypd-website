@@ -388,6 +388,25 @@
   ['pointerdown', 'focusin', 'click'].forEach(function (t) { document.addEventListener(t, onUse, true); });
 })();
 
+/* Referral link (?ref=<6-char code>, migration 082). Stored WITHOUT waiting for consent
+   (Tanush's decision 10 Nov 2026): the code exists only to give the friend the bonus
+   they clicked for, so /cookies lists it as functional. Key snypd_refer = {c, t},
+   read for 60 days by assets/auth.js. First touch wins: an unexpired stored code is
+   never replaced. Separate from the outreach ?r= / snypd_ref tracking in index.html
+   and plans.html, which is untouched. */
+(function () {
+  var c;
+  try { c = new URLSearchParams(location.search).get('ref'); } catch (e) { return; }
+  if (!c) return;
+  c = String(c).toLowerCase();
+  if (!/^[a-z2-9]{6}$/.test(c)) return;
+  try {
+    var old = JSON.parse(localStorage.getItem('snypd_refer') || 'null');
+    if (old && old.c && Date.now() - Number(old.t) < 60 * 864e5) return;
+    localStorage.setItem('snypd_refer', JSON.stringify({ c: c, t: Date.now() }));
+  } catch (e) {}
+})();
+
 /* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) and a Whop
    partner code (a=<Whop username>, from a partner's link) on links to other SNYPD
    pages, so the sign-up page can save them with the new account (assets/auth.js)

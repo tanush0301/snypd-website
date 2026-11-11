@@ -843,6 +843,18 @@
 </div>
 <p class="mini-p" data-snypd="billingCopy">Loading…</p>
 </div>
+<!-- Referral card (migration 082): hidden until my_referral_summary() answers. -->
+<div class="mini" id="ref-card" style="display:none">
+<div class="mini-hd">
+<div class="mini-title">Invite friends</div>
+<a class="mini-link" id="ref-copy" href="#">Copy link</a>
+</div>
+<p class="mini-p">When a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3 (up to 4 times). If they subscribe, you get 30% off a renewal. 5 paying friends = 1 free month.</p>
+<p class="mini-p" style="word-break:break-all"><span id="ref-link">—</span></p>
+<p class="mini-p" id="ref-stats">—</p>
+<p class="mini-p" id="ref-bonus" style="display:none"></p>
+<p class="mini-p" id="ref-codes" style="display:none"></p>
+</div>
 <div class="mini">
 <div class="mini-hd">
 <div class="mini-title">Sync</div>
@@ -998,6 +1010,59 @@
       openBilling(window.__snypdAccountState);
     }
   });
+
+  /* Referral card (migration 082). Own block: any failure leaves the card hidden and never
+     touches the rest of the account page. Values are set with textContent only. */
+  (async () => {
+    try {
+      const sb = await waitForSupabase();
+      if (!sb) return;
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session?.user) return;
+      const { data: s, error } = await sb.rpc("my_referral_summary");
+      if (error || !s || !/^[a-z2-9]{6}$/.test(String(s.code || ""))) {
+        // No code yet: create one (080's my_referral_code), then read the summary again.
+        const r = await sb.rpc("my_referral_code");
+        if (r.error || !/^[a-z2-9]{6}$/.test(String(r.data || ""))) return;
+        const again = await sb.rpc("my_referral_summary");
+        if (again.error || !again.data) return;
+        return fill(again.data, r.data);
+      }
+      fill(s, s.code);
+    } catch (e) { /* referral card is optional */ }
+
+    function fill(s, code) {
+      const link = "https://www.snypd.store/?ref=" + code;
+      const card = document.getElementById("ref-card");
+      document.getElementById("ref-link").textContent = link;
+      const n = (k) => Number(s[k] || 0);
+      document.getElementById("ref-stats").textContent =
+        n("joined") + " joined · " + n("found") + " found a listing · " + n("paid") + " subscribed" +
+        " · " + n("days_earned") + " days earned (" + n("days_left_cap") + " rewards left)";
+      if (s.bonus_until && new Date(s.bonus_until) > new Date()) {
+        const b = document.getElementById("ref-bonus");
+        b.textContent = "24/7 bonus active until " + new Date(s.bonus_until).toLocaleString();
+        b.style.display = "";
+      }
+      const codes = Array.isArray(s.codes) ? s.codes.filter(c => c && /^[A-Z0-9]{4,20}$/.test(String(c.code || ""))) : [];
+      if (codes.length || n("discounts_waiting")) {
+        const c = document.getElementById("ref-codes");
+        c.textContent = codes.length
+          ? "Your discount code" + (codes.length > 1 ? "s" : "") + " (use at checkout): " + codes.map(x => x.code).join(", ")
+          : n("discounts_waiting") + " discount waiting: it is applied to your next renewal automatically.";
+        c.style.display = "";
+      }
+      document.getElementById("ref-copy").addEventListener("click", async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget;
+        try {
+          if (navigator.share) await navigator.share({ text: "Get Vinted alerts with SNYPD:", url: link });
+          else { await navigator.clipboard.writeText(link); btn.textContent = "Copied"; setTimeout(() => { btn.textContent = "Copy link"; }, 2000); }
+        } catch (err) { /* user cancelled share */ }
+      });
+      card.style.display = "";
+    }
+  })();
 
   (async () => {
     const sb = await waitForSupabase();
