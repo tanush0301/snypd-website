@@ -201,7 +201,8 @@
     '.snc-ft{display:flex;flex-wrap:wrap;gap:10px;padding:16px 22px 20px;}' +
     '@media (max-width:699.98px){.snc-btns{width:100%;}.snc-btns .snc-btn{flex:1 1 0;white-space:nowrap;}.snc-btns .snc-link{flex:1 1 100%;text-align:left;min-height:40px;padding:8px 0;}}' +
     /* Phones (11 Nov 2026): the bar took about 260 px of an 844 px screen and covered the page's main button.
-       Under 600 px it is one short sentence and one row: Reject and Accept the same size, Settings beside them. */
+       Under 600 px it is one short sentence and one row: Reject and Accept the same size, Settings beside them
+       (also under 360 px, with smaller type: a second row cost 45 px on the smallest phones). */
     '.snc-short{display:none;}' +
     '@media (max-width:599.98px){.snc-bar{padding:10px 16px calc(10px + env(safe-area-inset-bottom));}' +
       '.snc-in{gap:8px;}.snc-txt{flex:1 1 100%;font-size:12px;line-height:1.5;}' +
@@ -209,8 +210,9 @@
       '.snc-btns{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;}' +
       '.snc-btns .snc-btn{min-height:44px;padding:10px 6px;letter-spacing:.04em;white-space:nowrap;}' +
       '.snc-btns .snc-link{min-height:44px;padding:10px 2px 10px 6px;letter-spacing:.04em;text-align:right;white-space:nowrap;}}' +
-    '@media (max-width:349.98px){.snc-btns{grid-template-columns:1fr 1fr;}' +
-      '.snc-btns .snc-link{grid-column:1 / -1;text-align:left;min-height:36px;padding:6px 0;}}' +
+    '@media (max-width:359.98px){.snc-bar{padding-left:12px;padding-right:12px;}.snc-txt{font-size:11.5px;}.snc-btns{gap:6px;}' +
+      '.snc-btns .snc-btn{font-size:11px;letter-spacing:0;padding:10px 3px;}' +
+      '.snc-btns .snc-link{font-size:11px;letter-spacing:0;padding:10px 0 10px 3px;}}' +
     '@media (prefers-reduced-motion:reduce){.snc-bar,.snc-ov{transition:none;}}';
 
   var bar = null, ov = null, lastFocus = null;

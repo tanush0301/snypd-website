@@ -89,11 +89,13 @@ const PHONE_MAX_FR = 190;   // French runs one line longer
 
   // ---- narrow phones --------------------------------------------------------------------------------------
   for (const w of [320, 360, 375]) {
-    const { page, ctx } = await open('/', { width: w, height: 700 });
+    const { page, ctx } = await open('/', { width: w, height: w === 320 ? 568 : 700 });
     const b = await bar(page);
     ok(sameLook(b.reject, b.accept), w + ': Reject and Accept equal');
     ok(b.sw <= b.vw && b.settings.right <= b.vw + 0.5, w + ': fits the screen');
-    ok(b.h <= (w < 350 ? 215 : PHONE_MAX + 20), w + ': height ' + b.h);
+    ok(b.reject.top === b.accept.top && Math.abs((b.settings.top + b.settings.h / 2) - (b.reject.top + b.reject.h / 2)) <= 2, w + ': Settings sits on the button row');
+    ok(b.reject.h >= 44 && b.settings.h >= 44, w + ': tap heights ' + b.reject.h + ' / ' + b.settings.h);
+    ok(b.h <= PHONE_MAX, w + ': height ' + b.h + ', at most ' + PHONE_MAX);
     await ctx.close();
   }
 
@@ -108,6 +110,8 @@ const PHONE_MAX_FR = 190;   // French runs one line longer
       ok(b.h <= PHONE_MAX_FR, 'French 390: bar is ' + b.h + ' px, at most ' + PHONE_MAX_FR);
     }
     ok(sameLook(b.reject, b.accept), 'French ' + w + ': Reject and Accept equal ' + JSON.stringify([b.reject.w, b.accept.w]));
+    ok(Math.abs((b.settings.top + b.settings.h / 2) - (b.reject.top + b.reject.h / 2)) <= 2, 'French ' + w + ': Settings sits on the button row');
+    ok(b.h <= PHONE_MAX_FR, 'French ' + w + ': height ' + b.h + ', at most ' + PHONE_MAX_FR);
     ok(b.sw <= b.vw && b.settings.right <= b.vw + 0.5, 'French ' + w + ': fits the screen');
     await ctx.close();
   }
