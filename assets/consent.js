@@ -407,6 +407,53 @@
   } catch (e) {}
 })();
 
+/* Invite bar (migration 085): tells a visitor who arrived through a friend's invite link what
+   they get, on the homepage and /signup only. Static block at the top of the page (not fixed),
+   so it never covers the cookie bar or the nav. Never names the referrer. Dismiss = this
+   browser session. Text via textContent only; French via \u escapes (file must stay ASCII). */
+(function () {
+  if (!/^\/(index\.html|signup|signup\.html)?$/.test(location.pathname) &&
+      !/^\/fr\/?$/.test(location.pathname)) return;
+  var ok = false;
+  try {
+    var s = JSON.parse(localStorage.getItem('snypd_refer') || 'null');
+    ok = !!(s && /^[a-z2-9]{6}$/.test(String(s.c || '')) && Date.now() - Number(s.t) < 60 * 864e5);
+    if (sessionStorage.getItem('snypd_refer_bar_closed') === '1') ok = false;
+  } catch (e) {}
+  if (!ok) return;
+  var fr = /^fr/.test(document.documentElement.getAttribute('lang') || '');
+  var TXT = fr
+    ? 'Un ami t\u2019a invit\u00e9 : 2 jours de plus d\u2019alertes 24h/24 d\u00e8s que ta premi\u00e8re recherche trouve une annonce.'
+    : 'A friend invited you: get 2 extra days of 24/7 alerts as soon as your first hunt finds a listing.';
+  function mount() {
+    if (document.getElementById('snypd-refer-bar')) return;
+    var bar = document.createElement('div');
+    bar.id = 'snypd-refer-bar';
+    bar.setAttribute('role', 'status');
+    bar.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 44px 10px 16px;' +
+      'background:#0C0C0D;border-bottom:1px solid #00E5A0;color:#E8EAEB;font-family:"DM Mono",ui-monospace,monospace;' +
+      'font-size:12.5px;line-height:1.5;text-align:center;position:relative;z-index:10;';
+    var t = document.createElement('span');
+    t.textContent = TXT;
+    t.style.color = '#00E5A0';
+    var x = document.createElement('button');
+    x.type = 'button';
+    x.setAttribute('aria-label', fr ? 'Fermer' : 'Close');
+    x.textContent = '\u00d7';
+    x.style.cssText = 'position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;' +
+      'color:#8B9094;font-size:20px;line-height:1;min-width:36px;min-height:36px;cursor:pointer;';
+    x.addEventListener('click', function () {
+      try { sessionStorage.setItem('snypd_refer_bar_closed', '1'); } catch (e) {}
+      if (bar.parentNode) bar.parentNode.removeChild(bar);
+    });
+    bar.appendChild(t);
+    bar.appendChild(x);
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+  if (document.body) mount();
+  else document.addEventListener('DOMContentLoaded', mount);
+})();
+
 /* Not about consent: keeps campaign tags (utm_*, e.g. from a Meta ad) and a Whop
    partner code (a=<Whop username>, from a partner's link) on links to other SNYPD
    pages, so the sign-up page can save them with the new account (assets/auth.js)
