@@ -250,7 +250,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       const r = s => document.querySelector(s).getBoundingClientRect(), shown = s => getComputedStyle(document.querySelector(s)).display !== 'none';
       const nav = document.getElementById('nav-start'), set = document.querySelector('.snc-bar [data-snc="settings"]').getBoundingClientRect(), rej = document.querySelector('.snc-bar [data-snc="reject"]').getBoundingClientRect();
       return { bar: Math.round(r('.snc-bar').top), ih: innerHeight, h1: Math.round(r('.hp-h1').top), sub: Math.round(r('.hp-sub').bottom), aTop: Math.round(r('#hero-alert-phone').top), aBot: Math.round(r('#hero-alert-phone').bottom),
-        goTop: Math.round(r('#qs-go').top), go: Math.round(r('#qs-go').bottom), goH: Math.round(r('#qs-go').height), field: Math.round(r('#qs-words').height), fieldW: Math.round(r('#qs-words').width),
+        goTop: Math.round(r('#qs-go').top), go: Math.round(r('#qs-go').bottom), fieldTop: Math.round(r('#qs-words').top), goH: Math.round(r('#qs-go').height), field: Math.round(r('#qs-words').height), fieldW: Math.round(r('#qs-words').width),
         text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: shown('#hero-ex'),
         navText: nav.innerText.trim(), navH: Math.round(nav.getBoundingClientRect().height), navLine: Math.round(parseFloat(getComputedStyle(nav).lineHeight) || 0),
         subText: document.querySelector('.hp-sub').innerText.trim(), goText: document.getElementById('qs-go').innerText.trim(),
@@ -268,7 +268,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(m.sw <= m.iw + 1, name + ': no sideways scroll');
     eq(m.navText, w < 360 ? 'START' : 'START FREE', name + ': header button label');
     ok(m.navH <= 50, name + ': the header button is one line (' + m.navH + ' px)');
-    eq(m.goText, 'WATCH IT', name + ': the box is one row with a short button');
+    eq(m.goText, 'WATCH IT', name + ': the button carries its short label');
+    ok(Math.abs(m.fieldTop - m.goTop) <= 2, name + ': the field and the button share one row (' + m.fieldTop + ' / ' + m.goTop + ')');
     await page.type('#qs-words', 'nike tech fleece');
     eq(await page.$eval('#qs-go', a => a.getAttribute('href')), '/signup?hunt=nike+tech+fleece', name + ': the words alone are carried to sign-up');
     await ctx.close();
