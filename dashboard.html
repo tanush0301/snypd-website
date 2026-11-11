@@ -2443,6 +2443,9 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       <div>
         <div class="wiz-alert-row__title" id="prof-label-discord">Discord alerts</div>
         <div class="wiz-alert-row__note" id="prof-discord-note">Get your finds in a private thread in the SNYPD Discord. Works on Android, iPhone and PC.</div>
+        <div id="prof-discord-code" hidden style="font:700 22px/1.2 monospace;letter-spacing:3px;margin:8px 0"></div>
+        <a class="btn btn-prim" id="prof-discord-open" href="https://discord.com/invite/jUBFckEZNf" rel="noopener" hidden>Open Discord</a>
+        <a class="prof-mini" id="prof-discord-oauth" href="#" hidden>Or log in with Discord</a>
       </div>
       <button type="button" class="btn btn-ghost" id="prof-discord-btn">Connect Discord</button>
     </div>
@@ -8694,20 +8697,49 @@ const HEARTBEAT_URL = (() => {
       linked = r && r.data ? r.data : null;
     } catch (e) { linked = null; }
   }
+  var codeBox = document.getElementById('prof-discord-code');
+  var openLink = document.getElementById('prof-discord-open');
+  var oauthLink = document.getElementById('prof-discord-oauth');
+  var L = {
+    code: ['Your code (copied). Tap Open Discord, type /link and paste it. Valid 10 minutes.',
+           'Ton code (copi\u00e9). Touche Ouvrir Discord, tape /lier et colle-le. Valable 10 minutes.'],
+    open: ['Open Discord', 'Ouvrir Discord'],
+    oauth: ['Or log in with Discord', 'Ou connecte-toi avec Discord']
+  };
+  function l(k) { return L[k][fr() ? 1 : 0]; }
+  async function post(path) {
+    var tok = await token(); if (!tok) { return { status: 401 }; }
+    var res = await fetch(API + path, { method: 'POST', headers: { Authorization: 'Bearer ' + tok } });
+    var body = null; try { body = await res.json(); } catch (e) {}
+    return { status: res.status, body: body };
+  }
   btn.addEventListener('click', async function () {
     btn.disabled = true; btn.textContent = t('working');
-    var tok = await token();
-    if (!tok) { paint(t('failed')); return; }
     try {
-      var res = await fetch(API + (linked ? '/api/v1/discord/disconnect' : '/api/v1/discord/start'),
-        { method: 'POST', headers: { Authorization: 'Bearer ' + tok } });
-      var body = null; try { body = await res.json(); } catch (e) {}
-      if (res.status === 503) { paint(t('off')); return; }
-      if (!res.ok) { paint(t('failed')); return; }
-      if (!linked && body && typeof body.url === 'string' && body.url.indexOf('https://discord.com/') === 0) {
-        window.location.href = body.url; return;
+      if (linked) {
+        var d = await post('/api/v1/discord/disconnect');
+        if (d.status === 200) { linked = null; codeBox.hidden = openLink.hidden = oauthLink.hidden = true; paint(); }
+        else { paint(t(d.status === 503 ? 'off' : 'failed')); }
+        return;
       }
-      linked = null; paint();
+      var r = await post('/api/v1/discord/code');
+      if (r.status === 503) { paint(t('off')); return; }
+      if (r.status !== 200 || !r.body || !r.body.code) { paint(t('failed')); return; }
+      codeBox.textContent = r.body.code; codeBox.hidden = false;
+      try { await navigator.clipboard.writeText(r.body.code); } catch (e) {}
+      openLink.textContent = l('open'); openLink.hidden = false;
+      oauthLink.textContent = l('oauth'); oauthLink.hidden = false;
+      paint(l('code'));
+    } catch (e) { paint(t('failed')); }
+  });
+  oauthLink.addEventListener('click', async function (ev) {
+    ev.preventDefault();
+    try {
+      var r = await post('/api/v1/discord/start');
+      if (r.status === 200 && r.body && typeof r.body.url === 'string' && r.body.url.indexOf('https://discord.com/') === 0) {
+        window.location.href = r.body.url; return;
+      }
+      paint(t(r.status === 503 ? 'off' : 'failed'));
     } catch (e) { paint(t('failed')); }
   });
   (async function () {
