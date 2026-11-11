@@ -98,7 +98,7 @@ async function show(data) {
     renotify: true,
     requireInteraction: false,
     timestamp: data.ts ? data.ts * 1000 : Date.now(),
-    data: { url: data.url || DEFAULT_URL },
+    data: { url: data.url || DEFAULT_URL, lang: fr ? 'fr' : 'en' },
   };
   // Android Chrome and Windows Chrome/Edge render this as the big preview
   // photo. iOS Safari and any macOS browser (via the OS's own Notification
@@ -112,33 +112,70 @@ async function show(data) {
   return self.registration.showNotification(title, options);
 }
 
+/* Notification tap (11 Nov 2026, website outreach/47; replaces the unfinished codex/iphone-notification-handoff).
+ * Two bugs before: (1) with a SNYPD tab open, the tap only focused that tab and never opened the listing;
+ * (2) on iPhone, a link opened BY CODE from a Home Screen app goes to Safari (logged out), never to the Vinted
+ * app: iOS hands a universal link to the app only on a real user tap. So on iPhone/iPad the tap opens our own
+ * /open-vinted page, whose big button is that real tap. Only https www.vinted.<tld>/items/<id> links are allowed;
+ * keep VINTED_RE in step with open-vinted.html. */
+const VINTED_RE = /^(www\.)?vinted\.(be|fr|nl|de|it|es|pt|at|lu|ie|co\.uk|com|pl|cz|sk|lt|lv|ee|fi|se|dk|hu|ro|hr|si|gr)$/;
+
+function isVintedListing(u) {
+  return u.protocol === 'https:' && !u.username && !u.password && !u.port &&
+    VINTED_RE.test(u.hostname) && /^\/items\/[0-9]+(?:-[^/]*)?\/?$/.test(u.pathname);
+}
+
+function tapTarget(raw) {
+  try {
+    if (typeof raw === 'string' && raw.trim()) {
+      const u = new URL(raw, self.location.origin);
+      if (u.origin === self.location.origin || isVintedListing(u)) return u;
+    }
+  } catch (e) {}
+  return new URL(DEFAULT_URL, self.location.origin);
+}
+
+function isAppleMobile() {
+  const ua = String((self.navigator && self.navigator.userAgent) || '');
+  // iPadOS reports a Mac user agent; the service worker has no touch info, so "Mobile/" in it is the tell.
+  return /iPhone|iPad|iPod/.test(ua) || /Macintosh.*Mobile\//.test(ua);
+}
+
+async function openOwnPage(target) {
+  let list = [];
+  try { list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true }); } catch (e) {}
+  for (const client of list) {
+    try {
+      if (new URL(client.url).origin !== self.location.origin || !client.navigate) continue;
+      const nav = await client.navigate(target.href);
+      if (nav) return nav.focus ? nav.focus() : nav;
+    } catch (e) { /* stale client: fall through to a new window */ }
+  }
+  if (self.clients.openWindow) return self.clients.openWindow(target.href);
+}
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const target = (event.notification.data && event.notification.data.url) || DEFAULT_URL;
-
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      // Prefer focusing a tab that is already open over opening a second one.
-      for (const client of list) {
-        if ('focus' in client) {
-          try {
-            if (client.url && new URL(client.url).origin === self.location.origin) {
-              client.focus();
-              if ('navigate' in client && target.startsWith('/')) {
-                return client.navigate(target);
-              }
-              return;
-            }
-          } catch (e) {
-            /* a client with an unparseable URL is not worth failing over */
-          }
-        }
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(target);
-      }
-    })
-  );
+  const data = event.notification.data || {};
+  const target = tapTarget(data.url);
+  if (!isVintedListing(target)) {
+    event.waitUntil(openOwnPage(target));
+    return;
+  }
+  if (isAppleMobile()) {
+    const page = new URL('/open-vinted', self.location.origin);
+    page.hash = new URLSearchParams({ url: target.href, lang: data.lang === 'fr' ? 'fr' : 'en' }).toString();
+    event.waitUntil(openOwnPage(page));
+    return;
+  }
+  // Android/desktop: open the listing itself during the tap (Android hands vinted.* links to the app when it is
+  // installed); never stop at focusing a SNYPD tab. If that fails, the handoff page still offers the link.
+  event.waitUntil((async () => {
+    try { if (self.clients.openWindow && await self.clients.openWindow(target.href)) return; } catch (e) {}
+    const page = new URL('/open-vinted', self.location.origin);
+    page.hash = new URLSearchParams({ url: target.href, lang: data.lang === 'fr' ? 'fr' : 'en' }).toString();
+    return openOwnPage(page);
+  })());
 });
 
 // Push services rotate subscriptions without warning. When that happens the
