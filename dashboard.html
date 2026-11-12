@@ -2613,7 +2613,7 @@ const HEARTBEAT_URL = (() => {
     window.SNYPD_I18N.fromUser(session.user);
   }
 
-  // First-session measurement (assets/first-session.js; outreach/53, release R1). New accounts only, for 7 days
+  // First-session measurement (assets/first-session.js; outreach/53, release R1). New accounts only, during their first week
   // from the first record. Stored on the account's own Auth metadata (user_metadata.fs): device type and which
   // set-up steps were reached. It shows nothing, changes nothing and can never block the page.
   (function firstSessionMeasure() {

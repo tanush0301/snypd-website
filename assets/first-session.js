@@ -8,7 +8,7 @@
  *   SnypdFirstSession.device(ua, platform, touchPoints, standalone) -> 'ios-safari' | 'ios-other' | 'ios-inapp' |
  *       'ios-app' | 'android' | 'android-inapp' | 'android-app' | 'desktop' | 'desktop-app'
  *   SnypdFirstSession.priceBounds(vintedUrl) -> { max: 0|1, min: 'none'|'def'|'own' }
- *   SnypdFirstSession.shouldTrack(joinedAtIso, prev, nowMs) -> boolean     (first 7 days only)
+ *   SnypdFirstSession.shouldTrack(joinedAtIso, prev, nowMs) -> boolean     (first week only)
  *   SnypdFirstSession.merge(prev, patch, nowIso, device) -> next           (pure; never mutates prev)
  *   SnypdFirstSession.create({ prev, device, save, load, now, setTimeout, clearTimeout, wait, cap }) -> { track, flush, state }
  *       load() returns the record as stored right now (another device may have written since this page loaded)
