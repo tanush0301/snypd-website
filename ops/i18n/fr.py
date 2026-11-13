@@ -397,6 +397,36 @@ FR = {
     'Share my link': 'Partager mon lien',
     'Get free days': 'Gagne des jours offerts',
     'Free days': 'Jours offerts',
+    # /invite page (referral landing)
+    'A friend sent you a gift': 'Un ami t’offre un cadeau',
+    '2 extra days of 24/7 Vinted alerts': '2 jours de plus d’alertes Vinted 24h/24',
+    'SNYPD watches the Vinted searches you choose, about once a minute, and alerts your phone when a new matching listing appears.':
+        'SNYPD surveille les recherches Vinted que tu choisis, environ une fois par minute, et alerte ton téléphone quand une nouvelle annonce correspond.',
+    'Claim my 2 bonus days': 'Obtenir mes 2 jours offerts',
+    'Free to start. No card needed.': 'Gratuit pour commencer. Sans carte.',
+    'How it works': 'Comment ça marche',
+    'Create your free account and paste a Vinted search link you already use.':
+        'Crée ton compte gratuit et colle un lien de recherche Vinted que tu utilises déjà.',
+    'Turn on alerts. Your first search runs 24/7 for 3 days.':
+        'Active les alertes. Ta première recherche tourne 24h/24 pendant 3 jours.',
+    'When your hunt finds its first listing, your 2 bonus days are added on top.':
+        'Quand ta recherche trouve sa première annonce, tes 2 jours offerts s’ajoutent en plus.',
+    'Questions': 'Questions',
+    'Who invited me?': 'Qui m’a invité' + NB + '?',
+    "Someone who uses SNYPD sent you this link. We don't show names, and we don't tell them anything about your account.":
+        'Quelqu’un qui utilise SNYPD t’a envoyé ce lien. Nous n’affichons aucun nom et nous ne lui disons rien sur ton compte.',
+    'Is it free?': 'C’est gratuit' + NB + '?',
+    'Yes. Your first saved search runs 24/7 for 3 days, and the 2 bonus days are added once your hunt finds a listing. After that, Free checks while your dashboard is open, or you pick a plan.':
+        'Oui. Ta première recherche enregistrée tourne 24h/24 pendant 3 jours, et les 2 jours offerts s’ajoutent dès que ta recherche trouve une annonce. Ensuite, Free vérifie tant que ton tableau de bord est ouvert, ou tu choisis un plan.',
+    'Does my friend get something?': 'Mon ami reçoit-il quelque chose' + NB + '?',
+    'Yes, extra days of 24/7 hunting when your hunt finds its first listing, and a discount on their renewal if you subscribe later. You pay nothing extra.':
+        'Oui, des jours de recherche 24h/24 en plus quand ta recherche trouve sa première annonce, et une réduction sur son renouvellement si tu t’abonnes plus tard. Tu ne paies rien de plus.',
+    'Do I need an app?': 'Faut-il une appli' + NB + '?',
+    'No download. On iPhone, add SNYPD to your Home Screen from Safari to get alerts.':
+        'Rien à télécharger. Sur iPhone, ajoute SNYPD à ton écran d’accueil depuis Safari pour recevoir les alertes.',
+    'Is SNYPD part of Vinted?': 'SNYPD fait-il partie de Vinted' + NB + '?',
+    'No. SNYPD is independent. It reads public listings only and never logs in, buys or messages.':
+        'Non. SNYPD est indépendant. Il lit seulement les annonces publiques et ne se connecte jamais, n’achète rien et n’envoie aucun message.',
     'Or invite a friend: you get 3 extra days of 24/7 when their hunt finds a listing.':
         'Ou invite un ami' + NB + ': tu reçois 3 jours de plus en 24h/24 quand sa recherche trouve une annonce.',
     'Know someone who hunts on Vinted? Share your link: you get 30% off a renewal when they subscribe.':

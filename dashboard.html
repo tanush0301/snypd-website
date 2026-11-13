@@ -6187,7 +6187,7 @@ const HEARTBEAT_URL = (() => {
       try {
         const { data: code, error } = muted ? { data: null, error: 'muted' } : await sb.rpc('my_referral_code');
         if (!error && code && /^[a-z2-9]{6}$/.test(code)) {
-          const link = 'https://www.snypd.store/?ref=' + code + '&src=receipt';
+          const link = 'https://www.snypd.store/invite?ref=' + code + '&src=receipt';
           document.getElementById('claim-referral-link').value = link;
           refBox.dataset.link = link;
           const what = String(title || '').trim().slice(0, 60);
@@ -6254,7 +6254,7 @@ const HEARTBEAT_URL = (() => {
     try {
       const { data: code, error } = await sb.rpc('my_referral_code');
       if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
-      const link = 'https://www.snypd.store/?ref=' + code + '&src=success';
+      const link = 'https://www.snypd.store/invite?ref=' + code + '&src=success';
       const text = 'I use SNYPD for Vinted alerts. With my link you get 2 extra days of 24/7 alerts:';
       const shareBtn = document.getElementById('ref-live-share');
       shareBtn.addEventListener('click', async () => {
