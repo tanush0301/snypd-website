@@ -56,6 +56,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .iv-faq p { font-size: 13px; line-height: 1.6; color: #8B9094; margin: 10px 0 0; }
 .iv-foot { padding: 24px 0 40px; font-size: 12px; color: #55555C; display: flex; gap: 16px; flex-wrap: wrap; }
 .iv-foot a { color: #8B9094; }
+[hidden] { display: none !important; }
 @media (max-width: 380px) { .iv-h1 { font-size: 34px; } }
 </style>
 </head>
@@ -63,10 +64,11 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 <header class="iv-nav"><div class="iv-wrap"><a class="iv-logo" href="/">SNYPD<span>_</span></a></div></header>
 <main class="iv-wrap">
   <section class="iv-hero">
-    <span class="iv-pill">A friend sent you a gift</span>
-    <h1 class="iv-h1">2 extra days of 24/7 Vinted alerts</h1>
+    <span class="iv-pill" data-iv="gift">A friend sent you a gift</span>
+    <h1 class="iv-h1" data-iv="gift">2 extra days of 24/7 Vinted alerts</h1>
+    <h1 class="iv-h1" data-iv="plain" hidden>Vinted alerts on your phone</h1>
     <p class="iv-sub">SNYPD watches the Vinted searches you choose, about once a minute, and alerts your phone when a new matching listing appears.</p>
-    <a class="iv-btn" data-invite-cta href="/signup">Claim my 2 bonus days</a>
+    <a class="iv-btn" data-invite-cta href="/signup"><span data-iv="gift">Claim my 2 bonus days</span><span data-iv="plain" hidden>Start free</span></a>
     <p class="iv-note">Free to start. No card needed.</p>
   </section>
   <section class="iv-sec">
@@ -74,36 +76,51 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
     <ol class="iv-steps">
       <li><b>1</b><span>Create your free account and paste a Vinted search link you already use.</span></li>
       <li><b>2</b><span>Turn on alerts. Your first search runs 24/7 for 3 days.</span></li>
-      <li><b>3</b><span>When your hunt finds its first listing, your 2 bonus days are added on top.</span></li>
+      <li data-iv="gift"><b>3</b><span>When your hunt finds its first listing, your 2 bonus days are added on top.</span></li>
     </ol>
   </section>
   <section class="iv-sec iv-faq">
     <h2 class="iv-h2">Questions</h2>
-    <details><summary>Who invited me?</summary><p>Someone who uses SNYPD sent you this link. We don't show names, and we don't tell them anything about your account.</p></details>
-    <details><summary>Is it free?</summary><p>Yes. Your first saved search runs 24/7 for 3 days, and the 2 bonus days are added once your hunt finds a listing. After that, Free checks while your dashboard is open, or you pick a plan.</p></details>
-    <details><summary>Does my friend get something?</summary><p>Yes, extra days of 24/7 hunting when your hunt finds its first listing, and a discount on their renewal if you subscribe later. You pay nothing extra.</p></details>
+    <details data-iv="gift"><summary>Who invited me?</summary><p>Someone who uses SNYPD sent you this link. We don't show names, and we don't tell them anything about your account.</p></details>
+    <details data-iv="gift"><summary>Is it free?</summary><p>Yes. Your first saved search runs 24/7 for 3 days, and the 2 bonus days are added once your hunt finds a listing. After that, Free checks while your dashboard is open, or you pick a plan.</p></details>
+    <details data-iv="plain" hidden><summary>Is it free?</summary><p>Yes. Your first saved search runs 24/7 for 3 days. After that, Free checks while your dashboard is open, or you pick a plan.</p></details>
+    <details data-iv="gift"><summary>Does my friend get something?</summary><p>Yes, extra days of 24/7 hunting when your hunt finds its first listing, and a discount on their renewal if you subscribe later. You pay nothing extra.</p></details>
     <details><summary>Do I need an app?</summary><p>No download. On iPhone, add SNYPD to your Home Screen from Safari to get alerts.</p></details>
     <details><summary>Is SNYPD part of Vinted?</summary><p>No. SNYPD is independent. It reads public listings only and never logs in, buys or messages.</p></details>
   </section>
   <section class="iv-sec">
-    <a class="iv-btn" data-invite-cta href="/signup">Claim my 2 bonus days</a>
+    <a class="iv-btn" data-invite-cta href="/signup"><span data-iv="gift">Claim my 2 bonus days</span><span data-iv="plain" hidden>Start free</span></a>
   </section>
 </main>
 <footer class="iv-foot iv-wrap"><a href="/">snypd.store</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/cookies">Cookies</a></footer>
 <script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
 <script>
-/* Carry the invite code into sign-up as well (fallback when storage is blocked; auth.js reads ?ref/&src on /signup). */
+/* No valid code (here or stored by consent.js) = no gift promised: show the neutral version and plain sign-up.
+   With a code, the CTA also carries ref/src to /signup (fallback when storage is blocked). */
 (function () {
+  var RE = /^[a-z2-9]{6}$/, SRC = /^(receipt|success|hub|trial|report|home|account|stock|announce)$/;
+  var c = '', s = '';
   try {
     var q = new URLSearchParams(location.search);
-    var c = String(q.get('ref') || '').toLowerCase();
-    var s = String(q.get('src') || '').toLowerCase();
-    if (!/^[a-z2-9]{6}$/.test(c)) return;
-    if (!/^(receipt|success|hub|trial|report|home|account|stock)$/.test(s)) s = '';
-    var href = '/signup?ref=' + c + (s ? '&src=' + s : '') + '&from=invite';
-    var els = document.querySelectorAll('[data-invite-cta]');
-    for (var i = 0; i < els.length; i++) els[i].setAttribute('href', href);
+    c = String(q.get('ref') || '').toLowerCase(); s = String(q.get('src') || '').toLowerCase();
   } catch (e) {}
+  if (!RE.test(c)) {
+    c = '';
+    try {
+      var st = JSON.parse(localStorage.getItem('snypd_refer') || 'null');
+      if (st && RE.test(String(st.c || '')) && Date.now() - Number(st.t) < 60 * 864e5) { c = st.c; s = String(st.s || ''); }
+    } catch (e) {}
+  }
+  if (!SRC.test(s)) s = '';
+  var gift = !!c, i, els;
+  els = document.querySelectorAll('[data-iv]');
+  for (i = 0; i < els.length; i++) {
+    var want = els[i].getAttribute('data-iv') === (gift ? 'gift' : 'plain');
+    if (want) els[i].removeAttribute('hidden'); else els[i].setAttribute('hidden', '');
+  }
+  var href = gift ? '/signup?ref=' + c + (s ? '&src=' + s : '') + '&from=invite' : '/signup?from=invite';
+  els = document.querySelectorAll('[data-invite-cta]');
+  for (i = 0; i < els.length; i++) els[i].setAttribute('href', href);
 })();
 </script>
 </body>

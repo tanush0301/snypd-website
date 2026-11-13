@@ -420,7 +420,7 @@
   c = String(c).toLowerCase();
   if (!/^[a-z2-9]{6}$/.test(c)) return;
   s = String(s || '').toLowerCase();
-  if (!/^(receipt|success|hub|trial|report|home|account|stock)$/.test(s)) s = '';
+  if (!/^(receipt|success|hub|trial|report|home|account|stock|announce)$/.test(s)) s = '';
   try {
     var old = JSON.parse(localStorage.getItem('snypd_refer') || 'null');
     if (old && old.c && Date.now() - Number(old.t) < 60 * 864e5) return;

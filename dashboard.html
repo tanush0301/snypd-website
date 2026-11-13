@@ -2186,6 +2186,19 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <button class="btn btn-ghost" id="ref-live-close" type="button">Got it</button>
   </div>
 </div>
+<!-- Referral announcement (once per device, accounts older than 3 days, never on the plan-is-live load).
+     Logic: referralAnnounceCard(). Link carries src=announce. -->
+<div class="elite-banner" id="ref-announce-card" style="display:none" aria-labelledby="ref-announce-title">
+  <div>
+    <div class="elite-banner__title" id="ref-announce-title">New: invite friends, get free days</div>
+    <div class="elite-banner__text">When a friend's first hunt finds a listing, they get 2 extra days of 24/7 alerts and you get 3. If they subscribe, you get 30% off a renewal.</div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="ref-announce-share" type="button">Share my link</button>
+    <a class="btn btn-ghost" id="ref-announce-wa" href="#" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <button class="btn btn-ghost" id="ref-announce-close" type="button">Not now</button>
+  </div>
+</div>
 <!-- Hunter statistics notice (7 Nov 2026, privacy page "Why, and the legal basis"): shown once to accounts that signed up
      before the policy changed; OK remembers it on this device. -->
 <div class="elite-banner" id="stats-note" style="display:none">
@@ -6267,6 +6280,45 @@ const HEARTBEAT_URL = (() => {
       document.getElementById('ref-live-close').addEventListener('click', () => { card.style.display = 'none'; });
       card.style.display = '';
       if (window.gtag) try { gtag('event', 'referral_shown', { src: 'success' }); } catch (e) {}
+    } catch (e) { /* referral is optional */ }
+  })();
+
+  // Referral announcement (085): once per device (localStorage snypd_ref_announce_v1, set when shown), only for accounts
+  // older than 3 days (after first value), never on the same load as the plan-is-live card.
+  (async function referralAnnounceCard() {
+    const card = document.getElementById('ref-announce-card');
+    if (!card) return;
+    try { if (localStorage.getItem('snypd_ref_announce_v1')) return; } catch (e) { return; }
+    try {
+      await new Promise(r => setTimeout(r, 1500));
+      const live = document.getElementById('ref-live-card');
+      if (live && live.style.display !== 'none') return;
+      const { data: { session } } = await sb.auth.getSession();
+      const created = Date.parse((session && session.user && session.user.created_at) || '');
+      if (!created || Date.now() - created < 3 * 864e5) return;
+      const { data: code, error } = await sb.rpc('my_referral_code');
+      if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
+      const link = 'https://www.snypd.store/invite?ref=' + code + '&src=announce';
+      const text = 'I use SNYPD for Vinted alerts. With my link you get 2 extra days of 24/7 alerts:';
+      const done = () => { card.style.display = 'none'; };
+      document.getElementById('ref-announce-wa').setAttribute('href', 'https://wa.me/?text=' + encodeURIComponent(text + ' ' + link));
+      document.getElementById('ref-announce-wa').addEventListener('click', () => {
+        if (window.gtag) try { gtag('event', 'referral_share', { src: 'announce', via: 'whatsapp' }); } catch (e) {}
+        setTimeout(done, 300);
+      });
+      const shareBtn = document.getElementById('ref-announce-share');
+      shareBtn.addEventListener('click', async () => {
+        try {
+          if (navigator.share) await navigator.share({ text, url: link });
+          else { await navigator.clipboard.writeText(text + ' ' + link); shareBtn.textContent = 'Copied'; }
+          if (window.gtag) try { gtag('event', 'referral_share', { src: 'announce' }); } catch (e) {}
+          setTimeout(done, 1200);
+        } catch (e) { /* share cancelled */ }
+      });
+      document.getElementById('ref-announce-close').addEventListener('click', done);
+      card.style.display = '';
+      try { localStorage.setItem('snypd_ref_announce_v1', String(Date.now())); } catch (e) {}
+      if (window.gtag) try { gtag('event', 'referral_shown', { src: 'announce' }); } catch (e) {}
     } catch (e) { /* referral is optional */ }
   })();
 

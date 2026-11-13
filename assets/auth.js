@@ -284,7 +284,7 @@
   /* Placement that brought the referral (consent.js keeps it as snypd_refer.s from &src=), else src= on
      this page's address (Google return trip). Fixed list only; counted per placement in the admin metrics. */
   function referralSrc(qsArg) {
-    var RE = /^(receipt|success|hub|trial|report|home|account|stock)$/;
+    var RE = /^(receipt|success|hub|trial|report|home|account|stock|announce)$/;
     try {
       var s = JSON.parse(lsGet('snypd_refer') || 'null');
       if (s && s.c && Date.now() - Number(s.t) < 60 * 864e5) return RE.test(String(s.s || '')) ? s.s : null;
