@@ -320,6 +320,13 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(await page.$eval('#sticky-bar', e => e.hidden), 'phone: no sticky bar at the top of the page');
     await page.evaluate(() => scrollTo(0, 1600)); await wait(400);
     ok(!(await page.$eval('#sticky-bar', e => e.hidden)), 'phone: the sticky sign-up bar shows after the hero');
+    // v9: on phones the board shows and the 5-week chart waits for a tap
+    const chartShown = () => page.$eval('.hp-chart', e => getComputedStyle(e).display !== 'none');
+    eq(await chartShown(), false, 'v9 phone: the chart is folded until tapped');
+    await page.$eval('#mb-more', e => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await wait(250);
+    await page.click('#mb-more'); await wait(300);
+    eq(await chartShown(), true, 'v9 phone: tapping "Show the 5-week chart" opens the chart');
+    eq(await page.$eval('#mb-more', e => [getComputedStyle(e).display, e.getAttribute('aria-expanded')]), ['none', 'true'], 'v9 phone: the button hides and reports expanded');
     await ctx.close();
   }
 
