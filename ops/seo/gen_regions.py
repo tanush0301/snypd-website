@@ -191,13 +191,12 @@ def home_data():
     import gen_price_guide as pg
     import gen_market_report as mr
     from gen_content import num
-    total = sum(pg.V[it['slug']]['sample_size'] for it in pg.PUB)
     ed = mr.EDITIONS[-1]
     listings = mr.load(ed)[1]['listings']
+    # v9: the listings-and-dates sentence is gone (the demo header already gives count, site and dates)
     return ('\r\n        <div class="hp-pc-links"><a href="%s">All %d items in the free Vinted price guide &rarr;</a>'
-            '<a href="%s/%s">Vinted Market Report, %s: %s listings &rarr;</a>'
-            '<span>%s listings behind the guide&rsquo;s prices, vinted.be, %s.</span></div>\r\n        '
-            % (pg.HUB['en'], len(pg.PUB), mr.HUB['en'], ed['slug']['en'], ed['name']['en'], num(listings, 'en'), num(total, 'en'), pg.window('en')))
+            '<a href="%s/%s">Vinted Market Report, %s: %s listings &rarr;</a></div>\r\n        '
+            % (pg.HUB['en'], len(pg.PUB), mr.HUB['en'], ed['slug']['en'], ed['name']['en'], num(listings, 'en')))
 
 
 # ----------------------------------------------------------------- homepage footer links
@@ -342,7 +341,7 @@ TEMPLATES = {
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
     'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). No card.',
     # Trial price checks (11 Nov 2026): the number comes from plans.json market_report.trial_checks.
-    'home-trial-checks': 'Your trial includes @@trial_checks@@ price checks for any item you type. A check that finds nothing is not counted. After that, Check a price is part of Pro and Elite.',
+    'home-trial-checks': 'Your trial includes @@trial_checks@@ price checks for any item you type.',
     'home-trial-checks-tag': 'PRO &middot; ELITE &middot; @@trial_checks@@ IN THE TRIAL',
     'home-trial-checks-short': 'A free trial includes @@trial_checks@@ in total.',
     'home-trial-checks-demo': 'During the free trial you get @@trial_checks@@ of these.',

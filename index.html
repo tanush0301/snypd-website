@@ -417,6 +417,54 @@
     .hp-qs input, .hp-qs .hp-btn { min-height: 48px; }
     .hp-qs .hp-btn { padding: 0 12px; }
   }
+
+  /* ---- v9 (11 Nov 2026, homepage trim): one mention per fact, alerts arrive one by one, one reseller block ---- */
+  /* alerts: item and price first, the rating on its own line under them */
+  .hp-alert-body .rank { display: block; margin-top: 2px; font-size: 12.5px; }
+  /* the three desktop alerts arrive one after another, like pushes; each plays once */
+  .hp-alert.s2 { animation: hpAlertIn .5s cubic-bezier(.2, .8, .2, 1) 1s both; }
+  .hp-alert.s3 { animation: hpAlertIn .5s cubic-bezier(.2, .8, .2, 1) 1.7s both; }
+  /* hero: trial + password in one line */
+  .hp-checks1 { margin: 0; font-size: 13.5px; line-height: 1.55; color: #E8EAEB; }
+  /* proof: founder line + three facts in one slim row */
+  .hp-proof1 { border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .hp-proof1 .who { margin: 0; font-size: 14px; line-height: 1.55; color: #A6ADB1; }
+  .hp-proof1 .who b { font-weight: 400; color: #FFFFFF; }
+  .hp-proof1 ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 26px; }
+  .hp-proof1 li { font-size: 12.5px; line-height: 1.5; color: #8B9094; }
+  .hp-proof1 li b { font-weight: 400; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-proof1 #stat-listings-asof { color: #6B7074; }
+  .hp-proof1 #stat-listings-asof::before { content: '('; } .hp-proof1 #stat-listings-asof::after { content: ')'; }
+  /* reseller block: three one-line features, then the board */
+  .hp-feat { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-width: 86ch; }
+  .hp-feat li { position: relative; padding-left: 16px; font-size: 14px; line-height: 1.6; color: #A6ADB1; }
+  .hp-feat li::before { content: ''; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; background: #00E5A0; }
+  .hp-feat li b { font-weight: 400; color: #FFFFFF; }
+  .hp-feat .tag { display: inline-block; margin-left: 4px; font-size: 10.5px; letter-spacing: .1em; color: #8B9094; border: 1px solid #33333A; padding: 2px 6px; vertical-align: 1px; white-space: nowrap; }
+  .hp-mbwrap { display: flex; flex-direction: column; gap: 12px; }
+  .hp-mb-more { display: none; min-height: 48px; font-family: inherit; font-size: 12px; letter-spacing: .1em; color: #E8EAEB; background: #141416; border: 1px solid #26262A; cursor: pointer; }
+  /* steps: three in a row on wide screens */
+  .hp-steps3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .hp-steps3 li { background: #0C0C0D; }
+  /* the other plans as one line each */
+  .hp-rest { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .hp-rest li { font-size: 13.5px; line-height: 1.55; color: #A6ADB1; }
+  .hp-rest li b { font-weight: 400; color: #FFFFFF; }
+  @media (prefers-reduced-motion: reduce) {
+    .hp-alert.s2, .hp-alert.s3 { animation: none; }
+  }
+  @media (max-width: 959.98px) {
+    .hp-steps3 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-proof1 { padding: 14px 16px; }
+    .hp-proof1 ul { flex-direction: column; gap: 4px; }
+    .hp-feat li { font-size: 13.5px; }
+    /* phone: the board shows, the chart waits for a tap */
+    .hp-mb-more { display: block; }
+    #mb:not(.open) .hp-chart { display: none; }
+    #mb.open .hp-mb-more { display: none; }
+  }
 </style>
 
 <!-- Supabase REST. This page makes two public calls (the listings counter and
@@ -538,7 +586,7 @@
           <span>
             <span class="hp-alert-meta"><span>SNYPD &middot; now</span><span class="sample">SAMPLE</span></span>
             <span class="hp-alert-title">New find</span>
-            <span class="hp-alert-body"><b class="rank">Cheaper than 76% of this week's finds</b> &middot; Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i></span>
+            <span class="hp-alert-body">Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i><b class="rank">Cheaper than 76% of this week's finds</b></span>
           </span>
         </div>
         <form id="qs" class="hp-qs" action="/signup" method="get" novalidate>
@@ -548,32 +596,22 @@
             <input id="qs-max" name="max" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="go" placeholder="Max price" aria-label="Maximum price (optional)">
           </div>
           <a id="qs-go" class="hp-btn" href="/signup"><span class="go-l">WATCH IT FOR ME</span><span class="go-s">WATCH IT</span></a>
-          <p class="hp-qs-note">Free account, no card. Have a Vinted link with your own filters? Paste it after sign-up.</p>
+          <p class="hp-qs-note">Have a Vinted link with your own filters? Paste it after sign-up.</p>
         </form>
-        <ul class="hp-checks">
-          <li id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--></li>
-          <li class="dim"><span class="hp-tick">&#10003;</span> Never asks for your Vinted password. Reads public listings only.</li>
-        </ul>
+        <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--> Never needs your Vinted password.</p>
       </div>
 
-      <div id="hero-alerts" class="hp-alerts" role="img" aria-label="A sample alert for a Jordan 1 Low Travis Scott at 180 euros, cheaper than 76 percent of this week's finds of the same search, followed by two more sample alerts">
-        <div class="hp-alerts-top"><span>WHAT AN ALERT LOOKS LIKE</span><b>SAMPLE</b></div>
+      <div id="hero-alerts" class="hp-alerts" role="img" aria-label="Three sample alerts: a Jordan 1 Low Travis Scott at 180 euros, cheaper than 76 percent of this week's finds; a Kindle Paperwhite at 45 euros; 12 new Nike Dunk Low matches from 15 euros">
+        <div class="hp-alerts-top"><span>WHAT ARRIVES ON YOUR PHONE</span><b>SAMPLE</b></div>
         <div class="hp-alert big" id="hero-alert-main">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
             <span class="hp-alert-meta"><span>SNYPD</span><span>now</span></span>
             <span class="hp-alert-title">New find</span>
-            <span class="hp-alert-body"><b class="rank">Cheaper than 76% of this week's finds</b> &middot; Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i></span>
+            <span class="hp-alert-body">Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i><b class="rank">Cheaper than 76% of this week's finds</b></span>
           </span>
         </div>
-        <div class="hp-ex" id="hero-ex">
-          <span class="hp-ex-h">HOW THAT LINE IS MADE</span>
-          <div class="hp-ex-bar" aria-hidden="true"><span class="fill"></span><span class="mark" id="hero-ex-mark"><b>&euro;180</b></span></div>
-          <div class="hp-ex-scale" aria-hidden="true"><span>cheapest</span><span>typical &euro;250</span><span>dearest</span></div>
-          <p>This search found 62 listings in the same condition this week. Most ask &euro;182 to &euro;350. This one asks less than three quarters of them.</p>
-          <p class="hp-ex-note" id="hero-ex-note">The rating needs 30 finds in the same condition in a week. Busy searches get it. A narrow search gets the alert without it.</p>
-        </div>
-        <div class="hp-alert">
+        <div class="hp-alert s2">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
             <span class="hp-alert-meta"><span>SNYPD</span><span>4 min ago</span></span>
@@ -581,7 +619,7 @@
             <span class="hp-alert-body">Amazon Kindle Paperwhite &mdash; <i>&euro;45</i></span>
           </span>
         </div>
-        <div class="hp-alert">
+        <div class="hp-alert s3">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
             <span class="hp-alert-meta"><span>SNYPD</span><span>15 min ago</span></span>
@@ -593,28 +631,14 @@
     </div>
   </div>
 
-  <div class="hp-wrap" style="padding-top:32px;padding-bottom:8px;">
-    <div id="proof" class="hp-proof">
-      <div>
-        <span class="n" id="stat-listings">14,346,219</span>
-        <span class="t">Vinted listings matched to users' searches since 17 Sept 2026</span>
-        <span class="s" id="stat-listings-asof">As of 11 Nov 2026</span>
-      </div>
-      <div>
-        <span class="n">~1 min</span>
-        <span class="t">between checks of a search (measured median)</span>
-        <span class="s">Up to 5 min when a search is quiet</span>
-      </div>
-      <div>
-        <span class="n">26</span>
-        <span class="t">Vinted sites: Europe and the US</span>
-        <span class="s">Prices in each site's own currency</span>
-      </div>
-      <div>
-        <span class="n">0</span>
-        <span class="t">Vinted logins needed</span>
-        <span class="s">SNYPD reads public listings only</span>
-      </div>
+  <div class="hp-wrap" style="padding-top:28px;padding-bottom:4px;">
+    <div id="proof" class="hp-proof1">
+      <p class="who"><b>Built by a Belgian sneaker reseller:</b> 150+ sales, 3.8k Instagram followers. Made in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
+      <ul>
+        <li><b>~1 min</b> between checks (measured median)</li>
+        <li><b id="stat-listings">14,058,361</b> listings matched to users' searches <span id="stat-listings-asof">As of 10 Nov 2026</span></li>
+        <li><b>0</b> Vinted logins: public listings only</li>
+      </ul>
     </div>
   </div>
 
@@ -623,7 +647,7 @@
       <div class="hp-head">
         <span class="hp-eyebrow mint">TRY IT &middot; NO SIGN-UP</span>
         <h2 class="hp-h2">What is it worth on Vinted? Check a price.</h2>
-        <p class="hp-lead">Buying to resell? Pick an item, set your margin and see the most you should pay. Real asking prices from the Vinted listings SNYPD saw.</p>
+        <p class="hp-lead">Pick an item, set your margin, see the most you should pay.</p>
       </div>
       <div class="hp-pc" id="pc">
         <div class="hp-pc-pick">
@@ -644,9 +668,9 @@
           </div>
           <!--/plans:home-demo-->
 <!--plans:home-data-->
-        <div class="hp-pc-links"><a href="/vinted-price-guide">All 34 items in the free Vinted price guide &rarr;</a><a href="/vinted-market-report/november-2026">Vinted Market Report, November 2026: 629,839 listings &rarr;</a><span>95,367 listings behind the guide&rsquo;s prices, vinted.be, 18 October to 1 November 2026.</span></div>
+        <div class="hp-pc-links"><a href="/vinted-price-guide">All 34 items in the free Vinted price guide &rarr;</a><a href="/vinted-market-report/november-2026">Vinted Market Report, November 2026: 629,839 listings &rarr;</a></div>
         <!--/plans:home-data-->
-        <p class="hp-pc-foot"><span id="pc-count">This demo covers the items of the free price guide.</span> On Pro and Elite you type any item and get its price by condition. <!--plans:home-trial-checks-demo-->During the free trial you get 10 of these.<!--/plans:home-trial-checks-demo--> Asking prices of live listings, not sale prices: Vinted does not publish what items sell for.</p>
+        <p class="hp-pc-foot"><span id="pc-count">This demo covers the items of the free price guide.</span> <!--plans:home-trial-checks-demo-->During the free trial you get 10 of these.<!--/plans:home-trial-checks-demo--></p>
       </div>
     </div>
   </div>
@@ -654,41 +678,16 @@
   <div id="research" class="hp-sec alt">
     <div class="hp-wrap">
       <div class="hp-head">
-        <span class="hp-eyebrow">HOW THE PRICE RESEARCH WORKS</span>
-        <h2 class="hp-h2">Three ways SNYPD tells you what a price means.</h2>
+        <span class="hp-eyebrow">FOR RESELLERS</span>
+        <h2 class="hp-h2">Know the price before you buy.</h2>
       </div>
-
-      <div class="hp-rs">
-        <div class="hp-rs-card">
-          <div class="hp-rs-top"><span class="num">1</span><span class="tag">EVERY PAID PLAN &middot; FREE TRIAL</span></div>
-          <h3>A price rating on your finds</h3>
-          <p>SNYPD remembers what your search found in the last 7 days and places each new find next to listings in the same condition. Any search, on all 26 Vinted sites.</p>
-          <div class="hp-rs-card-ex" role="img" aria-label="Sample of a find in the dashboard: Ralph Lauren, size M, very good, 12 euros, cheaper than 82 percent of this hunt's finds this week, 412 finds compared">
-            <span class="l1"><b>&euro;12</b> Ralph Lauren &middot; M &middot; Very good</span>
-            <span class="l2">Cheaper than 82% of this hunt's finds this week</span>
-            <span class="l3">same condition &middot; 412 finds compared &middot; sample</span>
-          </div>
-          <ul>
-            <li>It needs 30 finds in that condition. Before that it says nothing rather than guess, so a narrow search often has no rating.</li>
-          </ul>
-        </div>
-
-        <div class="hp-rs-card">
-          <div class="hp-rs-top"><span class="num">2</span><span class="tag"><!--plans:home-trial-checks-tag-->PRO &middot; ELITE &middot; 10 IN THE TRIAL<!--/plans:home-trial-checks-tag--></span></div>
-          <h3>Check a price: any item you type</h3>
-          <p>Type a brand and a model. You get the quick-sale, typical and patient asking price by condition, and the most to pay for your margin. From 14 days of EU listings, in euros.</p>
-          <ul>
-            <li>When listings are too mixed for one honest price, it says so instead of making one up.</li>
-            <li><!--plans:plans-pro-mr-day-->Up to 100 price checks a day<!--/plans:plans-pro-mr-day--> on Pro and Elite. <!--plans:home-trial-checks-short-->A free trial includes 10 in total.<!--/plans:home-trial-checks-short--></li>
-          </ul>
-          <a class="hp-rs-link" href="#try">Try the demo above &uarr;</a>
-        </div>
-
-        <div class="hp-rs-card wide">
-          <div class="hp-rs-top"><span class="num">3</span><span class="tag">PRO &middot; ELITE &middot; FREE TRIAL</span></div>
-          <h3>What's moving: prices that rise or fall</h3>
-          <p>SNYPD follows about 200 popular items every day and shows where sellers now ask more, or less. Each item has a 5-week chart. You also get a weekly report on your own searches.</p>
-          <!--plans:home-market-->
+      <ul class="hp-feat">
+        <li><b>A price rating on your finds.</b> Each new find is compared with what your search found this week, in the same condition. <span class="tag">PAID PLANS &middot; TRIAL</span></li>
+        <li><b>Check a price.</b> Type any item: quick-sale, typical and patient price by condition. <span class="tag"><!--plans:home-trial-checks-tag-->PRO &middot; ELITE &middot; 10 IN THE TRIAL<!--/plans:home-trial-checks-tag--></span></li>
+        <li><b>What's moving.</b> About 200 popular items, followed every day: where sellers now ask more, or less. <span class="tag">PRO &middot; ELITE &middot; TRIAL</span></li>
+      </ul>
+      <div class="hp-mbwrap" id="mb">
+        <!--plans:home-market-->
         <div class="hp-mb" id="mb-sample" data-date="2026-11-11">
           <div class="hp-mb-list">
             <div class="hp-mb-top"><b>What&rsquo;s moving</b><span>EU asking prices (EUR) &middot; board of 11 Nov 2026</span></div>
@@ -706,40 +705,22 @@
           </figure>
         </div>
         <!--/plans:home-market-->
-          <ul>
-            <li>EU listings, in euros. Rising or falling = the last 3 days against 8 to 21 days ago, by 10% or more.</li>
-          </ul>
-        </div>
+        <button type="button" class="hp-mb-more" id="mb-more" aria-expanded="false">SHOW THE 5-WEEK CHART</button>
       </div>
-      <p class="hp-rs-foot">All of it is built on asking prices of real listings. Vinted does not publish what items sold for, so SNYPD never shows &ldquo;sold&rdquo; numbers.</p>
     </div>
   </div>
 
   <div id="how" class="hp-sec">
     <div class="hp-wrap">
       <div class="hp-head">
-        <span class="hp-eyebrow">HOW ALERTS WORK</span>
+        <span class="hp-eyebrow">HOW IT WORKS</span>
         <h2 class="hp-h2">Three steps. Then your phone does the watching.</h2>
       </div>
-      <div class="hp-how">
-        <ol class="hp-steps">
-          <li><span class="k">1</span><div><h3>Say what you want</h3><p>A few words and a maximum price, or any Vinted search link with your own filters.</p></div></li>
-          <li><span class="k">2</span><div><h3>SNYPD checks Vinted for you</h3><p>About once a minute, around the clock during your free trial and on paid plans.</p></div></li>
-          <li><span class="k">3</span><div><h3>You get the alert and buy on Vinted</h3><p>SNYPD never buys and never messages sellers for you.</p></div></li>
-        </ol>
-        <figure class="hp-shot">
-          <img src="/assets/seo/snypd-feed-phone.webp" alt="A matched listing in the SNYPD dashboard, with its price and buttons to open it on Vinted or claim it" width="396" height="650" loading="lazy" decoding="async">
-          <figcaption>A match in your dashboard. The listing's photo is blurred here.</figcaption>
-        </figure>
-      </div>
-      <div class="hp-never">
-        <span class="hp-eyebrow">WHAT SNYPD NEVER DOES</span>
-        <span><span class="hp-tick">&#10003;</span> Never asks for your Vinted password</span>
-        <span><span class="hp-tick">&#10003;</span> Never logs into your account</span>
-        <span><span class="hp-tick">&#10003;</span> Never buys or messages sellers for you</span>
-        <span><span class="hp-tick">&#10003;</span> Only reads public listings</span>
-      </div>
-      <p class="hp-built"><b>Built by a Belgian sneaker reseller</b> (SNYPD's founder: 150+ sales, 3.8k Instagram followers), in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
+      <ol class="hp-steps hp-steps3">
+        <li><span class="k">1</span><div><h3>Say what you want</h3><p>A few words and a max price, or a Vinted search link.</p></div></li>
+        <li><span class="k">2</span><div><h3>SNYPD checks Vinted</h3><p>About once a minute, around the clock.</p></div></li>
+        <li><span class="k">3</span><div><h3>You get the alert</h3><p>You buy on Vinted. SNYPD never buys or messages for you.</p></div></li>
+      </ol>
     </div>
   </div>
 
@@ -747,24 +728,20 @@
     <div class="hp-wrap">
       <div class="hp-head">
         <span class="hp-eyebrow">PRICING</span>
-        <h2 class="hp-h2">Made for people who resell. Free to start.</h2>
-        <p class="hp-lead">Same check speed on every plan. Paid plans keep watching when your dashboard is closed.</p>
+        <h2 class="hp-h2">Free to start. Pro when you resell.</h2>
       </div>
       <div class="hp-top2">
         <div class="hp-plan pro" id="price-pro">
           <span class="for">FOR RESELLERS &middot; MOST COMPLETE</span>
           <span class="name">PRO</span>
           <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
-          <p class="q">Find stock below the typical price, and know what to pay before you buy.</p>
           <ul>
             <li><span class="hp-tick">&#10003;</span> <!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
-            <li><span class="hp-tick">&#10003;</span> A price rating on your finds, and &ldquo;only the cheap ones&rdquo; alerts</li>
-            <li><span class="hp-tick">&#10003;</span> What's moving: rising and falling prices, with charts</li>
-            <li><span class="hp-tick">&#10003;</span> Check a price: any item, by condition</li>
-            <li><span class="hp-tick">&#10003;</span> A weekly report on your own searches</li>
+            <li><span class="hp-tick">&#10003;</span> Price rating and &ldquo;only the cheap ones&rdquo; alerts</li>
+            <li><span class="hp-tick">&#10003;</span> Check a price, What's moving, weekly report</li>
           </ul>
           <a class="hp-btn block" href="/signup?plan=pro">START PRO</a>
-          <span class="under">Need 10 searches? <a href="/signup?plan=elite">Elite</a>: <!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line-->, <!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite-->.</span>
+          <span class="under">Need 10 searches? <a href="/signup?plan=elite">Elite</a>, <!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite-->.</span>
         </div>
         <div class="hp-plan free" id="price-free">
           <span class="for">TRY IT FIRST</span>
@@ -772,40 +749,18 @@
           <span class="price"><!--plans:price:free-->&euro;0<!--/plans:price:free--> <small>no card</small></span>
           <ul>
             <li><span class="hp-tick">&#10003;</span> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line--></li>
-            <li><span class="hp-tick">&#10003;</span> During those days: the price rating on your finds, What's moving and the weekly report</li>
-            <li id="free-trial-checks"><span class="hp-tick">&#10003;</span> <!--plans:home-trial-checks-->Your trial includes 10 price checks for any item you type. A check that finds nothing is not counted. After that, Check a price is part of Pro and Elite.<!--/plans:home-trial-checks--></li>
+            <li id="free-trial-checks"><span class="hp-tick">&#10003;</span> <!--plans:home-trial-checks-->Your trial includes 10 price checks for any item you type.<!--/plans:home-trial-checks--></li>
           </ul>
           <a class="hp-btn ghost block" href="/signup">START FREE</a>
         </div>
       </div>
-      <div id="price-rest" class="hp-plans two">
-        <div class="hp-plan">
-          <span class="for">ONE ITEM, THEN DONE</span>
-          <p class="q">A console, a jacket in your size: find it and stop.</p>
-          <span class="name">HUNT PASS</span>
-          <span class="price sm"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once &middot; VAT incl.</small></span>
-          <ul>
-            <li><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></li>
-            <li class="dim">With the price rating on your finds. Nothing to cancel.</li>
-          </ul>
-          <a class="hp-btn ghost block" href="/signup?plan=pass">GET HUNT PASS</a>
-        </div>
-        <div class="hp-plan">
-          <span class="for">ONE SEARCH, ALWAYS ON</span>
-          <p class="q">Keep watching the same search, month after month.</p>
-          <span class="name">SOLO</span>
-          <span class="price sm"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo &middot; VAT incl.</small></span>
-          <ul>
-            <li><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></li>
-            <li class="dim">With the price rating on your finds. Two searches: <a href="/signup?plan=kickstart">Kickstart</a>, <!--plans:price-mo:kickstart-->&euro;14.99 / mo<!--/plans:price-mo:kickstart-->.</li>
-          </ul>
-          <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
-        </div>
-      </div>
+      <ul id="price-rest" class="hp-rest">
+        <li><b>One item, then done?</b> <a href="/signup?plan=pass">Hunt Pass</a>, <!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> once: <!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line-->.</li>
+        <li><b>One search, always on?</b> <a href="/signup?plan=solo">Solo</a>, <!--plans:price-mo:solo-->&euro;5.99 / mo<!--/plans:price-mo:solo-->.</li>
+      </ul>
       <div class="hp-foot-note">
-        <a href="/plans">Compare all 5 plans side by side &rarr;</a>
-        <a href="https://discord.gg/gjKD4auXhK">Questions first? Ask in the Discord &rarr;</a>
-        <span>Prices per month, VAT included; the Hunt Pass is paid once. Card &middot; Apple Pay &middot; Google Pay.</span>
+        <a href="/plans">Compare all plans &rarr;</a>
+        <span>VAT included. Card &middot; Apple Pay &middot; Google Pay.</span>
       </div>
     </div>
   </div>
@@ -821,13 +776,10 @@
         <details id="faq-rating"><summary>Why does an alert have no price rating?</summary><p>The rating needs 30 finds in the same condition in one week. A busy search gets there in a day or two. A narrow one, like one exact item in one size, often has fewer. The alert still arrives, just without the rating.</p></details>
         <details><summary>Are these the prices items sold for?</summary><p>No. They are asking prices of listings SNYPD saw. Vinted does not publish what items sell for, so SNYPD does not show sale prices or guess them.</p></details>
         <details><summary><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></summary><p><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></p></details>
-        <details id="faq-invite"><summary>Can I get free days?</summary><p>Yes, by inviting friends. Every account has an invite link. When a friend's first hunt finds a listing, they get 2 extra days of 24/7 hunting and you get 3 (up to 4 times). If they subscribe, you get 30% off a renewal. <a href="/signup">Create your free account</a> to get your link.</p></details>
-        <details><summary>How fast are alerts?</summary><p><!--plans:home-faq-speed-a-->About every 60 s (measured median), up to 5 min on quiet searches. Same on every plan. One batched push.<!--/plans:home-faq-speed-a--></p></details>
-        <details><summary>Which markets?</summary><p>Alerts and the price rating: every Vinted site in Europe and the US, 26 in all. What's moving and Check a price: EU listings, in euros.</p></details>
-        <details><summary>How long do matches stay?</summary><p>About 30 minutes while listed. The alert on your phone keeps what the feed drops.</p></details>
         <details><summary>Alerts on iPhone?</summary><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></details>
+        <details id="faq-invite"><summary>Can I get free days?</summary><p>Yes, by inviting friends. Every account has an invite link. When a friend's first hunt finds a listing, they get 2 extra days of 24/7 hunting and you get 3 (up to 4 times). If they subscribe, you get 30% off a renewal. <a href="/signup">Create your free account</a> to get your link.</p></details>
       </div>
-      <p class="hp-faq-more">Something else? Ask the community on <a href="https://discord.gg/gjKD4auXhK">Discord</a>, or read the <a href="/faq">full FAQ</a>.</p>
+      <p class="hp-faq-more">Something else? Read the <a href="/faq">full FAQ</a> or ask on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
     </div>
   </div>
 
@@ -835,7 +787,7 @@
     <div class="hp-wrap hp-close">
       <div class="l">
         <h2 class="hp-h2" style="max-width:20ch;">Let it watch. Know what the price means.</h2>
-        <p class="hp-lead" style="font-size:14px;">Free account, no card. Type what you want and SNYPD starts checking.</p>
+        <p class="hp-lead" style="font-size:14px;">Free account, no card.</p>
       </div>
       <div class="r">
         <a class="hp-btn" href="/signup">START FREE</a>
@@ -1057,6 +1009,12 @@
 
   /* ---------- v7: the chart line draws once when it scrolls into view ---------- */
   function setupChart() {
+    // v9: on phones the board shows and the chart waits for a tap (CSS hides it until #mb has .open)
+    var mb = $('mb'), more = $('mb-more');
+    if (mb && more) more.addEventListener('click', function () {
+      mb.classList.add('open'); more.setAttribute('aria-expanded', 'true');
+      ga('home_chart_open', {});
+    });
     var fig = document.querySelector('.hp-chart');
     if (!fig || reduce || typeof IntersectionObserver !== 'function') return;
     fig.classList.add('wait');

@@ -103,19 +103,24 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   {
     const { page, ctx } = await open('');
     const links = await page.$$eval('a[href^="/signup"]', as => as.map(a => a.getAttribute('href') + ' | ' + a.textContent.trim()));
-    for (const want of ['/signup?plan=pass | GET HUNT PASS', '/signup?plan=solo | START SOLO', '/signup?plan=pro | START PRO', '/signup?plan=kickstart | Kickstart', '/signup?plan=elite | Elite']) {
+    // v9: Hunt Pass and Solo are one-line text links; Kickstart is reached through "Compare all plans" (/plans)
+    for (const want of ['/signup?plan=pass | Hunt Pass', '/signup?plan=solo | Solo', '/signup?plan=pro | START PRO', '/signup?plan=elite | Elite']) {
       ok(links.includes(want), 'plan link present: ' + want);
     }
+    ok(await page.$eval('#pricing a[href="/plans"]', a => /Compare all plans/.test(a.textContent)), 'pricing links to the full plan list');
     ok((await page.$$('#stat-listings')).length === 1 && (await page.$$('#stat-listings-asof')).length === 1, 'one listings figure and one date for prepublish.py');
     const text = await page.evaluate(() => document.body.innerText);
     ok(!/outnumbered|spots left|SEE HOW IT WORKS/i.test(text), 'the v5 hero and founding line are gone');
     ok(/SAMPLE/.test(text), 'the example alerts are labelled as samples');
     const main = await page.$eval('#hero-alert-main', e => e.innerText.replace(/\s+/g, ' '));
-    ok(/Cheaper than 76% of this week's finds . Jordan 1 Low Travis Scott . €180/.test(main), 'the worked example: the Travis Scott alert in the wording a real alert uses: ' + main);
-    ok(/62 listings in the same condition this week/.test(await page.$eval('#hero-ex', e => e.innerText)), 'the example says what the price line is built on');
-    // Pro leads the plans; Free sits next to it; the one-item and one-search plans follow
+    // v9: item and price first, the rating on its own line under them
+    ok(/Jordan 1 Low Travis Scott . €180\s*Cheaper than 76% of this week's finds/.test(main), 'the worked example: item and price first, then the rating: ' + main);
+    ok((await page.$$('#hero-ex')).length === 0, 'v9: no rating explanation in the hero (it lives in the FAQ)');
+    eq(await page.$$eval('#hero-alerts .hp-alert', a => a.length), 3, 'v9: three sample alerts arrive in the hero (desktop)');
+    // Pro leads the plans; Free sits next to it; Hunt Pass and Solo follow as one line each
     const order = await page.$$eval('#pricing .hp-plan', ps => ps.map(p => p.querySelector('.name').textContent.trim()));
-    eq(order, ['PRO', 'FREE', 'HUNT PASS', 'SOLO'], 'plan order: Pro first');
+    eq(order, ['PRO', 'FREE'], 'plan order: Pro first, Free beside it');
+    eq(await page.$$eval('#price-rest li', l => l.length), 2, 'v9: Hunt Pass and Solo as one line each');
     ok(await page.$eval('#price-pro a.hp-btn', a => !a.classList.contains('ghost') && a.getAttribute('href') === '/signup?plan=pro'), 'the Pro card has the solid button');
     // v8: trial price checks, the number from plans.json
     const tc = JSON.parse(fs.readFileSync(path.join(root, 'ops/seo/data/plans.json'), 'utf8')).market_report.trial_checks;
@@ -128,7 +133,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     // v8: the rating is promised for busy searches only
     ok(!/every (new )?(find|alert)\b/i.test(all), 'the page never promises a rating on "every find" or "every alert"');
     ok(/On busy searches, new finds come with a price rating/.test(await page.$eval('.hp-sub', e => e.textContent)), 'the hero line limits the rating to busy searches');
-    ok(/needs 30 finds in the same condition/.test(await page.$eval('#hero-ex-note', e => e.textContent)), 'the worked example says what the rating needs');
+    // v9: the rating rule is stated once, in the FAQ (it was repeated three times in v8)
+    eq((all.match(/30 finds in the same condition/g) || []).length, 1, 'v9: the 30-finds rule appears exactly once (FAQ)');
     const fq = await page.$eval('#faq-rating', e => e.textContent);
     ok(/Why does an alert have no price rating\?/.test(fq) && /30 finds in the same condition/.test(fq) && /alert still arrives/.test(fq), 'the FAQ explains an alert without a rating');
     ok(!/\b(instant|real-time|fastest|undetectable|sold prices|the only|nobody else)\b/i.test(all), 'no banned claim on the page (folded answers included)');
@@ -221,9 +227,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await p2.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await p2.setRequestInterception(true); p2.on('request', r => (r.url().startsWith(base) || r.url().startsWith('data:')) ? r.continue() : r.abort());
     await p2.goto(base + '/', { waitUntil: 'domcontentloaded' }); await wait(900);
-    const rm = await p2.evaluate(() => ({ wait: document.querySelector('.hp-chart').classList.contains('wait'), anim: getComputedStyle(document.getElementById('hero-alert-main')).animationName,
-      mark: getComputedStyle(document.getElementById('hero-ex-mark')).animationName }));
-    eq(rm, { wait: false, anim: 'none', mark: 'none' }, 'with reduced motion the alert, the marker and the chart line do not move');
+    // v9: the three alerts arrive one by one; with reduced motion none of them (and not the chart line) moves
+    const rm = await p2.evaluate(() => ({ wait: document.querySelector('.hp-chart').classList.contains('wait'),
+      anims: Array.prototype.map.call(document.querySelectorAll('#hero-alerts .hp-alert'), e => getComputedStyle(e).animationName) }));
+    eq(rm, { wait: false, anims: ['none', 'none', 'none'] }, 'with reduced motion the three alerts and the chart line do not move');
     await c2.close();
   }
 
@@ -251,7 +258,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       const nav = document.getElementById('nav-start'), set = document.querySelector('.snc-bar [data-snc="settings"]').getBoundingClientRect(), rej = document.querySelector('.snc-bar [data-snc="reject"]').getBoundingClientRect();
       return { bar: Math.round(r('.snc-bar').top), ih: innerHeight, h1: Math.round(r('.hp-h1').top), sub: Math.round(r('.hp-sub').bottom), aTop: Math.round(r('#hero-alert-phone').top), aBot: Math.round(r('#hero-alert-phone').bottom),
         goTop: Math.round(r('#qs-go').top), go: Math.round(r('#qs-go').bottom), fieldTop: Math.round(r('#qs-words').top), goH: Math.round(r('#qs-go').height), field: Math.round(r('#qs-words').height), fieldW: Math.round(r('#qs-words').width),
-        text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: shown('#hero-ex'),
+        text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: !!document.getElementById('hero-ex'),
         navText: nav.innerText.trim(), navH: Math.round(nav.getBoundingClientRect().height), navLine: Math.round(parseFloat(getComputedStyle(nav).lineHeight) || 0),
         subText: document.querySelector('.hp-sub').innerText.trim(), goText: document.getElementById('qs-go').innerText.trim(),
         settingsOnRow: Math.abs((set.top + set.height / 2) - (rej.top + rej.height / 2)) <= 2, sw: document.documentElement.scrollWidth, iw: innerWidth };
@@ -261,9 +268,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(m.h1 >= 0 && m.sub <= m.aTop, name + ': headline and its line come first, then the sample alert');
     ok(m.aTop >= 0 && m.aBot <= m.bar, name + ': the sample alert is on the first screen above the cookie bar (' + m.aTop + '-' + m.aBot + ' of ' + m.bar + ')');
     ok(m.goTop >= m.aBot && m.go <= m.bar, name + ': the main button is on the first screen above the cookie bar (' + m.go + ' of ' + m.bar + ')');
-    ok(/SAMPLE/.test(m.text) && /Cheaper than 76% of this week's finds . Jordan 1 Low Travis Scott . €180/.test(m.text), name + ': the alert is the Travis Scott sample with its price line: ' + m.text);
+    ok(/SAMPLE/.test(m.text) && /Jordan 1 Low Travis Scott . €180\s*Cheaper than 76% of this week's finds/.test(m.text), name + ': the alert is the Travis Scott sample, item and price first, then the rating: ' + m.text);
     ok(/busy searches/i.test(m.subText) && /price rating/.test(m.subText), name + ': the line under the headline still limits the rating to busy searches: ' + m.subText);
-    eq([m.main, m.max, m.ex], [false, false, true], name + ': one copy of the alert, no max-price field, the explanation still below');
+    eq([m.main, m.max, m.ex], [false, false, false], name + ': one copy of the alert, no max-price field, no rating explanation (v9: FAQ only)');
     ok(m.goH >= 44 && m.field >= 44 && m.fieldW >= 110, name + ': the field and the button are big enough to use (' + [m.fieldW, m.field, m.goH] + ')');
     ok(m.sw <= m.iw + 1, name + ': no sideways scroll');
     eq(m.navText, w < 360 ? 'START' : 'START FREE', name + ': header button label');
