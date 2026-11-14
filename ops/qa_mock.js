@@ -140,6 +140,10 @@
         is_founding_member: true,
         // ?pass=1: a running 30-day Hunt Pass (migration 063), 5 days left: never shown the keep-my-plan card.
         pass_expires_at: params.get('pass') === '1' ? new Date(now + 5 * 864e5).toISOString() : null,
+        // Keep my plan (/account): ?keep=tech|cost|none|unused = Whop membership set to end on 7 Dec 2026; ?pass=1 = the Hunt Pass plan id.
+        whop_cancel_at_period_end: ['tech', 'cost', 'none', 'unused'].indexOf(params.get('keep')) !== -1,
+        current_period_end: (PLAN === 'elite' || params.get('active') === '1') ? '2026-12-07T00:36:00Z' : null,
+        whop_plan_id: params.get('pass') === '1' ? 'plan_zLbAN08OXSJYo' : ((PLAN === 'elite' || params.get('active') === '1') ? 'plan_test_' + PLAN : null),
         founding_number: 7,
         // ?bonus=1: referral bonus days running (3 days left); ?bonus=ended: they ended an hour ago (migration 085/090).
         referral_bonus_until: params.get('bonus') === '1' ? new Date(now + 3 * 86400000).toISOString()
