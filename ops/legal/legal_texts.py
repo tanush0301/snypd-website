@@ -44,6 +44,7 @@ def privacy_body(email, discord):
   <ul>
     <li>The Vinted search links you save, their names and whether they are paused.</li>
     <li>In your first week: which set-up steps you reached (for example whether your first search has a price limit and whether alerts were turned on) and the type of device you used (for example iPhone or computer). It is saved with your account and holds no listing and no search words.</li>
+    <li>If you open a checkout on our plans page while signed in: which plan, which of our pages sent you there, the type of device, whether Apple Pay was available on it, whether the payment form loaded, and whether you closed the checkout, paid, or the payment failed or was canceled. It is saved with your account and holds no card or payment details (Whop handles those).</li>
     <li>Listings you mark as bought or sold, with the prices you enter.</li>
     <li>Points, streaks and ranks, including how many seconds per day your dashboard is open (this decides streaks).</li>
     <li>Your alert settings, such as quiet hours.</li>
@@ -73,6 +74,7 @@ def privacy_body(email, discord):
     <li><strong>To see which pages are read and where visitors come from</strong>, as page-view totals counted without cookies. Legal basis: our legitimate interest in knowing what works on our website (article 6(1)(f)).</li>
     <li><strong>To see which ads and links bring sign-ups</strong>, using the campaign tags above. Legal basis: our legitimate interest in knowing which marketing works (article 6(1)(f)).</li>
     <li><strong>To see where set-up goes wrong</strong>, using the set-up steps above. Legal basis: our legitimate interest in a service that is easy to start with (article 6(1)(f)).</li>
+    <li><strong>To see where payments fail</strong>, using the checkout steps above. Legal basis: our legitimate interest in a checkout that works (article 6(1)(f)).</li>
     <li><strong>To credit partners</strong> who send you to SNYPD, and to count partner-link visits. Legal basis: our legitimate interest in running the partner programme, and your consent for anything stored on your device.</li>
     <li><strong>Analytics and ad measurement</strong>. Legal basis: your consent (article 6(1)(a)), which you can withdraw at any time in the <a href="/cookies">cookie settings</a>.</li>
     <li><strong>To show anonymous hunting statistics</strong>: we count how many users hunt a brand or type of item (for example "Nike Tech") and the typical maximum price they set. We show these totals to SNYPD users and use them to suggest changes to your own hunts. A total is shown only when at least 5 different users hunt it. We never show your search words, sizes, or any single person's settings. You can leave these statistics at any time in Profile. Legal basis: our legitimate interest in helping users hunt better (article 6(1)(f)).</li>

@@ -263,6 +263,7 @@
     };
   });
 </script>
+<script defer src="/assets/checkout-record.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" onload="SNYPD.sbInit()" onerror="SNYPD.sbInit()"></script>
 
 <!-- Cookie consent: Google Analytics loads only after the visitor agrees. The Whop
@@ -701,7 +702,42 @@
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function track(name, params) { try { if (typeof gtag === 'function') gtag('event', name, params || {}); } catch (e) {} }
+  function track(name, params) {
+    try { if (typeof gtag === 'function') gtag('event', name, params || {}); } catch (e) {}
+    if (typeof coFromTrack === 'function') coFromTrack(name, params || {});
+  }
+
+  // ----- Checkout record (assets/checkout-record.js; website repo outreach/62, move 1) -------------
+  // Signed-in accounts only, on the account's own Auth metadata (user_metadata.co): which plan's checkout
+  // was opened and from where, the device, whether the payment form loaded, and how it ended. Fed by this
+  // page's track() calls; started at the end of this script. Shows nothing, changes nothing, never blocks.
+  var coRec = null, coQueue = [], coOpenedAt = {}, coDone = {};
+  var coSearch0 = location.search, coRef0 = document.referrer;  // before openRequested() rewrites the address
+  function coTrack(ev) {
+    try { if (coRec) coRec.track(ev); else if (coQueue.length < 10) coQueue.push(ev); } catch (e) {}
+  }
+  function coFromTrack(name, p) {
+    var k = p.plan;
+    if (name === 'plans_checkout_open') {
+      coOpenedAt[k] = Date.now();
+      coDone[k] = false;
+      var R = window.SnypdCheckoutRecord, ev = { k: 'open', plan: k };
+      try {
+        if (R) {
+          var standalone = window.navigator.standalone === true
+            || !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+          ev.d = R.device(navigator.userAgent, navigator.platform, navigator.maxTouchPoints, standalone);
+          ev.src = R.source(coSearch0, coRef0, location.origin);
+          if (window.ApplePaySession && ApplePaySession.canMakePayments) ev.ap = ApplePaySession.canMakePayments() ? 1 : 0;
+        }
+      } catch (e) {}
+      coTrack(ev);
+    } else if (name === 'plans_checkout_loaded') coTrack({ k: 'load' });
+    else if (name === 'plans_checkout_fallback') coTrack({ k: 'fallback' });
+    else if (name === 'plans_checkout_close') coTrack({ k: 'close', secs: p.secs });
+    else if (name === 'plans_checkout_complete') { coDone[k] = true; coTrack({ k: 'paid' }); if (coRec) coRec.flush(); }
+    else if (name === 'plans_checkout_return' && (p.status === 'failed' || p.status === 'canceled')) coTrack({ k: p.status });
+  }
 
   // ----- Nav: mobile menu, sticky offset ----------------------------------
   var menuBtn = $('menu-btn'), menu = $('mobile-menu');
@@ -985,6 +1021,7 @@
       if (mount) mount.hidden = false;
       var fallback = o.querySelector('[data-hosted-fallback]');
       if (fallback) fallback.hidden = true;
+      var loaded = false;
       var opts = {
         plan: WHOP_PLANS[k],
         locale: LOCALE || 'en',
@@ -992,7 +1029,10 @@
         // Back here after an off-site step (3-D Secure, bank page) or a finished
         // payment; checkoutReturn() below reads ?status.
         returnUrl: location.origin + '/plans?checkout=' + k,
-        onLoadingChange: function (busy) { if (loading) loading.hidden = !busy; },
+        onLoadingChange: function (busy) {
+          if (loading) loading.hidden = !busy;
+          if (!busy && !loaded) { loaded = true; track('plans_checkout_loaded', { plan: k }); }
+        },
         onComplete: function (c) {
           if (c && c.result === 'payment') track('plans_checkout_complete', { plan: k });
         }
@@ -1044,7 +1084,11 @@
     return true;
   }
   function closeCheckouts() {
-    document.querySelectorAll('[data-whop-embed-overlay]').forEach(function (o) { o.hidden = true; });
+    document.querySelectorAll('[data-whop-embed-overlay]').forEach(function (o) {
+      var k = o.getAttribute('data-whop-embed-overlay');
+      if (!o.hidden && !coDone[k]) track('plans_checkout_close', { plan: k, secs: coOpenedAt[k] ? Math.round((Date.now() - coOpenedAt[k]) / 1000) : null });
+      o.hidden = true;
+    });
     document.body.style.overflow = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
@@ -1155,6 +1199,24 @@
       paintSbar();
     }).observe(document.querySelector('[data-section="end"]'));
   }
+
+  // ----- Checkout record: start ---------------------------------------------------
+  SNYPD.sbReady.then(function (sb) {
+    var R = window.SnypdCheckoutRecord;
+    if (!sb || !sb.auth || !sb.auth.updateUser || !R) return null;
+    return sb.auth.getSession().then(function (res) {
+      var user = res && res.data && res.data.session && res.data.session.user;
+      if (!user || coRec) return;
+      var stored = function (u) { return (u && u.user_metadata && u.user_metadata.co) || null; };
+      coRec = R.create({
+        prev: stored(user),
+        load: function () { return sb.auth.getUser().then(function (r) { return stored(r && r.data && r.data.user); }); },
+        save: function (co) { return sb.auth.updateUser({ data: { co: co } }); }
+      });
+      coQueue.splice(0).forEach(function (ev) { coRec.track(ev); });
+      window.addEventListener('pagehide', function () { coRec.flush(); });
+    });
+  }).catch(function () {});
 
   // ----- Listings figure ------------------------------------------------------
   // Same cached figure as the homepage (public_stats, refreshed every 15 min by
