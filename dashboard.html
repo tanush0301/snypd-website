@@ -1760,6 +1760,9 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     .hw-box__plan { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
     .hw-box__keep { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .hw-box__keep .btn { height: 30px; padding: 0 12px; font-size: 11px; }
+    .mx-row { display: flex; gap: 8px; margin-top: 10px; }
+    .mx-row input { flex: 1 1 auto; min-width: 0; height: 32px; padding: 0 10px; background: var(--field, #191C1E); border: 1px solid var(--border); color: var(--text-primary); }
+    .mx-row .btn { height: 32px; padding: 0 12px; font-size: 11px; flex: 0 0 auto; }
     .wiz-preset {
       display: flex; flex-direction: column; gap: 4px;
       text-align: left; width: 100%; padding: 14px 16px;
@@ -1930,6 +1933,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
           <input type="number" id="fs-q-max" min="0" step="1" inputmode="numeric" placeholder="Max price" aria-label="Maximum price (optional)" />
         </div>
         <div class="hw-box" id="fs-q-hw" role="status" style="display:none"></div>
+        <div class="hw-box" id="fs-q-mx" role="status" style="display:none"></div>
         <input type="text" id="filter-new-name" placeholder="Name — e.g. Ralph Lauren shirts" />
         <p class="vq-or">or paste a Vinted search link</p>
         <input type="text" id="filter-new-url" placeholder="Paste /catalog?... link" />
@@ -1969,6 +1973,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
         <p class="wiz-quick__note" id="wiz-q-note">Lower or clear the minimum to include cheaper items. Like Vinted's search, matches can include words in the description.</p>
         <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
         <div class="hw-box" id="wiz-q-hw" role="status" style="display:none"></div>
+        <div class="hw-box" id="wiz-q-mx" role="status" style="display:none"></div>
       </div>
       <div class="wiz-actions">
         <button class="btn btn-prim" id="wiz-q-save" type="button">Start this hunt</button>
@@ -2214,6 +2219,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <button class="btn btn-prim" id="broad-hunt-apply" type="button" style="display:none"></button>
     <button class="btn btn-prim" id="broad-hunt-undo" type="button" style="display:none">Undo</button>
     <button class="btn btn-prim" id="broad-hunt-calm" type="button" style="display:none">Switch to Calm</button>
+    <button class="btn btn-ghost" id="broad-hunt-calmall" type="button" style="display:none"></button>
     <button class="btn btn-ghost" id="broad-hunt-edit" type="button">Edit hunt</button>
     <button class="btn btn-ghost" id="broad-hunt-keep" type="button">Keep it</button>
   </div>
@@ -2686,7 +2692,8 @@ const HEARTBEAT_URL = (() => {
       const cards = () => {
         if (seen($id('wiz-overlay'))) return;
         if (seen(card)) t.track({ card: 'shown' });
-        if (seen(broad)) t.track({ vol: 'shown', vol_k: seen($id('broad-hunt-apply')) ? 'coach' : 'broad' });
+        // Each card stamps its kind (website outreach/62 move 3): the feed-based broad card can now offer an apply too.
+        if (seen(broad)) t.track({ vol: 'shown', vol_k: broad.dataset.kind ? (broad.dataset.kind === 'coach' ? 'coach' : 'broad') : (seen($id('broad-hunt-apply')) ? 'coach' : 'broad') });
       };
       watch(card, cards);
       watch(broad, cards);
@@ -3511,6 +3518,49 @@ const HEARTBEAT_URL = (() => {
     function hwHide(box) { if (box) { box.style.display = 'none'; box.innerHTML = ''; } }
     window.SNYPD = window.SNYPD || {};
     window.SNYPD.hw = { check: hwCheck, html: hwHtml, show: hwShow, hide: hwHide, esc: hwEsc, smallPlan: hwSmallPlan };
+    // Max-price nudge (14 Nov 2026, website outreach/62 move 3). First hunts saved 5-13 Nov without a max price brought
+    // more than 1,000 matches in 24 h in 14 of 30 cases (with one: 22 of 85). Before such a search is saved: one box with
+    // a max-price field; "Start without a max" saves it unchanged. Once per search, never blocks.
+    function mxWithMax(url, max) {
+      const u = String(url || '');
+      const i = u.indexOf('#');
+      const hash = i >= 0 ? u.slice(i) : '';
+      const base = i >= 0 ? u.slice(0, i) : u;
+      if (/[?&]price_to=[^&]*/.test(base)) return base.replace(/([?&])price_to=[^&]*/, '$1price_to=' + max) + hash;
+      return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'price_to=' + max + hash;
+    }
+    function mxValue(raw) {
+      const v = Number(String(raw == null ? '' : raw).trim().replace(',', '.'));
+      return isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null;
+    }
+    function mxShow(box, cur, onMax, onKeep) {
+      if (!box) return;
+      box.innerHTML = '<div class="hw-box__t">' + hwSpan('Add a max price?') + '</div>'
+        + '<div class="hw-box__x">' + hwSpan('About half of the searches saved without one bring more than 1,000 matches a day: more alerts than anyone can open.') + '</div>'
+        + '<div class="mx-row"><input type="number" min="0" step="0.01" inputmode="decimal" data-mx-in aria-label="Maximum price" placeholder="' + hwEsc('Max ' + (cur || 'EUR')) + '" />'
+        + '<button class="btn btn-prim" type="button" data-mx-act="use">' + hwSpan('Use this max') + '</button></div>'
+        + '<div class="hw-box__keep"><button class="btn btn-ghost" type="button" data-mx-act="keep">' + hwSpan('Start without a max') + '</button></div>';
+      box.style.display = '';
+      const input = box.querySelector('[data-mx-in]');
+      const use = () => {
+        const v = mxValue(input && input.value);
+        if (v === null) { if (input) input.focus(); return; }
+        box.style.display = 'none';
+        onMax(v);
+      };
+      box.onclick = e => {
+        const a = e.target.closest('[data-mx-act]');
+        if (!a) return;
+        if (a.getAttribute('data-mx-act') === 'use') use();
+        else { box.style.display = 'none'; onKeep(); }
+      };
+      if (input) {
+        input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); use(); } };
+        try { input.focus(); } catch (e) {}
+      }
+    }
+    function mxHide(box) { if (box) { box.style.display = 'none'; box.innerHTML = ''; } }
+    window.SNYPD.mx = { show: mxShow, hide: mxHide, withMax: mxWithMax, value: mxValue };
 
     // floor: number or null. price_from is left out when it would sit at or
     // above the max price, which would return nothing.
@@ -3694,6 +3744,7 @@ const HEARTBEAT_URL = (() => {
       siteNote.style.display = msg ? '' : 'none';
     }
     let hwKeptUrl = null;   // the link the user chose to keep as typed after the words check
+    let mxKeptUrl = null;   // the link the user chose to save without a max price (max-price nudge)
     async function addHunt() {
       let url = urlInput.value.trim();
       // A link copied without its scheme ("vinted.fr/catalog?...") is still a link.
@@ -3726,6 +3777,23 @@ const HEARTBEAT_URL = (() => {
           return;
         }
         hwHide(hwBox);
+      }
+      {
+        // Max-price nudge (website outreach/62 move 3): a link without a max price, once per link, never blocks.
+        const mx = window.SNYPD && window.SNYPD.mx, mxBox = document.getElementById('fs-q-mx');
+        if (mx && !/[?&]price_to=[0-9]/.test(url) && mxKeptUrl !== url) {
+          let cur = 'EUR';
+          try { cur = SITE_CURRENCY[new URL(url).hostname.replace(/^www\./, '')] || 'EUR'; } catch (e) {}
+          mx.show(mxBox, cur, v => {
+            const next = mx.withMax(url, v);
+            if (hwKeptUrl === url) hwKeptUrl = next;
+            urlInput.value = next;
+            if (qMax && qWords && qWords.value.trim()) qMax.value = String(v);
+            addHunt();
+          }, () => { mxKeptUrl = url; addHunt(); });
+          return;
+        }
+        if (mx) mx.hide(mxBox);
       }
       saveBtn.disabled = true;
       const wasFirst = rows.length === 0;
@@ -4189,6 +4257,7 @@ const HEARTBEAT_URL = (() => {
           }
         } catch (e) {} finally { try { localStorage.removeItem('snypd_hunt_intent'); } catch (ignored) {} }
         let wqKept = null;   // words the user chose to keep as typed after the words check
+        let wqNoMax = null;  // words the user chose to start without a max price (max-price nudge)
         wqSave.addEventListener('click', async () => {
           const words = wqWords.value.trim();
           if (!words) {
@@ -4199,7 +4268,7 @@ const HEARTBEAT_URL = (() => {
           }
           const minText = wqMin ? wqMin.value.trim() : '';
           const maxText = wqMax ? wqMax.value.trim() : '';
-          const min = minText === '' ? null : Number(minText);
+          let min = minText === '' ? null : Number(minText);
           const max = maxText === '' ? null : Number(maxText);
           if ((wqMin && wqMin.validity && wqMin.validity.badInput) || (wqMax && wqMax.validity && wqMax.validity.badInput)
             || (min !== null && (!Number.isFinite(min) || min < 0))
@@ -4207,6 +4276,12 @@ const HEARTBEAT_URL = (() => {
             wqErr.textContent = 'Use a minimum of zero or more and a maximum above zero, or leave them blank.';
             wqErr.style.display = 'block';
             return;
+          }
+          // The untouched default minimum (30 EUR, 25 GBP ...) at or above the max typed here: clear it instead of
+          // refusing. The search builder already leaves such a minimum out (vqBuild); website outreach/62 move 3.
+          if (min !== null && max !== null && min >= max && !minEdited && wqMin && min === vq.floorFor(wqSite.value)) {
+            wqMin.value = '';
+            min = null;
           }
           if (min !== null && max !== null && min >= max) {
             wqErr.textContent = 'Minimum price must be below maximum price. Lower or clear the minimum.';
@@ -4223,6 +4298,13 @@ const HEARTBEAT_URL = (() => {
             return;
           }
           if (hw) hw.hide(hwBox);
+          // Max-price nudge (website outreach/62 move 3): once per words, never blocks.
+          const mx = window.SNYPD.mx, mxBox = document.getElementById('wiz-q-mx');
+          if (mx && max === null && wqNoMax !== words) {
+            mx.show(mxBox, vq.currencyFor(wqSite.value), v => { if (wqMax) wqMax.value = String(v); wqSave.click(); }, () => { wqNoMax = words; wqSave.click(); });
+            return;
+          }
+          if (mx) mx.hide(mxBox);
           await saveSearch(words, vq.build(wqSite.value, words, maxText, min));
         });
         wqWords.addEventListener('input', () => { wqKept = null; if (window.SNYPD.hw) window.SNYPD.hw.hide(document.getElementById('wiz-q-hw')); });
@@ -6654,6 +6736,15 @@ const HEARTBEAT_URL = (() => {
   const BROAD_PER_30MIN = 25;
   let broadSig = null;
   let broadHunt = null;
+  let broadBusy = [];   // every-mode rows of all hunts above the threshold ("Calm all", website outreach/62 move 3)
+  function broadRemember(sig) {
+    if (!sig) return;
+    try {
+      const kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {};
+      kept[sig] = Date.now();
+      localStorage.setItem('snypd_broad_ok', JSON.stringify(kept));
+    } catch (e) {}
+  }
   // Calm mode (migration 064) solves the noise without narrowing the hunt, so the card offers it and never shows
   // for a hunt that is already calm. One read of the user's hunts, only when the card would show.
   let broadModes = null;
@@ -6783,6 +6874,7 @@ const HEARTBEAT_URL = (() => {
     } else {
       coachButtons(['broad-hunt-edit', 'broad-hunt-keep']);
     }
+    card.dataset.kind = 'coach';
     card.style.display = '';
   }
   async function loadCoach() {
@@ -6931,6 +7023,8 @@ const HEARTBEAT_URL = (() => {
       if (est > topN) { top = sig; topN = est; }
     }
     if (!top || topN < BROAD_PER_30MIN) return;
+    const busySigs = [];
+    for (const [sig, n] of counts) if (Math.round(feed.eligibleCount * n / seen) >= BROAD_PER_30MIN) busySigs.push(sig);
     let kept = {};
     try { kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {}; } catch (e) {}
     if (kept[top]) return;
@@ -6940,6 +7034,9 @@ const HEARTBEAT_URL = (() => {
       row = (await huntModes()).find(h => h.is_active === true && savedSearchSignature(h.vinted_url) === top) || null;
     } catch (e) { console.error('SNYPD: broad-hunt mode lookup failed', e); }
     if (row && (row.push_mode === 'calm' || row.push_mode === 'cheap')) return;
+    let allRows = [];
+    try { allRows = await huntModes(); } catch (e) { allRows = []; }
+    broadBusy = allRows.filter(h => h.is_active === true && (h.push_mode || 'every') === 'every' && busySigs.indexOf(savedSearchSignature(h.vinted_url)) >= 0);
     broadSig = top;
     broadHunt = row && ('push_mode' in row) ? row : null;
     const bt = document.getElementById('broad-hunt-title');
@@ -6947,10 +7044,39 @@ const HEARTBEAT_URL = (() => {
     ['broad-hunt-apply', 'broad-hunt-undo'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; });
     const be = document.getElementById('broad-hunt-edit'), bk = document.getElementById('broad-hunt-keep');
     if (be) be.style.display = ''; if (bk) bk.style.display = '';
-    text.textContent = 'About ' + (topN * 2) + ' new listings an hour match "' + (url ? huntLabel(url) : 'this hunt')
-      + '": more than anyone can open, so alerts become noise. On Vinted, add a size or a max price, copy the link and paste it into this hunt.';
+    const label = url ? huntLabel(url) : 'this hunt';
+    // A max price from this hunt's own matches (website outreach/62 move 3): the price under which a quarter of what it
+    // matched in the last 30 min sits, offered through the hunt coach's tested apply + Undo. Needs 8+ priced matches.
+    const priced = feed.rows.filter(r => r.item_box && r.item_box.snypd_filter_contract && r.item_box.snypd_filter_contract.search === top
+      && r.price && isFinite(Number(r.price.amount)) && Number(r.price.amount) > 0);
+    const amounts = priced.map(r => Number(r.price.amount)).sort((a, b) => a - b);
+    const cur = (priced[0] && priced[0].price.currency_code) || 'EUR';
+    let suggest = null;
+    if (broadHunt && amounts.length >= 8) {
+      const p25 = Math.floor(amounts[Math.floor((amounts.length - 1) * 0.25)]);
+      const m = /[?&]price_to=([^&#]*)/.exec(String(broadHunt.vinted_url || ''));
+      const curMax = m ? parseFloat(decodeURIComponent(m[1]).replace(',', '.')) : NaN;
+      const floor = linkMin(broadHunt.vinted_url);
+      if (p25 >= 1 && !(isFinite(curMax) && p25 >= curMax) && !(floor !== null && p25 <= floor)) suggest = p25;
+    }
+    const sentences = ['About ' + (topN * 2) + ' new listings an hour match "' + label + '": more than anyone can open.'];
+    if (suggest !== null) sentences.push('A max price of ' + fmtMoney(suggest, cur) + ' keeps the cheapest quarter of them.');
+    if (broadHunt) sentences.push('Or switch to Calm: at most one summary every 15 min.');
+    else sentences.push('On Vinted, add a size or a max price, copy the link and paste it into this hunt.');
+    if (broadBusy.length >= 2) sentences.push(broadBusy.length + ' of your hunts are this busy.');
+    coachPaint(sentences);
+    const applyBtn = document.getElementById('broad-hunt-apply');
+    if (suggest !== null && applyBtn) {
+      coachShown = { id: broadHunt.id, url: broadHunt.vinted_url, name: label, verdict: 'busy', suggest: { max: suggest }, currency: cur, sig: top, feed: true };
+      applyBtn.textContent = 'Set max ' + fmtMoney(suggest, cur);
+      applyBtn.style.display = ''; applyBtn.disabled = false;
+      if (be) be.style.display = 'none';
+    }
     const calmBtn = document.getElementById('broad-hunt-calm');
     if (calmBtn) { calmBtn.style.display = broadHunt ? '' : 'none'; calmBtn.disabled = false; }
+    const calmAllBtn = document.getElementById('broad-hunt-calmall');
+    if (calmAllBtn) { calmAllBtn.style.display = broadBusy.length >= 2 ? '' : 'none'; calmAllBtn.disabled = false; calmAllBtn.textContent = 'Calm all ' + broadBusy.length; }
+    card.dataset.kind = 'broad';
     card.style.display = '';
   }
   (function wireBroadHunt() {
@@ -6979,8 +7105,30 @@ const HEARTBEAT_URL = (() => {
         localStorage.setItem('snypd_broad_ok', JSON.stringify(kept));
       } catch (e) {}
       if (text) text.textContent = 'Done: "' + huntLabel(broadHunt.vinted_url) + '" now sends at most one summary every 15 min. Change it anytime in Filters.';
-      [calm, edit, keep].forEach(b => { if (b) b.style.display = 'none'; });
+      [calm, edit, keep, document.getElementById('broad-hunt-apply'), document.getElementById('broad-hunt-calmall')].forEach(b => { if (b) b.style.display = 'none'; });
+      if (coachShown && coachShown.feed) coachShown = null;
       setTimeout(() => { if (card) card.style.display = 'none'; }, 8000);
+    });
+    const calmAll = document.getElementById('broad-hunt-calmall');
+    if (calmAll) calmAll.addEventListener('click', async () => {
+      const list = broadBusy.slice(0);
+      if (!list.length) return;
+      calmAll.disabled = true;
+      let done = 0;
+      for (const h of list) {
+        const { error } = await sb.from('user_searches').update({ push_mode: 'calm', push_calm_minutes: 15 }).eq('id', h.id).eq('user_id', uid);
+        if (error) { console.error('SNYPD: could not switch a busy hunt to calm', error); continue; }
+        h.push_mode = 'calm'; h.push_calm_minutes = 15; done++;
+        broadRemember(savedSearchSignature(h.vinted_url));
+      }
+      if (coachShown && coachShown.feed) coachShown = null;
+      if (text) text.textContent = done === list.length
+        ? 'Done: ' + done + ' hunts now send at most one summary every 15 min. Change it anytime in Filters.'
+        : 'Switched ' + done + ' of ' + list.length + ' hunts to Calm. Try again for the rest, or change them in Filters.';
+      if (done === list.length) {
+        ['broad-hunt-apply', 'broad-hunt-calm', 'broad-hunt-calmall', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; });
+        setTimeout(() => { if (card) card.style.display = 'none'; }, 8000);
+      } else calmAll.disabled = false;
     });
     if (edit) edit.addEventListener('click', () => {
       const pill = document.getElementById('filter-pill');
@@ -6989,7 +7137,7 @@ const HEARTBEAT_URL = (() => {
       coachShown = null;
     });
     if (keep) keep.addEventListener('click', () => {
-      if (coachShown) { coachRemember(coachShown); coachShown = null; if (card) card.style.display = 'none'; return; }
+      if (coachShown) { coachRemember(coachShown); if (coachShown.feed) broadRemember(coachShown.sig); coachShown = null; if (card) card.style.display = 'none'; return; }
       try {
         const kept = JSON.parse(localStorage.getItem('snypd_broad_ok') || '{}') || {};
         if (broadSig) kept[broadSig] = Date.now();

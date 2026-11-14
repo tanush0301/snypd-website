@@ -1480,3 +1480,28 @@ FR_PATTERNS += [
     (r'^Done: "(.+)" now has a max price of (.+)\.$', 'C’est fait' + NB + ':' + NB + '«' + NB + '$1' + NB + '» a maintenant un prix max de $2.'),
     (r'^Undone: "(.+)" is back as it was\.$', 'Annulé' + NB + ':' + NB + '«' + NB + '$1' + NB + '» est revenue comme avant.'),
 ]
+
+# ===== Max-price nudge + busy-hunt card (14 Nov 2026, website outreach/62 move 3): before a search without a max price
+# is saved (wizard + Filters), and on the busy-hunt card: a max price from the hunt's own matches, and Calm all.
+FR.update({
+    'Add a max price?': 'Ajouter un prix max' + NB + '?',
+    'About half of the searches saved without one bring more than 1,000 matches a day: more alerts than anyone can open.':
+        'Environ la moitié des recherches enregistrées sans prix max trouvent plus de 1' + NB + '000 annonces par jour' + NB + ': plus d’alertes que personne ne peut en ouvrir.',
+    'Use this max': 'Utiliser ce max',
+    'Start without a max': 'Lancer sans prix max',
+    'Maximum price': 'Prix maximum',
+    'Or switch to Calm: at most one summary every 15 min.': 'Ou passe en Calme' + NB + ': au plus un résumé toutes les 15 min.',
+    'On Vinted, add a size or a max price, copy the link and paste it into this hunt.':
+        'Sur Vinted, ajoute une taille ou un prix max, copie le lien et colle-le dans cette recherche.',
+})
+FR_PATTERNS += [
+    (r'^About (\d+) new listings an hour match "(.+)": more than anyone can open\.$',
+     'Environ $1 nouvelles annonces par heure correspondent à «' + NB + '$2' + NB + '»' + NB + ': plus que personne ne peut en ouvrir.'),
+    (r'^A max price of (.+) keeps the cheapest quarter of them\.$', 'Un prix max de $1 garde le quart le moins cher.'),
+    (r'^(\d+) of your hunts are this busy\.$', '$1 de tes recherches sont aussi chargées.'),
+    (r'^Calm all (\d+)$', 'Tout en Calme ($1)'),
+    (r'^Done: (\d+) hunts now send at most one summary every 15 min\. Change it anytime in Filters\.$',
+     'C’est fait' + NB + ': $1 recherches envoient désormais au plus un résumé toutes les 15 min. Tu peux le changer à tout moment dans Filtres.'),
+    (r'^Switched (\d+) of (\d+) hunts to Calm\. Try again for the rest, or change them in Filters\.$',
+     '$1 recherches sur $2 sont passées en Calme. Réessaie pour les autres, ou change-les dans Filtres.'),
+]

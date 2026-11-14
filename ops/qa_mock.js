@@ -314,6 +314,29 @@
     }
   }
 
+  // ?broad=2: ?broad=1 plus a second active every-match hunt (vinted.co.uk, GBP) with 35 fresh listings priced 5-39, so the
+  // busy-hunt card counts two busy hunts and offers Calm all (website outreach/62 move 3).
+  if (params.get('broad') === '2' && DB.user_searches[0]) {
+    var b2url = 'https://www.vinted.co.uk/catalog?search_text=nike';
+    DB.user_searches.push({ id: 'search-busy2', user_id: UID, search_name: 'Nike', vinted_url: b2url, is_active: true, push_mode: 'every', push_calm_minutes: 15, created_at: new Date(now - 2 * 86400000).toISOString() });
+    [[DB.user_searches[0].vinted_url, 40, 20, 'EUR', 5000], [b2url, 35, 5, 'GBP', 5600]].forEach(function (spec) {
+      var ub = new URL(spec[0]);
+      var pb = Array.from(ub.searchParams).filter(function (p) { return ['page', 'per_page', 'order', 'time', 'search_id'].indexOf(p[0]) < 0 && p[1]; }).sort();
+      var sigb = JSON.stringify([ub.hostname.toLowerCase(), ub.pathname.replace(/\/+$/, '') || '/', pb]);
+      for (var j = 0; j < spec[1]; j++) {
+        var tb = now - (j % 25 + 1) * min;
+        DB.current_ads.push({
+          listing_id: spec[4] + j, user_id: UID, title: 'Busy QA listing ' + spec[4] + '-' + j,
+          price: { amount: spec[2] + j, currency_code: spec[3] }, brand_title: 'Nike', size_title: '42', status: 'Good',
+          url: 'https://www.vinted.be/items/' + (spec[4] + j), content_source: 'search', image_url: '',
+          item_box: { snypd_filter_contract: { version: 1, search: sigb } }, 'item_box->snypd_filter_contract->>version': '1',
+          fetched_at: new Date(tb).toISOString(), created_at: new Date(tb).toISOString(),
+          uploaded_ts: Math.floor(tb / 1000), uploaded_at_ts: new Date(tb).toISOString(), is_visible: true, promoted: false,
+        });
+      }
+    });
+  }
+
   // ?pr=1: 9 fresh listings of the active seeded hunt carrying the scraper's price check (item_box.snypd_price, Session 66):
   // ratings 82, 58, -, 80, 23, -, -, 68 and one GONE listing rated 90 (never shown). Same stamp as ?broad=1.
   if (params.get('pr') === '1' && DB.user_searches[0]) {
