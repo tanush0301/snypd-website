@@ -28,6 +28,7 @@ sys.path.insert(0, HERE)
 import plans  # noqa: E402
 
 P = plans.PLANS
+DA = plans.DATA['discord_alerts']  # Discord alert caps (plans.json; backend discord_bot/discord_main)
 
 
 def esc(s):
@@ -43,6 +44,11 @@ def per_search():
     if min(cost, key=cost.get) != 'elite':
         sys.exit('gen_regions: Elite is no longer the cheapest per search; rewrite the card line')
     return '&euro;%.2f per search a month, the lowest of any plan' % cost['elite']
+
+
+def ps(k):
+    """Plain-text price per search a month for plan k (e.g. '€5.00'), from plans.json."""
+    return '€%.2f' % (float(P[k]['price']) / P[k]['searches'])
 
 
 # ----------------------------------------------------------------- /plans comparison table
@@ -93,6 +99,12 @@ def cmp_groups():
             ('Matches in your dashboard', 'Kept about 30 minutes while the listing is up.', [Y] * n),
             ('Push notifications', 'Phone and desktop. On iPhone, add SNYPD to your Home Screen first.',
              [W('24/7 for %d days, then dashboard open' % d) if not p else T('24/7') for p in paid]),
+            ('Discord alerts',
+             'A private alert thread in the SNYPD Discord, connected in Dashboard > Profile. Up to %d listings per message, '
+             'at most one message every %d min, %d messages a day. Same filters as push.'
+             % (DA['per_message'], DA['digest_minutes'], DA['per_day']),
+             [W('First %d days only' % d) if P[k]['discord_alerts'] == 'trial' else (Y if P[k]['discord_alerts'] else N)
+              for k in plans.ORDER]),
             ('One alert per listing', 'The same listing never alerts you twice.', [Y] * n),
         ]),
         ('PRICE DATA', [
@@ -147,7 +159,17 @@ def faqs():
         ('Do paid plans find listings faster?', 'No. Every plan checks about every %d seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.' % plans.MEDIAN_S),
         ('Is there a free trial?', 'Yes. Free runs your first search 24/7 with alerts for %d days (%d h), counted from when you save it, with no card. If it finds nothing in that time, we add %d more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.' % (d, h, x)),
         ('Does the price include VAT?', 'Yes. %s, %s, %s and %s a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.' % (so, k, pr, el)),
-        ('How do I pay?', 'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.'),
+        ('How do I pay?', 'By card, PayPal, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. '
+         'The Hunt Pass also takes Bancontact, Satispay, bank transfer and crypto; with bank transfer or crypto your access starts once the payment has cleared, which can take a while. '
+         'SNYPD never sees your card or PayPal details.'),
+        ('What are Discord alerts?', 'Your matches, also sent to a private thread in the SNYPD Discord that only you can see. Connect it in Dashboard > Profile > Notifications. '
+         'Each message shows up to %d listings with photo, price, size and condition, and an Open in Vinted button; at most one message every %d minutes and %d a day, with the same filters as your push alerts. '
+         'Every paid plan and the Hunt Pass include it, and so does the %d-day free trial. After the trial the thread stays but goes quiet until you pick a plan. You can use push, Discord or both.'
+         % (DA['per_message'], DA['digest_minutes'], DA['per_day'], d)),
+        ('Which plan is worth it for me?', 'Count the searches you want running 24/7. One item you want to find once: the Hunt Pass (%s, 30 days, nothing to cancel). '
+         'One search you keep: Solo (%s a month). Two searches: Kickstart (%s). Reselling with several searches and checking prices before you buy: Pro (%s, 5 searches and the Market Report, %s per search). '
+         'Ten searches: Elite (%s, %s per search, the lowest). Not sure? Start Free: the trial runs your first search 24/7 for %d days, and you can upgrade when it has found you something.'
+         % (plans.price('pass', 'en', entities=False), so, k, pr, ps('pro'), el, ps('elite'), d)),
         ('Does my plan renew automatically?', 'Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after %d days.' % plans.PASS_DAYS),
         ('Can I pay once, without a subscription?', pass_faq()),
         ('What happens when I cancel?', 'Your plan keeps running to the end of the month you paid for, then your account goes back to Free.'),

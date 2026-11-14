@@ -109,6 +109,7 @@
   .price__per { font-family: 'DM Mono', monospace; font-weight: 400; font-size: 12.5px; letter-spacing: 0; color: #8B9094; white-space: nowrap; }
   .price__sub { font-size: 11.5px; color: #8B9094; }
   .card__for { font-size: 12.5px; color: #E8EAEB; line-height: 1.5; margin: 0; }
+  .card__worth { font-size: 11.5px; color: #8B9094; line-height: 1.55; margin: 0; padding-top: 10px; border-top: 1px solid #1D1D20; }
   .feats { list-style: none; margin: 0; padding: 16px 0 0; border-top: 1px solid #1D1D20; display: flex; flex-direction: column; gap: 10px; }
   .card--pro .feats { border-top-color: rgba(162,0,255,.3); }
   .feats li { font-size: 12px; color: #E8EAEB; display: flex; gap: 9px; line-height: 1.45; }
@@ -416,8 +417,10 @@
           <li><!--plans:plans-free-searches-->1 active Vinted search<!--/plans:plans-free-searches--></li>
           <li class="part"><!--plans:plans-free-trial-->24/7 for the first 3 days, then while your dashboard is open<!--/plans:plans-free-trial--></li>
           <li>Matches in your dashboard</li>
+          <li class="part">Discord alerts during the 3-day trial</li>
           <li>Free Discord community</li>
         </ul>
+        <p class="card__worth">Worth it to test SNYPD on a real search before paying. After the trial it only checks while your dashboard is open.</p>
         <a class="btn" data-cta="free" href="/signup">START FREE</a>
       </article>
 
@@ -436,7 +439,9 @@
           <li><!--plans:plans-solo-searches-->1 active Vinted search<!--/plans:plans-solo-searches--></li>
           <li>Runs 24/7, dashboard closed</li>
           <li>Push alerts around the clock</li>
+          <li class="hl">Discord alerts in your own private thread</li>
         </ul>
+        <p class="card__worth">Worth it when you keep watching the same search for more than a month. Just one item to find? The Hunt Pass is cheaper.</p>
         <a class="btn" data-cta="solo" href="/signup?plan=solo">START SOLO</a>
       </article>
 
@@ -458,8 +463,10 @@
           <li>1 active Vinted search</li>
           <li>Runs 24/7, dashboard closed</li>
           <li>Push alerts around the clock</li>
+          <li class="hl">Discord alerts in your own private thread</li>
           <li><!--plans:plans-pass-end-->Ends after 30 days: no renewal, nothing to cancel<!--/plans:plans-pass-end--></li>
         </ul>
+        <p class="card__worth">Worth it when you want one specific item, like a console or a jacket in your size, and want to stop once you have it.</p>
         <a class="btn" data-cta="pass" href="/signup?plan=pass">GET HUNT PASS</a>
       </article>
 
@@ -478,6 +485,7 @@
           <li><!--plans:plans-kickstart-searches-->2 active Vinted searches, not 1<!--/plans:plans-kickstart-searches--></li>
           <li>Paid Discord channels</li>
         </ul>
+        <p class="card__worth">Worth it when you hunt two things at once, like two sizes or two brands, or one item on two Vinted sites.</p>
         <a class="btn" data-cta="kickstart" href="/signup?plan=kickstart">START KICKSTART</a>
       </article>
 
@@ -500,6 +508,7 @@
           <li class="hl">Market Report: typical price by condition, before you buy</li>
           <li><!--plans:plans-pro-mr-day-->Up to 100 price checks a day<!--/plans:plans-pro-mr-day--></li>
         </ul>
+        <p class="card__worth">Worth it when you resell: several searches running, and a quick price check before you buy so you know there is margin.</p>
         <a class="btn btn--prim" data-cta="pro" href="/signup?plan=pro">START PRO</a>
       </article>
 
@@ -518,6 +527,7 @@
           <li><!--plans:plans-elite-searches-->10 active Vinted searches, not 5<!--/plans:plans-elite-searches--></li>
           <li><!--plans:plans-elite-per-search-->&euro;3.50 per search a month, the lowest of any plan<!--/plans:plans-elite-per-search--></li>
         </ul>
+        <p class="card__worth">Worth it when 5 searches are not enough: many brands, sizes or Vinted sites at once, at the lowest price per search.</p>
         <a class="btn" data-cta="elite" href="/signup?plan=elite">START ELITE</a>
       </article>
     </div>
@@ -560,6 +570,7 @@
 <tr class="grp"><th scope="colgroup" colspan="6">ALERTS</th></tr>
 <tr><th scope="row"><span class="fl">Matches in your dashboard</span><span class="fn">Kept about 30 minutes while the listing is up.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr><th scope="row"><span class="fl">Push notifications</span><span class="fn">Phone and desktop. On iPhone, add SNYPD to your Home Screen first.</span></th><td class="pc c0"><span class="w">24/7 for 3 days, then dashboard open</span></td><td class="pc c1">24/7</td><td class="pc c2">24/7</td><td class="pc c3 is-pro">24/7</td><td class="pc c4">24/7</td></tr>
+<tr><th scope="row"><span class="fl">Discord alerts</span><span class="fn">A private alert thread in the SNYPD Discord, connected in Dashboard &gt; Profile. Up to 5 listings per message, at most one message every 5 min, 100 messages a day. Same filters as push.</span></th><td class="pc c0"><span class="w">First 3 days only</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr><th scope="row"><span class="fl">One alert per listing</span><span class="fn">The same listing never alerts you twice.</span></th><td class="pc c0"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c1"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c2"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
 <tr class="grp"><th scope="colgroup" colspan="6">PRICE DATA</th></tr>
 <tr><th scope="row"><span class="fl">Market Report price checks</span><span class="fn">Typical asking price and range, split by condition. Shows no price when the data is too thin.</span></th><td class="pc c0"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c1"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c2"><span class="n" aria-hidden="true">&#8212;</span><span class="sr">Not included</span></td><td class="pc c3 is-pro"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td><td class="pc c4"><span class="y" aria-hidden="true">&#10003;</span><span class="sr">Included</span></td></tr>
@@ -613,7 +624,9 @@
 <details><summary>Do paid plans find listings faster?</summary><p>No. Every plan checks about every 60 seconds (measured median), up to 5 minutes on quiet searches. Paid plans add searches and keep checking with your dashboard closed.</p></details>
 <details><summary>Is there a free trial?</summary><p>Yes. Free runs your first search 24/7 with alerts for 3 days (72 h), counted from when you save it, with no card. If it finds nothing in that time, we add 2 more days once. After that, Free keeps that one search for as long as you like, checked while your dashboard is open.</p></details>
 <details><summary>Does the price include VAT?</summary><p>Yes. &#8364;5.99, &#8364;14.99, &#8364;24.99 and &#8364;34.99 a month are the full prices, VAT included. Buying for a company? Tick &quot;buying on behalf of a company&quot; at checkout.</p></details>
-<details><summary>How do I pay?</summary><p>By card, or Apple Pay or Google Pay on devices that support them, through Whop&#8217;s secure checkout on this page. SNYPD never sees your card details.</p></details>
+<details><summary>How do I pay?</summary><p>By card, PayPal, or Apple Pay or Google Pay on devices that support them, through Whop&#8217;s secure checkout on this page. The Hunt Pass also takes Bancontact, Satispay, bank transfer and crypto; with bank transfer or crypto your access starts once the payment has cleared, which can take a while. SNYPD never sees your card or PayPal details.</p></details>
+<details><summary>What are Discord alerts?</summary><p>Your matches, also sent to a private thread in the SNYPD Discord that only you can see. Connect it in Dashboard &gt; Profile &gt; Notifications. Each message shows up to 5 listings with photo, price, size and condition, and an Open in Vinted button; at most one message every 5 minutes and 100 a day, with the same filters as your push alerts. Every paid plan and the Hunt Pass include it, and so does the 3-day free trial. After the trial the thread stays but goes quiet until you pick a plan. You can use push, Discord or both.</p></details>
+<details><summary>Which plan is worth it for me?</summary><p>Count the searches you want running 24/7. One item you want to find once: the Hunt Pass (&#8364;3.99, 30 days, nothing to cancel). One search you keep: Solo (&#8364;5.99 a month). Two searches: Kickstart (&#8364;14.99). Reselling with several searches and checking prices before you buy: Pro (&#8364;24.99, 5 searches and the Market Report, &#8364;5.00 per search). Ten searches: Elite (&#8364;34.99, &#8364;3.50 per search, the lowest). Not sure? Start Free: the trial runs your first search 24/7 for 3 days, and you can upgrade when it has found you something.</p></details>
 <details><summary>Does my plan renew automatically?</summary><p>Yes, every month, until you cancel. Cancel any time in your Whop account. The Hunt Pass is the exception: it is paid once and ends after 30 days.</p></details>
 <details><summary>Can I pay once, without a subscription?</summary><p>Yes: the Hunt Pass. One payment of &#8364;3.99, VAT included, and 1 Vinted search is watched 24/7 with push alerts for 30 days, like Solo. Then it simply ends: no renewal, no subscription, nothing to cancel. It suits hunting one specific item, like a console or a jacket in your size. Full refund within 14 days of the payment. For ongoing hunting, Solo is &#8364;5.99 a month.</p></details>
 <details><summary>What happens when I cancel?</summary><p>Your plan keeps running to the end of the month you paid for, then your account goes back to Free.</p></details>

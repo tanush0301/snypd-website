@@ -1,19 +1,21 @@
 {
   "_about": "Single source of truth for plan facts on every public page (read by ops/seo/plans.py). Change a fact here, then run python ops/seo/prepublish.py, which regenerates the marked regions of index.html and plans.html and fails on any page that disagrees. Sources: plan_limit_for() (migration 030; any paid plan other than kickstart/pro/elite gets 1, which is Solo), PAID_PLANS / ELITE_PLANS and the Free trial length in the backend (migration 042; 3 days = 72 h for trials that start on or after 20 Oct 2026, owner-approved 19 Oct 2026, plus one 2-day extension when the first hunt found nothing; trials started before 20 Oct 2026 keep 7 days and that is stated only in /terms), Whop plans, outreach/00-fact-sheet.md. Check speed comes from check-interval.json, not from here.",
-  "checked": "2026-10-19",
+  "checked": "2026-11-14",
   "currency": "EUR",
   "vat_included": true,
   "billing": "monthly",
   "plans": [
-    {"key": "free", "name": "Free", "price": "0", "searches": 1, "always_on": "trial", "push": "trial", "market_report": false, "card": false, "paid_discord": false},
-    {"key": "solo", "name": "Solo", "price": "5.99", "searches": 1, "always_on": true, "push": true, "market_report": false, "card": true, "paid_discord": false},
-    {"key": "kickstart", "name": "Kickstart", "price": "14.99", "searches": 2, "always_on": true, "push": true, "market_report": false, "card": true, "paid_discord": true},
-    {"key": "pro", "name": "Pro", "price": "24.99", "searches": 5, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true},
-    {"key": "elite", "name": "Elite", "price": "34.99", "searches": 10, "always_on": true, "push": true, "market_report": true, "card": true, "paid_discord": true}
+    {"key": "free", "name": "Free", "price": "0", "searches": 1, "always_on": "trial", "push": "trial", "discord_alerts": "trial", "market_report": false, "card": false, "paid_discord": false},
+    {"key": "solo", "name": "Solo", "price": "5.99", "searches": 1, "always_on": true, "push": true, "discord_alerts": true, "market_report": false, "card": true, "paid_discord": false},
+    {"key": "kickstart", "name": "Kickstart", "price": "14.99", "searches": 2, "always_on": true, "push": true, "discord_alerts": true, "market_report": false, "card": true, "paid_discord": true},
+    {"key": "pro", "name": "Pro", "price": "24.99", "searches": 5, "always_on": true, "push": true, "discord_alerts": true, "market_report": true, "card": true, "paid_discord": true},
+    {"key": "elite", "name": "Elite", "price": "34.99", "searches": 10, "always_on": true, "push": true, "discord_alerts": true, "market_report": true, "card": true, "paid_discord": true}
   ],
+  "_discord_alerts": "Private alert thread in the SNYPD Discord, connected in Dashboard > Profile > Notifications (site 554a772). Who gets alerts = backend discord_db.entitled(): an active paid plan (Hunt Pass included) or a running free trial; after the trial the thread stays but goes quiet. Same filters as push (Calm, cheap-only, quiet hours). Caps from discord_bot/discord_main: one digest per user at most every 5 min, up to 5 listings per message, 100 messages a day. Verified live 14 Nov 2026: discord-bot + backend DISCORD_ALERTS_ENABLED=1, DISCORD_DRAINED sent with 0 errors.",
+  "discord_alerts": {"digest_minutes": 5, "per_message": 5, "per_day": 100},
   "_passes": "One-time passes (owner-approved 20 Oct 2026): paid once, VAT included, run for 'days' from the purchase, then end. No renewal, nothing to cancel. The 14-day refund applies to the payment. Kept out of 'plans' so the monthly tables stay 5 columns. whop_plan_id 'plan_PENDING_PASS' = no Whop plan yet: check_site.py fails every page that offers its checkout until the real id is here.",
   "passes": [
-    {"key": "pass", "name": "Hunt Pass", "price": "3.99", "days": 30, "searches": 1, "always_on": true, "push": true, "market_report": false, "card": true, "paid_discord": false, "renews": false, "whop_plan_id": "plan_zLbAN08OXSJYo"}
+    {"key": "pass", "name": "Hunt Pass", "price": "3.99", "days": 30, "searches": 1, "always_on": true, "push": true, "discord_alerts": true, "market_report": false, "card": true, "paid_discord": false, "renews": false, "whop_plan_id": "plan_zLbAN08OXSJYo"}
   ],
   "free_trial": {
     "days": 3,
