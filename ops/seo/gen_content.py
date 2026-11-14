@@ -11,8 +11,8 @@
 #
 # RULES FOR EDITING THE COPY
 # - Every product fact must match what SNYPD really does (CLAUDE.md, plans.html's
-#   audit comment). Never: sub-second speed, "instant", email/Telegram/Discord
-#   alerts, re-list filtering, per-plan speed differences, "allowed by Vinted".
+#   audit comment). Never: sub-second speed, "instant", email/Telegram
+#   alerts (Discord alerts are real since 11 Nov 2026: private thread, plans.json discord_alerts), re-list filtering, per-plan speed differences, "allowed by Vinted".
 # - Competitor facts come from each vendor's own website and carry the date they
 #   were checked (CHECKED). Re-check them before changing that date.
 # - Prices come ONLY from ops/seo/data/*.json, the real Market Report output (run
