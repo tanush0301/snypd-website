@@ -1505,3 +1505,35 @@ FR_PATTERNS += [
     (r'^Switched (\d+) of (\d+) hunts to Calm\. Try again for the rest, or change them in Filters\.$',
      '$1 recherches sur $2 sont passées en Calme. Réessaie pour les autres, ou change-les dans Filtres.'),
 ]
+
+# ===== Paying customer's first days (14 Nov 2026, website outreach/62 move 2): for 72 h after a plan goes live on a
+# device, three checks (searches running, alerts on the phone, alert volume) with one action each.
+FR.update({
+    'Your plan is live: three quick checks': 'Ton plan est actif' + NB + ': trois vérifications rapides',
+    'All set: your plan is working': 'Tout est prêt' + NB + ': ton plan fonctionne',
+    'No search is running yet.': 'Aucune recherche ne tourne encore.',
+    '1 search is running 24/7.': '1 recherche tourne 24h/24.',
+    'Add a search': 'Ajouter une recherche',
+    'Alerts are on for this phone.': 'Les alertes sont activées sur ce téléphone.',
+    'Send a test': 'Envoyer un test',
+    'Alerts reach this computer only while the browser runs. On your phone, open snypd.store/dashboard, sign in and turn alerts on.':
+        'Les alertes n’arrivent sur cet ordinateur que si le navigateur est ouvert. Sur ton téléphone, ouvre snypd.store/dashboard, connecte-toi et active les alertes.',
+    'On iPhone, alerts need SNYPD on the Home Screen first.': 'Sur iPhone, les alertes demandent d’abord d’ajouter SNYPD à l’écran d’accueil.',
+    'Show me how': 'Me montrer comment',
+    'Notifications are blocked in this browser. Allow them in the browser settings for this site.':
+        'Les notifications sont bloquées dans ce navigateur. Autorise-les dans les réglages du navigateur pour ce site.',
+    'This browser cannot show alerts. Use Chrome or Safari on your phone.':
+        'Ce navigateur ne peut pas afficher d’alertes. Utilise Chrome ou Safari sur ton téléphone.',
+    'Alerts are off on this device.': 'Les alertes sont désactivées sur cet appareil.',
+    '1 of your searches has no max price and alerts on every match: it can bring more alerts than anyone can open.':
+        '1 de tes recherches n’a pas de prix max et alerte à chaque annonce' + NB + ': elle peut envoyer plus d’alertes que personne ne peut en ouvrir.',
+    'Review them': 'Les vérifier',
+    'Every search has a max price or Calm alerts.': 'Chaque recherche a un prix max ou des alertes Calme.',
+    'Close': 'Fermer',
+})
+FR_PATTERNS += [
+    (r'^(\d+) searches are running 24/7\.$', '$1 recherches tournent 24h/24.'),
+    (r'^Your plan allows (\d+)\.$', 'Ton plan en permet $1.'),
+    (r'^(\d+) of your searches have no max price and alert on every match: they can bring more alerts than anyone can open\.$',
+     '$1 de tes recherches n’ont pas de prix max et alertent à chaque annonce' + NB + ': elles peuvent envoyer plus d’alertes que personne ne peut en ouvrir.'),
+]

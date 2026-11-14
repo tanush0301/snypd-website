@@ -557,6 +557,8 @@
     rpc: function (name, args) {
       // ?boot=1 serves dashboard_boot() like migration 054/068 (profile, searches, claims, dq, xp_total, streak, quota + stock_mode), so the page's REAL boot path
       // (including its Stock hook) is exercised. Off by default: the usual QA flows keep using the separate REST reads.
+      // ?refcode=1: the account's own referral code, so the "plan is live" referral card can show (website outreach/62 move 2).
+      if (name === 'my_referral_code' && params.get('refcode') === '1') return Promise.resolve({ data: 'qa2345', error: null });
       if (name === 'dashboard_boot' && params.get('boot') === '1') {
         var u0 = DB.users[0] || {}, searches = (DB.user_searches || []).slice().sort(function (a, b) { return String(b.created_at).localeCompare(String(a.created_at)); });
         return Promise.resolve({ data: {

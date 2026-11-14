@@ -1763,6 +1763,13 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     .mx-row { display: flex; gap: 8px; margin-top: 10px; }
     .mx-row input { flex: 1 1 auto; min-width: 0; height: 32px; padding: 0 10px; background: var(--field, #191C1E); border: 1px solid var(--border); color: var(--text-primary); }
     .mx-row .btn { height: 32px; padding: 0 12px; font-size: 11px; flex: 0 0 auto; }
+    .pc-list { list-style: none; margin: 8px 0 0; padding: 0; }
+    .pc-list li { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; font-size: 13px; line-height: 1.45; }
+    .pc-list .pc-body { flex: 1 1 auto; min-width: 0; }
+    .pc-list .pc-mark { flex: 0 0 16px; font-weight: 700; text-align: center; }
+    .pc-list .pc-ok .pc-mark { color: #22c55e; }
+    .pc-list .pc-todo .pc-mark { color: rgb(245,158,11); }
+    .pc-list .btn { height: 28px; padding: 0 10px; font-size: 11px; margin-top: 6px; }
     .wiz-preset {
       display: flex; flex-direction: column; gap: 4px;
       text-align: left; width: 100%; padding: 14px 16px;
@@ -2178,6 +2185,17 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <div class="trial-recap" id="trial-recap" style="display:none"></div>
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
+</div>
+<!-- Paying customer's first days (14 Nov 2026, website outreach/62 move 2): searches running, alerts on the phone, alert
+     volume. Shown for 72 h after the plan went live on this device, until Done. Logic: paintPaidCheck(). -->
+<div class="elite-banner" id="paid-check" style="display:none" aria-labelledby="paid-check-title">
+  <div>
+    <div class="elite-banner__title" id="paid-check-title">Your plan is live: three quick checks</div>
+    <ul class="pc-list" id="paid-check-list"></ul>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-ghost" id="paid-check-done" type="button">Done</button>
+  </div>
 </div>
 <!-- Referral, "plan is live" moment (migration 085): shown ONCE on the load right after the activation
      poller confirms a paid plan (sessionStorage snypd_just_activated). Logic: referralPlanLiveCard(). -->
@@ -3266,6 +3284,8 @@ const HEARTBEAT_URL = (() => {
         clearInterval(timer);
         // One-time marker for the "plan is live" referral line (read + cleared on the next load).
         try { sessionStorage.setItem('snypd_just_activated', plan); } catch (e) {}
+        // Paying customer's first days (website outreach/62 move 2): the set-up check runs 72 h from now on this device.
+        try { localStorage.setItem('snypd_paid_check', JSON.stringify({ p: plan, t: Date.now() })); } catch (e) {}
         location.replace('/dashboard');
       } else if (Date.now() - started > 120000) {
         clearInterval(timer);
@@ -6326,11 +6346,131 @@ const HEARTBEAT_URL = (() => {
     });
   })();
 
+  // Paying customer's first days (14 Nov 2026, website outreach/62 move 2). An Elite buyer cancelled 3 h after paying
+  // (7 Nov) while 7 hunts without a max price sent one push a minute to a computer only; "paid, then broken" is also the
+  // most common complaint about rival tools. For 72 h after the plan went live on this device: three checks, one action
+  // each. Stored per device (snypd_paid_check = {p, t, done}); the referral card waits until this one is done.
+  const PAID_CHECK_KEY = 'snypd_paid_check', PAID_CHECK_MS = 72 * 3600000;
+  const PAID_LIMITS = { solo: 1, pass: 1, kickstart: 2, pro: 5, elite: 10 };
+  function paidCheckState() {
+    try { const s = JSON.parse(localStorage.getItem(PAID_CHECK_KEY) || 'null'); return s && typeof s === 'object' ? s : null; } catch (e) { return null; }
+  }
+  function paidCheckActive() {
+    const s = paidCheckState();
+    const age = s ? Date.now() - Number(s.t) : NaN;
+    return !!(s && !s.done && age >= 0 && age < PAID_CHECK_MS);
+  }
+  function paidCheckDone() {
+    const s = paidCheckState() || {};
+    s.done = 1;
+    try { localStorage.setItem(PAID_CHECK_KEY, JSON.stringify(s)); } catch (e) {}
+    const card = document.getElementById('paid-check');
+    if (card) card.style.display = 'none';
+    let later = null;
+    try { later = localStorage.getItem('snypd_ref_live_later'); localStorage.removeItem('snypd_ref_live_later'); } catch (e) {}
+    if (later) {
+      try { sessionStorage.setItem('snypd_just_activated', later); } catch (e) {}
+      referralPlanLiveCard();
+    }
+  }
+  async function paintPaidCheck() {
+    const card = document.getElementById('paid-check');
+    const list = document.getElementById('paid-check-list');
+    const title = document.getElementById('paid-check-title');
+    const doneBtn = document.getElementById('paid-check-done');
+    if (!card || !list) return;
+    const plan = String(document.body.dataset.plan || 'free');
+    if (!paidCheckActive() || !PAID_LIMITS[plan]) { card.style.display = 'none'; return; }
+    const esc = s => String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    const btn = (act, label) => ' <button class="btn btn-ghost" type="button" data-pc-act="' + act + '">' + esc(label) + '</button>';
+    const row = (ok, sentences, action) => '<li class="' + (ok ? 'pc-ok' : 'pc-todo') + '"><span class="pc-mark" data-i18n-skip aria-hidden="true">'
+      + (ok ? '&#10003;' : '!') + '</span><span class="pc-body">' + sentences.map(t => '<span>' + esc(t) + '</span>').join(' ') + (action || '') + '</span></li>';
+    let hunts = [];
+    try {
+      const r = await sb.from('user_searches').select('id, vinted_url, is_active, push_mode').eq('user_id', uid);
+      hunts = (r && !r.error && Array.isArray(r.data)) ? r.data : [];
+    } catch (e) { hunts = []; }
+    const active = hunts.filter(h => h.is_active === true);
+    const limit = PAID_LIMITS[plan];
+    let st = { state: 'pending' };
+    try { if (window.SNYPD && typeof window.SNYPD.alertsStatus === 'function') st = await window.SNYPD.alertsStatus(); } catch (e) {}
+    let dev = 'desktop';
+    try {
+      const standalone = window.navigator.standalone === true || !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+      if (window.SnypdFirstSession) dev = window.SnypdFirstSession.device(navigator.userAgent, navigator.platform, navigator.maxTouchPoints, standalone);
+    } catch (e) {}
+    const phone = /^(ios|android)/.test(dev);
+    const rows = [];
+    let allOk = true;
+    // 1. Searches running, against what the plan allows
+    if (!active.length) { allOk = false; rows.push(row(false, ['No search is running yet.'], btn('add', 'Add a search'))); }
+    else {
+      const s = [active.length === 1 ? '1 search is running 24/7.' : active.length + ' searches are running 24/7.'];
+      if (active.length < limit) s.push('Your plan allows ' + limit + '.');
+      rows.push(row(true, s, active.length < limit ? btn('add', 'Add a search') : ''));
+    }
+    // 2. Alerts on the phone
+    const state = st && st.state;
+    if (state === 'on' && phone) rows.push(row(true, ['Alerts are on for this phone.'], btn('test', 'Send a test')));
+    else {
+      allOk = false;
+      if (state === 'on') rows.push(row(false, ['Alerts reach this computer only while the browser runs. On your phone, open snypd.store/dashboard, sign in and turn alerts on.']));
+      else if (state === 'ios-install') rows.push(row(false, ['On iPhone, alerts need SNYPD on the Home Screen first.'], btn('guide', 'Show me how')));
+      else if (state === 'denied') rows.push(row(false, ['Notifications are blocked in this browser. Allow them in the browser settings for this site.']));
+      else if (state === 'unsupported') rows.push(row(false, ['This browser cannot show alerts. Use Chrome or Safari on your phone.']));
+      else rows.push(row(false, ['Alerts are off on this device.'], btn('alerts', 'Turn on alerts')));
+    }
+    // 3. Alert volume: every-match hunts without a max price flood most often (first hunts 5-13 Nov: 14 of 30)
+    const open = active.filter(h => (h.push_mode || 'every') === 'every' && !/[?&]price_to=[0-9]/.test(String(h.vinted_url || '')));
+    if (active.length && open.length) {
+      allOk = false;
+      rows.push(row(false, [open.length === 1
+        ? '1 of your searches has no max price and alerts on every match: it can bring more alerts than anyone can open.'
+        : open.length + ' of your searches have no max price and alert on every match: they can bring more alerts than anyone can open.'], btn('review', 'Review them')));
+    } else if (active.length) rows.push(row(true, ['Every search has a max price or Calm alerts.']));
+    list.innerHTML = rows.join('');
+    if (title) title.textContent = allOk ? 'All set: your plan is working' : 'Your plan is live: three quick checks';
+    if (doneBtn) doneBtn.textContent = allOk ? 'Close' : 'Done';
+    card.style.display = '';
+  }
+  (function wirePaidCheck() {
+    const card = document.getElementById('paid-check');
+    if (!card) return;
+    card.addEventListener('click', async e => {
+      const b = e.target.closest('[data-pc-act]');
+      if (b) {
+        const act = b.getAttribute('data-pc-act');
+        if (act === 'add' || act === 'review') {
+          const pill = document.getElementById('filter-pill');
+          if (pill) pill.click(); else { const add = document.getElementById('empty-add-hunt'); if (add) add.click(); }
+        } else if (act === 'test') {
+          if (window.SNYPD && typeof window.SNYPD.testDevice === 'function') window.SNYPD.testDevice();
+        } else if (act === 'guide') {
+          const g = document.getElementById('alerts-guide-link');
+          location.href = (g && g.getAttribute('href')) || '/vinted-alerts-on-your-phone';
+        } else if (act === 'alerts') {
+          b.disabled = true;
+          try { if (window.SNYPD && typeof window.SNYPD.enableAlerts === 'function') await window.SNYPD.enableAlerts(); } catch (er) {}
+          paintPaidCheck().catch(() => {});
+        }
+        return;
+      }
+      if (e.target.closest('#paid-check-done')) paidCheckDone();
+    });
+    window.addEventListener('snypd:hunts-changed', () => { if (paidCheckActive()) paintPaidCheck().catch(() => {}); });
+    window.addEventListener('snypd:alerts-changed', () => { if (paidCheckActive()) paintPaidCheck().catch(() => {}); });
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.paintPaidCheck = paintPaidCheck;
+    window.SNYPD.paidCheckActive = paidCheckActive;
+    if (paidCheckActive()) setTimeout(() => { paintPaidCheck().catch(err => console.error('SNYPD: paid check failed', err)); }, 1200);
+  })();
   // Referral, "plan is live" (migration 085): once, on the load right after the activation poller
   // confirmed a paid plan. The marker is cleared before anything else so a reload never shows it again.
-  (async function referralPlanLiveCard() {
+  async function referralPlanLiveCard() {
     let plan = null;
     try { plan = sessionStorage.getItem('snypd_just_activated'); sessionStorage.removeItem('snypd_just_activated'); } catch (e) {}
+    // While the set-up check is open the referral card waits; paidCheckDone() shows it (website outreach/62 move 2).
+    if (plan && paidCheckActive()) { try { localStorage.setItem('snypd_ref_live_later', plan); } catch (e) {} return; }
     const card = document.getElementById('ref-live-card');
     if (!plan || !card) return;
     try {
@@ -6350,7 +6490,8 @@ const HEARTBEAT_URL = (() => {
       card.style.display = '';
       if (window.gtag) try { gtag('event', 'referral_shown', { src: 'success' }); } catch (e) {}
     } catch (e) { /* referral is optional */ }
-  })();
+  }
+  referralPlanLiveCard();
 
   // Referral entry in the top bar (migration 085): shown only when the user's own code can be read,
   // so a signed-out page or a missing RPC never shows a dead link.
