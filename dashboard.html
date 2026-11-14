@@ -2197,6 +2197,21 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 </div>
 <!-- Paying customer's first days (14 Nov 2026, website outreach/62 move 2): searches running, alerts on the phone, alert
      volume. Shown for 72 h after the plan went live on this device, until Done. Logic: paintPaidCheck(). -->
+<!-- Keep my plan (14 Nov 2026, website outreach/62 move 6): a member whose recurring plan is set to end (they cancelled
+     in Whop) sees this before the end date. Data: GET /api/v1/membership; Keep: POST /api/v1/membership/keep (the backend
+     asks Whop to undo the scheduled cancel, on the member's own tap only). No pause, no discount. Logic: keepCheck(). -->
+<div class="elite-banner" id="keep-plan" style="display:none" aria-labelledby="keep-plan-title">
+  <div>
+    <div class="elite-banner__title" id="keep-plan-title"></div>
+    <div class="elite-banner__text" id="keep-plan-text"></div>
+    <div class="elite-banner__text" id="keep-plan-note" role="status" style="display:none"></div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="keep-plan-keep" type="button"></button>
+    <button class="btn btn-ghost" id="keep-plan-help" type="button" style="display:none"></button>
+    <button class="btn btn-ghost" id="keep-plan-later" type="button">Not now</button>
+  </div>
+</div>
 <div class="elite-banner" id="paid-check" style="display:none" aria-labelledby="paid-check-title">
   <div>
     <div class="elite-banner__title" id="paid-check-title">Your plan is live: three quick checks</div>
@@ -3039,6 +3054,8 @@ const HEARTBEAT_URL = (() => {
   // effectivePlan already degrades a lapsed paid plan to 'free', which is the
   // behaviour wanted here too.
   document.body.dataset.plan = effectivePlan;
+  // Hunt Pass holders (one-time, nothing renews) never see the keep-my-plan card (website outreach/62 move 6).
+  document.body.dataset.pass = (effectivePlan === 'solo' && Date.parse(profile.pass_expires_at || '') > Date.now()) ? '1' : '';
   // Trial price checks (11 Nov 2026): a running trial may use the Market tab's price check (10 in total, counted
   // by the backend). Set before the event so the panel sees it when the plan arrives. Presentation only.
   // Referral bonus days (migration 085/090) count like a running trial here: the backend already treats them so.
@@ -6645,6 +6662,172 @@ const HEARTBEAT_URL = (() => {
     window.SNYPD.paintPaidCheck = paintPaidCheck;
     window.SNYPD.paidCheckActive = paidCheckActive;
     if (paidCheckActive()) setTimeout(() => { paintPaidCheck().catch(err => console.error('SNYPD: paid check failed', err)); }, 1200);
+  })();
+  // Keep my plan (14 Nov 2026, website outreach/62 move 6). On 14 Nov three subscribers were set to leave (one item found;
+  // "too expensive"; an alert flood on a computer only). A member whose recurring plan is set to end sees one card before
+  // the end date: when it ends, what the Free plan means after that, one fix that matches the reason they gave Whop, and
+  // "Keep my <plan>" (the backend asks Whop to undo the scheduled cancel; price, plan and access stay as they are). No
+  // pause and no discount (founder, 14 Nov). "Not now" hides it for 3 days on this device. The account's own record
+  // (user_metadata.kp) counts days shown, the fix used, "Not now" taps and the outcome.
+  const KEEP_API = 'https://api.snypd.store/api/v1/membership';
+  const KEEP_NAMES = { solo: 'Solo', kickstart: 'Kickstart', pro: 'Pro', elite: 'Elite' };
+  const KEEP_LATER_KEY = 'snypd_keep_later', KEEP_LATER_MS = 3 * 864e5, KEEP_SEEN_KEY = 'snypd_keep_seen';
+  let keepShown = null, keepStarted = false;
+  function keepEl(id) { return document.getElementById(id); }
+  function keepDate(iso) {
+    const fr = !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
+    try { return new Intl.DateTimeFormat(fr ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(iso)).replace(/\.$/, ''); }
+    catch (e) { return String(iso || '').slice(0, 10); }
+  }
+  async function keepToken() {
+    const { data: { session: s } } = await sb.auth.getSession();
+    return s && s.access_token;
+  }
+  async function keepRecord(change) {
+    try {
+      const u = await sb.auth.getUser();
+      const meta = (u && u.data && u.data.user && u.data.user.user_metadata) || {};
+      const prev = (meta.kp && typeof meta.kp === 'object') ? meta.kp : {};
+      await sb.auth.updateUser({ data: { kp: Object.assign({}, prev, change(prev)) } });
+    } catch (e) {}
+  }
+  function keepText(lines) {
+    const box = keepEl('keep-plan-text');
+    if (box) box.innerHTML = lines.map(t => '<span>' + String(t).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) + '</span>').join(' ');
+  }
+  function keepNote(t) {
+    const n = keepEl('keep-plan-note');
+    if (!n) return;
+    n.textContent = t || '';
+    n.style.display = t ? '' : 'none';
+  }
+  function keepPaint(s) {
+    const card = keepEl('keep-plan');
+    if (!card) return;
+    const name = KEEP_NAMES[s.plan];
+    keepEl('keep-plan-title').textContent = 'Your ' + name + ' ends on ' + keepDate(s.ends_at);
+    const help = keepEl('keep-plan-help');
+    help.style.display = 'none'; help.dataset.act = ''; help.disabled = false;
+    const lines = [];
+    if (s.reason === 'technical_issues' || s.reason === 'bad_experience') {
+      if (s.every > 0) {
+        lines.push('If the alerts came too fast: Calm sends one summary every 15 minutes, and a max price cuts most matches.');
+        help.textContent = 'Calm all my searches'; help.dataset.act = 'calm'; help.style.display = '';
+      } else lines.push('Something did not work? Write to help@snypd.store and we will look at it.');
+    } else if (s.reason === 'too_expensive' && s.plan !== 'solo') {
+      lines.push('Need fewer searches? Solo is \u20ac5.99 a month for 1 search, Kickstart \u20ac14.99 for 2. Start one after this plan ends so you never pay twice.');
+      help.textContent = 'Compare plans'; help.dataset.act = 'plans'; help.style.display = '';
+    }
+    lines.push('After that the Free plan applies: 1 search, checked only while this page is open.');
+    lines.push('Keep your plan and nothing else changes.');
+    keepText(lines);
+    keepNote('');
+    const keep = keepEl('keep-plan-keep');
+    keep.textContent = 'Keep my ' + name; keep.style.display = ''; keep.disabled = false;
+    const later = keepEl('keep-plan-later');
+    later.textContent = 'Not now'; later.dataset.act = 'later'; later.style.display = '';
+    card.style.display = '';
+  }
+  async function keepCheck() {
+    const plan = String(document.body.dataset.plan || 'free');
+    if (keepStarted || !KEEP_NAMES[plan] || document.body.dataset.pass === '1') return;
+    keepStarted = true;
+    try {
+      const l = JSON.parse(localStorage.getItem(KEEP_LATER_KEY) || 'null');
+      if (l && Date.now() - Number(l.t) < KEEP_LATER_MS) return;
+    } catch (e) {}
+    let s = null;
+    try {
+      const t = await keepToken();
+      if (!t) return;
+      const res = await fetch(KEEP_API, { headers: { Authorization: 'Bearer ' + t } });
+      if (!res.ok) return;
+      s = await res.json();
+    } catch (e) { return; }
+    if (!s || s.cancelling !== true || !KEEP_NAMES[s.plan] || !s.ends_at) return;
+    let every = 0;
+    if (s.reason === 'technical_issues' || s.reason === 'bad_experience') {
+      try {
+        const r = await sb.from('user_searches').select('id, is_active, push_mode').eq('user_id', uid);
+        every = (r && !r.error && Array.isArray(r.data)) ? r.data.filter(h => h.is_active === true && (h.push_mode || 'every') === 'every').length : 0;
+      } catch (e) { every = 0; }
+    }
+    keepShown = Object.assign({}, s, { every: every });
+    keepPaint(keepShown);
+    let day = '';
+    try { day = new Date().toISOString().slice(0, 10); if (localStorage.getItem(KEEP_SEEN_KEY) === day) day = ''; else localStorage.setItem(KEEP_SEEN_KEY, day); } catch (e) { day = ''; }
+    if (day) keepRecord(p => ({ n: (Number(p.n) || 0) + 1, f: p.f || new Date().toISOString(), r: s.reason || 'none', e: s.ends_at }));
+  }
+  async function keepNow(btn) {
+    const s = keepShown;
+    if (!s) return;
+    btn.disabled = true;
+    keepNote('');
+    let res = null, body = null;
+    try {
+      const t = await keepToken();
+      res = await fetch(KEEP_API + '/keep', { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
+      try { body = await res.json(); } catch (e) { body = null; }
+    } catch (e) { res = null; }
+    const name = KEEP_NAMES[s.plan];
+    if (res && res.ok && body && body.ok === true) {
+      keepEl('keep-plan-title').textContent = 'Your ' + name + ' stays on';
+      keepText(['It renews on ' + keepDate(body.renews_at || s.ends_at) + ', as before. Nothing else changed.']);
+      btn.style.display = 'none';
+      keepEl('keep-plan-help').style.display = 'none';
+      const later = keepEl('keep-plan-later');
+      later.textContent = 'Close'; later.dataset.act = 'close';
+      keepRecord(() => ({ k: new Date().toISOString() }));
+      return;
+    }
+    const code = res ? res.status : 0, detail = body && body.detail;
+    if (code === 409) { keepNote('Your plan is no longer set to end.'); btn.style.display = 'none'; }
+    else if (code === 503 && detail === 'not_allowed') { keepNote('We could not change it from here. Write to help@snypd.store and we will do it for you.'); btn.style.display = 'none'; }
+    else { keepNote('That did not work. Try again in a minute.'); btn.disabled = false; }
+    keepRecord(() => ({ x: String(code || 'net') + (detail ? ':' + String(detail).slice(0, 20) : '') }));
+  }
+  async function keepCalm(btn) {
+    btn.disabled = true;
+    let ok = false, n = 0;
+    try {
+      const r = await sb.from('user_searches').update({ push_mode: 'calm', push_calm_minutes: 15 })
+        .eq('user_id', uid).eq('is_active', true).eq('push_mode', 'every').select('id');
+      ok = !!(r && !r.error);
+      n = (r && Array.isArray(r.data)) ? r.data.length : 0;
+    } catch (e) { ok = false; }
+    if (ok) {
+      keepNote(n === 1 ? 'Done: 1 search now sends one summary every 15 minutes.' : 'Done: ' + n + ' searches now send one summary every 15 minutes.');
+      btn.style.display = 'none';
+      try { window.dispatchEvent(new Event('snypd:hunts-changed')); } catch (e) {}
+    } else { keepNote('Could not change your searches. Try again.'); btn.disabled = false; }
+    keepRecord(() => ({ h: ok ? 'calm' : 'calm_failed' }));
+  }
+  (function wireKeepPlan() {
+    const card = keepEl('keep-plan');
+    if (!card) return;
+    card.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b || b.disabled) return;
+      if (b.id === 'keep-plan-keep') { keepNow(b); return; }
+      const act = b.dataset.act;
+      if (act === 'calm') { keepCalm(b); return; }
+      if (act === 'plans') {
+        b.disabled = true;
+        Promise.race([keepRecord(() => ({ h: 'plans' })), new Promise(r => setTimeout(r, 800))]).then(() => { location.href = '/plans?from=keep'; });
+        return;
+      }
+      if (act === 'later') {
+        try { localStorage.setItem(KEEP_LATER_KEY, JSON.stringify({ t: Date.now(), e: keepShown && keepShown.ends_at })); } catch (er) {}
+        card.style.display = 'none';
+        keepRecord(p => ({ l: (Number(p.l) || 0) + 1 }));
+        return;
+      }
+      if (act === 'close') card.style.display = 'none';
+    });
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.keepCheck = keepCheck;
+    if (document.body.dataset.plan) setTimeout(() => { keepCheck().catch(() => {}); }, 900);
+    document.addEventListener('snypd:plan', () => { setTimeout(() => { keepCheck().catch(() => {}); }, 900); });
   })();
   // Referral, "plan is live" (migration 085): once, on the load right after the activation poller
   // confirmed a paid plan. The marker is cleared before anything else so a reload never shows it again.

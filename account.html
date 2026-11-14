@@ -643,6 +643,14 @@
     line-height:1.45;
   }
 
+  /* "Before Whop" step + keep button (14 Nov 2026, website outreach/62 move 6) */
+  .snypd-account-final .mp-title{ font-weight:700; margin-bottom:4px; }
+  .snypd-account-final .mp-list{ margin:8px 0 0; padding-left:18px; }
+  .snypd-account-final .mp-list li{ margin-top:6px; }
+  .snypd-account-final .notice .actions{ margin-top:10px; }
+  .snypd-account-final [data-keep-msg]:empty{ display:none; }
+  .snypd-account-final [data-keep-msg]{ margin-top:8px; }
+
   .snypd-account-final .actions{
     display:flex;
     gap:10px;
@@ -802,7 +810,7 @@
 <div class="v" data-snypd="status">—</div>
 </div>
 <div class="row">
-<div class="k">Renews on</div>
+<div class="k" data-snypd="renewsLabel">Renews on</div>
 <div class="v" data-snypd="renews">—</div>
 </div>
 <!-- Marketing-email consent toggle (19 Oct 2026): withdrawing must be as easy as
@@ -818,6 +826,21 @@
 <button class="btn btn-secondary" data-snypd-action="signout" type="button">Sign out</button>
 </div>
 <div class="subtle" data-snypd="managedBy">Membership managed by Whop.</div>
+<!-- Before Whop (14 Nov 2026, website outreach/62 move 6): "Manage subscription" first shows what else can help, with
+     "Continue to Whop" first and always one tap away. Never on Whop's own cancel page; no pause, no discount. -->
+<div class="notice" id="manage-panel" style="display:none">
+<div class="mp-title">Change or cancel your plan</div>
+<div><span>Continue to Whop to change your payment method or cancel.</span> <span>Before you do:</span></div>
+<ul class="mp-list">
+<li><span>Too many alerts? Calm sends one summary every 15 minutes, and a max price cuts most matches.</span> <a class="mini-link" href="/dashboard" data-mp-help="searches">Open my searches</a></li>
+<li data-mp-only="fewer"><span>Need fewer searches? Solo is &euro;5.99 a month for 1 search, Kickstart &euro;14.99 for 2. Start the new plan after this one ends so you never pay twice.</span> <a class="mini-link" href="/plans?from=account" data-mp-help="plans">Compare plans</a></li>
+<li><span>Something not working? Write to help@snypd.store and we will look at it.</span></li>
+</ul>
+<div class="actions">
+<a class="btn btn-primary" id="mp-whop" href="#">Continue to Whop</a>
+<button class="btn btn-secondary" id="mp-back" type="button">Back</button>
+</div>
+</div>
 
 <aside class="card">
 <div class="card-hd">
@@ -979,6 +1002,77 @@
     window.location.href = PLANS_URL;
   }
 
+  // Keep my plan + "before Whop" step (14 Nov 2026, website outreach/62 move 6). Keep = POST /api/v1/membership/keep:
+  // the backend asks Whop to undo this member's own scheduled cancel; price, plan and access stay as they are.
+  // "Manage subscription" first shows what else can help, with "Continue to Whop" first. No pause, no discount.
+  // The account's own records: user_metadata.kp (keep outcome) and user_metadata.mp (this step: opens, Whop, help used).
+  const KEEP_URL = "https://api.snypd.store/api/v1/membership/keep";
+  const PASS_PLAN_ID = "plan_zLbAN08OXSJYo";
+
+  async function metaRecord(sb, key, change){
+    try {
+      const u = await sb.auth.getUser();
+      const meta = (u && u.data && u.data.user && u.data.user.user_metadata) || {};
+      const prev = (meta[key] && typeof meta[key] === "object") ? meta[key] : {};
+      await sb.auth.updateUser({ data: { [key]: Object.assign({}, prev, change(prev)) } });
+    } catch (e) {}
+  }
+
+  function soon(p){ return Promise.race([p, new Promise(r => setTimeout(r, 800))]); }
+
+  async function keepPlan(sb, btn){
+    const notice = document.querySelector(`[data-snypd="notice"]`);
+    const say = (t) => { const s = notice && notice.querySelector("[data-keep-msg]"); if (s) s.textContent = t; };
+    btn.disabled = true;
+    say("");
+    let res = null, body = null;
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      res = await fetch(KEEP_URL, { method: "POST", headers: { Authorization: "Bearer " + (session && session.access_token) } });
+      try { body = await res.json(); } catch (e) { body = null; }
+    } catch (e) { res = null; }
+    const code = res ? res.status : 0;
+    const detail = body && body.detail;
+    if (res && res.ok && body && body.ok === true){
+      const st = window.__snypdAccountState || {};
+      const when = body.renews_at || st.ends;
+      setText("renewsLabel", "Renews on");
+      if (when) setText("renews", fmtDate(when));
+      if (notice) notice.textContent = "Your plan stays on. It renews on " + fmtDate(when) + ", as before.";
+      st.cancelling = false;
+      metaRecord(sb, "kp", () => ({ k: new Date().toISOString(), s: "account" }));
+      return;
+    }
+    if (code === 409){ say("Your plan is no longer set to end."); btn.style.display = "none"; }
+    else if (code === 503 && detail === "not_allowed"){ say("We could not change it from here. Write to help@snypd.store and we will do it for you."); btn.style.display = "none"; }
+    else { say("That did not work. Try again in a minute."); btn.disabled = false; }
+    metaRecord(sb, "kp", () => ({ x: String(code || "net") + (detail ? ":" + String(detail).slice(0, 20) : ""), s: "account" }));
+  }
+
+  function showManagePanel(sb, st){
+    const panel = document.getElementById("manage-panel");
+    if (!panel){ openBilling(st); return; }
+    const whop = document.getElementById("mp-whop");
+    if (whop) whop.setAttribute("href", st.whop_manage_url || WHOP_FALLBACK_ORDERS_URL);
+    const fewer = panel.querySelector('[data-mp-only="fewer"]');
+    if (fewer) fewer.style.display = (st.plan === "kickstart" || st.plan === "pro" || st.plan === "elite") ? "" : "none";
+    panel.style.display = "block";
+    try { panel.scrollIntoView({ block: "nearest" }); } catch (e) {}
+    metaRecord(sb, "mp", (p) => ({ o: (Number(p.o) || 0) + 1, t: new Date().toISOString() }));
+  }
+
+  document.addEventListener("click", async (e) => {
+    const a = e.target.closest("#mp-whop, #mp-back, [data-mp-help]");
+    if (!a) return;
+    e.preventDefault();
+    if (a.id === "mp-back"){ const p = document.getElementById("manage-panel"); if (p) p.style.display = "none"; return; }
+    const href = a.getAttribute("href") || WHOP_FALLBACK_ORDERS_URL;
+    const sb = await waitForSupabase();
+    const change = a.id === "mp-whop" ? (p) => ({ w: (Number(p.w) || 0) + 1 }) : () => ({ h: a.getAttribute("data-mp-help") });
+    if (sb) await soon(metaRecord(sb, "mp", change));
+    window.location.href = href;
+  });
+
   async function waitForSupabase(){
     for (let i = 0; i < 180; i++){
       if (window.SNYPD && SNYPD.supabase) return SNYPD.supabase;
@@ -1008,8 +1102,15 @@
       return;
     }
 
+    if (action === "keep"){
+      keepPlan(sb, btn);
+      return;
+    }
+
     if (action === "billing" || action === "billingLink"){
-      openBilling(window.__snypdAccountState);
+      const st = window.__snypdAccountState;
+      if (st && st.subscribed && st.plan_id !== PASS_PLAN_ID){ showManagePanel(sb, st); return; }
+      openBilling(st);
     }
   });
 
@@ -1165,6 +1266,8 @@
     setText("plan", effectivePlan.toUpperCase());
     setText("status", effectiveStatusLabel);
     setText("renews", fmtDate(row.current_period_end));
+    const cancelling = subscribed && row.whop_cancel_at_period_end === true;
+    setText("renewsLabel", cancelling ? "Ends on" : "Renews on");
     setText("planLimit", String(limit));
     setText("lastUpdated", `Last updated ${fmtDate(row.whop_updated_at)}`);
 
@@ -1203,7 +1306,20 @@
     if (notice){
       if (subscribed && row.whop_cancel_at_period_end && row.current_period_end){
         notice.style.display = "block";
-        notice.textContent = `Your membership is set to cancel at period end. Access ends on ${fmtDate(row.current_period_end)}.`;
+        notice.textContent = "";
+        const line = document.createElement("span");
+        line.textContent = `Your membership is set to cancel at period end. Access ends on ${fmtDate(row.current_period_end)}.`;
+        notice.appendChild(line);
+        if (row.whop_plan_id !== PASS_PLAN_ID){
+          const acts = document.createElement("div");
+          acts.className = "actions";
+          acts.innerHTML = '<button class="btn btn-primary" type="button" data-snypd-action="keep">Keep my plan</button>';
+          notice.appendChild(acts);
+          const msg = document.createElement("div");
+          msg.setAttribute("data-keep-msg", "");
+          msg.setAttribute("role", "status");
+          notice.appendChild(msg);
+        }
       } else if (subscribed && normalizedStatus === "trialing" && row.current_period_end){
         notice.style.display = "block";
         notice.textContent = `Trial active. Current access period ends on ${fmtDate(row.current_period_end)}.`;
@@ -1218,7 +1334,10 @@
       subscribed,
       whop_manage_url: row.whop_manage_url || "",
       status: normalizedStatus,
-      plan: effectivePlan
+      plan: effectivePlan,
+      plan_id: row.whop_plan_id || "",
+      cancelling: subscribed && row.whop_cancel_at_period_end === true,
+      ends: row.current_period_end || null
     };
   })();
 })();
