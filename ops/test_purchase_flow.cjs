@@ -91,7 +91,8 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
     checks++;
   }
   // The homepage's purchase path retains the selected Pass, like the other offers.
-  assert.match(read('index.html'),/href="\/signup\?plan=pass"[^>]*>GET HUNT PASS<\/a>/);checks++;
+  // v9 homepage: the Pass is a one-line text link, still carrying plan=pass to sign-up.
+  assert.match(read('index.html'),/href="\/signup\?plan=pass"[^>]*>Hunt Pass<\/a>/);checks++;
   const g={document:{documentElement:{hasAttribute:()=>true,getAttribute:()=>null,setAttribute(){}},
       readyState:'complete',querySelectorAll:()=>[],addEventListener(){},head:{appendChild(){}},createElement:()=>({})},
     location:{search:'?lang=fr',href:'https://www.snypd.store/signup?plan=pass&lang=fr'},

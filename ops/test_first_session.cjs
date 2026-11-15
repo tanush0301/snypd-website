@@ -72,12 +72,20 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   // every fs the page sent, oldest first; the last one is the stored record
   const sent = p => p.evaluate(() => (window.__qa_auth_updates || []).filter(u => u && u.data && u.data.fs).map(u => u.data.fs));
   const allUpdates = p => p.evaluate(() => JSON.stringify(window.__qa_auth_updates || []));
+  // The max-price nudge (website outreach/62 move 3) follows the words check for a search without a max price.
+  // These scenarios test other things, so they answer it with "Start without a max".
+  async function passMax(p, id = 'wiz-q-mx') {
+    const shown = await p.evaluate(id => { const b = document.getElementById(id); return !!b && b.style.display !== 'none' && b.offsetHeight > 0; }, id);
+    if (shown) { await p.click('#' + id + ' [data-mx-act="keep"]'); await wait(900); }
+    return shown;
+  }
   async function wizard(page, { words, max, clearMin, enable = true, later = true }) {
     ok(await vis(page, '#wiz-step-1'), 'the wizard opens for an account without a hunt');
     await page.type('#wiz-q-words', words);
     if (max) await page.type('#wiz-q-max', String(max));
     if (clearMin) await page.$eval('#wiz-q-min', e => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles: true })); });
     await page.click('#wiz-q-save'); await wait(1500);
+    if (!max) await passMax(page);
     ok(await vis(page, '#wiz-step-mode'), 'alert-style step shown after the hunt is saved; the wizard says: '
       + await page.evaluate(() => ['wiz-q-err', 'wiz-q-hw'].map(i => document.getElementById(i)).map(e => (e && e.getClientRects().length ? e.innerText : '')).join(' / ')));
     await page.click('.wiz-mode'); await wait(200);
@@ -128,16 +136,13 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   // ---- 3. Android, permission refused --------------------------------------------------------------------------
   {
     const { page, ctx } = await open({ ua: ANDROID, vp: PHONE, grant: 'denied' }, NEW);
-    // A price limit below the pre-filled minimum: step 1 refuses the form until the minimum is cleared.
-    await page.type('#wiz-q-words', 'levis 501');
-    await page.type('#wiz-q-max', '20');
-    await page.click('#wiz-q-save'); await wait(700);
-    ok(await vis(page, '#wiz-q-err') && !(await vis(page, '#wiz-step-mode')), 'max 20 with the pre-filled minimum is refused today');
-    await page.$eval('#wiz-q-words', e => { e.value = ''; });
-    await wizard(page, { words: 'levis 501', clearMin: true });
+    // A price limit below the untouched pre-filled minimum: the minimum is cleared and the hunt saved (outreach/62
+    // move 3; until 14 Nov 2026 step 1 refused the form here).
+    await wizard(page, { words: 'levis 501', max: 20 });
+    ok(!(await vis(page, '#wiz-q-err')), 'max 20 with the pre-filled minimum is no longer refused');
     const last = (await sent(page)).pop();
     eq([last.dev, last.al, last.al1, last.al_try, last.later], ['android', 'denied', 'denied', 1, 1], 'a refusal is recorded as a refusal');
-    eq([last.max, last.min, last.werr], [1, 'none', 1], 'the price limit, the cleared minimum and the one form refusal are recorded');
+    eq([last.max, last.min, last.werr], [1, 'none', undefined], 'the price limit and the cleared minimum are recorded, no form refusal');
     await ctx.close();
   }
 
@@ -205,6 +210,7 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     eq(await page.evaluate(() => typeof window.SNYPD.fs), 'undefined', 'no tracker for an account older than 7 days');
     await page.type('#wiz-q-words', 'nike dunk low');
     await page.click('#wiz-q-save'); await wait(1500);
+    await passMax(page);
     ok(await vis(page, '#wiz-step-mode'), 'the wizard still works without the tracker');
     await wait(3600);
     eq((await sent(page)).length, 0, 'nothing is written for an old account');
@@ -237,6 +243,7 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     eq(await page.evaluate(() => typeof window.SNYPD.fs), 'undefined');
     await page.type('#wiz-q-words', 'nike dunk low');
     await page.click('#wiz-q-save'); await wait(1500);
+    await passMax(page);
     ok(await vis(page, '#wiz-step-mode'), 'saving the first hunt works without the module');
     await ctx.close();
   }

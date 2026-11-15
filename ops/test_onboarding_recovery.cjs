@@ -226,14 +226,24 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
     await f.el('wiz-q-save').click();
     assert.equal(f.inserts(),1); assert.equal(f.built[0][3],expected); passed++;
   }
-  // Invalid ranges never reach the database; the user can correct and retry.
+  // Invalid ranges the user typed never reach the database; the user can correct and retry.
   for (const [minimum, maximum] of [['30','20'],['20','20'],['-1','20'],['5','0'],['5','-2'],['NaN','20']]) {
     f=await wizardFixture(); f.el('wiz-q-words').value='jacket';
-    f.el('wiz-q-min').value=minimum; f.el('wiz-q-max').value=maximum;
+    f.el('wiz-q-min').value=minimum; for (const cb of f.el('wiz-q-min').listeners.input || []) cb();   // typed by the user
+    f.el('wiz-q-max').value=maximum;
     await f.el('wiz-q-save').click();
     assert.equal(f.inserts(),0); assert.equal(f.el('wiz-q-err').style.display,'block');
     f.el('wiz-q-min').value='5'; f.el('wiz-q-max').value='20';
     await f.el('wiz-q-save').click(); assert.equal(f.inserts(),1); passed++;
+  }
+  // The untouched pre-filled minimum (30) at or above the max typed: cleared instead of refused (outreach/62 move 3).
+  for (const maximum of ['20', '30']) {
+    f=await wizardFixture(); f.el('wiz-q-words').value='jacket';
+    assert.equal(f.el('wiz-q-min').value,'30');
+    f.el('wiz-q-max').value=maximum;
+    await f.el('wiz-q-save').click();
+    assert.equal(f.inserts(),1); assert.equal(f.built[0][3],null); assert.equal(f.el('wiz-q-min').value,'');
+    assert.notEqual(f.el('wiz-q-err').style.display,'block'); passed++;
   }
   f=await wizardFixture(); f.el('wiz-q-site').value='vinted.co.uk';
   for (const cb of f.el('wiz-q-site').listeners.change) cb();

@@ -772,6 +772,24 @@ FR.update({
     'Up to 100 price checks a day': 'Jusqu’à 100 vérifications de prix par jour',
     'Paid Discord channels': 'Salons Discord payants',
     'Free Discord community': 'Communauté Discord gratuite',
+    # Discord alerts + "worth it" lines (14 Nov 2026)
+    'Discord alerts': 'Alertes Discord',
+    'Discord alerts in your own private thread': 'Alertes Discord dans ton propre fil privé',
+    'Discord alerts during the 3-day trial': 'Alertes Discord pendant l’essai de 3 jours',
+    'A private alert thread in the SNYPD Discord, connected in Dashboard > Profile. Up to 5 listings per message, at most one message every 5 min, 100 messages a day. Same filters as push.':
+        'Un fil d’alertes privé dans le Discord SNYPD, à connecter dans Tableau de bord > Profil. Jusqu’à 5 annonces par message, au plus un message toutes les 5' + NB + 'min, 100 messages par jour. Mêmes filtres que les push.',
+    'Worth it to test SNYPD on a real search before paying. After the trial it only checks while your dashboard is open.':
+        'Utile pour tester SNYPD sur une vraie recherche avant de payer. Après l’essai, il ne vérifie que lorsque ton tableau de bord est ouvert.',
+    'Worth it when you keep watching the same search for more than a month. Just one item to find? The Hunt Pass is cheaper.':
+        'Rentable si tu surveilles la même recherche plus d’un mois. Un seul article à trouver' + NB + '? Le Hunt Pass revient moins cher.',
+    'Worth it when you want one specific item, like a console or a jacket in your size, and want to stop once you have it.':
+        'Rentable si tu cherches un article précis, comme une console ou une veste à ta taille, et veux t’arrêter une fois trouvé.',
+    'Worth it when you hunt two things at once, like two sizes or two brands, or one item on two Vinted sites.':
+        'Rentable si tu cherches deux choses à la fois, comme deux tailles ou deux marques, ou un article sur deux sites Vinted.',
+    'Worth it when you resell: several searches running, and a quick price check before you buy so you know there is margin.':
+        'Rentable si tu revends' + NB + ': plusieurs recherches actives, et une vérification de prix rapide avant d’acheter pour savoir s’il y a de la marge.',
+    'Worth it when 5 searches are not enough: many brands, sizes or Vinted sites at once, at the lowest price per search.':
+        'Rentable quand 5 recherches ne suffisent pas' + NB + ': beaucoup de marques, tailles ou sites Vinted à la fois, au prix par recherche le plus bas.',
     'START FREE': 'COMMENCER GRATUITEMENT',
     'START KICKSTART': 'CHOISIR KICKSTART',
     'START PRO': 'CHOISIR PRO',
@@ -886,8 +904,14 @@ FR.update({
     'Do you need my Vinted login?': 'Vous avez besoin de mes identifiants Vinted' + NB + '?',
     'Never. SNYPD reads public listings only. It never logs in, buys or messages anyone.': 'Jamais. SNYPD lit uniquement les annonces publiques. Il ne se connecte jamais, n’achète rien et n’écrit à personne.',
     'How do I pay?': 'Comment je paie' + NB + '?',
-    'By card, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. SNYPD never sees your card details.':
-        'Par carte, ou avec Apple Pay ou Google Pay sur les appareils compatibles, via le paiement sécurisé de Whop sur cette page. SNYPD ne voit jamais les données de ta carte.',
+    'By card, PayPal, or Apple Pay or Google Pay on devices that support them, through Whop’s secure checkout on this page. The Hunt Pass also takes Bancontact, Satispay, bank transfer and crypto; with bank transfer or crypto your access starts once the payment has cleared, which can take a while. SNYPD never sees your card or PayPal details.':
+        'Par carte, PayPal, ou avec Apple Pay ou Google Pay sur les appareils compatibles, via le paiement sécurisé de Whop sur cette page. Le Hunt Pass accepte aussi Bancontact, Satispay, le virement bancaire et la crypto' + NB + '; avec un virement ou de la crypto, ton accès démarre une fois le paiement reçu, ce qui peut prendre un moment. SNYPD ne voit jamais les données de ta carte ou de ton compte PayPal.',
+    'What are Discord alerts?': 'Que sont les alertes Discord' + NB + '?',
+    'Your matches, also sent to a private thread in the SNYPD Discord that only you can see. Connect it in Dashboard > Profile > Notifications. Each message shows up to 5 listings with photo, price, size and condition, and an Open in Vinted button; at most one message every 5 minutes and 100 a day, with the same filters as your push alerts. Every paid plan and the Hunt Pass include it, and so does the 3-day free trial. After the trial the thread stays but goes quiet until you pick a plan. You can use push, Discord or both.':
+        'Tes annonces trouvées, envoyées aussi dans un fil privé du Discord SNYPD que toi seul vois. Connecte-le dans Tableau de bord > Profil > Notifications. Chaque message montre jusqu’à 5 annonces avec photo, prix, taille et état, et un bouton Ouvrir dans Vinted' + NB + '; au plus un message toutes les 5 minutes et 100 par jour, avec les mêmes filtres que tes alertes push. Tous les plans payants et le Hunt Pass l’incluent, tout comme l’essai gratuit de 3 jours. Après l’essai, le fil reste mais se met en pause jusqu’à ce que tu choisisses un plan. Tu peux utiliser les push, Discord ou les deux.',
+    'Which plan is worth it for me?': 'Quel plan est rentable pour moi' + NB + '?',
+    'Count the searches you want running 24/7. One item you want to find once: the Hunt Pass (€3.99, 30 days, nothing to cancel). One search you keep: Solo (€5.99 a month). Two searches: Kickstart (€14.99). Reselling with several searches and checking prices before you buy: Pro (€24.99, 5 searches and the Market Report, €5.00 per search). Ten searches: Elite (€34.99, €3.50 per search, the lowest). Not sure? Start Free: the trial runs your first search 24/7 for 3 days, and you can upgrade when it has found you something.':
+        'Compte les recherches que tu veux faire tourner 24h/24. Un seul article à trouver une fois' + NB + ': le Hunt Pass (3,99' + NB + '€, 30 jours, rien à résilier). Une recherche que tu gardes' + NB + ': Solo (5,99' + NB + '€ par mois). Deux recherches' + NB + ': Kickstart (14,99' + NB + '€). Tu revends avec plusieurs recherches et vérifies les prix avant d’acheter' + NB + ': Pro (24,99' + NB + '€, 5 recherches et le Market Report, 5,00' + NB + '€ par recherche). Dix recherches' + NB + ': Elite (34,99' + NB + '€, 3,50' + NB + '€ par recherche, le plus bas). Tu hésites' + NB + '? Commence avec Free' + NB + ': l’essai fait tourner ta première recherche 24h/24 pendant 3 jours, et tu peux passer à un plan payant quand elle t’a trouvé quelque chose.',
     'Does the price include VAT?': 'Le prix inclut-il la TVA' + NB + '?',
     'Yes. €5.99, €14.99, €24.99 and €34.99 a month are the full prices, VAT included. Buying for a company? Tick "buying on behalf of a company" at checkout.':
         'Oui. 5,99' + NB + '€, 14,99' + NB + '€, 24,99' + NB + '€ et 34,99' + NB + '€ par mois sont les prix complets, TVA incluse. Tu achètes pour une entreprise' + NB + '? Coche «' + NB + 'buying on behalf of a company' + NB + '» au moment du paiement.',
@@ -1484,4 +1508,61 @@ FR_PATTERNS += [
     (r'^Raise max to (.+)$', 'Monter le max à $1'),
     (r'^Done: "(.+)" now has a max price of (.+)\.$', 'C’est fait' + NB + ':' + NB + '«' + NB + '$1' + NB + '» a maintenant un prix max de $2.'),
     (r'^Undone: "(.+)" is back as it was\.$', 'Annulé' + NB + ':' + NB + '«' + NB + '$1' + NB + '» est revenue comme avant.'),
+]
+
+# ===== Max-price nudge + busy-hunt card (14 Nov 2026, website outreach/62 move 3): before a search without a max price
+# is saved (wizard + Filters), and on the busy-hunt card: a max price from the hunt's own matches, and Calm all.
+FR.update({
+    'Add a max price?': 'Ajouter un prix max' + NB + '?',
+    'About half of the searches saved without one bring more than 1,000 matches a day: more alerts than anyone can open.':
+        'Environ la moitié des recherches enregistrées sans prix max trouvent plus de 1' + NB + '000 annonces par jour' + NB + ': plus d’alertes que personne ne peut en ouvrir.',
+    'Use this max': 'Utiliser ce max',
+    'Start without a max': 'Lancer sans prix max',
+    'Maximum price': 'Prix maximum',
+    'Or switch to Calm: at most one summary every 15 min.': 'Ou passe en Calme' + NB + ': au plus un résumé toutes les 15 min.',
+    'On Vinted, add a size or a max price, copy the link and paste it into this hunt.':
+        'Sur Vinted, ajoute une taille ou un prix max, copie le lien et colle-le dans cette recherche.',
+})
+FR_PATTERNS += [
+    (r'^About (\d+) new listings an hour match "(.+)": more than anyone can open\.$',
+     'Environ $1 nouvelles annonces par heure correspondent à «' + NB + '$2' + NB + '»' + NB + ': plus que personne ne peut en ouvrir.'),
+    (r'^A max price of (.+) keeps the cheapest quarter of them\.$', 'Un prix max de $1 garde le quart le moins cher.'),
+    (r'^(\d+) of your hunts are this busy\.$', '$1 de tes recherches sont aussi chargées.'),
+    (r'^Calm all (\d+)$', 'Tout en Calme ($1)'),
+    (r'^Done: (\d+) hunts now send at most one summary every 15 min\. Change it anytime in Filters\.$',
+     'C’est fait' + NB + ': $1 recherches envoient désormais au plus un résumé toutes les 15 min. Tu peux le changer à tout moment dans Filtres.'),
+    (r'^Switched (\d+) of (\d+) hunts to Calm\. Try again for the rest, or change them in Filters\.$',
+     '$1 recherches sur $2 sont passées en Calme. Réessaie pour les autres, ou change-les dans Filtres.'),
+]
+
+# ===== Paying customer's first days (14 Nov 2026, website outreach/62 move 2): for 72 h after a plan goes live on a
+# device, three checks (searches running, alerts on the phone, alert volume) with one action each.
+FR.update({
+    'Your plan is live: three quick checks': 'Ton plan est actif' + NB + ': trois vérifications rapides',
+    'All set: your plan is working': 'Tout est prêt' + NB + ': ton plan fonctionne',
+    'No search is running yet.': 'Aucune recherche ne tourne encore.',
+    '1 search is running 24/7.': '1 recherche tourne 24h/24.',
+    'Add a search': 'Ajouter une recherche',
+    'Alerts are on for this phone.': 'Les alertes sont activées sur ce téléphone.',
+    'Send a test': 'Envoyer un test',
+    'Alerts reach this computer only while the browser runs. On your phone, open snypd.store/dashboard, sign in and turn alerts on.':
+        'Les alertes n’arrivent sur cet ordinateur que si le navigateur est ouvert. Sur ton téléphone, ouvre snypd.store/dashboard, connecte-toi et active les alertes.',
+    'On iPhone, alerts need SNYPD on the Home Screen first.': 'Sur iPhone, les alertes demandent d’abord d’ajouter SNYPD à l’écran d’accueil.',
+    'Show me how': 'Me montrer comment',
+    'Notifications are blocked in this browser. Allow them in the browser settings for this site.':
+        'Les notifications sont bloquées dans ce navigateur. Autorise-les dans les réglages du navigateur pour ce site.',
+    'This browser cannot show alerts. Use Chrome or Safari on your phone.':
+        'Ce navigateur ne peut pas afficher d’alertes. Utilise Chrome ou Safari sur ton téléphone.',
+    'Alerts are off on this device.': 'Les alertes sont désactivées sur cet appareil.',
+    '1 of your searches has no max price and alerts on every match: it can bring more alerts than anyone can open.':
+        '1 de tes recherches n’a pas de prix max et alerte à chaque annonce' + NB + ': elle peut envoyer plus d’alertes que personne ne peut en ouvrir.',
+    'Review them': 'Les vérifier',
+    'Every search has a max price or Calm alerts.': 'Chaque recherche a un prix max ou des alertes Calme.',
+    'Close': 'Fermer',
+})
+FR_PATTERNS += [
+    (r'^(\d+) searches are running 24/7\.$', '$1 recherches tournent 24h/24.'),
+    (r'^Your plan allows (\d+)\.$', 'Ton plan en permet $1.'),
+    (r'^(\d+) of your searches have no max price and alert on every match: they can bring more alerts than anyone can open\.$',
+     '$1 de tes recherches n’ont pas de prix max et alertent à chaque annonce' + NB + ': elles peuvent envoyer plus d’alertes que personne ne peut en ouvrir.'),
 ]

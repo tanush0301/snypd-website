@@ -55,6 +55,13 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       chips: b ? [...b.querySelectorAll('[data-hw-pick]')].map(c => c.textContent.trim()) : [], plan: !!(b && b.querySelector('.hw-box__plan')),
       html: b ? b.innerHTML : '' };
   }, id);
+  // The max-price nudge (website outreach/62 move 3) follows the words check for a search without a max price.
+  // These scenarios test other things, so they answer it with "Start without a max".
+  async function passMax(p, id = 'wiz-q-mx') {
+    const shown = await p.evaluate(id => { const b = document.getElementById(id); return !!b && b.style.display !== 'none' && b.offsetHeight > 0; }, id);
+    if (shown) { await p.click('#' + id + ' [data-mx-act="keep"]'); await wait(900); }
+    return shown;
+  }
   async function wizType(p, words) {
     await p.evaluate(w => { const i = document.getElementById('wiz-q-words'); i.value = w; i.dispatchEvent(new Event('input')); }, words);
     await p.click('#wiz-q-save');
@@ -74,6 +81,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq((await hunts(page)).length, 0, 'nothing saved yet');
   await page.evaluate(() => [...document.querySelectorAll('#wiz-q-hw [data-hw-pick]')].find(c => c.textContent.trim() === 'Nike').click());
   await wait(900);
+  ok(await passMax(page), 'a chip without a max price meets the max-price nudge');
   let h = await hunts(page);
   eq([h.length, h[0] && h[0].q, h[0] && h[0].name], [1, 'Nike', 'Nike'], 'chip saved "Nike"');
   ok(await modeStep(page), 'wizard moves on to the alert step');
@@ -87,6 +95,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(b.chips, ['Ralph Lauren pull', 'Nike pull'], 'two brands -> each brand with the item, typo fixed');
   await page.click('#wiz-q-hw [data-hw-act="keep"]');
   await wait(900);
+  await passMax(page);
   h = await hunts(page);
   eq([h.length, h[0] && h[0].q], [1, 'ralph loren pull nike'], 'kept as typed');
   await page.close();
@@ -103,8 +112,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(/Long searches find little/.test(b.text) && b.chips.length === 0, 'long -> advice, no chips');
   await page.evaluate(() => { const i = document.getElementById('wiz-q-words'); i.value = 'nike jordan 4'; i.dispatchEvent(new Event('input')); });
   await page.click('#wiz-q-save'); await wait(900);
+  await passMax(page);
   h = await hunts(page);
-  eq([h.length, h[0] && h[0].q, (await box(page, 'wiz-q-hw')).shown], [1, 'nike jordan 4', false], 'normal search saves directly');
+  eq([h.length, h[0] && h[0].q, (await box(page, 'wiz-q-hw')).shown], [1, 'nike jordan 4', false], 'normal search saves (after the max-price nudge)');
   await page.close();
 
   // ---- 3b. HTML typed into a list part stays text
@@ -132,6 +142,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq((await hunts(page)).length, before, 'sheet: nothing saved yet');
   await page.evaluate(() => [...document.querySelectorAll('#fs-q-hw [data-hw-pick]')].find(c => c.textContent.trim() === 'Ralph Lauren').click());
   await wait(1000);
+  ok(await passMax(page, 'fs-q-mx'), 'sheet: a chip without a max price meets the max-price nudge');
   h = await hunts(page);
   const saved = h.find(x => x.q === 'Ralph Lauren');
   ok(h.length === before + 1 && saved && saved.name === 'Ralph Lauren', 'sheet chip saved "Ralph Lauren": ' + JSON.stringify(h.map(x => x.q)));
