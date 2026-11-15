@@ -8553,14 +8553,14 @@ const HEARTBEAT_URL = (() => {
     var q = (opts.q != null ? String(opts.q) : (input.value || '')).trim();
     if (!q) { return; }
     var keep = Array.isArray(opts.keep) ? opts.keep.slice(0, 12) : [];
-    state = { q: q, keep: keep, mine: opts.mine || null, into: into };
+    state = { q: q, keep: keep, mine: opts.mine || null, into: into, title: !!opts.title, brand: opts.title ? String(opts.brand || '').slice(0, 60) : '' };
     into.__mrState = state;
     var my = ++seq;
     goBtn.disabled = true;
     into.innerHTML = '<div class="mr-loading"><span class="mr-spinner"></span>'
       + '<span>Checking real listings across every condition' + HELLIP + '</span></div>';
     try {
-      var res = await api('/api/v1/market/snapshot', 'POST', { q: q, keep: keep });
+      var res = await api('/api/v1/market/snapshot', 'POST', state.title ? { q: q, keep: keep, from_title: true, brand: state.brand } : { q: q, keep: keep });
       if (my !== seq) { return; }
       if (res.status === 200 && res.body) {
         render(res.body, into, state.mine);
@@ -8655,7 +8655,7 @@ const HEARTBEAT_URL = (() => {
     var k = e.target.closest('[data-mr-keep]');
     var st = k ? stateAt(k) : null;
     if (k && st.q) {
-      run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into });
+      run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into, title: st.title, brand: st.brand });
       return;
     }
     var dr = e.target.closest('[data-mr-drop]');
@@ -8665,7 +8665,7 @@ const HEARTBEAT_URL = (() => {
       var q2 = without(st.q, w);
       if (!q2) { return; }
       if (st.into === result) { input.value = q2; }
-      run({ q: q2, keep: st.keep.filter(function (x) { return x !== w; }), mine: st.mine, into: st.into });
+      run({ q: q2, keep: st.keep.filter(function (x) { return x !== w; }), mine: st.mine, into: st.into, title: st.title, brand: st.brand });
     }
   });
   document.addEventListener('input', function (e) {
@@ -8714,7 +8714,7 @@ const HEARTBEAT_URL = (() => {
        EU-euro prices do not cover; sourceBlock says so. Euro sites (fr, de, ...) get no label. */
     var cur = String(item.cur || '').trim().toUpperCase();
     into.__mrCur = (cur && cur !== 'EUR') ? cur : '';
-    run({ q: q, keep: [], mine: condLabel(item.cond), into: into });
+    run({ q: q, keep: [], mine: condLabel(item.cond), into: into, title: true, brand: brand });
   };
   window.SNYPD.marketCheck = function (q) {
     var t = (q || '').trim();
