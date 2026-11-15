@@ -467,8 +467,35 @@ def page_support(lang='en'):
                    + [('more', t['toc_more'])], body, head_extra=FORM_CSS)
 
 
+# Contact pages in the other languages (15 Nov 2026): form, email, Discord. Texts: copy_support_langs.py.
+import copy_support_langs as csl  # noqa: E402
+for _l, _c in csl.C.items():
+    SLUGS['support'][_l] = '/%s/support' % _l
+    FORM_H[_l] = _c['toc_write']
+    L[_l] = dict(reply=_c['reply'], form_p=_c['form_p'].replace('{reply}', '%s'), l_email=_c['l_email'], l_topic=_c['l_topic'],
+                 l_msg=_c['l_msg'], send=_c['send'], small=_c['small'], chat=_c['chat'].replace('{discord}', '%s'),
+                 topics=list(zip(csl.TOPIC_KEYS, _c['topics'])), hints=dict(zip(csl.TOPIC_KEYS, _c['hints'])),
+                 js=dict(sending=_c['sending'], sent=_c['sent'], failed=_c['failed'], err=dict(zip(csl.ERR_KEYS, _c['err']))))
+
+
+def page_contact(lang):
+    c = csl.C[lang]
+    f = lambda x: x.replace('{mail}', EMAIL).replace('{reply}', c['reply']).replace('{discord}', DISCORD)  # noqa: E731
+    intro = ('<section id="person"><h2>%s</h2><div class="lg-box lg-mint"><p>%s</p><p>%s</p>'
+             '<div class="ct-actions"><a class="ct-btn" href="#write">%s</a>'
+             '<a class="ct-btn ct-ghost" href="mailto:%s">%s</a>'
+             '<a class="ct-btn ct-ghost" href="%s" rel="noopener">%s</a></div></div></section>'
+             % (esc(c['toc_person']), f(c['p_email']), f(c['p_chat']), esc(c['b_write']), EMAIL, esc(c['b_email']), DISCORD, esc(c['b_discord'])))
+    more = '<section id="more"><h2>%s</h2><p>%s</p></section>' % (esc(c['toc_more']), c['more_p'])
+    return gc.page('support', lang, c['title'], f(c['desc']), 'SUPPORT', c['h1'], f(c['lead']),
+                   [('person', c['toc_person']), ('write', c['toc_write']), ('more', c['toc_more'])],
+                   intro + form_section(lang) + more, head_extra=FORM_CSS)
+
+
 if __name__ == '__main__':
     write('faq.html', page_faq('en'))
     write('fr/faq.html', page_faq('fr'))
     write('support.html', page_support('en'))
     write('fr/support.html', page_support('fr'))
+    for _l in csl.C:
+        write('%s/support.html' % _l, page_contact(_l))

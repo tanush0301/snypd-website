@@ -161,6 +161,16 @@ const ok = (c, name) => { assert(c, name); checks++; };
   ok(fr.includes('hreflang="en" href="https://www.snypd.store/support"') && html.includes('hreflang="fr" href="https://www.snypd.store/fr/support"'), 'pages link to each other');
   ok(!fr.includes('@@') && !html.includes('@@'), 'no unfilled placeholders');
 
+  // contact pages in the other languages: same form, same topic keys
+  for (const l of ['de', 'nl', 'it', 'es', 'pl', 'sv']) {
+    const h = fs.readFileSync(path.join(root, l + '/support.html'), 'utf8');
+    ok(new RegExp('<html[^>]*lang="' + l + '"').test(h) && h.includes('id="sf"') && h.includes(API), l + ': page has the form');
+    ok(keys(h) === keys(html), l + ': same topic keys');
+    ok(/<form[^>]*id="sf"[\s\S]*discord\.gg\/gjKD4auXhK[\s\S]*<\/form>/.test(h) && h.includes('mailto:' + MAIL), l + ': Discord link in the form, address shown');
+    ok(!h.includes('@@') && !h.includes('{mail}') && !h.includes('{reply}') && !h.includes('{discord}') && !h.includes('%('), l + ': no unfilled placeholders');
+    ok(h.includes('hreflang="en" href="https://www.snypd.store/support"') && html.includes('hreflang="' + l + '" href="https://www.snypd.store/' + l + '/support"'), l + ': linked both ways');
+  }
+
   await browser.close(); server.close();
   console.log('PASS: ' + checks + ' support-form checks; no production requests.');
 })().catch(e => { console.error('FAIL:', e.message); process.exit(1); });
