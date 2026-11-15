@@ -27,7 +27,7 @@ import copy_alerts_compare as cac  # noqa: E402  (DE/NL/IT/ES copy for the alert
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SITE = 'https://www.snypd.store'
 DISCORD = 'https://discord.gg/gjKD4auXhK'
-EMAIL = 'help@snypd.store'
+EMAIL = 'heysnypd@gmail.com'
 PUBLISHED = '2026-09-28'
 MODIFIED = '2026-10-01'
 CHECKED = {'en': '28 September 2026', 'fr': '28 septembre 2026'}
@@ -233,7 +233,7 @@ UI = {
                foot_tag='SNYPD &middot; NOT AFFILIATED WITH VINTED', foot_t='Reads public listings only.',
                foot=[('bot', 'Vinted bot'), ('monitor', 'Vinted monitor'), ('notify', 'Vinted notifications'), ('notwork', 'Vinted notifications not working'), ('saved', 'Vinted saved searches'), ('pricedrop', 'Vinted price drop alerts'), ('compare', 'Vinted bots compared'), ('/vinted-price-guide', 'Vinted price guide'), ('checker', 'Vinted price checker'), ('sold', 'Vinted sold items'),('/vinted-market-report', 'Vinted market report'), 
                      ('deals', 'Vinted deals'), ('fees', 'Vinted fees'), ('/faq', 'FAQ'), ('/support', 'Support'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:heysnypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie settings</a>',
                home='Home'),
     'fr': dict(locale='fr_FR', toc='SUR CETTE PAGE', updated='Mis à jour le', by='Par SNYPD, créé par un revendeur de sneakers belge',
                nav=[('bot', 'BOT VINTED'), ('/fr/guide-prix-vinted', 'PRIX VINTED'), ('/plans', 'TARIFS'), (DISCORD, 'DISCORD')],
@@ -241,7 +241,7 @@ UI = {
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
                foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('saved', 'Recherches enregistrées Vinted'), ('pricedrop', 'Baisse de prix Vinted'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('checker', 'Estimer un prix Vinted'), ('sold', 'Articles vendus sur Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
                      ('/faq', 'FAQ (anglais)'), ('/support', 'Support (anglais)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
+               legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:heysnypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
     'de': dict(locale='de_DE', toc='AUF DIESER SEITE', updated='Aktualisiert am', by='Von SNYPD, gebaut von einem belgischen Sneaker-Reseller',
                nav=[('bot', 'VINTED BOT'), ('/de/vinted-preise', 'VINTED-PREISE'), ('/plans', 'TARIFE'), (DISCORD, 'DISCORD')],
@@ -249,7 +249,7 @@ UI = {
                foot_tag='SNYPD &middot; NICHT MIT VINTED VERBUNDEN', foot_t='Liest nur öffentliche Anzeigen.',
                foot=[('bot', 'Vinted Bot'), ('notify', 'Vinted-Benachrichtigung für neue Artikel'), ('notwork', 'Vinted-Benachrichtigungen kommen nicht'), ('saved', 'Gespeicherte Suchen auf Vinted'), ('pricedrop', 'Vinted-Preissenkung'), ('compare', 'Vinted Bots im Vergleich'), ('sold', 'Verkaufte Artikel auf Vinted sehen'), ('/de/vinted-preise', 'Vinted-Preisführer'),('monitor', 'Vinted-Monitor (EN)'), ('fees', 'Vinted-Gebühren (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:help@snypd.store">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
+               legal='<a href="/privacy">Datenschutz</a><a href="/terms">Nutzungsbedingungen</a><a href="mailto:heysnypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-Einstellungen</a>',
                home='Startseite'),
     'nl': dict(locale='nl_NL', toc='OP DEZE PAGINA', updated='Bijgewerkt op', by='Door SNYPD, gemaakt door een Belgische sneakerreseller',
                nav=[('bot', 'VINTED BOT'), ('/nl/vinted-prijzen', 'VINTED-PRIJZEN'), ('/plans', 'ABONNEMENTEN'), (DISCORD, 'DISCORD')],
@@ -257,7 +257,7 @@ UI = {
                foot_tag='SNYPD &middot; NIET VERBONDEN AAN VINTED', foot_t='Leest alleen openbare advertenties.',
                foot=[('bot', 'Vinted bot'), ('notify', 'Vinted-melding bij nieuwe artikelen'), ('notwork', 'Vinted-meldingen werken niet'), ('saved', 'Opgeslagen zoekopdrachten op Vinted'), ('pricedrop', 'Vinted-prijsverlaging'), ('compare', 'Vinted bots vergeleken'), ('/nl/vinted-prijzen', 'Vinted-prijsgids'), ('monitor', 'Vinted monitor (EN)'), ('fees', 'Vinted-kosten (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:help@snypd.store">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Voorwaarden</a><a href="mailto:heysnypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-instellingen</a>',
                home='Home'),
     'it': dict(locale='it_IT', toc='IN QUESTA PAGINA', updated='Aggiornato il', by='Di SNYPD, creato da un reseller di sneaker belga',
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PREZZI'), (DISCORD, 'DISCORD')],
@@ -265,7 +265,7 @@ UI = {
                foot_tag='SNYPD &middot; NON AFFILIATO A VINTED', foot_t='Legge solo annunci pubblici.',
                foot=[('bot', 'Bot Vinted'), ('notify', 'Notifiche Vinted per nuovi annunci'), ('notwork', 'Notifiche Vinted non funzionano'), ('saved', 'Ricerche salvate su Vinted'), ('compare', 'Bot Vinted a confronto'), ('sold', 'Vedere gli articoli venduti su Vinted'), ('/it/prezzi-vinted', 'Guide prezzi Vinted'), ('/it/stima-prezzo-vinted', 'Stima prezzo Vinted'),('fees', 'Commissioni Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Supporto (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:help@snypd.store">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
+               legal='<a href="/privacy">Privacy</a><a href="/terms">Termini</a><a href="mailto:heysnypd@gmail.com">Contatti</a><a href="/cookies">Cookie</a><a href="/cookies" data-cookie-settings>Impostazioni cookie</a>',
                home='Home'),
     'es': dict(locale='es_ES', toc='EN ESTA PÁGINA', updated='Actualizado el', by='Por SNYPD, creado por un revendedor de zapatillas belga',
                nav=[('bot', 'VINTED BOT'), ('/plans', 'PRECIOS'), (DISCORD, 'DISCORD')],
@@ -273,7 +273,7 @@ UI = {
                foot_tag='SNYPD &middot; SIN RELACIÓN CON VINTED', foot_t='Solo lee anuncios públicos.',
                foot=[('bot', 'Bot de Vinted'), ('notify', 'Alertas de Vinted para anuncios nuevos'), ('notwork', 'Notificaciones de Vinted no funcionan'), ('saved', 'Búsquedas guardadas en Vinted'), ('compare', 'Bots de Vinted comparados'), ('sold', 'Ver artículos vendidos en Vinted'), ('/vinted-price-guide', 'Precios de Vinted (EN)'),('fees', 'Comisiones de Vinted (EN)'),
                      ('/faq', 'FAQ (EN)'), ('/support', 'Soporte (EN)'), (DISCORD, 'Discord')],
-               legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:help@snypd.store">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
+               legal='<a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="mailto:heysnypd@gmail.com">Contacto</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ajustes de cookies</a>',
                home='Inicio'),
 }
 

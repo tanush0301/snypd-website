@@ -9,7 +9,7 @@ LIVE = MODE == 'live'
 UPDATED = '9 October 2026'
 # A page whose text changed later carries its own date (privacy: hunter statistics, 7 Nov 2026).
 UPDATED_BY_SLUG = {'privacy': '14 November 2026', 'terms': '14 November 2026'}  # terms: PayPal + Discord alerts (14 Nov); check speed wording (7 Nov)
-EMAIL = 'help@snypd.store'   # = the live pages since 1 Nov 2026 (c537565 edited the HTML by hand)
+EMAIL = 'heysnypd@gmail.com'   # = the live pages since 1 Nov 2026 (c537565 edited the HTML by hand)
 DISCORD = 'https://discord.gg/gjKD4auXhK'
 
 CSS = r"""

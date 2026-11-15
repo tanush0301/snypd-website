@@ -139,9 +139,12 @@ async function journey(responses, options = {}) {
   for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     if(!/\bsrc\s*=|application\/ld\+json/i.test(match[1]))new vm.Script(match[2]);
   }
-  assert(!html.includes('snypd@gmail.com')); checks++;
+  assert(!html.split('heysnypd@gmail.com').join('').includes('snypd@gmail.com')); checks++;
+  assert(!html.includes('help@snypd.store')); checks++;
+  assert(html.includes('mailto:heysnypd@gmail.com')); checks++;
   const generator=fs.readFileSync(path.join(root,'ops/seo/gen_regions.py'),'utf8');
-  assert(!generator.includes('snypd@gmail.com')); checks++;
+  assert(!generator.split('heysnypd@gmail.com').join('').includes('snypd@gmail.com')); checks++;
+  assert(!generator.includes('help@snypd.store')); checks++;
   // Source and generated dictionaries must include every new visible string.
   const fr=fs.readFileSync(path.join(root,'ops/i18n/fr.py'),'utf8');
   const asset=fs.readFileSync(path.join(root,'assets/i18n.js'),'utf8');
