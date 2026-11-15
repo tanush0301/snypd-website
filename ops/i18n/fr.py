@@ -516,6 +516,8 @@ _MONTHS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août'
 # previous result, so later ones can finish what an earlier one left in English.
 FR_PATTERNS = [
     # referral card on /account (migration 085)
+    (r'^(\d+) joined · (\d+) found a listing · (\d+) subscribed · (\d+) days earned$',
+     '$1 inscrit(s) · $2 avec une annonce trouvée · $3 abonné(s) · $4 jours gagnés'),
     (r'^(\d+) joined · (\d+) found a listing · (\d+) subscribed · (\d+) days earned \((\d+) rewards left\)$',
      '$1 inscrit(s) · $2 avec une annonce trouvée · $3 abonné(s) · $4 jours gagnés (encore $5 récompense(s))'),
     (r'^24/7 bonus active until (.+)$', 'Bonus 24h/24 actif jusqu’au $1'),

@@ -1046,7 +1046,8 @@
       const n = (k) => Number(s[k] || 0);
       document.getElementById("ref-stats").textContent =
         n("joined") + " joined · " + n("found") + " found a listing · " + n("paid") + " subscribed" +
-        " · " + n("days_earned") + " days earned (" + n("days_left_cap") + " rewards left)";
+        " · " + n("days_earned") + " days earned" +
+        (s.days_left_cap == null ? "" : " (" + n("days_left_cap") + " rewards left)");
       if (s.bonus_until && new Date(s.bonus_until) > new Date()) {
         const b = document.getElementById("ref-bonus");
         b.textContent = "24/7 bonus active until " + new Date(s.bonus_until).toLocaleString();
