@@ -182,7 +182,7 @@ def build(lang):
   <div class="lg-wrap lg-foot-in">
     <div class="lg-foot-a">
       <small>{t['foot']}</small>
-      <span class="lg-foot-l"><a href="/plans">Plans</a><a href="/faq">FAQ</a><a href="/support">Support</a></span>
+      <span class="lg-foot-l"><a href="/plans">Plans</a><a href="/faq">FAQ</a><a href="/support">Support</a><a href="https://discord.gg/gjKD4auXhK" rel="noopener">Discord</a></span>
     </div>
     <nav class="lg-foot-l" aria-label="Legal" style="align-items:flex-start;"><a href="/privacy">{l[0]}</a><a href="/terms">{l[1]}</a><a href="mailto:{EMAIL}">{l[2]}</a><a href="/cookies">{l[3]}</a><a href="/cookies" data-cookie-settings>{l[4]}</a></nav>
   </div>
