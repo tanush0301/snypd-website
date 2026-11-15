@@ -75,7 +75,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     mine: [...document.querySelectorAll('.mr-sheet .mr-cond-row.is-mine .mr-cond-name')].map(e => e.innerText),
   }));
   eq([st.sheet, st.marketShown], [true, false], 'answer opens in a sheet over the Feed, no tab switch');
-  eq(st.req, [{ q: 'Ralph Lauren ' + card.t, keep: [] }], 'brand is put in front of the title, nothing typed');
+  // Card title check (15 Nov 2026): a card tap tells the backend the search is a listing title and passes the brand;
+  // typed searches in the panel (checked below) still send only q + keep.
+  eq(st.req, [{ q: 'Ralph Lauren ' + card.t, keep: [], from_title: true, brand: 'Ralph Lauren' }], 'brand is put in front of the title, nothing typed; the request says it is a listing title');
   eq(st.labels, ['Quick sale', 'Typical', 'Patient'], 'three labelled asking prices');
   eq(st.tiles, ['\u20AC35', '\u20AC42', '\u20AC50'], 'prices are the card condition (Very good) row, not the overall');
   eq([st.max, st.margin], ['\u20AC25.20', '40'], 'max buy price = typical x (100 - 40%)');
