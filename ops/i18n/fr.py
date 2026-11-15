@@ -397,6 +397,11 @@ FR = {
     'Share my link': 'Partager mon lien',
     'Get free days': 'Gagne des jours offerts',
     'Free days': 'Jours offerts',
+    'Vinted alerts on your phone': 'Les alertes Vinted sur ton téléphone',
+    'Start free': 'Commencer gratuitement',
+    'Yes. Your first saved search runs 24/7 for 3 days. After that, Free checks while your dashboard is open, or you pick a plan.': 'Oui. Ta première recherche enregistrée tourne 24h/24 pendant 3 jours. Ensuite, Free vérifie tant que ton tableau de bord est ouvert, ou tu choisis un plan.',
+    'New: invite friends, get free days': 'Nouveau' + NB + ': invite des amis, gagne des jours offerts',
+    "When a friend's first hunt finds a listing, they get 2 extra days of 24/7 alerts and you get 3. If they subscribe, you get 30% off a renewal.": "Quand la première recherche d'un ami trouve une annonce, il reçoit 2 jours d'alertes 24h/24 en plus et toi 3. S'il s'abonne, tu as 30" + NB + '% de réduction sur un renouvellement.',
     # /invite page (referral landing)
     'A friend sent you a gift': 'Un ami t’offre un cadeau',
     '2 extra days of 24/7 Vinted alerts': '2 jours de plus d’alertes Vinted 24h/24',
