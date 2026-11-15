@@ -121,6 +121,31 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
   var href = gift ? '/signup?ref=' + c + (s ? '&src=' + s : '') + '&from=invite' : '/signup?from=invite';
   els = document.querySelectorAll('[data-invite-cta]');
   for (i = 0; i < els.length; i++) els[i].setAttribute('href', href);
+
+  /* Funnel counter (migration 087): one 'open' per page load, only with a valid code and only for a real reader
+     (page visible for 4 s), so chat preview crawlers are not counted. Daily total per placement, no identifiers,
+     nothing stored on the device. Same public anon key as the homepage. A failure never affects the page. */
+  if (!gift) return;
+  var counted = false;
+  function countOpen() {
+    if (counted || document.visibilityState !== 'visible') return;
+    counted = true;
+    try {
+      var key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ';
+      fetch('https://igbuqanjocfmahlzzupc.supabase.co/rest/v1/rpc/referral_track', {
+        method: 'POST', keepalive: true,
+        headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_event: 'open', p_src: s || 'none' })
+      }).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  function armOpen() { setTimeout(countOpen, 4000); }
+  if (document.visibilityState === 'visible') armOpen();
+  else document.addEventListener('visibilitychange', function onVis() {
+    if (document.visibilityState !== 'visible') return;
+    document.removeEventListener('visibilitychange', onVis);
+    armOpen();
+  });
 })();
 </script>
 </body>
