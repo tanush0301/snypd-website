@@ -94,6 +94,8 @@ FAQ = [
 # total, hidden "website" field against bots). Topic keys must match TOPICS in that file.
 # /support exists in English and French (/fr/support); every text lives in L below.
 FORM_API = 'https://api.snypd.store/api/v1/support/contact'
+# problem section id -> form topic key (the section's 'Use the form' button preselects it)
+TOPIC_OF = {'no-alerts': 'alerts', 'discord': 'discord', 'missing-listing': 'listing', 'link-refused': 'link', 'plan': 'plan', 'billing': 'billing'}
 FORM_CSS = """<style>
 .sf { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
 .sf label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; letter-spacing: .06em; color: #A9ADB1; }
@@ -114,6 +116,14 @@ FORM_JS = """<script>
   var st = document.getElementById('sf-status'), btn = document.getElementById('sf-send');
   var T = @@T@@, busy = false;
   function say(t, cls) { st.textContent = t; st.className = 'sf-note ' + (cls || ''); }
+  var hint = document.getElementById('sf-hint');
+  function showHint() { if (hint && T.hints.hasOwnProperty(f.topic.value)) hint.textContent = T.hints[f.topic.value]; }
+  f.topic.addEventListener('change', showHint);
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[data-topic]') : null; if (!a) return;
+    f.topic.value = a.getAttribute('data-topic'); showHint();
+    setTimeout(function () { f.message.focus(); }, 50);
+  });
   f.addEventListener('submit', function (e) {
     e.preventDefault(); if (busy) return;
     var email = f.email.value.trim(), msg = f.message.value.trim();
@@ -125,7 +135,7 @@ FORM_JS = """<script>
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { s: r.status, b: b || {} }; }); })
       .then(function (x) {
         busy = false; btn.disabled = false;
-        if (x.s === 200 && x.b.ok === true) { f.reset(); say(T.sent, 'ok'); return; }
+        if (x.s === 200 && x.b.ok === true) { f.reset(); showHint(); say(T.sent, 'ok'); return; }
         var code = x.b.detail && x.b.detail.error;
         say((typeof code === 'string' && T.err.hasOwnProperty(code) && T.err[code]) || T.failed, 'err');
       })
@@ -162,6 +172,15 @@ L = {
         more=('<section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. '
               'Prices and limits: <a href="/plans">plans</a>.</p></section>'),
         email_btn='EMAIL US ABOUT THIS',
+        form_btn='USE THE FORM',
+        hints=dict(
+            alerts='Helpful to include: your device and browser (for example iPhone Home Screen app, Chrome on Android), and whether matches still show in your dashboard.',
+            discord='Helpful to include: your Discord username, and what happens (no code, code refused, or connected but no messages).',
+            listing='Helpful to include: the link to the Vinted listing, which of your searches should have found it, and when you saw it.',
+            link='Helpful to include: the link you pasted and the message SNYPD showed.',
+            plan='Helpful to include: the email you used at Whop checkout and the plan you bought.',
+            billing='Helpful to include: what you would like (cancel, refund, or change to which plan).',
+            other='Tell us what you were trying to do and what happened instead.'),
         no_app=('<p>Button does not open your mail app? <a href="#write">Use the form</a>, or write to '
                 '<a href="mailto:%s">%s</a> from any email service.</p>'),
         form_p='No mail app needed. Fill this in and your message goes straight to our inbox. We answer %s.',
@@ -195,7 +214,16 @@ L = {
                '<p>La plupart des problèmes ci-dessous se règlent en quelques étapes. Chaque section a un bouton qui ouvre un e-mail avec les infos dont on a besoin.</p></section>'),
         more=('<section id="more"><h2>Autres questions</h2><p>Fonctionnement de SNYPD, plans et remboursements : <a href="/fr/faq">FAQ</a>. '
               'Prix et limites : <a href="/plans">plans</a>.</p></section>'),
-        email_btn='NOUS ÉCRIRE À CE SUJET',
+        email_btn='NOUS ÉCRIRE PAR E-MAIL',
+        form_btn='UTILISER LE FORMULAIRE',
+        hints=dict(
+            alerts='Utile à préciser : ton appareil et ton navigateur (par exemple app iPhone sur l’écran d’accueil, Chrome sur Android), et si les annonces apparaissent encore dans ton tableau de bord.',
+            discord='Utile à préciser : ton nom d’utilisateur Discord, et ce qui se passe (pas de code, code refusé, ou connecté mais aucun message).',
+            listing='Utile à préciser : le lien de l’annonce Vinted, laquelle de tes recherches aurait dû la trouver, et quand tu l’as vue.',
+            link='Utile à préciser : le lien que tu as collé et le message affiché par SNYPD.',
+            plan='Utile à préciser : l’e-mail utilisé au paiement Whop et le plan acheté.',
+            billing='Utile à préciser : ce que tu souhaites (résilier, remboursement, ou passer à quel plan).',
+            other='Dis-nous ce que tu essayais de faire et ce qui s’est passé à la place.'),
         no_app=('<p>Le bouton n’ouvre pas ton application mail ? <a href="#write">Utilise le formulaire</a>, ou écris à '
                 '<a href="mailto:%s">%s</a> depuis n’importe quelle messagerie.</p>'),
         form_p='Pas besoin d’application mail. Remplis ce formulaire et ton message arrive directement dans notre boîte. Nous répondons %s.',
@@ -237,21 +265,22 @@ def form_section(lang):
     t = L[lang]
     opts = ''.join('<option value="%s">%s</option>' % (k, esc(txt)) for k, txt in t['topics'])
     fill = {'reply': t['reply'], 'mail': EMAIL}
-    texts = dict(sending=t['js']['sending'], sent=t['js']['sent'] % fill, failed=t['js']['failed'] % fill,
+    texts = dict(hints=t['hints'], sending=t['js']['sending'], sent=t['js']['sent'] % fill, failed=t['js']['failed'] % fill,
                  err={k: v % fill for k, v in t['js']['err'].items()})
     js = FORM_JS.replace('@@T@@', json.dumps(texts, ensure_ascii=False).replace('</', '<\\/')).replace('@@API@@', FORM_API)
     return ('<section id="write"><h2>%s</h2><p>%s</p>'
             '<form class="sf" id="sf" novalidate>'
             '<label for="sf-email">%s'
             '<input id="sf-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required></label>'
-            '<label for="sf-topic">%s<select id="sf-topic" name="topic">%s</select></label>'
+            '<label for="sf-topic">%s<select id="sf-topic" name="topic" aria-describedby="sf-hint">%s</select></label>'
+            '<p class="sf-small" id="sf-hint">%s</p>'
             '<label for="sf-msg">%s<textarea id="sf-msg" name="message" rows="6" maxlength="4000" required></textarea></label>'
             '<div class="sf-hp" aria-hidden="true"><label>Website<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>'
             '<button class="ct-btn" id="sf-send" type="submit">%s</button>'
             '<p class="sf-note" id="sf-status" role="status" aria-live="polite"></p>'
             '<p class="sf-small">%s</p>'
             '<p class="sf-small">%s</p>'
-            '</form>%s</section>' % (esc(FORM_H[lang]), t['form_p'] % t['reply'], esc(t['l_email']), esc(t['l_topic']), opts, esc(t['l_msg']),
+            '</form>%s</section>' % (esc(FORM_H[lang]), t['form_p'] % t['reply'], esc(t['l_email']), esc(t['l_topic']), opts, esc(t['hints'][t['topics'][0][0]]), esc(t['l_msg']),
                                      esc(t['send']), t['small'], t['chat'] % DISCORD, js))
 
 
@@ -427,9 +456,10 @@ def page_support(lang='en'):
     t = L[lang]
     blocks = []
     for pid, title, steps, (subj, lines) in PROBLEMS[lang]:
-        blocks.append('<section id="%s"><h2>%s</h2><ol>%s</ol><p><a class="ct-btn ct-ghost" href="%s">%s</a></p>%s</section>'
-                      % (pid, esc(title), ''.join('<li>%s</li>' % s for s in steps), esc(mail('SNYPD: ' + subj, lines)),
-                         esc(t['email_btn']), t['no_app'] % (EMAIL, EMAIL)))
+        blocks.append('<section id="%s"><h2>%s</h2><ol>%s</ol><div class="ct-actions" style="margin:0 0 14px;">'
+                      '<a class="ct-btn" href="#write" data-topic="%s">%s</a><a class="ct-btn ct-ghost" href="%s">%s</a></div>%s</section>'
+                      % (pid, esc(title), ''.join('<li>%s</li>' % s for s in steps), TOPIC_OF[pid], esc(t['form_btn']),
+                         esc(mail('SNYPD: ' + subj, lines)), esc(t['email_btn']), t['no_app'] % (EMAIL, EMAIL)))
     intro = t['intro'] % (EMAIL, EMAIL, t['reply'], DISCORD, EMAIL, DISCORD)
     body = intro + form_section(lang) + ''.join(blocks) + t['more']
     return gc.page('support', lang, t['title'], t['desc'] % t['reply'], t['eyebrow'], t['h1'], t['lead'] % t['reply'],

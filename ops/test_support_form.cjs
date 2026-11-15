@@ -128,6 +128,21 @@ const ok = (c, name) => { assert(c, name); checks++; };
     await page.close();
   }
 
+  // topic hints and the per-section form buttons
+  {
+    const { page, state } = await open(390, 844, () => ({ status: 200, body: { ok: true } }));
+    const h0 = await page.$eval('#sf-hint', n => n.textContent);
+    await page.evaluate(() => document.querySelector('#plan a[data-topic]').click());
+    const r = await page.evaluate(() => ({ v: document.getElementById('sf-topic').value, h: document.getElementById('sf-hint').textContent }));
+    ok(h0.length > 20 && r.v === 'plan' && /Whop/.test(r.h) && r.h !== h0, 'section button picks the topic and shows its hint');
+    await page.evaluate(() => { const s = document.getElementById('sf-topic'); s.value = 'discord'; s.dispatchEvent(new Event('change')); });
+    ok(/Discord username/.test(await page.$eval('#sf-hint', n => n.textContent)), 'hint follows the topic');
+    ok(await page.evaluate(() => document.querySelectorAll('a[data-topic]').length) === 6, 'six sections offer the form');
+    ok(await page.evaluate(() => [...document.querySelectorAll('a[data-topic]')].every(a => [...document.querySelectorAll('#sf-topic option')].some(o => o.value === a.getAttribute('data-topic')))), 'every section topic exists in the form');
+    ok(state.posts.length === 0 && state.errors.length === 0, 'nothing sent, no errors');
+    await page.close();
+  }
+
   // source checks
   const html = fs.readFileSync(path.join(root, 'support.html'), 'utf8');
   ok(html.includes(API), 'page posts to the backend route');
