@@ -23,7 +23,8 @@ EMAIL = 'heysnypd@gmail.com'
 REPLY = 'within 24 hours'  # Tanush's commitment, 10 Oct 2026
 MANAGE = 'https://whop.com/@me/settings/orders/'
 # Shown under every email button: a mailto link does nothing on a computer without a mail app.
-NO_APP = '<p>Button does not open your mail app? Write to <a href="mailto:%s">%s</a> from any email service.</p>' % (EMAIL, EMAIL)
+NO_APP = ('<p>Button does not open your mail app? <a href="#write">Use the form</a>, or write to '
+          '<a href="mailto:%s">%s</a> from any email service.</p>' % (EMAIL, EMAIL))
 
 FAQ = [
     ('start', 'Getting started', [
@@ -99,6 +100,85 @@ def page_faq():
                    'How the Vinted monitor works, what each plan includes and how to get alerts on your phone.',
                    [(sid, title) for sid, title, _ in FAQ] + [('help', 'Still stuck?')], body, [gc.faq_ld(pairs)])
 
+# Contact form (15 Nov 2026). Posts to the backend route /api/v1/support/contact, which sends one
+# email to the support inbox (backend src/support_contact.py: 3 per address per hour, 8 a day in
+# total, hidden "website" field against bots). Topic keys must match TOPICS in that file.
+FORM_API = 'https://api.snypd.store/api/v1/support/contact'
+FORM_TOPICS = [('alerts', 'Alerts are not arriving'), ('discord', 'Discord alerts'), ('listing', 'A listing did not show up'),
+               ('link', 'My search link was refused'), ('plan', 'I paid but my plan did not change'),
+               ('billing', 'Cancel, refund or change plan'), ('other', 'Something else')]
+FORM_CSS = """<style>
+.sf { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
+.sf label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; letter-spacing: .06em; color: #A9ADB1; }
+.sf input, .sf select, .sf textarea { width: 100%; box-sizing: border-box; min-height: 48px; padding: 12px 14px; font: inherit; font-size: 16px; letter-spacing: 0; color: #FFFFFF; background: #0A0A0B; border: 1px solid #3A3A40; border-radius: 0; }
+.sf textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+.sf input:focus-visible, .sf select:focus-visible, .sf textarea:focus-visible { outline: 2px solid #00E5A0; outline-offset: 1px; }
+.sf button { align-self: flex-start; border: 0; cursor: pointer; font: inherit; font-size: 12px; }
+.sf button[disabled] { opacity: .55; cursor: default; }
+.sf-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.sf-note { margin: 0; min-height: 22px; font-size: 14px; line-height: 1.5; }
+.sf-note.ok { color: #00E5A0; }
+.sf-note.err { color: #FFB4A8; }
+.sf-small { margin: 0; font-size: 12px; line-height: 1.6; color: #8A8E93; }
+</style>"""
+FORM_JS = """<script>
+(function () {
+  var f = document.getElementById('sf'); if (!f) return;
+  var st = document.getElementById('sf-status'), btn = document.getElementById('sf-send');
+  var MAIL = '@@MAIL@@', busy = false;
+  function say(t, cls) { st.textContent = t; st.className = 'sf-note ' + (cls || ''); }
+  var TEXT = {
+    bad_email: 'Check your email address: we need it to answer you.',
+    message_too_short: 'Tell us a little more, so we can help.',
+    message_too_long: 'That message is too long. Shorten it, or email ' + MAIL + '.',
+    too_many: 'You have sent several messages already. We will answer those. For anything urgent, email ' + MAIL + '.',
+    busy: 'The form has reached its limit for today. Please email ' + MAIL + ' instead.'
+  };
+  f.addEventListener('submit', function (e) {
+    e.preventDefault(); if (busy) return;
+    var email = f.email.value.trim(), msg = f.message.value.trim();
+    if (email.indexOf('@') < 1 || email.indexOf('.') < 0) { say(TEXT.bad_email, 'err'); f.email.focus(); return; }
+    if (msg.length < 10) { say(TEXT.message_too_short, 'err'); f.message.focus(); return; }
+    busy = true; btn.disabled = true; say('Sending...', '');
+    fetch('@@API@@', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, topic: f.topic.value, message: msg, website: f.website.value, page: location.pathname }) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { s: r.status, b: b || {} }; }); })
+      .then(function (x) {
+        busy = false;
+        if (x.s === 200 && x.b.ok === true) {
+          f.reset(); btn.disabled = false;
+          say('Message sent. We answer @@REPLY@@, at the address you gave.', 'ok');
+          return;
+        }
+        btn.disabled = false;
+        var code = x.b.detail && x.b.detail.error;
+        say(TEXT[code] || ('We could not send your message. Please email ' + MAIL + ' instead.'), 'err');
+      })
+      .catch(function () {
+        busy = false; btn.disabled = false;
+        say('We could not send your message. Please email ' + MAIL + ' instead.', 'err');
+      });
+  });
+})();
+</script>"""
+
+
+def form_section():
+    opts = ''.join('<option value="%s">%s</option>' % (k, esc(t)) for k, t in FORM_TOPICS)
+    js = FORM_JS.replace('@@MAIL@@', EMAIL).replace('@@API@@', FORM_API).replace('@@REPLY@@', REPLY)
+    return ('<section id="write"><h2>Write to us here</h2>'
+            '<p>No mail app needed. Fill this in and your message goes straight to our inbox. We answer %s.</p>'
+            '<form class="sf" id="sf" novalidate>'
+            '<label for="sf-email">YOUR EMAIL (THE ONE OF YOUR SNYPD ACCOUNT)'
+            '<input id="sf-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required></label>'
+            '<label for="sf-topic">WHAT IS IT ABOUT?<select id="sf-topic" name="topic">%s</select></label>'
+            '<label for="sf-msg">YOUR MESSAGE<textarea id="sf-msg" name="message" rows="6" maxlength="4000" required></textarea></label>'
+            '<div class="sf-hp" aria-hidden="true"><label>Website<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>'
+            '<button class="ct-btn" id="sf-send" type="submit">SEND MESSAGE</button>'
+            '<p class="sf-note" id="sf-status" role="status" aria-live="polite"></p>'
+            '<p class="sf-small">We use your address and message only to answer you. Never send a password.</p>'
+            '</form>%s</section>' % (REPLY, opts, js))
+
 
 def mail(subject, lines):
     q = urllib.parse.urlencode({'subject': subject, 'body': '\n'.join(lines) + '\n'}, quote_via=urllib.parse.quote)
@@ -150,17 +230,18 @@ def page_support():
     intro = ('<section id="person"><h2>Reach a person</h2><div class="lg-box lg-mint"><p>Email <a href="mailto:%s">%s</a>. '
              'We answer every email %s. Use the email address of your SNYPD account, so we can find it.</p>'
              '<p>Prefer chat? The <a href="%s">SNYPD Discord</a> is free to join: ask a question, get help from other members and receive your alerts there.</p>'
-             '<div class="ct-actions"><a class="ct-btn" href="mailto:%s">EMAIL US</a>'
+             '<div class="ct-actions"><a class="ct-btn" href="#write">WRITE TO US HERE</a>'
+             '<a class="ct-btn ct-ghost" href="mailto:%s">EMAIL US</a>'
              '<a class="ct-btn ct-ghost" href="%s" rel="noopener">JOIN THE DISCORD</a></div></div>'
              '<p>Most of the problems below can be fixed in a few steps. Each section has a button that opens an email with the details we need already listed.</p></section>'
              % (EMAIL, EMAIL, REPLY, DISCORD, EMAIL, DISCORD))
-    body = intro + ''.join(blocks) + ('<section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. '
+    body = intro + form_section() + ''.join(blocks) + ('<section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. '
                                       'Prices and limits: <a href="/plans">plans</a>.</p></section>')
     return gc.page('support', 'en', 'SNYPD support: fix alerts, search links and billing',
-                   'Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Email support, reply %s.' % REPLY,
+                   'Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Contact form and email, reply %s.' % REPLY,
                    'SUPPORT', 'Something not working?',
-                   'Find your problem below and follow the steps. If that does not fix it, email us: we answer every email %s.' % REPLY,
-                   [('person', 'Reach a person')] + [(pid, title) for pid, title, _, _ in PROBLEMS] + [('more', 'Other questions')], body)
+                   'Find your problem below and follow the steps. If that does not fix it, write to us: we answer every message %s.' % REPLY,
+                   [('person', 'Reach a person'), ('write', 'Write to us here')] + [(pid, title) for pid, title, _, _ in PROBLEMS] + [('more', 'Other questions')], body, head_extra=FORM_CSS)
 
 
 if __name__ == '__main__':
