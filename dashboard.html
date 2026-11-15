@@ -2107,6 +2107,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       <div style="display:flex;gap:8px;align-items:center">
         <input id="claim-referral-link" readonly style="flex:1;min-width:0;font-size:12px;padding:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted)">
         <button class="btn btn-ghost" id="claim-referral-share" type="button">Share</button>
+        <a class="btn btn-ghost" id="claim-referral-wa" href="#" target="_blank" rel="noopener noreferrer">WhatsApp</a>
       </div>
     </div>
     <div class="filter-sheet__footer">
@@ -2206,6 +2207,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
   </div>
   <div class="email-optin__actions">
     <button class="btn btn-prim" id="ref-live-share" type="button">Share my link</button>
+    <a class="btn btn-ghost" id="ref-live-wa" href="#" target="_blank" rel="noopener noreferrer">WhatsApp</a>
     <button class="btn btn-ghost" id="ref-live-close" type="button">Got it</button>
   </div>
 </div>
@@ -6309,8 +6311,10 @@ const HEARTBEAT_URL = (() => {
           refBox.dataset.text = (what ? 'Found ' + what + ' for ' : 'Found it for ') + fmtPrice(amount, currency)
             + ' on Vinted with SNYPD. You get 2 extra days of 24/7 alerts:';
           refBox.dataset.shown = '1';
+          const waLink = document.getElementById('claim-referral-wa');
+          if (waLink) waLink.setAttribute('href', 'https://wa.me/?text=' + encodeURIComponent(refBox.dataset.text + ' ' + link));
           refBox.style.display = 'flex';
-          if (window.gtag) try { gtag('event', 'referral_shown', { src: 'receipt' }); } catch (e) {}
+          if (window.gtag) try { gtag('event', 'referral_shown', { src: 'receipt' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'shown', p_src: 'receipt' }).then(() => {}, () => {}); } catch (e) {}
         }
       } catch (e) { /* referral is optional, never blocks the receipt */ }
     }
@@ -6335,6 +6339,13 @@ const HEARTBEAT_URL = (() => {
       overlay.style.display = 'none';
     };
     doneBtn.addEventListener('click', close);
+    const waBtn = document.getElementById('claim-referral-wa');
+    if (waBtn) waBtn.addEventListener('click', () => {
+      const box = document.getElementById('claim-referral');
+      if (box) box.dataset.shared = '1';
+      refState(0);
+      if (window.gtag) try { gtag('event', 'referral_share', { src: 'receipt', via: 'whatsapp' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'receipt' }).then(() => {}, () => {}); } catch (e) {}
+    });
     const shareBtn = document.getElementById('claim-referral-share');
     if (shareBtn) shareBtn.addEventListener('click', async () => {
       const box = document.getElementById('claim-referral');
@@ -6344,7 +6355,7 @@ const HEARTBEAT_URL = (() => {
         else { await navigator.clipboard.writeText(box.dataset.text + ' ' + link); shareBtn.textContent = 'Copied'; setTimeout(() => { shareBtn.textContent = 'Share'; }, 2000); }
         box.dataset.shared = '1';
         refState(0);
-        if (window.gtag) try { gtag('event', 'referral_share', { src: 'receipt' }); } catch (e) {}
+        if (window.gtag) try { gtag('event', 'referral_share', { src: 'receipt' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'receipt' }).then(() => {}, () => {}); } catch (e) {}
       } catch (e) { const i = document.getElementById('claim-referral-link'); if (i) i.select(); }
     });
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
@@ -6491,17 +6502,22 @@ const HEARTBEAT_URL = (() => {
       if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
       const link = 'https://www.snypd.store/invite?ref=' + code + '&src=success';
       const text = 'I use SNYPD for Vinted alerts. With my link you get 2 extra days of 24/7 alerts:';
+      const waBtn = document.getElementById('ref-live-wa');
+      if (waBtn) {
+        waBtn.setAttribute('href', 'https://wa.me/?text=' + encodeURIComponent(text + ' ' + link));
+        waBtn.addEventListener('click', () => { if (window.gtag) try { gtag('event', 'referral_share', { src: 'success', via: 'whatsapp' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'success' }).then(() => {}, () => {}); } catch (e) {} });
+      }
       const shareBtn = document.getElementById('ref-live-share');
       shareBtn.addEventListener('click', async () => {
         try {
           if (navigator.share) await navigator.share({ text, url: link });
           else { await navigator.clipboard.writeText(text + ' ' + link); shareBtn.textContent = 'Copied'; }
-          if (window.gtag) try { gtag('event', 'referral_share', { src: 'success' }); } catch (e) {}
+          if (window.gtag) try { gtag('event', 'referral_share', { src: 'success' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'success' }).then(() => {}, () => {}); } catch (e) {}
         } catch (e) { /* share cancelled */ }
       });
       document.getElementById('ref-live-close').addEventListener('click', () => { card.style.display = 'none'; });
       card.style.display = '';
-      if (window.gtag) try { gtag('event', 'referral_shown', { src: 'success' }); } catch (e) {}
+      if (window.gtag) try { gtag('event', 'referral_shown', { src: 'success' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'shown', p_src: 'success' }).then(() => {}, () => {}); } catch (e) {}
     } catch (e) { /* referral is optional */ }
   }
   referralPlanLiveCard();
@@ -6526,7 +6542,7 @@ const HEARTBEAT_URL = (() => {
       const done = () => { card.style.display = 'none'; };
       document.getElementById('ref-announce-wa').setAttribute('href', 'https://wa.me/?text=' + encodeURIComponent(text + ' ' + link));
       document.getElementById('ref-announce-wa').addEventListener('click', () => {
-        if (window.gtag) try { gtag('event', 'referral_share', { src: 'announce', via: 'whatsapp' }); } catch (e) {}
+        if (window.gtag) try { gtag('event', 'referral_share', { src: 'announce', via: 'whatsapp' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'announce' }).then(() => {}, () => {}); } catch (e) {}
         setTimeout(done, 300);
       });
       const shareBtn = document.getElementById('ref-announce-share');
@@ -6534,14 +6550,14 @@ const HEARTBEAT_URL = (() => {
         try {
           if (navigator.share) await navigator.share({ text, url: link });
           else { await navigator.clipboard.writeText(text + ' ' + link); shareBtn.textContent = 'Copied'; }
-          if (window.gtag) try { gtag('event', 'referral_share', { src: 'announce' }); } catch (e) {}
+          if (window.gtag) try { gtag('event', 'referral_share', { src: 'announce' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'announce' }).then(() => {}, () => {}); } catch (e) {}
           setTimeout(done, 1200);
         } catch (e) { /* share cancelled */ }
       });
       document.getElementById('ref-announce-close').addEventListener('click', done);
       card.style.display = '';
       try { localStorage.setItem('snypd_ref_announce_v1', String(Date.now())); } catch (e) {}
-      if (window.gtag) try { gtag('event', 'referral_shown', { src: 'announce' }); } catch (e) {}
+      if (window.gtag) try { gtag('event', 'referral_shown', { src: 'announce' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'shown', p_src: 'announce' }).then(() => {}, () => {}); } catch (e) {}
     } catch (e) { /* referral is optional */ }
   })();
 

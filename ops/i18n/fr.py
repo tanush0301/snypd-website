@@ -397,6 +397,7 @@ FR = {
     'Share my link': 'Partager mon lien',
     'Get free days': 'Gagne des jours offerts',
     'Free days': 'Jours offerts',
+    'Send on WhatsApp': 'Envoyer sur WhatsApp',
     'Vinted alerts on your phone': 'Les alertes Vinted sur ton téléphone',
     'Start free': 'Commencer gratuitement',
     'Yes. Your first saved search runs 24/7 for 3 days. After that, Free checks while your dashboard is open, or you pick a plan.': 'Oui. Ta première recherche enregistrée tourne 24h/24 pendant 3 jours. Ensuite, Free vérifie tant que ton tableau de bord est ouvert, ou tu choisis un plan.',
