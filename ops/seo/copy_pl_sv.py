@@ -47,7 +47,7 @@ def ui(discord):
                    foot_tag='SNYPD &middot; NIEPOWIĄZANY Z VINTED', foot_t='Czyta tylko publiczne ogłoszenia.',
                    foot=[('bot', 'Bot Vinted'), ('notify', 'Powiadomienia Vinted o nowych ogłoszeniach'), ('notwork', 'Powiadomienia Vinted nie działają'),
                          ('compare', 'Porównanie botów Vinted'), ('/vinted-price-guide', 'Ceny na Vinted (EN)'), ('monitor', 'Monitor Vinted'), ('fees', 'Opłaty Vinted'),
-                         ('/faq', 'FAQ (EN)'), ('/support', 'Pomoc (EN)'), (discord, 'Discord')],
+                         ('/faq', 'FAQ (EN)'), ('/pl/support', 'Pomoc'), (discord, 'Discord')],
                    legal='<a href="/privacy">Prywatność</a><a href="/terms">Regulamin</a><a href="mailto:heysnypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Ustawienia cookies</a>',
                    home='Strona główna'),
         'sv': dict(locale='sv_SE', toc='PÅ DEN HÄR SIDAN', updated='Uppdaterad', by='Av SNYPD, byggt av en belgisk sneakerreseller',
@@ -56,7 +56,7 @@ def ui(discord):
                    foot_tag='SNYPD &middot; INTE KOPPLAT TILL VINTED', foot_t='Läser bara offentliga annonser.',
                    foot=[('bot', 'Vinted bot'), ('notify', 'Vinted bevakning'), ('notwork', 'Vinted-notiser fungerar inte'), ('saved', 'Sparade sökningar på Vinted'), ('saved', 'Zapisane wyszukiwania Vinted'), ('compare', 'Vinted botar jämförda'),
                          ('/vinted-price-guide', 'Vinted-priser (EN)'), ('monitor', 'Vinted monitor'), ('fees', 'Vinted-avgifter'),
-                         ('/faq', 'FAQ (EN)'), ('/support', 'Support (EN)'), (discord, 'Discord')],
+                         ('/faq', 'FAQ (EN)'), ('/sv/support', 'Support'), (discord, 'Discord')],
                    legal='<a href="/privacy">Integritet</a><a href="/terms">Villkor</a><a href="mailto:heysnypd@gmail.com">Kontakt</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Cookie-inställningar</a>',
                    home='Start'),
     }

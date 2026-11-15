@@ -101,7 +101,7 @@ def cmp_groups():
              [W('24/7 for %d days, then dashboard open' % d) if not p else T('24/7') for p in paid]),
             ('Discord alerts',
              'A private alert thread in the SNYPD Discord, connected in Dashboard > Profile. Up to %d listings per message, '
-             'at most one message every %d min, %d messages a day. Same filters as push.'
+             'at most one message a minute (every %d min on busy searches), %d messages a day. Same filters as push.'
              % (DA['per_message'], DA['digest_minutes'], DA['per_day']),
              [W('First %d days only' % d) if P[k]['discord_alerts'] == 'trial' else (Y if P[k]['discord_alerts'] else N)
               for k in plans.ORDER]),
@@ -163,7 +163,7 @@ def faqs():
          'The Hunt Pass also takes Bancontact, Satispay, bank transfer and crypto; with bank transfer or crypto your access starts once the payment has cleared, which can take a while. '
          'SNYPD never sees your card or PayPal details.'),
         ('What are Discord alerts?', 'Your matches, also sent to a private thread in the SNYPD Discord that only you can see. Connect it in Dashboard > Profile > Notifications. '
-         'Each message shows up to %d listings with photo, price, size and condition, and an Open in Vinted button; at most one message every %d minutes and %d a day, with the same filters as your push alerts. '
+         'Each message shows up to %d listings with photo, price, size and condition, and an Open in Vinted button; at most one message a minute, or one every %d minutes when your searches are busy, and %d a day, with the same filters as your push alerts. '
          'Every paid plan and the Hunt Pass include it, and so does the %d-day free trial. After the trial the thread stays but goes quiet until you pick a plan. You can use push, Discord or both.'
          % (DA['per_message'], DA['digest_minutes'], DA['per_day'], d)),
         ('Which plan is worth it for me?', 'Count the searches you want running 24/7. One item you want to find once: the Hunt Pass (%s, 30 days, nothing to cancel). '

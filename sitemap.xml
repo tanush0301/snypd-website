@@ -10,7 +10,17 @@
   </url>
   <url>
     <loc>https://www.snypd.store/faq</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/faq"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/faq"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/faq"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/fr/faq</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/faq"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/faq"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/faq"/>
   </url>
   <url>
     <loc>https://www.snypd.store/signup</loc>
@@ -21,6 +31,12 @@
     <lastmod>2026-11-15</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
   </url>
   <url>
@@ -28,6 +44,90 @@
     <lastmod>2026-11-15</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/de/support</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/nl/support</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/it/support</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/es/support</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/pl/support</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
+  </url>
+  <url>
+    <loc>https://www.snypd.store/sv/support</loc>
+    <lastmod>2026-11-15</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/support"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/support"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/support"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://www.snypd.store/nl/support"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://www.snypd.store/it/support"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.snypd.store/es/support"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.snypd.store/pl/support"/>
+    <xhtml:link rel="alternate" hreflang="sv" href="https://www.snypd.store/sv/support"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.snypd.store/support"/>
   </url>
   <url>
