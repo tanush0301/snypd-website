@@ -84,7 +84,15 @@ async function show(data) {
   } catch (e) {}
   // Price check (Session 66): push.py sends "rank" (50-100) only for paid plans and running trials, as a number,
   // so the sentence follows the user's language here. Payloads without it are shown exactly as before.
-  if (Number.isInteger(data.rank) && data.rank >= 50 && data.rank <= 100) {
+  // Euro verdict (15 Nov 2026): push.py adds "under" (cents below the hunt's usual price this week, same condition)
+  // and "cur" next to "rank". Whole units only; without them the percentage sentence below is used as before.
+  const underUnits = Number.isInteger(data.under) && data.under >= 100 && Number.isInteger(data.rank) && data.rank >= 50
+    ? Math.floor(data.under / 100) : 0;
+  const underCur = typeof data.cur === 'string' && /^[A-Za-z]{2,4}$/.test(data.cur) ? data.cur.toUpperCase() : 'EUR';
+  if (underUnits > 0) {
+    body = underUnits + ' ' + underCur + (fr ? ' sous le prix habituel de cette recherche ' : ' under this hunt\'s usual price ')
+      + String.fromCharCode(183) + ' ' + body;
+  } else if (Number.isInteger(data.rank) && data.rank >= 50 && data.rank <= 100) {
     body = (fr ? 'Moins cher que ' + data.rank + '\u00a0% des trouvailles de la semaine \u00b7 '
                : 'Cheaper than ' + data.rank + '% of this week\'s finds \u00b7 ') + body;
   }

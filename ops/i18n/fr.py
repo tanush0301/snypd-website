@@ -983,6 +983,8 @@ FR.update({
     'Prefer chat?': 'Tu préfères le chat' + NB + '?',
     'Join the SNYPD Discord': 'Rejoins le Discord SNYPD',
     'While you wait:': 'En attendant' + NB + ':',
+    'Questions first?': 'Une question d’abord' + NB + '?',
+    'Ask in the SNYPD Discord': 'Pose-la sur le Discord SNYPD',
     'join the SNYPD Discord': 'rejoins le Discord SNYPD',
     'Renews on': 'Renouvellement le',
     'Your current plan supports up to:': 'Ton plan actuel permet jusqu’à' + NB + ':',
@@ -1290,6 +1292,7 @@ FR.update({
     'Price check · Solo and up': 'Prix comparé · dès Solo',
 })
 FR_PATTERNS += [
+    (r"^(.+) under this hunt's usual price$", '$1 sous le prix habituel de cette recherche'),
     (r"^Cheaper than (\d+)% of this hunt's finds this week$", 'Moins cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
     (r"^Pricier than (\d+)% of this hunt's finds this week$", 'Plus cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
     (r"^(\d+) new listings$", '$1 nouvelles annonces'),

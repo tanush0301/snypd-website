@@ -134,6 +134,17 @@ const ok = (c, name) => { assert(c, name); checks++; };
   ok(html.includes('mailto:' + MAIL) && html.includes('discord.gg/gjKD4auXhK'), 'email and Discord still offered');
   ok(!html.includes('help@snypd.store'), 'old address absent');
   ok(/id="discord"/.test(html) && html.includes('/link'), 'Discord alerts section present');
+  ok(/<form[^>]*id="sf"[\s\S]*discord\.gg\/gjKD4auXhK[\s\S]*<\/form>/.test(html), 'Discord link inside the form');
+
+  // French page: same form, same topic keys, French texts
+  const fr = fs.readFileSync(path.join(root, 'fr/support.html'), 'utf8');
+  const keys = h => (h.match(/<option value="[a-z]+"/g) || []).join(',');
+  ok(/<html[^>]*lang="fr"/.test(fr) && fr.includes('id="sf"') && fr.includes(API), 'French page has the form');
+  ok(keys(fr) === keys(html) && keys(fr).split(',').length === 7, 'French topics use the same keys');
+  ok(/<form[^>]*id="sf"[\s\S]*discord\.gg\/gjKD4auXhK[\s\S]*<\/form>/.test(fr), 'French form carries the Discord link');
+  ok(fr.includes('ENVOYER LE MESSAGE') && fr.includes('Message envoy') && fr.includes('mailto:' + MAIL), 'French texts and address');
+  ok(fr.includes('hreflang="en" href="https://www.snypd.store/support"') && html.includes('hreflang="fr" href="https://www.snypd.store/fr/support"'), 'pages link to each other');
+  ok(!fr.includes('@@') && !html.includes('@@'), 'no unfilled placeholders');
 
   await browser.close(); server.close();
   console.log('PASS: ' + checks + ' support-form checks; no production requests.');
