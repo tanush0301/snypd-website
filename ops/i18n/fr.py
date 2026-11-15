@@ -388,8 +388,8 @@ FR = {
     # Referral card on /account (migration 085)
     'Invite friends': 'Invite des amis',
     'Copy link': 'Copier le lien',
-    "When a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3 (up to 4 times). If they subscribe, you get 30% off a renewal. 5 paying friends = 1 free month.":
-        "Quand la recherche d'un ami trouve sa première annonce, il reçoit 2 jours de plus de recherche 24h/24 et toi 3 (jusqu'à 4 fois). S'il s'abonne, tu as 30" + NB + '% de réduction sur un renouvellement. 5 amis abonnés = 1 mois offert.',
+    "When a friend's hunt finds its first listing, they get 2 extra days of 24/7 hunting and you get 3. If they subscribe, you get 30% off a renewal. 5 paying friends = 1 free month.":
+        "Quand la recherche d'un ami trouve sa première annonce, il reçoit 2 jours de plus de recherche 24h/24 et toi 3. S'il s'abonne, tu as 30" + NB + '% de réduction sur un renouvellement. 5 amis abonnés = 1 mois offert.',
     # Referral placements (dashboard: plan-is-live card, top-bar entry, trial card, weekly report)
     'Your plan is live': 'Ton plan est actif',
     'Every friend who subscribes through your link gets you 30% off a renewal. 5 paying friends = 1 free month.':
