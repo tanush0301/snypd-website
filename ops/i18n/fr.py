@@ -1287,6 +1287,7 @@ FR.update({
     'Price check · Solo and up': 'Prix comparé · dès Solo',
 })
 FR_PATTERNS += [
+    (r"^(.+) under this hunt's usual price$", '$1 sous le prix habituel de cette recherche'),
     (r"^Cheaper than (\d+)% of this hunt's finds this week$", 'Moins cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
     (r"^Pricier than (\d+)% of this hunt's finds this week$", 'Plus cher que $1' + NB + '% des trouvailles de cette recherche cette semaine'),
     (r"^(\d+) new listings$", '$1 nouvelles annonces'),
