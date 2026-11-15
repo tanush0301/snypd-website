@@ -6075,8 +6075,8 @@ const HEARTBEAT_URL = (() => {
     // (not "Pricier than 100-p", which would count finds at the same price as cheaper).
     const sp = r.item_box && r.item_box.snypd_price;
     const prP = sp && Number.isInteger(sp.p) && sp.p >= 0 && sp.p <= 100 && Number.isInteger(sp.n) && sp.n >= 30 && !isGone ? sp.p : null;
-    const prHtml = prP == null ? '' :
-      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prP >= 50 ? 'Cheaper than ' + prP + "% of this hunt's finds this week" : (prP === 0 ? "The priciest of this hunt's finds this week" : 'Only ' + prP + "% of this hunt's finds this week cost more")}</span>` +
+    const prUnder = (prP != null && prP >= 50 && Number.isInteger(sp.m) && sp.m > 0 && isFinite(Number(amount)) && Number(amount) > 0 && sp.m / 100 - Number(amount) >= 1) ? Math.floor(sp.m / 100 - Number(amount)) : 0; const prHtml = prP == null ? '' :
+      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prUnder > 0 ? fmtPrice(prUnder, currency) + " under this hunt's usual price" : prP >= 50 ? 'Cheaper than ' + prP + "% of this hunt's finds this week" : (prP === 0 ? "The priciest of this hunt's finds this week" : 'Only ' + prP + "% of this hunt's finds this week cost more")}</span>` +
       `<span class="pr-line__sub">same condition &middot; ${sp.n} finds compared</span></div>` +
       `<a class="pr-lock" href="/plans">Price check &middot; Solo and up</a>`;
 
@@ -8553,14 +8553,14 @@ const HEARTBEAT_URL = (() => {
     var q = (opts.q != null ? String(opts.q) : (input.value || '')).trim();
     if (!q) { return; }
     var keep = Array.isArray(opts.keep) ? opts.keep.slice(0, 12) : [];
-    state = { q: q, keep: keep, mine: opts.mine || null, into: into };
+    state = { q: q, keep: keep, mine: opts.mine || null, into: into, title: !!opts.title, brand: opts.title ? String(opts.brand || '').slice(0, 60) : '' };
     into.__mrState = state;
     var my = ++seq;
     goBtn.disabled = true;
     into.innerHTML = '<div class="mr-loading"><span class="mr-spinner"></span>'
       + '<span>Checking real listings across every condition' + HELLIP + '</span></div>';
     try {
-      var res = await api('/api/v1/market/snapshot', 'POST', { q: q, keep: keep });
+      var res = await api('/api/v1/market/snapshot', 'POST', state.title ? { q: q, keep: keep, from_title: true, brand: state.brand } : { q: q, keep: keep });
       if (my !== seq) { return; }
       if (res.status === 200 && res.body) {
         render(res.body, into, state.mine);
@@ -8655,7 +8655,7 @@ const HEARTBEAT_URL = (() => {
     var k = e.target.closest('[data-mr-keep]');
     var st = k ? stateAt(k) : null;
     if (k && st.q) {
-      run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into });
+      run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into, title: st.title, brand: st.brand });
       return;
     }
     var dr = e.target.closest('[data-mr-drop]');
@@ -8665,7 +8665,7 @@ const HEARTBEAT_URL = (() => {
       var q2 = without(st.q, w);
       if (!q2) { return; }
       if (st.into === result) { input.value = q2; }
-      run({ q: q2, keep: st.keep.filter(function (x) { return x !== w; }), mine: st.mine, into: st.into });
+      run({ q: q2, keep: st.keep.filter(function (x) { return x !== w; }), mine: st.mine, into: st.into, title: st.title, brand: st.brand });
     }
   });
   document.addEventListener('input', function (e) {
@@ -8714,7 +8714,7 @@ const HEARTBEAT_URL = (() => {
        EU-euro prices do not cover; sourceBlock says so. Euro sites (fr, de, ...) get no label. */
     var cur = String(item.cur || '').trim().toUpperCase();
     into.__mrCur = (cur && cur !== 'EUR') ? cur : '';
-    run({ q: q, keep: [], mine: condLabel(item.cond), into: into });
+    run({ q: q, keep: [], mine: condLabel(item.cond), into: into, title: true, brand: brand });
   };
   window.SNYPD.marketCheck = function (q) {
     var t = (q || '').trim();
@@ -9117,8 +9117,8 @@ const HEARTBEAT_URL = (() => {
     working: ['Working...', 'Un instant...'],
     idle: ['Get your finds in a private thread in the SNYPD Discord. Works on Android, iPhone and PC.',
            'Re\u00e7ois tes trouvailles dans un fil priv\u00e9 du Discord SNYPD. Marche sur Android, iPhone et PC.'],
-    on: ['Connected as {n}. Finds arrive in your private thread in #alerts, at most every 5 minutes.',
-         'Connect\u00e9 en tant que {n}. Tes trouvailles arrivent dans ton fil priv\u00e9 de #alerts, au plus toutes les 5 minutes.'],
+    on: ['Connected as {n}. Finds arrive in your private thread in #alerts, at most one message a minute (every 5 minutes when busy).',
+         'Connect\u00e9 en tant que {n}. Tes trouvailles arrivent dans ton fil priv\u00e9 de #alerts, au plus un message par minute (toutes les 5 minutes si c\u2019est charg\u00e9).'],
     ok: ['Discord connected. Your private thread is in #alerts.', 'Discord connect\u00e9. Ton fil priv\u00e9 est dans #alerts.'],
     taken: ['That Discord account is already linked to another SNYPD account.', 'Ce compte Discord est d\u00e9j\u00e0 li\u00e9 \u00e0 un autre compte SNYPD.'],
     cancelled: ['Discord was not connected.', 'Discord n\u2019a pas \u00e9t\u00e9 connect\u00e9.'],

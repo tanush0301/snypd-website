@@ -128,12 +128,48 @@ const ok = (c, name) => { assert(c, name); checks++; };
     await page.close();
   }
 
+  // topic hints and the per-section form buttons
+  {
+    const { page, state } = await open(390, 844, () => ({ status: 200, body: { ok: true } }));
+    const h0 = await page.$eval('#sf-hint', n => n.textContent);
+    await page.evaluate(() => document.querySelector('#plan a[data-topic]').click());
+    const r = await page.evaluate(() => ({ v: document.getElementById('sf-topic').value, h: document.getElementById('sf-hint').textContent }));
+    ok(h0.length > 20 && r.v === 'plan' && /Whop/.test(r.h) && r.h !== h0, 'section button picks the topic and shows its hint');
+    await page.evaluate(() => { const s = document.getElementById('sf-topic'); s.value = 'discord'; s.dispatchEvent(new Event('change')); });
+    ok(/Discord username/.test(await page.$eval('#sf-hint', n => n.textContent)), 'hint follows the topic');
+    ok(await page.evaluate(() => document.querySelectorAll('a[data-topic]').length) === 6, 'six sections offer the form');
+    ok(await page.evaluate(() => [...document.querySelectorAll('a[data-topic]')].every(a => [...document.querySelectorAll('#sf-topic option')].some(o => o.value === a.getAttribute('data-topic')))), 'every section topic exists in the form');
+    ok(state.posts.length === 0 && state.errors.length === 0, 'nothing sent, no errors');
+    await page.close();
+  }
+
   // source checks
   const html = fs.readFileSync(path.join(root, 'support.html'), 'utf8');
   ok(html.includes(API), 'page posts to the backend route');
   ok(html.includes('mailto:' + MAIL) && html.includes('discord.gg/gjKD4auXhK'), 'email and Discord still offered');
   ok(!html.includes('help@snypd.store'), 'old address absent');
   ok(/id="discord"/.test(html) && html.includes('/link'), 'Discord alerts section present');
+  ok(/<form[^>]*id="sf"[\s\S]*discord\.gg\/gjKD4auXhK[\s\S]*<\/form>/.test(html), 'Discord link inside the form');
+
+  // French page: same form, same topic keys, French texts
+  const fr = fs.readFileSync(path.join(root, 'fr/support.html'), 'utf8');
+  const keys = h => (h.match(/<option value="[a-z]+"/g) || []).join(',');
+  ok(/<html[^>]*lang="fr"/.test(fr) && fr.includes('id="sf"') && fr.includes(API), 'French page has the form');
+  ok(keys(fr) === keys(html) && keys(fr).split(',').length === 7, 'French topics use the same keys');
+  ok(/<form[^>]*id="sf"[\s\S]*discord\.gg\/gjKD4auXhK[\s\S]*<\/form>/.test(fr), 'French form carries the Discord link');
+  ok(fr.includes('ENVOYER LE MESSAGE') && fr.includes('Message envoy') && fr.includes('mailto:' + MAIL), 'French texts and address');
+  ok(fr.includes('hreflang="en" href="https://www.snypd.store/support"') && html.includes('hreflang="fr" href="https://www.snypd.store/fr/support"'), 'pages link to each other');
+  ok(!fr.includes('@@') && !html.includes('@@'), 'no unfilled placeholders');
+
+  // contact pages in the other languages: same form, same topic keys
+  for (const l of ['de', 'nl', 'it', 'es', 'pl', 'sv']) {
+    const h = fs.readFileSync(path.join(root, l + '/support.html'), 'utf8');
+    ok(new RegExp('<html[^>]*lang="' + l + '"').test(h) && h.includes('id="sf"') && h.includes(API), l + ': page has the form');
+    ok(keys(h) === keys(html), l + ': same topic keys');
+    ok(/<form[^>]*id="sf"[\s\S]*discord\.gg\/gjKD4auXhK[\s\S]*<\/form>/.test(h) && h.includes('mailto:' + MAIL), l + ': Discord link in the form, address shown');
+    ok(!h.includes('@@') && !h.includes('{mail}') && !h.includes('{reply}') && !h.includes('{discord}') && !h.includes('%('), l + ': no unfilled placeholders');
+    ok(h.includes('hreflang="en" href="https://www.snypd.store/support"') && html.includes('hreflang="' + l + '" href="https://www.snypd.store/' + l + '/support"'), l + ': linked both ways');
+  }
 
   await browser.close(); server.close();
   console.log('PASS: ' + checks + ' support-form checks; no production requests.');

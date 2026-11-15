@@ -87,6 +87,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(s.lines.length, 5, 'every rated card shows its line on a paid plan');
   ok(s.lines.includes("Cheaper than 82% of this hunt's finds this week | same condition \u00b7 412 finds compared"), 'line + sub-line text: ' + s.lines[0]);
   ok(s.lines.includes("Only 23% of this hunt's finds this week cost more | same condition \u00b7 412 finds compared"), 'below 50 reads "Only p% ... cost more" (p = share asking more; ties never counted as cheaper)');
+  // Euro verdict (15 Nov 2026): the row rated 58 carries m = 3000 (usual 30.00) at a price of 22 -> "8 under".
+  ok(s.lines.some(l => /8(\.00)?\D*under this hunt's usual price \| same condition · 412 finds compared$/.test(l) && /^\D*8/.test(l)), 'a find below its usual price reads "<8 EUR> under this hunt\'s usual price": ' + s.lines.join(' / '));
+  ok(!s.lines.some(l => /^Cheaper than 58%/.test(l)), 'the euro line replaces the percentage line on that card');
+  eq(s.lines.filter(l => /under this hunt's usual price/.test(l)).length, 1, 'rows without a usual price keep the percentage sentence');
   eq(s.locks, 0, 'no lock chips on a paid plan');
   eq(s.cheapBorders, 2, 'the two cards in the cheapest quarter (82, 80) get the mint border');
   ok(s.gone.length >= 1 && s.gone.every(x => x === false), 'a gone listing never shows a rating');

@@ -347,6 +347,7 @@
       var t = now - (2 + 2 * i) * min;
       var box = { snypd_filter_contract: { version: 1, search: sig2 } };
       if (x[0] != null) box.snypd_price = { p: x[0], n: 412, c: 'Very good' };
+      if (x[0] === 58) box.snypd_price.m = 3000;  // euro verdict (15 Nov 2026): usual price 30.00, this find 22 -> 8 under
       DB.current_ads.push({
         listing_id: 7000 + i, user_id: UID, title: 'Price check QA listing ' + i,
         price: { amount: x[1], currency_code: 'EUR' }, brand_title: 'Ralph Lauren', size_title: 'M', status: 'Very good',

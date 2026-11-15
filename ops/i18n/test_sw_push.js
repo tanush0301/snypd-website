@@ -55,6 +55,23 @@ async function fire(payload, { stored, navLang, cachesBroken }) {
     [Object.assign({ rank: '82' }, two), { stored: 'en' }, '2 new finds', two.body],
     [Object.assign({ rank: 101 }, two), { stored: 'en' }, '2 new finds', two.body],
     [Object.assign({ rank: 90 }, one), { cachesBroken: true, navLang: 'en-US' }, 'New find', "Cheaper than 90% of this week's finds \u00b7 New listing"],
+    // Euro verdict (push.py "under"/"cur", 15 Nov 2026): whole units under the hunt's usual price; needs rank >= 50.
+    [Object.assign({ rank: 82, under: 600, usual: 2000, cur: 'EUR' }, two), { stored: 'en' }, '2 new finds',
+      "6 EUR under this hunt's usual price \u00b7 " + two.body],
+    [Object.assign({ rank: 82, under: 600, usual: 2000, cur: 'EUR' }, two), { stored: 'fr' }, '2 nouvelles trouvailles',
+      '6 EUR sous le prix habituel de cette recherche \u00b7 45.0 EUR \u2014 Nike Air (Nike \u00b7 M) et 1 de plus'],
+    [Object.assign({ rank: 82, under: 650, cur: 'gbp' }, two), { stored: 'en' }, '2 new finds',
+      "6 GBP under this hunt's usual price \u00b7 " + two.body],
+    [Object.assign({ rank: 82, under: 600 }, two), { stored: 'en' }, '2 new finds',
+      "6 EUR under this hunt's usual price \u00b7 " + two.body],
+    [Object.assign({ rank: 82, under: 600, cur: '<b>x' }, two), { stored: 'en' }, '2 new finds',
+      "6 EUR under this hunt's usual price \u00b7 " + two.body],
+    [Object.assign({ rank: 82, under: 99, cur: 'EUR' }, two), { stored: 'en' }, '2 new finds',
+      "Cheaper than 82% of this week's finds \u00b7 " + two.body],
+    [Object.assign({ rank: 82, under: '600', cur: 'EUR' }, two), { stored: 'en' }, '2 new finds',
+      "Cheaper than 82% of this week's finds \u00b7 " + two.body],
+    [Object.assign({ under: 600, cur: 'EUR' }, two), { stored: 'en' }, '2 new finds', two.body],
+    [Object.assign({ rank: 40, under: 600, cur: 'EUR' }, two), { stored: 'en' }, '2 new finds', two.body],
   ];
   let bad = 0;
   for (const [payload, env, wantT, wantB] of cases) {

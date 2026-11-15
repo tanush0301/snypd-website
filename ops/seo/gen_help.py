@@ -9,14 +9,14 @@ useful here. The FAQPage JSON-LD is built from the same (question, answer) pairs
 visible text, so the two cannot drift. Plan numbers are plans.py tokens, filled by write().
 Facts: outreach/00-fact-sheet.md only. ops/ is in .vercelignore: never deploys.
 """
-import os, sys, urllib.parse
+import json, os, sys, urllib.parse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gen_content as gc  # noqa: E402
 from gen_content import SLUGS, PAGE_MODIFIED, DISCORD, esc, faq_ld, faq_html, write  # noqa: E402
 
-SLUGS['faq'] = {'en': '/faq'}
-SLUGS['support'] = {'en': '/support'}
+SLUGS['faq'] = {'en': '/faq', 'fr': '/fr/faq'}
+SLUGS['support'] = {'en': '/support', 'fr': '/fr/support'}
 PAGE_MODIFIED['faq'] = '2026-10-10'
 PAGE_MODIFIED['support'] = '2026-10-10'
 EMAIL = 'heysnypd@gmail.com'
@@ -89,24 +89,13 @@ FAQ = [
 ]
 
 
-def page_faq():
-    pairs = [qa for _, _, qs in FAQ for qa in qs]
-    body = ''.join('<section id="%s"><h2>%s</h2>%s</section>' % (sid, esc(title), faq_html(qs)) for sid, title, qs in FAQ)
-    body += ('<section id="help"><h2>Still stuck?</h2><p>The <a href="/support">support page</a> lists the common problems and how to fix them. '
-             'Or email <a href="mailto:%s">%s</a>: we answer every email %s.</p></section>' % (EMAIL, EMAIL, REPLY))
-    return gc.page('faq', 'en', 'SNYPD FAQ: Vinted alerts, plans and push notifications',
-                   'Straight answers about SNYPD, the Vinted alert bot: how often it checks, push on iPhone, the free plan and @@trial_days@@-day trial, prices and refunds.',
-                   'FAQ', 'SNYPD questions, answered',
-                   'How the Vinted monitor works, what each plan includes and how to get alerts on your phone.',
-                   [(sid, title) for sid, title, _ in FAQ] + [('help', 'Still stuck?')], body, [gc.faq_ld(pairs)])
-
 # Contact form (15 Nov 2026). Posts to the backend route /api/v1/support/contact, which sends one
 # email to the support inbox (backend src/support_contact.py: 3 per address per hour, 8 a day in
 # total, hidden "website" field against bots). Topic keys must match TOPICS in that file.
+# /support exists in English and French (/fr/support); every text lives in L below.
 FORM_API = 'https://api.snypd.store/api/v1/support/contact'
-FORM_TOPICS = [('alerts', 'Alerts are not arriving'), ('discord', 'Discord alerts'), ('listing', 'A listing did not show up'),
-               ('link', 'My search link was refused'), ('plan', 'I paid but my plan did not change'),
-               ('billing', 'Cancel, refund or change plan'), ('other', 'Something else')]
+# problem section id -> form topic key (the section's 'Use the form' button preselects it)
+TOPIC_OF = {'no-alerts': 'alerts', 'discord': 'discord', 'missing-listing': 'listing', 'link-refused': 'link', 'plan': 'plan', 'billing': 'billing'}
 FORM_CSS = """<style>
 .sf { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
 .sf label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; letter-spacing: .06em; color: #A9ADB1; }
@@ -125,59 +114,174 @@ FORM_JS = """<script>
 (function () {
   var f = document.getElementById('sf'); if (!f) return;
   var st = document.getElementById('sf-status'), btn = document.getElementById('sf-send');
-  var MAIL = '@@MAIL@@', busy = false;
+  var T = @@T@@, busy = false;
   function say(t, cls) { st.textContent = t; st.className = 'sf-note ' + (cls || ''); }
-  var TEXT = {
-    bad_email: 'Check your email address: we need it to answer you.',
-    message_too_short: 'Tell us a little more, so we can help.',
-    message_too_long: 'That message is too long. Shorten it, or email ' + MAIL + '.',
-    too_many: 'You have sent several messages already. We will answer those. For anything urgent, email ' + MAIL + '.',
-    busy: 'The form has reached its limit for today. Please email ' + MAIL + ' instead.'
-  };
+  var hint = document.getElementById('sf-hint');
+  function showHint() { if (hint && T.hints.hasOwnProperty(f.topic.value)) hint.textContent = T.hints[f.topic.value]; }
+  f.topic.addEventListener('change', showHint);
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[data-topic]') : null; if (!a) return;
+    f.topic.value = a.getAttribute('data-topic'); showHint();
+    setTimeout(function () { f.message.focus(); }, 50);
+  });
   f.addEventListener('submit', function (e) {
     e.preventDefault(); if (busy) return;
     var email = f.email.value.trim(), msg = f.message.value.trim();
-    if (email.indexOf('@') < 1 || email.indexOf('.') < 0) { say(TEXT.bad_email, 'err'); f.email.focus(); return; }
-    if (msg.length < 10) { say(TEXT.message_too_short, 'err'); f.message.focus(); return; }
-    busy = true; btn.disabled = true; say('Sending...', '');
+    if (email.indexOf('@') < 1 || email.indexOf('.') < 0) { say(T.err.bad_email, 'err'); f.email.focus(); return; }
+    if (msg.length < 10) { say(T.err.message_too_short, 'err'); f.message.focus(); return; }
+    busy = true; btn.disabled = true; say(T.sending, '');
     fetch('@@API@@', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, topic: f.topic.value, message: msg, website: f.website.value, page: location.pathname }) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { s: r.status, b: b || {} }; }); })
       .then(function (x) {
-        busy = false;
-        if (x.s === 200 && x.b.ok === true) {
-          f.reset(); btn.disabled = false;
-          say('Message sent. We answer @@REPLY@@, at the address you gave.', 'ok');
-          return;
-        }
-        btn.disabled = false;
-        var code = x.b.detail && x.b.detail.error;
-        say(TEXT[code] || ('We could not send your message. Please email ' + MAIL + ' instead.'), 'err');
-      })
-      .catch(function () {
         busy = false; btn.disabled = false;
-        say('We could not send your message. Please email ' + MAIL + ' instead.', 'err');
-      });
+        if (x.s === 200 && x.b.ok === true) { f.reset(); showHint(); say(T.sent, 'ok'); return; }
+        var code = x.b.detail && x.b.detail.error;
+        say((typeof code === 'string' && T.err.hasOwnProperty(code) && T.err[code]) || T.failed, 'err');
+      })
+      .catch(function () { busy = false; btn.disabled = false; say(T.failed, 'err'); });
   });
 })();
 </script>"""
 
+NBSP = chr(160)
 
-def form_section():
-    opts = ''.join('<option value="%s">%s</option>' % (k, esc(t)) for k, t in FORM_TOPICS)
-    js = FORM_JS.replace('@@MAIL@@', EMAIL).replace('@@API@@', FORM_API).replace('@@REPLY@@', REPLY)
-    return ('<section id="write"><h2>Write to us here</h2>'
-            '<p>No mail app needed. Fill this in and your message goes straight to our inbox. We answer %s.</p>'
+
+def nb(s):
+    """French spacing: a no-break space before ? ! : ;"""
+    for ch in '?!:;':
+        s = s.replace(' ' + ch, NBSP + ch)
+    return s
+
+
+L = {
+    'en': dict(
+        path='/support', file='support.html', reply=REPLY,
+        title='SNYPD support: fix alerts, search links and billing',
+        desc='Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Contact form and email, reply %s.',
+        eyebrow='SUPPORT', h1='Something not working?',
+        lead='Find your problem below and follow the steps. If that does not fix it, write to us: we answer every message %s.',
+        toc_person='Reach a person', toc_write='Write to us here', toc_more='Other questions',
+        intro=('<section id="person"><h2>Reach a person</h2><div class="lg-box lg-mint"><p>Email <a href="mailto:%s">%s</a>. '
+               'We answer every email %s. Use the email address of your SNYPD account, so we can find it.</p>'
+               '<p>Prefer chat? The <a href="%s">SNYPD Discord</a> is free to join: ask a question, get help from other members and receive your alerts there.</p>'
+               '<div class="ct-actions"><a class="ct-btn" href="#write">WRITE TO US HERE</a>'
+               '<a class="ct-btn ct-ghost" href="mailto:%s">EMAIL US</a>'
+               '<a class="ct-btn ct-ghost" href="%s" rel="noopener">JOIN THE DISCORD</a></div></div>'
+               '<p>Most of the problems below can be fixed in a few steps. Each section has a button that opens an email with the details we need already listed.</p></section>'),
+        more=('<section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. '
+              'Prices and limits: <a href="/plans">plans</a>.</p></section>'),
+        email_btn='EMAIL US ABOUT THIS',
+        form_btn='USE THE FORM',
+        hints=dict(
+            alerts='Helpful to include: your device and browser (for example iPhone Home Screen app, Chrome on Android), and whether matches still show in your dashboard.',
+            discord='Helpful to include: your Discord username, and what happens (no code, code refused, or connected but no messages).',
+            listing='Helpful to include: the link to the Vinted listing, which of your searches should have found it, and when you saw it.',
+            link='Helpful to include: the link you pasted and the message SNYPD showed.',
+            plan='Helpful to include: the email you used at Whop checkout and the plan you bought.',
+            billing='Helpful to include: what you would like (cancel, refund, or change to which plan).',
+            other='Tell us what you were trying to do and what happened instead.'),
+        no_app=('<p>Button does not open your mail app? <a href="#write">Use the form</a>, or write to '
+                '<a href="mailto:%s">%s</a> from any email service.</p>'),
+        form_p='No mail app needed. Fill this in and your message goes straight to our inbox. We answer %s.',
+        l_email='YOUR EMAIL (THE ONE OF YOUR SNYPD ACCOUNT)', l_topic='WHAT IS IT ABOUT?', l_msg='YOUR MESSAGE', send='SEND MESSAGE',
+        small='We use your address and message only to answer you. Never send a password.',
+        chat='Prefer chat? <a href="%s" rel="noopener">Join the SNYPD Discord</a>: it is free, and other members can help too.',
+        topics=[('alerts', 'Alerts are not arriving'), ('discord', 'Discord alerts'), ('listing', 'A listing did not show up'),
+                ('link', 'My search link was refused'), ('plan', 'I paid but my plan did not change'),
+                ('billing', 'Cancel, refund or change plan'), ('other', 'Something else')],
+        js=dict(sending='Sending...', sent='Message sent. We answer %(reply)s, at the address you gave.',
+                failed='We could not send your message. Please email %(mail)s instead.',
+                err=dict(bad_email='Check your email address: we need it to answer you.',
+                         message_too_short='Tell us a little more, so we can help.',
+                         message_too_long='That message is too long. Shorten it, or email %(mail)s.',
+                         too_many='You have sent several messages already. We will answer those. For anything urgent, email %(mail)s.',
+                         busy='The form has reached its limit for today. Please email %(mail)s instead.')),
+    ),
+    'fr': dict(
+        path='/fr/support', file='fr/support.html', reply='sous 24 heures',
+        title='Support SNYPD : alertes, liens de recherche et facturation',
+        desc='Aide SNYPD : alertes qui n’arrivent pas, annonce manquante, lien de recherche Vinted refusé, plan ou facturation. Formulaire de contact et e-mail, réponse %s.',
+        eyebrow='SUPPORT', h1='Quelque chose ne marche pas ?',
+        lead='Trouve ton problème ci-dessous et suis les étapes. Si ça ne suffit pas, écris-nous : nous répondons à chaque message %s.',
+        toc_person='Parler à quelqu’un', toc_write='Écris-nous ici', toc_more='Autres questions',
+        intro=('<section id="person"><h2>Parler à quelqu’un</h2><div class="lg-box lg-mint"><p>Écris à <a href="mailto:%s">%s</a>. '
+               'Nous répondons à chaque e-mail %s. Utilise l’adresse e-mail de ton compte SNYPD, pour qu’on le retrouve.</p>'
+               '<p>Tu préfères le chat ? Le <a href="%s">Discord SNYPD</a> est gratuit : pose ta question, reçois l’aide des autres membres et reçois tes alertes là-bas.</p>'
+               '<div class="ct-actions"><a class="ct-btn" href="#write">ÉCRIS-NOUS ICI</a>'
+               '<a class="ct-btn ct-ghost" href="mailto:%s">ENVOYER UN E-MAIL</a>'
+               '<a class="ct-btn ct-ghost" href="%s" rel="noopener">REJOINDRE LE DISCORD</a></div></div>'
+               '<p>La plupart des problèmes ci-dessous se règlent en quelques étapes. Chaque section a un bouton qui ouvre un e-mail avec les infos dont on a besoin.</p></section>'),
+        more=('<section id="more"><h2>Autres questions</h2><p>Fonctionnement de SNYPD, plans et remboursements : <a href="/fr/faq">FAQ</a>. '
+              'Prix et limites : <a href="/plans">plans</a>.</p></section>'),
+        email_btn='NOUS ÉCRIRE PAR E-MAIL',
+        form_btn='UTILISER LE FORMULAIRE',
+        hints=dict(
+            alerts='Utile à préciser : ton appareil et ton navigateur (par exemple app iPhone sur l’écran d’accueil, Chrome sur Android), et si les annonces apparaissent encore dans ton tableau de bord.',
+            discord='Utile à préciser : ton nom d’utilisateur Discord, et ce qui se passe (pas de code, code refusé, ou connecté mais aucun message).',
+            listing='Utile à préciser : le lien de l’annonce Vinted, laquelle de tes recherches aurait dû la trouver, et quand tu l’as vue.',
+            link='Utile à préciser : le lien que tu as collé et le message affiché par SNYPD.',
+            plan='Utile à préciser : l’e-mail utilisé au paiement Whop et le plan acheté.',
+            billing='Utile à préciser : ce que tu souhaites (résilier, remboursement, ou passer à quel plan).',
+            other='Dis-nous ce que tu essayais de faire et ce qui s’est passé à la place.'),
+        no_app=('<p>Le bouton n’ouvre pas ton application mail ? <a href="#write">Utilise le formulaire</a>, ou écris à '
+                '<a href="mailto:%s">%s</a> depuis n’importe quelle messagerie.</p>'),
+        form_p='Pas besoin d’application mail. Remplis ce formulaire et ton message arrive directement dans notre boîte. Nous répondons %s.',
+        l_email='TON E-MAIL (CELUI DE TON COMPTE SNYPD)', l_topic='C’EST À QUEL SUJET ?', l_msg='TON MESSAGE', send='ENVOYER LE MESSAGE',
+        small='Nous utilisons ton adresse et ton message uniquement pour te répondre. N’envoie jamais de mot de passe.',
+        chat='Tu préfères le chat ? <a href="%s" rel="noopener">Rejoins le Discord SNYPD</a> : c’est gratuit, et les autres membres peuvent aussi t’aider.',
+        topics=[('alerts', 'Les alertes n’arrivent pas'), ('discord', 'Alertes Discord'), ('listing', 'Une annonce n’est pas apparue'),
+                ('link', 'Mon lien de recherche a été refusé'), ('plan', 'J’ai payé mais mon plan n’a pas changé'),
+                ('billing', 'Résilier, remboursement ou changer de plan'), ('other', 'Autre chose')],
+        js=dict(sending='Envoi...', sent='Message envoyé. Nous répondons %(reply)s, à l’adresse indiquée.',
+                failed='Impossible d’envoyer ton message. Écris plutôt à %(mail)s.',
+                err=dict(bad_email='Vérifie ton adresse e-mail : il nous la faut pour te répondre.',
+                         message_too_short='Dis-nous en un peu plus, pour qu’on puisse t’aider.',
+                         message_too_long='Ce message est trop long. Raccourcis-le, ou écris à %(mail)s.',
+                         too_many='Tu as déjà envoyé plusieurs messages. Nous allons y répondre. Pour une urgence, écris à %(mail)s.',
+                         busy='Le formulaire a atteint sa limite pour aujourd’hui. Écris plutôt à %(mail)s.')),
+    ),
+}
+FORM_H = {'en': 'Write to us here', 'fr': 'Écris-nous ici'}
+
+
+def _nb_deep(v):
+    if isinstance(v, str):
+        return nb(v)
+    if isinstance(v, dict):
+        return {k: _nb_deep(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_nb_deep(x) for x in v]
+    if isinstance(v, tuple):
+        return tuple(_nb_deep(x) for x in v)
+    return v
+
+
+L['fr'] = _nb_deep(L['fr'])
+FORM_H['fr'] = nb(FORM_H['fr'])
+
+
+def form_section(lang):
+    t = L[lang]
+    opts = ''.join('<option value="%s">%s</option>' % (k, esc(txt)) for k, txt in t['topics'])
+    fill = {'reply': t['reply'], 'mail': EMAIL}
+    texts = dict(hints=t['hints'], sending=t['js']['sending'], sent=t['js']['sent'] % fill, failed=t['js']['failed'] % fill,
+                 err={k: v % fill for k, v in t['js']['err'].items()})
+    js = FORM_JS.replace('@@T@@', json.dumps(texts, ensure_ascii=False).replace('</', '<\\/')).replace('@@API@@', FORM_API)
+    return ('<section id="write"><h2>%s</h2><p>%s</p>'
             '<form class="sf" id="sf" novalidate>'
-            '<label for="sf-email">YOUR EMAIL (THE ONE OF YOUR SNYPD ACCOUNT)'
+            '<label for="sf-email">%s'
             '<input id="sf-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required></label>'
-            '<label for="sf-topic">WHAT IS IT ABOUT?<select id="sf-topic" name="topic">%s</select></label>'
-            '<label for="sf-msg">YOUR MESSAGE<textarea id="sf-msg" name="message" rows="6" maxlength="4000" required></textarea></label>'
+            '<label for="sf-topic">%s<select id="sf-topic" name="topic" aria-describedby="sf-hint">%s</select></label>'
+            '<p class="sf-small" id="sf-hint">%s</p>'
+            '<label for="sf-msg">%s<textarea id="sf-msg" name="message" rows="6" maxlength="4000" required></textarea></label>'
             '<div class="sf-hp" aria-hidden="true"><label>Website<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>'
-            '<button class="ct-btn" id="sf-send" type="submit">SEND MESSAGE</button>'
+            '<button class="ct-btn" id="sf-send" type="submit">%s</button>'
             '<p class="sf-note" id="sf-status" role="status" aria-live="polite"></p>'
-            '<p class="sf-small">We use your address and message only to answer you. Never send a password.</p>'
-            '</form>%s</section>' % (REPLY, opts, js))
+            '<p class="sf-small">%s</p>'
+            '<p class="sf-small">%s</p>'
+            '</form>%s</section>' % (esc(FORM_H[lang]), t['form_p'] % t['reply'], esc(t['l_email']), esc(t['l_topic']), opts, esc(t['hints'][t['topics'][0][0]]), esc(t['l_msg']),
+                                     esc(t['send']), t['small'], t['chat'] % DISCORD, js))
 
 
 def mail(subject, lines):
@@ -186,7 +290,7 @@ def mail(subject, lines):
 
 
 # (id, problem, steps to fix it, (email subject, what to include))
-PROBLEMS = [
+PROBLEMS = {'en': [
     ('no-alerts', 'Alerts are not arriving', [
         'Check that the search is <strong>Active</strong> in your dashboard and that new matches show up there. If they do, the search works and the problem is the notification.',
         'Turn alerts on from the dashboard on the device that should ring. On iPhone this only works from the SNYPD app on your Home Screen (Safari &rarr; Share &rarr; Add to Home Screen).',
@@ -219,31 +323,179 @@ PROBLEMS = [
         'To move between paid plans, manage your subscription in Whop, or email us and we help you switch.',
         'The Hunt Pass is one payment for @@pass_days@@ days. It ends by itself: no renewal and nothing to cancel. Full refund within @@refund_days@@ days of the payment.',
      ], ('Billing', ['SNYPD account email:', 'What you would like (cancel / refund / change to which plan):'])),
+], 'fr': [
+    ('no-alerts', 'Les alertes n’arrivent pas', [
+        'Vérifie que la recherche est <strong>Active</strong> dans ton tableau de bord et que de nouvelles annonces y apparaissent. Si oui, la recherche fonctionne et le problème vient de la notification.',
+        'Active les alertes depuis le tableau de bord, sur l’appareil qui doit sonner. Sur iPhone, ça ne marche que depuis l’app SNYPD sur ton écran d’accueil (Safari &rarr; Partager &rarr; Sur l’écran d’accueil).',
+        'Vérifie que le mode Concentration ou Ne pas déranger est désactivé pour SNYPD, et que ton navigateur a le droit d’afficher des notifications.',
+        'En Free, après les @@trial_days@@ premiers jours, les recherches tournent seulement tant que ton tableau de bord est ouvert. Les abonnements payants continuent quand il est fermé.',
+     ], ('Alertes absentes', ['E-mail du compte :', 'Appareil et navigateur (ex. app iPhone sur l’écran d’accueil, Chrome sur Android) :', 'Les annonces apparaissent-elles dans ton tableau de bord ? oui/non :'])),
+    ('discord', 'Alertes Discord : les connecter ou les réparer', [
+        'Dans ton tableau de bord, ouvre Profil &rarr; Notifications et appuie sur <strong>Connecter Discord</strong>. Tu reçois un code court, valable 10 minutes.',
+        'Appuie sur Ouvrir Discord et rejoins le serveur SNYPD. Tape <strong>/link</strong> (ou /lier) là-bas et colle le code.',
+        'Tes trouvailles arrivent ensuite dans un fil privé dans #alerts, que toi seul peux voir. Ça marche sur Android, iPhone et ordinateur, en plus des notifications push ou à leur place.',
+        'Inclus dans chaque abonnement payant, le Hunt Pass et l’essai gratuit. Après l’essai, le fil reste mais se tait jusqu’à ce que tu choisisses un plan.',
+        'Code refusé ? Il a expiré : appuie de nouveau sur Connecter Discord pour en avoir un nouveau. Un compte Discord ne peut être lié qu’à un seul compte SNYPD.',
+     ], ('Alertes Discord', ['E-mail du compte :', 'Nom d’utilisateur Discord :', 'Ce qui se passe (pas de code / code refusé / connecté mais aucun message) :'])),
+    ('missing-listing', 'Une annonce attendue n’est pas apparue', [
+        'Ouvre ton lien de recherche sur Vinted et vérifie que l’annonce correspond à tous ses filtres (taille, prix, état, site du pays).',
+        'Vinted lui-même ajoute une nouvelle annonce à sa recherche quelques minutes après sa mise en ligne : une annonce très récente peut donc apparaître un peu plus tard.',
+        'Les annonces restent dans ton tableau de bord environ 30 minutes tant qu’elles sont en ligne ; pour les plus anciennes, la notification push fait foi.',
+     ], ('Annonce manquante', ['E-mail du compte :', 'Lien de l’annonce Vinted :', 'Laquelle de tes recherches aurait dû la trouver :', 'Quand tu l’as vue sur Vinted (heure) :'])),
+    ('link-refused', 'Mon lien de recherche a été refusé', [
+        'SNYPD garde tous les filtres de ton lien. Quand un lien contient quelque chose qu’il ne sait pas lire, il le refuse et indique quelle partie, plutôt que de lancer une autre recherche.',
+        'Retire ce filtre sur Vinted, copie de nouveau le lien depuis la barre d’adresse et colle-le.',
+     ], ('Lien de recherche refusé', ['E-mail du compte :', 'Le lien que tu as collé :', 'Le message affiché par SNYPD :'])),
+    ('plan', 'J’ai payé mais mon plan n’a pas changé', [
+        'Ton plan est lié à ton compte SNYPD par l’e-mail : l’e-mail utilisé au paiement Whop doit être le même que celui de ton compte SNYPD.',
+        'Ton plan se met à jour automatiquement après le paiement, et une vérification toutes les 15 minutes rattrape une mise à jour manquée : recharge le tableau de bord. S’il affiche toujours Free, écris-nous avec ton reçu Whop et nous le lions à la main.',
+     ], ('Plan non mis à jour', ['E-mail du compte SNYPD :', 'E-mail utilisé au paiement Whop :', 'Plan acheté :'])),
+    ('billing', 'Résilier, remboursement ou changer de plan', [
+        'Résilie à tout moment dans ton <a href="' + MANAGE + '">compte Whop</a> (Orders), ou via Compte &rarr; Gérer l’abonnement dans SNYPD. Ton plan court jusqu’à la fin du mois payé.',
+        'Remboursement intégral dans les @@refund_days@@ jours suivant ton premier paiement pour un plan : écris-nous depuis l’e-mail de ton compte.',
+        'Pour passer d’un plan payant à un autre, gère ton abonnement dans Whop, ou écris-nous et nous t’aidons à changer.',
+        'Le Hunt Pass est un paiement unique pour @@pass_days@@ jours. Il s’arrête tout seul : pas de renouvellement, rien à résilier. Remboursement intégral dans les @@refund_days@@ jours suivant le paiement.',
+     ], ('Facturation', ['SNYPD - e-mail du compte :', 'Ce que tu souhaites (résilier / remboursement / passer à quel plan) :'])),
+]}
+# French spacing in the visible text only; the pre-filled email lines stay plain.
+PROBLEMS['fr'] = [(pid, nb(title), [nb(s) for s in steps], m) for pid, title, steps, m in PROBLEMS['fr']]
+
+
+FAQ_FR = [
+    ('start', 'Pour commencer', [
+        ('Comment commencer ?',
+         'Crée un compte gratuit, colle un lien de recherche Vinted (avec tes filtres de marque, taille, prix et état) et enregistre-le. '
+         'Les nouvelles annonces apparaissent dans ton tableau de bord et, une fois les alertes activées, tu reçois une notification push sur ton téléphone ou ton ordinateur.'),
+        ('Faut-il mon identifiant Vinted ?',
+         'Non. SNYPD ne demande jamais ton mot de passe Vinted et ne se connecte jamais à ton compte. Il lit uniquement les annonces publiques, n’achète rien et n’écrit jamais aux vendeurs. '
+         'Une alerte ouvre l’annonce sur Vinted, où tu achètes toi-même.'),
+        ('SNYPD est-il affilié à Vinted ?',
+         'Non. SNYPD est un outil indépendant créé par un revendeur de sneakers belge. Il n’est ni affilié à Vinted, ni approuvé par Vinted, ni lié à Vinted.'),
+        ('Avec quels pays Vinted ça marche ?',
+         'Tous les sites Vinted d’Europe et des États-Unis, 26 au total : vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com et les autres. '
+         'Colle un lien de recherche du site où tu achètes ; les prix s’affichent dans la devise de ce site.'),
+        ('Puis-je utiliser n’importe quel filtre Vinted ?',
+         'Oui. Tous les filtres du lien que tu colles sont conservés. Si un lien contient quelque chose que SNYPD ne sait pas lire, il est refusé avec la raison au lieu d’être raccourci en silence : '
+         'une recherche ne tourne jamais avec moins de filtres que ceux que tu as choisis.'),
+    ]),
+    ('alerts', 'Vitesse et alertes', [
+        ('À quelle fréquence SNYPD vérifie-t-il ma recherche ?',
+         'Environ toutes les @@median_s@@ secondes (médiane mesurée), et au plus toutes les 5 minutes sur les recherches calmes. Pareil sur tous les plans. '
+         + gc.VINTED_LAG['fr']),
+        ('Vais-je recevoir deux fois la même annonce ?',
+         'Non : une alerte par annonce, et plusieurs trouvailles rapprochées arrivent dans une seule notification. Si un vendeur supprime un article et le remet en ligne, '
+         'Vinted lui donne une nouvelle annonce : SNYPD peut donc t’alerter de nouveau.'),
+        ('Les notifications push marchent-elles sur iPhone ?',
+         'Oui, une fois SNYPD sur ton écran d’accueil : ouvre snypd.store dans Safari, touche Partager, puis Sur l’écran d’accueil, et active les alertes depuis l’app installée. '
+         'Apple n’autorise le push web que pour les apps de l’écran d’accueil. Sur Android, Windows et Mac, les alertes marchent directement depuis le navigateur.'),
+        ('Ça continue de tourner ordinateur fermé ?',
+         'Avec un plan payant, toujours. En Free : 24h/24 pendant les @@trial_days@@ premiers jours après l’enregistrement de ta première recherche, puis seulement tant que ton tableau de bord est ouvert.'),
+        ('SNYPD peut-il m’alerter sur Discord, Telegram ou par e-mail ?',
+         'Discord : oui. Tes trouvailles peuvent aussi arriver dans un fil privé du Discord SNYPD que toi seul vois. '
+         'Connecte-le dans Tableau de bord &rarr; Profil &rarr; Notifications. Tous les plans payants et le Hunt Pass l’incluent, ainsi que l’essai gratuit. '
+         'Telegram et e-mail : non. Étapes et dépannage : <a href="/fr/support#discord">alertes Discord</a>.'),
+    ]),
+    ('plans', 'Plans et facturation', [
+        ('Combien de recherches puis-je lancer ?',
+         'Recherches actives par plan : Free @@searches:free@@, Solo @@searches:solo@@, Kickstart @@searches:kickstart@@, Pro @@searches:pro@@, Elite @@searches:elite@@. '
+         'Mets une recherche en pause pour libérer sa place.'),
+        ('Y a-t-il un plan gratuit ou un essai ?',
+         'Oui. Free n’a pas de limite de durée et ne demande pas de carte. Ta première recherche tourne 24h/24 avec alertes pendant @@trial_days@@ jours (@@trial_hours@@ h) à partir de son enregistrement. '
+         'Si elle ne trouve rien pendant ce temps, nous ajoutons @@trial_ext_days@@ jours, une fois. Ensuite, Free la vérifie tant que ton tableau de bord est ouvert.'),
+        ('Combien coûtent les plans payants ?',
+         'Solo @@price:solo@@, Kickstart @@price:kickstart@@, Pro @@price:pro@@ et Elite @@price:elite@@ par mois, TVA comprise. Les plans payants continuent de vérifier 24h/24, tableau de bord fermé. '
+         'Facturation mensuelle via Whop ; résiliable à tout moment. <a href="/plans">Comparer les plans</a>.'),
+        ('Puis-je payer une seule fois, sans abonnement ?',
+         'Oui : le Hunt Pass. Un paiement de @@price:pass@@, TVA comprise, et 1 recherche Vinted est surveillée 24h/24 avec alertes push pendant @@pass_days@@ jours, comme Solo. '
+         'Puis il s’arrête simplement : pas de renouvellement, pas d’abonnement, rien à résilier. Idéal pour chercher un article précis, comme une console ou une veste à ta taille. '
+         'Remboursement intégral dans les @@refund_days@@ jours suivant le paiement. Pour chercher en continu, Solo coûte @@price:solo@@ par mois.'),
+        ('Puis-je être remboursé ?',
+         'Oui. Écris à <a href="mailto:' + EMAIL + '">' + EMAIL + '</a> dans les @@refund_days@@ jours suivant ton premier paiement pour un plan et nous le remboursons intégralement.'),
+        ('Qu’est-ce que le Market Report ?',
+         'Inclus dans Pro et Elite : tape un article et vois son prix demandé typique sur Vinted, par état. Ce sont des prix demandés, pas des prix de vente conclue. '
+         'Il n’affiche aucun prix quand les données sont trop minces ou trop mélangées pour être fiables. Exemples gratuits : <a href="/fr/guide-prix-vinted">guide des prix Vinted</a>.'),
+    ]),
+    ('community', 'Communauté', [
+        ('Y a-t-il un Discord SNYPD ?',
+         'Oui, et il est gratuit sur tous les plans. Pose une question, reçois l’aide des autres membres et, une fois connecté, reçois tes alertes là-bas dans un fil privé. '
+         'Les plans payants ont aussi accès aux salons payants. Les alertes push marchent sans lui. '
+         '<a href="' + DISCORD + '">Rejoindre le Discord</a>.'),
+    ]),
 ]
+FAQ_FR = [(sid, nb(title), [(nb(q), nb(a_)) for q, a_ in qs]) for sid, title, qs in FAQ_FR]
+FAQS = {'en': FAQ, 'fr': FAQ_FR}
+FAQ_T = {
+    'en': dict(title='SNYPD FAQ: Vinted alerts, plans and push notifications',
+               desc='Straight answers about SNYPD, the Vinted alert bot: how often it checks, push on iPhone, the free plan and @@trial_days@@-day trial, prices and refunds.',
+               eyebrow='FAQ', h1='SNYPD questions, answered',
+               lead='How the Vinted monitor works, what each plan includes and how to get alerts on your phone.',
+               help_h='Still stuck?',
+               help_p=('The <a href="/support">support page</a> lists the common problems and how to fix them, and has a contact form. '
+                       'Or email <a href="mailto:%s">%s</a>: we answer every email %s. Prefer chat? <a href="%s" rel="noopener">Join the SNYPD Discord</a>.')),
+    'fr': dict(title='FAQ SNYPD : alertes Vinted, plans et notifications push',
+               desc='Des réponses claires sur SNYPD, le bot d’alertes Vinted : fréquence de vérification, push sur iPhone, plan gratuit et essai de @@trial_days@@ jours, prix et remboursements.',
+               eyebrow='FAQ', h1='Les réponses à tes questions sur SNYPD',
+               lead='Comment fonctionne le monitor Vinted, ce que chaque plan inclut et comment recevoir les alertes sur ton téléphone.',
+               help_h='Toujours bloqué ?',
+               help_p=('La <a href="/fr/support">page support</a> liste les problèmes courants et comment les régler, avec un formulaire de contact. '
+                       'Ou écris à <a href="mailto:%s">%s</a> : nous répondons à chaque e-mail %s. Tu préfères le chat ? <a href="%s" rel="noopener">Rejoins le Discord SNYPD</a>.')),
+}
+FAQ_T['fr'] = _nb_deep(FAQ_T['fr'])
 
 
-def page_support():
+def page_faq(lang='en'):
+    faq, t = FAQS[lang], FAQ_T[lang]
+    pairs = [qa for _, _, qs in faq for qa in qs]
+    body = ''.join('<section id="%s"><h2>%s</h2>%s</section>' % (sid, esc(title), faq_html(qs)) for sid, title, qs in faq)
+    body += '<section id="help"><h2>%s</h2><p>%s</p></section>' % (esc(t['help_h']), t['help_p'] % (EMAIL, EMAIL, L[lang]['reply'], DISCORD))
+    return gc.page('faq', lang, t['title'], t['desc'], t['eyebrow'], t['h1'], t['lead'],
+                   [(sid, title) for sid, title, _ in faq] + [('help', t['help_h'])], body, [gc.faq_ld(pairs)])
+
+
+def page_support(lang='en'):
+    t = L[lang]
     blocks = []
-    for pid, title, steps, (subj, lines) in PROBLEMS:
-        blocks.append('<section id="%s"><h2>%s</h2><ol>%s</ol><p><a class="ct-btn ct-ghost" href="%s">EMAIL US ABOUT THIS</a></p>%s</section>'
-                      % (pid, esc(title), ''.join('<li>%s</li>' % s for s in steps), esc(mail('SNYPD: ' + subj, lines)), NO_APP))
-    intro = ('<section id="person"><h2>Reach a person</h2><div class="lg-box lg-mint"><p>Email <a href="mailto:%s">%s</a>. '
-             'We answer every email %s. Use the email address of your SNYPD account, so we can find it.</p>'
-             '<p>Prefer chat? The <a href="%s">SNYPD Discord</a> is free to join: ask a question, get help from other members and receive your alerts there.</p>'
-             '<div class="ct-actions"><a class="ct-btn" href="#write">WRITE TO US HERE</a>'
-             '<a class="ct-btn ct-ghost" href="mailto:%s">EMAIL US</a>'
-             '<a class="ct-btn ct-ghost" href="%s" rel="noopener">JOIN THE DISCORD</a></div></div>'
-             '<p>Most of the problems below can be fixed in a few steps. Each section has a button that opens an email with the details we need already listed.</p></section>'
-             % (EMAIL, EMAIL, REPLY, DISCORD, EMAIL, DISCORD))
-    body = intro + form_section() + ''.join(blocks) + ('<section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. '
-                                      'Prices and limits: <a href="/plans">plans</a>.</p></section>')
-    return gc.page('support', 'en', 'SNYPD support: fix alerts, search links and billing',
-                   'Help with SNYPD: alerts not arriving, a missing listing, a refused Vinted search link, plan or billing problems. Contact form and email, reply %s.' % REPLY,
-                   'SUPPORT', 'Something not working?',
-                   'Find your problem below and follow the steps. If that does not fix it, write to us: we answer every message %s.' % REPLY,
-                   [('person', 'Reach a person'), ('write', 'Write to us here')] + [(pid, title) for pid, title, _, _ in PROBLEMS] + [('more', 'Other questions')], body, head_extra=FORM_CSS)
+    for pid, title, steps, (subj, lines) in PROBLEMS[lang]:
+        blocks.append('<section id="%s"><h2>%s</h2><ol>%s</ol><div class="ct-actions" style="margin:0 0 14px;">'
+                      '<a class="ct-btn" href="#write" data-topic="%s">%s</a><a class="ct-btn ct-ghost" href="%s">%s</a></div>%s</section>'
+                      % (pid, esc(title), ''.join('<li>%s</li>' % s for s in steps), TOPIC_OF[pid], esc(t['form_btn']),
+                         esc(mail('SNYPD: ' + subj, lines)), esc(t['email_btn']), t['no_app'] % (EMAIL, EMAIL)))
+    intro = t['intro'] % (EMAIL, EMAIL, t['reply'], DISCORD, EMAIL, DISCORD)
+    body = intro + form_section(lang) + ''.join(blocks) + t['more']
+    return gc.page('support', lang, t['title'], t['desc'] % t['reply'], t['eyebrow'], t['h1'], t['lead'] % t['reply'],
+                   [('person', t['toc_person']), ('write', t['toc_write'])] + [(pid, title) for pid, title, _, _ in PROBLEMS[lang]]
+                   + [('more', t['toc_more'])], body, head_extra=FORM_CSS)
+
+
+# Contact pages in the other languages (15 Nov 2026): form, email, Discord. Texts: copy_support_langs.py.
+import copy_support_langs as csl  # noqa: E402
+for _l, _c in csl.C.items():
+    SLUGS['support'][_l] = '/%s/support' % _l
+    FORM_H[_l] = _c['toc_write']
+    L[_l] = dict(reply=_c['reply'], form_p=_c['form_p'].replace('{reply}', '%s'), l_email=_c['l_email'], l_topic=_c['l_topic'],
+                 l_msg=_c['l_msg'], send=_c['send'], small=_c['small'], chat=_c['chat'].replace('{discord}', '%s'),
+                 topics=list(zip(csl.TOPIC_KEYS, _c['topics'])), hints=dict(zip(csl.TOPIC_KEYS, _c['hints'])),
+                 js=dict(sending=_c['sending'], sent=_c['sent'], failed=_c['failed'], err=dict(zip(csl.ERR_KEYS, _c['err']))))
+
+
+def page_contact(lang):
+    c = csl.C[lang]
+    f = lambda x: x.replace('{mail}', EMAIL).replace('{reply}', c['reply']).replace('{discord}', DISCORD)  # noqa: E731
+    intro = ('<section id="person"><h2>%s</h2><div class="lg-box lg-mint"><p>%s</p><p>%s</p>'
+             '<div class="ct-actions"><a class="ct-btn" href="#write">%s</a>'
+             '<a class="ct-btn ct-ghost" href="mailto:%s">%s</a>'
+             '<a class="ct-btn ct-ghost" href="%s" rel="noopener">%s</a></div></div></section>'
+             % (esc(c['toc_person']), f(c['p_email']), f(c['p_chat']), esc(c['b_write']), EMAIL, esc(c['b_email']), DISCORD, esc(c['b_discord'])))
+    more = '<section id="more"><h2>%s</h2><p>%s</p></section>' % (esc(c['toc_more']), c['more_p'])
+    return gc.page('support', lang, c['title'], f(c['desc']), 'SUPPORT', c['h1'], f(c['lead']),
+                   [('person', c['toc_person']), ('write', c['toc_write']), ('more', c['toc_more'])],
+                   intro + form_section(lang) + more, head_extra=FORM_CSS)
 
 
 if __name__ == '__main__':
-    write('faq.html', page_faq())
-    write('support.html', page_support())
+    write('faq.html', page_faq('en'))
+    write('fr/faq.html', page_faq('fr'))
+    write('support.html', page_support('en'))
+    write('fr/support.html', page_support('fr'))
+    for _l in csl.C:
+        write('%s/support.html' % _l, page_contact(_l))
