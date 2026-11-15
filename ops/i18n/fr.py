@@ -980,6 +980,8 @@ FR.update({
     'Prefer chat?': 'Tu préfères le chat' + NB + '?',
     'Join the SNYPD Discord': 'Rejoins le Discord SNYPD',
     'While you wait:': 'En attendant' + NB + ':',
+    'Questions first?': 'Une question d’abord' + NB + '?',
+    'Ask in the SNYPD Discord': 'Pose-la sur le Discord SNYPD',
     'join the SNYPD Discord': 'rejoins le Discord SNYPD',
     'Renews on': 'Renouvellement le',
     'Your current plan supports up to:': 'Ton plan actuel permet jusqu’à' + NB + ':',
