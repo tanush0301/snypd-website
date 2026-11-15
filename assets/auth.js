@@ -636,6 +636,7 @@
     if (isLogin) out.push('<span style="font-size:13px;color:var(--text-secondary);">No account? <a href="/signup">Create one free</a></span>');
     if (isSignup) out.push('<span style="font-size:13px;color:var(--text-secondary);">Already have an account? <a href="/login">Log in</a></span>');
     if (v === 'forgot' || v === 'forgot-sent') out.push('<button type="button" data-act="login" style="align-self:flex-start;' + LINKBTN + 'min-height:44px;">← Back to log in</button>');
+    if (v === 'verify') out.push('<span style="font-size:13px;color:var(--text-secondary);">While you wait: <a href="https://discord.gg/gjKD4auXhK" target="_blank" rel="noopener">join the SNYPD Discord</a></span>');
     if (v === 'verify') out.push('<button type="button" data-act="login" style="align-self:flex-start;' + LINKBTN + 'min-height:44px;">← Back to log in</button>');
 
     out.push('<span style="font-size:12px;line-height:1.6;color:var(--text-muted);padding-top:16px;border-top:1px solid var(--border);"><span style="color:var(--success);">✓</span> Never asks for your Vinted password - never logs into your account - only reads public listings.</span>');

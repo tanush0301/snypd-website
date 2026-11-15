@@ -22,6 +22,8 @@ PAGE_MODIFIED['support'] = '2026-10-10'
 EMAIL = 'heysnypd@gmail.com'
 REPLY = 'within 24 hours'  # Tanush's commitment, 10 Oct 2026
 MANAGE = 'https://whop.com/@me/settings/orders/'
+# Shown under every email button: a mailto link does nothing on a computer without a mail app.
+NO_APP = '<p>Button does not open your mail app? Write to <a href="mailto:%s">%s</a> from any email service.</p>' % (EMAIL, EMAIL)
 
 FAQ = [
     ('start', 'Getting started', [
@@ -52,8 +54,10 @@ FAQ = [
          'Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser.'),
         ('Does it keep running with my laptop closed?',
          'Paid plans, always. Free: 24/7 for the first @@trial_days@@ days after you save your first search, then only while your dashboard is open.'),
-        ('Can SNYPD alert me on Telegram, Discord or email?',
-         'No. Alerts come as push notifications and in your dashboard only.'),
+        ('Can SNYPD alert me on Discord, Telegram or email?',
+         'Discord: yes. Your matches can also go to a private thread in the SNYPD Discord that only you can see. '
+         'Connect it in Dashboard &rarr; Profile &rarr; Notifications. Every paid plan and the Hunt Pass include it, and so does the free trial. '
+         'Telegram and email: no. Steps and fixes: <a href="/support#discord">Discord alerts</a>.'),
     ]),
     ('plans', 'Plans and billing', [
         ('How many searches can I run?',
@@ -77,7 +81,8 @@ FAQ = [
     ]),
     ('community', 'Community', [
         ('Is there a SNYPD Discord?',
-         'Yes. Every plan can join the free SNYPD Discord for reseller questions; paid plans also get the paid channels. Alerts work without it. '
+         'Yes, and it is free to join on every plan. Ask a question, get help from other members and, once you connect it, receive your alerts there in a private thread. '
+         'Paid plans also get the paid channels. Push alerts work without it. '
          '<a href="' + DISCORD + '">Join the Discord</a>.'),
     ]),
 ]
@@ -108,6 +113,13 @@ PROBLEMS = [
         'Check that Focus or Do Not Disturb is off for SNYPD, and that your browser is allowed to show notifications.',
         'On Free after the first @@trial_days@@ days, searches run only while your dashboard is open. Paid plans keep running with it closed.',
      ], ('Alerts not arriving', ['Account email:', 'Device and browser (e.g. iPhone Home Screen app, Chrome on Android):', 'Do matches show in your dashboard? yes/no:'])),
+    ('discord', 'Discord alerts: connect them or fix them', [
+        'In your dashboard open Profile &rarr; Notifications and press <strong>Connect Discord</strong>. You get a short code, valid for 10 minutes.',
+        'Press Open Discord and join the SNYPD server. Type <strong>/link</strong> there and paste the code.',
+        'Your finds then arrive in a private thread in #alerts that only you can see. It works on Android, iPhone and computer, next to push or instead of it.',
+        'Included in every paid plan, the Hunt Pass and the free trial. After the trial the thread stays but goes quiet until you pick a plan.',
+        'Code refused? It has expired: press Connect Discord again for a new one. One Discord account can be linked to one SNYPD account.',
+     ], ('Discord alerts', ['Account email:', 'Discord username:', 'What happens (no code / code refused / connected but no messages):'])),
     ('missing-listing', 'A listing I expected did not show up', [
         'Open your search link on Vinted and check that the listing matches every filter in it (size, price, condition, country site).',
         'Vinted itself adds a new listing to its search a few minutes after it is posted, so a very fresh listing can appear a little later.',
@@ -125,6 +137,7 @@ PROBLEMS = [
         'Cancel any time in your <a href="' + MANAGE + '">Whop account</a> (Orders), or Account &rarr; Manage subscription in SNYPD. Your plan runs to the end of the month you paid for.',
         'Full refund within @@refund_days@@ days of your first payment for a plan: email us from your account email.',
         'To move between paid plans, manage your subscription in Whop, or email us and we help you switch.',
+        'The Hunt Pass is one payment for @@pass_days@@ days. It ends by itself: no renewal and nothing to cancel. Full refund within @@refund_days@@ days of the payment.',
      ], ('Billing', ['SNYPD account email:', 'What you would like (cancel / refund / change to which plan):'])),
 ]
 
@@ -132,13 +145,15 @@ PROBLEMS = [
 def page_support():
     blocks = []
     for pid, title, steps, (subj, lines) in PROBLEMS:
-        blocks.append('<section id="%s"><h2>%s</h2><ol>%s</ol><p><a class="ct-btn ct-ghost" href="%s">EMAIL US ABOUT THIS</a></p></section>'
-                      % (pid, esc(title), ''.join('<li>%s</li>' % s for s in steps), esc(mail('SNYPD: ' + subj, lines))))
+        blocks.append('<section id="%s"><h2>%s</h2><ol>%s</ol><p><a class="ct-btn ct-ghost" href="%s">EMAIL US ABOUT THIS</a></p>%s</section>'
+                      % (pid, esc(title), ''.join('<li>%s</li>' % s for s in steps), esc(mail('SNYPD: ' + subj, lines)), NO_APP))
     intro = ('<section id="person"><h2>Reach a person</h2><div class="lg-box lg-mint"><p>Email <a href="mailto:%s">%s</a>. '
              'We answer every email %s. Use the email address of your SNYPD account, so we can find it.</p>'
-             '<p>Questions about reselling or how others set up their searches: the <a href="%s">SNYPD Discord</a> community.</p></div>'
+             '<p>Prefer chat? The <a href="%s">SNYPD Discord</a> is free to join: ask a question, get help from other members and receive your alerts there.</p>'
+             '<div class="ct-actions"><a class="ct-btn" href="mailto:%s">EMAIL US</a>'
+             '<a class="ct-btn ct-ghost" href="%s" rel="noopener">JOIN THE DISCORD</a></div></div>'
              '<p>Most of the problems below can be fixed in a few steps. Each section has a button that opens an email with the details we need already listed.</p></section>'
-             % (EMAIL, EMAIL, REPLY, DISCORD))
+             % (EMAIL, EMAIL, REPLY, DISCORD, EMAIL, DISCORD))
     body = intro + ''.join(blocks) + ('<section id="more"><h2>Other questions</h2><p>How SNYPD works, plans and refunds: <a href="/faq">FAQ</a>. '
                                       'Prices and limits: <a href="/plans">plans</a>.</p></section>')
     return gc.page('support', 'en', 'SNYPD support: fix alerts, search links and billing',
