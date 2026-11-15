@@ -240,7 +240,7 @@ UI = {
                login='CONNEXION', start='COMMENCER', switch=('EN', 'en', 'English version'),
                foot_tag='SNYPD &middot; NON AFFILIÉ À VINTED', foot_t='Lit uniquement les annonces publiques.',
                foot=[('bot', 'Bot Vinted'), ('monitor', 'Monitor Vinted'), ('notify', 'Alertes Vinted'), ('notwork', 'Notifications Vinted en panne'), ('saved', 'Recherches enregistrées Vinted'), ('pricedrop', 'Baisse de prix Vinted'), ('compare', 'Comparatif des bots Vinted'), ('/fr/guide-prix-vinted', 'Guide des prix Vinted'), ('checker', 'Estimer un prix Vinted'), ('sold', 'Articles vendus sur Vinted'), ('/fr/rapport-marche-vinted', 'Rapport du marché Vinted'), ('fees', 'Frais Vinted'),
-                     ('/faq', 'FAQ (anglais)'), ('/fr/support', 'Support'), (DISCORD, 'Discord')],
+                     ('/fr/faq', 'FAQ'), ('/fr/support', 'Support'), (DISCORD, 'Discord')],
                legal='<a href="/privacy">Confidentialité</a><a href="/terms">Conditions</a><a href="mailto:heysnypd@gmail.com">Contact</a><a href="/cookies">Cookies</a><a href="/cookies" data-cookie-settings>Paramètres des cookies</a>',
                home='Accueil'),
     'de': dict(locale='de_DE', toc='AUF DIESER SEITE', updated='Aktualisiert am', by='Von SNYPD, gebaut von einem belgischen Sneaker-Reseller',

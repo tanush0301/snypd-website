@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gen_content as gc  # noqa: E402
 from gen_content import SLUGS, PAGE_MODIFIED, DISCORD, esc, faq_ld, faq_html, write  # noqa: E402
 
-SLUGS['faq'] = {'en': '/faq'}
+SLUGS['faq'] = {'en': '/faq', 'fr': '/fr/faq'}
 SLUGS['support'] = {'en': '/support', 'fr': '/fr/support'}
 PAGE_MODIFIED['faq'] = '2026-10-10'
 PAGE_MODIFIED['support'] = '2026-10-10'
@@ -88,17 +88,6 @@ FAQ = [
     ]),
 ]
 
-
-def page_faq():
-    pairs = [qa for _, _, qs in FAQ for qa in qs]
-    body = ''.join('<section id="%s"><h2>%s</h2>%s</section>' % (sid, esc(title), faq_html(qs)) for sid, title, qs in FAQ)
-    body += ('<section id="help"><h2>Still stuck?</h2><p>The <a href="/support">support page</a> lists the common problems and how to fix them. '
-             'Or email <a href="mailto:%s">%s</a>: we answer every email %s.</p></section>' % (EMAIL, EMAIL, REPLY))
-    return gc.page('faq', 'en', 'SNYPD FAQ: Vinted alerts, plans and push notifications',
-                   'Straight answers about SNYPD, the Vinted alert bot: how often it checks, push on iPhone, the free plan and @@trial_days@@-day trial, prices and refunds.',
-                   'FAQ', 'SNYPD questions, answered',
-                   'How the Vinted monitor works, what each plan includes and how to get alerts on your phone.',
-                   [(sid, title) for sid, title, _ in FAQ] + [('help', 'Still stuck?')], body, [gc.faq_ld(pairs)])
 
 # Contact form (15 Nov 2026). Posts to the backend route /api/v1/support/contact, which sends one
 # email to the support inbox (backend src/support_contact.py: 3 per address per hour, 8 a day in
@@ -204,7 +193,7 @@ L = {
                '<a class="ct-btn ct-ghost" href="mailto:%s">ENVOYER UN E-MAIL</a>'
                '<a class="ct-btn ct-ghost" href="%s" rel="noopener">REJOINDRE LE DISCORD</a></div></div>'
                '<p>La plupart des problèmes ci-dessous se règlent en quelques étapes. Chaque section a un bouton qui ouvre un e-mail avec les infos dont on a besoin.</p></section>'),
-        more=('<section id="more"><h2>Autres questions</h2><p>Fonctionnement de SNYPD, plans et remboursements : <a href="/faq">FAQ</a> (en anglais). '
+        more=('<section id="more"><h2>Autres questions</h2><p>Fonctionnement de SNYPD, plans et remboursements : <a href="/fr/faq">FAQ</a>. '
               'Prix et limites : <a href="/plans">plans</a>.</p></section>'),
         email_btn='NOUS ÉCRIRE À CE SUJET',
         no_app=('<p>Le bouton n’ouvre pas ton application mail ? <a href="#write">Utilise le formulaire</a>, ou écris à '
@@ -343,6 +332,97 @@ PROBLEMS = {'en': [
 PROBLEMS['fr'] = [(pid, nb(title), [nb(s) for s in steps], m) for pid, title, steps, m in PROBLEMS['fr']]
 
 
+FAQ_FR = [
+    ('start', 'Pour commencer', [
+        ('Comment commencer ?',
+         'Crée un compte gratuit, colle un lien de recherche Vinted (avec tes filtres de marque, taille, prix et état) et enregistre-le. '
+         'Les nouvelles annonces apparaissent dans ton tableau de bord et, une fois les alertes activées, tu reçois une notification push sur ton téléphone ou ton ordinateur.'),
+        ('Faut-il mon identifiant Vinted ?',
+         'Non. SNYPD ne demande jamais ton mot de passe Vinted et ne se connecte jamais à ton compte. Il lit uniquement les annonces publiques, n’achète rien et n’écrit jamais aux vendeurs. '
+         'Une alerte ouvre l’annonce sur Vinted, où tu achètes toi-même.'),
+        ('SNYPD est-il affilié à Vinted ?',
+         'Non. SNYPD est un outil indépendant créé par un revendeur de sneakers belge. Il n’est ni affilié à Vinted, ni approuvé par Vinted, ni lié à Vinted.'),
+        ('Avec quels pays Vinted ça marche ?',
+         'Tous les sites Vinted d’Europe et des États-Unis, 26 au total : vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com et les autres. '
+         'Colle un lien de recherche du site où tu achètes ; les prix s’affichent dans la devise de ce site.'),
+        ('Puis-je utiliser n’importe quel filtre Vinted ?',
+         'Oui. Tous les filtres du lien que tu colles sont conservés. Si un lien contient quelque chose que SNYPD ne sait pas lire, il est refusé avec la raison au lieu d’être raccourci en silence : '
+         'une recherche ne tourne jamais avec moins de filtres que ceux que tu as choisis.'),
+    ]),
+    ('alerts', 'Vitesse et alertes', [
+        ('À quelle fréquence SNYPD vérifie-t-il ma recherche ?',
+         'Environ toutes les @@median_s@@ secondes (médiane mesurée), et au plus toutes les 5 minutes sur les recherches calmes. Pareil sur tous les plans. '
+         + gc.VINTED_LAG['fr']),
+        ('Vais-je recevoir deux fois la même annonce ?',
+         'Non : une alerte par annonce, et plusieurs trouvailles rapprochées arrivent dans une seule notification. Si un vendeur supprime un article et le remet en ligne, '
+         'Vinted lui donne une nouvelle annonce : SNYPD peut donc t’alerter de nouveau.'),
+        ('Les notifications push marchent-elles sur iPhone ?',
+         'Oui, une fois SNYPD sur ton écran d’accueil : ouvre snypd.store dans Safari, touche Partager, puis Sur l’écran d’accueil, et active les alertes depuis l’app installée. '
+         'Apple n’autorise le push web que pour les apps de l’écran d’accueil. Sur Android, Windows et Mac, les alertes marchent directement depuis le navigateur.'),
+        ('Ça continue de tourner ordinateur fermé ?',
+         'Avec un plan payant, toujours. En Free : 24h/24 pendant les @@trial_days@@ premiers jours après l’enregistrement de ta première recherche, puis seulement tant que ton tableau de bord est ouvert.'),
+        ('SNYPD peut-il m’alerter sur Discord, Telegram ou par e-mail ?',
+         'Discord : oui. Tes trouvailles peuvent aussi arriver dans un fil privé du Discord SNYPD que toi seul vois. '
+         'Connecte-le dans Tableau de bord &rarr; Profil &rarr; Notifications. Tous les plans payants et le Hunt Pass l’incluent, ainsi que l’essai gratuit. '
+         'Telegram et e-mail : non. Étapes et dépannage : <a href="/fr/support#discord">alertes Discord</a>.'),
+    ]),
+    ('plans', 'Plans et facturation', [
+        ('Combien de recherches puis-je lancer ?',
+         'Recherches actives par plan : Free @@searches:free@@, Solo @@searches:solo@@, Kickstart @@searches:kickstart@@, Pro @@searches:pro@@, Elite @@searches:elite@@. '
+         'Mets une recherche en pause pour libérer sa place.'),
+        ('Y a-t-il un plan gratuit ou un essai ?',
+         'Oui. Free n’a pas de limite de durée et ne demande pas de carte. Ta première recherche tourne 24h/24 avec alertes pendant @@trial_days@@ jours (@@trial_hours@@ h) à partir de son enregistrement. '
+         'Si elle ne trouve rien pendant ce temps, nous ajoutons @@trial_ext_days@@ jours, une fois. Ensuite, Free la vérifie tant que ton tableau de bord est ouvert.'),
+        ('Combien coûtent les plans payants ?',
+         'Solo @@price:solo@@, Kickstart @@price:kickstart@@, Pro @@price:pro@@ et Elite @@price:elite@@ par mois, TVA comprise. Les plans payants continuent de vérifier 24h/24, tableau de bord fermé. '
+         'Facturation mensuelle via Whop ; résiliable à tout moment. <a href="/plans">Comparer les plans</a>.'),
+        ('Puis-je payer une seule fois, sans abonnement ?',
+         'Oui : le Hunt Pass. Un paiement de @@price:pass@@, TVA comprise, et 1 recherche Vinted est surveillée 24h/24 avec alertes push pendant @@pass_days@@ jours, comme Solo. '
+         'Puis il s’arrête simplement : pas de renouvellement, pas d’abonnement, rien à résilier. Idéal pour chercher un article précis, comme une console ou une veste à ta taille. '
+         'Remboursement intégral dans les @@refund_days@@ jours suivant le paiement. Pour chercher en continu, Solo coûte @@price:solo@@ par mois.'),
+        ('Puis-je être remboursé ?',
+         'Oui. Écris à <a href="mailto:' + EMAIL + '">' + EMAIL + '</a> dans les @@refund_days@@ jours suivant ton premier paiement pour un plan et nous le remboursons intégralement.'),
+        ('Qu’est-ce que le Market Report ?',
+         'Inclus dans Pro et Elite : tape un article et vois son prix demandé typique sur Vinted, par état. Ce sont des prix demandés, pas des prix de vente conclue. '
+         'Il n’affiche aucun prix quand les données sont trop minces ou trop mélangées pour être fiables. Exemples gratuits : <a href="/fr/guide-prix-vinted">guide des prix Vinted</a>.'),
+    ]),
+    ('community', 'Communauté', [
+        ('Y a-t-il un Discord SNYPD ?',
+         'Oui, et il est gratuit sur tous les plans. Pose une question, reçois l’aide des autres membres et, une fois connecté, reçois tes alertes là-bas dans un fil privé. '
+         'Les plans payants ont aussi accès aux salons payants. Les alertes push marchent sans lui. '
+         '<a href="' + DISCORD + '">Rejoindre le Discord</a>.'),
+    ]),
+]
+FAQ_FR = [(sid, nb(title), [(nb(q), nb(a_)) for q, a_ in qs]) for sid, title, qs in FAQ_FR]
+FAQS = {'en': FAQ, 'fr': FAQ_FR}
+FAQ_T = {
+    'en': dict(title='SNYPD FAQ: Vinted alerts, plans and push notifications',
+               desc='Straight answers about SNYPD, the Vinted alert bot: how often it checks, push on iPhone, the free plan and @@trial_days@@-day trial, prices and refunds.',
+               eyebrow='FAQ', h1='SNYPD questions, answered',
+               lead='How the Vinted monitor works, what each plan includes and how to get alerts on your phone.',
+               help_h='Still stuck?',
+               help_p=('The <a href="/support">support page</a> lists the common problems and how to fix them, and has a contact form. '
+                       'Or email <a href="mailto:%s">%s</a>: we answer every email %s. Prefer chat? <a href="%s" rel="noopener">Join the SNYPD Discord</a>.')),
+    'fr': dict(title='FAQ SNYPD : alertes Vinted, plans et notifications push',
+               desc='Des réponses claires sur SNYPD, le bot d’alertes Vinted : fréquence de vérification, push sur iPhone, plan gratuit et essai de @@trial_days@@ jours, prix et remboursements.',
+               eyebrow='FAQ', h1='Les réponses à tes questions sur SNYPD',
+               lead='Comment fonctionne le monitor Vinted, ce que chaque plan inclut et comment recevoir les alertes sur ton téléphone.',
+               help_h='Toujours bloqué ?',
+               help_p=('La <a href="/fr/support">page support</a> liste les problèmes courants et comment les régler, avec un formulaire de contact. '
+                       'Ou écris à <a href="mailto:%s">%s</a> : nous répondons à chaque e-mail %s. Tu préfères le chat ? <a href="%s" rel="noopener">Rejoins le Discord SNYPD</a>.')),
+}
+FAQ_T['fr'] = _nb_deep(FAQ_T['fr'])
+
+
+def page_faq(lang='en'):
+    faq, t = FAQS[lang], FAQ_T[lang]
+    pairs = [qa for _, _, qs in faq for qa in qs]
+    body = ''.join('<section id="%s"><h2>%s</h2>%s</section>' % (sid, esc(title), faq_html(qs)) for sid, title, qs in faq)
+    body += '<section id="help"><h2>%s</h2><p>%s</p></section>' % (esc(t['help_h']), t['help_p'] % (EMAIL, EMAIL, L[lang]['reply'], DISCORD))
+    return gc.page('faq', lang, t['title'], t['desc'], t['eyebrow'], t['h1'], t['lead'],
+                   [(sid, title) for sid, title, _ in faq] + [('help', t['help_h'])], body, [gc.faq_ld(pairs)])
+
+
 def page_support(lang='en'):
     t = L[lang]
     blocks = []
@@ -358,6 +438,7 @@ def page_support(lang='en'):
 
 
 if __name__ == '__main__':
-    write('faq.html', page_faq())
+    write('faq.html', page_faq('en'))
+    write('fr/faq.html', page_faq('fr'))
     write('support.html', page_support('en'))
     write('fr/support.html', page_support('fr'))
