@@ -6073,8 +6073,8 @@ const HEARTBEAT_URL = (() => {
     // (not "Pricier than 100-p", which would count finds at the same price as cheaper).
     const sp = r.item_box && r.item_box.snypd_price;
     const prP = sp && Number.isInteger(sp.p) && sp.p >= 0 && sp.p <= 100 && Number.isInteger(sp.n) && sp.n >= 30 && !isGone ? sp.p : null;
-    const prHtml = prP == null ? '' :
-      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prP >= 50 ? 'Cheaper than ' + prP + "% of this hunt's finds this week" : (prP === 0 ? "The priciest of this hunt's finds this week" : 'Only ' + prP + "% of this hunt's finds this week cost more")}</span>` +
+    const prUnder = (prP != null && prP >= 50 && Number.isInteger(sp.m) && sp.m > 0 && isFinite(Number(amount)) && Number(amount) > 0 && sp.m / 100 - Number(amount) >= 1) ? Math.floor(sp.m / 100 - Number(amount)) : 0; const prHtml = prP == null ? '' :
+      `<div class="pr-line${prP < 50 ? ' pr-line--hi' : ''}"><span class="pr-line__main">${prUnder > 0 ? fmtPrice(prUnder, currency) + " under this hunt's usual price" : prP >= 50 ? 'Cheaper than ' + prP + "% of this hunt's finds this week" : (prP === 0 ? "The priciest of this hunt's finds this week" : 'Only ' + prP + "% of this hunt's finds this week cost more")}</span>` +
       `<span class="pr-line__sub">same condition &middot; ${sp.n} finds compared</span></div>` +
       `<a class="pr-lock" href="/plans">Price check &middot; Solo and up</a>`;
 
