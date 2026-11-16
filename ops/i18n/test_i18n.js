@@ -85,8 +85,8 @@ for (const [en, want] of cases) {
   if (got !== want) { bad++; console.log('FAIL', JSON.stringify(en), '\n  got ', JSON.stringify(got), '\n  want', JSON.stringify(want)); }
 }
 // Banned words must never appear in any French value (fact-sheet rules).
-const dict = JSON.parse(src.match(/var DICT = (.*);/)[1]).fr;
-const pats = JSON.parse(src.match(/var PATTERNS = (.*);/)[1]).fr;
+const dict = JSON.parse(src.match(/var DICT = ([\s\S]*?);\r?\n\s*var PATTERNS/)[1]).fr;   // one entry per line since 16 Nov 2026
+const pats = JSON.parse(src.match(/var PATTERNS = ([\s\S]*?);\r?\n\s*var SUPPORTED/)[1]).fr;
 const all = Object.values(dict).concat(pats.map((p) => p[1])).join('\n').toLowerCase();
 for (const w of [/instantan/, /temps réel/, /le plus rapide/, /sûr/, /autorisé par vinted/, /prix de vente/, /vendu (pour|à) (\$|\d|€)/, /se vend à/]) {
   if (w.test(all)) { bad++; console.log('BANNED WORD in French text:', w); }
