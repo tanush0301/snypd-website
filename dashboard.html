@@ -8355,7 +8355,7 @@ const HEARTBEAT_URL = (() => {
     return COND_LABEL[k] || null;
   }
   var WHY = { size: 'size', colour: 'colour', year: 'year', condition: 'condition', filler: 'filler',
-    not_found: 'not in our listings', dropped: 'left out to find more' };
+    not_found: 'not in our listings', dropped: 'left out to find more' }; function productBlock(d) { var p = d.product; if (!p || typeof p !== 'object') { return ''; } var vs = (p.needs_choice && Array.isArray(p.variants)) ? p.variants.filter(function (v) { return v && v.name && v.search; }).slice(0, 5) : []; if (!p.name && vs.length < 2) { return ''; } var html = '<div class="mr-cmp mr-prod" data-mr-product>'; if (p.name) { html += 'Looks like: <b>' + escapeHtml(p.name) + '</b>'; } if (vs.length >= 2) { html += (p.name ? '<br>' : '') + '<span>Several products match these words. Pick one for a sharper price:</span> ' + vs.map(function (v) { return '<button type="button" class="mr-try" data-mr-variant="' + escapeHtml(v.search) + '">' + escapeHtml(v.name) + (Number.isInteger(v.listings) ? ' <span class="r">' + v.listings + ' listings</span>' : '') + '</button>'; }).join(''); } return html + '<br><span class="mr-prod-note">Product name suggested by AI, checked against our Vinted listings. It can be wrong.</span></div>'; }
   function searchBlock(d) {
     var s = d.search;
     if (!s || !s.compared_on) { return ''; }
@@ -8443,7 +8443,7 @@ const HEARTBEAT_URL = (() => {
 
     html += priceBlock(d, mine);
     html += '<p class="mr-headline">' + headline(d) + '</p>';
-    html += searchBlock(d);
+    html += productBlock(d) + searchBlock(d);
 
     (d.flags || []).forEach(function (f) {
       html += '<div class="mr-flag">' + escapeHtml(f.message || '') + '</div>';
@@ -8652,7 +8652,7 @@ const HEARTBEAT_URL = (() => {
     return (box && box.__mrState) || state;
   }
   document.addEventListener('click', function (e) {
-    var k = e.target.closest('[data-mr-keep]');
+    var vr = e.target.closest('[data-mr-variant]'); if (vr) { var sv = stateAt(vr); var qv = vr.getAttribute('data-mr-variant'); if (!qv) { return; } if (sv.into === result) { input.value = qv; } run({ q: qv, keep: [], mine: sv.mine, into: sv.into }); return; } var k = e.target.closest('[data-mr-keep]');
     var st = k ? stateAt(k) : null;
     if (k && st.q) {
       run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into, title: st.title, brand: st.brand });

@@ -1310,6 +1310,9 @@ FR.update({
     'Compared on:': 'Comparé sur' + NB + ':',
     'Ignored (tap to add back):': 'Ignoré (touche pour remettre)' + NB + ':',
     'Too few listings with every word. Try without:': 'Trop peu d’annonces avec tous ces mots. Essaie sans' + NB + ':',
+    'Looks like:': 'On dirait' + NB + ':',
+    'Several products match these words. Pick one for a sharper price:': 'Plusieurs produits correspondent à ces mots. Choisis-en un pour un prix plus précis' + NB + ':',
+    'Product name suggested by AI, checked against our Vinted listings. It can be wrong.': 'Nom du produit proposé par une IA, vérifié avec nos annonces Vinted. Il peut être faux.',
     'size': 'taille', 'colour': 'couleur', 'year': 'année', 'condition': 'état', 'filler': 'mot vide',
     'not in our listings': 'absent de nos annonces', 'left out to find more': 'retiré pour trouver plus',
     # Weekly hunt report (Session 66 P6)
