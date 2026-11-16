@@ -6369,9 +6369,19 @@ const HEARTBEAT_URL = (() => {
         });
         g.font = '150px ' + mono; g.fillStyle = '#00E5A0'; g.fillText(String(price || ''), 96, 760);
         if (line) {
+          // wrapped to at most 2 lines (one line cut the sentence off at this size)
           g.font = '34px ' + mono; g.fillStyle = '#E8EAEB';
-          let t = String(line); while (g.measureText(t).width > W - 192 && t.length > 4) t = t.slice(0, -4) + '...';
-          g.fillText(t, 96, 840);
+          const pl = []; let pc = '';
+          for (const w of String(line).split(/\s+/)) {
+            const t = pc ? pc + ' ' + w : w;
+            if (g.measureText(t).width <= W - 192 || !pc) pc = t; else { pl.push(pc); pc = w; }
+          }
+          if (pc) pl.push(pc);
+          if (pl.length > 2) { pl.length = 2; pl[1] = pl[1] + '...'; }
+          pl.forEach((t, i) => {
+            while (g.measureText(t).width > W - 192 && t.length > 4) t = t.slice(0, -4) + '...';
+            g.fillText(t, 96, 836 + i * 46);
+          });
         }
         g.font = '30px ' + mono; g.fillStyle = '#8B9094'; g.fillText('Vinted alerts on your phone - snypd.store', 96, 980);
         c.toBlob((b) => resolve(b || null), 'image/png');
