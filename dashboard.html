@@ -3727,6 +3727,13 @@ const HEARTBEAT_URL = (() => {
     function nameFromUrl(u) {
       try { return new URL(u).searchParams.get('search_text') || 'Vinted search'; } catch (e) { return 'Vinted search'; }
     }
+    // Share a hunt (referral placement 'hunt'): only the search words and the max price travel, never the other filters.
+    function huntShareWords(u) {
+      try { const q = (new URL(u).searchParams.get('search_text') || '').trim().replace(/\s+/g, ' '); return q && q.length <= 80 ? q : ''; } catch (e) { return ''; }
+    }
+    function huntShareMax(u) {
+      try { const m = Number(String(new URL(u).searchParams.get('price_to') || '').replace(',', '.')); return isFinite(m) && m > 0 && m < 1000000 ? Math.round(m) : 0; } catch (e) { return 0; }
+    }
 
     async function computeQuota(preloaded) {
       let rpcUsed = null, rpcLimit = null;
@@ -3789,6 +3796,7 @@ const HEARTBEAT_URL = (() => {
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
               <button type="button" data-fs-showall aria-pressed="${r.show_all_results ? 'true' : 'false'}">${r.show_all_results ? 'TITLE MATCH ONLY' : 'SHOW ALL VINTED RESULTS'}</button>
               <a href="${escFs(r.vinted_url)}" target="_blank" rel="noopener" style="font-size:11px;letter-spacing:.08em;color:var(--text-muted)">OPEN ON VINTED</a>
+              ${huntShareWords(r.vinted_url) ? '<button type="button" data-fs-share>SHARE</button>' : ''}
               <button type="button" class="fs-danger" data-fs-delete>DELETE</button>
             </div>
           </div>`;
@@ -3978,6 +3986,24 @@ const HEARTBEAT_URL = (() => {
       const id = row.dataset.id;
       const item = rows.find(r => String(r.id) === String(id));
       if (!item) return;
+      if (e.target.closest('[data-fs-share]')) {
+        // The friend lands on /invite with this hunt's words + max price; sign-up opens the first-hunt wizard prefilled.
+        const btn = e.target.closest('[data-fs-share]');
+        const words = huntShareWords(item.vinted_url);
+        if (!words) return;
+        try {
+          const { data: code, error } = await sb.rpc('my_referral_code');
+          if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
+          const mx = huntShareMax(item.vinted_url);
+          const link = 'https://www.snypd.store/invite?ref=' + code + '&src=hunt&hunt=' + encodeURIComponent(words) + (mx ? '&max=' + mx : '');
+          const text = 'My Vinted hunt on SNYPD: ' + words + (mx ? ' (max ' + mx + ')' : '') + '. Start the same one and get 2 extra days of 24/7 alerts:';
+          if (navigator.share) await navigator.share({ text, url: link });
+          else { await navigator.clipboard.writeText(text + ' ' + link); btn.textContent = 'COPIED'; setTimeout(() => { btn.textContent = 'SHARE'; }, 2000); }
+          if (window.gtag) try { gtag('event', 'referral_share', { src: 'hunt' }); } catch (e2) {}
+          try { sb.rpc('referral_track', { p_event: 'share', p_src: 'hunt' }).then(() => {}, () => {}); } catch (e2) {}
+        } catch (err) { /* share cancelled */ }
+        return;
+      }
       if (e.target.closest('[data-fs-toggle]')) {
         const next = !item.is_active;
         if (next && quota.remaining <= 0) return;

@@ -56,6 +56,10 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .iv-faq p { font-size: 13px; line-height: 1.6; color: #8B9094; margin: 10px 0 0; }
 .iv-foot { padding: 24px 0 40px; font-size: 12px; color: #55555C; display: flex; gap: 16px; flex-wrap: wrap; }
 .iv-foot a { color: #8B9094; }
+.iv-hunt { border: 1px solid #3A3A40; padding: 12px 14px; margin: 0 0 18px; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.iv-hunt__l { flex: 1 0 100%; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #8B9094; }
+.iv-hunt__w { font-size: 16px; color: #FFFFFF; word-break: break-word; }
+.iv-hunt__m { font-size: 13px; color: #00E5A0; }
 [hidden] { display: none !important; }
 @media (max-width: 380px) { .iv-h1 { font-size: 34px; } }
 </style>
@@ -68,8 +72,10 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
     <h1 class="iv-h1" data-iv="gift">2 extra days of 24/7 Vinted alerts</h1>
     <h1 class="iv-h1" data-iv="plain" hidden>Vinted alerts on your phone</h1>
     <p class="iv-sub">SNYPD watches the Vinted searches you choose, about once a minute, and alerts your phone when a new matching listing appears.</p>
+    <div class="iv-hunt" data-iv-hunt hidden><span class="iv-hunt__l">Your friend's hunt</span><span class="iv-hunt__w" data-iv-hunt-words data-i18n-skip></span><span class="iv-hunt__m" data-iv-hunt-max data-i18n-skip></span></div>
     <a class="iv-btn" data-invite-cta href="/signup"><span data-iv="gift">Claim my 2 bonus days</span><span data-iv="plain" hidden>Start free</span></a>
     <p class="iv-note">Free to start. No card needed.</p>
+    <p class="iv-note" data-iv-hunt hidden>This search is filled in for you after sign-up.</p>
   </section>
   <section class="iv-sec">
     <h2 class="iv-h2">How it works</h2>
@@ -98,11 +104,16 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 /* No valid code (here or stored by consent.js) = no gift promised: show the neutral version and plain sign-up.
    With a code, the CTA also carries ref/src to /signup (fallback when storage is blocked). */
 (function () {
-  var RE = /^[a-z2-9]{6}$/, SRC = /^(receipt|success|hub|trial|report|home|account|stock|announce)$/;
-  var c = '', s = '';
+  var RE = /^[a-z2-9]{6}$/, SRC = /^(receipt|success|hub|trial|report|home|account|stock|announce|hunt)$/;
+  var c = '', s = '', hw = '', hm = 0;
   try {
     var q = new URLSearchParams(location.search);
     c = String(q.get('ref') || '').toLowerCase(); s = String(q.get('src') || '').toLowerCase();
+    /* A shared hunt: words (max 80 chars) + optional whole max price. Shown as text only, then carried to /signup. */
+    hw = String(q.get('hunt') || '').trim().replace(/\s+/g, ' ');
+    if (hw.length > 80) hw = '';
+    hm = Math.round(Number(q.get('max')));
+    if (!(hm > 0 && hm < 1000000)) hm = 0;
   } catch (e) {}
   if (!RE.test(c)) {
     c = '';
@@ -118,7 +129,14 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
     var want = els[i].getAttribute('data-iv') === (gift ? 'gift' : 'plain');
     if (want) els[i].removeAttribute('hidden'); else els[i].setAttribute('hidden', '');
   }
-  var href = gift ? '/signup?ref=' + c + (s ? '&src=' + s : '') + '&from=invite' : '/signup?from=invite';
+  var extra = hw ? '&hunt=' + encodeURIComponent(hw) + (hm > 0 ? '&max=' + hm : '') : '';
+  var href = (gift ? '/signup?ref=' + c + (s ? '&src=' + s : '') + '&from=invite' : '/signup?from=invite') + extra;
+  if (hw) {
+    els = document.querySelectorAll('[data-iv-hunt]');
+    for (i = 0; i < els.length; i++) els[i].removeAttribute('hidden');
+    var hwEl = document.querySelector('[data-iv-hunt-words]'); if (hwEl) hwEl.textContent = hw;
+    var hmEl = document.querySelector('[data-iv-hunt-max]'); if (hmEl) hmEl.textContent = hm > 0 ? 'max ' + hm : '';
+  }
   els = document.querySelectorAll('[data-invite-cta]');
   for (i = 0; i < els.length; i++) els[i].setAttribute('href', href);
 
