@@ -139,6 +139,9 @@
           : params.get('trial') === 'ended' ? new Date(now - 20 * 3600000).toISOString() : null,
         is_founding_member: true,
         founding_number: 7,
+        // ?bonus=1: referral bonus days running (3 days left); ?bonus=ended: they ended an hour ago (migration 085/090).
+        referral_bonus_until: params.get('bonus') === '1' ? new Date(now + 3 * 86400000).toISOString()
+          : params.get('bonus') === 'ended' ? new Date(now - 3600000).toISOString() : null,
       },
     ],
     current_ads: [
@@ -564,7 +567,9 @@
         var u0 = DB.users[0] || {}, searches = (DB.user_searches || []).slice().sort(function (a, b) { return String(b.created_at).localeCompare(String(a.created_at)); });
         return Promise.resolve({ data: {
           profile: { subscription_plan: u0.subscription_plan, sub_status: u0.sub_status, billing_provider: u0.billing_provider, whop_product_id: u0.whop_product_id, whop_manage_url: u0.whop_manage_url,
-            is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: u0.free_trial_started_at || null, trial_ends_at: u0.trial_ends_at || null, trial_extended_at: null, pass_expires_at: null },
+            is_founding_member: u0.is_founding_member, founding_number: u0.founding_number, free_trial_started_at: u0.free_trial_started_at || null, trial_ends_at: u0.trial_ends_at || null, trial_extended_at: null, pass_expires_at: null,
+            // ?pre090=1: a database without migration 090 (dashboard_boot carries no referral_bonus_until)
+            referral_bonus_until: params.get('pre090') === '1' ? undefined : (u0.referral_bonus_until || null) },
           searches: searches, claims: (DB.user_claims || []).slice(), dq: [], xp_total: (DB.xp_events || []).reduce(function (a, x) { return a + (x.xp || 0); }, 0),
           streak: ((DB.user_streak_state || [])[0] || {}).current_streak || null, quota: { quota_limit: PLAN === 'free' ? 1 : 5, used: searches.length },
           stock_mode: STOCK ? STOCK.mode() : undefined, stock_tab_hidden: STOCK ? STOCK.tabHidden() : false,
