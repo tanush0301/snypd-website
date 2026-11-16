@@ -2982,7 +2982,7 @@ const HEARTBEAT_URL = (() => {
   let me = boot
     ? { data: boot.data.profile || null, error: null }
     : await sb.from('users')
-      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at, trial_ends_at, trial_extended_at, pass_expires_at')
+      .select(CORE_USER_COLUMNS + ', founding_number, free_trial_started_at, trial_ends_at, trial_extended_at, pass_expires_at, referral_bonus_until')
       .eq('id', uid)
       .maybeSingle();
   if (me.error) {
@@ -3034,8 +3034,9 @@ const HEARTBEAT_URL = (() => {
   document.body.dataset.plan = effectivePlan;
   // Trial price checks (11 Nov 2026): a running trial may use the Market tab's price check (10 in total, counted
   // by the backend). Set before the event so the panel sees it when the plan arrives. Presentation only.
-  document.body.dataset.trial = (effectivePlan === 'free' && profile.free_trial_started_at &&
-    trialEndMs(profile) > Date.now()) ? '1' : '';
+  // Referral bonus days (migration 085/090) count like a running trial here: the backend already treats them so.
+  document.body.dataset.trial = (effectivePlan === 'free' && ((profile.free_trial_started_at &&
+    trialEndMs(profile) > Date.now()) || bonusActive(profile))) ? '1' : '';
   document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
   // Feedback questions (outreach/47, migration 081; assets/feedback.js): shows nothing until dashboard_boot carries feedback_done.
   try { if (boot && boot.data && window.SnypdFeedback) window.SnypdFeedback.mount({ sb: sb, boot: boot.data, plan: effectivePlan, profile: profile }); } catch (e) { console.error('SNYPD feedback', e); } try { window.SNYPD = window.SNYPD || {}; window.SNYPD.fbCtx = (boot && boot.data && Array.isArray(boot.data.feedback_done)) ? { sb: sb, done: boot.data.feedback_done.slice() } : null; } catch (e) {}
@@ -3046,11 +3047,16 @@ const HEARTBEAT_URL = (() => {
   // Price check (Session 66): every line for paid plans and during the trial; Free gets one open card (see .pr-free).
   // Presentation only: the rating sits in the user's own feed rows either way.
   document.body.classList.toggle('pr-free', effectivePlan === 'free' &&
-    !(profile.free_trial_started_at && trialEndMs(profile) > Date.now()));
+    !(profile.free_trial_started_at && trialEndMs(profile) > Date.now()) && !bonusActive(profile));
   // Trial end (migration 061, 20 Oct 2026): users.trial_ends_at. New trials are
   // 72 h (+48 h once if the hunt found nothing); every trial that started
   // before 061 is start + 7 days, which is also the fallback when the column
   // is empty. The backend (helpers.in_free_trial) reads the same column.
+  // Referral bonus days still running (users.referral_bonus_until, carried by dashboard_boot since migration 090).
+  function bonusActive(p) {
+    const e = Date.parse((p && p.referral_bonus_until) || '');
+    return Number.isFinite(e) && e > Date.now();
+  }
   function trialEndMs(p) {
     const e = Date.parse((p && p.trial_ends_at) || '');
     if (Number.isFinite(e)) return e;
@@ -3766,7 +3772,7 @@ const HEARTBEAT_URL = (() => {
       }
       // After the trial a Free hunt only runs while this tab is open (backend
       // helpers.in_free_trial); "LIVE" would say it is still watched in the background.
-      const tabOnly = effectivePlan === 'free' && !(trialEndMs(profile) > Date.now());
+      const tabOnly = effectivePlan === 'free' && !(trialEndMs(profile) > Date.now()) && !bonusActive(profile);
       listEl.innerHTML = rows.map(r => {
         const live = r.is_active === true;
         return `
