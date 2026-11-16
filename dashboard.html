@@ -2109,6 +2109,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
         <button class="btn btn-ghost" id="claim-referral-share" type="button">Share</button>
         <a class="btn btn-ghost" id="claim-referral-wa" href="#" target="_blank" rel="noopener noreferrer">WhatsApp</a>
       </div>
+      <button class="btn btn-ghost" id="claim-referral-card" type="button">Share as image</button>
     </div>
     <div class="filter-sheet__footer">
       <button class="btn btn-ghost" id="claim-receipt-mark-sold" type="button" style="flex:1">Mark sold</button>
@@ -3727,6 +3728,13 @@ const HEARTBEAT_URL = (() => {
     function nameFromUrl(u) {
       try { return new URL(u).searchParams.get('search_text') || 'Vinted search'; } catch (e) { return 'Vinted search'; }
     }
+    // Share a hunt (referral placement 'hunt'): only the search words and the max price travel, never the other filters.
+    function huntShareWords(u) {
+      try { const q = (new URL(u).searchParams.get('search_text') || '').trim().replace(/\s+/g, ' '); return q && q.length <= 80 ? q : ''; } catch (e) { return ''; }
+    }
+    function huntShareMax(u) {
+      try { const m = Number(String(new URL(u).searchParams.get('price_to') || '').replace(',', '.')); return isFinite(m) && m > 0 && m < 1000000 ? Math.round(m) : 0; } catch (e) { return 0; }
+    }
 
     async function computeQuota(preloaded) {
       let rpcUsed = null, rpcLimit = null;
@@ -3789,6 +3797,7 @@ const HEARTBEAT_URL = (() => {
               <button type="button" data-fs-toggle>${live ? 'PAUSE' : 'ACTIVATE'}</button>
               <button type="button" data-fs-showall aria-pressed="${r.show_all_results ? 'true' : 'false'}">${r.show_all_results ? 'TITLE MATCH ONLY' : 'SHOW ALL VINTED RESULTS'}</button>
               <a href="${escFs(r.vinted_url)}" target="_blank" rel="noopener" style="font-size:11px;letter-spacing:.08em;color:var(--text-muted)">OPEN ON VINTED</a>
+              ${huntShareWords(r.vinted_url) ? '<button type="button" data-fs-share>SHARE</button>' : ''}
               <button type="button" class="fs-danger" data-fs-delete>DELETE</button>
             </div>
           </div>`;
@@ -3978,6 +3987,24 @@ const HEARTBEAT_URL = (() => {
       const id = row.dataset.id;
       const item = rows.find(r => String(r.id) === String(id));
       if (!item) return;
+      if (e.target.closest('[data-fs-share]')) {
+        // The friend lands on /invite with this hunt's words + max price; sign-up opens the first-hunt wizard prefilled.
+        const btn = e.target.closest('[data-fs-share]');
+        const words = huntShareWords(item.vinted_url);
+        if (!words) return;
+        try {
+          const { data: code, error } = await sb.rpc('my_referral_code');
+          if (error || !/^[a-z2-9]{6}$/.test(String(code || ''))) return;
+          const mx = huntShareMax(item.vinted_url);
+          const link = 'https://www.snypd.store/invite?ref=' + code + '&src=hunt&hunt=' + encodeURIComponent(words) + (mx ? '&max=' + mx : '');
+          const text = 'My Vinted hunt on SNYPD: ' + words + (mx ? ' (max ' + mx + ')' : '') + '. Start the same one and get 2 extra days of 24/7 alerts:';
+          if (navigator.share) await navigator.share({ text, url: link });
+          else { await navigator.clipboard.writeText(text + ' ' + link); btn.textContent = 'COPIED'; setTimeout(() => { btn.textContent = 'SHARE'; }, 2000); }
+          if (window.gtag) try { gtag('event', 'referral_share', { src: 'hunt' }); } catch (e2) {}
+          try { sb.rpc('referral_track', { p_event: 'share', p_src: 'hunt' }).then(() => {}, () => {}); } catch (e2) {}
+        } catch (err) { /* share cancelled */ }
+        return;
+      }
       if (e.target.closest('[data-fs-toggle]')) {
         const next = !item.is_active;
         if (next && quota.remaining <= 0) return;
@@ -6296,7 +6323,7 @@ const HEARTBEAT_URL = (() => {
       // hardcoded mockup numbers.
       const card = btn.closest('.card');
       if (card) card.remove();
-      showClaimReceipt({ title: row.title, amount, currency, xpEarnedThisClaim, claimId: claimRowId });
+      showClaimReceipt({ title: row.title, amount, currency, xpEarnedThisClaim, claimId: claimRowId, sp: row.item_box && row.item_box.snypd_price });
     } catch (err) {
       console.error('SNYPD: could not save claim', err);
       btn.disabled = false;
@@ -6305,7 +6332,53 @@ const HEARTBEAT_URL = (() => {
     }
   });
 
-  async function showClaimReceipt({ title, amount, currency, xpEarnedThisClaim, claimId }) {
+  // Find card (referral placement 'card'): the same price-check rule as the Feed card, only the favourable half
+  // (p >= 50), and never on Free, where the Feed keeps that line locked.
+  function claimPriceLine(sp, amount, currency) {
+    if (document.body.classList.contains('pr-free')) return '';
+    if (!(sp && Number.isInteger(sp.p) && sp.p >= 50 && sp.p <= 100 && Number.isInteger(sp.n) && sp.n >= 30)) return '';
+    const under = (Number.isInteger(sp.m) && sp.m > 0 && isFinite(Number(amount)) && Number(amount) > 0 && sp.m / 100 - Number(amount) >= 1)
+      ? Math.floor(sp.m / 100 - Number(amount)) : 0;
+    return under > 0 ? fmtPrice(under, currency) + " under this hunt's usual price" : 'Cheaper than ' + sp.p + "% of this hunt's finds this week";
+  }
+  // Text only: no listing photo, no seller data. Returns a PNG blob (or null when canvas is unavailable).
+  function drawFindCard(title, price, line) {
+    return new Promise((resolve) => {
+      try {
+        const W = 1080, c = document.createElement('canvas'); c.width = W; c.height = W;
+        const g = c.getContext('2d'); if (!g) return resolve(null);
+        const mono = "'DM Mono', ui-monospace, Menlo, Consolas, monospace";
+        g.fillStyle = '#0A0A0B'; g.fillRect(0, 0, W, W);
+        g.strokeStyle = '#1D1D20'; g.lineWidth = 4; g.strokeRect(40, 40, W - 80, W - 80);
+        g.textBaseline = 'alphabetic';
+        g.font = '44px ' + mono; g.fillStyle = '#FFFFFF'; g.fillText('SNYPD', 96, 150);
+        g.fillStyle = '#00E5A0'; g.fillText('_', 96 + g.measureText('SNYPD').width, 150);
+        g.font = '30px ' + mono; g.fillStyle = '#8B9094'; g.fillText('FOUND ON VINTED', 96, 300);
+        // title: wrapped to at most 3 lines
+        g.font = '60px ' + mono; g.fillStyle = '#FFFFFF';
+        const words = String(title || 'A find').split(/\s+/), lines = []; let cur = '';
+        for (const w of words) {
+          const t = cur ? cur + ' ' + w : w;
+          if (g.measureText(t).width <= W - 192 || !cur) cur = t; else { lines.push(cur); cur = w; }
+        }
+        if (cur) lines.push(cur);
+        if (lines.length > 3) { lines.length = 3; lines[2] = lines[2].replace(/.{0,3}$/, '...'); }
+        lines.forEach((t, i) => {
+          while (g.measureText(t).width > W - 192 && t.length > 4) t = t.slice(0, -4) + '...';
+          g.fillText(t, 96, 390 + i * 78);
+        });
+        g.font = '150px ' + mono; g.fillStyle = '#00E5A0'; g.fillText(String(price || ''), 96, 760);
+        if (line) {
+          g.font = '34px ' + mono; g.fillStyle = '#E8EAEB';
+          let t = String(line); while (g.measureText(t).width > W - 192 && t.length > 4) t = t.slice(0, -4) + '...';
+          g.fillText(t, 96, 840);
+        }
+        g.font = '30px ' + mono; g.fillStyle = '#8B9094'; g.fillText('Vinted alerts on your phone - snypd.store', 96, 980);
+        c.toBlob((b) => resolve(b || null), 'image/png');
+      } catch (e) { resolve(null); }
+    });
+  }
+  async function showClaimReceipt({ title, amount, currency, xpEarnedThisClaim, claimId, sp }) {
     const overlay = document.getElementById('claim-receipt-overlay');
     if (!overlay) return;
     document.getElementById('claim-receipt-title').textContent = title || 'Claimed item';
@@ -6345,6 +6418,10 @@ const HEARTBEAT_URL = (() => {
           refBox.dataset.text = (what ? 'Found ' + what + ' for ' : 'Found it for ') + fmtPrice(amount, currency)
             + ' on Vinted with SNYPD. You get 2 extra days of 24/7 alerts:';
           refBox.dataset.shown = '1';
+          refBox.dataset.cardLink = 'https://www.snypd.store/invite?ref=' + code + '&src=card';
+          refBox.dataset.cardTitle = what;
+          refBox.dataset.cardPrice = fmtPrice(amount, currency);
+          refBox.dataset.cardLine = claimPriceLine(sp, amount, currency);
           const waLink = document.getElementById('claim-referral-wa');
           if (waLink) waLink.setAttribute('href', 'https://wa.me/?text=' + encodeURIComponent(refBox.dataset.text + ' ' + link));
           refBox.style.display = 'flex';
@@ -6379,6 +6456,30 @@ const HEARTBEAT_URL = (() => {
       if (box) box.dataset.shared = '1';
       refState(0);
       if (window.gtag) try { gtag('event', 'referral_share', { src: 'receipt', via: 'whatsapp' }); } catch (e) {} try { sb.rpc('referral_track', { p_event: 'share', p_src: 'receipt' }).then(() => {}, () => {}); } catch (e) {}
+    });
+    const cardBtn = document.getElementById('claim-referral-card');
+    if (cardBtn) cardBtn.addEventListener('click', async () => {
+      const box = document.getElementById('claim-referral');
+      const link = box && box.dataset.cardLink; if (!link) return;
+      try {
+        const blob = await drawFindCard(box.dataset.cardTitle, box.dataset.cardPrice, box.dataset.cardLine);
+        if (!blob) return;
+        // Apps that take an image often drop a separate url, so the invite link rides in the text.
+        const text = box.dataset.text + ' ' + link;
+        let file = null; try { file = new File([blob], 'snypd-find.png', { type: 'image/png' }); } catch (e2) {}
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], text });
+        else {
+          const a = document.createElement('a'), u = URL.createObjectURL(blob);
+          a.href = u; a.download = 'snypd-find.png'; document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(u), 4000);
+          try { await navigator.clipboard.writeText(text); } catch (e2) {}
+          cardBtn.textContent = 'Image saved, text copied'; setTimeout(() => { cardBtn.textContent = 'Share as image'; }, 2500);
+        }
+        box.dataset.shared = '1';
+        refState(0);
+        if (window.gtag) try { gtag('event', 'referral_share', { src: 'card' }); } catch (e2) {}
+        try { sb.rpc('referral_track', { p_event: 'share', p_src: 'card' }).then(() => {}, () => {}); } catch (e2) {}
+      } catch (e) { /* share cancelled */ }
     });
     const shareBtn = document.getElementById('claim-referral-share');
     if (shareBtn) shareBtn.addEventListener('click', async () => {
