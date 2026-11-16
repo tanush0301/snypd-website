@@ -241,7 +241,46 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, '390 px: no horizontal overflow with the product block');
   await page.close();
 
-  eq(errors, [], 'no page errors');
+  // ---- 6. "Did this price check help?" (16 Nov 2026, feedback question PC, migration 089)
+  const ALLQ = 'A,B1,C,B2,D,D_text,E1,E2,G,F,H,I';   // every popup question answered, so no popup interferes
+  const openMarket = async (q) => {
+    const p = await open(q + '&lang=en');   // section 5 left French behind in this browser's storage
+    await p.evaluate(() => { document.querySelector('[data-view="market"]').click(); });
+    await p.waitForFunction(() => getComputedStyle(document.getElementById('market-panel')).display !== 'none', { timeout: 5000 });
+    return p;
+  };
+  page = await openMarket('plan=elite&pr=1');
+  await ask('prodq obsidian');
+  ok(!(await page.$('#mr-result [data-mr-ask]')), 'no question when the account has no feedback list (migration not live)');
+  await page.close();
+  page = await openMarket('plan=elite&pr=1&boot=1&fbdone=' + ALLQ + ',PC');
+  await ask('prodq obsidian');
+  ok(!(await page.$('#mr-result [data-mr-ask]')), 'no question once it has been answered');
+  await page.close();
+  page = await openMarket('plan=elite&pr=1&boot=1&fbdone=' + ALLQ);
+  await ask('prodq obsidian');
+  st = await page.$eval('#mr-result [data-mr-ask]', e => ({ t: e.innerText.replace(/\s+/g, ' ').trim(), a: [...e.querySelectorAll('[data-mr-ask-a]')].map(b => b.getAttribute('data-mr-ask-a')) }));
+  ok(/^Did this price check help\?/.test(st.t), 'question shown under the answer: ' + st.t);
+  eq(st.a, ['yes', 'partly', 'no'], 'three answers');
+  await page.click('#mr-result [data-mr-ask-a="partly"]');
+  ok(await page.$('#mr-result [data-mr-ask] textarea') && /How should it work\? \(optional\)/.test(await page.$eval('#mr-result [data-mr-ask]', e => e.innerText)), 'a tap opens the optional text box');
+  eq(await page.evaluate(() => (window.__fbRpc || []).length), 0, 'nothing saved before Send');
+  await page.$eval('#mr-result [data-mr-ask] textarea', e => { e.value = '  show me sold items too  '; });
+  await page.click('#mr-result [data-mr-ask-send]');
+  await page.waitForFunction(() => /Thank you/.test(document.querySelector('#mr-result [data-mr-ask]').innerText), { timeout: 5000 });
+  eq(await page.evaluate(() => window.__fbRpc), [{ p_question: 'PC', p_answer: 'partly', p_detail: 'show me sold items too', p_skipped: false, p_source: 'dashboard' }], 'answer + text saved once through feedback_submit');
+  await ask('varq tech');
+  ok(!(await page.$('#mr-result [data-mr-ask]')), 'not asked again on the next price check');
+  await page.close();
+  page = await openMarket('plan=elite&pr=1&boot=1&fbrpc=error&fbdone=' + ALLQ);
+  await ask('prodq obsidian');
+  await page.click('#mr-result [data-mr-ask-a="yes"]');
+  await page.click('#mr-result [data-mr-ask-send]');
+  await page.waitForFunction(() => /Could not save\. Try again\./.test(document.querySelector('#mr-result [data-mr-ask]').innerText), { timeout: 5000 });
+  ok(!(await page.$eval('#mr-result [data-mr-ask-send]', e => e.disabled)), 'failed save: error shown, Send usable again');
+  await page.close();
+
+  eq(errors.filter(e => !/feedback save failed/.test(e)), [], 'no page errors');
   await browser.close(); server.close();
   console.log('all ' + passed + ' market-fix checks pass');
 })().catch(e => { console.error('FAIL:', e.message); process.exit(1); });
