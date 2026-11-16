@@ -1236,6 +1236,9 @@ FR.update({
 FR_PATTERNS += [
     (r'^Done: "(.+)" now sends at most one summary every 15 min\. Change it anytime in Filters\.$',
      'C’est fait' + NB + ': «' + NB + '$1' + NB + '» envoie désormais au plus un résumé toutes les 15 min. Tu peux le changer à tout moment dans Filtres.'),
+    # Flood card "Only the cheap ones" (16 Nov 2026): sets that hunt to push_mode cheap.
+    (r'^Done: "(.+)" now sends a push only for the cheap finds\. The Feed still shows everything\. Change it anytime in Filters\.$',
+     'C’est fait' + NB + ': «' + NB + '$1' + NB + '» envoie désormais une notification seulement pour les trouvailles les moins chères. Le Feed montre toujours tout. Tu peux le changer à tout moment dans Filtres.'),
 ]
 
 # ===== /plans chooser by goal (23 Oct 2026): nothing preselected; one item -> Hunt Pass, one search ongoing -> Solo,
@@ -1310,6 +1313,9 @@ FR.update({
     'Compared on:': 'Comparé sur' + NB + ':',
     'Ignored (tap to add back):': 'Ignoré (touche pour remettre)' + NB + ':',
     'Too few listings with every word. Try without:': 'Trop peu d’annonces avec tous ces mots. Essaie sans' + NB + ':',
+    'Looks like:': 'On dirait' + NB + ':',
+    'Several products match these words. Pick one for a sharper price:': 'Plusieurs produits correspondent à ces mots. Choisis-en un pour un prix plus précis' + NB + ':',
+    'Product name suggested by AI, checked against our Vinted listings. It can be wrong.': 'Nom du produit proposé par une IA, vérifié avec nos annonces Vinted. Il peut être faux.',
     'size': 'taille', 'colour': 'couleur', 'year': 'année', 'condition': 'état', 'filler': 'mot vide',
     'not in our listings': 'absent de nos annonces', 'left out to find more': 'retiré pour trouver plus',
     # Weekly hunt report (Session 66 P6)
