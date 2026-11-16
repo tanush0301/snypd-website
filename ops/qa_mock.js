@@ -663,6 +663,24 @@
       if (COACH === 'error') return Promise.resolve(new Response(JSON.stringify({ detail: 'could not check your hunts right now' }), { status: 503 }));
       return Promise.resolve(new Response(JSON.stringify(coachBody()), { status: 200 }));
     }
+    // SNYPD AI hunt helper (16 Nov 2026, POST /api/v1/hunt-ai). The text decides the answer: 'nomatch' = nothing in our
+    // listings, 'aidown' = not available, 'ailimit' = 429, 'aibad' = malformed options; anything else = three options
+    // (one with HTML in its words, one very busy without a max).
+    if (u.indexOf('/api/v1/hunt-ai') !== -1) {
+      var aiReq = {};
+      try { aiReq = JSON.parse(opts && opts.body || '{}'); } catch (e) {}
+      window.__aiRequests = (window.__aiRequests || []).concat([aiReq]);
+      var aiText = String(aiReq.text || '').toLowerCase();
+      if (aiText.indexOf('ailimit') !== -1) return Promise.resolve(new Response(JSON.stringify({ detail: 'You have used the SNYPD AI 10 times this hour.' }), { status: 429 }));
+      if (aiText.indexOf('aidown') !== -1) return Promise.resolve(new Response(JSON.stringify({ available: false, options: [] }), { status: 200 }));
+      if (aiText.indexOf('nomatch') !== -1) return Promise.resolve(new Response(JSON.stringify({ available: true, options: [], priced: true }), { status: 200 }));
+      if (aiText.indexOf('aibad') !== -1) return Promise.resolve(new Response(JSON.stringify({ available: true, options: [null, { label: 'x' }, { words: 5 }, { label: 'Levis 501', words: 'levis 501', listings: 993, busy: false, max: 22 }] }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ available: true, priced: true, options: [
+        { label: 'Jordan 4 Military Black', words: 'jordan 4 military black', listings: 209, busy: false, max: 80 },
+        { label: 'Jordan 4', words: 'jordan 4 <b>x</b>', listings: 2062, busy: false, max: 90 },
+        { label: 'Jordan sneakers', words: 'jordan sneakers', listings: null, busy: true, max: null }],
+        source: { site: 'vinted.be', currency: 'EUR', window_days: 14 } }), { status: 200 }));
+    }
     // Market board (Session 67): ?mb=full | teaser | empty | error, else full for elite / pro / a running trial (?trial=1), teaser otherwise
     if (u.indexOf('/api/v1/market-board') !== -1) {
       var mbq = new URLSearchParams(location.search).get('mb');

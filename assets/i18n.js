@@ -236,6 +236,7 @@
 "Dashboard":"Tableau de bord",
 "Delete this hunt?":"Supprimer cette recherche\u00a0?",
 "Denmark":"Danemark",
+"Describe something else":"D\u00e9crire autre chose",
 "Details":"D\u00e9tails",
 "Did this price check help?":"Cette v\u00e9rification de prix t\u2019a aid\u00e9\u00a0?",
 "Did you mean:":"Tu voulais dire\u00a0:",
@@ -478,6 +479,7 @@
 "No active membership. Upgrade to unlock SNYPD tracking.":"Aucun abonnement actif. Passe \u00e0 un plan payant pour d\u00e9bloquer la surveillance SNYPD.",
 "No alerts 23:00 - 08:00 your time, then one summary.":"Aucune alerte de 23:00 \u00e0 08:00 (ton heure), puis un r\u00e9sum\u00e9.",
 "No card. No time limit.":"Sans carte. Sans limite de dur\u00e9e.",
+"No clear match in our listings. Try naming the brand and the item, for example \"ralph lauren jumper\".":"Pas de correspondance claire dans nos annonces. Essaie de nommer la marque et l\u2019article, par exemple \u00ab\u00a0ralph lauren jumper\u00a0\u00bb.",
 "No download. On iPhone, add SNYPD to your Home Screen from Safari to get alerts.":"Rien \u00e0 t\u00e9l\u00e9charger. Sur iPhone, ajoute SNYPD \u00e0 ton \u00e9cran d\u2019accueil depuis Safari pour recevoir les alertes.",
 "No find in the cheapest 25% right now.":"Aucune trouvaille dans les 25\u00a0% les moins ch\u00e8res pour l\u2019instant.",
 "No hunts yet":"Aucune recherche pour l\u2019instant",
@@ -502,6 +504,7 @@
 "Not happy? Email":"Pas satisfait\u00a0? \u00c9cris \u00e0",
 "Not included":"Non inclus",
 "Not now":"Pas maintenant",
+"Not sure what to type? Describe what you want in your own words.":"Tu ne sais pas quoi taper\u00a0? D\u00e9cris ce que tu veux avec tes propres mots.",
 "Not sure? Start with your goal.":"Tu h\u00e9sites\u00a0? Commence par ton objectif.",
 "Not watching":"Hors surveillance",
 "Notes":"Des notes",
@@ -577,6 +580,7 @@
 "Phone and desktop. On iPhone, add SNYPD to your Home Screen first.":"T\u00e9l\u00e9phone et ordinateur. Sur iPhone, ajoute d\u2019abord SNYPD \u00e0 ton \u00e9cran d\u2019accueil.",
 "Phone app":"Une appli mobile",
 "Pick how much SNYPD watches.":"Choisis combien SNYPD surveille.",
+"Pick one. It fills in the search for you.":"Choisis-en une. Elle remplit la recherche pour toi.",
 "Pick what you're hunting for and we'll show the plan that fits.":"Choisis ce que tu cherches et on t\u2019indique le plan qui convient.",
 "Plan":"Plan",
 "Plan limit":"Limite du plan",
@@ -779,6 +783,8 @@
 "Stock tab":"Onglet Stock",
 "Stop":"Arr\u00eater",
 "Stopped":"Arr\u00eat\u00e9",
+"Suggest a search":"Proposer une recherche",
+"Suggested by AI, checked against our Vinted listings. It can be wrong.":"Propos\u00e9 par une IA, v\u00e9rifi\u00e9 avec nos annonces Vinted. Elle peut se tromper.",
 "Summary every":"R\u00e9sum\u00e9 toutes les",
 "Support":"Support",
 "Sweden":"Su\u00e8de",
@@ -804,6 +810,7 @@
 "That is one listing, not a search. Search on Vinted, then copy the address of the results page.":"C\u2019est une annonce, pas une recherche. Lance une recherche sur Vinted, puis copie l\u2019adresse de la page de r\u00e9sultats.",
 "That is the quick-sale price: only a quarter of listings ask less. You check the hunt before it is saved.":"C\u2019est le bas de la fourchette\u00a0: seulement un quart des annonces demandent moins. Tu v\u00e9rifies la recherche avant qu\u2019elle soit enregistr\u00e9e.",
 "That search is too broad. Add a model name or colourway.":"Cette recherche est trop large. Ajoute un nom de mod\u00e8le ou un coloris.",
+"The SNYPD AI is not available right now. Type your search in the box above.":"La SNYPD AI n\u2019est pas disponible pour le moment. Tape ta recherche dans le champ au-dessus.",
 "The first 100 SNYPD accounts, free accounts included. All of those places are taken. If the Pro price ever goes up, founding members can keep Pro at \u20ac24.99 a month for as long as their account exists.":"Les 100 premiers comptes SNYPD, comptes gratuits compris. Toutes ces places sont prises. Si le prix de Pro augmente un jour, les membres fondateurs peuvent garder Pro \u00e0 24,99\u00a0\u20ac par mois aussi longtemps que leur compte existe.",
 "The first find right away, then at most one summary every 15 or 30 min.":"La premi\u00e8re trouvaille tout de suite, puis au plus un r\u00e9sum\u00e9 toutes les 15 ou 30 min.",
 "The full report (typical price per condition, the cheapest find with its link, change vs last week) is part of Pro and Elite.":"Le rapport complet (prix typique par \u00e9tat, la trouvaille la moins ch\u00e8re avec son lien, \u00e9volution vs semaine derni\u00e8re) fait partie de Pro et Elite.",
@@ -954,6 +961,7 @@
 "Yes. Your first saved search runs 24/7 for 3 days, and the 2 bonus days are added once your hunt finds a listing. After that, Free checks while your dashboard is open, or you pick a plan.":"Oui. Ta premi\u00e8re recherche enregistr\u00e9e tourne 24h/24 pendant 3 jours, et les 2 jours offerts s\u2019ajoutent d\u00e8s que ta recherche trouve une annonce. Ensuite, Free v\u00e9rifie tant que ton tableau de bord est ouvert, ou tu choisis un plan.",
 "Yes. Your first saved search runs 24/7 for 3 days. After that, Free checks while your dashboard is open, or you pick a plan.":"Oui. Ta premi\u00e8re recherche enregistr\u00e9e tourne 24h/24 pendant 3 jours. Ensuite, Free v\u00e9rifie tant que ton tableau de bord est ouvert, ou tu choisis un plan.",
 "Yes. \u20ac5.99, \u20ac14.99, \u20ac24.99 and \u20ac34.99 a month are the full prices, VAT included. Buying for a company? Tick \"buying on behalf of a company\" at checkout.":"Oui. 5,99\u00a0\u20ac, 14,99\u00a0\u20ac, 24,99\u00a0\u20ac et 34,99\u00a0\u20ac par mois sont les prix complets, TVA incluse. Tu ach\u00e8tes pour une entreprise\u00a0? Coche \u00ab\u00a0buying on behalf of a company\u00a0\u00bb au moment du paiement.",
+"You have used the SNYPD AI a lot just now. Type your search in the box above instead.":"Tu as beaucoup utilis\u00e9 la SNYPD AI \u00e0 l\u2019instant. Tape plut\u00f4t ta recherche dans le champ au-dessus.",
 "You have used your 10 trial price checks":"Tu as utilis\u00e9 tes 10 v\u00e9rifications de prix d\u2019essai",
 "You have used your searches for now. Try again a bit later.":"Tu as utilis\u00e9 tes recherches pour le moment. R\u00e9essaie un peu plus tard.",
 "You opened SNYPD inside Instagram or Facebook, which cannot add it to your Home Screen. Tap the ... menu at the top, open this page in Safari, then tap Share and \"Add to Home Screen\".":"Tu as ouvert SNYPD dans Instagram ou Facebook, qui ne peuvent pas l\u2019ajouter \u00e0 ton \u00e9cran d\u2019accueil. Touche le menu ... en haut, ouvre cette page dans Safari, puis touche Partager et \u00ab\u00a0Sur l\u2019\u00e9cran d\u2019accueil\u00a0\u00bb.",
@@ -1037,6 +1045,7 @@
 "to":"\u00e0",
 "typical":"typique",
 "under typical":"de moins que le prix typique",
+"very busy search":"recherche tr\u00e8s charg\u00e9e",
 "vs last week":"vs semaine derni\u00e8re",
 "within 14 days of your first payment for a plan and we refund it in full.":"dans les 14 jours suivant ton premier paiement pour un plan et on te rembourse int\u00e9gralement.",
 "within 14 days of your first payment for a plan and we refund that payment in full.":"dans les 14 jours suivant ton premier paiement pour un plan et on rembourse ce paiement int\u00e9gralement.",
@@ -1709,6 +1718,14 @@
 [
 "^(\\d+) listings$",
 "$1 annonces"
+],
+[
+"^(\\d+) listings in 14 days$",
+"$1 annonces en 14 jours"
+],
+[
+"^max \u20ac(\\d+)$",
+"max $1\u00a0\u20ac"
 ],
 [
 "^(\\d+) new listings found by your hunts\\.$",
