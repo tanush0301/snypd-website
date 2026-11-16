@@ -104,7 +104,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 /* No valid code (here or stored by consent.js) = no gift promised: show the neutral version and plain sign-up.
    With a code, the CTA also carries ref/src to /signup (fallback when storage is blocked). */
 (function () {
-  var RE = /^[a-z2-9]{6}$/, SRC = /^(receipt|success|hub|trial|report|home|account|stock|announce|hunt)$/;
+  var RE = /^[a-z2-9]{6}$/, SRC = /^(receipt|success|hub|trial|report|home|account|stock|announce|hunt|card)$/;
   var c = '', s = '', hw = '', hm = 0;
   try {
     var q = new URLSearchParams(location.search);

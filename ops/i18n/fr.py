@@ -397,6 +397,8 @@ FR = {
     'Share my link': 'Partager mon lien',
     'Get free days': 'Gagne des jours offerts',
     'Free days': 'Jours offerts',
+    'Share as image': 'Partager en image',
+    'Image saved, text copied': 'Image enregistrée, texte copié',
     'SHARE': 'PARTAGER',
     'COPIED': 'COPIÉ',
     "Your friend's hunt": 'La recherche de ton ami',
