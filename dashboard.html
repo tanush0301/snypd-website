@@ -3037,7 +3037,7 @@ const HEARTBEAT_URL = (() => {
     trialEndMs(profile) > Date.now()) ? '1' : '';
   document.dispatchEvent(new CustomEvent('snypd:plan', { detail: effectivePlan }));
   // Feedback questions (outreach/47, migration 081; assets/feedback.js): shows nothing until dashboard_boot carries feedback_done.
-  try { if (boot && boot.data && window.SnypdFeedback) window.SnypdFeedback.mount({ sb: sb, boot: boot.data, plan: effectivePlan, profile: profile }); } catch (e) { console.error('SNYPD feedback', e); }
+  try { if (boot && boot.data && window.SnypdFeedback) window.SnypdFeedback.mount({ sb: sb, boot: boot.data, plan: effectivePlan, profile: profile }); } catch (e) { console.error('SNYPD feedback', e); } try { window.SNYPD = window.SNYPD || {}; window.SNYPD.fbCtx = (boot && boot.data && Array.isArray(boot.data.feedback_done)) ? { sb: sb, done: boot.data.feedback_done.slice() } : null; } catch (e) {}
 
   const eliteBanner = document.getElementById('elite-banner');
   // All paid plans run 24/7 (PAID_PLANS-gated), so this is a Free-only nudge.
@@ -8451,7 +8451,7 @@ const HEARTBEAT_URL = (() => {
       + escapeHtml(so.currency || 'EUR') + ', last ' + (so.window_days || 14) + ' days.' + otherMarketNote() + '</div>';
   }
 
-  function render(d, into, mine) {
+  function askBlock() { var c = window.SNYPD && window.SNYPD.fbCtx; if (!c || !c.sb || c.done.indexOf('PC') >= 0) { return ''; } return '<div class="mr-cmp mr-ask" data-mr-ask><span>Did this price check help?</span> ' + [['yes', 'Yes'], ['partly', 'Partly'], ['no', 'No']].map(function (a) { return '<button type="button" class="mr-try" data-mr-ask-a="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</div>'; } function render(d, into, mine) {
     /* A thin result that still carries a price is its own state: the badge must
      * not say "not enough data" directly above a euro figure. */
     var b = badgeFor(d.provisional ? 'too_thin_shown' : d.display_verdict);
@@ -8487,7 +8487,7 @@ const HEARTBEAT_URL = (() => {
     if (d.coverage_note) {
       html += '<div class="mr-note">' + escapeHtml(d.coverage_note) + '</div>';
     }
-    html += sourceBlock(d, into);
+    html += sourceBlock(d, into) + askBlock();
     html += '</div>';
 
     /* The condition ladder comes before positioning and drift: it is the most
@@ -8687,7 +8687,7 @@ const HEARTBEAT_URL = (() => {
     return (box && box.__mrState) || state;
   }
   document.addEventListener('click', function (e) {
-    var vr = e.target.closest('[data-mr-variant]'); if (vr) { var sv = stateAt(vr); var qv = vr.getAttribute('data-mr-variant'); if (!qv) { return; } if (sv.into === result) { input.value = qv; } run({ q: qv, keep: [], mine: sv.mine, into: sv.into }); return; } var k = e.target.closest('[data-mr-keep]');
+    var aa = e.target.closest('[data-mr-ask-a]'); if (aa) { var ab = aa.closest('[data-mr-ask]'); ab.setAttribute('data-mr-ask-v', aa.getAttribute('data-mr-ask-a')); ab.innerHTML = '<span>How should it work? (optional)</span><br><textarea class="mr-ask-t" maxlength="1000" rows="2" style="width:100%;box-sizing:border-box;margin:6px 0;font:inherit;font-size:13px;color:var(--text-primary);background:transparent;border:1px solid var(--border);padding:8px"></textarea><br><button type="button" class="mr-try" data-mr-ask-send>Send</button> <span class="mr-ask-err"></span>'; return; } var sd = e.target.closest('[data-mr-ask-send]'); if (sd) { var sbx = sd.closest('[data-mr-ask]'); var fc = window.SNYPD && window.SNYPD.fbCtx; if (!fc || !fc.sb) { return; } sd.disabled = true; var sta = sbx.querySelector('textarea'); fc.sb.rpc('feedback_submit', { p_question: 'PC', p_answer: sbx.getAttribute('data-mr-ask-v'), p_detail: (sta && sta.value.trim()) || null, p_skipped: false, p_source: 'dashboard' }).then(function (r) { if (r && r.error) { throw r.error; } if (fc.done.indexOf('PC') < 0) { fc.done.push('PC'); } Array.prototype.forEach.call(document.querySelectorAll('[data-mr-ask]'), function (x) { if (x !== sbx) { x.parentNode.removeChild(x); } }); sbx.innerHTML = '<span>Thank you, this helps us a lot.</span>'; }).catch(function (er) { console.error('SNYPD: price check answer not saved', er); sd.disabled = false; var se = sbx.querySelector('.mr-ask-err'); if (se) { se.textContent = 'Could not save. Try again.'; } }); return; } var vr = e.target.closest('[data-mr-variant]'); if (vr) { var sv = stateAt(vr); var qv = vr.getAttribute('data-mr-variant'); if (!qv) { return; } if (sv.into === result) { input.value = qv; } run({ q: qv, keep: [], mine: sv.mine, into: sv.into }); return; } var k = e.target.closest('[data-mr-keep]');
     var st = k ? stateAt(k) : null;
     if (k && st.q) {
       run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into, title: st.title, brand: st.brand });
