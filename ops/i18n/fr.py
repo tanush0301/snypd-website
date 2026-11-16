@@ -191,6 +191,9 @@ FR = {
     'Connect Discord': 'Connecter Discord',
     'Get your finds in a private thread in the SNYPD Discord. Works on Android, iPhone and PC.':
         'Reçois tes trouvailles dans un fil privé du Discord SNYPD. Marche sur Android, iPhone et PC.',
+    # Discord row in the first-hunt wizard's alerts step (16 Nov 2026)
+    'In a private thread in the SNYPD Discord. No Home Screen step on iPhone.':
+        'Dans un fil privé du Discord SNYPD. Sans passer par l’écran d’accueil sur iPhone.',
     'Not available on this device': 'Indisponible sur cet appareil',
     'Yes': 'Oui',
     'No': 'Non',

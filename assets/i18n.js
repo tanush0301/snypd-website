@@ -378,6 +378,7 @@
 "If an account exists for":"Si un compte existe pour",
 "Ignored (tap to add back):":"Ignor\u00e9 (touche pour remettre)\u00a0:",
 "Image saved, text copied":"Image enregistr\u00e9e, texte copi\u00e9",
+"In a private thread in the SNYPD Discord. No Home Screen step on iPhone.":"Dans un fil priv\u00e9 du Discord SNYPD. Sans passer par l\u2019\u00e9cran d\u2019accueil sur iPhone.",
 "In your":"Dans ton",
 "Included":"Inclus",
 "Invite friends":"Invite des amis",

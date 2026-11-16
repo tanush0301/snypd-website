@@ -641,11 +641,23 @@
     return { generated_at: '2026-11-07T12:00:00Z', hunts: a ? [a] : [], cached: false };
   }
   // ---- fetch() interception for the backend API ----
+  // Discord alerts (16 Nov 2026): ?dc=linked seeds a linked account; ?dc=off makes the Discord routes answer 503.
+  // Every call to a Discord route is counted in window.__dcCalls (path only).
+  if (params.get('dc') === 'linked') DB.discord_links = [{ discord_username: 'qa_hunter', enabled: true }];
   var realFetch = window.fetch.bind(window);
   window.fetch = function (url, opts) {
     var u = String(url);
     if (u.indexOf('api.snypd.store') === -1) return realFetch(url, opts);
 
+    if (u.indexOf('/api/v1/discord/') !== -1) {
+      var dcPath = u.slice(u.indexOf('/api/v1/discord/'));
+      (window.__dcCalls = window.__dcCalls || []).push(dcPath);
+      if (params.get('dc') === 'off') return Promise.resolve(new Response(JSON.stringify({ detail: 'discord alerts are off' }), { status: 503 }));
+      if (dcPath.indexOf('/api/v1/discord/code') === 0) return Promise.resolve(new Response(JSON.stringify({ code: 'QA7K2M', expires_in: 600 }), { status: 200 }));
+      if (dcPath.indexOf('/api/v1/discord/disconnect') === 0) { DB.discord_links = []; return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 })); }
+      if (dcPath.indexOf('/api/v1/discord/start') === 0) return Promise.resolve(new Response(JSON.stringify({ url: 'https://discord.com/oauth2/authorize?qa=1' }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ detail: 'not found' }), { status: 404 }));
+    }
     if (u.indexOf('/api/v1/heartbeat') !== -1) {
       return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     }
