@@ -307,7 +307,7 @@
         listing_id: 5000 + i, user_id: UID, title: 'Broad QA listing ' + i,
         price: { amount: 20 + i, currency_code: 'EUR' }, brand_title: 'Jordan', size_title: '42', status: 'Good',
         url: 'https://www.vinted.be/items/' + (5000 + i), content_source: 'search', image_url: '',
-        item_box: { snypd_filter_contract: { version: 1, search: sig } }, 'item_box->snypd_filter_contract->>version': '1',
+        item_box: (function () { var bx = { snypd_filter_contract: { version: 1, search: sig } }; var bp = params.get('broadpr'); if (bp === '1' || (bp === '2' && i % 2 === 0)) bx.snypd_price = { p: (i * 7) % 100, n: 412, c: 'Good' }; return bx; })(), 'item_box->snypd_filter_contract->>version': '1',
         fetched_at: new Date(t).toISOString(), created_at: new Date(t).toISOString(),
         uploaded_ts: Math.floor(t / 1000), uploaded_at_ts: new Date(t).toISOString(), is_visible: true, promoted: false,
       });
