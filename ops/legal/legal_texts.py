@@ -95,6 +95,7 @@ def privacy_body(email, discord):
     <li><strong>IONOS</strong>: the server that runs monitoring and alerts, in Frankfurt, Germany.</li>
     <li><strong>Vercel</strong>: hosts this website, delivers it through its global network and counts page views without cookies (Vercel Web Analytics).</li>
     <li><strong>Resend</strong>: sends SNYPD&rsquo;s emails about your account, such as the notice that your free trial is about to end.</li>
+    <li><strong>Groq</strong> (United States): when you type a search into Check a price, the search words are sent to Groq&rsquo;s AI service to suggest which product they mean. Only the search words are sent, nothing about you or your account.</li>
     <li><strong>Whop</strong>: checkout, payments and subscriptions. Its checkout, which loads only when you open one, also runs Whop's own measurement script. The Whop pixel on the rest of the site runs only with your consent.</li>
     <li><strong>Meta</strong>: the Meta Pixel, only with your consent. It tells Meta which SNYPD pages you visit and that a sign-up happened, so we can see which Facebook or Instagram ads work.</li>
     <li><strong>Google</strong>: sign in with Google, Google Analytics (only with consent) and, in Chrome, delivery of alerts. Other browsers deliver alerts through their maker's push service, such as Apple, Mozilla or Microsoft.</li>

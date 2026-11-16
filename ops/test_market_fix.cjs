@@ -182,6 +182,40 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   eq(st, { sheet: false, req: 0, locked: true, marketShown: true }, 'Free: no sheet, no request, the locked Market panel as before');
   await page.close();
 
+  // ---- 3b. Product block (16 Nov 2026): AI-suggested name + variants our listings contain
+  page = await open('plan=elite&pr=1');
+  await page.evaluate(() => { document.querySelector('[data-view="market"]').click(); });
+  await page.waitForFunction(() => getComputedStyle(document.getElementById('market-panel')).display !== 'none', { timeout: 5000 });
+  const ask = async (q) => {
+    await page.$eval('#mr-query', (e, q) => { e.value = q; }, q);
+    await page.evaluate(() => { window.__mk.length = 0; });
+    await page.$eval('#mr-go', e => e.scrollIntoView({ block: 'center' })); await page.click('#mr-go');
+    await page.waitForFunction(() => window.__mk.length >= 1 && !document.querySelector('#mr-result .mr-loading') && document.querySelector('#mr-result .mr-cmp, #mr-result .mr-3'), { timeout: 6000 });
+    await wait(300);
+  };
+  await ask('prodq obsidian');
+  st = await page.evaluate(() => { const b = document.querySelector('#mr-result [data-mr-product]'); return b ? { t: b.innerText.replace(/\s+/g, ' ').trim(), n: b.querySelectorAll('[data-mr-variant]').length } : null; });
+  ok(st && /^Looks like: Air Jordan 1 Retro High OG "Obsidian"/.test(st.t), 'product name shown: ' + JSON.stringify(st));
+  eq(st.n, 0, 'no variant buttons for a single product');
+  ok(/suggested by AI, checked against our Vinted listings\. It can be wrong\./.test(st.t), 'AI note shown');
+  ok(!/retail|sold/i.test(st.t), 'no retail figure, never "sold"');
+  await ask('varq tech');
+  st = await page.evaluate(() => { const b = document.querySelector('#mr-result [data-mr-product]'); return {
+    t: b.innerText.replace(/\s+/g, ' ').trim(), injected: b.querySelectorAll('b b').length,
+    vs: [...b.querySelectorAll('[data-mr-variant]')].map(x => [x.getAttribute('data-mr-variant'), x.innerText.replace(/\s+/g, ' ').trim()]) }; });
+  ok(st.injected === 0 && st.t.includes('Nike Tech <b>Fleece</b>'), 'HTML in a product name is shown as text');
+  eq(st.vs, [['nike tech fleece jacket', 'Nike Tech Fleece Jacket 332 listings'], ['nike tech fleece hoodie', 'Nike Tech Fleece Hoodie 284 listings'],
+    ['nike tech fleece pants', 'Nike Tech Fleece Pants']], 'variants with our listing counts; malformed entry ignored');
+  ok(/Several products match these words\. Pick one for a sharper price:/.test(st.t), 'choice line shown');
+  await page.evaluate(() => { window.__mk.length = 0; });
+  await page.click('#mr-result [data-mr-variant="nike tech fleece hoodie"]');
+  await page.waitForFunction(() => window.__mk.length === 1 && !document.querySelector('#mr-result .mr-loading'), { timeout: 6000 });
+  eq(await page.evaluate(() => window.__mk[0]), { q: 'nike tech fleece hoodie', keep: [] }, 'tap on a variant re-runs the price check on it');
+  eq(await page.$eval('#mr-query', e => e.value), 'nike tech fleece hoodie', 'and updates the search box');
+  await ask('nike p6000 size 8');
+  ok(!(await page.$('#mr-result [data-mr-product]')), 'no product block when the answer carries none');
+  await page.close();
+
   // ---- 4. French + phone
   page = await open('plan=elite&pr=1&lang=fr', { width: 390, height: 844, isMobile: true, hasTouch: true });
   await page.click('#list .card .mkt-check');
@@ -194,6 +228,17 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, '390 px: no horizontal overflow with the sheet open');
   const box = await page.$eval('.mr-sheet__box', e => { const r = e.getBoundingClientRect(); return { w: r.width, b: r.bottom }; });
   ok(box.w <= 390 && box.b <= 845, '390 px: sheet fits the screen as a bottom sheet ' + JSON.stringify(box));
+  await page.close();
+
+  // ---- 5. Product block in French on a phone
+  page = await open('plan=elite&pr=1&lang=fr', { width: 390, height: 844, isMobile: true, hasTouch: true });
+  await page.evaluate(() => { document.querySelector('[data-view="market"]').click(); });
+  await page.waitForFunction(() => getComputedStyle(document.getElementById('market-panel')).display !== 'none', { timeout: 5000 });
+  await ask('varq tech');
+  await wait(500);
+  txt = await page.$eval('#mr-result [data-mr-product]', e => e.innerText.replace(/\s+/g, ' '));
+  ok(/On dirait\s?:/.test(txt) && /Choisis-en un pour un prix plus précis/.test(txt) && /Il peut être faux\./.test(txt) && /332 annonces/.test(txt), 'French product block: ' + txt.slice(0, 200));
+  ok(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, '390 px: no horizontal overflow with the product block');
   await page.close();
 
   eq(errors, [], 'no page errors');

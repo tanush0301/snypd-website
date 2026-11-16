@@ -307,7 +307,7 @@
         listing_id: 5000 + i, user_id: UID, title: 'Broad QA listing ' + i,
         price: { amount: 20 + i, currency_code: 'EUR' }, brand_title: 'Jordan', size_title: '42', status: 'Good',
         url: 'https://www.vinted.be/items/' + (5000 + i), content_source: 'search', image_url: '',
-        item_box: { snypd_filter_contract: { version: 1, search: sig } }, 'item_box->snypd_filter_contract->>version': '1',
+        item_box: (function () { var bx = { snypd_filter_contract: { version: 1, search: sig } }; var bp = params.get('broadpr'); if (bp === '1' || (bp === '2' && i % 2 === 0)) bx.snypd_price = { p: (i * 7) % 100, n: 412, c: 'Good' }; return bx; })(), 'item_box->snypd_filter_contract->>version': '1',
         fetched_at: new Date(t).toISOString(), created_at: new Date(t).toISOString(),
         uploaded_ts: Math.floor(t / 1000), uploaded_at_ts: new Date(t).toISOString(), is_visible: true, promoted: false,
       });
@@ -747,6 +747,24 @@
       if (q.indexOf('trackq') !== -1) {
         return Promise.resolve(new Response(JSON.stringify({
           query: q, sample_size: 0, display_verdict: 'too_thin', show_headline: false, tracking: { tracked: true, reason: 'registered' },
+          quota: { hour_remaining: 19, hour_limit: 20 },
+        }), { status: 200 }));
+      }
+      // 16 Nov 2026: product block. 'prodq' = a product name only; 'varq' = a name plus variants to pick from
+      // (one malformed entry and HTML in a name, both must be handled by the page).
+      if (q.indexOf('prodq') !== -1 || q.indexOf('varq') !== -1) {
+        var isVar = q.indexOf('varq') !== -1;
+        return Promise.resolve(new Response(JSON.stringify({
+          query: q, sample_size: 320, distinct_sellers: 210, display_verdict: 'ok', confidence: 'high', provisional: false,
+          show_headline: true, typical_cents: 6400, range_cents: { low: 4800, high: 8200 }, by_condition: [], flags: [],
+          search: { asked: q, compared_on: q.split(' '), pinned: [], ignored: [], read_as: [], offer_drop: [] },
+          source: { site: 'vinted.be', market: 'EU', currency: 'EUR', window_days: 14 },
+          product: isVar ? { name: 'Nike Tech <b>Fleece</b>', kind: 'clothing', needs_choice: true, variants: [
+            { name: 'Nike Tech Fleece Jacket', search: 'nike tech fleece jacket', listings: 332 },
+            { name: 'Nike Tech Fleece Hoodie', search: 'nike tech fleece hoodie', listings: 284 },
+            { name: '', search: 'broken entry' },
+            { name: 'Nike Tech Fleece Pants', search: 'nike tech fleece pants', listings: null }] }
+            : { name: 'Air Jordan 1 Retro High OG "Obsidian"', kind: 'sneaker', needs_choice: false, variants: [] },
           quota: { hour_remaining: 19, hour_limit: 20 },
         }), { status: 200 }));
       }

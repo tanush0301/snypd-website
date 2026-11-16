@@ -2264,7 +2264,7 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
   <div class="email-optin__actions">
     <button class="btn btn-prim" id="broad-hunt-apply" type="button" style="display:none"></button>
     <button class="btn btn-prim" id="broad-hunt-undo" type="button" style="display:none">Undo</button>
-    <button class="btn btn-prim" id="broad-hunt-calm" type="button" style="display:none">Switch to Calm</button>
+    <button class="btn btn-prim" id="broad-hunt-calm" type="button" style="display:none">Switch to Calm</button> <button class="btn btn-ghost" id="broad-hunt-cheap" type="button" style="display:none">Only the cheap ones</button>
     <button class="btn btn-ghost" id="broad-hunt-calmall" type="button" style="display:none"></button>
     <button class="btn btn-ghost" id="broad-hunt-edit" type="button">Edit hunt</button>
     <button class="btn btn-ghost" id="broad-hunt-keep" type="button">Keep it</button>
@@ -7178,7 +7178,7 @@ const HEARTBEAT_URL = (() => {
     });
   }
   function coachButtons(show) {
-    ['broad-hunt-apply', 'broad-hunt-undo', 'broad-hunt-calm', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => {
+    ['broad-hunt-apply', 'broad-hunt-undo', 'broad-hunt-calm', 'broad-hunt-cheap', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => {
       const b = document.getElementById(id);
       if (b) { b.style.display = show.indexOf(id) >= 0 ? '' : 'none'; b.disabled = false; }
     });
@@ -7417,7 +7417,7 @@ const HEARTBEAT_URL = (() => {
       if (be) be.style.display = 'none';
     }
     const calmBtn = document.getElementById('broad-hunt-calm');
-    if (calmBtn) { calmBtn.style.display = broadHunt ? '' : 'none'; calmBtn.disabled = false; }
+    if (calmBtn) { calmBtn.style.display = broadHunt ? '' : 'none'; calmBtn.disabled = false; } const cheapBtn = document.getElementById('broad-hunt-cheap'); const cheapRated = priced.filter(r => r.item_box.snypd_price && Number.isInteger(r.item_box.snypd_price.p)).length; if (cheapBtn) { cheapBtn.style.display = (broadHunt && !(document.body && document.body.classList.contains('pr-free')) && priced.length >= 8 && cheapRated / priced.length >= 0.6) ? '' : 'none'; cheapBtn.disabled = false; }
     const calmAllBtn = document.getElementById('broad-hunt-calmall');
     if (calmAllBtn) { calmAllBtn.style.display = broadBusy.length >= 2 ? '' : 'none'; calmAllBtn.disabled = false; calmAllBtn.textContent = 'Calm all ' + broadBusy.length; }
     card.dataset.kind = 'broad';
@@ -7429,6 +7429,7 @@ const HEARTBEAT_URL = (() => {
     const card = document.getElementById('broad-hunt');
     const calm = document.getElementById('broad-hunt-calm');
     const text = document.getElementById('broad-hunt-text');
+    const cheap = document.getElementById('broad-hunt-cheap'); if (cheap) cheap.addEventListener('click', async () => { if (!broadHunt) return; cheap.disabled = true; const { error } = await sb.from('user_searches').update({ push_mode: 'cheap' }).eq('id', broadHunt.id).eq('user_id', uid); if (error) { console.error('SNYPD: could not switch broad hunt to cheap-only', error); if (text) text.textContent = 'Could not switch this hunt. Try again, or change it in Filters.'; cheap.disabled = false; return; } broadHunt.push_mode = 'cheap'; broadRemember(broadSig); if (text) text.textContent = 'Done: "' + huntLabel(broadHunt.vinted_url) + '" now sends a push only for the cheap finds. The Feed still shows everything. Change it anytime in Filters.'; ['broad-hunt-apply', 'broad-hunt-calm', 'broad-hunt-cheap', 'broad-hunt-calmall', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; }); if (coachShown && coachShown.feed) coachShown = null; setTimeout(() => { if (card) card.style.display = 'none'; }, 8000); });
     if (calm) calm.addEventListener('click', async () => {
       if (!broadHunt) return;
       calm.disabled = true;
@@ -7449,7 +7450,7 @@ const HEARTBEAT_URL = (() => {
         localStorage.setItem('snypd_broad_ok', JSON.stringify(kept));
       } catch (e) {}
       if (text) text.textContent = 'Done: "' + huntLabel(broadHunt.vinted_url) + '" now sends at most one summary every 15 min. Change it anytime in Filters.';
-      [calm, edit, keep, document.getElementById('broad-hunt-apply'), document.getElementById('broad-hunt-calmall')].forEach(b => { if (b) b.style.display = 'none'; });
+      [calm, edit, keep, document.getElementById('broad-hunt-apply'), document.getElementById('broad-hunt-calmall'), document.getElementById('broad-hunt-cheap')].forEach(b => { if (b) b.style.display = 'none'; });
       if (coachShown && coachShown.feed) coachShown = null;
       setTimeout(() => { if (card) card.style.display = 'none'; }, 8000);
     });
@@ -7470,7 +7471,7 @@ const HEARTBEAT_URL = (() => {
         ? 'Done: ' + done + ' hunts now send at most one summary every 15 min. Change it anytime in Filters.'
         : 'Switched ' + done + ' of ' + list.length + ' hunts to Calm. Try again for the rest, or change them in Filters.';
       if (done === list.length) {
-        ['broad-hunt-apply', 'broad-hunt-calm', 'broad-hunt-calmall', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; });
+        ['broad-hunt-apply', 'broad-hunt-calm', 'broad-hunt-cheap', 'broad-hunt-calmall', 'broad-hunt-edit', 'broad-hunt-keep'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; });
         setTimeout(() => { if (card) card.style.display = 'none'; }, 8000);
       } else calmAll.disabled = false;
     });
@@ -8490,7 +8491,7 @@ const HEARTBEAT_URL = (() => {
     return COND_LABEL[k] || null;
   }
   var WHY = { size: 'size', colour: 'colour', year: 'year', condition: 'condition', filler: 'filler',
-    not_found: 'not in our listings', dropped: 'left out to find more' };
+    not_found: 'not in our listings', dropped: 'left out to find more' }; function productBlock(d) { var p = d.product; if (!p || typeof p !== 'object') { return ''; } var vs = (p.needs_choice && Array.isArray(p.variants)) ? p.variants.filter(function (v) { return v && v.name && v.search; }).slice(0, 5) : []; if (!p.name && vs.length < 2) { return ''; } var html = '<div class="mr-cmp mr-prod" data-mr-product>'; if (p.name) { html += 'Looks like: <b>' + escapeHtml(p.name) + '</b>'; } if (vs.length >= 2) { html += (p.name ? '<br>' : '') + '<span>Several products match these words. Pick one for a sharper price:</span> ' + vs.map(function (v) { return '<button type="button" class="mr-try" data-mr-variant="' + escapeHtml(v.search) + '">' + escapeHtml(v.name) + (Number.isInteger(v.listings) ? ' <span class="r">' + v.listings + ' listings</span>' : '') + '</button>'; }).join(''); } return html + '<br><span class="mr-prod-note">Product name suggested by AI, checked against our Vinted listings. It can be wrong.</span></div>'; }
   function searchBlock(d) {
     var s = d.search;
     if (!s || !s.compared_on) { return ''; }
@@ -8578,7 +8579,7 @@ const HEARTBEAT_URL = (() => {
 
     html += priceBlock(d, mine);
     html += '<p class="mr-headline">' + headline(d) + '</p>';
-    html += searchBlock(d);
+    html += productBlock(d) + searchBlock(d);
 
     (d.flags || []).forEach(function (f) {
       html += '<div class="mr-flag">' + escapeHtml(f.message || '') + '</div>';
@@ -8787,7 +8788,7 @@ const HEARTBEAT_URL = (() => {
     return (box && box.__mrState) || state;
   }
   document.addEventListener('click', function (e) {
-    var k = e.target.closest('[data-mr-keep]');
+    var vr = e.target.closest('[data-mr-variant]'); if (vr) { var sv = stateAt(vr); var qv = vr.getAttribute('data-mr-variant'); if (!qv) { return; } if (sv.into === result) { input.value = qv; } run({ q: qv, keep: [], mine: sv.mine, into: sv.into }); return; } var k = e.target.closest('[data-mr-keep]');
     var st = k ? stateAt(k) : null;
     if (k && st.q) {
       run({ q: st.q, keep: st.keep.concat([k.getAttribute('data-mr-keep')]), mine: st.mine, into: st.into, title: st.title, brand: st.brand });
