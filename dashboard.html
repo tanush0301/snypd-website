@@ -2038,6 +2038,13 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
           </div>
           <button type="button" class="toggle-switch is-on" id="wiz-toggle-push" role="switch" aria-checked="true" aria-labelledby="wiz-label-push"><span class="toggle-switch__knob"></span></button>
         </div>
+        <div class="wiz-alert-row" id="wiz-discord-row" style="display:none">
+          <div>
+            <div class="wiz-alert-row__title" id="wiz-label-discord">Discord alerts</div>
+            <div class="wiz-alert-row__note" id="wiz-discord-note">In a private thread in the SNYPD Discord. No Home Screen step on iPhone.</div>
+          </div>
+          <button type="button" class="btn btn-ghost" id="wiz-discord-btn">Connect Discord</button>
+        </div>
       </div>
       <p class="wiz-sub" id="wiz-trial-note" style="display:none;margin:14px 0 0;font-size:12px;color:var(--text-primary)"></p>
       <p class="wiz-alert-result" id="wiz-alert-result" style="display:none"></p>
@@ -9289,6 +9296,7 @@ const HEARTBEAT_URL = (() => {
   function paint(msg) {
     btn.disabled = false; btn.textContent = linked ? t('disconnect') : t('connect');
     note.textContent = msg || (linked ? t('on', linked.discord_username || 'Discord') : t('idle'));
+    paintWiz();
   }
   async function load() {
     var c = sb(); if (!c) { return; }
@@ -9307,6 +9315,32 @@ const HEARTBEAT_URL = (() => {
     oauth: ['Or log in with Discord', 'Ou connecte-toi avec Discord']
   };
   function l(k) { return L[k][fr() ? 1 : 0]; }
+  /* First-hunt wizard row (16 Nov 2026): hands off to this block. It only ever connects: the row stays hidden
+     until the linked state is known, and once linked it shows the state and has no button. */
+  var loaded = false;
+  var wizRow = document.getElementById('wiz-discord-row');
+  var wizBtn = document.getElementById('wiz-discord-btn');
+  var wizNote = document.getElementById('wiz-discord-note');
+  var W = {
+    idle: ['In a private thread in the SNYPD Discord. No Home Screen step on iPhone.',
+           'Dans un fil privé du Discord SNYPD. Sans passer par l’écran d’accueil sur iPhone.'],
+    on: ['Connected as {n}.', 'Connecté en tant que {n}.']
+  };
+  function paintWiz() {
+    if (!loaded || !wizRow || !wizBtn || !wizNote) { return; }
+    wizRow.style.display = '';
+    wizBtn.hidden = !!linked;
+    wizNote.textContent = linked ? W.on[fr() ? 1 : 0].replace('{n}', linked.discord_username || 'Discord') : W.idle[fr() ? 1 : 0];
+  }
+  if (wizBtn) {
+    wizBtn.addEventListener('click', function () {
+      if (!loaded || linked || btn.disabled) { return; }
+      var o = document.getElementById('wiz-overlay'); if (o) { o.style.display = 'none'; }
+      var v = document.querySelector('[data-view="profile"]'); if (v) { v.click(); }
+      btn.click();
+      try { document.getElementById('prof-discord-row').scrollIntoView({ block: 'center' }); } catch (e) {}
+    });
+  }
   async function post(path) {
     var tok = await token(); if (!tok) { return { status: 401 }; }
     var res = await fetch(API + path, { method: 'POST', headers: { Authorization: 'Bearer ' + tok } });
@@ -9344,7 +9378,7 @@ const HEARTBEAT_URL = (() => {
   });
   (async function () {
     for (var i = 0; i < 40 && !sb(); i++) { await new Promise(function (r) { setTimeout(r, 250); }); }
-    await load();
+    await load(); loaded = true;
     var q = new URLSearchParams(location.search); var res = q.get('discord');
     if (res && T[res]) {
       paint(t(res));
