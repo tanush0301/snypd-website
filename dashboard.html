@@ -2237,6 +2237,18 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <a class="btn btn-ghost" href="/privacy#why">Privacy policy</a>
   </div>
 </div>
+<!-- Discord invite (16 Nov 2026, founder: prompt to join when a trial starts): shown once during a running free trial;
+     either button remembers it on this device (snypd_dc_join_v1). Logic: dcJoinCard() after statsNote(). -->
+<div class="elite-banner" id="dc-join" style="display:none" aria-labelledby="dc-join-title">
+  <div>
+    <div class="elite-banner__title" id="dc-join-title">Join the SNYPD Discord</div>
+    <div class="elite-banner__text" id="dc-join-text">See deals SNYPD found for other searches, ask what an item is worth, and get help with your alerts. Free to join.</div>
+  </div>
+  <div class="email-optin__actions">
+    <a class="btn btn-prim" id="dc-join-go" href="https://discord.gg/zESz4DAtP3" target="_blank" rel="noopener">Join the Discord</a>
+    <button class="btn btn-ghost" id="dc-join-no" type="button">Not now</button>
+  </div>
+</div>
 <div class="elite-banner" id="words-card" style="display:none">
   <div style="flex:1;min-width:0">
     <div class="elite-banner__title" id="words-card-title">This search needs every word in one listing</div>
@@ -3067,6 +3079,28 @@ const HEARTBEAT_URL = (() => {
     const prB = document.getElementById('stats-note-profile');
     if (okB) okB.addEventListener('click', done);
     if (prB) prB.addEventListener('click', () => { done(); const t = document.querySelector('[data-view="profile"]'); if (t) t.click(); });
+  })();
+  // Discord invite: once per device, only while a free trial is running.
+  (function dcJoinCard() {
+    const card = document.getElementById('dc-join');
+    if (!card) return;
+    let seen = false;
+    try { seen = !!localStorage.getItem('snypd_dc_join_v1'); } catch (e) {}
+    const inTrial = effectivePlan === 'free' && profile.free_trial_started_at && trialEndMs(profile) > Date.now();
+    if (seen || !inTrial) return;
+    if (uiFr()) {
+      const set = (id, s) => { const el = document.getElementById(id); if (el) el.textContent = s; };
+      set('dc-join-title', 'Rejoins le Discord SNYPD');
+      set('dc-join-text', 'Vois les bonnes affaires trouvées par SNYPD pour d’autres recherches, demande ce que vaut un article et reçois de l’aide pour tes alertes. Gratuit.');
+      set('dc-join-go', 'Rejoindre le Discord');
+      set('dc-join-no', 'Pas maintenant');
+    }
+    card.style.display = '';
+    const done = () => { try { localStorage.setItem('snypd_dc_join_v1', String(Date.now())); } catch (e) {} card.style.display = 'none'; };
+    const go = document.getElementById('dc-join-go');
+    const no = document.getElementById('dc-join-no');
+    if (go) go.addEventListener('click', done);
+    if (no) no.addEventListener('click', done);
   })();
   // Free 24/7 trial. During it, "Free only checks while this tab is open" would be false.
   if (eliteBanner && effectivePlan === 'free' && profile.free_trial_started_at) {
