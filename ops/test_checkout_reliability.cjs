@@ -148,7 +148,7 @@ async function journey(responses, options = {}) {
   // Source and generated dictionaries must include every new visible string.
   const fr=fs.readFileSync(path.join(root,'ops/i18n/fr.py'),'utf8');
   const asset=fs.readFileSync(path.join(root,'assets/i18n.js'),'utf8');
-  const dictionary=JSON.parse(asset.match(/  var DICT = (.*);\n/)[1]).fr;
+  const dictionary=JSON.parse(asset.match(/  var DICT = ([\s\S]*?);\r?\n\s*var PATTERNS/)[1]).fr;
   for(const key of ['RELOAD TO CHECK PLAN','CHECKING YOUR PLAN','PLAN UNAVAILABLE',
     'Checkout could not load here. Continue on Whop using your SNYPD account email:',
     'Enter promo code','and check the total before paying.','CONTINUE TO WHOP']) {
