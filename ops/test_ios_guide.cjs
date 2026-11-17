@@ -169,6 +169,20 @@ const SMALL = { width: 320, height: 568, isMobile: true, hasTouch: true };
     await ctx.close();
   }
 
+  // ---- 5b. Small phone (375x553 visible): the wizard scrolls, starts at its top, and the save button works ----
+  {
+    const { page, ctx } = await open({ ua: IPHONE, vp: { width: 375, height: 553, isMobile: true, hasTouch: true } }, NEW);
+    const m = await page.evaluate(() => {
+      const ov = document.getElementById('wiz-overlay'), s = document.getElementById('wiz-step-1');
+      return { flow: getComputedStyle(ov).overflowY, top: s.getBoundingClientRect().top, ch: ov.clientHeight, sh: ov.scrollHeight };
+    });
+    ok(m.flow === 'auto' || m.flow === 'scroll', 'the wizard overlay scrolls: ' + JSON.stringify(m));
+    ok(m.top >= 0, 'the first step starts on screen, not cut off above it: ' + JSON.stringify(m));
+    ok(m.sh > m.ch, 'the step is taller than this screen, so scrolling is what makes it usable');
+    await toAlertsStep(page);
+    await ctx.close();
+  }
+
   // ---- 6. French: every part of the guide is translated (Safari and in-app) ----
   for (const ua of [IPHONE, IPHONE_IG]) {
     const { page, ctx } = await open({ ua }, NEW + '&lang=fr');

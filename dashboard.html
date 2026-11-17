@@ -1642,10 +1642,14 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       position: fixed; inset: 0; z-index: 500;
       background: rgba(0,0,0,0.75);
       display: none;
-      align-items: center; justify-content: center;
+      /* A step taller than the screen must scroll, top first (17 Nov 2026: at 375x553 the save button was
+         below the screen and unreachable). The modal centres itself with auto margins when there is room. */
+      align-items: flex-start; justify-content: center;
       padding: 24px;
+      overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     }
     .wiz-modal {
+      margin: auto;
       width: 100%; max-width: 520px;
       background: var(--panel);
       border: 1px solid var(--border);
