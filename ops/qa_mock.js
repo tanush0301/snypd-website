@@ -291,6 +291,11 @@
   };
 
   if (NO_HUNTS) { DB.user_searches = []; DB.user_claims = []; DB.xp_events = []; }
+  // ?firstsite=co.uk|com|fr|...: the Vinted site of the account's FIRST (oldest) hunt (plan card at the first find).
+  if (params.get('firstsite') && DB.user_searches.length) {
+    var fsOld = DB.user_searches.slice().sort(function (a, b) { return String(a.created_at).localeCompare(String(b.created_at)); })[0];
+    fsOld.vinted_url = String(fsOld.vinted_url).replace(/vinted\.[a-z.]+\//, 'vinted.' + params.get('firstsite').replace(/[^a-z.]/g, '') + '/');
+  }
   // ?badhunt=list|brands|long: the active hunt asks Vinted for several things at once (hunt words card, Session 70).
   // ?feed=empty: no listing in the feed (a precise search with nothing new), for the example listings test.
   if (params.get('feed') === 'empty') DB.current_ads = [];
@@ -584,6 +589,14 @@
           feedback_done: params.get('fb081') === '0' ? undefined : FB_DONE.slice(),
           // ?fbfind=<hours ago> = first find of the trial; ?fbactive=<n> = active days in the last 14 (migration 081 feedback_signals)
           feedback_signals: params.get('fb081') === '0' ? undefined : { first_find_at: params.get('fbfind') ? new Date(Date.now() - Number(params.get('fbfind')) * 36e5).toISOString() : null, active_days_14: Number(params.get('fbactive') || 0) } }, error: null });
+      }
+      // Trial statistics (migration 061 my_trial_stats): ?tfound=<n> = listings the trial hunt has matched so far.
+      // Without the parameter the RPC stays "not implemented", as before.
+      if (name === 'my_trial_stats' && params.get('tfound') !== null) {
+        var tu = DB.users[0] || {};
+        if (!tu.free_trial_started_at) return Promise.resolve({ data: null, error: null });
+        return Promise.resolve({ data: { trial_started_at: tu.free_trial_started_at, trial_ends_at: tu.trial_ends_at,
+          counted_since: tu.free_trial_started_at, found_trial: Number(params.get('tfound')) || 0, extended: false, paused: null }, error: null });
       }
       // Feedback questions (migration 081): ?fbdone=A,B1 seeds the answered ids; ?fb081=0 = migration not applied
       // (no feedback_done key, RPC missing, the page must show nothing); ?fbrpc=error makes the save fail.

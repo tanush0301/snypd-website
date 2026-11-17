@@ -1736,3 +1736,15 @@ FR.update({
 FR_PATTERNS += [
     (r'^"(.+)" sent you a lot of alerts in the last hour\.$', '"$1" t\'a envoyé beaucoup d\'alertes en une heure.'),
 ]
+# ===== Plan card at the first real find (17 Nov 2026): one recommended plan while the trial runs.
+for _k, _v in {
+    'Keep this hunt running after the trial': 'Garde cette recherche active après l’essai',
+    'Solo keeps one search running 24/7 with alerts, month by month. Or pay once: a Hunt Pass runs it for 30 days and then simply ends.':
+        'Solo garde une recherche active 24h/24 avec les alertes, mois après mois. Ou paie une seule fois' + NB + ': le Pass 30 jours la fait tourner 30 jours, puis s’arrête simplement.',
+    'A Hunt Pass runs one search 24/7 with alerts for 30 days and then simply ends: paid once, no subscription. Solo is the monthly plan.':
+        'Le Pass 30 jours fait tourner une recherche 24h/24 avec les alertes pendant 30 jours, puis s’arrête simplement' + NB + ': un seul paiement, sans abonnement. Solo est le plan mensuel.',
+    'Solo €5.99/month': 'Solo 5,99' + NB + '€/mois',
+    'Hunt Pass €3.99 once': 'Pass 30 jours 3,99' + NB + '€ en une fois',
+    'Not now': 'Pas maintenant',
+}.items():
+    FR.setdefault(_k, _v)
