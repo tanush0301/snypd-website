@@ -138,6 +138,12 @@
           : params.get('trial') === 'ending' ? new Date(now + 6 * 3600000).toISOString()
           : params.get('trial') === 'ended' ? new Date(now - 20 * 3600000).toISOString() : null,
         is_founding_member: true,
+        // ?pass=1: a running 30-day Hunt Pass (migration 063), 5 days left: never shown the keep-my-plan card.
+        pass_expires_at: params.get('pass') === '1' ? new Date(now + 5 * 864e5).toISOString() : null,
+        // Keep my plan (/account): ?keep=tech|cost|none|unused = Whop membership set to end on 7 Dec 2026; ?pass=1 = the Hunt Pass plan id.
+        whop_cancel_at_period_end: ['tech', 'cost', 'none', 'unused'].indexOf(params.get('keep')) !== -1,
+        current_period_end: (PLAN === 'elite' || params.get('active') === '1') ? '2026-12-07T00:36:00Z' : null,
+        whop_plan_id: params.get('pass') === '1' ? 'plan_zLbAN08OXSJYo' : ((PLAN === 'elite' || params.get('active') === '1') ? 'plan_test_' + PLAN : null),
         founding_number: 7,
         // ?bonus=1: referral bonus days running (3 days left); ?bonus=ended: they ended an hour ago (migration 085/090).
         referral_bonus_until: params.get('bonus') === '1' ? new Date(now + 3 * 86400000).toISOString()
@@ -669,6 +675,24 @@
     }
     if (u.indexOf('/api/v1/push/status') !== -1) {
       return Promise.resolve(new Response(JSON.stringify({ status: 'ready', ready: true }), { status: 200 }));
+    }
+    // Keep my plan (website outreach/62 move 6): ?keep=tech | cost | none | unused = the member's plan is set to end, with
+    // that Whop reason; else not cancelling. ?keepres=409 | 403 (answered 503 not_allowed) | 502 | net for the Keep tap.
+    if (u.indexOf('/api/v1/membership') !== -1) {
+      var kq = params.get('keep') || 'off', kr = params.get('keepres') || 'ok';
+      var kEnds = '2026-12-07T00:36:00Z';
+      if (opts && String(opts.method || 'GET').toUpperCase() === 'POST') {
+        window.__keepPosts = (window.__keepPosts || []).concat([{ url: u, auth: (opts.headers || {}).Authorization || null }]);
+        if (kr === 'net') return Promise.reject(new TypeError('Failed to fetch'));
+        if (kr === '409') return Promise.resolve(new Response(JSON.stringify({ detail: 'nothing_to_keep' }), { status: 409 }));
+        if (kr === '403') return Promise.resolve(new Response(JSON.stringify({ detail: 'not_allowed' }), { status: 503 }));
+        if (kr === '502') return Promise.resolve(new Response(JSON.stringify({ detail: 'could_not_keep' }), { status: 502 }));
+        return Promise.resolve(new Response(JSON.stringify({ ok: true, plan: PLAN, renews_at: kEnds }), { status: 200 }));
+      }
+      window.__keepRequests = (window.__keepRequests || 0) + 1;
+      var kReasons = { tech: 'technical_issues', cost: 'too_expensive', none: null, unused: 'unused' };
+      if (!(kq in kReasons)) return Promise.resolve(new Response(JSON.stringify({ cancelling: false }), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({ cancelling: true, plan: PLAN, ends_at: kEnds, reason: kReasons[kq], can_keep: true }), { status: 200 }));
     }
     if (u.indexOf('/api/v1/hunt-coach') !== -1) {
       window.__coachRequests = (window.__coachRequests || 0) + 1;
