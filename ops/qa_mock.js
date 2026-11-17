@@ -758,6 +758,29 @@
                        { condition: 'Other condition', finds: 35, status: 'ok', typical_cents: 2000, low_cents: 2000, high_cents: 2000, typical_change_pct: null }] },
         { id: 'h3', name: 'lego', site: 'vinted.pl', currency: 'PLN', finds: 0, finds_before: null, finds_change_pct: null, cheapest: null, conditions: [] }] }, hrBase)), { status: 200 }));
     }
+    // SNYPD AI chat (17 Nov 2026, POST /api/v1/market/chat). The text decides the answer: 'rising' = trend,
+    // 'mixq' = trend with a data mix, 'idk' = ideas, 'poem' = other, 'chatdown' = unavailable, 'chatlimit' = 429,
+    // 'broadq' = no price (too broad), 'notrend' = price with no_trend, 'usedup' = price checks used; else a price.
+    if (u.indexOf('/api/v1/market/chat') !== -1) {
+      var mcReq = {};
+      try { mcReq = JSON.parse(opts && opts.body || '{}'); } catch (e) {}
+      window.__mcRequests = (window.__mcRequests || []).concat([mcReq]);
+      var mcT = String(mcReq.text || '').toLowerCase();
+      var mcOut = function (o, st) { return Promise.resolve(new Response(JSON.stringify(o), { status: st || 200 })); };
+      if (mcT.indexOf('chatlimit') !== -1) return mcOut({ detail: 'Too many messages just now. Try again later.' }, 429);
+      if (mcT.indexOf('chatdown') !== -1) return mcOut({ available: false });
+      if (mcT.indexOf('poem') !== -1) return mcOut({ available: true, kind: 'other' });
+      if (mcT.indexOf('usedup') !== -1) return mcOut({ available: true, kind: 'limit', window: 'hour', limit: 20 });
+      if (mcT.indexOf('broadq') !== -1) return mcOut({ available: true, kind: 'no_price', item: 'nike', reason: 'too_broad', no_trend: false });
+      if (mcT.indexOf('idk') !== -1) return mcOut({ available: true, kind: 'ideas', priced: true, picked: { cat: null, budget: null }, options: [
+        { label: 'Palace hoodie', words: 'palace hoodie', listings: 106, days: 7, busy: false, max: 65, why: 'rising', cat: 'tops' },
+        { label: 'Levis 501', words: 'levis <i>501</i>', listings: 534, days: 7, busy: false, max: 22, why: 'popular', cat: 'trousers' }, null, { words: 5 }] });
+      if (mcT.indexOf('mixq') !== -1) return mcOut({ available: true, kind: 'trend', item: 'adidas samba og white', trend: { q: 'adidas samba og white', name: 'Adidas Samba OG White', signal: null, mix: true, change_pct: -17.1, typical_cents: 4000, listings: 180, cutting: false } });
+      if (mcT.indexOf('rising') !== -1) return mcOut({ available: true, kind: 'trend', item: 'carhartt jacket', trend: { q: 'carhartt jacket', name: 'Carhartt <b>jacket</b>', signal: 'rising', mix: false, change_pct: 12.4, typical_cents: 7995, listings: 1357, cutting: true } });
+      return mcOut({ available: true, kind: 'price', item: mcT.replace(/[^a-z0-9 ]/g, '').slice(0, 40), no_trend: mcT.indexOf('notrend') !== -1,
+        price: { verdict: 'ok', listings: 207, sellers: 198, provisional: false, compared_on: ['jordan', '4'], typical_cents: 8000, low_cents: 4500, high_cents: 13500 },
+        quota: { hour_remaining: 18, hour_limit: 20 }, source: { site: 'vinted.be', currency: 'EUR', window_days: 14 } });
+    }
     if (u.indexOf('/api/v1/market/snapshot') !== -1) {
       var body = {};
       try { body = JSON.parse(opts && opts.body || '{}'); } catch (e) {}
