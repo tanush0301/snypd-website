@@ -195,7 +195,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   };
   await ask('prodq obsidian');
   st = await page.evaluate(() => { const b = document.querySelector('#mr-result [data-mr-product]'); return b ? { t: b.innerText.replace(/\s+/g, ' ').trim(), n: b.querySelectorAll('[data-mr-variant]').length } : null; });
-  ok(st && /^Looks like: Air Jordan 1 Retro High OG "Obsidian"/.test(st.t), 'product name shown: ' + JSON.stringify(st));
+  ok(st && /^SNYPD AI Looks like: Air Jordan 1 Retro High OG "Obsidian"/.test(st.t), 'product name shown: ' + JSON.stringify(st));
   eq(st.n, 0, 'no variant buttons for a single product');
   ok(/suggested by AI, checked against our Vinted listings\. It can be wrong\./.test(st.t), 'AI note shown');
   ok(!/retail|sold/i.test(st.t), 'no retail figure, never "sold"');
@@ -203,15 +203,21 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   st = await page.evaluate(() => { const b = document.querySelector('#mr-result [data-mr-product]'); return {
     t: b.innerText.replace(/\s+/g, ' ').trim(), injected: b.querySelectorAll('b b').length,
     vs: [...b.querySelectorAll('[data-mr-variant]')].map(x => [x.getAttribute('data-mr-variant'), x.innerText.replace(/\s+/g, ' ').trim()]) }; });
-  ok(st.injected === 0 && st.t.includes('Nike Tech <b>Fleece</b>'), 'HTML in a product name is shown as text');
-  eq(st.vs, [['nike tech fleece jacket', 'Nike Tech Fleece Jacket 332 listings'], ['nike tech fleece hoodie', 'Nike Tech Fleece Hoodie 284 listings'],
+  ok(st.injected === 0 && /^SNYPD AI Several products match/.test(st.t) && !/Looks like/.test(st.t), 'several products: box title, no single name above a price for all of them: ' + st.t.slice(0, 80));
+  eq(st.vs, [['nike tech fleece jacket', 'Nike Tech Fleece Jacket 332 listings'], ['varq tech hoodie', 'Nike Tech Fleece Hoodie 284 listings'],
     ['nike tech fleece pants', 'Nike Tech Fleece Pants']], 'variants with our listing counts; malformed entry ignored');
   ok(/Several products match these words\. Pick one for a sharper price:/.test(st.t), 'choice line shown');
   await page.evaluate(() => { window.__mk.length = 0; });
-  await page.click('#mr-result [data-mr-variant="nike tech fleece hoodie"]');
+  await page.click('#mr-result [data-mr-variant="varq tech hoodie"]');
   await page.waitForFunction(() => window.__mk.length === 1 && !document.querySelector('#mr-result .mr-loading'), { timeout: 6000 });
-  eq(await page.evaluate(() => window.__mk[0]), { q: 'nike tech fleece hoodie', keep: [] }, 'tap on a variant re-runs the price check on it');
-  eq(await page.$eval('#mr-query', e => e.value), 'nike tech fleece hoodie', 'and updates the search box');
+  eq(await page.evaluate(() => window.__mk[0]), { q: 'varq tech hoodie', keep: [] }, 'tap on a variant re-runs the price check on it');
+  eq(await page.$eval('#mr-query', e => e.value), 'varq tech hoodie', 'and updates the search box');
+  await wait(300);
+  st = await page.evaluate(() => { const b = document.querySelector('#mr-result [data-mr-product]'); return b ? { t: b.innerText.replace(/\s+/g, ' ').trim(), injected: b.querySelectorAll('b b').length, n: b.querySelectorAll('[data-mr-variant]').length } : null; });
+  ok(st && st.n === 0 && !/Pick one/.test(st.t), 'after a pick: no second round of choices: ' + JSON.stringify(st));
+  ok(st && st.injected === 0 && st.t.includes('Looks like: Nike Tech <b>Fleece</b>'), 'after a pick the name is shown, HTML as text');
+  await ask('varq tech hoodie');
+  eq(await page.$$eval('#mr-result [data-mr-variant]', x => x.length), 3, 'the same search typed by hand still offers the choices');
   await ask('nike p6000 size 8');
   ok(!(await page.$('#mr-result [data-mr-product]')), 'no product block when the answer carries none');
   await page.close();
@@ -237,7 +243,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await ask('varq tech');
   await wait(500);
   txt = await page.$eval('#mr-result [data-mr-product]', e => e.innerText.replace(/\s+/g, ' '));
-  ok(/On dirait\s?:/.test(txt) && /Choisis-en un pour un prix plus précis/.test(txt) && /Il peut être faux\./.test(txt) && /332 annonces/.test(txt), 'French product block: ' + txt.slice(0, 200));
+  ok(/SNYPD AI/.test(txt) && !/On dirait/.test(txt) && /Choisis-en un pour un prix plus précis/.test(txt) && /Il peut être faux\./.test(txt) && /332 annonces/.test(txt), 'French product block: ' + txt.slice(0, 200));
   ok(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, '390 px: no horizontal overflow with the product block');
   await page.close();
 

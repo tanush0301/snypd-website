@@ -796,7 +796,7 @@
           source: { site: 'vinted.be', market: 'EU', currency: 'EUR', window_days: 14 },
           product: isVar ? { name: 'Nike Tech <b>Fleece</b>', kind: 'clothing', needs_choice: true, variants: [
             { name: 'Nike Tech Fleece Jacket', search: 'nike tech fleece jacket', listings: 332 },
-            { name: 'Nike Tech Fleece Hoodie', search: 'nike tech fleece hoodie', listings: 284 },
+            { name: 'Nike Tech Fleece Hoodie', search: 'varq tech hoodie', listings: 284 },
             { name: '', search: 'broken entry' },
             { name: 'Nike Tech Fleece Pants', search: 'nike tech fleece pants', listings: null }] }
             : { name: 'Air Jordan 1 Retro High OG "Obsidian"', kind: 'sneaker', needs_choice: false, variants: [] },
