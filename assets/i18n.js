@@ -876,6 +876,7 @@
 "The same listing never alerts you twice.":"La m\u00eame annonce ne te pr\u00e9vient jamais deux fois.",
 "The square with an arrow, in Safari's bar.":"Le carr\u00e9 avec une fl\u00e8che, dans la barre de Safari.",
 "The test could not be shown. Check this device\u2019s notification settings.":"Le test n\u2019a pas pu s\u2019afficher. V\u00e9rifie les r\u00e9glages de notification de cet appareil.",
+"Their prices are too far apart for one typical price. Open the full price check to see the range.":"Leurs prix sont trop \u00e9loign\u00e9s pour un seul prix typique. Ouvre la v\u00e9rification de prix compl\u00e8te pour voir la fourchette.",
 "These have sat in Holding for 45 days or more. Clearing them keeps your profit number honest - it doesn't affect your saved total or streak.":"Ils sont en stock depuis 45 jours ou plus. Les trier garde ton b\u00e9n\u00e9fice exact - \u00e7a ne change ni ton total \u00e9conomis\u00e9 ni ta s\u00e9rie.",
 "These words match too many different things for one price. Add a model name.":"Ces mots correspondent \u00e0 trop de choses diff\u00e9rentes pour un seul prix. Ajoute un nom de mod\u00e8le.",
 "This browser cannot deliver alerts. Chrome or Edge on desktop can, and so can SNYPD installed to a phone home screen.":"Ce navigateur ne peut pas recevoir d\u2019alertes. Chrome ou Edge sur ordinateur le peuvent, tout comme SNYPD install\u00e9 sur l\u2019\u00e9cran d\u2019accueil d\u2019un t\u00e9l\u00e9phone.",

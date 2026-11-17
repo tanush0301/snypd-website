@@ -1349,6 +1349,7 @@ FR.update({
     'Range:': 'Fourchette' + NB + ':',
     'Rough guide, few listings.': 'Indication approximative, peu d’annonces.',
     'These words match too many different things for one price. Add a model name.': 'Ces mots correspondent à trop de choses différentes pour un seul prix. Ajoute un nom de modèle.',
+    'Their prices are too far apart for one typical price. Open the full price check to see the range.': 'Leurs prix sont trop éloignés pour un seul prix typique. Ouvre la vérification de prix complète pour voir la fourchette.',
     'Not enough listings to give a price.': 'Pas assez d’annonces pour donner un prix.',
     'The listings changed too much to call a trend.': 'Les annonces ont trop changé pour parler de tendance.',
     'Price rising': 'Prix en hausse',

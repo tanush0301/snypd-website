@@ -795,6 +795,8 @@
       if (mcT.indexOf('chatdown') !== -1) return mcOut({ available: false });
       if (mcT.indexOf('poem') !== -1) return mcOut({ available: true, kind: 'other' });
       if (mcT.indexOf('usedup') !== -1) return mcOut({ available: true, kind: 'limit', window: 'hour', limit: 20 });
+      if (mcT.indexOf('spreadq') !== -1) return mcOut({ available: true, kind: 'price', item: 'jordan 4 military black', no_trend: false, price: { verdict: 'too_broad', listings: 209, sellers: 198, provisional: false, compared_on: ['jordan', '4'] } });
+      if (mcT.indexOf('hugeq') !== -1) return mcOut({ available: true, kind: 'price', item: 'nike', no_trend: false, price: { verdict: 'too_broad', listings: 28190, sellers: 20000, provisional: false, compared_on: ['nike'] } });
       if (mcT.indexOf('broadq') !== -1) return mcOut({ available: true, kind: 'no_price', item: 'nike', reason: 'too_broad', no_trend: false });
       if (mcT.indexOf('idk') !== -1) return mcOut({ available: true, kind: 'ideas', priced: true, picked: { cat: null, budget: null }, options: [
         { label: 'Palace hoodie', words: 'palace hoodie', listings: 106, days: 7, busy: false, max: 65, why: 'rising', cat: 'tops' },
