@@ -23,6 +23,7 @@
  *   al_on when alerts first came on | al_dev on which device
  *   card set-up card: shown < snooze < resume | vol broad/coach card: shown, or the last button (calm, apply, edit,
  *   keep, undo) | vol_k 'broad' or 'coach'
+ *   ig iPhone Home Screen guide: shown < share (the share sheet was opened from the guide)
  * Pure ASCII (dashboard.html carries a BOM and loads this file).
  */
 (function (root, factory) {
@@ -36,6 +37,8 @@
   var DEFAULT_FLOORS = [30, 25, 35, 130, 750, 350, 220, 12000, 150];
   var AL = { on: 1, denied: 1, ios: 1, unsup: 1, err: 1 };
   var CARD_RANK = { shown: 1, snooze: 2, resume: 3 };
+  // iPhone Home Screen guide: the furthest step reached (shown < share sheet opened from the guide).
+  var IG_RANK = { shown: 1, share: 2 };
   var VOL = { shown: 1, calm: 1, apply: 1, edit: 1, keep: 1, undo: 1 };
   var SRC = { quick: 1, sheet: 1 };
 
@@ -99,6 +102,7 @@
     if (patch.werr === 1) n.werr = Math.min(20, (Number(n.werr) || 0) + 1);
     if (patch.hw === 1) n.hw = Math.min(20, (Number(n.hw) || 0) + 1);
     if (patch.card && CARD_RANK[patch.card] && CARD_RANK[patch.card] > (CARD_RANK[n.card] || 0)) n.card = patch.card;
+    if (patch.ig && IG_RANK[patch.ig] && IG_RANK[patch.ig] > (IG_RANK[n.ig] || 0)) n.ig = patch.ig;
     if (patch.vol && VOL[patch.vol] && !(patch.vol === 'shown' && n.vol)) n.vol = patch.vol;
     if ((patch.vol_k === 'broad' || patch.vol_k === 'coach') && !n.vol_k) n.vol_k = patch.vol_k;
     return n;

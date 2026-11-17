@@ -1606,3 +1606,75 @@ FR_PATTERNS += [
     (r'^(\d+) of your searches have no max price and alert on every match: they can bring more alerts than anyone can open\.$',
      '$1 de tes recherches n’ont pas de prix max et alertent à chaque annonce' + NB + ': elles peuvent envoyer plus d’alertes que personne ne peut en ouvrir.'),
 ]
+
+# ===== Keep my plan (14 Nov 2026, website outreach/62 move 6): dashboard card for a member whose recurring plan is set
+# to end, and the "before Whop" step on /account. No pause, no discount.
+FR.update({
+    'If the alerts came too fast: Calm sends one summary every 15 minutes, and a max price cuts most matches.':
+        'Si les alertes arrivaient trop vite' + NB + ': le mode Calme envoie un résumé toutes les 15 minutes, et un prix max retire la plupart des annonces.',
+    'Calm all my searches': 'Tout passer en Calme',
+    'Something did not work? Write to help@snypd.store and we will look at it.':
+        'Quelque chose ne marchait pas' + NB + '? Écris à help@snypd.store et on regarde.',
+    'Need fewer searches? Solo is €5.99 a month for 1 search, Kickstart €14.99 for 2. Start one after this plan ends so you never pay twice.':
+        'Besoin de moins de recherches' + NB + '? Solo coûte 5,99' + NB + '€ par mois pour 1 recherche, Kickstart 14,99' + NB + '€ pour 2. Prends-le après la fin de ce plan pour ne jamais payer deux fois.',
+    'Compare plans': 'Comparer les plans',
+    'After that the Free plan applies: 1 search, checked only while this page is open.':
+        'Ensuite, le plan Free s’applique' + NB + ': 1 recherche, vérifiée seulement quand cette page est ouverte.',
+    'Keep your plan and nothing else changes.': 'Garde ton plan et rien d’autre ne change.',
+    'Your plan is no longer set to end.': 'Ton plan n’est plus programmé pour s’arrêter.',
+    'We could not change it from here. Write to help@snypd.store and we will do it for you.':
+        'Impossible de le changer d’ici. Écris à help@snypd.store et on le fait pour toi.',
+    'That did not work. Try again in a minute.': 'Ça n’a pas marché. Réessaie dans une minute.',
+    'Done: 1 search now sends one summary every 15 minutes.': 'C’est fait' + NB + ': 1 recherche envoie maintenant un résumé toutes les 15 minutes.',
+    'Could not change your searches. Try again.': 'Impossible de modifier tes recherches. Réessaie.',
+    'Not now': 'Pas maintenant',
+    'Close': 'Fermer',
+    'Ends on': 'Se termine le',
+    'Keep my plan': 'Garder mon plan',
+    'Change or cancel your plan': 'Changer ou résilier ton plan',
+    'Continue to Whop to change your payment method or cancel.': 'Continue vers Whop pour changer de moyen de paiement ou résilier.',
+    'Before you do:': 'Avant ça' + NB + ':',
+    'Too many alerts? Calm sends one summary every 15 minutes, and a max price cuts most matches.':
+        'Trop d’alertes' + NB + '? Le mode Calme envoie un résumé toutes les 15 minutes, et un prix max retire la plupart des annonces.',
+    'Open my searches': 'Ouvrir mes recherches',
+    'Need fewer searches? Solo is €5.99 a month for 1 search, Kickstart €14.99 for 2. Start the new plan after this one ends so you never pay twice.':
+        'Besoin de moins de recherches' + NB + '? Solo coûte 5,99' + NB + '€ par mois pour 1 recherche, Kickstart 14,99' + NB + '€ pour 2. Prends le nouveau plan après la fin de celui-ci pour ne jamais payer deux fois.',
+    'Something not working? Write to help@snypd.store and we will look at it.':
+        'Quelque chose ne marche pas' + NB + '? Écris à help@snypd.store et on regarde.',
+    'Continue to Whop': 'Continuer vers Whop',
+    'Back': 'Retour',
+})
+FR_PATTERNS += [
+    (r'^Your (Solo|Kickstart|Pro|Elite) ends on (.+)$', 'Ton $1 se termine le $2'),
+    (r'^Keep my (Solo|Kickstart|Pro|Elite)$', 'Garder mon $1'),
+    (r'^Your (Solo|Kickstart|Pro|Elite) stays on$', 'Ton $1 continue'),
+    (r'^It renews on (.+), as before\. Nothing else changed\.$', 'Il se renouvelle le $1, comme avant. Rien d’autre n’a changé.'),
+    (r'^Done: (\d+) searches now send one summary every 15 minutes\.$', 'C’est fait' + NB + ': $1 recherches envoient maintenant un résumé toutes les 15 minutes.'),
+    (r'^Your membership is set to cancel at period end\. Access ends on (.+)\.$',
+     'Ton abonnement s’arrête à la fin de la période. L’accès se termine le $1.'),
+    (r'^Your plan stays on\. It renews on (.+), as before\.$', 'Ton plan continue. Il se renouvelle le $1, comme avant.'),
+]
+
+# ===== iPhone Home Screen guide (17 Nov 2026): one sheet with drawn steps instead of a paragraph.
+FR.update({
+    'Get alerts on this iPhone': 'Reçois les alertes sur cet iPhone',
+    'About 1 minute': 'Environ 1 minute',
+    'Apple only allows alerts from SNYPD on your Home Screen. Your hunt keeps running in the meantime.':
+        'Apple n’autorise les alertes que depuis SNYPD sur ton écran d’accueil. Ta recherche continue de tourner en attendant.',
+    'First open this page in Safari.': 'Ouvre d’abord cette page dans Safari.',
+    "You are inside another app's browser, which cannot add SNYPD to your Home Screen. Tap the menu (… or the compass) at the top or bottom and choose Open in Safari or Open in browser.":
+        'Tu es dans le navigateur d’une autre app, qui ne peut pas ajouter SNYPD à ton écran d’accueil. Touche le menu (… ou la boussole) en haut ou en bas et choisis Ouvrir dans Safari ou Ouvrir dans le navigateur.',
+    '1. Tap Share.': '1. Touche Partager.',
+    "The square with an arrow, in Safari's bar.": 'Le carré avec une flèche, dans la barre de Safari.',
+    'The button below opens it for you.': 'Le bouton ci-dessous l’ouvre pour toi.',
+    '2. Scroll down and tap Add to Home Screen,': '2. Descends et touche Sur l’écran d’accueil,',
+    'then Add. If you see Open as Web App, leave it on.': 'puis Ajouter. Si tu vois Ouvrir comme app web, laisse-le activé.',
+    '3. Open SNYPD from the new icon': '3. Ouvre SNYPD depuis la nouvelle icône',
+    'and tap Enable alerts. It may ask you to sign in once more: use the same email.':
+        'et touche Activer les alertes. Elle peut te demander de te reconnecter' + NB + ': utilise le même e‑mail.',
+    'Later': 'Plus tard',
+    'Open the Share menu': 'Ouvrir le menu Partager',
+    'On iPhone, alerts need SNYPD on your Home Screen. Your hunt keeps running in the meantime.':
+        'Sur iPhone, les alertes demandent SNYPD sur ton écran d’accueil. Ta recherche continue de tourner en attendant.',
+    'Show the steps again': 'Revoir les étapes',
+})

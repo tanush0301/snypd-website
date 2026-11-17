@@ -1642,10 +1642,14 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
       position: fixed; inset: 0; z-index: 500;
       background: rgba(0,0,0,0.75);
       display: none;
-      align-items: center; justify-content: center;
+      /* A step taller than the screen must scroll, top first (17 Nov 2026: at 375x553 the save button was
+         below the screen and unreachable). The modal centres itself with auto margins when there is room. */
+      align-items: flex-start; justify-content: center;
       padding: 24px;
+      overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     }
     .wiz-modal {
+      margin: auto;
       width: 100%; max-width: 520px;
       background: var(--panel);
       border: 1px solid var(--border);
@@ -2094,6 +2098,41 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
      so a button for it would be fake. MARK SOLD hands off to the exact,
      already-tested History inline sale-form for this same item rather than
      duplicating that logic in a second place. -->
+<!-- iPhone Home Screen guide (17 Nov 2026). On iPhone, alerts only work from the installed Home Screen app.
+     The text-only instruction lost most people: 27 tapped "turn on alerts", 7 installed. One sheet with drawn
+     steps, opened from the wizard, the set-up card, the header button and the paid check. Logic: iosGuide(). -->
+<div class="wiz-overlay" id="ios-guide" style="display:none;align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)" role="dialog" aria-modal="true" aria-labelledby="ios-guide-title">
+  <div class="filter-sheet" data-sheet style="max-width:520px">
+    <div class="filter-sheet__handle"></div>
+    <div class="filter-sheet__header" style="gap:12px;align-items:flex-start">
+      <span class="filter-sheet__title" id="ios-guide-title">Get alerts on this iPhone</span>
+      <span class="filter-sheet__meta" style="flex-shrink:0;white-space:nowrap;padding-top:4px">About 1 minute</span>
+    </div>
+    <p class="wiz-sub" id="ios-guide-lead" style="margin:0">Apple only allows alerts from SNYPD on your Home Screen. Your hunt keeps running in the meantime.</p>
+    <div id="ios-guide-inapp" style="display:none;border:1px solid var(--border);padding:12px;font-size:13px;color:var(--text-primary);line-height:1.5">
+      <strong>First open this page in Safari.</strong> You are inside another app's browser, which cannot add SNYPD to your Home Screen. Tap the menu (&hellip; or the compass) at the top or bottom and choose Open in Safari or Open in browser.
+    </div>
+    <ol id="ios-guide-steps" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+      <li style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);padding:12px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--success)"><path d="M18 4v17"></path><path d="M12 10l6-6 6 6"></path><path d="M11 15H9a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V17a2 2 0 0 0-2-2h-2"></path></svg>
+        <div style="font-size:13px;line-height:1.45;color:var(--text-primary)"><strong>1. Tap Share.</strong> The square with an arrow, in Safari's bar. <span id="ios-guide-share-hint">The button below opens it for you.</span></div>
+      </li>
+      <li style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);padding:12px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--success)"><rect x="6" y="6" width="24" height="24" rx="5"></rect><path d="M18 12v12"></path><path d="M12 18h12"></path></svg>
+        <div style="font-size:13px;line-height:1.45;color:var(--text-primary)"><strong>2. Scroll down and tap Add to Home Screen,</strong> then Add. If you see Open as Web App, leave it on.</div>
+      </li>
+      <li style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);padding:12px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--success)"><rect x="6" y="6" width="24" height="24" rx="6"></rect><path d="M13 18.5l3.5 3.5L23 14"></path></svg>
+        <div style="font-size:13px;line-height:1.45;color:var(--text-primary)"><strong>3. Open SNYPD from the new icon</strong> and tap Enable alerts. It may ask you to sign in once more: use the same email.</div>
+      </li>
+    </ol>
+    <div class="filter-sheet__footer">
+      <button class="btn btn-ghost" id="ios-guide-later" type="button" style="flex:1">Later</button>
+      <button class="btn btn-prim" id="ios-guide-share" type="button" style="flex:2">Open the Share menu</button>
+    </div>
+  </div>
+</div>
+
 <div class="wiz-overlay" id="claim-receipt-overlay" style="align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)">
   <div class="filter-sheet" data-sheet style="max-width:520px">
     <div class="filter-sheet__handle"></div>
@@ -2197,6 +2236,21 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 </div>
 <!-- Paying customer's first days (14 Nov 2026, website outreach/62 move 2): searches running, alerts on the phone, alert
      volume. Shown for 72 h after the plan went live on this device, until Done. Logic: paintPaidCheck(). -->
+<!-- Keep my plan (14 Nov 2026, website outreach/62 move 6): a member whose recurring plan is set to end (they cancelled
+     in Whop) sees this before the end date. Data: GET /api/v1/membership; Keep: POST /api/v1/membership/keep (the backend
+     asks Whop to undo the scheduled cancel, on the member's own tap only). No pause, no discount. Logic: keepCheck(). -->
+<div class="elite-banner" id="keep-plan" style="display:none" aria-labelledby="keep-plan-title">
+  <div>
+    <div class="elite-banner__title" id="keep-plan-title"></div>
+    <div class="elite-banner__text" id="keep-plan-text"></div>
+    <div class="elite-banner__text" id="keep-plan-note" role="status" style="display:none"></div>
+  </div>
+  <div class="email-optin__actions">
+    <button class="btn btn-prim" id="keep-plan-keep" type="button"></button>
+    <button class="btn btn-ghost" id="keep-plan-help" type="button" style="display:none"></button>
+    <button class="btn btn-ghost" id="keep-plan-later" type="button">Not now</button>
+  </div>
+</div>
 <div class="elite-banner" id="paid-check" style="display:none" aria-labelledby="paid-check-title">
   <div>
     <div class="elite-banner__title" id="paid-check-title">Your plan is live: three quick checks</div>
@@ -3039,6 +3093,8 @@ const HEARTBEAT_URL = (() => {
   // effectivePlan already degrades a lapsed paid plan to 'free', which is the
   // behaviour wanted here too.
   document.body.dataset.plan = effectivePlan;
+  // Hunt Pass holders (one-time, nothing renews) never see the keep-my-plan card (website outreach/62 move 6).
+  document.body.dataset.pass = (effectivePlan === 'solo' && Date.parse(profile.pass_expires_at || '') > Date.now()) ? '1' : '';
   // Trial price checks (11 Nov 2026): a running trial may use the Market tab's price check (10 in total, counted
   // by the backend). Set before the event so the panel sees it when the plan arrives. Presentation only.
   // Referral bonus days (migration 085/090) count like a running trial here: the backend already treats them so.
@@ -4489,6 +4545,17 @@ const HEARTBEAT_URL = (() => {
           enableBtn.disabled = false;
 
           if (res && res.ok) { overlay.style.display = 'none'; return; }
+
+          // iPhone without the Home Screen app: show the drawn steps, not a paragraph and a
+          // "Try again" that can only repeat it (17 Nov 2026).
+          if (res && res.state === 'ios-install' && window.SNYPD && typeof window.SNYPD.openIosGuide === 'function' && window.SNYPD.openIosGuide()) {
+            if (resultEl) {
+              resultEl.textContent = 'On iPhone, alerts need SNYPD on your Home Screen. Your hunt keeps running in the meantime.';
+              resultEl.style.display = 'block';
+            }
+            enableBtn.textContent = 'Show the steps again';
+            return;
+          }
 
           // Stay open. Closing here is what told 48 of 49 accounts that
           // alerts were on when they were not.
@@ -6628,6 +6695,7 @@ const HEARTBEAT_URL = (() => {
         } else if (act === 'test') {
           if (window.SNYPD && typeof window.SNYPD.testDevice === 'function') window.SNYPD.testDevice();
         } else if (act === 'guide') {
+          if (window.SNYPD && typeof window.SNYPD.openIosGuide === 'function' && window.SNYPD.openIosGuide()) return;
           const g = document.getElementById('alerts-guide-link');
           location.href = (g && g.getAttribute('href')) || '/vinted-alerts-on-your-phone';
         } else if (act === 'alerts') {
@@ -6645,6 +6713,172 @@ const HEARTBEAT_URL = (() => {
     window.SNYPD.paintPaidCheck = paintPaidCheck;
     window.SNYPD.paidCheckActive = paidCheckActive;
     if (paidCheckActive()) setTimeout(() => { paintPaidCheck().catch(err => console.error('SNYPD: paid check failed', err)); }, 1200);
+  })();
+  // Keep my plan (14 Nov 2026, website outreach/62 move 6). On 14 Nov three subscribers were set to leave (one item found;
+  // "too expensive"; an alert flood on a computer only). A member whose recurring plan is set to end sees one card before
+  // the end date: when it ends, what the Free plan means after that, one fix that matches the reason they gave Whop, and
+  // "Keep my <plan>" (the backend asks Whop to undo the scheduled cancel; price, plan and access stay as they are). No
+  // pause and no discount (founder, 14 Nov). "Not now" hides it for 3 days on this device. The account's own record
+  // (user_metadata.kp) counts days shown, the fix used, "Not now" taps and the outcome.
+  const KEEP_API = 'https://api.snypd.store/api/v1/membership';
+  const KEEP_NAMES = { solo: 'Solo', kickstart: 'Kickstart', pro: 'Pro', elite: 'Elite' };
+  const KEEP_LATER_KEY = 'snypd_keep_later', KEEP_LATER_MS = 3 * 864e5, KEEP_SEEN_KEY = 'snypd_keep_seen';
+  let keepShown = null, keepStarted = false;
+  function keepEl(id) { return document.getElementById(id); }
+  function keepDate(iso) {
+    const fr = !!(window.SNYPD_I18N && SNYPD_I18N.lang === 'fr');
+    try { return new Intl.DateTimeFormat(fr ? 'fr-FR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(iso)).replace(/\.$/, ''); }
+    catch (e) { return String(iso || '').slice(0, 10); }
+  }
+  async function keepToken() {
+    const { data: { session: s } } = await sb.auth.getSession();
+    return s && s.access_token;
+  }
+  async function keepRecord(change) {
+    try {
+      const u = await sb.auth.getUser();
+      const meta = (u && u.data && u.data.user && u.data.user.user_metadata) || {};
+      const prev = (meta.kp && typeof meta.kp === 'object') ? meta.kp : {};
+      await sb.auth.updateUser({ data: { kp: Object.assign({}, prev, change(prev)) } });
+    } catch (e) {}
+  }
+  function keepText(lines) {
+    const box = keepEl('keep-plan-text');
+    if (box) box.innerHTML = lines.map(t => '<span>' + String(t).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])) + '</span>').join(' ');
+  }
+  function keepNote(t) {
+    const n = keepEl('keep-plan-note');
+    if (!n) return;
+    n.textContent = t || '';
+    n.style.display = t ? '' : 'none';
+  }
+  function keepPaint(s) {
+    const card = keepEl('keep-plan');
+    if (!card) return;
+    const name = KEEP_NAMES[s.plan];
+    keepEl('keep-plan-title').textContent = 'Your ' + name + ' ends on ' + keepDate(s.ends_at);
+    const help = keepEl('keep-plan-help');
+    help.style.display = 'none'; help.dataset.act = ''; help.disabled = false;
+    const lines = [];
+    if (s.reason === 'technical_issues' || s.reason === 'bad_experience') {
+      if (s.every > 0) {
+        lines.push('If the alerts came too fast: Calm sends one summary every 15 minutes, and a max price cuts most matches.');
+        help.textContent = 'Calm all my searches'; help.dataset.act = 'calm'; help.style.display = '';
+      } else lines.push('Something did not work? Write to help@snypd.store and we will look at it.');
+    } else if (s.reason === 'too_expensive' && s.plan !== 'solo') {
+      lines.push('Need fewer searches? Solo is \u20ac5.99 a month for 1 search, Kickstart \u20ac14.99 for 2. Start one after this plan ends so you never pay twice.');
+      help.textContent = 'Compare plans'; help.dataset.act = 'plans'; help.style.display = '';
+    }
+    lines.push('After that the Free plan applies: 1 search, checked only while this page is open.');
+    lines.push('Keep your plan and nothing else changes.');
+    keepText(lines);
+    keepNote('');
+    const keep = keepEl('keep-plan-keep');
+    keep.textContent = 'Keep my ' + name; keep.style.display = ''; keep.disabled = false;
+    const later = keepEl('keep-plan-later');
+    later.textContent = 'Not now'; later.dataset.act = 'later'; later.style.display = '';
+    card.style.display = '';
+  }
+  async function keepCheck() {
+    const plan = String(document.body.dataset.plan || 'free');
+    if (keepStarted || !KEEP_NAMES[plan] || document.body.dataset.pass === '1') return;
+    keepStarted = true;
+    try {
+      const l = JSON.parse(localStorage.getItem(KEEP_LATER_KEY) || 'null');
+      if (l && Date.now() - Number(l.t) < KEEP_LATER_MS) return;
+    } catch (e) {}
+    let s = null;
+    try {
+      const t = await keepToken();
+      if (!t) return;
+      const res = await fetch(KEEP_API, { headers: { Authorization: 'Bearer ' + t } });
+      if (!res.ok) return;
+      s = await res.json();
+    } catch (e) { return; }
+    if (!s || s.cancelling !== true || !KEEP_NAMES[s.plan] || !s.ends_at) return;
+    let every = 0;
+    if (s.reason === 'technical_issues' || s.reason === 'bad_experience') {
+      try {
+        const r = await sb.from('user_searches').select('id, is_active, push_mode').eq('user_id', uid);
+        every = (r && !r.error && Array.isArray(r.data)) ? r.data.filter(h => h.is_active === true && (h.push_mode || 'every') === 'every').length : 0;
+      } catch (e) { every = 0; }
+    }
+    keepShown = Object.assign({}, s, { every: every });
+    keepPaint(keepShown);
+    let day = '';
+    try { day = new Date().toISOString().slice(0, 10); if (localStorage.getItem(KEEP_SEEN_KEY) === day) day = ''; else localStorage.setItem(KEEP_SEEN_KEY, day); } catch (e) { day = ''; }
+    if (day) keepRecord(p => ({ n: (Number(p.n) || 0) + 1, f: p.f || new Date().toISOString(), r: s.reason || 'none', e: s.ends_at }));
+  }
+  async function keepNow(btn) {
+    const s = keepShown;
+    if (!s) return;
+    btn.disabled = true;
+    keepNote('');
+    let res = null, body = null;
+    try {
+      const t = await keepToken();
+      res = await fetch(KEEP_API + '/keep', { method: 'POST', headers: { Authorization: 'Bearer ' + t } });
+      try { body = await res.json(); } catch (e) { body = null; }
+    } catch (e) { res = null; }
+    const name = KEEP_NAMES[s.plan];
+    if (res && res.ok && body && body.ok === true) {
+      keepEl('keep-plan-title').textContent = 'Your ' + name + ' stays on';
+      keepText(['It renews on ' + keepDate(body.renews_at || s.ends_at) + ', as before. Nothing else changed.']);
+      btn.style.display = 'none';
+      keepEl('keep-plan-help').style.display = 'none';
+      const later = keepEl('keep-plan-later');
+      later.textContent = 'Close'; later.dataset.act = 'close';
+      keepRecord(() => ({ k: new Date().toISOString() }));
+      return;
+    }
+    const code = res ? res.status : 0, detail = body && body.detail;
+    if (code === 409) { keepNote('Your plan is no longer set to end.'); btn.style.display = 'none'; }
+    else if (code === 503 && detail === 'not_allowed') { keepNote('We could not change it from here. Write to help@snypd.store and we will do it for you.'); btn.style.display = 'none'; }
+    else { keepNote('That did not work. Try again in a minute.'); btn.disabled = false; }
+    keepRecord(() => ({ x: String(code || 'net') + (detail ? ':' + String(detail).slice(0, 20) : '') }));
+  }
+  async function keepCalm(btn) {
+    btn.disabled = true;
+    let ok = false, n = 0;
+    try {
+      const r = await sb.from('user_searches').update({ push_mode: 'calm', push_calm_minutes: 15 })
+        .eq('user_id', uid).eq('is_active', true).eq('push_mode', 'every').select('id');
+      ok = !!(r && !r.error);
+      n = (r && Array.isArray(r.data)) ? r.data.length : 0;
+    } catch (e) { ok = false; }
+    if (ok) {
+      keepNote(n === 1 ? 'Done: 1 search now sends one summary every 15 minutes.' : 'Done: ' + n + ' searches now send one summary every 15 minutes.');
+      btn.style.display = 'none';
+      try { window.dispatchEvent(new Event('snypd:hunts-changed')); } catch (e) {}
+    } else { keepNote('Could not change your searches. Try again.'); btn.disabled = false; }
+    keepRecord(() => ({ h: ok ? 'calm' : 'calm_failed' }));
+  }
+  (function wireKeepPlan() {
+    const card = keepEl('keep-plan');
+    if (!card) return;
+    card.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b || b.disabled) return;
+      if (b.id === 'keep-plan-keep') { keepNow(b); return; }
+      const act = b.dataset.act;
+      if (act === 'calm') { keepCalm(b); return; }
+      if (act === 'plans') {
+        b.disabled = true;
+        Promise.race([keepRecord(() => ({ h: 'plans' })), new Promise(r => setTimeout(r, 800))]).then(() => { location.href = '/plans?from=keep'; });
+        return;
+      }
+      if (act === 'later') {
+        try { localStorage.setItem(KEEP_LATER_KEY, JSON.stringify({ t: Date.now(), e: keepShown && keepShown.ends_at })); } catch (er) {}
+        card.style.display = 'none';
+        keepRecord(p => ({ l: (Number(p.l) || 0) + 1 }));
+        return;
+      }
+      if (act === 'close') card.style.display = 'none';
+    });
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.keepCheck = keepCheck;
+    if (document.body.dataset.plan) setTimeout(() => { keepCheck().catch(() => {}); }, 900);
+    document.addEventListener('snypd:plan', () => { setTimeout(() => { keepCheck().catch(() => {}); }, 900); });
   })();
   // Referral, "plan is live" (migration 085): once, on the load right after the activation poller
   // confirmed a paid plan. The marker is cleared before anything else so a reload never shows it again.
@@ -7965,12 +8199,58 @@ const HEARTBEAT_URL = (() => {
   // land there). On iPhone it cannot add SNYPD to the Home Screen; on Android it
   // has no push. Tell people to open the page in Safari or Chrome instead.
   function isInAppBrowser() {
-    return /Instagram|FBAN|FBAV|FB_IAB/.test(navigator.userAgent);
+    return /Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Snapchat|GSA\/|LinkedInApp|Pinterest|Line\//.test(navigator.userAgent);
   }
   function isStandalone() {
     return window.navigator.standalone === true
       || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   }
+
+  // iPhone Home Screen guide (17 Nov 2026): one sheet with drawn steps instead of a paragraph.
+  // Opened from the wizard, the set-up card, the header button and the paid check.
+  function iosGuideTrack(step) {
+    try { if (window.SNYPD && typeof window.SNYPD.fs === 'function') window.SNYPD.fs({ ig: step }); } catch (e) {}
+  }
+  function openIosGuide() {
+    var sheet = document.getElementById('ios-guide');
+    if (!sheet) { return false; }
+    var inApp = isInAppBrowser();
+    var note = document.getElementById('ios-guide-inapp');
+    var steps = document.getElementById('ios-guide-steps');
+    var share = document.getElementById('ios-guide-share');
+    if (note) { note.style.display = inApp ? '' : 'none'; }
+    if (steps) { steps.style.opacity = inApp ? '0.55' : ''; }
+    // Inside another app's browser the share sheet has no Add to Home Screen: do not offer it.
+    if (share) { share.style.display = (inApp || !navigator.share) ? 'none' : ''; }
+    var hint = document.getElementById('ios-guide-share-hint');
+    if (hint) { hint.style.display = (inApp || !navigator.share) ? 'none' : ''; }
+    sheet.style.display = 'flex';
+    iosGuideTrack('shown');
+    return true;
+  }
+  function closeIosGuide() {
+    var sheet = document.getElementById('ios-guide');
+    if (sheet) { sheet.style.display = 'none'; }
+  }
+  (function wireIosGuide() {
+    var sheet = document.getElementById('ios-guide');
+    if (!sheet) { return; }
+    var later = document.getElementById('ios-guide-later');
+    var share = document.getElementById('ios-guide-share');
+    if (later) { later.addEventListener('click', closeIosGuide); }
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) { closeIosGuide(); } });
+    if (share) {
+      share.addEventListener('click', async function () {
+        iosGuideTrack('share');
+        if (!navigator.share) { return; }
+        try {
+          await navigator.share({ title: 'SNYPD', url: location.origin + '/dashboard' });
+        } catch (e) { /* cancelled: the steps stay on screen */ }
+      });
+    }
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.openIosGuide = openIosGuide;
+  })();
 
   function urlBase64ToUint8Array(base64String) {
     var padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -8220,6 +8500,7 @@ const HEARTBEAT_URL = (() => {
       // the native share sheet this opens includes it as an option on iOS -
       // this gets the user most of the way there instead of leaving the tap
       // do nothing.
+      if (openIosGuide()) { return; }
       if (navigator.share) {
         try {
           await navigator.share({ title: 'SNYPD', text: 'Add SNYPD to your Home Screen to get alerts.', url: location.href });
