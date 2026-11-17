@@ -92,6 +92,8 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     await page.click('#wiz-mode-next'); await wait(1200);
     ok(await vis(page, '#wiz-step-2'), 'alerts step shown');
     if (enable) { await page.click('#wiz-enable-alerts'); await wait(3200); }
+    // iPhone without the Home Screen app: the drawn guide (17 Nov 2026) opens on top; close it as a person would.
+    if (await vis(page, '#ios-guide')) { await page.click('#ios-guide-later'); await wait(400); }
     if (later && await vis(page, '#wiz-finish')) { await page.click('#wiz-finish'); await wait(400); }
     await wait(3600);                                             // the tracker's quiet period
   }
@@ -143,6 +145,21 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     const last = (await sent(page)).pop();
     eq([last.dev, last.al, last.al1, last.al_try, last.later], ['android', 'denied', 'denied', 1, 1], 'a refusal is recorded as a refusal');
     eq([last.max, last.min, last.werr], [1, 'none', undefined], 'the price limit and the cleared minimum are recorded, no form refusal');
+    await ctx.close();
+  }
+
+  // ---- 3b. A typed minimum above the maximum is still refused, and the refusal is counted ----------------------
+  {
+    const { page, ctx } = await open({ ua: ANDROID, vp: PHONE, grant: 'granted' }, NEW);
+    await page.$eval('#wiz-q-min', e => { e.value = '50'; e.dispatchEvent(new Event('input', { bubbles: true })); });
+    await page.type('#wiz-q-words', 'levis 501');
+    await page.type('#wiz-q-max', '20');
+    await page.click('#wiz-q-save'); await wait(1200);
+    ok(await vis(page, '#wiz-q-err'), 'a typed minimum above the maximum is refused');
+    ok(await vis(page, '#wiz-step-1'), 'the wizard stays on step 1');
+    await wait(3600);
+    const last = (await sent(page)).pop();
+    eq([last && last.werr, last && last.max], [1, undefined], 'the refusal is counted once, no hunt recorded');
     await ctx.close();
   }
 

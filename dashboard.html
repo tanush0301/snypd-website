@@ -2094,6 +2094,41 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
      so a button for it would be fake. MARK SOLD hands off to the exact,
      already-tested History inline sale-form for this same item rather than
      duplicating that logic in a second place. -->
+<!-- iPhone Home Screen guide (17 Nov 2026). On iPhone, alerts only work from the installed Home Screen app.
+     The text-only instruction lost most people: 27 tapped "turn on alerts", 7 installed. One sheet with drawn
+     steps, opened from the wizard, the set-up card, the header button and the paid check. Logic: iosGuide(). -->
+<div class="wiz-overlay" id="ios-guide" style="display:none;align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)" role="dialog" aria-modal="true" aria-labelledby="ios-guide-title">
+  <div class="filter-sheet" data-sheet style="max-width:520px">
+    <div class="filter-sheet__handle"></div>
+    <div class="filter-sheet__header" style="gap:12px;align-items:flex-start">
+      <span class="filter-sheet__title" id="ios-guide-title">Get alerts on this iPhone</span>
+      <span class="filter-sheet__meta" style="flex-shrink:0;white-space:nowrap;padding-top:4px">About 1 minute</span>
+    </div>
+    <p class="wiz-sub" id="ios-guide-lead" style="margin:0">Apple only allows alerts from SNYPD on your Home Screen. Your hunt keeps running in the meantime.</p>
+    <div id="ios-guide-inapp" style="display:none;border:1px solid var(--border);padding:12px;font-size:13px;color:var(--text-primary);line-height:1.5">
+      <strong>First open this page in Safari.</strong> You are inside another app's browser, which cannot add SNYPD to your Home Screen. Tap the menu (&hellip; or the compass) at the top or bottom and choose Open in Safari or Open in browser.
+    </div>
+    <ol id="ios-guide-steps" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+      <li style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);padding:12px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--success)"><path d="M18 4v17"></path><path d="M12 10l6-6 6 6"></path><path d="M11 15H9a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V17a2 2 0 0 0-2-2h-2"></path></svg>
+        <div style="font-size:13px;line-height:1.45;color:var(--text-primary)"><strong>1. Tap Share.</strong> The square with an arrow, in Safari's bar. <span id="ios-guide-share-hint">The button below opens it for you.</span></div>
+      </li>
+      <li style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);padding:12px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--success)"><rect x="6" y="6" width="24" height="24" rx="5"></rect><path d="M18 12v12"></path><path d="M12 18h12"></path></svg>
+        <div style="font-size:13px;line-height:1.45;color:var(--text-primary)"><strong>2. Scroll down and tap Add to Home Screen,</strong> then Add. If you see Open as Web App, leave it on.</div>
+      </li>
+      <li style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);padding:12px">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--success)"><rect x="6" y="6" width="24" height="24" rx="6"></rect><path d="M13 18.5l3.5 3.5L23 14"></path></svg>
+        <div style="font-size:13px;line-height:1.45;color:var(--text-primary)"><strong>3. Open SNYPD from the new icon</strong> and tap Enable alerts. It may ask you to sign in once more: use the same email.</div>
+      </li>
+    </ol>
+    <div class="filter-sheet__footer">
+      <button class="btn btn-ghost" id="ios-guide-later" type="button" style="flex:1">Later</button>
+      <button class="btn btn-prim" id="ios-guide-share" type="button" style="flex:2">Open the Share menu</button>
+    </div>
+  </div>
+</div>
+
 <div class="wiz-overlay" id="claim-receipt-overlay" style="align-items:flex-end;justify-content:stretch;padding:0;background:rgba(8,9,10,0.62)">
   <div class="filter-sheet" data-sheet style="max-width:520px">
     <div class="filter-sheet__handle"></div>
@@ -4507,6 +4542,17 @@ const HEARTBEAT_URL = (() => {
 
           if (res && res.ok) { overlay.style.display = 'none'; return; }
 
+          // iPhone without the Home Screen app: show the drawn steps, not a paragraph and a
+          // "Try again" that can only repeat it (17 Nov 2026).
+          if (res && res.state === 'ios-install' && window.SNYPD && typeof window.SNYPD.openIosGuide === 'function' && window.SNYPD.openIosGuide()) {
+            if (resultEl) {
+              resultEl.textContent = 'On iPhone, alerts need SNYPD on your Home Screen. Your hunt keeps running in the meantime.';
+              resultEl.style.display = 'block';
+            }
+            enableBtn.textContent = 'Show the steps again';
+            return;
+          }
+
           // Stay open. Closing here is what told 48 of 49 accounts that
           // alerts were on when they were not.
           if (resultEl) {
@@ -6645,6 +6691,7 @@ const HEARTBEAT_URL = (() => {
         } else if (act === 'test') {
           if (window.SNYPD && typeof window.SNYPD.testDevice === 'function') window.SNYPD.testDevice();
         } else if (act === 'guide') {
+          if (window.SNYPD && typeof window.SNYPD.openIosGuide === 'function' && window.SNYPD.openIosGuide()) return;
           const g = document.getElementById('alerts-guide-link');
           location.href = (g && g.getAttribute('href')) || '/vinted-alerts-on-your-phone';
         } else if (act === 'alerts') {
@@ -8148,12 +8195,58 @@ const HEARTBEAT_URL = (() => {
   // land there). On iPhone it cannot add SNYPD to the Home Screen; on Android it
   // has no push. Tell people to open the page in Safari or Chrome instead.
   function isInAppBrowser() {
-    return /Instagram|FBAN|FBAV|FB_IAB/.test(navigator.userAgent);
+    return /Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Snapchat|GSA\/|LinkedInApp|Pinterest|Line\//.test(navigator.userAgent);
   }
   function isStandalone() {
     return window.navigator.standalone === true
       || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   }
+
+  // iPhone Home Screen guide (17 Nov 2026): one sheet with drawn steps instead of a paragraph.
+  // Opened from the wizard, the set-up card, the header button and the paid check.
+  function iosGuideTrack(step) {
+    try { if (window.SNYPD && typeof window.SNYPD.fs === 'function') window.SNYPD.fs({ ig: step }); } catch (e) {}
+  }
+  function openIosGuide() {
+    var sheet = document.getElementById('ios-guide');
+    if (!sheet) { return false; }
+    var inApp = isInAppBrowser();
+    var note = document.getElementById('ios-guide-inapp');
+    var steps = document.getElementById('ios-guide-steps');
+    var share = document.getElementById('ios-guide-share');
+    if (note) { note.style.display = inApp ? '' : 'none'; }
+    if (steps) { steps.style.opacity = inApp ? '0.55' : ''; }
+    // Inside another app's browser the share sheet has no Add to Home Screen: do not offer it.
+    if (share) { share.style.display = (inApp || !navigator.share) ? 'none' : ''; }
+    var hint = document.getElementById('ios-guide-share-hint');
+    if (hint) { hint.style.display = (inApp || !navigator.share) ? 'none' : ''; }
+    sheet.style.display = 'flex';
+    iosGuideTrack('shown');
+    return true;
+  }
+  function closeIosGuide() {
+    var sheet = document.getElementById('ios-guide');
+    if (sheet) { sheet.style.display = 'none'; }
+  }
+  (function wireIosGuide() {
+    var sheet = document.getElementById('ios-guide');
+    if (!sheet) { return; }
+    var later = document.getElementById('ios-guide-later');
+    var share = document.getElementById('ios-guide-share');
+    if (later) { later.addEventListener('click', closeIosGuide); }
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) { closeIosGuide(); } });
+    if (share) {
+      share.addEventListener('click', async function () {
+        iosGuideTrack('share');
+        if (!navigator.share) { return; }
+        try {
+          await navigator.share({ title: 'SNYPD', url: location.origin + '/dashboard' });
+        } catch (e) { /* cancelled: the steps stay on screen */ }
+      });
+    }
+    window.SNYPD = window.SNYPD || {};
+    window.SNYPD.openIosGuide = openIosGuide;
+  })();
 
   function urlBase64ToUint8Array(base64String) {
     var padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -8403,6 +8496,7 @@ const HEARTBEAT_URL = (() => {
       // the native share sheet this opens includes it as an option on iOS -
       // this gets the user most of the way there instead of leaving the tap
       // do nothing.
+      if (openIosGuide()) { return; }
       if (navigator.share) {
         try {
           await navigator.share({ title: 'SNYPD', text: 'Add SNYPD to your Home Screen to get alerts.', url: location.href });
