@@ -92,6 +92,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(!s.lines.some(l => /^Cheaper than 58%/.test(l)), 'the euro line replaces the percentage line on that card');
   eq(s.lines.filter(l => /under this hunt's usual price/.test(l)).length, 1, 'rows without a usual price keep the percentage sentence');
   eq(s.locks, 0, 'no lock chips on a paid plan');
+  eq(await page.evaluate(() => getComputedStyle(document.querySelector('#list > .card[data-pr] .pr-line'), '::before').content), '"SNYPD AI"', 'the rating line carries the SNYPD AI tag');
   eq(s.cheapBorders, 2, 'the two cards in the cheapest quarter (82, 80) get the mint border');
   ok(s.gone.length >= 1 && s.gone.every(x => x === false), 'a gone listing never shows a rating');
   ok(desc(s.uploaded), 'default order = newest first (upload time)');
