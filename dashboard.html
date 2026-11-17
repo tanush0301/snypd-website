@@ -2230,6 +2230,9 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
     <div class="elite-banner__title">Paid plans hunt while you're away</div>
     <div class="elite-banner__text">Free only checks while this tab is open. Paid plans keep hunting 24/7, tab closed or not.</div>
     <div class="elite-banner__value" id="trial-value" style="display:none"></div>
+    <!-- Plan card at the first real find (17 Nov 2026): one recommended plan while the trial runs, led by the first
+         hunt's Vinted site (UK/US: Solo first; everyone else: Hunt Pass first). Logic: paintFirstFindPlan(). -->
+    <div class="trial-recap" id="first-find-plan" style="display:none"></div>
     <div class="trial-recap" id="trial-recap" style="display:none"></div>
   </div>
   <a class="btn btn-prim" href="/plans">See plans</a>
@@ -3260,6 +3263,50 @@ const HEARTBEAT_URL = (() => {
       }
     }
     if (line && !window.SNYPD_ACTIVATING) { el.textContent = line; el.style.display = ''; }
+    if (Date.now() < end && found >= 1) paintFirstFindPlan(end).catch(console.error);
+  }
+  // Plan card at the first real find (17 Nov 2026). Half of the buyers so far paid within hours of their first
+  // hunt, and nothing offered a plan between sign-up and the trial-end summary. One recommended plan, the other one
+  // tap away: UK/US first hunts see Solo first, everyone else the Hunt Pass (who pays today: UK+US 6 of 78,
+  // France 2 of 312). Not shown next to the sign-up plan prompt, in the trial-end summary window (last 24 h), or
+  // after "Not now" on this device.
+  async function paintFirstFindPlan(endMs) {
+    const box = document.getElementById('first-find-plan');
+    if (!box || !eliteBanner || effectivePlan !== 'free') return;
+    if (window.SNYPD_ACTIVATING || window.SNYPD_PLAN_PROMPT) return;
+    if (!(Date.now() < endMs - 864e5)) return;
+    let no = false;
+    try { no = !!localStorage.getItem('snypd_ffp_no'); } catch (e) {}
+    if (no) return;
+    let url = '';
+    try {
+      const r = await sb.from('user_searches').select('vinted_url, created_at').eq('user_id', uid).order('created_at', { ascending: true }).limit(1);
+      if (!r.error && r.data && r.data[0]) url = String(r.data[0].vinted_url || '');
+    } catch (e) { console.error('SNYPD: first hunt read failed', e); }
+    if (!url || window.SNYPD_ACTIVATING || window.SNYPD_PLAN_PROMPT) return;
+    const soloFirst = /\/\/(www\.)?vinted\.(co\.uk|com)\//.test(url);
+    const sp = t => '<span>' + t + '</span>';
+    const solo = (cls) => '<a class="btn ' + cls + '" data-ffp="solo" href="/plans?checkout=solo">' + sp('Solo &euro;5.99/month') + '</a>';
+    const pass = (cls) => '<a class="btn ' + cls + '" data-ffp="pass" href="/plans?checkout=pass">' + sp('Hunt Pass &euro;3.99 once') + '</a>';
+    box.setAttribute('data-lead', soloFirst ? 'solo' : 'pass');
+    box.innerHTML = '<div class="trial-recap__k">' + sp('Keep this hunt running after the trial') + '</div>'
+      + '<div class="trial-recap__t">' + sp(soloFirst
+        ? 'Solo keeps one search running 24/7 with alerts, month by month. Or pay once: a Hunt Pass runs it for 30 days and then simply ends.'
+        : 'A Hunt Pass runs one search 24/7 with alerts for 30 days and then simply ends: paid once, no subscription. Solo is the monthly plan.') + '</div>'
+      + '<div class="trial-recap__a">' + (soloFirst ? solo('btn-prim') + pass('btn-ghost') : pass('btn-prim') + solo('btn-ghost'))
+      + '<button class="btn btn-tertiary" id="first-find-plan-no" type="button">' + sp('Not now') + '</button></div>';
+    box.style.display = '';
+    eliteBanner.style.display = '';
+    // One main button at a time: the banner's own "See plans" goes quiet while the card shows.
+    const seePlans = eliteBanner.querySelector(':scope > a.btn');
+    const quiet = on => { if (seePlans) { seePlans.classList.toggle('btn-prim', !on); seePlans.classList.toggle('btn-ghost', on); } };
+    quiet(true);
+    const nb = document.getElementById('first-find-plan-no');
+    if (nb) nb.addEventListener('click', () => {
+      try { localStorage.setItem('snypd_ffp_no', String(Date.now())); } catch (e) {}
+      box.style.display = 'none';
+      quiet(false);
+    });
   }
   paintTrialValue().catch(console.error);
 
