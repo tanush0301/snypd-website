@@ -1606,3 +1606,27 @@ FR_PATTERNS += [
     (r'^(\d+) of your searches have no max price and alert on every match: they can bring more alerts than anyone can open\.$',
      '$1 de tes recherches n’ont pas de prix max et alertent à chaque annonce' + NB + ': elles peuvent envoyer plus d’alertes que personne ne peut en ouvrir.'),
 ]
+
+# ===== iPhone Home Screen guide (17 Nov 2026): one sheet with drawn steps instead of a paragraph.
+FR.update({
+    'Get alerts on this iPhone': 'Reçois les alertes sur cet iPhone',
+    'About 1 minute': 'Environ 1 minute',
+    'Apple only allows alerts from SNYPD on your Home Screen. Your hunt keeps running in the meantime.':
+        'Apple n’autorise les alertes que depuis SNYPD sur ton écran d’accueil. Ta recherche continue de tourner en attendant.',
+    'First open this page in Safari.': 'Ouvre d’abord cette page dans Safari.',
+    "You are inside another app's browser, which cannot add SNYPD to your Home Screen. Tap the menu (… or the compass) at the top or bottom and choose Open in Safari or Open in browser.":
+        'Tu es dans le navigateur d’une autre app, qui ne peut pas ajouter SNYPD à ton écran d’accueil. Touche le menu (… ou la boussole) en haut ou en bas et choisis Ouvrir dans Safari ou Ouvrir dans le navigateur.',
+    '1. Tap Share.': '1. Touche Partager.',
+    "The square with an arrow, in Safari's bar.": 'Le carré avec une flèche, dans la barre de Safari.',
+    'The button below opens it for you.': 'Le bouton ci-dessous l’ouvre pour toi.',
+    '2. Scroll down and tap Add to Home Screen,': '2. Descends et touche Sur l’écran d’accueil,',
+    'then Add. If you see Open as Web App, leave it on.': 'puis Ajouter. Si tu vois Ouvrir comme app web, laisse-le activé.',
+    '3. Open SNYPD from the new icon': '3. Ouvre SNYPD depuis la nouvelle icône',
+    'and tap Enable alerts. It may ask you to sign in once more: use the same email.':
+        'et touche Activer les alertes. Elle peut te demander de te reconnecter' + NB + ': utilise le même e‑mail.',
+    'Later': 'Plus tard',
+    'Open the Share menu': 'Ouvrir le menu Partager',
+    'On iPhone, alerts need SNYPD on your Home Screen. Your hunt keeps running in the meantime.':
+        'Sur iPhone, les alertes demandent SNYPD sur ton écran d’accueil. Ta recherche continue de tourner en attendant.',
+    'Show the steps again': 'Revoir les étapes',
+})
