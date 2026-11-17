@@ -683,6 +683,24 @@
       try { aiReq = JSON.parse(opts && opts.body || '{}'); } catch (e) {}
       window.__aiRequests = (window.__aiRequests || []).concat([aiReq]);
       var aiText = String(aiReq.text || '').toLowerCase();
+      // Ideas (17 Nov 2026): the text 'ideas' / 'idk ...' / 'im not sure' / 'help me find', or a picked type or budget.
+      // 'ideasdown' = board unavailable. Options depend on the picked type and budget so the follow-ups can be tested.
+      if (aiText.indexOf('ideasdown') !== -1) return Promise.resolve(new Response(JSON.stringify({ available: false, options: [] }), { status: 200 }));
+      if (aiReq.cat || aiReq.budget || /^(ideas|idk|im not sure|help me find)/.test(aiText)) {
+        var ideaAll = [
+          { label: 'Palace hoodie', label_fr: 'Sweat Palace', words: 'palace hoodie', listings: 106, days: 7, busy: false, max: 65, why: 'rising', cat: 'tops' },
+          { label: 'New Balance 990', label_fr: 'New Balance 990', words: 'new balance 990', listings: 157, days: 7, busy: false, max: 100, why: 'rising', cat: 'sneakers' },
+          { label: 'Asics Gel-Kayano', label_fr: 'Asics Gel-Kayano', words: 'asics gel <i>kayano</i>', listings: 2055, days: 7, busy: false, max: 50, why: 'popular', cat: 'sneakers' },
+          { label: 'Levis 501', label_fr: 'Levis 501', words: 'levis 501', listings: 534, days: 7, busy: false, max: 22, why: 'popular', cat: 'trousers' }];
+        var ideaPriced = ['vinted.co.uk', 'vinted.com', 'vinted.pl'].indexOf(String(aiReq.site || '')) === -1;
+        var ideaOut = ideaAll.filter(function (o) { return (!aiReq.cat || o.cat === aiReq.cat) && (!ideaPriced || !aiReq.budget || o.max <= aiReq.budget); })
+          .map(function (o) { return ideaPriced ? o : Object.assign({}, o, { max: null }); });
+        return Promise.resolve(new Response(JSON.stringify({ available: true, kind: 'ideas', options: ideaOut, priced: ideaPriced,
+          followups: { cats: [{ key: 'sneakers', label: 'Sneakers', label_fr: 'Baskets' }, { key: 'tops', label: 'Tops & knitwear', label_fr: 'Hauts et pulls' },
+            { key: 'trousers', label: 'Trousers', label_fr: 'Pantalons' }, null, { key: 5 }], budgets: ideaPriced ? [25, 50, 100] : [] },
+          picked: { cat: aiReq.cat || null, budget: aiReq.budget || null },
+          source: { site: 'vinted.be', currency: 'EUR', window_days: 7, asof: '2026-11-17' } }), { status: 200 }));
+      }
       if (aiText.indexOf('ailimit') !== -1) return Promise.resolve(new Response(JSON.stringify({ detail: 'You have used the SNYPD AI 10 times this hour.' }), { status: 429 }));
       if (aiText.indexOf('aidown') !== -1) return Promise.resolve(new Response(JSON.stringify({ available: false, options: [] }), { status: 200 }));
       if (aiText.indexOf('nomatch') !== -1) return Promise.resolve(new Response(JSON.stringify({ available: true, options: [], priced: true }), { status: 200 }));

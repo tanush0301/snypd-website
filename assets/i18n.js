@@ -324,6 +324,7 @@
 "Free stops when you close the tab.":"Free s\u2019arr\u00eate quand tu fermes l\u2019onglet.",
 "Free to start. No card needed.":"Gratuit pour commencer. Sans carte.",
 "Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.":"Free\u00a0: 24h/24 pendant les 3 premiers jours apr\u00e8s ta premi\u00e8re recherche enregistr\u00e9e, puis seulement tant que ton tableau de bord est ouvert.",
+"From our own Vinted listings, not an AI guess. Asking prices, not sold prices.":"D\u2019apr\u00e8s nos propres annonces Vinted, pas une supposition d\u2019IA. Prix demand\u00e9s, pas les prix r\u00e9ellement pay\u00e9s.",
 "Full list of cookies":"Liste compl\u00e8te des cookies",
 "GET HUNT PASS":"PRENDRE LE PASS 30 JOURS",
 "Germany":"Allemagne",
@@ -373,6 +374,7 @@
 "I have a Vinted link":"J\u2019ai un lien Vinted",
 "I have read that, let me in":"J\u2019ai lu, je continue",
 "INCLUDED IN YOUR PLAN":"INCLUS DANS TON PLAN",
+"Ideas from Vinted right now. Pick one, it fills in the search.":"Des id\u00e9es sur Vinted en ce moment. Choisis-en une, elle remplit la recherche.",
 "Idle":"Inactif",
 "If SNYPD didn't exist, how would you find these items?":"Si SNYPD n\u2019existait pas, comment trouverais-tu ces articles\u00a0?",
 "If an account exists for":"Si un compte existe pour",
@@ -460,6 +462,7 @@
 "NO":"NON",
 "NO SUBSCRIPTION":"SANS ABONNEMENT",
 "Name \u2014 e.g. Ralph Lauren shirts":"Nom \u2014 ex. chemises Ralph Lauren",
+"Narrow it down:":"Pr\u00e9cise\u00a0:",
 "Need to change your plan or payment method?":"Besoin de changer de plan ou de moyen de paiement\u00a0?",
 "Netherlands":"Pays-Bas",
 "Never asks for your Vinted password - never logs into your account - only reads public listings.":"Ne demande jamais ton mot de passe Vinted - ne se connecte jamais \u00e0 ton compte - lit uniquement les annonces publiques.",
@@ -485,6 +488,7 @@
 "No find in the cheapest 25% right now.":"Aucune trouvaille dans les 25\u00a0% les moins ch\u00e8res pour l\u2019instant.",
 "No hunts yet":"Aucune recherche pour l\u2019instant",
 "No hunts yet. Add one below.":"Aucune recherche pour l\u2019instant. Ajoutes-en une ci-dessous.",
+"No idea fits that. Try another type or a higher budget.":"Aucune id\u00e9e ne correspond. Essaie un autre type ou un budget plus \u00e9lev\u00e9.",
 "No listings matching":"Aucune annonce pour",
 "No minimum set. Most Vinted items under about EUR30 are fast fashion, not resale stock.":"Aucun minimum. La plupart des articles Vinted \u00e0 moins d\u2019environ 30 EUR sont de la fast fashion, pas du stock \u00e0 revendre.",
 "No new listings this week yet.":"Pas encore de nouvelle annonce cette semaine.",
@@ -731,6 +735,7 @@
 "Show":"Afficher",
 "Show fewer":"Voir moins",
 "Show me how":"Me montrer comment",
+"Show me ideas":"Montre-moi des id\u00e9es",
 "Show more":"Voir plus",
 "Show password":"Afficher le mot de passe",
 "Show plan":"Voir le plan",
@@ -1036,6 +1041,7 @@
 "or less":"ou moins",
 "or paste a Vinted search link":"ou colle un lien de recherche Vinted",
 "or the":"ou la",
+"price rising":"prix en hausse",
 "sellers, but they run from":"vendeurs, mais elles vont de",
 "sellers.":"vendeurs.",
 "size":"taille",
@@ -1723,6 +1729,14 @@
 [
 "^(\\d+) listings in 14 days$",
 "$1 annonces en 14 jours"
+],
+[
+"^(\\d+) listings in 7 days$",
+"$1 annonces en 7 jours"
+],
+[
+"^Under \u20ac(\\d+)$",
+"Moins de $1\u00a0\u20ac"
 ],
 [
 "^max \u20ac(\\d+)$",

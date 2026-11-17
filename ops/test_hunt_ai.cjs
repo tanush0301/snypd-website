@@ -147,6 +147,74 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), '390 px: no sideways scroll with the options open');
   await page.close();
 
+  // ---- 6. Ideas for a vague ask (17 Nov 2026): button, options from our data, type + budget choices, pick, fallbacks
+  page = await open('plan=free&hunts=0');
+  const last = async p => { const r = await reqs(p); return r[r.length - 1]; };
+  const picks = p => p.$$eval('#wiz-q-ai [data-ai-pick]', bs => bs.map(b => b.innerText.replace(/\s+/g, ' ').trim()));
+  const tap = async (p, sel) => { await p.$eval(sel, e => e.click()); await wait(500); };
+  const siteSet = await page.evaluate(() => { const s = document.getElementById('wiz-q-site'); const before = s.value; const o = [...s.options].find(x => /vinted\.(be|fr|nl|de)$/.test(x.value)); if (o) { s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true })); } return { before, now: s.value, all: [...s.options].map(x => x.value).slice(0, 6) }; });
+  ok(/vinted\.(be|fr|nl|de)$/.test(siteSet.now), 'wizard set to a euro Vinted site for the ideas checks: ' + JSON.stringify(siteSet));
+  ok(await page.$('#wiz-q-ai [data-ai-ideas]'), 'home view has a "Show me ideas" button');
+  await tap(page, '#wiz-q-ai [data-ai-ideas]');
+  let rq = await last(page);
+  ok(rq && rq.text === 'ideas' && !rq.cat && !rq.budget, 'ideas button sends text "ideas": ' + JSON.stringify(rq));
+  let pk = await picks(page);
+  eq(pk.length, 4, 'four ideas shown');
+  const euroSite = /max €65/.test(pk[0]);
+  ok(euroSite, 'euro site: the idea carries a max price: ' + pk[0]);
+  ok(/^palace hoodie 106 listings in 7 days/.test(pk[0]) && /price rising$/.test(pk[0]), 'idea line: words, our count, rising: ' + pk[0]);
+  ok(pk[2].includes('asics gel <i>kayano</i>') && (await page.$$eval('#wiz-q-ai [data-ai-pick] i', x => x.length)) === 0, 'HTML in an idea is shown as text');
+  ok(!/price rising/.test(pk[2]), 'a popular idea carries no rising tag');
+  t = await text(page, '#wiz-q-ai');
+  ok(/Ideas from Vinted right now/.test(t) && /Narrow it down:/.test(t) && /From our own Vinted listings, not an AI guess\. Asking prices, not sold prices\./.test(t), 'ideas view text: ' + t.slice(0, 120));
+  eq(await page.$$eval('#wiz-q-ai [data-ai-cat]', b => b.map(x => x.innerText.trim().toLowerCase())), ['sneakers', 'tops & knitwear', 'trousers'], 'type choices; malformed entries ignored');
+  if (euroSite) {
+    eq(await page.$$eval('#wiz-q-ai [data-ai-budget]', b => b.map(x => x.innerText.trim().toLowerCase())), ['under €25', 'under €50', 'under €100'], 'budget choices');
+    await tap(page, '#wiz-q-ai [data-ai-cat="sneakers"]');
+    rq = await last(page);
+    ok(rq.cat === 'sneakers' && !rq.budget, 'type tap asks with that type: ' + JSON.stringify(rq));
+    eq((await picks(page)).length, 2, 'two sneaker ideas');
+    ok(await page.$eval('#wiz-q-ai [data-ai-cat="sneakers"]', e => e.classList.contains('on')), 'picked type is marked');
+    await tap(page, '#wiz-q-ai [data-ai-budget="50"]');
+    rq = await last(page);
+    ok(rq.cat === 'sneakers' && rq.budget === 50, 'budget tap keeps the type: ' + JSON.stringify(rq));
+    pk = await picks(page);
+    ok(pk.length === 1 && /^asics gel/.test(pk[0]), 'type + budget narrows to one: ' + pk.join(' / '));
+    await tap(page, '#wiz-q-ai [data-ai-cat="sneakers"]');
+    rq = await last(page);
+    ok(!rq.cat && rq.budget === 50, 'tapping the picked type again clears it: ' + JSON.stringify(rq));
+    await tap(page, '#wiz-q-ai [data-ai-budget="25"]');
+    await tap(page, '#wiz-q-ai [data-ai-cat="tops"]');
+    t = await text(page, '#wiz-q-ai');
+    ok((await picks(page)).length === 0 && /No idea fits that\. Try another type or a higher budget\./.test(t) && (await page.$$('#wiz-q-ai [data-ai-cat]')).length === 3, 'nothing fits: says so and keeps the choices');
+    await tap(page, '#wiz-q-ai [data-ai-budget="25"]');
+    rq = await last(page);
+    ok(rq.cat === 'tops' && !rq.budget, 'tapping the picked budget again clears it: ' + JSON.stringify(rq));
+    await page.click('#wiz-q-ai [data-ai-pick="0"]'); await wait(300);
+    eq([await val(page, '#wiz-q-words'), await val(page, '#wiz-q-max')], ['palace hoodie', '65'], 'an idea pick fills words + max');
+  } else {
+    await page.click('#wiz-q-ai [data-ai-pick="0"]'); await wait(300);
+    eq(await val(page, '#wiz-q-words'), 'palace hoodie', 'an idea pick fills the words (non-euro site: no max)');
+  }
+  eq((await hunts(page)).length, 0, 'an idea pick saves nothing by itself');
+  await tap(page, '#wiz-q-ai [data-ai-back]');
+  await describe(page, '#wiz-q-ai', 'idk what to resell');
+  eq((await picks(page)).length, 4, 'a vague sentence gets ideas, not "No clear match"');
+  ok(!/No clear match/.test(await text(page, '#wiz-q-ai')), 'no "No clear match" for a vague ask');
+  await tap(page, '#wiz-q-ai [data-ai-back]');
+  await describe(page, '#wiz-q-ai', 'ideasdown');
+  ok(/not available right now/.test(await text(page, '#wiz-q-ai')), 'ideas unavailable: plain message, form still usable');
+  await page.close();
+
+  page = await open('plan=free&hunts=0&lang=fr', PHONE);
+  await wait(500);
+  ok(/Montre-moi des idées/i.test(await text(page, '#wiz-q-ai')), 'French ideas button');
+  await tap(page, '#wiz-q-ai [data-ai-ideas]');
+  t = await text(page, '#wiz-q-ai');
+  ok(/Des idées sur Vinted en ce moment/.test(t) && /106 annonces en 7 jours/.test(t) && /prix en hausse/.test(t) && /Baskets/i.test(t) && /Précise/.test(t) && !/prix de vente/.test(t), 'French ideas view: ' + t.slice(0, 200));
+  ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), '390 px: no sideways scroll with the ideas open');
+  await page.close();
+
   await browser.close(); server.close();
   eq(errors, [], 'no page errors');
   console.log('PASS: ' + passed + ' SNYPD AI hunt-helper checks.');
