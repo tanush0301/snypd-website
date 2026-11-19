@@ -7817,9 +7817,20 @@ const HEARTBEAT_URL = (() => {
       // account with no rows yet is "nothing found", never "Vinted is down".
       let vintedStale = false;
       if (running) {
-        const lastFetched = feed.newestFetchedAt ? Date.parse(feed.newestFetchedAt) : NaN;
-        if (Number.isFinite(lastFetched)) {
-          vintedStale = (Date.now() - lastFetched) > VINTED_STALE_MIN * 60 * 1000;
+        const limitMs = VINTED_STALE_MIN * 60 * 1000;
+        if (hbKnowsChecks) {
+          // 19 Nov 2026: the heartbeat says when Vinted last answered one of this
+          // account's searches. A precise search that simply has nothing new is
+          // "checked, nothing new", never "can't reach Vinted". Stale only when
+          // searches are being checked and none got an answer for 15 minutes.
+          if (hbLastOkMs != null) vintedStale = (Date.now() - hbLastOkMs) > limitMs;
+          else if (hbNoAnswerSinceMs != null) vintedStale = (Date.now() - hbNoAnswerSinceMs) > limitMs;
+        } else {
+          // Heartbeat without that field (older backend, or it failed): the old rule.
+          const lastFetched = feed.newestFetchedAt ? Date.parse(feed.newestFetchedAt) : NaN;
+          if (Number.isFinite(lastFetched)) {
+            vintedStale = (Date.now() - lastFetched) > limitMs;
+          }
         }
       }
       setSyncState(vintedStale ? 'vinted_unreachable' : 'ok');
@@ -7932,6 +7943,23 @@ const HEARTBEAT_URL = (() => {
   const STOP_URL = HEARTBEAT_URL.replace(/\/heartbeat$/i, '/stop');
 
   let heartbeatMisses = 0;
+  // From the heartbeat answer (19 Nov 2026): when Vinted last answered one of this
+  // account's searches, on this device's clock. See the vintedStale rule in loadAds.
+  let hbKnowsChecks = false;      // the backend sent the "searches" field
+  let hbLastOkMs = null;          // last successful check
+  let hbNoAnswerSinceMs = null;   // searches are checked but none has an answer yet, since
+  function noteHeartbeatAnswer(j) {
+    if (!j || typeof j.searches !== 'number') { hbKnowsChecks = false; return; }
+    hbKnowsChecks = true;
+    if (typeof j.last_ok === 'number' && typeof j.now === 'number') {
+      hbLastOkMs = Date.now() - Math.max(0, j.now - j.last_ok) * 1000;
+      hbNoAnswerSinceMs = null;
+    } else {
+      hbLastOkMs = null;
+      if (j.searches > 0) { if (hbNoAnswerSinceMs == null) hbNoAnswerSinceMs = Date.now(); }
+      else hbNoAnswerSinceMs = null;
+    }
+  }
 
   async function sendHeartbeat() {
     try {
@@ -7942,6 +7970,7 @@ const HEARTBEAT_URL = (() => {
       });
       if (!response.ok) throw new Error(`Heartbeat HTTP ${response.status}`);
       heartbeatMisses = 0;
+      try { noteHeartbeatAnswer(await response.json()); } catch (e2) { hbKnowsChecks = false; }
     } catch (e) {
       console.error(e);
       heartbeatMisses++;
