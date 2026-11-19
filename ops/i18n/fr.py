@@ -241,6 +241,9 @@ FR = {
     'Got it': 'Compris',
     'No results yet. Press “Start Sniping Now”.': 'Aucun résultat pour l’instant. Appuie sur «' + NB + 'Démarrer' + NB + '».',
     'No results yet. Sniping is running…': 'Aucun résultat pour l’instant. La recherche tourne…',
+    'Already on Vinted for your search': 'Déjà sur Vinted pour ta recherche',
+    'Older listings, shown so you can see what your search finds. New listings appear here as soon as they are posted. Only new ones send an alert.':
+        'Des annonces plus anciennes, pour te montrer ce que trouve ta recherche. Les nouvelles annonces apparaissent ici dès leur mise en ligne. Seules les nouvelles déclenchent une alerte.',
     'A hunt is one saved Vinted search. SNYPD checks it every 1 to 5 minutes and every new match lands here, newest first.':
         'Une recherche SNYPD, c’est une recherche Vinted enregistrée. SNYPD la vérifie toutes les 1 à 5 minutes et chaque nouvelle annonce arrive ici, la plus récente en premier.',
     'Add your first hunt': 'Ajoute ta première recherche',
