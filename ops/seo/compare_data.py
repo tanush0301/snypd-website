@@ -49,6 +49,8 @@ WITHDRAW14 = L('14-day withdrawal, minus what you used', 'Rétractation 14 jours
 NO = L('No', 'Non', 'Nein', 'Nee', 'No', 'No')
 DASH = L('&mdash;', '&mdash;', '&mdash;', '&mdash;', '&mdash;', '&mdash;')
 FREE = L('Free', 'Gratuit', 'Kostenlos', 'Gratis', 'Gratis', 'Gratis')
+# Rows read later than COMPARE_CHECKED carry their own date next to the tool's name.
+CHECKED_NOV = L('read 19 Nov 2026', 'lu le 19 nov. 2026', 'gelesen am 19. Nov. 2026', 'gelezen op 19 nov. 2026', 'letto il 19 nov. 2026', 'leído el 19 nov. 2026')
 
 HEAD = {
     'en': ['TOOL', 'WHAT IT DOES', 'PRICE DATA', 'NEEDS YOUR VINTED ACCOUNT', 'ALERTS ARRIVE', 'REFUND', 'PER MONTH', 'FREE OPTION'],
@@ -195,6 +197,52 @@ COMPETITORS = [
         money_range('25', None, note=L(' <small>(&euro;8/week, &euro;180/year)</small>', ' <small>(8&nbsp;&euro;/sem., 180&nbsp;&euro;/an)</small>', ' <small>(8&nbsp;&euro;/Woche, 180&nbsp;&euro;/Jahr)</small>',
                                         ' <small>(&euro;&nbsp;8/week, &euro;&nbsp;180/jaar)</small>', ' <small>(8&nbsp;&euro;/sett., 180&nbsp;&euro;/anno)</small>', ' <small>(8&nbsp;&euro;/sem., 180&nbsp;&euro;/año)</small>')),
         L('7-day trial with a code', 'Essai 7 jours avec un code', '7 Tage Test mit Code', '7 dagen proef met een code', 'Prova di 7 giorni con un codice', 'Prueba de 7 días con un código')]},
+    # --- Added 19 Nov 2026: each row read on that day on the vendor's own site ('checked' is shown next to the name,
+    # because the page says the other rows were checked on COMPARE_CHECKED). Redrip is a seller tool: not listed.
+    # vtdbot.com/uk
+    {'name': 'VTD BOT', 'url': 'https://www.vtdbot.com/uk', 'kind': 'monitor', 'checked': CHECKED_NOV, 'cells': [
+        L('Alerts + value estimates', 'Alertes + estimations de valeur', 'Benachrichtigungen + Wertschätzungen', 'Meldingen + waardeschattingen',
+          'Notifiche + stime di valore', 'Alertas + estimaciones de valor'),
+        L('Estimated market value and net margin', 'Valeur de marché estimée et marge nette', 'Geschätzter Marktwert und Nettomarge', 'Geschatte marktwaarde en nettomarge',
+          'Valore di mercato stimato e margine netto', 'Valor de mercado estimado y margen neto'),
+        L('No: it says it never connects to your Vinted account', 'Non : il indique ne jamais se connecter à ton compte Vinted', 'Nein: laut Anbieter keine Verbindung zu deinem Vinted-Konto',
+          'Nee: het zegt nooit met je Vinted-account te verbinden', 'No: dichiara di non collegarsi mai al tuo account Vinted', 'No: indica que nunca se conecta a tu cuenta de Vinted'),
+        L('Push, sound or email', 'Push, son ou e-mail', 'Push, Ton oder E-Mail', 'Push, geluid of e-mail', 'Push, suono o e-mail', 'Push, sonido o e-mail'),
+        NS, money_range('8', '33', cur='gbp'),
+        L('None stated', 'Aucune indiquée', 'Keine angegeben', 'Geen vermeld', 'Nessuna indicata', 'Ninguna indicada')]},
+    # pouncio.com
+    {'name': 'Pouncio', 'url': 'https://pouncio.com/', 'kind': 'autobuy', 'checked': CHECKED_NOV, 'cells': [
+        ALERTS_AUTOBUY,
+        L('Says its price index is built from sold listings', 'Indique un indice de prix basé sur des annonces vendues', 'Nennt einen Preisindex aus verkauften Anzeigen',
+          'Noemt een prijsindex op basis van verkochte advertenties', 'Dichiara un indice dei prezzi basato su annunci venduti', 'Indica un índice de precios basado en anuncios vendidos'),
+        L('Yes: you log in to Vinted and it keeps an encrypted session', 'Oui : tu te connectes à Vinted et il garde une session chiffrée', 'Ja: du meldest dich bei Vinted an, es speichert eine verschlüsselte Sitzung',
+          'Ja: je logt in bij Vinted en het bewaart een versleutelde sessie', 'Sì: accedi a Vinted e conserva una sessione cifrata', 'Sí: inicias sesión en Vinted y guarda una sesión cifrada'),
+        L('Telegram, Discord, email, app', 'Telegram, Discord, e-mail, app', 'Telegram, Discord, E-Mail, App', 'Telegram, Discord, e-mail, app', 'Telegram, Discord, e-mail, app', 'Telegram, Discord, e-mail, app'),
+        L('First month, if no deal with &euro;50+ profit in 30 days', 'Premier mois, si aucune affaire à 50&nbsp;&euro; de marge ou plus en 30 jours', 'Erster Monat, wenn in 30 Tagen kein Deal mit 50&nbsp;&euro;+ Gewinn',
+          'Eerste maand, als er in 30 dagen geen deal met &euro;&nbsp;50+ winst is', 'Primo mese, se in 30 giorni nessun affare con 50&nbsp;&euro;+ di margine', 'Primer mes, si en 30 días no hay oferta con 50&nbsp;&euro;+ de beneficio'),
+        money_range('49.99', '129.99'),
+        L('1 Vinted account, 1 bot, alerts', '1 compte Vinted, 1 bot, alertes', '1 Vinted-Konto, 1 Bot, Benachrichtigungen', '1 Vinted-account, 1 bot, meldingen',
+          '1 account Vinted, 1 bot, notifiche', '1 cuenta de Vinted, 1 bot, alertas')]},
+    # kops.gg/pricing
+    {'name': 'Kops', 'url': 'https://kops.gg/pricing', 'kind': 'autobuy', 'checked': CHECKED_NOV, 'cells': [
+        L('Live feed + autobuy', 'Flux en direct + achat automatique', 'Live-Feed + Autobuy', 'Live feed + autobuy', 'Feed in diretta + acquisto automatico', 'Feed en directo + compra automática'),
+        L('Resale price estimator', 'Estimateur de prix de revente', 'Schätzer für den Wiederverkaufspreis', 'Schatter voor doorverkoopprijs', 'Stimatore del prezzo di rivendita', 'Estimador de precio de reventa'),
+        L('Plans list 0, 10 or 50 Vinted accounts', 'Les offres indiquent 0, 10 ou 50 comptes Vinted', 'Tarife nennen 0, 10 oder 50 Vinted-Konten', 'Abonnementen noemen 0, 10 of 50 Vinted-accounts',
+          'I piani indicano 0, 10 o 50 account Vinted', 'Los planes indican 0, 10 o 50 cuentas de Vinted'),
+        NS, NS,  # the pricing page covers cancelling, not refunds
+        money_range('9.99', '79.99'),
+        L('3-day trial on Starter, card required', 'Essai 3 jours sur Starter, carte requise', '3 Tage Test bei Starter, Karte nötig', '3 dagen proef bij Starter, kaart vereist',
+          'Prova di 3 giorni con Starter, carta richiesta', 'Prueba de 3 días en Starter, con tarjeta')]},
+    # fyndit.app
+    {'name': 'Fyndit', 'url': 'https://www.fyndit.app/', 'kind': 'autobuy', 'checked': CHECKED_NOV, 'cells': [
+        ALERTS_AUTOBUY,
+        L('Average market price and discount per item', 'Prix moyen du marché et remise par article', 'Durchschnittlicher Marktpreis und Rabatt pro Artikel', 'Gemiddelde marktprijs en korting per artikel',
+          'Prezzo medio di mercato e sconto per articolo', 'Precio medio de mercado y descuento por artículo'),
+        L('Paid plans: 1&ndash;20 connected Vinted accounts', 'Offres payantes : 1 à 20 comptes Vinted connectés', 'Bezahltarife: 1&ndash;20 verbundene Vinted-Konten', 'Betaalde abonnementen: 1&ndash;20 gekoppelde Vinted-accounts',
+          'Piani a pagamento: 1&ndash;20 account Vinted collegati', 'Planes de pago: 1&ndash;20 cuentas de Vinted conectadas'),
+        DISCORD, NS, money_range('12.90', '79.90'),
+        L('1 monitor, Discord alerts, no card', '1 monitor, alertes Discord, sans carte', '1 Monitor, Discord-Alarme, ohne Karte', '1 monitor, Discord-meldingen, zonder kaart',
+          '1 monitor, avvisi Discord, senza carta', '1 monitor, alertas en Discord, sin tarjeta')]},
     # bot-vinted.com (tool at app.bot-vinted.com)
     {'name': 'Bot Vinted', 'url': 'https://bot-vinted.com', 'kind': 'monitor', 'cells': [
         ALERTS, NS, NS,

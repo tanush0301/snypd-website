@@ -1223,7 +1223,8 @@ def compare_table(lang):
     rows, us = [], None
     for i, c in enumerate(COMPETITORS):
         url = c['url'] or HELP435[lang]
-        label = '<a href="%s"%s>%s</a>' % (url, '' if c.get('us') else ' rel="nofollow noopener"', cd.name(c, lang))
+        label = '<a href="%s"%s>%s</a>%s' % (url, '' if c.get('us') else ' rel="nofollow noopener"', cd.name(c, lang),
+                                             (' <small>(%s)</small>' % c['checked'].get(lang, c['checked']['en'])) if c.get('checked') else '')
         if c.get('us'):
             label += '<span class="ct-badge">%s</span>' % cd.US_BADGE[lang]
             us = i
