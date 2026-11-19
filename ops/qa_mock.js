@@ -292,6 +292,8 @@
 
   if (NO_HUNTS) { DB.user_searches = []; DB.user_claims = []; DB.xp_events = []; }
   // ?badhunt=list|brands|long: the active hunt asks Vinted for several things at once (hunt words card, Session 70).
+  // ?feed=empty: no listing in the feed (a precise search with nothing new), for the example listings test.
+  if (params.get('feed') === 'empty') DB.current_ads = [];
   if (params.get('badhunt')) {
     var bhq = { list: 'Ralph Lauren, Nike, Adidas', brands: 'ralph loren pull nike', long: 'jujutsu kaisen tome 20 a 30' }[params.get('badhunt')] || 'Ralph Lauren, Nike, Adidas';
     DB.user_searches.unshift({ id: 'search-bad', user_id: UID, search_name: bhq, vinted_url: 'https://www.vinted.fr/catalog?search_text=' + encodeURIComponent(bhq) + '&price_to=40&order=newest_first',
@@ -693,6 +695,21 @@
       var kReasons = { tech: 'technical_issues', cost: 'too_expensive', none: null, unused: 'unused' };
       if (!(kq in kReasons)) return Promise.resolve(new Response(JSON.stringify({ cancelling: false }), { status: 200 }));
       return Promise.resolve(new Response(JSON.stringify({ cancelling: true, plan: PLAN, ends_at: kEnds, reason: kReasons[kq], can_keep: true }), { status: 200 }));
+    }
+    // Example listings under an empty feed (19 Nov 2026, GET /api/v1/hunt-examples). ?ex=N = N examples (default 3),
+    // ?ex=0 none, ?ex=error = 503, ?ex=bad = malformed rows plus one good one, ?ex=html = markup in a title.
+    if (u.indexOf('/api/v1/hunt-examples') !== -1) {
+      window.__exRequests = (window.__exRequests || []).concat([{ auth: ((opts && opts.headers) || {}).Authorization || null }]);
+      var exq = params.get('ex') || '3';
+      if (exq === 'error') return Promise.resolve(new Response(JSON.stringify({ detail: 'nope' }), { status: 503 }));
+      var exNow = Math.floor(Date.now() / 1000);
+      var exRow = function (i) { return { listing_id: 9000 + i, title: exq === 'html' ? '<img src=x onerror=window.__xss=1>Jumper' : 'Example jumper ' + i,
+        price: { amount: String(10 + i) + '.0', currency_code: 'EUR' }, brand_title: 'Ralph Lauren', size_title: 'M', status: 'Very good',
+        image_url: '', url: '/items/' + (9000 + i) + '-example', uploaded_ts: exNow - 3600 * i }; };
+      var exRows = [];
+      if (exq === 'bad') exRows = [null, 'x', { title: 'no id' }, { listing_id: 5, uploaded_ts: 'x' }, exRow(1)];
+      else for (var exi = 1; exi <= Math.min(30, parseInt(exq, 10) || (exq === 'html' ? 1 : 0)); exi++) exRows.push(exRow(exi));
+      return Promise.resolve(new Response(JSON.stringify({ examples: exRows, searches: 1 }), { status: 200 }));
     }
     if (u.indexOf('/api/v1/hunt-coach') !== -1) {
       window.__coachRequests = (window.__coachRequests || 0) + 1;

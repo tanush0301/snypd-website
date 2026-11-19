@@ -2355,6 +2355,13 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
   <a href="#" data-dismiss-hint style="margin-left:8px;text-transform:uppercase;letter-spacing:0.08em;font-size:11px">Got it</a>
 </div>
 <div class="empty" id="empty" style="display:none">No results yet. Press “Start Sniping Now”.</div>
+<div id="examples" style="display:none">
+<div style="margin:18px 0 10px">
+<div id="examples-title" style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-primary)">Already on Vinted for your search</div>
+<div id="examples-sub" class="muted" style="margin-top:6px;max-width:60ch">Older listings, shown so you can see what your search finds. New listings appear here as soon as they are posted. Only new ones send an alert.</div>
+</div>
+<div id="examples-list"></div>
+</div>
 <div class="pr-bar" id="pr-bar" style="display:none">
 <span class="pr-bar__lbl">Sort</span>
 <button type="button" class="pr-chip on" data-pr-sort="new">Newest</button>
@@ -5911,7 +5918,81 @@ const HEARTBEAT_URL = (() => {
 
   const EMPTY_ICON = '<svg width="28" height="28" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:0.6"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>';
 
+  // Example listings under an empty feed (19 Nov 2026). A precise search often has nothing
+  // uploaded in the last 30 minutes, so a new account saw an empty feed. The backend returns
+  // the newest older listings of the account's own searches; they are shown below the empty
+  // message, marked as already on Vinted, without Claim, and never send an alert.
+  var exCache = null, exAt = 0, exBusy = false, exWanted = false, exPainted = '';
+  const EX_REFRESH_MS = 60000;
+  function exValid(r) {
+    return !!r && (typeof r.listing_id === 'number' || typeof r.listing_id === 'string') && typeof r.uploaded_ts === 'number';
+  }
+  function exCardHTML(r) {
+    const { amount, currency } = derivePrice(r);
+    const priceLabel = fmtPrice(amount, currency);
+    const img = getImageUrl(r);
+    const imgHtml = img
+      ? `<img class="thumb" loading="lazy" src="${esc(img)}" alt="${esc(r.title || 'Listing')}"
+               onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb fallback'}))" />`
+      : `<div class="thumb fallback"></div>`;
+    const meta = [r.brand_title, r.size_title, r.status, relativeTime(r.uploaded_ts * 1000)].filter(Boolean).map(esc).join(' &middot; ');
+    return `
+      <div class="card ex-card" data-ex-id="${esc(r.listing_id)}">
+        <div class="thumb-wrap">${imgHtml}</div>
+        <div>
+          <div class="meta-top">
+            <div class="t"${r.title ? ' data-i18n-skip' : ''}>${esc(r.title) || 'View listing'}</div>
+            <div class="p-stack"><div class="p${priceLabel ? '' : ' p-unknown'}">${priceLabel || 'Price unavailable'}</div></div>
+          </div>
+          <div class="muted">${meta}</div>
+          <div class="card-actions">
+            <a class="btn btn-ghost card-link" href="${esc(vintedListingUrl(r))}" target="${vintedLinkTarget()}" rel="noopener external">Open on Vinted</a>
+          </div>
+        </div>
+      </div>`;
+  }
+  function hideExamples() {
+    exWanted = false;
+    const box = document.getElementById('examples');
+    if (box) box.style.display = 'none';
+  }
+  function paintExamples() {
+    const box = document.getElementById('examples');
+    const lst = document.getElementById('examples-list');
+    if (!box || !lst) return;
+    if (!exWanted || !Array.isArray(exCache) || !exCache.length) { box.style.display = 'none'; return; }
+    const key = exCache.map(r => String(r.listing_id)).join(',');
+    if (key !== exPainted) {
+      lst.innerHTML = exCache.map(exCardHTML).join('');
+      exPainted = key;
+    }
+    box.style.display = '';
+  }
+  function showExamples() {
+    exWanted = true;
+    paintExamples();
+    if (exBusy || (Date.now() - exAt) < EX_REFRESH_MS) return;
+    exBusy = true;
+    exAt = Date.now();
+    (async () => {
+      try {
+        const t = session && session.access_token;
+        if (!t) return;
+        const res = await fetch('https://api.snypd.store/api/v1/hunt-examples', { headers: { Authorization: 'Bearer ' + t } });
+        if (!res.ok) return;
+        const j = await res.json();
+        exCache = (j && Array.isArray(j.examples)) ? j.examples.filter(exValid).slice(0, 10) : [];
+      } catch (e) {
+        console.warn('SNYPD: examples not loaded', e);
+      } finally {
+        exBusy = false;
+        paintExamples();
+      }
+    })();
+  }
+
   function updateEmptyUI(hasRows, lastMatchTs) {
+    hideExamples();
     // Undo the first-hunt screen's pill suppression on every other path, so
     // saving a hunt brings the control straight back without a reload.
     if (hasRows || hasActiveHunts !== false) {
@@ -5957,6 +6038,7 @@ const HEARTBEAT_URL = (() => {
     }
     empty.innerHTML = EMPTY_ICON + msg;
     empty.style.display = 'block';
+    if (running) showExamples();
   }
 
   function relativeMinutesAgo(iso) {
