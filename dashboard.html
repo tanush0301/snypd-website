@@ -3337,9 +3337,10 @@ const HEARTBEAT_URL = (() => {
     }
   }
 
-  // Plan chosen at sign-up (head script, Phase 0.7): an account that already has
-  // a hunt goes to checkout now, as before; a new one sees the plan here once
-  // its first hunt is saved, so the trial starts first.
+  // Plan chosen at sign-up (head script, Phase 0.7): the plan is shown here, for a
+  // new account once its first hunt is saved (so the trial starts first), for an
+  // account that already has a hunt right away. Checkout opens only on the user's
+  // tap (19 Nov 2026: 6 of 6 checkouts opened by a redirect were closed in 4-16 s).
   (async function planAfterHunt() {
     let intent = null;
     try { intent = JSON.parse(localStorage.getItem('snypd_checkout_after_hunt') || 'null'); } catch (e) {}
@@ -3356,10 +3357,7 @@ const HEARTBEAT_URL = (() => {
       const r = await sb.from('user_searches').select('id', { count: 'exact', head: true }).eq('user_id', uid);
       return r.error ? 0 : (r.count || 0);
     };
-    const go = () => { localStorage.removeItem('snypd_checkout_after_hunt'); location.replace('/plans?checkout=' + intent.plan); };
-    if (await huntCount() > 0) { go(); return; }
-    window.addEventListener('snypd:hunts-changed', function paint() {
-      window.removeEventListener('snypd:hunts-changed', paint);
+    const paint = () => {
       if (!eliteBanner || window.SNYPD_ACTIVATING) return;
       window.SNYPD_PLAN_PROMPT = true;  // the trial-note refresh after this save must not overwrite it
       const t = eliteBanner.querySelector('.elite-banner__title');
@@ -3377,6 +3375,11 @@ const HEARTBEAT_URL = (() => {
         a.addEventListener('click', () => localStorage.removeItem('snypd_checkout_after_hunt'));
       }
       eliteBanner.style.display = '';
+    };
+    if (await huntCount() > 0) { paint(); return; }
+    window.addEventListener('snypd:hunts-changed', function once() {
+      window.removeEventListener('snypd:hunts-changed', once);
+      paint();
     });
   })().catch(console.error);
 
