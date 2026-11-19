@@ -1308,6 +1308,15 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 
 /* Elite upsell (Ledger 2j) - real copy, no invented "N found overnight"
    count. Free/Kickstart/Pro only; never shown to an already-Elite account. */
+/* First days (19 Nov 2026): a new account sees listings first. See the data-first-days block
+   after joinedAt: three cards move below the feed; here the alerts card is compact on phones. */
+@media (max-width: 600px) {
+  body[data-first-days] #alerts-setup-card { padding: 10px 12px; gap: 8px; }
+  body[data-first-days] #alerts-setup-card .elite-banner__text { display: none; }
+}
+body[data-first-days] #email-optin-card,
+body[data-first-days] #dc-join,
+body[data-first-days] #claim-hint { margin-top: 16px; }
 .elite-banner {
   padding: 17px 20px;
   margin-bottom: 16px;
@@ -2726,6 +2735,20 @@ const HEARTBEAT_URL = (() => {
   // Real, not fabricated - Supabase Auth stamps every user row with this on
   // signup, no separate tracking needed for a real "joined" date.
   const joinedAt = session.user.created_at || null;
+  // First days (19 Nov 2026): on a phone a new account's first listing sat almost two screens
+  // down, under five cards. For 3 days after sign-up the email-news card, the Discord card and
+  // the claim hint sit below the feed (same elements, same behaviour, only moved).
+  try {
+    const joinedMs = Date.parse(joinedAt || '');
+    if (Number.isFinite(joinedMs) && Date.now() - joinedMs < 3 * 86400000) {
+      document.body.setAttribute('data-first-days', '1');
+      const anchor = document.getElementById('msg');
+      ['email-optin-card', 'dc-join', 'claim-hint'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && anchor && anchor.parentNode) anchor.parentNode.insertBefore(el, anchor);
+      });
+    }
+  } catch (e) { console.warn('SNYPD: first-days layout skipped', e); }
   set('user-bar', `Logged in as ${email}`);
   // UI language (assets/i18n.js): a choice saved on the account follows the user to
   // other devices; flipping the switch saves it there before the page reloads.
