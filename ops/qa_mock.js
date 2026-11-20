@@ -696,6 +696,25 @@
       if (!(kq in kReasons)) return Promise.resolve(new Response(JSON.stringify({ cancelling: false }), { status: 200 }));
       return Promise.resolve(new Response(JSON.stringify({ cancelling: true, plan: PLAN, ends_at: kEnds, reason: kReasons[kq], can_keep: true }), { status: 200 }));
     }
+    // Live feed wait (20 Nov 2026, GET /api/v1/feed/wait?since=). Answers when window.__feedTick (ms) is newer than
+    // `since`, else after 1.5 s with changed:false. ?fw=404 = older backend, ?fw=retry = {retry: 60}, ?fw=error = 503.
+    if (u.indexOf('/api/v1/feed/wait') !== -1) {
+      var fwSince = parseInt((u.split('since=')[1] || '0'), 10) || 0;
+      window.__fwRequests = (window.__fwRequests || []).concat([{ since: fwSince, auth: ((opts && opts.headers) || {}).Authorization || null }]);
+      var fwq = params.get('fw') || 'on';
+      if (fwq === '404') return Promise.resolve(new Response('Not Found', { status: 404 }));
+      if (fwq === 'error') return Promise.resolve(new Response(JSON.stringify({ detail: 'nope' }), { status: 503 }));
+      if (fwq === 'retry') return Promise.resolve(new Response(JSON.stringify({ changed: false, tick: 0, retry: 60 }), { status: 200 }));
+      return new Promise(function (resolve) {
+        var fwEnd = Date.now() + 1500;
+        (function fwPoll() {
+          var tick = window.__feedTick || 0;
+          if (tick > fwSince) return resolve(new Response(JSON.stringify({ changed: true, tick: tick }), { status: 200 }));
+          if (Date.now() > fwEnd) return resolve(new Response(JSON.stringify({ changed: false, tick: tick }), { status: 200 }));
+          setTimeout(fwPoll, 100);
+        })();
+      });
+    }
     // Example listings under an empty feed (19 Nov 2026, GET /api/v1/hunt-examples). ?ex=N = N examples (default 3),
     // ?ex=0 none, ?ex=error = 503, ?ex=bad = malformed rows plus one good one, ?ex=html = markup in a title.
     if (u.indexOf('/api/v1/hunt-examples') !== -1) {

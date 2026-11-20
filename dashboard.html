@@ -8197,6 +8197,45 @@ const HEARTBEAT_URL = (() => {
   // If user clicks Stop, we respect it and won’t auto-start until Start is clicked again.
   let manualPaused = (localStorage.getItem('snypd_manual_paused') === 'true');
 
+  // Live feed (20 Nov 2026): one waiting request to our own server, answered the moment a find is
+  // queued for this account; then the feed refreshes at once instead of on the 20 s timer below.
+  // Reads no database. Any problem = pause and rely on the timer.
+  const FEED_WAIT_URL = 'https://api.snypd.store/api/v1/feed/wait';
+  let feedWaitOn = false, feedWaitTick = null;
+  const feedWaitSleep = ms => new Promise(r => setTimeout(r, ms));
+  async function feedWaitLoop() {
+    if (feedWaitOn) return;
+    feedWaitOn = true;
+    try {
+      while (running) {
+        if (document.visibilityState !== 'visible') { await feedWaitSleep(2000); continue; }
+        let pause = 0;
+        try {
+          const s = await sb.auth.getSession();
+          const t = s && s.data && s.data.session && s.data.session.access_token;
+          if (!t) { pause = 60000; }
+          else {
+            const res = await fetch(FEED_WAIT_URL + '?since=' + (feedWaitTick || 0), { headers: { Authorization: 'Bearer ' + t } });
+            if (!res.ok) { pause = res.status === 404 ? 600000 : 60000; }
+            else {
+              const j = await res.json();
+              const first = feedWaitTick === null;
+              if (j && typeof j.tick === 'number' && j.tick > (feedWaitTick || 0)) feedWaitTick = j.tick;
+              else if (first) feedWaitTick = 0;
+              if (j && j.changed === true && !first && running && document.visibilityState === 'visible') {
+                window.__feedWaitLoads = (window.__feedWaitLoads || 0) + 1;
+                await loadAds();
+              }
+              if (j && typeof j.retry === 'number') pause = Math.max(5, Math.min(600, j.retry)) * 1000;
+              else if (!j || j.changed !== true) pause = 250;
+            }
+          }
+        } catch (e) { pause = 30000; }
+        if (pause) await feedWaitSleep(pause);
+      }
+    } finally { feedWaitOn = false; }
+  }
+
   async function start() {
     if (running) return;
     if (manualPaused) return;
@@ -8217,6 +8256,7 @@ const HEARTBEAT_URL = (() => {
     adsTimer = setInterval(() => {
       if (document.visibilityState === 'visible') loadAds();
     }, Math.max(5, SUPABASE_ADS_FETCH_INTERVALL) * 1000);
+    feedWaitLoop().catch(() => {});
   }
 
   async function stop(statusLabel = 'stopped') {
