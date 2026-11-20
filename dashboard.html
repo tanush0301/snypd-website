@@ -2050,7 +2050,11 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
            with no subject. aria-labelledby points at the visible label that
            already exists, rather than duplicating the copy in an aria-label
            that could drift from it. -->
-      <div class="wiz-alert-rows">
+      <div class="wiz-presets" id="wiz-alert-choice" role="radiogroup" aria-label="Where to get alerts" style="display:none">
+        <button type="button" class="wiz-mode" data-alert-choice="iphone" role="radio" aria-checked="true"><span class="wiz-mode__title">On this iPhone</span><span class="wiz-mode__note">Add SNYPD to your Home Screen, then allow notifications. About a minute, three drawn steps.</span></button>
+        <button type="button" class="wiz-mode" data-alert-choice="discord" role="radio" aria-checked="false"><span class="wiz-mode__title">In Discord</span><span class="wiz-mode__note">A private thread with your finds. No Home Screen step: join the SNYPD Discord, then type a 6-character code.</span></button>
+      </div>
+      <div class="wiz-alert-rows" id="wiz-alert-rows">
         <div class="wiz-alert-row">
           <div>
             <div class="wiz-alert-row__title" id="wiz-label-push">Push notification</div>
@@ -4339,6 +4343,7 @@ const HEARTBEAT_URL = (() => {
         step1.style.display = 'none';
         step2.style.display = '';
         paintHeard();
+        try { if (window.SNYPD.paintAlertChoice) window.SNYPD.paintAlertChoice(); } catch (e) {}
         refreshTrialNote().catch(console.error);
       };
 
@@ -4613,6 +4618,7 @@ const HEARTBEAT_URL = (() => {
       const enableBtn = document.getElementById('wiz-enable-alerts');
       if (enableBtn) {
         enableBtn.addEventListener('click', async () => {
+          if (window.SNYPD.alertChoice === 'discord') { const wb = document.getElementById('wiz-discord-btn'); if (wb) wb.click(); return; }
           const resultEl = document.getElementById('wiz-alert-result');
 
           const wantsPush = pushToggle && pushToggle.classList.contains('is-on');
@@ -4674,6 +4680,30 @@ const HEARTBEAT_URL = (() => {
         const v = heardSel.value; if (!/^[a-z_]{2,12}$/.test(v)) return;
         Promise.resolve().then(() => sb.auth.updateUser({ data: { heard_from: v } })).catch(e => console.error('SNYPD wizard: heard_from not saved', e));
       });
+      // Alerts choice (first-session v2, 20 Nov 2026): an iPhone in Safari cannot get push without the Home Screen
+      // app, so Discord is offered as an equal choice there. Shown only when Discord is available and not linked.
+      const choiceBox = document.getElementById('wiz-alert-choice'), alertRows = document.getElementById('wiz-alert-rows');
+      const choiceBtn = document.getElementById('wiz-enable-alerts');
+      let choiceShown = false;
+      window.SNYPD.alertChoice = 'iphone';
+      const iosNoApp = () => (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+        && !(window.navigator.standalone === true || !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches));
+      window.SNYPD.paintAlertChoice = () => {
+        if (!choiceBox || !alertRows || !choiceBtn) return;
+        const row = document.getElementById('wiz-discord-row'), wb = document.getElementById('wiz-discord-btn');
+        const on = iosNoApp() && !!row && row.style.display !== 'none' && !!wb && !wb.hidden;
+        choiceBox.style.display = on ? '' : 'none';
+        alertRows.style.display = on ? 'none' : '';
+        if (!on) {
+          window.SNYPD.alertChoice = 'iphone';
+          if (choiceShown) { choiceShown = false; choiceBtn.textContent = 'Turn on alerts & start hunting'; }
+          return;
+        }
+        choiceShown = true;
+        choiceBox.querySelectorAll('[data-alert-choice]').forEach(b => b.setAttribute('aria-checked', b.dataset.alertChoice === window.SNYPD.alertChoice ? 'true' : 'false'));
+        choiceBtn.textContent = window.SNYPD.alertChoice === 'discord' ? 'Connect Discord' : 'Show me how';
+      };
+      if (choiceBox) choiceBox.querySelectorAll('[data-alert-choice]').forEach(b => b.addEventListener('click', () => { window.SNYPD.alertChoice = b.dataset.alertChoice; window.SNYPD.paintAlertChoice(); }));
       const finishBtn = document.getElementById('wiz-finish');
       if (finishBtn) {
         finishBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
@@ -9991,6 +10021,7 @@ const HEARTBEAT_URL = (() => {
     if (!loaded || !wizRow || !wizBtn || !wizNote) { return; }
     wizRow.style.display = '';
     wizBtn.hidden = !!linked;
+    try { if (window.SNYPD && window.SNYPD.paintAlertChoice) window.SNYPD.paintAlertChoice(); } catch (e) {}
     wizNote.textContent = linked ? W.on[fr() ? 1 : 0].replace('{n}', linked.discord_username || 'Discord') : W.idle[fr() ? 1 : 0];
   }
   if (wizBtn) {

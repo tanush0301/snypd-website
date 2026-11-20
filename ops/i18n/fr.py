@@ -191,6 +191,10 @@ FR = {
     # Discord alerts row in Profile (11 Nov 2026, outreach/47)
     'Discord alerts': 'Alertes Discord',
     'Connect Discord': 'Connecter Discord',
+    'On this iPhone': 'Sur cet iPhone',
+    'In Discord': 'Dans Discord',
+    'Add SNYPD to your Home Screen, then allow notifications. About a minute, three drawn steps.': 'Ajoute SNYPD à ton écran d’accueil, puis autorise les notifications. Environ une minute, trois étapes illustrées.',
+    'A private thread with your finds. No Home Screen step: join the SNYPD Discord, then type a 6-character code.': 'Un fil privé avec tes trouvailles. Sans passer par l’écran d’accueil' + NB + ': rejoins le Discord SNYPD, puis tape un code de 6 caractères.',
     'Get your finds in a private thread in the SNYPD Discord. Works on Android, iPhone and PC.':
         'Reçois tes trouvailles dans un fil privé du Discord SNYPD. Marche sur Android, iPhone et PC.',
     # Discord row in the first-hunt wizard's alerts step (16 Nov 2026)
