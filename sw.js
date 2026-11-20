@@ -71,7 +71,9 @@ function toFrench(s) {
     .replace(/^1 new match - /, '1 nouvelle annonce - ')
     .replace(/^(\d+) new matches - /, '$1 nouvelles annonces - ')
     .replace(/^From (.+)\. Tap to see them\.$/, 'D\u00e8s $1. Touche pour les voir.')
-    .replace(/^Tap to see them\.$/, 'Touche pour les voir.');
+    .replace(/^Tap to see them\.$/, 'Touche pour les voir.')
+    .replace(/^One of your searches is very busy$/, 'Une de tes recherches est tr\u00e8s active')
+    .replace(/^(\d+) alerts in the last hour\. Tap to get fewer: Calm or only the cheap ones\.$/, '$1 alertes en une heure. Touche pour en recevoir moins\u00a0: Calme ou seulement les moins ch\u00e8res.');
 }
 
 async function show(data) {

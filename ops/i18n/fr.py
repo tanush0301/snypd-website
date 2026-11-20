@@ -1726,3 +1726,13 @@ FR.update({
 FR_PATTERNS += [
     (r'^(\d+) new listings$', '$1 nouvelles annonces'),
 ]
+
+# ===== Flood offer card (20 Nov 2026): opened by the push link ?flood=<saved search id>.
+FR.update({
+    'This search is very busy': 'Cette recherche est très active',
+    'Calm sends at most one summary every 15 min.': 'Calme envoie au plus un résumé toutes les 15 min.',
+    'Or get an alert only for the cheap finds.': 'Ou reçois une alerte seulement pour les trouvailles pas chères.',
+})
+FR_PATTERNS += [
+    (r'^"(.+)" sent you a lot of alerts in the last hour\.$', '"$1" t\'a envoyé beaucoup d\'alertes en une heure.'),
+]

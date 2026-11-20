@@ -161,6 +161,7 @@
 "Calm":"Calme",
 "Calm all my searches":"Tout passer en Calme",
 "Calm or cheap-only alerts":"Les alertes calmes ou petits prix",
+"Calm sends at most one summary every 15 min.":"Calme envoie au plus un r\u00e9sum\u00e9 toutes les 15 min.",
 "Can I change plan later?":"Puis-je changer de plan plus tard\u00a0?",
 "Can I get a refund?":"Puis-je \u00eatre rembours\u00e9\u00a0?",
 "Can I pay once, without a subscription?":"Puis-je payer une seule fois, sans abonnement\u00a0?",
@@ -592,6 +593,7 @@
 "Open on Vinted":"Ouvrir sur Vinted",
 "Open profile":"Ouvrir le profil",
 "Open the Share menu":"Ouvrir le menu Partager",
+"Or get an alert only for the cheap finds.":"Ou re\u00e7ois une alerte seulement pour les trouvailles pas ch\u00e8res.",
 "Or invite a friend: you get 3 extra days of 24/7 when their hunt finds a listing.":"Ou invite un ami\u00a0: tu re\u00e7ois 3 jours de plus en 24h/24 quand sa recherche trouve une annonce.",
 "Or switch to Calm: at most one summary every 15 min.":"Ou passe en Calme\u00a0: au plus un r\u00e9sum\u00e9 toutes les 15 min.",
 "Other":"Autre",
@@ -895,6 +897,7 @@
 "This reset link has expired":"Ce lien a expir\u00e9",
 "This search has no words or filters yet. Add at least one on Vinted, then copy the link again.":"Cette recherche n\u2019a encore ni mots ni filtres. Ajoutes-en au moins un sur Vinted, puis copie \u00e0 nouveau le lien.",
 "This search is filled in for you after sign-up.":"Cette recherche est pr\u00e9-remplie apr\u00e8s ton inscription.",
+"This search is very busy":"Cette recherche est tr\u00e8s active",
 "This search needs every word in one listing":"Il faut tous les mots dans une seule annonce",
 "Tip: add SNYPD to your Home Screen (Share -> Add to Home Screen) so alerts keep arriving when Safari is closed.":"Astuce\u00a0: ajoute SNYPD \u00e0 ton \u00e9cran d\u2019accueil (Partager -> Sur l\u2019\u00e9cran d\u2019accueil) pour que les alertes arrivent m\u00eame Safari ferm\u00e9.",
 "Too expensive":"Trop cher",
@@ -2014,6 +2017,10 @@
 [
 "^(\\d+) new listings$",
 "$1 nouvelles annonces"
+],
+[
+"^\"(.+)\" sent you a lot of alerts in the last hour\\.$",
+"\"$1\" t'a envoy\u00e9 beaucoup d'alertes en une heure."
 ]
 ]
 };

@@ -7645,6 +7645,7 @@ const HEARTBEAT_URL = (() => {
     const title = document.getElementById('broad-hunt-title');
     const apply = document.getElementById('broad-hunt-apply');
     if (!card || !title || !apply || !Array.isArray(coachList) || !coachList.length) return;
+    if (floodShown) return;   // the flood offer has the card
     let rows = [];
     try { rows = await huntModes(); } catch (e) { console.error('SNYPD: hunt coach could not read hunts', e); return; }
     const hw = window.SNYPD && window.SNYPD.hw;
@@ -7804,10 +7805,55 @@ const HEARTBEAT_URL = (() => {
   }
   if (typeof window.addEventListener === 'function') window.addEventListener('snypd:hunts-changed', () => { if (!wordsUndo) setTimeout(() => noteHuntWords().catch(console.error), 300); });
 
+  // Flood offer (20 Nov 2026): the push sender sends one "this search is very busy" alert whose link carries
+  // ?flood=<saved search id>. Open the busy-search card for that search; its Calm / cheap-only buttons do the rest.
+  let floodChecked = false, floodShown = false;
+  async function noteFloodOffer() {
+    if (floodChecked) return;
+    floodChecked = true;
+    let id = null;
+    try {
+      const q = new URLSearchParams(location.search);
+      id = q.get('flood');
+      if (id !== null) {
+        q.delete('flood');
+        const qs = q.toString();
+        history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+      }
+    } catch (e) { id = null; }
+    if (!id) return;
+    const card = document.getElementById('broad-hunt');
+    const title = document.getElementById('broad-hunt-title');
+    if (!card || !title) return;
+    let rows = [];
+    try { rows = await huntModes(); } catch (e) { console.error('SNYPD: flood offer could not read hunts', e); return; }
+    const row = rows.find(r => String(r.id) === String(id));
+    if (!row || row.is_active !== true || (row.push_mode || 'every') !== 'every') return;
+    floodShown = true;
+    coachShown = null;
+    broadHunt = row;
+    broadSig = savedSearchSignature(row.vinted_url);
+    broadBusy = [];
+    const free = !!(document.body && document.body.classList.contains('pr-free'));
+    title.textContent = 'This search is very busy';
+    const sentences = ['"' + huntLabel(row.vinted_url) + '" sent you a lot of alerts in the last hour.',
+      'Calm sends at most one summary every 15 min.'];
+    if (!free) sentences.push('Or get an alert only for the cheap finds.');
+    coachPaint(sentences);
+    coachButtons(free ? ['broad-hunt-calm', 'broad-hunt-edit', 'broad-hunt-keep']
+                      : ['broad-hunt-calm', 'broad-hunt-cheap', 'broad-hunt-edit', 'broad-hunt-keep']);
+    const all = document.getElementById('broad-hunt-calmall');
+    if (all) all.style.display = 'none';
+    card.dataset.kind = 'flood';
+    card.style.display = '';
+    try { card.scrollIntoView({ block: 'center' }); } catch (e) {}
+  }
+
   async function noteBroadHunt(feed) {
     const card = document.getElementById('broad-hunt');
     const text = document.getElementById('broad-hunt-text');
     if (coachShown) return;   // the hunt coach has the card
+    if (floodShown) return;   // the flood offer has the card
     if (!card || !text || !feed || !Array.isArray(feed.rows) || !feed.rows.length) return;
     if (!(feed.eligibleCount >= BROAD_PER_30MIN)) return;
     const counts = new Map();
@@ -7969,6 +8015,7 @@ const HEARTBEAT_URL = (() => {
 
       hasActiveHunts = feed.huntCount > 0;
       feedEligibleCount = feed.eligibleCount;
+      if (!floodChecked) await noteFloodOffer().catch(e => console.error('SNYPD: flood offer failed', e));
       if (!coachList) loadCoach().catch(e => console.error('SNYPD: hunt coach failed', e));
       if (!wordsShown && !wordsUndo) noteHuntWords().catch(e => console.error('SNYPD: words card failed', e));
       noteBroadHunt(feed).catch(e => console.error('SNYPD: broad-hunt check failed', e));

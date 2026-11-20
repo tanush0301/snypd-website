@@ -47,6 +47,11 @@ async function fire(payload, { stored, navLang, cachesBroken }) {
       '1 nouvelle annonce cette nuit', 'Touche pour les voir.'],
     [{ title: '12 new matches - jordan 1', body: 'From 45.0 EUR. Tap to see them.' }, { stored: 'en' },
       '12 new matches - jordan 1', 'From 45.0 EUR. Tap to see them.'],
+    // Flood offer (push.py _build_flood_payload, 20 Nov 2026).
+    [{ title: 'One of your searches is very busy', body: '34 alerts in the last hour. Tap to get fewer: Calm or only the cheap ones.' }, { stored: 'fr' },
+      'Une de tes recherches est très active', '34 alertes en une heure. Touche pour en recevoir moins : Calme ou seulement les moins chères.'],
+    [{ title: 'One of your searches is very busy', body: '34 alerts in the last hour. Tap to get fewer: Calm or only the cheap ones.' }, { stored: 'en' },
+      'One of your searches is very busy', '34 alerts in the last hour. Tap to get fewer: Calm or only the cheap ones.'],
     // Price check (push.py "rank", Session 66): worded in the user's language, only for 50-100 integers.
     [Object.assign({ rank: 82 }, two), { stored: 'en' }, '2 new finds', "Cheaper than 82% of this week's finds \u00b7 " + two.body],
     [Object.assign({ rank: 82 }, two), { stored: 'fr' }, '2 nouvelles trouvailles',
