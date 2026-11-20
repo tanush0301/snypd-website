@@ -67,7 +67,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await p.click('#wiz-q-save');
     await wait(700);
   }
-  const modeStep = p => p.evaluate(() => { const s = document.getElementById('wiz-step-mode'); return !!s && s.style.display !== 'none'; });
+  const modeStep = p => p.evaluate(() => { const s = document.getElementById('wiz-step-2'); return !!s && s.style.display !== 'none'; });
 
   // ---- 1. wizard: placeholder + list -> panel, chip saves that one thing
   let page = await open('plan=free&hunts=0');

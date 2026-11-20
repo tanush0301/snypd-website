@@ -86,10 +86,8 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     if (clearMin) await page.$eval('#wiz-q-min', e => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles: true })); });
     await page.click('#wiz-q-save'); await wait(1500);
     if (!max) await passMax(page);
-    ok(await vis(page, '#wiz-step-mode'), 'alert-style step shown after the hunt is saved; the wizard says: '
+    ok(await vis(page, '#wiz-step-2') && !(await vis(page, '#wiz-step-mode')), 'alerts step shown straight after the hunt is saved; the wizard says: '
       + await page.evaluate(() => ['wiz-q-err', 'wiz-q-hw'].map(i => document.getElementById(i)).map(e => (e && e.getClientRects().length ? e.innerText : '')).join(' / ')));
-    await page.click('.wiz-mode'); await wait(200);
-    await page.click('#wiz-mode-next'); await wait(1200);
     ok(await vis(page, '#wiz-step-2'), 'alerts step shown');
     if (enable) { await page.click('#wiz-enable-alerts'); await wait(3200); }
     // iPhone without the Home Screen app: the drawn guide (17 Nov 2026) opens on top; close it as a person would.
@@ -107,7 +105,7 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     const all = await sent(page), last = all[all.length - 1];
     ok(all.length >= 1 && all.length <= 4, 'between 1 and 4 writes for the whole first session, got ' + all.length);
     eq([last.v, last.dev, last.devs, last.wz], [1, 'ios-safari', ['ios-safari'], 3], 'device and wizard step');
-    eq([last.max, last.min, last.src], [0, 'def', 'quick'], 'first hunt: no price limit, the pre-filled minimum kept');
+    eq([last.max, last.min, last.src], [0, 'none', 'quick'], 'first hunt: no price limit and no minimum (none is pre-filled)');
     eq([last.al, last.al1, last.al_try, last.later, last.al_on], ['ios', 'ios', 1, 1, undefined], 'alerts: shown the Home Screen text, then "later"');
     eq(last.card, 'shown', 'the set-up card appeared after the wizard');
     ok(last.app === undefined, 'not an installed app');
@@ -228,7 +226,7 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     await page.type('#wiz-q-words', 'nike dunk low');
     await page.click('#wiz-q-save'); await wait(1500);
     await passMax(page);
-    ok(await vis(page, '#wiz-step-mode'), 'the wizard still works without the tracker');
+    ok(await vis(page, '#wiz-step-2'), 'the wizard still works without the tracker');
     await wait(3600);
     eq((await sent(page)).length, 0, 'nothing is written for an old account');
     await ctx.close();
@@ -261,7 +259,7 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
     await page.type('#wiz-q-words', 'nike dunk low');
     await page.click('#wiz-q-save'); await wait(1500);
     await passMax(page);
-    ok(await vis(page, '#wiz-step-mode'), 'saving the first hunt works without the module');
+    ok(await vis(page, '#wiz-step-2'), 'saving the first hunt works without the module');
     await ctx.close();
   }
 

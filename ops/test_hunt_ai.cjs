@@ -80,9 +80,9 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   ok(/^jordan sneakers very busy search$/.test(o[2]), 'busy option has no count and no max: ' + o[2]);
   ok(/Suggested by AI, checked against our Vinted listings\. It can be wrong\./.test(await text(page, '#wiz-q-ai')), 'AI note shown');
   await page.click('#wiz-q-ai [data-ai-pick="0"]'); await wait(300);
-  const minNow = await val(page, '#wiz-q-min');   // the wizard's default minimum for this site (below 80)
-  ok(Number(minNow) > 0 && Number(minNow) < 80, 'default minimum is below the picked max: ' + minNow);
-  eq([await val(page, '#wiz-q-words'), await val(page, '#wiz-q-max')], ['jordan 4 military black', '80'], 'pick fills words + max; a minimum below the max stays');
+  const minNow = await val(page, '#wiz-q-min');   // no minimum is pre-filled since first-session v2
+  eq(minNow, '', 'no minimum is pre-filled');
+  eq([await val(page, '#wiz-q-words'), await val(page, '#wiz-q-max')], ['jordan 4 military black', '80'], 'pick fills words + max');
   eq((await hunts(page)).length, 0, 'a pick saves nothing by itself');
   await page.click('#wiz-q-save'); await wait(1200);
   let h = await hunts(page);
@@ -101,7 +101,7 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   o = await page.$$eval('#wiz-q-ai [data-ai-pick]', bs => bs.map(b => b.innerText.replace(/\s+/g, ' ').trim()));
   eq(o, ['levis 501 993 listings in 14 days · max €22'], 'malformed options ignored, the good one shown');
   await page.click('#wiz-q-ai [data-ai-pick="0"]'); await wait(300);
-  eq([await val(page, '#wiz-q-words'), await val(page, '#wiz-q-max'), await val(page, '#wiz-q-min')], ['levis 501', '22', ''], 'max 22 below the default minimum 30: the minimum is cleared');
+  eq([await val(page, '#wiz-q-words'), await val(page, '#wiz-q-max'), await val(page, '#wiz-q-min')], ['levis 501', '22', ''], 'pick fills words + max 22; the minimum stays empty');
   await page.close();
 
   // ---- 3. Fallbacks: nothing found, not available, rate limited. The form keeps working.

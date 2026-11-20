@@ -73,8 +73,6 @@ const SMALL = { width: 320, height: 568, isMobile: true, hasTouch: true };
     await page.type('#wiz-q-words', 'nike tech');
     await page.type('#wiz-q-max', '40');
     await page.click('#wiz-q-save'); await wait(1500);
-    await page.click('.wiz-mode'); await wait(200);
-    await page.click('#wiz-mode-next'); await wait(1200);
     ok(await vis(page, '#wiz-step-2'), 'alerts step shown');
   }
   const NEW = 'plan=free&hunts=0&boot=1&joined=fresh';

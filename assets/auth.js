@@ -546,7 +546,7 @@
 
     if (isLogin) out.push('<h1 style="margin:0 0 4px;' + H1 + 'font-size:clamp(40px,5vw,48px);">Log in</h1>');
     if (isSignup) {
-      out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);text-wrap:balance;">Create your free account</h1><span style="font-size:13px;color:var(--text-secondary);">Free plan, no card.</span></div>');
+      out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);text-wrap:balance;">Start watching in a minute</h1><span style="font-size:13px;color:var(--text-secondary);">Your first search runs 24/7 with alerts for 3 days. No card.</span></div>');
     }
     if ((isSignup || isLogin || v === 'verify') && PLAN_NAMES[plan]) {
       out.push('<div data-selected-offer style="border:1px solid var(--border-hover);background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text-secondary);"><div style="font-size:10px;letter-spacing:.12em;color:var(--success);">SELECTED OFFER</div><div style="margin-top:4px;color:var(--text-primary);">' + PLAN_NAMES[plan] + '</div><div>' + PLAN_TERMS[plan] + '</div><div style="margin-top:8px;">Account first, then your hunt and secure checkout. Creating your account does not take a payment.</div></div>');
@@ -566,12 +566,6 @@
 
     out.push(bannerHTML(banner()));
 
-    if (isSignup) {
-      out.push('<div class="au-fbox" style="display:flex;flex-direction:column;gap:8px;"><label for="' + ID + '-heard" style="font-size:12px;letter-spacing:.1em;color:var(--text-secondary);"><span>HOW DID YOU FIND SNYPD?</span> <span style="color:var(--text-muted);letter-spacing:0;">(optional)</span></label>' +
-        '<select id="' + ID + '-heard" name="heard" data-f="heard"' + attr('disabled', lock) + ' class="f-in" style="' + INPUT + 'var(--border);color:' + (S.heard ? 'var(--text-primary)' : 'var(--text-muted)') + ';font-size:16px;padding:0 14px;outline:none;border-radius:0;cursor:pointer;">' +
-        '<option value="">Choose one</option>' + HEARD.map(function (h) { return '<option value="' + h[0] + '"' + attr('selected', S.heard === h[0]) + '>' + h[1] + '</option>'; }).join('') +
-        '</select></div>');
-    }
 
     /* Instagram/Facebook/TikTok open links in their own in-app browser, and Google
        refuses sign-in there (disallowed_useragent). Most SNYPD visitors arrive from
@@ -579,7 +573,7 @@
     if ((isLogin || isSignup) && IN_APP) {
       out.push('<div role="note" style="border:1px solid var(--border-hover);background:var(--panel);padding:14px 16px;font-size:13px;line-height:1.55;color:var(--text-secondary);">You opened this inside Instagram or another app. Google sign-in does not work here, so use your email below. Prefer Google? Tap the <b style="color:var(--text-primary);font-weight:500;">...</b> menu at the top and open this page in your browser.</div>');
     } else if (isLogin || isSignup) {
-      out.push('<button type="button" data-act="google"' + attr('disabled', lock) + ' class="h-ghost" style="display:flex;align-items:center;justify-content:center;gap:12px;height:52px;width:100%;background:var(--panel);border:1px solid var(--border-hover);color:var(--text-primary);font-size:13px;letter-spacing:.08em;cursor:pointer;">' + GOOGLE_SVG + '<span>CONTINUE WITH GOOGLE</span></button>');
+      out.push('<button type="button" data-act="google"' + attr('disabled', lock) + ' class="' + (isSignup ? 'h-brand' : 'h-ghost') + '" style="display:flex;align-items:center;justify-content:center;gap:12px;height:52px;width:100%;' + (isSignup ? 'background:var(--brand);border:1px solid var(--brand);color:var(--brand-fg);' : 'background:var(--panel);border:1px solid var(--border-hover);color:var(--text-primary);') + 'font-size:13px;letter-spacing:.08em;cursor:pointer;">' + GOOGLE_SVG + '<span>CONTINUE WITH GOOGLE</span></button>');
       out.push('<div style="display:flex;align-items:center;gap:12px;"><span style="flex:1;height:1px;background:var(--border);"></span><span style="font-size:12px;letter-spacing:.12em;color:var(--text-muted);">OR</span><span style="flex:1;height:1px;background:var(--border);"></span></div>');
     }
 
@@ -614,15 +608,16 @@
         (er.pw2 ? errSpan(ID + '-pw2e', er.pw2) : '') + '</div>');
     }
 
-    if (isSignup) out.push('<label style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer;"><input type="checkbox" name="marketing" data-f="marketing"' + attr('checked', S.marketing) + attr('disabled', busy) + ' style="width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#00E5A0;cursor:pointer;"><span style="font-size:13px;color:var(--text-secondary);">Email me product updates, Vinted tips and occasional offers.</span></label>');
 
     if (isLogin || isSignup || v === 'forgot' || v === 'reset' || v === 'verify') {
       var labels = { verify: ['CONFIRM EMAIL', 'CONFIRMING…'], login: ['LOG IN', 'LOGGING IN…'], signup: ['CREATE ACCOUNT', 'CREATING ACCOUNT…'], forgot: ['SEND RESET LINK', 'SENDING…'], reset: ['SAVE PASSWORD', 'SAVING…'] }[v];
-      out.push('<div style="display:flex;flex-direction:column;gap:10px;"><button type="submit"' + attr('disabled', lock) + ' class="h-brand" style="height:52px;width:100%;background:var(--brand);color:var(--brand-fg);border:none;font-size:13px;letter-spacing:.1em;cursor:' + (busy ? 'progress' : 'pointer') + ';opacity:' + (busy ? 0.7 : 1) + ';">' + (busy ? labels[1] : labels[0]) + '</button>' +
+      out.push('<div style="display:flex;flex-direction:column;gap:10px;"><button type="submit"' + attr('disabled', lock) + ' class="' + (isSignup && !IN_APP ? 'h-ghost' : 'h-brand') + '" style="height:52px;width:100%;' + (isSignup && !IN_APP ? 'background:var(--panel);color:var(--text-primary);border:1px solid var(--border-hover);' : 'background:var(--brand);color:var(--brand-fg);border:none;') + 'font-size:13px;letter-spacing:.1em;cursor:' + (busy ? 'progress' : 'pointer') + ';opacity:' + (busy ? 0.7 : 1) + ';">' + (busy ? labels[1] : labels[0]) + '</button>' +
         (st === 'slow' ? '<span role="status" style="font-size:12px;line-height:1.6;color:var(--warning);">Still working. Your connection looks slow; keep this tab open.</span>' : '') +
         (isSignup && LEGAL_LIVE ? '<span style="font-size:12px;line-height:1.6;color:var(--text-muted);">By creating an account you agree to the <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</span>' : '') +
         '</div>');
     }
+
+    if (isSignup) out.push('<label style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer;"><input type="checkbox" name="marketing" data-f="marketing"' + attr('checked', S.marketing) + attr('disabled', busy) + ' style="width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#00E5A0;cursor:pointer;"><span style="font-size:13px;color:var(--text-secondary);">Email me product updates, Vinted tips and occasional offers.</span></label>');
 
     if (v === 'forgot-sent' || v === 'verify') {
       var cd = S.cooldown, gmail = /@(gmail|googlemail)\.com$/i.test((S.email || '').trim());

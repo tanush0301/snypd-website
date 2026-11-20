@@ -14,8 +14,6 @@ const BROWSER = 'ops/test_flood_guard.cjs', CARD = 'ops/test_broad_hunt.cjs';
 
 const MUTATIONS = [
   ['          if (mx && max === null && wqNoMax !== words) {', '          if (false) {', BROWSER, 'wizard nudge never shown'],
-  ['          if (min !== null && max !== null && min >= max && !minEdited && wqMin && min === vq.floorFor(wqSite.value)) {', '          if (false) {', BROWSER, 'untouched default minimum still refuses'],
-  ['min >= max && !minEdited && wqMin && min === vq.floorFor', 'min >= max && wqMin && min === vq.floorFor', BROWSER, 'a typed minimum is cleared too'],
   ['        if (mx && !/[?&]price_to=[0-9]/.test(url) && mxKeptUrl !== url) {', '        if (false) {', BROWSER, 'sheet nudge never shown'],
   ['          }, () => { mxKeptUrl = url; addHunt(); });', '          }, () => { addHunt(); });', BROWSER, 'sheet "Start without a max" loops'],
   ['      return isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null;', '      return isFinite(v) ? Math.round(v * 100) / 100 : null;', BROWSER, 'a max of 0 accepted'],

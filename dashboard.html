@@ -1985,7 +1985,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
 <div class="wiz-overlay" id="wiz-overlay">
   <div class="wiz-modal">
     <div class="wiz-step" id="wiz-step-1">
-      <div class="wiz-eyebrow">Step 1 of 3</div>
+      <div class="wiz-eyebrow">Step 1 of 2</div>
       <h2 class="wiz-title">What are you hunting?</h2>
       <p class="wiz-sub">Type what you want. SNYPD runs that search on Vinted for you, no link needed. You can add more from Filters anytime.</p>
       <div class="wiz-quick">
@@ -1995,16 +1995,17 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
           <input type="number" id="wiz-q-max" min="0" step="0.01" inputmode="decimal" placeholder="Max price" aria-label="Maximum price (optional)" />
         </div>
         <label class="wiz-quick__note" for="wiz-q-min"><span>Minimum price (optional)</span> · <span id="wiz-q-min-currency">EUR</span></label>
-        <input type="number" class="vq-input" id="wiz-q-min" min="0" step="0.01" inputmode="decimal" value="30" aria-describedby="wiz-q-note" />
-        <p class="wiz-quick__note" id="wiz-q-note">Lower or clear the minimum to include cheaper items. Like Vinted's search, matches can include words in the description.</p>
+        <input type="number" class="vq-input" id="wiz-q-min" min="0" step="0.01" inputmode="decimal" aria-describedby="wiz-q-note" />
+        <p class="wiz-quick__note" id="wiz-q-note">Like Vinted's search, matches can include words in the description.</p>
         <p class="wiz-quick__err" id="wiz-q-err" role="status" style="display:none"></p>
         <div class="hw-box" id="wiz-q-hw" role="status" style="display:none"></div>
-        <div class="hw-box" id="wiz-q-mx" role="status" style="display:none"></div><div class="ai-box" id="wiz-q-ai"></div>
+        <div class="hw-box" id="wiz-q-mx" role="status" style="display:none"></div>
       </div>
       <div class="wiz-actions">
         <button class="btn btn-prim" id="wiz-q-save" type="button">Start this hunt</button>
         <button class="btn btn-ghost" id="wiz-build-own" type="button">I have a Vinted link</button>
       </div>
+      <div class="ai-box" id="wiz-q-ai" style="margin-top:16px"></div>
     </div>
     <div class="wiz-step" id="wiz-step-mode" style="display:none">
       <div class="wiz-progress">
@@ -2038,7 +2039,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
            1px rule filling the space, then a short mint bar. Only the label
            existed before. -->
       <div class="wiz-progress">
-        <span class="wiz-eyebrow" style="margin:0">Step 3 / 3</span>
+        <span class="wiz-eyebrow" style="margin:0">Step 2 / 2</span>
         <span class="wiz-progress__rule"></span>
         <span class="wiz-progress__bar"></span>
       </div>
@@ -2070,6 +2071,10 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
       <div class="wiz-actions">
         <button class="btn btn-prim" id="wiz-enable-alerts" type="button">Turn on alerts &amp; start hunting</button>
         <button class="btn btn-tertiary" id="wiz-finish" type="button">Set this up later</button>
+      </div>
+      <div id="wiz-heard" style="display:none;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+        <label for="wiz-heard-sel" style="display:block;font-size:12px;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:8px"><span>HOW DID YOU FIND SNYPD?</span> <span style="color:var(--text-muted);letter-spacing:0">(optional)</span></label>
+        <select id="wiz-heard-sel" class="vq-input" style="width:100%"><option value="">Choose one</option><option value="chatgpt">ChatGPT</option><option value="claude">Claude</option><option value="other_ai">Another AI assistant</option><option value="google">Google search</option><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="reddit">Reddit</option><option value="youtube">YouTube</option><option value="friend">A friend</option><option value="other">Somewhere else</option></select>
       </div>
     </div>
   </div>
@@ -4060,7 +4065,7 @@ const HEARTBEAT_URL = (() => {
         if (wasFirst && window.SNYPD && window.SNYPD.fs) window.SNYPD.fs({ hunt: inserted && inserted.vinted_url, src: 'sheet' });
         if (wasFirst && window.SNYPD && typeof window.SNYPD.showModeStep === 'function') {
           closeSheet();
-          window.SNYPD.showModeStep(inserted);
+          window.SNYPD.showAlertsStep();
         } else if (wasFirst && window.SNYPD && typeof window.SNYPD.showAlertsStep === 'function') {
           closeSheet();
           window.SNYPD.showAlertsStep();
@@ -4314,7 +4319,7 @@ const HEARTBEAT_URL = (() => {
         Promise.resolve().then(async () => {
           if (!await xpEventExistsEver('first_hunt', null)) await awardXP('first_hunt', 20, null, {});
         }).catch(e => console.error('SNYPD wizard: optional XP failed', e));
-        window.SNYPD.showModeStep(savedRow);
+        window.SNYPD.showAlertsStep();
         window.dispatchEvent(new Event('snypd:hunts-changed'));
         return true;
       }
@@ -4333,6 +4338,7 @@ const HEARTBEAT_URL = (() => {
         overlay.style.display = 'flex';
         step1.style.display = 'none';
         step2.style.display = '';
+        paintHeard();
         refreshTrialNote().catch(console.error);
       };
 
@@ -4476,7 +4482,6 @@ const HEARTBEAT_URL = (() => {
           if (wqMax) wqMax.placeholder = 'Max ' + cur;
           if (wqMin) {
             wqMin.placeholder = 'Min ' + cur;
-            if (!minEdited) wqMin.value = String(vq.floorFor(wqSite.value));
           }
           if (wqNote) wqNote.textContent = 'Lower or clear the minimum to include cheaper items. Like Vinted\'s search, matches can include words in the description.';
         };
@@ -4535,12 +4540,6 @@ const HEARTBEAT_URL = (() => {
             wqErr.textContent = 'Use a minimum of zero or more and a maximum above zero, or leave them blank.';
             wqErr.style.display = 'block';
             return;
-          }
-          // The untouched default minimum (30 EUR, 25 GBP ...) at or above the max typed here: clear it instead of
-          // refusing. The search builder already leaves such a minimum out (vqBuild); website outreach/62 move 3.
-          if (min !== null && max !== null && min >= max && !minEdited && wqMin && min === vq.floorFor(wqSite.value)) {
-            wqMin.value = '';
-            min = null;
           }
           if (min !== null && max !== null && min >= max) {
             wqErr.textContent = 'Minimum price must be below maximum price. Lower or clear the minimum.';
@@ -4664,6 +4663,17 @@ const HEARTBEAT_URL = (() => {
         });
       }
 
+      // "How did you find SNYPD?" moved here from /signup (first-session v2, 20 Nov 2026): optional, saved on pick,
+      // shown only while user_metadata.heard_from is empty. Any failure leaves the step as it was.
+      const heardBox = document.getElementById('wiz-heard'), heardSel = document.getElementById('wiz-heard-sel');
+      async function paintHeard() {
+        if (!heardBox || !heardSel) return;
+        try { const s = await sb.auth.getSession(); const md = (s && s.data && s.data.session && s.data.session.user && s.data.session.user.user_metadata) || {}; heardBox.style.display = md.heard_from ? 'none' : ''; } catch (e) {}
+      }
+      if (heardSel) heardSel.addEventListener('change', () => {
+        const v = heardSel.value; if (!/^[a-z_]{2,12}$/.test(v)) return;
+        Promise.resolve().then(() => sb.auth.updateUser({ data: { heard_from: v } })).catch(e => console.error('SNYPD wizard: heard_from not saved', e));
+      });
       const finishBtn = document.getElementById('wiz-finish');
       if (finishBtn) {
         finishBtn.addEventListener('click', () => { overlay.style.display = 'none'; });

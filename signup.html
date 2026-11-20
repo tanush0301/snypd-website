@@ -43,6 +43,8 @@
   .h-ghost:hover { border-color: var(--border3) !important; }
   .h-toggle:hover { color: var(--text-primary) !important; }
   .f-in:focus { border-color: var(--success) !important; }
+  /* Phones: tighter form so the submit button sits above the cookie bar (first-session v2, 20 Nov 2026). */
+  @media (max-width: 600px) { #au-form { gap: 10px !important; } #au-form h1 { font-size: 30px !important; } .au-wrap { padding-top: 4px !important; align-items: flex-start !important; } }
 </style>
 <script>
   /* Capture the URL before the Supabase client reads (and clears) it, so an
@@ -91,7 +93,7 @@
 
   <div style="flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr));">
 
-    <div style="display:flex;justify-content:center;align-items:center;padding:clamp(28px,5vw,56px) clamp(20px,4vw,40px);">
+    <div class="au-wrap" style="display:flex;justify-content:center;align-items:center;padding:clamp(28px,5vw,56px) clamp(20px,4vw,40px);">
       <form id="au-form" novalidate aria-busy="false" style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px;"></form>
       <noscript><p style="max-width:400px;font-size:13px;line-height:1.6;color:#A6ADB1;">Logging in to SNYPD needs JavaScript. Turn it on for this site and reload the page.</p></noscript>
     </div>

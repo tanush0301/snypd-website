@@ -122,16 +122,14 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   f.setInsertError(null); await f.el('wiz-q-save').click();
   assert.equal(f.el('wiz-step-2').style.display, ''); assert.equal(f.inserts(),2); passed++;
 
-  // Calm mode (migration 064): a saved row that has push_mode gets the alert-style step
-  // before alerts, with Continue disabled until a style is picked. A row without it
-  // (column missing) goes straight to alerts, which every case above covers.
+  // First-session v2 (20 Nov 2026): a saved row goes straight to the alerts step, also when it has push_mode;
+  // the alert-style step is no longer part of set-up (Every match is the default, Calm lives in Filters).
   f = await wizardFixture({insertedRow: {id: 'h1', push_mode: 'every', push_calm_minutes: 15}});
   f.el('wiz-step-1').style.display = ''; f.el('wiz-q-words').value = 'carhartt';
   await f.el('wiz-q-save').click();
-  assert.equal(f.el('wiz-step-mode').style.display, ''); assert.equal(f.el('wiz-step-2').style.display, 'none');
-  assert.equal(f.el('wiz-step-mode').dataset.huntId, 'h1'); assert.equal(f.el('wiz-mode-next').disabled, true);
-  await f.el('wiz-mode-next').click();
-  assert.equal(f.el('wiz-step-2').style.display, 'none'); assert.equal(f.inserts(), 1); passed++;
+  assert.equal(f.el('wiz-step-2').style.display, '');
+  assert.equal(f.el('wiz-step-mode').dataset.huntId, undefined);
+  assert.equal(f.inserts(), 1); passed++;
 
   // Existing hunters get a visible resume action without an automatic modal.
   f = await wizardFixture({count:1});
@@ -221,7 +219,7 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
   // First-hunt minimum is visible, editable and actually used by the save path.
   for (const [minimum, maximum, expected] of [['5','20',5],['','20',null],['0','20',0],['30','',30]]) {
     f=await wizardFixture(); f.el('wiz-q-words').value='jacket';
-    assert.equal(f.el('wiz-q-min').value,'30');
+    assert.ok(!f.el('wiz-q-min').value, 'no minimum is pre-filled');
     f.el('wiz-q-min').value=minimum; f.el('wiz-q-max').value=maximum;
     await f.el('wiz-q-save').click();
     assert.equal(f.inserts(),1); assert.equal(f.built[0][3],expected); passed++;
@@ -236,10 +234,10 @@ async function pushFixture({sub = true, registerStatus = 200, permission = 'gran
     f.el('wiz-q-min').value='5'; f.el('wiz-q-max').value='20';
     await f.el('wiz-q-save').click(); assert.equal(f.inserts(),1); passed++;
   }
-  // The untouched pre-filled minimum (30) at or above the max typed: cleared instead of refused (outreach/62 move 3).
+  // No minimum is pre-filled, so a max alone always saves without a minimum.
   for (const maximum of ['20', '30']) {
     f=await wizardFixture(); f.el('wiz-q-words').value='jacket';
-    assert.equal(f.el('wiz-q-min').value,'30');
+    assert.ok(!f.el('wiz-q-min').value, 'no minimum is pre-filled');
     f.el('wiz-q-max').value=maximum;
     await f.el('wiz-q-save').click();
     assert.equal(f.inserts(),1); assert.equal(f.built[0][3],null); assert.equal(f.el('wiz-q-min').value,'');

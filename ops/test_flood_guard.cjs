@@ -75,21 +75,21 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   await page.type('#wiz-q-mx [data-mx-in]', '25');
   await page.click('#wiz-q-mx [data-mx-act="use"]'); await wait(1200);
   let h = await hunts(page);
-  eq([h.length, qOf(h[0].url).price_to, qOf(h[0].url).price_from], [1, '25', undefined], 'saved with max 25, the default minimum 30 dropped');
-  ok(await vis(page, '#wiz-step-mode'), 'wizard moves on');
+  eq([h.length, qOf(h[0].url).price_to, qOf(h[0].url).price_from], [1, '25', undefined], 'saved with max 25 and no minimum');
+  ok(await vis(page, '#wiz-step-2'), 'wizard moves on to the alerts step');
   ok(!(await vis(page, '#wiz-q-err')), 'no form refusal');
   await page.close();
 
   // ---- 2. Wizard: "Start without a max" saves unchanged (default minimum kept); once per words
   page = await open('plan=free&hunts=0');
   await setVal(page, '#wiz-q-words', 'carhartt detroit', true);
-  const defMin = await page.$eval('#wiz-q-min', e => e.value);   // the site's pre-filled minimum (30 EUR, 35 USD ...)
-  ok(Number(defMin) > 0, 'a default minimum is pre-filled: ' + defMin);
+  const defMin = await page.$eval('#wiz-q-min', e => e.value);   // no minimum is pre-filled since first-session v2
+  eq(defMin, '', 'no minimum is pre-filled');
   await page.click('#wiz-q-save'); await wait(700);
   await page.click('#wiz-q-mx [data-mx-act="keep"]'); await wait(1200);
   h = await hunts(page);
-  eq([h.length, qOf(h[0].url).price_to, qOf(h[0].url).price_from], [1, undefined, defMin], 'saved without a max, default minimum kept');
-  ok(await vis(page, '#wiz-step-mode'), 'wizard moves on after "Start without a max"');
+  eq([h.length, qOf(h[0].url).price_to, qOf(h[0].url).price_from], [1, undefined, undefined], 'saved without a max and without a minimum');
+  ok(await vis(page, '#wiz-step-2'), 'wizard moves on after "Start without a max"');
   await page.close();
 
   // ---- 3. Wizard: a max typed below the untouched default minimum saves directly (no nudge, no refusal)
@@ -98,14 +98,14 @@ const PHONE = { width: 390, height: 844, isMobile: true, hasTouch: true };
   await setVal(page, '#wiz-q-max', '20', true);
   await page.click('#wiz-q-save'); await wait(1200);
   h = await hunts(page);
-  eq([h.length, qOf(h[0].url).price_to, qOf(h[0].url).price_from], [1, '20', undefined], 'max 20 saved; the untouched minimum 30 cleared');
+  eq([h.length, qOf(h[0].url).price_to, qOf(h[0].url).price_from], [1, '20', undefined], 'max 20 saved; no minimum added');
   ok(!(await vis(page, '#wiz-q-mx')) && !(await vis(page, '#wiz-q-err')), 'no nudge, no refusal');
   await page.close();
 
   // ---- 4. Wizard: a minimum the user typed at or above the max is still refused
   page = await open('plan=free&hunts=0');
   await setVal(page, '#wiz-q-words', 'nike tech fleece', true);
-  const typedMin = await page.$eval('#wiz-q-min', e => e.value);   // retyped by the user: the same value as the default
+  const typedMin = '30';   // typed by the user
   await setVal(page, '#wiz-q-min', typedMin, true);
   await setVal(page, '#wiz-q-max', String(Number(typedMin) - 10), true);
   await page.click('#wiz-q-save'); await wait(800);
