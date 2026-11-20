@@ -50,6 +50,7 @@
 "A friend sent you a gift":"Un ami t\u2019offre un cadeau",
 "A hunt is one saved Vinted search. SNYPD checks it every 1 to 5 minutes and every new match lands here, newest first.":"Une recherche SNYPD, c\u2019est une recherche Vinted enregistr\u00e9e. SNYPD la v\u00e9rifie toutes les 1 \u00e0 5 minutes et chaque nouvelle annonce arrive ici, la plus r\u00e9cente en premier.",
 "A private alert thread in the SNYPD Discord, connected in Dashboard > Profile. Up to 5 listings per message, at most one message a minute (every 5 min on busy searches), 200 messages a day. Same filters as push.":"Un fil d\u2019alertes priv\u00e9 dans le Discord SNYPD, \u00e0 connecter dans Tableau de bord > Profil. Jusqu\u2019\u00e0 5 annonces par message, au plus un message par minute (toutes les 5\u00a0min sur les recherches charg\u00e9es), 200 messages par jour. M\u00eames filtres que les push.",
+"A short sound when a new listing appears while this page is open.":"Un son bref quand une nouvelle annonce appara\u00eet pendant que cette page est ouverte.",
 "ACCEPT ALL":"TOUT ACCEPTER",
 "ACCOUNT CREATED \u00b7 1 STEP LEFT":"COMPTE CR\u00c9\u00c9 \u00b7 ENCORE 1 \u00c9TAPE",
 "ACTIVATE":"ACTIVER",
@@ -807,6 +808,7 @@
 "Somewhat disappointed":"Un peu d\u00e9\u00e7u",
 "Somewhere else":"Ailleurs",
 "Sort":"Trier",
+"Sound for new listings":"Son pour les nouvelles annonces",
 "Spain":"Espagne",
 "Spreadsheet":"Un tableur",
 "Start Hunt Pass":"Prendre le Pass 30 jours",
@@ -2008,6 +2010,10 @@
 [
 "^Your plan stays on\\. It renews on (.+), as before\\.$",
 "Ton plan continue. Il se renouvelle le $1, comme avant."
+],
+[
+"^(\\d+) new listings$",
+"$1 nouvelles annonces"
 ]
 ]
 };

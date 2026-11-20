@@ -1715,3 +1715,14 @@ FR.update({
         'Sur iPhone, les alertes demandent SNYPD sur ton écran d’accueil. Ta recherche continue de tourner en attendant.',
     'Show the steps again': 'Revoir les étapes',
 })
+
+# ===== New-listing signals on an open dashboard (20 Nov 2026): notice, tab title count, sound switch.
+FR.update({
+    'Sound for new listings': 'Son pour les nouvelles annonces',
+    'A short sound when a new listing appears while this page is open.':
+        'Un son bref quand une nouvelle annonce apparaît pendant que cette page est ouverte.',
+    '1 new listing': '1 nouvelle annonce',
+})
+FR_PATTERNS += [
+    (r'^(\d+) new listings$', '$1 nouvelles annonces'),
+]

@@ -1317,6 +1317,11 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 body[data-first-days] #email-optin-card,
 body[data-first-days] #dc-join,
 body[data-first-days] #claim-hint { margin-top: 16px; }
+/* New-listing notice (20 Nov 2026): see feedSignal(). */
+.feed-new-note { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 60;
+  background: #0f1f17; color: #00e58a; border: 1px solid #1f6b4a; padding: 8px 14px; font-size: 13px;
+  letter-spacing: .04em; max-width: calc(100vw - 32px); pointer-events: none; }
+.feed-new-note[hidden] { display: none; }
 .elite-banner {
   padding: 17px 20px;
   margin-bottom: 16px;
@@ -1923,6 +1928,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
   <button class="bottombar-tab" type="button" data-view="profile">Profile</button>
 </nav>
 <button class="new-pill" id="new-pill" type="button"></button>
+<div class="feed-new-note" id="feed-new-note" role="status" aria-live="polite" hidden></div>
 
 <!-- Ledger 2a: the filter bottom sheet. Per the design handoff (README §5.2,
      CLAUDE_CODE_PROMPT.md §1/§6), this is now the ONLY place to add, pause,
@@ -2569,6 +2575,13 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
         <div class="wiz-alert-row__note" id="prof-quiet-note">No alerts 23:00 - 08:00 your time, then one summary.</div>
       </div>
       <button type="button" class="toggle-switch" id="prof-toggle-quiet" role="switch" aria-checked="false" aria-labelledby="prof-label-quiet"><span class="toggle-switch__knob"></span></button>
+    </div>
+    <div class="wiz-alert-row">
+      <div>
+        <div class="wiz-alert-row__title" id="prof-label-sound">Sound for new listings</div>
+        <div class="wiz-alert-row__note" id="prof-sound-note">A short sound when a new listing appears while this page is open.</div>
+      </div>
+      <button type="button" class="toggle-switch is-on" id="prof-toggle-sound" role="switch" aria-checked="true" aria-labelledby="prof-label-sound"><span class="toggle-switch__knob"></span></button>
     </div>
     <div class="wiz-alert-row" id="prof-discord-row">
       <div>
@@ -5881,6 +5894,79 @@ const HEARTBEAT_URL = (() => {
   let hasRenderedOnce = false;
   let pendingNew = [];
 
+  // New listing on an open dashboard (20 Nov 2026): a short sound, a count in the tab title while the
+  // window is not in front, and a notice on the page. Adds no request; never throws into the feed.
+  const FEED_SOUND_KEY = 'snypd_feed_sound';
+  const FEED_TITLE = document.title;
+  let feedUnseen = 0, feedAudio = null, feedLastBeep = 0, feedNoteTimer = null;
+  function feedSoundOn() {
+    try { return localStorage.getItem(FEED_SOUND_KEY) !== 'off'; } catch (e) { return true; }
+  }
+  function feedBeep() {
+    try {
+      if (!feedSoundOn() || Date.now() - feedLastBeep < 10000) return false;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      if (!feedAudio) feedAudio = new AC();
+      if (feedAudio.state === 'suspended') { feedAudio.resume().catch(() => {}); }
+      if (feedAudio.state !== 'running') return false;   // browsers allow sound only after a click or key press
+      const osc = feedAudio.createOscillator(), gain = feedAudio.createGain(), t = feedAudio.currentTime;
+      osc.type = 'sine'; osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.06, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      osc.connect(gain); gain.connect(feedAudio.destination);
+      osc.start(t); osc.stop(t + 0.2);
+      feedLastBeep = Date.now();
+      window.__feedBeeps = (window.__feedBeeps || 0) + 1;
+      return true;
+    } catch (e) { return false; }
+  }
+  function feedClearUnseen() {
+    feedUnseen = 0;
+    try { if (document.title !== FEED_TITLE) document.title = FEED_TITLE; } catch (e) {}
+  }
+  function feedSignal(n) {
+    try {
+      n = Number(n) || 0;
+      if (n < 1) return;
+      const front = document.visibilityState === 'visible' && (typeof document.hasFocus !== 'function' || document.hasFocus());
+      if (!front) {
+        feedUnseen += n;
+        document.title = '(' + (feedUnseen > 99 ? '99+' : feedUnseen) + ') ' + FEED_TITLE;
+      }
+      const note = document.getElementById('feed-new-note');
+      if (note) {
+        note.textContent = n === 1 ? '1 new listing' : n + ' new listings';
+        note.hidden = false;
+        if (feedNoteTimer) clearTimeout(feedNoteTimer);
+        feedNoteTimer = setTimeout(() => { note.hidden = true; }, 5000);
+      }
+      feedBeep();
+    } catch (e) {}
+  }
+  window.addEventListener('focus', feedClearUnseen);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') feedClearUnseen(); });
+  // Sound needs one click or key press first: wake the audio on the first one.
+  ['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, function wake() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC && feedSoundOn()) { if (!feedAudio) feedAudio = new AC(); if (feedAudio.state === 'suspended') feedAudio.resume().catch(() => {}); }
+    } catch (e) {}
+  }, { passive: true }));
+  (function wireFeedSound() {
+    const sw = document.getElementById('prof-toggle-sound');
+    if (!sw) return;
+    const paint = () => { const on = feedSoundOn(); sw.classList.toggle('is-on', on); sw.setAttribute('aria-checked', on ? 'true' : 'false'); };
+    paint();
+    sw.addEventListener('click', () => {
+      const on = !feedSoundOn();
+      try { localStorage.setItem(FEED_SOUND_KEY, on ? 'on' : 'off'); } catch (e) {}
+      paint();
+      if (on) { feedLastBeep = 0; feedBeep(); }
+    });
+  })();
+
   function updatePill() {
     if (!newPill) return;
     if (pendingNew.length > 0) {
@@ -7106,6 +7192,10 @@ const HEARTBEAT_URL = (() => {
     const incomingIds = new Set(rows.map(r => String(r.listing_id)));
     const existingCards = Array.from(list.querySelectorAll('.card'));
     const existingIds = new Set(existingCards.map(c => c.dataset.id));
+    // For the new-listing signal: the oldest card on screen BEFORE this refresh. Measured here because a
+    // big batch replaces every card, and then nothing on screen is left to compare with.
+    const prevOldestMs = existingCards.length
+      ? Math.min(...existingCards.map(c => Number(c.dataset.uploadedMs) || 0)) : -Infinity;
 
     // Listings that aged out of the freshness window - always the oldest
     // (bottom-most, given newest-first order), so removing them doesn't
@@ -7120,6 +7210,7 @@ const HEARTBEAT_URL = (() => {
     pendingNew = pendingNew.filter(r => incomingIds.has(String(r.listing_id))
       && !existingIds.has(String(r.listing_id)));
     const unseenRows = rows.filter(r => !existingIds.has(String(r.listing_id)));
+    feedSignal(unseenRows.filter(r => !(uploadedTimeMs(r) < prevOldestMs)).length);
     // Rows older than the oldest card on screen come from "Show more": they
     // belong at the bottom, in order, never in the "new" path at the top.
     const shownMs = Array.from(list.querySelectorAll('.card')).map(c => Number(c.dataset.uploadedMs) || 0);
