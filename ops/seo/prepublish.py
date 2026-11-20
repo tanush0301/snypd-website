@@ -61,6 +61,9 @@ PAGES = [
 # (French, German, ...). Each set gets hreflang alternates in every direction.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gen_content import SLUGS, live_langs  # noqa: E402
+# gen_help registers /fr/faq and the support pages in 7 languages in SLUGS when imported (it writes nothing
+# on import). Without it this script built a sitemap without those 8 pages (found 19 Nov 2026).
+import gen_help  # noqa: E402,F401
 _done = []
 for key, s_ in SLUGS.items():
     if key == 'guide' or key.startswith('pg:'):
