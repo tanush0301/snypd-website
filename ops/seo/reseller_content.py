@@ -235,7 +235,7 @@ def tools(lang, index, g):
                 'listing it and keeping the books. We make SNYPD, the sourcing tool on this page, so every other fact links to the tool’s own site and its date.')
         sections = [
             ('answer', 'The short answer',
-             '<ul><li><strong>Finding underpriced items (sourcing): SNYPD.</strong> It checks your Vinted searches about once a minute and sends a push '
+             '<ul><li><strong>Finding underpriced items (sourcing): SNYPD.</strong> It checks your Vinted searches about every 30 seconds to a minute and sends a push '
              'alert when a new listing matches. Once a search has enough finds, it also shows how each new find’s price compares with that week’s finds. It never logs in to your Vinted account and never buys for you.</li>'
              '<li><strong>Price research:</strong> SNYPD’s free <a href="/vinted-price-guide">Vinted price guide</a> (asking prices for %d models) '
              'or ResellTrack (paid market research).</li>'
@@ -331,7 +331,7 @@ def tools(lang, index, g):
                 'de l’outil, avec sa date.')
         sections = [
             ('reponse', 'La réponse courte',
-             '<ul><li><strong>Trouver des articles sous-évalués (sourcing) : SNYPD.</strong> Il vérifie tes recherches Vinted environ une fois par minute '
+             '<ul><li><strong>Trouver des articles sous-évalués (sourcing) : SNYPD.</strong> Il vérifie tes recherches Vinted environ toutes les 30 secondes à une minute '
              'et envoie une notification quand une nouvelle annonce correspond. Quand une recherche a assez de trouvailles, il compare aussi le prix de chaque nouvelle '
              'avec celles de la semaine. Il ne se connecte jamais '
              'à ton compte Vinted et n’achète jamais à ta place.</li>'

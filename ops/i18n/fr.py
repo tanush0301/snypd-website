@@ -418,8 +418,8 @@ FR = {
     # /invite page (referral landing)
     'A friend sent you a gift': 'Un ami t’offre un cadeau',
     '2 extra days of 24/7 Vinted alerts': '2 jours de plus d’alertes Vinted 24h/24',
-    'SNYPD watches the Vinted searches you choose, about once a minute, and alerts your phone when a new matching listing appears.':
-        'SNYPD surveille les recherches Vinted que tu choisis, environ une fois par minute, et alerte ton téléphone quand une nouvelle annonce correspond.',
+    'SNYPD watches the Vinted searches you choose, about every 30 seconds to a minute, and alerts your phone when a new matching listing appears.':
+        'SNYPD surveille les recherches Vinted que tu choisis, environ toutes les 30 secondes à une minute, et alerte ton téléphone quand une nouvelle annonce correspond.',
     'Claim my 2 bonus days': 'Obtenir mes 2 jours offerts',
     'Free to start. No card needed.': 'Gratuit pour commencer. Sans carte.',
     'How it works': 'Comment ça marche',
