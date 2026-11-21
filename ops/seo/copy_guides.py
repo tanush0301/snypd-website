@@ -695,4 +695,70 @@ GUIDES = {
         ],
         cta_h='Krijg een melding bij nieuwe advertenties onder jouw prijs'),
   },
+  # ======================================================================== ALERT GUIDE (FR only, 21 Nov 2026)
+  # Target: "comment avoir une alerte pour chaque nouvelle annonce vinted". Vinted statements = the 'saved' FR block
+  # above (help 433/435, read 18 Oct 2026); SNYPD facts = outreach/00-fact-sheet.md; plan numbers = plans.py tokens.
+  'alertguide': {
+    'slugs': {'fr': '/fr/alerte-vinted-nouvelle-annonce'},
+    'fr': dict(
+        title='Alerte Vinted à chaque nouvelle annonce\xa0: le guide (2026) | SNYPD',
+        desc='Comment recevoir une alerte pour chaque nouvelle annonce Vinted qui correspond à ta recherche\xa0: ce que Vinted propose, la mise en place pas à pas, les réglages et les erreurs à éviter.',
+        eyebrow='GUIDE ALERTES VINTED',
+        h1='Comment recevoir une alerte pour chaque nouvelle annonce Vinted\xa0?',
+        lead='Un guide pratique\xa0: ce que Vinted fait déjà (centre d’aide lu le {read}), comment mettre en place une alerte par nouvelle annonce en quelques minutes, et comment la régler pour ne pas être noyé sous les notifications.',
+        answer='Sur Vinted, une recherche sauvegardée affiche un compteur «\xa0+N\xa0» des nouveaux articles, mais le centre d’aide ne décrit aucune notification pour chaque nouveau résultat. Pour être prévenu à chaque nouvelle annonce, il faut un outil qui vérifie ta recherche à ta place et t’envoie un push quand une annonce correspond.',
+        toc=[('vinted', 'Ce que Vinted propose'), ('etapes', 'La mise en place, étape par étape'), ('ou', 'Où arrivent les alertes'),
+             ('reglages', 'Régler l’alerte'), ('exemples', 'Trois exemples de recherche'), ('erreurs', 'Cinq erreurs fréquentes')],
+        sections=[
+            ('vinted', 'Ce que Vinted propose déjà',
+             '<p>Vinted te permet de sauvegarder une recherche depuis la barre de recherche. Le centre d’aide (<a href="{h435}" rel="nofollow noopener">Comment sauvegarder une recherche\xa0?</a>) précise que tu peux en garder un nombre illimité et qu’une recherche sauvegardée affiche un nombre suivi d’un signe plus\xa0: le nombre de nouveaux articles mis en ligne depuis ta dernière consultation, remis à zéro quand tu la consultes.</p>'
+             '<p>Côté notifications (<a href="{h433}" rel="nofollow noopener">Comment gérer tes notifications\xa0?</a>), Vinted cite entre autres un membre que tu suis qui met en ligne un article, la baisse de prix d’un favori et la vente d’un favori. Les nouveaux résultats d’une recherche sauvegardée ne figurent pas dans cette liste. Tu vois donc le compteur quand tu ouvres l’appli, mais rien ne te prévient au moment où une annonce arrive.</p>'
+             '<p>Tout sur les recherches sauvegardées\xa0: <a href="{saved}">recherches enregistrées Vinted</a>. Si tes notifications Vinted habituelles n’arrivent plus\xa0: <a href="{notwork}">notification Vinted qui ne fonctionne pas</a>.</p>'),
+            ('etapes', 'La mise en place avec SNYPD, étape par étape',
+             '<ol><li><strong>Fais ta recherche sur Vinted</strong> dans un navigateur, avec tous tes filtres\xa0: marque, taille, état, prix maximum.</li>'
+             '<li><strong>Copie le lien</strong> dans la barre d’adresse. Il contient <code>/catalog?</code>. Tous les filtres du lien sont repris tels quels\xa0; un lien avec un paramètre inconnu est refusé plutôt que coupé en silence.</li>'
+             '<li><strong>Crée ton compte SNYPD</strong> (pas de carte bancaire pour le plan Free).</li>'
+             '<li><strong>Colle le lien</strong> et lance la recherche. SNYPD la vérifie environ toutes les 30 secondes à une minute.</li>'
+             '<li><strong>Active les alertes.</strong> Sur ordinateur, autorise les notifications quand le navigateur le demande. Sur iPhone, ajoute d’abord SNYPD à l’écran d’accueil (Partager, puis «\xa0Sur l’écran d’accueil\xa0»), ouvre SNYPD depuis cette icône, puis active les alertes\xa0: Apple n’autorise les notifications web que là. Guide détaillé\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.</li>'
+             '<li><strong>En option, Discord</strong>\xa0: relie ton compte au serveur Discord SNYPD pour recevoir aussi tes alertes dans un fil privé.</li></ol>'
+             '<p>La fréquence de vérification n’est pas un délai d’arrivée\xa0: Vinted affiche lui-même une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne. SNYPD ne se connecte jamais à ton compte Vinted, n’achète rien et n’écrit pas aux vendeurs. L’alerte ouvre l’annonce sur Vinted, c’est toi qui décides.</p>'),
+            ('ou', 'Où arrivent les alertes',
+             '<ul><li><strong>Notification push</strong> sur ton téléphone ou ton ordinateur. Plusieurs annonces trouvées à la suite arrivent groupées dans un seul push (jusqu’à 5 annonces listées).</li>'
+             '<li><strong>Le tableau de bord</strong>, qui montre toutes les nouvelles annonces trouvées.</li>'
+             '<li><strong>Discord</strong>\xa0: avec un abonnement, le Pass 30 jours ou un essai en cours, un fil privé sur le serveur Discord SNYPD.</li></ul>'
+             '<p>Pas de Telegram, pas d’e-mail pour les alertes.</p>'),
+            ('reglages', 'Régler l’alerte pour ne pas être noyé',
+             '<p>Une recherche trop large peut sortir des centaines d’annonces par jour. Quatre réglages changent tout\xa0:</p>'
+             '<ul><li><strong>Un prix maximum.</strong> C’est le filtre le plus efficace\xa0: mets-le dans ta recherche Vinted avant de copier le lien.</li>'
+             '<li><strong>Des mots précis.</strong> La recherche Vinted demande que tous les mots soient dans une même annonce. «\xa0ralph lauren pull\xa0» fonctionne\xa0; une liste comme «\xa0Ralph Lauren, Nike, Adidas\xa0» ne trouve presque rien. Une marque = une recherche.</li>'
+             '<li><strong>Le mode Calme</strong>\xa0: la première trouvaille tout de suite, puis au plus un résumé toutes les 15 ou 30 minutes au lieu de «\xa0Chaque annonce\xa0».</li>'
+             '<li><strong>Seulement les moins chères</strong>\xa0: un push seulement pour une annonce moins chère que 75\xa0% de ce que cette recherche a trouvé dans la semaine (prix demandés, même état). Les annonces pas encore évaluées passent quand même, et le tableau de bord montre tout. Disponible sur les plans payants, le Pass 30 jours et pendant l’essai, pas sur le plan Free.</li></ul>'),
+            ('exemples', 'Trois exemples de recherche',
+             '<p>Des idées de structure, à adapter à ce que tu cherches. Le prix maximum, c’est toi qui le fixes selon ton budget\xa0:</p>'
+             '<ul><li><strong>Marque + modèle + taille</strong>\xa0: «\xa0nike air max 90\xa0», filtre taille 42, filtre prix maximum.</li>'
+             '<li><strong>Marque + type de vêtement + état</strong>\xa0: «\xa0carhartt veste\xa0», filtre état «\xa0Très bon état\xa0» ou mieux, filtre prix maximum.</li>'
+             '<li><strong>Un objet précis</strong>\xa0: «\xa0ps5 manette\xa0», filtre prix maximum. Si tu ne cherches qu’un seul objet, une seule recherche bien ciblée suffit.</li></ul>'),
+            ('erreurs', 'Cinq erreurs fréquentes',
+             '<ol><li><strong>Plusieurs marques dans une seule recherche.</strong> Vinted veut tous les mots dans la même annonce\xa0: la recherche ne trouve presque rien. Fais une recherche par marque.</li>'
+             '<li><strong>Pas de prix maximum.</strong> Tu reçois tout, y compris ce que tu n’achèteras jamais, et tu finis par ignorer les alertes.</li>'
+             '<li><strong>Les alertes jamais activées.</strong> La recherche tourne, mais sans autorisation de notification, rien n’arrive sur ton appareil.</li>'
+             '<li><strong>iPhone sans l’icône sur l’écran d’accueil.</strong> Dans Safari seul, Apple ne permet pas les notifications web. Ajoute SNYPD à l’écran d’accueil et ouvre-le depuis l’icône.</li>'
+             '<li><strong>Attendre une alerte à la seconde où l’annonce est postée.</strong> Vinted affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne\xa0; SNYPD ne peut la voir qu’à partir de ce moment.</li></ol>'),
+        ],
+        faq=[
+            ('Est-ce gratuit\xa0?',
+             'Oui pour commencer. Le plan Free fait tourner ta première recherche 24h/24 avec les alertes pendant @@trial_days@@ jours après ta première recherche dans SNYPD. Si elle ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois. Ensuite, elle ne tourne que quand le tableau de bord est ouvert. Les plans payants tournent 24h/24 dès @@price:solo@@ par mois.'),
+            ('En combien de temps arrive l’alerte\xa0?',
+             'SNYPD vérifie ta recherche environ toutes les 30 secondes à une minute. C’est la fréquence de vérification, pas un délai garanti\xa0: Vinted affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne.'),
+            ('Vinted peut-il m’envoyer une notification pour une recherche sauvegardée\xa0?',
+             'Son centre d’aide décrit un compteur «\xa0+N\xa0» dans la barre de recherche, pas une notification pour chaque nouveau résultat. Pour être prévenu à chaque nouvelle annonce, il faut un outil qui vérifie la recherche.'),
+            ('Dois-je donner mon mot de passe Vinted\xa0?',
+             'Non. SNYPD ne te demande jamais ton mot de passe Vinted et ne se connecte jamais à ton compte. Il n’achète rien et n’écrit pas aux vendeurs.'),
+            ('Pourquoi je ne reçois rien sur mon iPhone\xa0?',
+             'Sur iPhone, les alertes ne fonctionnent qu’une fois SNYPD ajouté à l’écran d’accueil et ouvert depuis cette icône. Active ensuite les alertes depuis l’appli. Pas à pas\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.'),
+            ('Je reçois trop d’alertes, que faire\xa0?',
+             'Ajoute un prix maximum à ta recherche, utilise des mots plus précis, ou passe la recherche en mode Calme (un résumé toutes les 15 ou 30 minutes) ou en «\xa0Seulement les moins chères\xa0» (pas sur le plan Free). Toutes les options d’alerte\xa0: <a href="{notify}">alertes Vinted pour les nouvelles annonces</a>.'),
+        ],
+        cta_h='Crée ta première alerte Vinted'),
+  },
 }

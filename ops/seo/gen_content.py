@@ -2451,7 +2451,7 @@ for _k, _g in cg.GUIDES.items():
 
 def page_guide(key, lang):
     c = cg.GUIDES[key][lang]
-    fmt = {k: href(k, lang) for k in ('bot', 'notify', 'notwork', 'sold', 'saved', 'pricedrop')}
+    fmt = {k: href(k, lang) for k in ('bot', 'notify', 'notwork', 'sold', 'saved', 'pricedrop', 'phone')}
     for art in ('433', '435', '258'):
         fmt['h' + art] = cg.HELP.get((art, lang)) or cg.HELP.get((art, 'en'), '')
     fmt['read'] = date_txt(cg.HELP_READ, lang)
