@@ -149,6 +149,16 @@ const PHONE = { width: 390, height: 664, isMobile: true, hasTouch: true, deviceS
   eq(await bg('#elite-banner > a'), PURPLE, '"See plans" is the main button again once the alerts card is gone');
   await page.close();
 
+  // ---- 7. Claim receipt: one neutral review link, for everyone, no score
+  {
+    const html = fs.readFileSync(path.join(root, 'dashboard.html'), 'utf8');
+    eq((html.match(/trustpilot\.com/g) || []).length, 1, 'one Trustpilot link in the page');
+    ok(/id="claim-review"[^>]*>(?:(?!<\/div>).)*href="https:\/\/www\.trustpilot\.com\/evaluate\/snypd\.store"/.test(html), 'the review link sits in the claim receipt and points at the review form');
+    const inReceipt = html.slice(html.indexOf('id="claim-receipt-overlay"'), html.indexOf('id="claim-receipt-done"'));
+    ok(inReceipt.includes('id="claim-review"') && !/display:none/.test(inReceipt.slice(inReceipt.indexOf('id="claim-review"'), inReceipt.indexOf('id="claim-review"') + 80)), 'shown to every user (never hidden by a rule)');
+    ok(!/TrustScore|stars?|\d(\.\d)? out of 5|good review|5-star/i.test(inReceipt), 'no score and no request for a good review');
+  }
+
   eq(errors, [], 'no page errors');
   await browser.close(); server.close();
   console.log('PASS: ' + passed + ' first-session v2 checks.');

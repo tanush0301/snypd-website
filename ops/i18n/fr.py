@@ -192,6 +192,8 @@ FR = {
     'Discord alerts': 'Alertes Discord',
     'Connect Discord': 'Connecter Discord',
     'On this iPhone': 'Sur cet iPhone',
+    'Tell others what you think of SNYPD:': 'Dis aux autres ce que tu penses de SNYPD' + NB + ':',
+    'write a review on Trustpilot': 'laisse un avis sur Trustpilot',
     'In Discord': 'Dans Discord',
     'Add SNYPD to your Home Screen, then allow notifications. About a minute, three drawn steps.': 'Ajoute SNYPD à ton écran d’accueil, puis autorise les notifications. Environ une minute, trois étapes illustrées.',
     'A private thread with your finds. No Home Screen step: join the SNYPD Discord, then type a 6-character code.': 'Un fil privé avec tes trouvailles. Sans passer par l’écran d’accueil' + NB + ': rejoins le Discord SNYPD, puis tape un code de 6 caractères.',
