@@ -1500,7 +1500,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
      card balloons to ~558px. The 300px ceiling settles it - the grid still
      fills the width whenever there are enough cards to do so honestly, and
      a near-empty feed shows real-sized cards instead of two giant ones. */
-  #list { grid-template-columns: repeat(auto-fit, minmax(170px, 300px)); gap: 14px; justify-content: start; }
+  #list, #examples-list { grid-template-columns: repeat(auto-fit, minmax(170px, 300px)); gap: 14px; justify-content: start; }
   /* Desktop grid cell (2j) is a square thumbnail. Same value as the base
      rule now that mobile is square too - kept explicit so the desktop grid
      is pinned to 1:1 regardless of what the mobile card ever changes to. */
@@ -2393,7 +2393,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
 <div id="examples-title" style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-primary)">Already on Vinted for your search</div>
 <div id="examples-sub" class="muted" style="margin-top:6px;max-width:60ch">Older listings, shown so you can see what your search finds. New listings appear here as soon as they are posted. Only new ones send an alert.</div>
 </div>
-<div id="examples-list"></div>
+<div id="examples-list" class="list"></div>
 </div>
 <div class="pr-bar" id="pr-bar" style="display:none">
 <span class="pr-bar__lbl">Sort</span>
