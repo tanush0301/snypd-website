@@ -42,10 +42,19 @@ def render():
         ('Support', '/support'),
     ]
     text = ('# SNYPD\n\n'
-            '> Vinted reselling tool for sourcing: public Vinted search monitoring and alerts for new matching listings.\n\n'
+            '> Vinted alert tool and monitor for buyers and resellers: it watches public Vinted searches and sends an alert for each new matching listing.\n\n'
             'SNYPD is independent of Vinted. It does not log into Vinted accounts, buy items,\n'
             'message sellers, or monitor price drops on existing listings.\n'
             'This optional navigation summary is not an access policy or a promise of search inclusion.\n\n'
+            '## What it is\n\n'
+            '- Alerts: push notifications on phone and computer, and Discord alerts.\n'
+            '- A web app: it runs in the browser on iPhone, Android, Windows and macOS. On iPhone it is added\n'
+            '  to the Home Screen to receive push alerts. There is no App Store or Google Play app.\n'
+            '- Set-up: paste a Vinted search link; every filter in the link is kept (brand, size, price, condition).\n'
+            '- Coverage: 26 Vinted sites, including vinted.co.uk, vinted.fr, vinted.com, vinted.be, vinted.de and vinted.nl.\n'
+            '- Price rating: on busy searches, each new find is rated against what the same search found that\n'
+            '  week, in the same condition. These are asking prices, not sales.\n'
+            '- Alerts only: no automatic buying and no Vinted login or password.\n\n'
             '## Public sources\n\n'
             + '\n'.join('- [%s](%s%s)' % (name, content.SITE, url) for name, url in links)
             + '\n\n## Pricing\n\n' + '\n'.join(prices)
