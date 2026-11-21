@@ -135,6 +135,20 @@ const PHONE = { width: 390, height: 664, isMobile: true, hasTouch: true, deviceS
   await shot(page, 'wizard-step1-1440');
   await page.close();
 
+  // ---- 6. First dashboard: one main button at a time (the plans banner's button is quiet while the alerts card shows)
+  page = await open('plan=free&hunts=1&boot=1&joined=fresh');
+  await wait(2500);
+  const bg = sel => page.$eval(sel, e => getComputedStyle(e).backgroundColor);
+  const PURPLE = 'rgb(162, 0, 255)';
+  ok(await vis(page, '#alerts-setup-card') && await vis(page, '#elite-banner'), 'alerts card and plans banner both show for a new account with a search');
+  eq(await bg('#alerts-setup-resume'), PURPLE, '"Set up alerts" is the main button');
+  ok((await bg('#elite-banner > a')) !== PURPLE, '"See plans" is quiet while the alerts card shows: ' + await bg('#elite-banner > a'));
+  ok(await vis(page, '#elite-banner > a'), '"See plans" is still there');
+  await page.click('#alerts-setup-later'); await wait(500);
+  ok(!(await vis(page, '#alerts-setup-card')), 'the alerts card closes on "Not now"');
+  eq(await bg('#elite-banner > a'), PURPLE, '"See plans" is the main button again once the alerts card is gone');
+  await page.close();
+
   eq(errors, [], 'no page errors');
   await browser.close(); server.close();
   console.log('PASS: ' + passed + ' first-session v2 checks.');

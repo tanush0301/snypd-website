@@ -1317,6 +1317,9 @@ body:not(.pr-free) .card[data-pr-cheap], body.pr-free .card.pr-open[data-pr-chea
 body[data-first-days] #email-optin-card,
 body[data-first-days] #dc-join,
 body[data-first-days] #claim-hint { margin-top: 16px; }
+/* First-session v2 (20 Nov 2026): one main button at a time. While the alerts set-up card is showing, the plans
+   banner's own button is quiet (the card comes first in the page, so a sibling rule is enough). */
+#alerts-setup-card:not([style*="display:none"]):not([style*="display: none"]) ~ #elite-banner > a.btn-prim { background: transparent; color: var(--text-primary); border: 1px solid var(--border-hover); box-shadow: none; }
 /* New-listing notice (20 Nov 2026): see feedSignal(). */
 .feed-new-note { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 60;
   background: #0f1f17; color: #00e58a; border: 1px solid #1f6b4a; padding: 8px 14px; font-size: 13px;
