@@ -859,7 +859,7 @@ def page_bot(lang):
         body = f"""
 <section id="answer">
   <h2>SNYPD in one paragraph</h2>
-  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search about every 30 seconds to a minute. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer, and on paid plans, the Hunt Pass and a running trial also a Discord alert in your private thread in the SNYPD Discord. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search, 24/7 for the first @@trial_days@@ days and then while your dashboard is open; paid plans from @@price:solo@@ a month keep watching 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD is a Vinted alert bot, also called a Vinted monitor, for resellers. You paste a Vinted search link with your filters (brand, size, price, condition) and SNYPD checks that search about every 30 seconds to a minute. When a new listing matches, it appears in your dashboard and you get a push notification on your phone or computer. On paid plans, the Hunt Pass and a running trial, you also get a Discord alert in your private thread in the SNYPD Discord. SNYPD never asks for your Vinted password, never signs in to your account, never buys and never messages sellers. The free plan runs one search, 24/7 for the first @@trial_days@@ days and then while your dashboard is open; paid plans from @@price:solo@@ a month keep watching 24/7.</p></div>
 </section>
 <section id="kinds">
   <h2>The three kinds of Vinted bot</h2>
@@ -928,7 +928,7 @@ def page_bot(lang):
     body = f"""
 <section id="resume">
   <h2>SNYPD en un paragraphe</h2>
-  <div class="lg-box lg-mint"><p>SNYPD est un bot d’alertes Vinted pour les revendeurs. Tu colles le lien d’une recherche Vinted avec tes filtres (marque, taille, prix, état) et SNYPD vérifie cette recherche environ toutes les 30 secondes à une minute. Quand une nouvelle annonce correspond, elle apparaît dans ton tableau de bord et tu reçois une notification push sur ton téléphone ou ton ordinateur, et, avec un abonnement, le Pass ou un essai en cours, aussi une alerte Discord dans ton fil Discord privé sur le Discord SNYPD. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’envoie aucun message aux vendeurs. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les abonnements, à partir de @@price:solo@@ par mois, surveillent 24h/24. Tu cherches un seul article&nbsp;? Le Pass surveille ta recherche pendant @@pass_days@@ jours, même quand ton tableau de bord est fermé&nbsp;: @@price:pass@@ en une fois, sans renouvellement. <a href="/plans#card-pass">Voir le Pass @@pass_days@@ jours</a></p></div>
+  <div class="lg-box lg-mint"><p>SNYPD est un bot d’alertes Vinted pour les revendeurs. Tu colles le lien d’une recherche Vinted avec tes filtres (marque, taille, prix, état) et SNYPD vérifie cette recherche environ toutes les 30 secondes à une minute. Quand une nouvelle annonce correspond, elle apparaît dans ton tableau de bord et tu reçois une notification push sur ton téléphone ou ton ordinateur. Avec un abonnement, le Pass ou un essai en cours, tu reçois aussi une alerte dans ton fil privé sur le serveur Discord SNYPD. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’envoie aucun message aux vendeurs. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les abonnements, à partir de @@price:solo@@ par mois, surveillent 24h/24. Tu cherches un seul article&nbsp;? Le Pass surveille ta recherche pendant @@pass_days@@ jours, même quand ton tableau de bord est fermé&nbsp;: @@price:pass@@ en une fois, sans renouvellement. <a href="/plans#card-pass">Voir le Pass @@pass_days@@ jours</a></p></div>
 </section>
 <section id="types">
   <h2>Les trois types de bot Vinted</h2>
@@ -1280,7 +1280,7 @@ def reasons(lang):
              'SNYPD needs an email address and nothing else: no Vinted password, no login, no browser extension. It never buys and never messages sellers. You buy through Vinted&rsquo;s normal checkout.',
              'Autobuy needs your account: Souk&rsquo;s docs say &ldquo;To use Autobuy, first link your Vinted account&rdquo;, VINTI asks you to sign in to your Vinted account, and V-Tools&rsquo; plans come with connected Vinted accounts. V-Tools&rsquo; own FAQ on bans: &ldquo;No tool can guarantee zero risk.&rdquo;'),
             ('Alerts land on your phone',
-             'Push notifications go straight to your phone or computer and need nothing else. Alerts can also arrive in a private thread in the SNYPD Discord. No Telegram. Several finds close together arrive as one notification, not a buzz each.',
+             'Push notifications go straight to your phone or computer and need nothing else. On paid plans, the Hunt Pass and a running trial, alerts also arrive in a private thread in the SNYPD Discord. No Telegram. Several finds close together arrive as one notification, not a buzz each.',
              'Telvin alerts only inside Telegram; Resell Reserve, Resell Vault, Monitorius and VintageLab in Discord. On iPhone, add SNYPD to your Home Screen once: Apple only allows web push for Home Screen apps.'),
             ('Every Vinted filter you set',
              'Paste a Vinted search link and SNYPD keeps every filter in it: brand, size, price, condition, colour, material, category. If you can filter it on Vinted, SNYPD keeps that filter.',
@@ -1304,7 +1304,7 @@ def reasons(lang):
              'SNYPD a besoin d’une adresse e-mail, rien d’autre : pas de mot de passe Vinted, pas de connexion, pas d’extension. Il n’achète jamais et n’écrit jamais aux vendeurs. Tu achètes avec le paiement normal de Vinted.',
              'L’achat automatique passe par ton compte : la doc de Souk dit « To use Autobuy, first link your Vinted account », VINTI te demande de te connecter à ton compte Vinted, et les plans de V-Tools incluent des comptes Vinted connectés. La FAQ de V-Tools sur les bannissements : « No tool can guarantee zero risk ».'),
             ('Les alertes arrivent sur ton téléphone',
-             'Les notifications push arrivent directement sur ton téléphone ou ton ordinateur, sans rien d’autre à installer. Les alertes peuvent aussi arriver dans un fil Discord privé sur le Discord SNYPD. Pas de Telegram. Plusieurs trouvailles rapprochées arrivent en une seule notification.',
+             'Les notifications push arrivent directement sur ton téléphone ou ton ordinateur, sans rien d’autre à installer. Avec un abonnement, le Pass ou un essai en cours, les alertes arrivent aussi dans un fil privé sur le serveur Discord SNYPD. Pas de Telegram. Plusieurs trouvailles rapprochées arrivent en une seule notification.',
              'Telvin alerte uniquement dans Telegram ; Resell Reserve, Resell Vault, Monitorius et VintageLab dans Discord. Sur iPhone, ajoute SNYPD à ton écran d’accueil une fois : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
             ('Chaque filtre Vinted que tu règles',
              'Colle un lien de recherche Vinted et SNYPD garde tous ses filtres : marque, taille, prix, état, couleur, matière, catégorie. Si tu peux le filtrer sur Vinted, SNYPD garde ce filtre.',
@@ -1376,7 +1376,7 @@ def page_compare(lang):
   <p>No tool is best at everything. Three things other Vinted bots offer that SNYPD does not, from each tool&rsquo;s own site:</p>
   <ul class="fit-list">
     <li><strong>They can buy for you.</strong>Souk, V-Tools, Resell Reserve, Resell Vault, VINTI, VintageLab and CopMarket (Pro) sell autobuy. Buying on Vinted needs a logged-in account, so those features act through yours. SNYPD never signs in as you, so every purchase stays your decision, made on Vinted.</li>
-    <li><strong>They alert you in Telegram, Discord or their own app.</strong>Telvin sends alerts in Telegram; Resell Reserve, Resell Vault, Monitorius and VintageLab in Discord; InstantAlert, Vinotify and DealFindr in their own apps; MarktAlert by Telegram, email or webhooks. SNYPD sends push notifications to your phone or computer, with nothing to install, and can also alert you in a private thread in the SNYPD Discord. No Telegram.</li>
+    <li><strong>They alert you in Telegram, Discord or their own app.</strong>Telvin sends alerts in Telegram; Resell Reserve, Resell Vault, Monitorius and VintageLab in Discord; InstantAlert, Vinotify and DealFindr in their own apps; MarktAlert by Telegram, email or webhooks. SNYPD sends push notifications to your phone or computer, with nothing to install, and on paid plans, the Hunt Pass and a running trial it can also alert you in a private thread in the SNYPD Discord. No Telegram.</li>
     <li><strong>Their first paid plan costs less.</strong>Vinotify starts at &euro;2.99 a month, Telvin at &euro;4.90, InstantAlert and DealFindr at &euro;4.99. SNYPD&rsquo;s first paid plan, Solo, is @@price:solo@@ and watches 1 search 24/7; the Market Report starts with Pro at @@price:pro@@. Without a subscription, the Hunt Pass is @@price:pass@@ once for 1 search over @@pass_days@@ days.</li>
   </ul>
 </section>
@@ -1427,7 +1427,7 @@ def page_compare(lang):
   <p>Aucun outil n’est le meilleur en tout. Trois choses que d’autres bots Vinted proposent et pas SNYPD, d’après le site de chaque outil :</p>
   <ul class="fit-list">
     <li><strong>Ils peuvent acheter à ta place.</strong>Souk, V-Tools, Resell Reserve, Resell Vault, VINTI, VintageLab et CopMarket (Pro) vendent de l’achat automatique. Acheter sur Vinted demande un compte connecté, donc ces fonctions passent par le tien. SNYPD ne se connecte jamais à ta place : chaque achat reste ta décision, sur Vinted.</li>
-    <li><strong>Ils alertent dans Telegram, Discord ou leur propre app.</strong>Telvin alerte dans Telegram ; Resell Reserve, Resell Vault, Monitorius et VintageLab dans Discord ; InstantAlert, Vinotify et DealFindr dans leur app ; MarktAlert par Telegram, e-mail ou webhooks. SNYPD envoie des notifications push sur ton téléphone ou ton ordinateur : rien à installer, et SNYPD peut aussi t’alerter dans un fil Discord privé sur le Discord SNYPD. Pas de Telegram.</li>
+    <li><strong>Ils alertent dans Telegram, Discord ou leur propre app.</strong>Telvin alerte dans Telegram ; Resell Reserve, Resell Vault, Monitorius et VintageLab dans Discord ; InstantAlert, Vinotify et DealFindr dans leur app ; MarktAlert par Telegram, e-mail ou webhooks. SNYPD envoie des notifications push sur ton téléphone ou ton ordinateur : rien à installer, et avec un abonnement, le Pass ou un essai en cours, SNYPD peut aussi t’alerter dans un fil privé sur le serveur Discord SNYPD. Pas de Telegram.</li>
     <li><strong>Leur premier plan payant coûte moins cher.</strong>Vinotify commence à 2,99&nbsp;&euro; par mois, Telvin à 4,90&nbsp;&euro;, InstantAlert et DealFindr à 4,99&nbsp;&euro;. Le premier plan payant de SNYPD, Solo, coûte @@price:solo@@ et surveille 1 recherche 24h/24 ; le Market Report commence avec Pro à @@price:pro@@. Sans abonnement, le Pass 30 jours coûte @@price:pass@@ en une fois pour 1 recherche pendant @@pass_days@@ jours.</li>
   </ul>
 </section>
@@ -1488,7 +1488,7 @@ def page_monitor(lang):
             ('How fast is a Vinted monitor?',
              'It depends on how often the tool checks. SNYPD checks each search about every 30 seconds to a minute on every plan. ' + SPEED_MEASURED['en'] + ' Some vendors advertise milliseconds; those are their own figures, measured their own way.'),
             ('Do I need Discord or Telegram?',
-             'Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, and push needs nothing else. Discord is optional: SNYPD can also send alerts to a private thread in the SNYPD Discord. No Telegram. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps.'),
+             'Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, and push needs nothing else. Discord is optional: on paid plans, the Hunt Pass and a running trial, SNYPD can also send alerts to a private thread in the SNYPD Discord. No Telegram. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps.'),
             ('Which Vinted countries can a monitor watch?',
              'That depends on the tool. SNYPD works on %s, 26 sites in all, each in its own currency: paste a search link from the site you shop on.' % MARKETS_TEXT['en']),
         ]
@@ -1525,7 +1525,7 @@ def page_monitor(lang):
   <ul>
     <li><strong>Push notifications</strong> to your phone or computer: SNYPD, with nothing to install. App-based tools such as InstantAlert, Vinotify and DealFindr push through their own apps.</li>
     <li><strong>Telegram</strong>: Telvin Bot sends alerts only there; MarktAlert offers Telegram among other channels.</li>
-    <li><strong>Discord</strong>: SNYPD can also send alerts to a private thread in the SNYPD Discord; Resell Reserve, Resell Vault, Monitorius and VintageLab post alerts in Discord.</li>
+    <li><strong>Discord</strong>: on paid plans, the Hunt Pass and a running trial, SNYPD can also send alerts to a private thread in the SNYPD Discord; Resell Reserve, Resell Vault, Monitorius and VintageLab post alerts in Discord.</li>
     <li><strong>An app feed</strong>: V-Tools shows finds in its own app.</li>
   </ul>
   <p>Whichever you pick, check that the alert reaches you with your laptop closed. A monitor that only runs while a browser tab is open misses most of the night.</p>
@@ -1573,7 +1573,7 @@ def page_monitor(lang):
         ('Un monitor Vinted, c’est rapide ?',
          'Ça dépend de la fréquence de vérification de l’outil. SNYPD vérifie chaque recherche environ toutes les 30 secondes à une minute, sur tous les plans. ' + SPEED_MEASURED['fr'] + ' Certains éditeurs annoncent des millisecondes ; ce sont leurs propres chiffres, mesurés à leur façon.'),
         ('Faut-il Discord ou Telegram ?',
-         'Seulement si le monitor choisi envoie ses alertes là-bas. SNYPD envoie des notifications push sur ton téléphone ou ton ordinateur, sans rien d’autre à installer. Discord est en option : SNYPD peut aussi envoyer les alertes dans un fil Discord privé sur le Discord SNYPD. Pas de Telegram. Sur iPhone, ajoute d’abord SNYPD à ton écran d’accueil : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
+         'Seulement si le monitor choisi envoie ses alertes là-bas. SNYPD envoie des notifications push sur ton téléphone ou ton ordinateur, sans rien d’autre à installer. Discord est en option : avec un abonnement, le Pass ou un essai en cours, SNYPD peut aussi envoyer les alertes dans un fil privé sur le serveur Discord SNYPD. Pas de Telegram. Sur iPhone, ajoute d’abord SNYPD à ton écran d’accueil : Apple n’autorise les notifications web que pour les apps de l’écran d’accueil.'),
         ('Quels pays Vinted un monitor peut-il surveiller ?',
          'Ça dépend de l’outil. SNYPD fonctionne sur %s, 26 sites au total, chacun dans sa devise : colle un lien de recherche du site où tu achètes.' % MARKETS_TEXT['fr']),
     ]
@@ -1610,7 +1610,7 @@ def page_monitor(lang):
   <ul>
     <li><strong>Notifications push</strong> sur ton téléphone ou ton ordinateur : SNYPD, sans rien installer. Des outils à application comme InstantAlert, Vinotify et DealFindr envoient leurs push via leur app.</li>
     <li><strong>Telegram</strong> : Telvin Bot alerte uniquement là ; MarktAlert propose Telegram parmi d’autres canaux.</li>
-    <li><strong>Discord</strong> : SNYPD peut aussi envoyer les alertes dans un fil Discord privé sur le Discord SNYPD ; Resell Reserve, Resell Vault, Monitorius et VintageLab publient les alertes dans Discord.</li>
+    <li><strong>Discord</strong> : avec un abonnement, le Pass ou un essai en cours, SNYPD peut aussi envoyer les alertes dans un fil privé sur le serveur Discord SNYPD ; Resell Reserve, Resell Vault, Monitorius et VintageLab publient les alertes dans Discord.</li>
     <li><strong>Le flux d’une app</strong> : V-Tools affiche les trouvailles dans sa propre app.</li>
   </ul>
   <p>Quel que soit ton choix, vérifie que l’alerte t’arrive ordinateur fermé. Un monitor qui ne tourne que dans un onglet ouvert rate la plus grande partie de la nuit.</p>
