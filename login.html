@@ -31,6 +31,9 @@
   .f-in:focus { border-color: var(--success) !important; }
   /* Phones: tighter form so the submit button sits above the cookie bar (first-session v2, 20 Nov 2026). */
   @media (max-width: 600px) { #au-form { gap: 10px !important; } #au-form h1 { font-size: 30px !important; } .au-wrap { padding-top: 4px !important; align-items: flex-start !important; } }
+  /* Phones narrower than 390 px (21 Nov 2026): smaller fields and gaps, so the submit button clears the cookie bar. */
+  @media (max-width: 389px) { #au-form { gap: 6px !important; } #au-form h1 { font-size: 24px !important; } #au-form > div:first-child { gap: 6px !important; } #au-form .au-fbox { gap: 4px !important; } #au-form .au-fbox > div:first-child { min-height: 20px !important; } #au-form .au-fbox input { height: 44px !important; } #au-form button[data-act="google"], #au-form button[type="submit"] { height: 44px !important; } }
+  @media (max-width: 339px) { #au-form { gap: 4px !important; } #au-form h1 { font-size: 20px !important; } #au-form > div:first-child { gap: 4px !important; } #au-form > div:first-child > span { font-size: 12px !important; } #au-form .au-fbox > div:first-child { min-height: 16px !important; } #au-form .au-fbox input { height: 42px !important; } .au-wrap { padding-top: 0 !important; } }
 </style>
 <script>
   /* Capture the URL before the Supabase client reads (and clears) it, so an

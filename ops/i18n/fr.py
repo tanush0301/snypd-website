@@ -252,8 +252,8 @@ FR = {
     'Already on Vinted for your search': 'Déjà sur Vinted pour ta recherche',
     'Older listings, shown so you can see what your search finds. New listings appear here as soon as they are posted. Only new ones send an alert.':
         'Des annonces plus anciennes, pour te montrer ce que trouve ta recherche. Les nouvelles annonces apparaissent ici dès leur mise en ligne. Seules les nouvelles déclenchent une alerte.',
-    'A hunt is one saved Vinted search. SNYPD checks it every 1 to 5 minutes and every new match lands here, newest first.':
-        'Une recherche SNYPD, c’est une recherche Vinted enregistrée. SNYPD la vérifie toutes les 1 à 5 minutes et chaque nouvelle annonce arrive ici, la plus récente en premier.',
+    'A hunt is one saved Vinted search. SNYPD checks it about every 30 seconds to a minute and every new match lands here, newest first.':
+        'Une recherche SNYPD, c’est une recherche Vinted enregistrée. SNYPD la vérifie environ toutes les 30 secondes à une minute et chaque nouvelle annonce arrive ici, la plus récente en premier.',
     'Add your first hunt': 'Ajoute ta première recherche',
     'No hunts yet': 'Aucune recherche pour l’instant',
     'No hunts yet. Add one below.': 'Aucune recherche pour l’instant. Ajoutes-en une ci-dessous.',
@@ -338,7 +338,7 @@ FR = {
     'I have a Vinted link': 'J’ai un lien Vinted',
     'Type at least one word, for example a brand.': 'Tape au moins un mot, par exemple une marque.',
     'How should we tell you?': 'Comment te prévenir' + NB + '?',
-    'We check your hunt every 1 to 5 min and send a push when a new listing matches.': 'On vérifie ta recherche toutes les 1 à 5 min et on t’envoie une notification push quand une nouvelle annonce correspond.',
+    'We check your hunt about every 30 seconds to a minute and send a push when a new listing matches.': 'On vérifie ta recherche environ toutes les 30 secondes à une minute et on t’envoie une notification push quand une nouvelle annonce correspond.',
     'Push notification': 'Notification push',
     'on your phone or computer': 'sur ton téléphone ou ton ordinateur',
     'Turn on alerts & start hunting': 'Activer les alertes et démarrer',
@@ -1226,8 +1226,8 @@ FR.update({
     'Step 2 / 3': 'Étape 2 / 3',
     'Step 3 / 3': 'Étape 3 / 3',
     'How should we alert you?': 'Comment veux-tu être prévenu' + NB + '?',
-    'We still check this hunt every 1 to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.':
-        'On vérifie toujours ta recherche toutes les 1 à 5 min. Ce choix règle seulement la fréquence des notifications. Tu peux le changer à tout moment dans Filtres.',
+    'We still check this hunt about every 30 seconds to a minute. This only sets how often your phone buzzes. Change it anytime in Filters.':
+        'On vérifie toujours ta recherche environ toutes les 30 secondes à une minute. Ce choix règle seulement la fréquence des notifications. Tu peux le changer à tout moment dans Filtres.',
     'Alert style': 'Type d’alerte',
     'Every match': 'Chaque annonce',
     'Be first on every new listing. Best for resellers.': 'Sois le premier sur chaque nouvelle annonce. Idéal pour les revendeurs.',

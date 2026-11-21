@@ -1319,6 +1319,10 @@ body[data-first-days] #dc-join,
 body[data-first-days] #claim-hint { margin-top: 16px; }
 /* First-session v2 (20 Nov 2026): one main button at a time. While the alerts set-up card is showing, the plans
    banner's own button is quiet (the card comes first in the page, so a sibling rule is enough). */
+/* First-session polish (21 Nov 2026): while the alerts set-up card shows, the old text-only iPhone notice is hidden
+   (the card opens the drawn guide) and the plan card's main button goes quiet too. */
+body:has(#alerts-setup-card:not([style*="display:none"]):not([style*="display: none"])) #notify-note.cta-note { display: none !important; }
+#alerts-setup-card:not([style*="display:none"]):not([style*="display: none"]) ~ #elite-banner #first-find-plan a.btn-prim { background: transparent; color: var(--text-primary); border: 1px solid var(--border-hover); box-shadow: none; }
 #alerts-setup-card:not([style*="display:none"]):not([style*="display: none"]) ~ #elite-banner > a.btn-prim { background: transparent; color: var(--text-primary); border: 1px solid var(--border-hover); box-shadow: none; }
 /* New-listing notice (20 Nov 2026): see feedSignal(). */
 .feed-new-note { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: 60;
@@ -2017,7 +2021,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
         <span class="wiz-progress__bar"></span>
       </div>
       <h2 class="wiz-title">How should we alert you?</h2>
-      <p class="wiz-sub">We still check this hunt every 1 to 5 min. This only sets how often your phone buzzes. Change it anytime in Filters.</p>
+      <p class="wiz-sub">We still check this hunt about every 30 seconds to a minute. This only sets how often your phone buzzes. Change it anytime in Filters.</p>
       <div class="wiz-presets" role="radiogroup" aria-label="Alert style">
         <button type="button" class="wiz-mode" data-mode="every" role="radio" aria-checked="false">
           <span class="wiz-mode__title">Every match</span>
@@ -2047,7 +2051,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
         <span class="wiz-progress__bar"></span>
       </div>
       <h2 class="wiz-title">How should we tell you?</h2>
-      <p class="wiz-sub">We check your hunt every 1 to 5 min and send a push when a new listing matches.</p>
+      <p class="wiz-sub">We check your hunt about every 30 seconds to a minute and send a push when a new listing matches.</p>
       <!-- RISK 15: each toggle's only content is a decorative knob span, so
            without an explicit name a screen reader announces "switch, on"
            with no subject. aria-labelledby points at the visible label that
@@ -6291,7 +6295,7 @@ const HEARTBEAT_URL = (() => {
     if (hasActiveHunts === false) {
       empty.innerHTML = EMPTY_ICON
         + '<div style="font-size:15px;color:var(--text-primary);margin-bottom:8px">No hunts yet</div>'
-        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD checks it every 1 to 5 minutes and every new match lands here, newest first.</div>'
+        + '<div style="max-width:46ch;margin:0 auto">A hunt is one saved Vinted search. SNYPD checks it about every 30 seconds to a minute and every new match lands here, newest first.</div>'
         + '<div style="margin-top:18px"><button class="btn btn-prim" type="button" id="empty-add-hunt">Add your first hunt</button></div>';
       empty.style.display = 'block';
       const zeroPill = document.getElementById('filter-pill');
@@ -9035,6 +9039,10 @@ const HEARTBEAT_URL = (() => {
     try { await initPromise; } catch (e) { /* already recorded in pushState */ }
     return { ready: pushState.ready, state: pushState.state, message: pushState.message };
   };
+  // init() can announce its state before alertsStatus (just above) exists: an iPhone without the Home Screen app
+  // and browsers without push return early. Announce once more when the start-up check is done, so the alerts
+  // set-up card never misses it (found 21 Nov 2026: the card stayed hidden when the page data arrived first).
+  Promise.resolve(initPromise).then(function () { window.dispatchEvent(new Event('snypd:alerts-changed')); });
 
   window.SNYPD.disableAlerts = async function () {
     try { await initPromise; } catch (e) { /* already recorded in pushState */ }

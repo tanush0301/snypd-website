@@ -149,6 +149,32 @@ const PHONE = { width: 390, height: 664, isMobile: true, hasTouch: true, deviceS
   eq(await bg('#elite-banner > a'), PURPLE, '"See plans" is the main button again once the alerts card is gone');
   await page.close();
 
+  // ---- 6b. Polish (21 Nov 2026): pace wording, no second iPhone notice, plan card button quiet next to the alerts card
+  {
+    const html = fs.readFileSync(path.join(root, 'dashboard.html'), 'utf8');
+    ok(!/1 to 5 min/.test(html), 'no "every 1 to 5 min" text left in the page');
+    eq((html.match(/about every 30 seconds to a minute/g) || []).length, 3, 'three texts carry the measured pace wording');
+    const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1';
+    page = await open('plan=free&hunts=1&boot=1&joined=fresh&trial=1&tfound=5');
+    await page.setUserAgent(IPHONE);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.addStyleTag({ content: '*{transition:none!important;animation:none!important}' });
+    await wait(3500);
+    const PURPLE2 = 'rgb(162, 0, 255)';
+    const shown = sel => page.evaluate(sel => { const e = document.querySelector(sel); return !!e && e.getClientRects().length > 0; }, sel);
+    const bg2 = sel => page.$eval(sel, e => getComputedStyle(e).backgroundColor);
+    ok(await vis(page, '#alerts-setup-card'), 'iPhone: the alerts card shows');
+    ok(/Home Screen/.test(await tc(page, '#notify-note')), 'iPhone: the notice text is still set');
+    ok(!(await shown('#notify-note')), 'iPhone: the text-only notice is hidden while the alerts card shows');
+    ok(await shown('#first-find-plan'), 'the plan card shows once the trial has a find');
+    ok((await bg2('#first-find-plan a.btn-prim')) !== PURPLE2, 'the plan card button is quiet while the alerts card shows: ' + await bg2('#first-find-plan a.btn-prim'));
+    eq(await bg2('#alerts-setup-resume'), PURPLE2, '"Set up alerts" is the one purple button');
+    await page.click('#alerts-setup-later'); await wait(500);
+    ok(await shown('#notify-note'), 'iPhone: the notice comes back once the alerts card is closed');
+    eq(await bg2('#first-find-plan a.btn-prim'), PURPLE2, 'the plan card button is the main button once the alerts card is gone');
+    await page.close();
+  }
+
   // ---- 7. Claim receipt: one neutral review link, for everyone, no score
   {
     const html = fs.readFileSync(path.join(root, 'dashboard.html'), 'utf8');
