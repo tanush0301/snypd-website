@@ -8295,7 +8295,8 @@ const HEARTBEAT_URL = (() => {
   // queued for this account; then the feed refreshes at once instead of on the 20 s timer below.
   // Reads no database. Any problem = pause and rely on the timer.
   const FEED_WAIT_URL = 'https://api.snypd.store/api/v1/feed/wait';
-  let feedWaitOn = false, feedWaitTick = null;
+  let feedWaitOn = false, feedWaitTick = null, feedWaitLastLoad = 0;
+  const FEED_WAIT_MIN_GAP = 5000;   // ms between two find-triggered reloads
   const feedWaitSleep = ms => new Promise(r => setTimeout(r, ms));
   async function feedWaitLoop() {
     if (feedWaitOn) return;
@@ -8317,8 +8318,13 @@ const HEARTBEAT_URL = (() => {
               if (j && typeof j.tick === 'number' && j.tick > (feedWaitTick || 0)) feedWaitTick = j.tick;
               else if (first) feedWaitTick = 0;
               if (j && j.changed === true && !first && running && document.visibilityState === 'visible') {
-                window.__feedWaitLoads = (window.__feedWaitLoads || 0) + 1;
-                await loadAds();
+                const gap = FEED_WAIT_MIN_GAP - (Date.now() - feedWaitLastLoad);
+                if (gap > 0) await feedWaitSleep(gap);
+                if (running && document.visibilityState === 'visible') {
+                  feedWaitLastLoad = Date.now();
+                  window.__feedWaitLoads = (window.__feedWaitLoads || 0) + 1;
+                  await loadAds();
+                }
               }
               if (j && typeof j.retry === 'number') pause = Math.max(5, Math.min(600, j.retry)) * 1000;
               else if (!j || j.changed !== true) pause = 250;

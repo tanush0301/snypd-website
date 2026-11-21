@@ -91,6 +91,14 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   s = await state(p);
   ok(s.loads === 2, 'second find: second reload');
 
+  // 3b. a burst (21 Nov 2026): six finds in about 2.5 s cause at most two reloads, and every listing is shown
+  for (let i = 0; i < 6; i++) { await arrive(p, true); await wait(400); }
+  await p.waitForFunction(() => Array.from(document.querySelectorAll('#list .card .t')).filter(e => /Fresh arrival/.test(e.textContent)).length === 8, { timeout: 12000 });
+  await wait(1500);
+  s = await state(p);
+  ok(s.fresh === 8, 'burst: all six listings shown, got ' + s.fresh);
+  ok(s.loads - 2 >= 1 && s.loads - 2 <= 2, 'burst: at most two reloads for six finds, got ' + (s.loads - 2));
+
   // 4. a marker that was already set before the page opened does not cause a reload at start
   const ctx = await browser.createBrowserContext();
   const q = await ctx.newPage();

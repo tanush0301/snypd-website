@@ -11,7 +11,9 @@ src = raw.decode("utf-8")
 
 MUTS = [
     ("loop never started", "    feedWaitLoop().catch(() => {});\r\n", ""),
-    ("no reload on a change", "                await loadAds();\r\n              }\r\n              if (j && typeof j.retry", "              }\r\n              if (j && typeof j.retry"),
+    ("no reload on a change", "                  await loadAds();\r\n                }\r\n              }\r\n              if (j && typeof j.retry", "                }\r\n              }\r\n              if (j && typeof j.retry"),
+    ("no pause between two find-triggered reloads", "                if (gap > 0) await feedWaitSleep(gap);\r\n", ""),
+    ("reload time never remembered", "                  feedWaitLastLoad = Date.now();\r\n", ""),
     ("reloads at start for an old marker", "if (j && j.changed === true && !first && running", "if (j && j.changed === true && running"),
     ("marker never remembered", "if (j && typeof j.tick === 'number' && j.tick > (feedWaitTick || 0)) feedWaitTick = j.tick;", ""),
     ("no login sent", "{ headers: { Authorization: 'Bearer ' + t } });\r\n            if (!res.ok) { pause = res.status === 404", "{});\r\n            if (!res.ok) { pause = res.status === 404"),
