@@ -870,7 +870,7 @@ def page_bot(lang):
   <p>They buy or check out for you. Buying on Vinted needs a logged-in account, so these tools act through yours; V-Tools, for example, states that you connect your own Vinted accounts. Souk, V-Tools and Resell Reserve sell autobuy features.</p>
   <h3>DO-IT-YOURSELF SCRIPTS</h3>
   <p>Open-source projects on GitHub that you host yourself, usually posting to Discord or Telegram. Free, but you run the server and fix it when Vinted changes something.</p>
-  <p>Prices, channels and free plans of each tool are side by side in <a href="{SLUGS['compare']['en']}">Vinted bots compared</a>. How a monitor works, step by step: <a href="{SLUGS['monitor']['en']}">what is a Vinted monitor?</a></p>
+  <p>Prices, channels and free plans of each tool are side by side in <a href="{SLUGS['compare']['en']}">Vinted bots compared</a>. How a monitor works, step by step: <a href="{SLUGS['monitor']['en']}">what is a Vinted monitor?</a> Looking for a &ldquo;Vinted sniper&rdquo;? See <a href="{SLUGS['sniper']['en']}">what a Vinted sniper is</a>.</p>
 </section>
 <section id="automation">
   <h2>Vinted automation: the buyer side, not the seller side</h2>
@@ -1331,7 +1331,7 @@ COMPARE_FAQ = {
         ('Are Vinted bots worth it?',
          'For resellers who buy in a narrow niche, often. Vinted&rsquo;s own saved searches show a &ldquo;+N&rdquo; counter the next time you open the app, but they do not notify you about each new match, so a well-priced listing can be gone before you look. If you only buy now and then for yourself, saved searches may be enough. Try a free plan before paying: SNYPD, Telvin, Crazed and MarktAlert all list one.'),
         ('Can a Vinted bot get my account banned?',
-         'Vinted&rsquo;s terms prohibit bots and scraping programs, so no tool can promise there is no risk. V-Tools&rsquo; own FAQ says: &ldquo;No tool can guarantee zero risk.&rdquo; What differs is what happens on your account: autobuy tools act through your logged-in Vinted account, while SNYPD never signs in as you, so nothing it does happens on your account.'),
+         'Vinted&rsquo;s terms prohibit bots and scraping programs, so no tool can promise there is no risk. V-Tools&rsquo; own FAQ says: &ldquo;No tool can guarantee zero risk.&rdquo; What differs is what happens on your account: autobuy tools act through your logged-in Vinted account, while SNYPD never signs in as you, so nothing it does happens on your account. More: <a href="/vinted-sniper">what a Vinted sniper is</a>.'),
         ('Is there a free Vinted bot?',
          'Yes, with limits. According to each tool&rsquo;s own site, checked on %s: SNYPD Free runs 1 search with no time limit, 24/7 for the first @@trial_days@@ days and then while your dashboard is open; Vinotify&rsquo;s free plan checks 1 search once a day; Telvin&rsquo;s free plan covers 1 keyword alert and 100 notifications; Crazed is free with 3 alerts and 30 items a day; MarktAlert&rsquo;s free plan has 2 alerts checked every 15 minutes; DealFindr&rsquo;s has 3 searches checked hourly, with alerts 30 minutes late. InstantAlert, Monitorius and CopMarket offer short trials. Open-source scripts such as Vinted Scanner are free if you run them yourself.' % COMPARE_CHECKED['en']),
         ('Which Vinted bot is the fastest?',

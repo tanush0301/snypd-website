@@ -877,4 +877,54 @@ GUIDES = {
         ],
         cta_h='Set up your first Vinted alert'),
   },
+  # ======================================================================== Vinted sniper (EN only, 22 Nov 2026)
+  # Target: "vinted sniper". SNYPD facts = outreach/00-fact-sheet.md; terms wording = gen_content.py compare FAQ / monitor page.
+  # No terms URL, no section number, no rival named (coordinator, 22 Nov 2026).
+  'sniper': {
+    'slugs': {'en': '/vinted-sniper'},
+    'en': dict(
+        title='Vinted sniper: alert bot or auto-buy? What to know | SNYPD',
+        desc='What a Vinted sniper is: alert bots versus auto-buy tools. SNYPD checks your searches about every 30 seconds to a minute and never logs in or buys for you.',
+        eyebrow='VINTED SNIPER GUIDE',
+        h1='What is a Vinted sniper, and what does it do on your account?',
+        lead='Resellers say &ldquo;Vinted sniper&rdquo; for two different kinds of tool: bots that alert you to new listings, and bots that buy for you. Here is the difference, what Vinted’s terms say, and where SNYPD fits.',
+        answer='A Vinted sniper is a tool that watches Vinted searches so you see new listings before most other buyers. Some only alert you; auto-buy tools also log in to your Vinted account and check out for you. SNYPD is an alert tool: it checks your search about every 30 seconds to a minute and sends you an alert, and you decide and buy yourself. It never logs in to your Vinted account, never buys and never messages sellers.',
+        toc=[('meaning', 'Alert bot or auto-buy'), ('account', 'What happens on your account'), ('terms', 'What Vinted’s terms say'),
+             ('speed', 'How fast a sniper is'), ('snypd', 'SNYPD as a Vinted sniper'), ('prices', 'Plans and prices')],
+        sections=[
+            ('meaning', 'Two meanings of &ldquo;Vinted sniper&rdquo;: alert bot or auto-buy',
+             '<ul><li><strong>Alert bots</strong>, also called monitors, keep checking a Vinted search and tell you when a new listing matches. You open the listing and decide whether to buy.</li>'
+             '<li><strong>Auto-buy bots</strong> go one step further: they buy or check out for you, following rules you set.</li></ul>'
+             '<p>Both are called snipers because both aim at the same thing: seeing a good listing early. More on the first kind: <a href="/vinted-monitor">what is a Vinted monitor?</a></p>'),
+            ('account', 'What a sniper does on your Vinted account',
+             '<p>Buying on Vinted needs a logged-in account, so auto-buy tools log in to your Vinted account and check out for you. Whatever they do, they do as you.</p>'
+             '<p>An alert bot has no reason to log in. SNYPD never asks for your Vinted password, never signs in to your Vinted account, never buys and never messages sellers. You get the alert, open the listing and buy it yourself through Vinted’s normal checkout.</p>'),
+            ('terms', 'What Vinted’s terms say about bots',
+             '<p>Vinted’s terms prohibit bots and scraping programs, so no tool can promise there is no risk. That applies to every sniper, SNYPD included. Read Vinted’s own terms in the Vinted app or on the Vinted site and decide for yourself.</p>'
+             '<p>What does differ between tools is what happens on your account: an auto-buy tool acts through your logged-in Vinted account, while SNYPD never signs in as you.</p>'),
+            ('speed', 'How fast is a Vinted sniper?',
+             '<p>SNYPD checks your search about every 30 seconds to a minute, on every plan. That is how often it looks, not how fast an alert reaches you: Vinted itself shows a new listing in its search minutes after it is posted.</p>'
+             '<p>Each tool measures its own speed in its own way, so compare like with like: <a href="/vinted-bot-comparison">Vinted bots compared</a>.</p>'),
+            ('snypd', 'SNYPD as a Vinted sniper',
+             '<ol><li><strong>Open your search on Vinted</strong> and set your filters: brand, size, price, condition.</li>'
+             '<li><strong>Copy the link</strong> from the address bar (it contains <code>/catalog?</code>) and paste it into SNYPD.</li>'
+             '<li><strong>Turn on alerts.</strong> Push notifications on your phone or computer; on iPhone, add SNYPD to the Home Screen first. Step by step: <a href="{phone}">Vinted alerts on your phone</a>.</li></ol>'
+             '<p>Discord alerts are an option on paid plans, the Hunt Pass and a running trial: <a href="/vinted-alerts-push-vs-discord">push or Discord for Vinted alerts</a>. SNYPD works on every Vinted site in Europe and the US, 26 sites in all.</p>'),
+            ('prices', 'Plans and prices',
+             '<p>Free: your first search runs 24/7 with alerts for @@trial_days@@ days. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free checks only while the dashboard is open. Paid plans from @@price:solo@@ a month run 24/7 with push alerts. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
+        ],
+        faq=[
+            ('Does SNYPD buy items for me?',
+             'No. SNYPD alerts you to new listings; you decide and buy yourself through Vinted’s normal checkout. It never logs in to your Vinted account and never messages sellers.'),
+            ('What is the difference between a Vinted sniper and an auto-buy bot?',
+             'Some snipers only alert you to new listings. Auto-buy bots also log in to your Vinted account and check out for you. SNYPD is an alert tool.'),
+            ('Are Vinted snipers against Vinted’s terms?',
+             'Vinted’s terms prohibit bots and scraping programs, so no tool can promise there is no risk, SNYPD included. Read Vinted’s own terms in the app or on the site.'),
+            ('How often does SNYPD check my search?',
+             'About every 30 seconds to a minute, on every plan. That is how often SNYPD looks, not a catch time: Vinted shows a new listing in its search minutes after it is posted.'),
+            ('Is there a free trial?',
+             'Yes. Free: your first search runs 24/7 with alerts for @@trial_days@@ days. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed.'),
+        ],
+        cta_h='Set up your first Vinted alert'),
+  },
 }
