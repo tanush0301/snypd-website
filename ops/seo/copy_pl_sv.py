@@ -146,7 +146,7 @@ WAY_CELLS = {
         cost={'pl': '19,99&ndash;44,99&nbsp;&pound;' + _M['pl'], 'sv': '19,99&ndash;44,99&nbsp;&pound;' + _M['sv']}),
     'SNYPD': dict(
         get={'pl': 'Każde nowe ogłoszenie z wklejonego linku wyszukiwania Vinted, ze wszystkimi filtrami', 'sv': 'Varje ny annons för söklänken från Vinted som du klistrar in, med alla filter'},
-        how={'pl': 'Push na telefon i komputer, bez sklepu z aplikacjami', 'sv': 'Push till mobil och dator, ingen appbutik'},
+        how={'pl': 'Push na telefon i komputer, bez sklepu z aplikacjami, oraz prywatny wątek na Discordzie', 'sv': 'Push till mobil och dator, ingen appbutik, och en privat Discord-tråd'},
         cost={'pl': 'Za darmo: 1 wyszukiwanie, @@trial_days@@ dni 24/7; płatnie od @@price:solo@@ / mies. lub @@price:pass@@ jednorazowo za @@pass_days@@ dni',
               'sv': 'Gratis: 1 sökning, dygnet runt i @@trial_days@@ dagar; betalt från @@price:solo@@ / mån. eller @@price:pass@@ en gång för @@pass_days@@ dagar'}),
 }
