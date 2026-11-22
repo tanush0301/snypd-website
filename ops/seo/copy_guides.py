@@ -712,7 +712,7 @@ GUIDES = {
         sections=[
             ('vinted', 'Ce que Vinted propose déjà',
              '<p>Sur Vinted, une recherche sauvegardée affiche un compteur «\xa0+N\xa0» des nouveaux articles depuis ta dernière visite (<a href="{h435}" rel="nofollow noopener">Comment sauvegarder une recherche\xa0?</a>). Mais Vinted n’envoie aucun push quand un nouveau résultat arrive\xa0: tu ne le vois qu’en ouvrant l’appli.</p>'
-             '<p>Tout sur les recherches sauvegardées\xa0: <a href="{saved}">recherches enregistrées Vinted</a>. Si tes notifications Vinted habituelles n’arrivent plus\xa0: <a href="{notwork}">notification Vinted qui ne fonctionne pas</a>.</p>'),
+             '<p>Tout sur les recherches sauvegardées\xa0: <a href="{saved}">recherches enregistrées Vinted</a>. Si tes notifications Vinted habituelles n’arrivent plus\xa0: <a href="{notwork}">notification Vinted qui ne fonctionne pas</a>. Les options gratuites et leurs limites\xa0: <a href="/fr/bot-vinted-gratuit">bot Vinted gratuit</a>.</p>'),
             ('etapes', 'La mise en place avec SNYPD, étape par étape',
              '<ol><li><strong>Fais ta recherche sur Vinted</strong> dans un navigateur, avec tous tes filtres\xa0: marque, taille, état, prix maximum.</li>'
              '<li><strong>Copie le lien</strong> dans la barre d’adresse. Il contient <code>/catalog?</code>. Tous les filtres du lien sont repris tels quels\xa0; un lien avec un paramètre inconnu est refusé plutôt que coupé en silence.</li>'
@@ -801,6 +801,58 @@ GUIDES = {
              'Non. SNYPD ne te demande jamais ton mot de passe Vinted et ne se connecte jamais à ton compte.'),
         ],
         cta_h='Crée ta première alerte Vinted'),
+  },
+  # ======================================================================== BOT GRATUIT (FR only, 22 Nov 2026)
+  # Target: "bot vinted gratuit". Vinted statements = the 'saved' FR block above (linked, not repeated); SNYPD facts =
+  # outreach/00-fact-sheet.md; plan numbers = plans.py tokens. No named rivals, no named open-source project.
+  'gratuit': {
+    'slugs': {'fr': '/fr/bot-vinted-gratuit'},
+    'fr': dict(
+        title='Bot Vinted gratuit\xa0: ce que «\xa0gratuit\xa0» veut dire | SNYPD',
+        desc='Bot Vinted gratuit\xa0: recherches sauvegardées de Vinted, scripts à héberger soi-même ou essai SNYPD. Ce que chaque option fait, et ses limites.',
+        eyebrow='BOT VINTED GRATUIT',
+        h1='Existe-t-il un bot Vinted gratuit ?',
+        lead='Trois façons d’être prévenu des nouvelles annonces Vinted sans payer, et ce que « gratuit » veut dire pour chacune : ce que Vinted fait lui-même, les scripts à héberger soi-même et l’essai SNYPD.',
+        answer='Oui, mais « gratuit » ne veut pas dire la même chose partout. Les recherches sauvegardées de Vinted sont gratuites mais n’envoient pas de notification pour chaque nouvelle annonce. Les scripts open source sont gratuits, mais c’est toi qui les fais tourner et les entretiens. SNYPD a un plan Free : ta première recherche tourne 24h/24 avec les alertes pendant @@trial_days@@ jours, puis seulement quand le tableau de bord est ouvert.',
+        toc=[('vinted', 'Les recherches sauvegardées de Vinted'), ('scripts', 'Les scripts à héberger soi-même'),
+             ('snypd', 'Le plan Free de SNYPD'), ('choisir', 'Que choisir')],
+        sections=[
+            ('vinted', 'Les recherches sauvegardées de Vinted : gratuites, sans push',
+             '<p>Vinted te laisse sauvegarder une recherche gratuitement. Elle affiche un compteur « +N » des nouveaux articles depuis ta dernière visite, mais son centre d’aide ne décrit aucune notification pour chaque nouveau résultat : tu le vois quand tu ouvres l’appli, pas au moment où l’annonce arrive.</p>'
+             '<p>Tout le détail, avec les sources : <a href="{saved}">recherches enregistrées Vinted</a>.</p>'),
+            ('scripts', 'Les scripts à héberger soi-même : logiciel gratuit, travail pour toi',
+             '<p>Des projets open source surveillent une recherche Vinted et postent les nouvelles annonces, en général sur Discord ou Telegram. Le logiciel est gratuit, mais le reste est pour toi :</p>'
+             '<ul><li><strong>Un serveur</strong> ou un ordinateur allumé en permanence pour que le script tourne.</li>'
+             '<li><strong>Les jetons et la configuration</strong> : créer le bot Discord ou Telegram, garder ses clés, régler tes recherches dans un fichier.</li>'
+             '<li><strong>Les mises à jour</strong> : quand Vinted change quelque chose, le script peut cesser de fonctionner jusqu’à ce que quelqu’un le répare.</li></ul>'
+             '<p>Si tu aimes bricoler et que tu as déjà un serveur, c’est une vraie option. Sinon, le temps passé compte aussi.</p>'),
+            ('snypd', 'Le plan Free de SNYPD : un essai, puis une recherche tableau de bord ouvert',
+             '<p>Le plan Free fait tourner ta première recherche 24h/24 avec les alertes pendant @@trial_days@@ jours après ta première recherche dans SNYPD. Si elle ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois. Ensuite, elle ne tourne que quand le tableau de bord est ouvert. Le plan Free comprend une recherche, sans carte bancaire.</p>'
+             '<ul><li><strong>Pendant l’essai</strong> : vérification environ toutes les 30 secondes à une minute, notifications push sur ton téléphone ou ton ordinateur, et alertes Discord dans un fil privé du serveur SNYPD si tu le relies.</li>'
+             '<li><strong>Après l’essai</strong> : la recherche n’est vérifiée que quand le tableau de bord est ouvert, donc les alertes push n’arrivent que pendant qu’il est ouvert. Pour le push 24h/24 : un plan payant ou le Pass 30 jours. Les alertes Discord sont réservées aux plans payants, au Pass 30 jours et à un essai en cours.</li>'
+             '<li><strong>Pour continuer 24h/24</strong> : un plan payant dès @@price:solo@@ par mois, ou le Pass 30 jours, @@price:pass@@ en une fois pour 1 recherche pendant @@pass_days@@ jours, sans abonnement. Détails : <a href="/plans">la page des tarifs</a>.</li></ul>'
+             '<p>SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte pas à ton compte, n’achète rien et n’écrit pas aux vendeurs. Plus de détails : <a href="{bot}">SNYPD, le bot d’alertes Vinted</a>.</p>'),
+            ('choisir', 'Que choisir',
+             '<ul><li><strong>Tu regardes Vinted de temps en temps</strong> : les recherches sauvegardées de Vinted suffisent.</li>'
+             '<li><strong>Tu veux tout contrôler et tu as un serveur</strong> : un script à héberger soi-même.</li>'
+             '<li><strong>Tu veux être prévenu sans rien installer</strong> : essaie le plan Free de SNYPD pendant @@trial_days@@ jours, puis décide si un plan payant ou le Pass 30 jours vaut le coup.</li></ul>'
+             '<p>La mise en place pas à pas : <a href="/fr/alerte-vinted-nouvelle-annonce">recevoir une alerte pour chaque nouvelle annonce Vinted</a>.</p>'),
+        ],
+        faq=[
+            ('Existe-t-il un bot Vinted gratuit ?',
+             'Oui, avec des limites. Les recherches sauvegardées de Vinted sont gratuites mais sans notification par nouvelle annonce, les scripts open source sont gratuits mais à héberger et entretenir toi-même, et SNYPD a un plan Free avec un essai de @@trial_days@@ jours.'),
+            ('Le plan Free de SNYPD, c’est vraiment gratuit ?',
+             'Oui, sans carte bancaire. Le plan Free fait tourner ta première recherche 24h/24 avec les alertes pendant @@trial_days@@ jours après ta première recherche dans SNYPD. Si elle ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois. Ensuite, elle ne tourne que quand le tableau de bord est ouvert. Les plans payants tournent 24h/24 dès @@price:solo@@ par mois.'),
+            ('Est-ce que je reçois des notifications push avec le plan Free ?',
+             'Oui. Pendant l’essai, ta recherche tourne 24h/24. Après, elle n’est vérifiée que quand le tableau de bord est ouvert, donc les alertes push n’arrivent que pendant qu’il est ouvert. Pour le push 24h/24 : un plan payant ou le Pass 30 jours.'),
+            ('Les alertes Discord sont-elles gratuites ?',
+             'Seulement pendant un essai en cours. Ensuite, elles sont réservées aux plans payants et au Pass 30 jours.'),
+            ('Et sans abonnement ?',
+             'Le Pass 30 jours : @@price:pass@@ en une fois pour 1 recherche pendant @@pass_days@@ jours, puis il s’arrête tout seul. Rien à résilier.'),
+            ('À quelle fréquence SNYPD vérifie ma recherche ?',
+             'Environ toutes les 30 secondes à une minute. C’est la fréquence de vérification, pas un délai garanti : Vinted affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne.'),
+        ],
+        cta_h='Essaie SNYPD gratuitement'),
   },
   # ======================================================================== PUSH VS DISCORD (EN only, 22 Nov 2026)
   # Target: "vinted alerts push or discord". SNYPD facts = outreach/00-fact-sheet.md; no Discord caps (in flux).

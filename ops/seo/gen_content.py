@@ -938,7 +938,7 @@ def page_bot(lang):
   <h3>BOTS D’ACHAT AUTOMATIQUE (AUTOBUY, AUTOCOP)</h3>
   <p>Ils achètent ou passent commande à ta place. Acheter sur Vinted demande un compte connecté, donc ces outils agissent via le tien ; V-Tools, par exemple, indique que tu connectes tes propres comptes Vinted. Souk, V-Tools et Resell Reserve vendent de l’achat automatique.</p>
   <h3>SCRIPTS À HÉBERGER SOI-MÊME</h3>
-  <p>Des projets open source sur GitHub que tu héberges toi-même, qui postent en général sur Discord ou Telegram. Gratuits, mais c’est toi qui gères le serveur et qui répares quand Vinted change quelque chose.</p>
+  <p>Des projets open source sur GitHub que tu héberges toi-même, qui postent en général sur Discord ou Telegram. Gratuits, mais c’est toi qui gères le serveur et qui répares quand Vinted change quelque chose. Ce que « gratuit » veut dire pour chaque option : <a href="/fr/bot-vinted-gratuit">bot Vinted gratuit</a>.</p>
   <p>Les prix, canaux d’alerte et plans gratuits de chaque outil sont côte à côte dans le <a href="{SLUGS['compare']['fr']}">comparatif des bots Vinted</a>. Le fonctionnement d’un monitor, étape par étape : <a href="{SLUGS['monitor']['fr']}">qu’est-ce qu’un monitor Vinted ?</a></p>
 </section>
 <section id="automatisation">
