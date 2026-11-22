@@ -1077,7 +1077,7 @@ def page_notify(lang):
     <li>Colle-la dans SNYPD et active-la.</li>
     <li>SNYPD la vérifie environ toutes les 30 secondes à une minute et envoie une notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li>
   </ol>
-  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>. Le guide complet, réglages et erreurs à éviter compris : <a href="/fr/alerte-vinted-nouvelle-annonce">recevoir une alerte pour chaque nouvelle annonce Vinted</a>.</p>
+  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>. Le guide complet, réglages et erreurs à éviter compris : <a href="/fr/alerte-vinted-nouvelle-annonce">recevoir une alerte pour chaque nouvelle annonce Vinted</a>. Pas d’alertes Telegram chez SNYPD : <a href="/fr/alerte-vinted-telegram">alerte Vinted sur Telegram, que choisir</a>.</p>
   {figure('feed', 'fr')}
 </section>
 {push_setup('fr')}
