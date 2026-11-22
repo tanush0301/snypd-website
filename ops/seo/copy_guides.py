@@ -837,7 +837,7 @@ GUIDES = {
              ('channels', 'Push or Discord'), ('tips', 'Tips for useful alerts'), ('prices', 'Plans and prices')],
         sections=[
             ('sites', 'Vinted UK and Vinted US: two separate sites',
-             '<p>Vinted runs a separate site per country. In the UK it is <strong>vinted.co.uk</strong>, with prices in pounds (GBP). In the US it is <strong>vinted.com</strong>, with prices in dollars (USD). A search you build on one site only shows listings from that site.</p>'
+             '<p>Vinted runs a separate site per country. In the UK it is <strong>vinted.co.uk</strong>, with prices in pounds (GBP). In the US it is <strong>vinted.com</strong>, with prices in dollars (USD).</p>'
              '<p>SNYPD watches searches on both. It works on every Vinted site in Europe and the US, 26 sites in all: you paste a search link from the site you shop on, and SNYPD watches that search on that site.</p>'),
             ('vinted', 'What Vinted gives you for new listings',
              '<p>Vinted lets you save a search: press the <strong>Save</strong> icon next to it in the search bar. Its help centre describes what you then get: a number with a plus next to the saved search, counting the new items listed since you last checked. The counter goes back to zero when you view the search.</p>'
@@ -861,13 +861,13 @@ GUIDES = {
              '<li><strong>One search per item you hunt.</strong> If you shop on both sites, paste one link from vinted.co.uk and one from vinted.com: each search watches one site.</li></ul>'
              '<p>More settings: <a href="{notify}">Vinted alerts for new listings</a>. Regular Vinted notifications not arriving? See <a href="{notwork}">Vinted notifications not working</a>.</p>'),
             ('prices', 'Plans and prices',
-             '<p>SNYPD’s plans are priced in euros. Free: your first search runs 24/7 with alerts for @@trial_days@@ days (72 h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free runs only while the dashboard is open. Paid plans from @@price:solo@@ a month run 24/7. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
+             '<p>SNYPD’s plans are priced in euros. Free: your first search runs 24/7 with alerts for @@trial_days@@ days. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free runs only while the dashboard is open. Paid plans from @@price:solo@@ a month run 24/7. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
         ],
         faq=[
             ('Does SNYPD work on Vinted UK and Vinted US?',
              'Yes. SNYPD watches searches on vinted.co.uk and vinted.com, and on every other Vinted site in Europe: 26 sites in all. Paste a search link from the site you shop on.'),
             ('Is there a free trial?',
-             'Yes. Free: your first search runs 24/7 with alerts for @@trial_days@@ days (72 h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed.'),
+             'Yes. Free: your first search runs 24/7 with alerts for @@trial_days@@ days. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed.'),
             ('How fast does SNYPD check my search?',
              'About every 30 seconds to a minute, on every plan. That is how often SNYPD looks, not a catch time: Vinted shows a new listing in its search minutes after it is posted.'),
             ('Does Vinted send a notification for new items in a saved search?',
