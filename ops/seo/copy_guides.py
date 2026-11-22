@@ -761,4 +761,64 @@ GUIDES = {
         ],
         cta_h='Crée ta première alerte Vinted'),
   },
+  # ======================================================================== PUSH VS DISCORD (EN only, 22 Nov 2026)
+  # Target: "vinted alerts push or discord". SNYPD facts = outreach/00-fact-sheet.md; no Discord caps (in flux).
+  'pushdiscord': {
+    'slugs': {'en': '/vinted-alerts-push-vs-discord'},
+    'en': dict(
+        title='Vinted alerts: push notification or Discord? (2026) | SNYPD',
+        desc='Push notification or Discord for your Vinted alerts? How each works, who can use Discord, and which to pick on iPhone, Android or a computer.',
+        eyebrow='VINTED ALERTS GUIDE',
+        h1='Vinted alerts: push notification or Discord, which should I use?',
+        lead='A practical comparison for buyers and resellers in the UK and US: what each channel is, how SNYPD sends alerts through each one, and which to pick for the way you hunt.',
+        answer='For most people, push is enough: it works on your phone or computer, needs no other app, and comes with every SNYPD plan, including Free. Pick Discord if you already live in Discord, or if you are on iPhone and do not want to add SNYPD to your Home Screen. Discord alerts come with paid plans, the Hunt Pass and a running trial. You can use both at once.',
+        toc=[('channels', 'What each channel is'), ('push', 'How SNYPD push alerts work'), ('discord', 'How SNYPD Discord alerts work'),
+             ('who', 'Who can use which'), ('pick', 'Which one to pick'), ('both', 'Using both'), ('others', 'Telegram, email and other apps')],
+        sections=[
+            ('channels', 'What each channel is',
+             '<p>A Vinted alert tool watches your Vinted search for you and tells you when a new listing matches it. The watching is the same whichever channel you choose: SNYPD checks your search about every 30 seconds to a minute on every plan. That is how often it looks, not how fast an alert reaches you: Vinted itself shows a new listing in its search minutes after it is posted. What changes between channels is only where the alert lands.</p>'
+             '<ul><li><strong>Push notification</strong>: a notification from your browser or from SNYPD added to your Home Screen. It shows up on your lock screen or desktop like a message from any other app.</li>'
+             '<li><strong>Discord</strong>: a message in a chat app many resellers already keep open all day. The alert arrives as a Discord notification, on whichever device you run Discord.</li></ul>'
+             '<p>Both also appear in the SNYPD dashboard, which lists every new find for your searches.</p>'),
+            ('push', 'How SNYPD push alerts work',
+             '<ol><li><strong>Paste a Vinted search link</strong> with your filters (brand, size, price, condition) into SNYPD.</li>'
+             '<li><strong>Turn on alerts.</strong> On a computer or Android phone, allow notifications when the browser asks.</li>'
+             '<li><strong>On iPhone, add SNYPD to the Home Screen first</strong> (Share, then &ldquo;Add to Home Screen&rdquo;), open SNYPD from that icon, then turn on alerts. Apple only allows web push for Home Screen apps, so in Safari alone nothing arrives. Step by step: <a href="{phone}">Vinted alerts on your phone</a>.</li></ol>'
+             '<p>When several matches turn up close together, SNYPD batches them into one notification instead of buzzing you for each one. Tap it and the listing opens on Vinted; you decide whether to buy. Push needs no other account and no other app.</p>'),
+            ('discord', 'How SNYPD Discord alerts work',
+             '<ol><li><strong>Join the SNYPD Discord</strong> server.</li>'
+             '<li><strong>Link your account</strong>: SNYPD gives you a code, and you send it with the <code>/link</code> command in the server.</li>'
+             '<li><strong>Get your own thread.</strong> Your alerts arrive in a private thread in the SNYPD Discord, with an @mention so Discord notifies you.</li></ol>'
+             '<p>The thread is yours: other members do not see your finds. Your phone or computer notifies you the way Discord normally does, so your Discord notification settings decide what you hear.</p>'),
+            ('who', 'Who can use which',
+             '<ul><li><strong>Push and the dashboard</strong>: every plan, including Free.</li>'
+             '<li><strong>Discord alerts</strong>: paid plans, the Hunt Pass and a running trial only. Free after the trial has push and the dashboard, not Discord.</li></ul>'
+             '<p>Plans and prices: <a href="/plans">SNYPD plans</a>. Paid plans start at @@price:solo@@ a month.</p>'),
+            ('pick', 'Which one to pick',
+             '<ul><li><strong>iPhone, and you do not want to add SNYPD to your Home Screen</strong>: Discord. The Discord app notifies you without that step.</li>'
+             '<li><strong>You already live in Discord</strong> (reseller groups, cook groups, friends): Discord, so your finds sit next to everything else you read.</li>'
+             '<li><strong>You want nothing extra</strong>: push. No other app, no other account, and it works on Free.</li>'
+             '<li><strong>You hunt from a computer at a desk</strong>: either works. Browser push needs only a click to allow notifications; Discord on desktop is handy if it is already open.</li>'
+             '<li><strong>You are on Free after the trial</strong>: push, since Discord alerts need a paid plan, the Hunt Pass or a running trial.</li></ul>'),
+            ('both', 'Using both',
+             '<p>You do not have to choose. With Discord alerts on, push keeps working too: you can keep push on your phone and read the Discord thread on your computer, or the other way round. If two buzzes for one find is too much, turn notifications off in one place and keep the other as a record.</p>'
+             '<p>Getting too many alerts on either channel? A maximum price in your Vinted search and more precise words cut the noise most. More settings: <a href="{notify}">Vinted alerts for new listings</a>.</p>'),
+            ('others', 'Telegram, email and other apps',
+             '<p>Other tools use Telegram or their own apps for alerts. SNYPD has no Telegram alerts and no email alerts: alerts arrive as push notifications, in the dashboard and, on the plans above, in Discord.</p>'
+             '<p>Whatever the channel, SNYPD never asks for your Vinted password, never signs in to your Vinted account, never buys for you and never messages sellers. If your regular Vinted notifications stopped arriving, see <a href="{notwork}">Vinted notifications not working</a>.</p>'),
+        ],
+        faq=[
+            ('Is Discord faster than push?',
+             'SNYPD checks your search about every 30 seconds to a minute whichever channel you use. Both channels get the same finds; how quickly your device shows the notification depends on the device and its settings.'),
+            ('Do I need Discord to use SNYPD?',
+             'No. Push notifications and the dashboard need nothing else. Discord is optional, on paid plans, the Hunt Pass and a running trial.'),
+            ('Why do I get no push alerts on my iPhone?',
+             'On iPhone, push only works once SNYPD is added to the Home Screen and opened from that icon; then turn on alerts in the app. Step by step: <a href="{phone}">Vinted alerts on your phone</a>. If you would rather skip that, Discord alerts are an option on paid plans, the Hunt Pass and a running trial.'),
+            ('Can other people see my Discord alerts?',
+             'No. SNYPD sends them to a private thread for your account in the SNYPD Discord, with an @mention for you.'),
+            ('Does SNYPD send alerts by Telegram or email?',
+             'No. SNYPD alerts arrive as push notifications, in the dashboard and in Discord. Other tools use Telegram or their own apps.'),
+        ],
+        cta_h='Set up your first Vinted alert'),
+  },
 }

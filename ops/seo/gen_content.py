@@ -1488,7 +1488,7 @@ def page_monitor(lang):
             ('How fast is a Vinted monitor?',
              'It depends on how often the tool checks. SNYPD checks each search about every 30 seconds to a minute on every plan. ' + SPEED_MEASURED['en'] + ' Some vendors advertise milliseconds; those are their own figures, measured their own way.'),
             ('Do I need Discord or Telegram?',
-             'Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, and push needs nothing else. Discord is optional: on paid plans, the Hunt Pass and a running trial, SNYPD can also send alerts to a private thread in the SNYPD Discord. No Telegram. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps.'),
+             'Only if the monitor you pick sends alerts there. SNYPD sends push notifications to your phone or computer, and push needs nothing else. Discord is optional: on paid plans, the Hunt Pass and a running trial, SNYPD can also send alerts to a private thread in the SNYPD Discord. No Telegram. On iPhone, add SNYPD to your Home Screen first: Apple only allows web push for Home Screen apps. Which to pick: <a href="%s">push or Discord for Vinted alerts</a>.' % SLUGS['pushdiscord']['en']),
             ('Which Vinted countries can a monitor watch?',
              'That depends on the tool. SNYPD works on %s, 26 sites in all, each in its own currency: paste a search link from the site you shop on.' % MARKETS_TEXT['en']),
         ]
