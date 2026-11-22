@@ -869,7 +869,7 @@ def page_bot(lang):
   <h3>AUTOBUY AND AUTOCOP BOTS</h3>
   <p>They buy or check out for you. Buying on Vinted needs a logged-in account, so these tools act through yours; V-Tools, for example, states that you connect your own Vinted accounts. Souk, V-Tools and Resell Reserve sell autobuy features.</p>
   <h3>DO-IT-YOURSELF SCRIPTS</h3>
-  <p>Open-source projects on GitHub that you host yourself, usually posting to Discord or Telegram. Free, but you run the server and fix it when Vinted changes something.</p>
+  <p>Open-source projects on GitHub that you host yourself, usually posting to Discord or Telegram. Free, but you run the server and fix it when Vinted changes something. What &ldquo;free&rdquo; really gets you: <a href="{SLUGS['freebot']['en']}">free Vinted bot</a>.</p>
   <p>Prices, channels and free plans of each tool are side by side in <a href="{SLUGS['compare']['en']}">Vinted bots compared</a>. How a monitor works, step by step: <a href="{SLUGS['monitor']['en']}">what is a Vinted monitor?</a> Looking for a &ldquo;Vinted sniper&rdquo;? See <a href="{SLUGS['sniper']['en']}">what a Vinted sniper is</a>.</p>
 </section>
 <section id="automation">
