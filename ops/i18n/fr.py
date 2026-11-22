@@ -1772,3 +1772,4 @@ for _k, _v in {
         'Tes autres filtres Vinted (marque, taille, état) sont conservés pour cette recherche.',
 }.items():
     FR.setdefault(_k, _v)
+FR.setdefault('YOUR SEARCH', 'TA RECHERCHE')

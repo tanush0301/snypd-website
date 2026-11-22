@@ -265,6 +265,18 @@
       return h && typeof h.q === 'string' && Date.now() - Number(h.t) < 864e5 ? h.q.slice(0, 80) : null;
     } catch (e) { return null; }
   }
+  /* The same stored search as one line for the sign-up view: words, Vinted site, price bounds. */
+  function huntIntentLine() {
+    try {
+      var h = JSON.parse(lsGet('snypd_hunt_intent') || 'null');
+      if (!h || typeof h.q !== 'string' || !h.q.trim() || !(Date.now() - Number(h.t) < 864e5)) return '';
+      var parts = [h.q.trim().slice(0, 80)];
+      if (typeof h.site === 'string' && /^vinted\.[a-z.]{2,6}$/.test(h.site)) parts.push(h.site);
+      if (h.site && Number(h.min) > 0) parts.push('min ' + Number(h.min));
+      if (Number(h.max) > 0) parts.push('max ' + Number(h.max));
+      return parts.join(' \u00b7 ');
+    } catch (e) { return ''; }
+  }
 
   /* Referral code (migration 085): snypd_refer = {c, t} set by consent.js from ?ref=, read for 60 days;
      else a ?ref= on this page's own address (the Google return trip carries it, see google()). */
@@ -547,6 +559,9 @@
     if (isLogin) out.push('<h1 style="margin:0 0 4px;' + H1 + 'font-size:clamp(40px,5vw,48px);">Log in</h1>');
     if (isSignup) {
       out.push('<div style="' + STACK + '"><h1 style="margin:0;' + H1 + 'font-size:clamp(36px,4.5vw,44px);text-wrap:balance;">Start watching in a minute</h1><span style="font-size:13px;color:var(--text-secondary);">Your first search runs 24/7 with alerts for 3 days. No card.</span></div>');
+      var carried = huntIntentLine();
+      // Wide screens only: on phones the extra line pushed the submit button under the cookie bar (375x553, French).
+      if (carried && window.innerWidth >= 600) out.push('<div data-carried-search style="font-size:12px;line-height:1.5;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="font-size:10px;letter-spacing:.12em;color:var(--success);">YOUR SEARCH</span> <span style="color:var(--text-primary);">' + esc(carried) + '</span></div>');
     }
     if ((isSignup || isLogin || v === 'verify') && PLAN_NAMES[plan]) {
       out.push('<div data-selected-offer style="border:1px solid var(--border-hover);background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text-secondary);"><div style="font-size:10px;letter-spacing:.12em;color:var(--success);">SELECTED OFFER</div><div style="margin-top:4px;color:var(--text-primary);">' + PLAN_NAMES[plan] + '</div><div>' + PLAN_TERMS[plan] + '</div><div style="margin-top:8px;">Account first, then your hunt and secure checkout. Creating your account does not take a payment.</div></div>');

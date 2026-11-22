@@ -1032,6 +1032,7 @@
 "Wrong email?":"Mauvais e-mail\u00a0?",
 "YES":"OUI",
 "YOUR FIT":"TON PLAN",
+"YOUR SEARCH":"TA RECHERCHE",
 "YOUR VINTED ACCOUNT":"TON COMPTE VINTED",
 "Yes":"Oui",
 "Yes, email me":"Oui, \u00e9cris-moi",
