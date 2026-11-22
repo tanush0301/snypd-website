@@ -711,8 +711,8 @@ GUIDES = {
              ('reglages', 'Régler l’alerte'), ('exemples', 'Trois exemples de recherche'), ('erreurs', 'Cinq erreurs fréquentes')],
         sections=[
             ('vinted', 'Ce que Vinted propose déjà',
-             '<p>Sur Vinted, une recherche sauvegardée affiche un compteur «\xa0+N\xa0» des nouveaux articles depuis ta dernière visite. Mais Vinted n’envoie aucun push quand un nouveau résultat arrive\xa0: tu ne le vois qu’en ouvrant l’appli.</p>'
-             '<p>Tout sur les recherches sauvegardées\xa0: <a href="{saved}">recherches enregistrées Vinted</a>.</p>'),
+             '<p>Sur Vinted, une recherche sauvegardée affiche un compteur «\xa0+N\xa0» des nouveaux articles depuis ta dernière visite (<a href="{h435}" rel="nofollow noopener">Comment sauvegarder une recherche\xa0?</a>). Mais Vinted n’envoie aucun push quand un nouveau résultat arrive\xa0: tu ne le vois qu’en ouvrant l’appli.</p>'
+             '<p>Tout sur les recherches sauvegardées\xa0: <a href="{saved}">recherches enregistrées Vinted</a>. Si tes notifications Vinted habituelles n’arrivent plus\xa0: <a href="{notwork}">notification Vinted qui ne fonctionne pas</a>.</p>'),
             ('etapes', 'La mise en place avec SNYPD, étape par étape',
              '<ol><li><strong>Fais ta recherche sur Vinted</strong> dans un navigateur, avec tous tes filtres\xa0: marque, taille, état, prix maximum.</li>'
              '<li><strong>Copie le lien</strong> dans la barre d’adresse. Il contient <code>/catalog?</code>. Tous les filtres du lien sont repris tels quels\xa0; un lien avec un paramètre inconnu est refusé plutôt que coupé en silence.</li>'
