@@ -789,7 +789,7 @@ GUIDES = {
              '<ol><li><strong>Join the SNYPD Discord</strong> server.</li>'
              '<li><strong>Link your account</strong>: SNYPD gives you a code, and you send it with the <code>/link</code> command in the server.</li>'
              '<li><strong>Get your own thread.</strong> Your alerts arrive in a private thread in the SNYPD Discord, with an @mention so Discord notifies you.</li></ol>'
-             '<p>The thread is yours: other members do not see your finds. Your phone or computer notifies you the way Discord normally does, so your Discord notification settings decide what you hear.</p>'),
+             '<p>The thread is private to your account. Your phone or computer notifies you the way Discord normally does, so your Discord notification settings decide what you hear.</p>'),
             ('who', 'Who can use which',
              '<ul><li><strong>Push and the dashboard</strong>: every plan, including Free.</li>'
              '<li><strong>Discord alerts</strong>: paid plans, the Hunt Pass and a running trial only. Free after the trial has push and the dashboard, not Discord.</li></ul>'
@@ -809,7 +809,7 @@ GUIDES = {
         ],
         faq=[
             ('Is Discord faster than push?',
-             'SNYPD checks your search about every 30 seconds to a minute whichever channel you use. Both channels get the same finds; how quickly your device shows the notification depends on the device and its settings.'),
+             'SNYPD checks your search about every 30 seconds to a minute whichever channel you use. How quickly your device shows the notification depends on the device and its settings.'),
             ('Do I need Discord to use SNYPD?',
              'No. Push notifications and the dashboard need nothing else. Discord is optional, on paid plans, the Hunt Pass and a running trial.'),
             ('Why do I get no push alerts on my iPhone?',
