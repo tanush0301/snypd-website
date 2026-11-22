@@ -888,7 +888,7 @@ GUIDES = {
         eyebrow='VINTED SNIPER GUIDE',
         h1='What is a Vinted sniper, and what does it do on your account?',
         lead='Resellers say &ldquo;Vinted sniper&rdquo; for two different kinds of tool: bots that alert you to new listings, and bots that buy for you. Here is the difference, what Vinted’s terms say, and where SNYPD fits.',
-        answer='A Vinted sniper is a tool that watches Vinted searches so you see new listings before most other buyers. Some only alert you; auto-buy tools also log in to your Vinted account and check out for you. SNYPD is an alert tool: it checks your search about every 30 seconds to a minute and sends you an alert, and you decide and buy yourself. It never logs in to your Vinted account, never buys and never messages sellers.',
+        answer='A Vinted sniper is a tool that keeps checking Vinted searches and reports new listings that match them. Some only alert you; auto-buy tools also log in to your Vinted account and check out for you. SNYPD is an alert tool: it checks your search about every 30 seconds to a minute and sends you an alert, and you decide and buy yourself. It never logs in to your Vinted account, never buys and never messages sellers.',
         toc=[('meaning', 'Alert bot or auto-buy'), ('account', 'What happens on your account'), ('terms', 'What Vinted’s terms say'),
              ('speed', 'How fast a sniper is'), ('snypd', 'SNYPD as a Vinted sniper'), ('prices', 'Plans and prices')],
         sections=[
@@ -908,10 +908,10 @@ GUIDES = {
             ('snypd', 'SNYPD as a Vinted sniper',
              '<ol><li><strong>Open your search on Vinted</strong> and set your filters: brand, size, price, condition.</li>'
              '<li><strong>Copy the link</strong> from the address bar (it contains <code>/catalog?</code>) and paste it into SNYPD.</li>'
-             '<li><strong>Turn on alerts.</strong> Push notifications on your phone or computer; on iPhone, add SNYPD to the Home Screen first. Step by step: <a href="{phone}">Vinted alerts on your phone</a>.</li></ol>'
+             '<li><strong>Turn on alerts.</strong> Push notifications reach your phone or computer during the trial and on paid plans; after the trial, the Free plan checks only while the dashboard is open. On iPhone, add SNYPD to the Home Screen first. Step by step: <a href="{phone}">Vinted alerts on your phone</a>.</li></ol>'
              '<p>Discord alerts are an option on paid plans, the Hunt Pass and a running trial: <a href="/vinted-alerts-push-vs-discord">push or Discord for Vinted alerts</a>. SNYPD works on every Vinted site in Europe and the US, 26 sites in all.</p>'),
             ('prices', 'Plans and prices',
-             '<p>Free: your first search runs 24/7 with alerts for @@trial_days@@ days. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free checks only while the dashboard is open. Paid plans from @@price:solo@@ a month run 24/7 with push alerts. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
+             '<p>Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free checks only while the dashboard is open. Paid plans from @@price:solo@@ a month run 24/7 with push alerts. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
         ],
         faq=[
             ('Does SNYPD buy items for me?',
@@ -923,7 +923,7 @@ GUIDES = {
             ('How often does SNYPD check my search?',
              'About every 30 seconds to a minute, on every plan. That is how often SNYPD looks, not a catch time: Vinted shows a new listing in its search minutes after it is posted.'),
             ('Is there a free trial?',
-             'Yes. Free: your first search runs 24/7 with alerts for @@trial_days@@ days. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed.'),
+             'Yes. Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed.'),
         ],
         cta_h='Set up your first Vinted alert'),
   },
