@@ -110,7 +110,7 @@ GUIDES = {
              '<li>Paste it into SNYPD and switch the search on.</li>'
              '<li>SNYPD checks it about every 30 seconds to a minute and sends a push when a new listing matches. The alert opens the listing on Vinted.</li></ol>'
              '<p>That is how often SNYPD looks, not a delivery time: Vinted itself shows a new listing in search a few minutes after it is posted. SNYPD never logs in to your Vinted account, never buys and never messages sellers.</p>'
-             '<p>Free: 1 search, 24/7 with alerts for the first @@trial_days@@ days after your first search in SNYPD, then only while the dashboard is open. Paid plans from @@price:solo@@ per month run 24/7. On iPhone, add SNYPD to the Home Screen first (Apple allows web push only there). More: <a href="{bot}">SNYPD, the Vinted bot for alerts</a>.</p>'),
+             '<p>Free: 1 search, 24/7 with alerts for the first @@trial_days@@ days after your first search in SNYPD, then only while the dashboard is open. Paid plans from @@price:solo@@ per month run 24/7. On iPhone, add SNYPD to the Home Screen first (Apple allows web push only there). More: <a href="{bot}">SNYPD, the Vinted bot for alerts</a>. Every free option side by side: <a href="/free-vinted-bot">free Vinted bot</a>.</p>'),
         ],
         faq=[
             ('How many saved searches can you have on Vinted?',
@@ -876,5 +876,56 @@ GUIDES = {
              'On iPhone, push only works once SNYPD is added to the Home Screen and opened from that icon; then turn on alerts in the app. Step by step: <a href="{phone}">Vinted alerts on your phone</a>. Discord alerts are another option on paid plans, the Hunt Pass and a running trial.'),
         ],
         cta_h='Set up your first Vinted alert'),
+  },
+  # ======================================================================== FREE VINTED BOT (EN only, 22 Nov 2026)
+  # Target: "free vinted bot". SNYPD facts = outreach/00-fact-sheet.md + ops/seo/data/plans.json (Free: push and
+  # discord_alerts = 'trial'). Trial sentence verbatim from the fact sheet. No rival and no open-source project named.
+  'freebot': {
+    'slugs': {'en': '/free-vinted-bot'},
+    'en': dict(
+        title='Free Vinted bot: what free really gets you (2026) | SNYPD',
+        desc='Free ways to watch Vinted searches: Vinted’s saved searches, open-source scripts you host, and SNYPD’s free trial and Free plan. What each one costs you.',
+        eyebrow='FREE VINTED BOT',
+        h1='Is there a free Vinted bot? What “free” really means',
+        lead='Three free ways to keep an eye on new Vinted listings, and what each one costs you in time, upkeep or features: Vinted’s own saved searches, open-source scripts you host yourself, and SNYPD’s free trial and Free plan.',
+        answer='Yes, in three forms. Vinted’s own saved searches are free but give you a “+N” counter, not a push. Open-source scripts are free software, but you run and maintain them. SNYPD: Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, the Free plan keeps 1 search, checked only while the dashboard is open; push notifications come with the trial, paid plans and the Hunt Pass, and Discord alerts with paid plans, the Hunt Pass and a running trial. Paid plans from @@price:solo@@ / month.',
+        toc=[('vinted', 'Vinted’s saved searches'), ('selfhost', 'Open-source scripts you host'), ('snypd', 'SNYPD’s trial and Free plan'),
+             ('paid', 'When free is not enough'), ('choose', 'Which free option fits you')],
+        sections=[
+            ('vinted', 'Free option 1: Vinted’s own saved searches',
+             '<p>Saving a search on Vinted costs nothing. You get a “+N” counter next to the saved search, counting new items since you last looked, and no push notification for new results. How it works in detail: <a href="{saved}">Vinted saved searches</a>.</p>'
+             '<p>Good if you open Vinted several times a day anyway. Not enough if you want to hear about a new listing while you are away from the app.</p>'),
+            ('selfhost', 'Free option 2: open-source scripts you host yourself',
+             '<p>Some open-source projects check Vinted searches and post new listings to a chat app. The software is free; running it is your job:</p>'
+             '<ul><li><strong>A server</strong> or a computer that stays on: the script stops when the machine does.</li>'
+             '<li><strong>Tokens and setup</strong>: usually a bot token for the chat app it posts to, plus configuration files.</li>'
+             '<li><strong>Updates</strong>: when Vinted changes something, the script can stop working until someone fixes it, and that someone may be you.</li></ul>'
+             '<p>Good if you like running your own tools. Not a fit if you want something that works without upkeep.</p>'),
+            ('snypd', 'Free option 3: SNYPD’s free trial and Free plan',
+             '<p><strong>Free trial.</strong> Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed. During the trial you get push notifications, and Discord alerts if you connect Discord (Discord alerts come with paid plans, the Hunt Pass and a running trial).</p>'
+             '<p><strong>Free plan, after the trial.</strong> 1 search, no time limit, no card. It is checked only while your SNYPD dashboard is open, and new matches show in the dashboard. Push and Discord are not part of Free after the trial: push notifications come with the trial, paid plans and the Hunt Pass; Discord alerts with paid plans, the Hunt Pass and a running trial.</p>'
+             '<p>SNYPD checks a search about every 30 seconds to a minute, on every plan. That is how often it looks, not how fast an alert reaches you: Vinted itself shows a new listing in its search minutes after it is posted. SNYPD never asks for your Vinted password, never signs in to your Vinted account, never buys for you and never messages sellers.</p>'),
+            ('paid', 'When free is not enough',
+             '<p>If you want your search watched 24/7 after the trial: paid plans start at @@price:solo@@ / month, or the Hunt Pass costs @@price:pass@@ once for @@pass_days@@ days of one search, with no subscription. Both include push notifications. Discord alerts come with paid plans, the Hunt Pass and a running trial. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
+            ('choose', 'Which free option fits you',
+             '<ul><li><strong>You check Vinted often and want nothing extra</strong>: saved searches.</li>'
+             '<li><strong>You can run and maintain a server</strong>: an open-source script.</li>'
+             '<li><strong>You want to try alerts without setup</strong>: SNYPD’s free trial, then the Free plan or a paid plan.</li></ul>'),
+        ],
+        faq=[
+            ('Is there a free Vinted bot?',
+             'Yes, in three forms. Vinted’s own saved searches are free and show a “+N” counter, with no push. Open-source scripts are free software that you host and maintain yourself. SNYPD has a free trial and a Free plan.'),
+            ('Does SNYPD have a free trial?',
+             'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed. During the trial you get push notifications, and Discord alerts if you connect Discord.'),
+            ('What does SNYPD’s Free plan include after the trial?',
+             '1 search, no time limit, no card, checked only while your SNYPD dashboard is open. Push notifications come with the trial, paid plans and the Hunt Pass; Discord alerts with paid plans, the Hunt Pass and a running trial.'),
+            ('Do Vinted saved searches send notifications?',
+             'Vinted’s help centre describes a “+N” counter next to a saved search, not a push notification. More: <a href="{saved}">Vinted saved searches</a>.'),
+            ('Are open-source Vinted bots really free?',
+             'The software is free. You still need a server or computer that stays on, tokens and setup, and time to update the script when Vinted changes something.'),
+            ('How often does SNYPD check my search?',
+             'About every 30 seconds to a minute, on every plan. That is how often SNYPD looks, not a delivery time: Vinted shows a new listing in its search minutes after it is posted.'),
+        ],
+        cta_h='Start your free trial'),
   },
 }
