@@ -854,7 +854,7 @@ def page_bot(lang):
             ('How often does SNYPD check my search?', 'About every 30 seconds to a minute. ' + SPEED_MEASURED['en'] + ' Searches that go quiet slow down to at most 5 minutes. Speed is the same on every plan.'),
             ('Does it work on iPhone?', 'Yes, once SNYPD is added to your Home Screen: open snypd.store in Safari, tap Share, then Add to Home Screen, and turn on alerts in the installed app. Apple only allows web push for Home Screen apps. On Android, Windows and Mac, alerts work straight from the browser.'),
             ('Is there a free plan?', 'Yes. Free includes one search with no time limit and no card. ' + TRIAL['en'] + ' After that it checks while your SNYPD dashboard is open; paid plans from @@price:solo@@ a month keep checking 24/7 with it closed.'),
-            ('Which Vinted countries does it work with?', 'Every Vinted site in Europe and the US, 26 in all: vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com and the rest. Paste a search link from the site you shop on; prices show in that site’s currency.'),
+            ('Which Vinted countries does it work with?', 'Every Vinted site in Europe and the US, 26 in all: vinted.fr, vinted.be, vinted.de, vinted.nl, vinted.it, vinted.es, vinted.pl, vinted.co.uk, vinted.com and the rest. Paste a search link from the site you shop on; prices show in that site’s currency. UK or US: <a href="%s">Vinted alerts in the UK and US</a>.' % SLUGS['ukus']['en']),
         ]
         body = f"""
 <section id="answer">

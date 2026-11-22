@@ -802,7 +802,7 @@ GUIDES = {
              '<li><strong>You are on Free after the trial</strong>: push, since Discord alerts need a paid plan, the Hunt Pass or a running trial.</li></ul>'),
             ('both', 'Using both',
              '<p>You do not have to choose. With Discord alerts on, push keeps working too: you can keep push on your phone and read the Discord thread on your computer, or the other way round. If two buzzes for one find is too much, turn notifications off in one place and keep the other as a record.</p>'
-             '<p>Getting too many alerts on either channel? A maximum price in your Vinted search and more precise words cut the noise most. More settings: <a href="{notify}">Vinted alerts for new listings</a>.</p>'),
+             '<p>Getting too many alerts on either channel? A maximum price in your Vinted search and more precise words cut the noise most. More settings: <a href="{notify}">Vinted alerts for new listings</a>. Hunting on vinted.co.uk or vinted.com? See <a href="/vinted-alerts-uk-us">Vinted alerts in the UK and US</a>.</p>'),
             ('others', 'Telegram, email and other apps',
              '<p>Other tools use Telegram or their own apps for alerts. SNYPD has no Telegram alerts and no email alerts: alerts arrive as push notifications, in the dashboard and, on the plans above, in Discord.</p>'
              '<p>Whatever the channel, SNYPD never asks for your Vinted password, never signs in to your Vinted account, never buys for you and never messages sellers. If your regular Vinted notifications stopped arriving, see <a href="{notwork}">Vinted notifications not working</a>.</p>'),
@@ -818,6 +818,62 @@ GUIDES = {
              'No. SNYPD sends them to a private thread for your account in the SNYPD Discord, with an @mention for you.'),
             ('Does SNYPD send alerts by Telegram or email?',
              'No. SNYPD alerts arrive as push notifications, in the dashboard and in Discord. Other tools use Telegram or their own apps.'),
+        ],
+        cta_h='Set up your first Vinted alert'),
+  },
+  # ======================================================================== UK / US (EN only, 22 Nov 2026)
+  # Target: "vinted alerts uk / us". SNYPD facts = outreach/00-fact-sheet.md; Vinted statements = the 'saved' EN block.
+  # No checkout-currency sentence (fact sheet says nothing). No price rating / Market Report claims for GBP or USD.
+  'ukus': {
+    'slugs': {'en': '/vinted-alerts-uk-us'},
+    'en': dict(
+        title='Vinted alerts for new listings in the UK and US (2026) | SNYPD',
+        desc='How to get an alert for each new Vinted listing on vinted.co.uk or vinted.com: copy your search link, paste it into SNYPD, turn on push or Discord alerts.',
+        eyebrow='VINTED ALERTS GUIDE',
+        h1='How do I get alerts for new Vinted listings in the UK or the US?',
+        lead='A step-by-step guide for buyers and resellers on Vinted UK (vinted.co.uk) and Vinted US (vinted.com): what Vinted itself gives you, how to set up an alert for each new listing, and how to keep the alerts useful.',
+        answer='Open your search on vinted.co.uk or vinted.com with your filters, copy the link (it contains <code>/catalog?</code>) and paste it into SNYPD. SNYPD checks that search about every 30 seconds to a minute and sends a push notification, or a Discord alert on paid plans, the Hunt Pass and a running trial, when a new listing matches. On iPhone, add SNYPD to your Home Screen first. A saved search on Vinted gives you a counter, not an alert per listing.',
+        toc=[('sites', 'Vinted UK and Vinted US'), ('vinted', 'What Vinted gives you'), ('setup', 'Set up an alert, step by step'),
+             ('channels', 'Push or Discord'), ('tips', 'Tips for useful alerts'), ('prices', 'Plans and prices')],
+        sections=[
+            ('sites', 'Vinted UK and Vinted US: two separate sites',
+             '<p>Vinted runs a separate site per country. In the UK it is <strong>vinted.co.uk</strong>, with prices in pounds (GBP). In the US it is <strong>vinted.com</strong>, with prices in dollars (USD). A search you build on one site only shows listings from that site.</p>'
+             '<p>SNYPD watches searches on both. It works on every Vinted site in Europe and the US, 26 sites in all: you paste a search link from the site you shop on, and SNYPD watches that search on that site.</p>'),
+            ('vinted', 'What Vinted gives you for new listings',
+             '<p>Vinted lets you save a search: press the <strong>Save</strong> icon next to it in the search bar. Its help centre describes what you then get: a number with a plus next to the saved search, counting the new items listed since you last checked. The counter goes back to zero when you view the search.</p>'
+             '<p>That counter only shows when you open the search bar. Vinted’s help on notifications lists messages for members you follow listing new items and for items you favourited (price reduced, sold), but not for new results of a saved search. More on this: <a href="{saved}">Vinted saved searches</a>.</p>'
+             '<p>So if you want to hear about each new listing that matches your search, you need a tool that checks the search for you.</p>'),
+            ('setup', 'Set up an alert for new listings, step by step',
+             '<ol><li><strong>Open your search on vinted.co.uk or vinted.com</strong> in a browser and set your filters: brand, size, price, condition.</li>'
+             '<li><strong>Copy the address</strong> from the address bar. It contains <code>/catalog?</code>. That link carries all your filters.</li>'
+             '<li><strong>Paste it into SNYPD</strong> and switch the search on. All the Vinted filters in the link are kept.</li>'
+             '<li><strong>Turn on alerts.</strong> On a computer or Android phone, allow notifications when the browser asks. On iPhone, add SNYPD to the Home Screen first (Share, then &ldquo;Add to Home Screen&rdquo;), open it from that icon, then turn on alerts: Apple only allows web push for Home Screen apps. Step by step: <a href="{phone}">Vinted alerts on your phone</a>.</li></ol>'
+             '<p>From then on, SNYPD checks your search about every 30 seconds to a minute, on every plan. That is how often it looks, not how fast an alert reaches you: Vinted itself shows a new listing in its search minutes after it is posted. New matches appear in your SNYPD dashboard and as a notification; tap it and the listing opens on Vinted, where you decide whether to buy.</p>'
+             '<p>SNYPD never asks for your Vinted password, never signs in to your Vinted account, never buys for you and never messages sellers.</p>'),
+            ('channels', 'Push notifications or Discord',
+             '<ul><li><strong>Push</strong>: on your phone or computer, on every plan including Free. No other app or account needed.</li>'
+             '<li><strong>Discord</strong>: alerts in a private thread in the SNYPD Discord, on paid plans, the Hunt Pass and a running trial. Handy on iPhone if you would rather not add SNYPD to your Home Screen.</li></ul>'
+             '<p>You can use both at once. Which to pick: <a href="/vinted-alerts-push-vs-discord">push or Discord for Vinted alerts</a>. SNYPD has no Telegram or email alerts.</p>'),
+            ('tips', 'Tips for useful alerts in the UK and US',
+             '<ul><li><strong>Set a maximum price in the search itself</strong>, in that site’s currency: pounds on vinted.co.uk, dollars on vinted.com. The alert follows the filters in your link.</li>'
+             '<li><strong>Use precise words</strong>: a model name or reference finds fewer, better matches than a broad word.</li>'
+             '<li><strong>Add size and condition filters</strong> before you copy the link, so you only hear about listings you would buy.</li>'
+             '<li><strong>One search per item you hunt.</strong> If you shop on both sites, paste one link from vinted.co.uk and one from vinted.com: each search watches one site.</li></ul>'
+             '<p>More settings: <a href="{notify}">Vinted alerts for new listings</a>. Regular Vinted notifications not arriving? See <a href="{notwork}">Vinted notifications not working</a>.</p>'),
+            ('prices', 'Plans and prices',
+             '<p>SNYPD’s plans are priced in euros. Free: your first search runs 24/7 with alerts for @@trial_days@@ days (72 h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. After that, Free runs only while the dashboard is open. Paid plans from @@price:solo@@ a month run 24/7. All plans: <a href="/plans">SNYPD plans</a>. More about SNYPD: <a href="{bot}">the Vinted bot for alerts</a>.</p>'),
+        ],
+        faq=[
+            ('Does SNYPD work on Vinted UK and Vinted US?',
+             'Yes. SNYPD watches searches on vinted.co.uk and vinted.com, and on every other Vinted site in Europe: 26 sites in all. Paste a search link from the site you shop on.'),
+            ('Is there a free trial?',
+             'Yes. Free: your first search runs 24/7 with alerts for @@trial_days@@ days (72 h). If it finds nothing in that time, we add @@trial_ext_days@@ more days once. No card needed.'),
+            ('How fast does SNYPD check my search?',
+             'About every 30 seconds to a minute, on every plan. That is how often SNYPD looks, not a catch time: Vinted shows a new listing in its search minutes after it is posted.'),
+            ('Does Vinted send a notification for new items in a saved search?',
+             'Its help centre describes a counter, not a notification: a number with a plus in the search bar, reset each time you view the search. For an alert per new listing, paste the search link into a tool such as <a href="{bot}">SNYPD</a>.'),
+            ('Why do I get no alerts on my iPhone?',
+             'On iPhone, push only works once SNYPD is added to the Home Screen and opened from that icon; then turn on alerts in the app. Step by step: <a href="{phone}">Vinted alerts on your phone</a>. Discord alerts are another option on paid plans, the Hunt Pass and a running trial.'),
         ],
         cta_h='Set up your first Vinted alert'),
   },

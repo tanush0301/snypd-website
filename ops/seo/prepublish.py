@@ -60,6 +60,7 @@ PAGES = [
     ('/fr/alerte-vinted-nouvelle-annonce', 'fr/alerte-vinted-nouvelle-annonce.html', None),
     # English-only guide (22 Nov 2026).
     ('/vinted-alerts-push-vs-discord', 'vinted-alerts-push-vs-discord.html', None),
+    ('/vinted-alerts-uk-us', 'vinted-alerts-uk-us.html', None),
 ]
 # Language versions are added for every language gen_content.LIVE publishes
 # (French, German, ...). Each set gets hreflang alternates in every direction.
