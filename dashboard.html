@@ -1322,6 +1322,7 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
 /* First-session polish (21 Nov 2026): while the alerts set-up card shows, the old text-only iPhone notice is hidden
    (the card opens the drawn guide) and the plan card's main button goes quiet too. */
 body:has(#alerts-setup-card:not([style*="display:none"]):not([style*="display: none"])) #notify-note.cta-note { display: none !important; }
+body:has(#no-channel-card:not([style*="display:none"]):not([style*="display: none"])) #notify-note.cta-note { display: none !important; }
 #alerts-setup-card:not([style*="display:none"]):not([style*="display: none"]) ~ #elite-banner #first-find-plan a.btn-prim { background: transparent; color: var(--text-primary); border: 1px solid var(--border-hover); box-shadow: none; }
 #alerts-setup-card:not([style*="display:none"]):not([style*="display: none"]) ~ #elite-banner > a.btn-prim { background: transparent; color: var(--text-primary); border: 1px solid var(--border-hover); box-shadow: none; }
 /* New-listing notice (20 Nov 2026): see feedSignal(). */

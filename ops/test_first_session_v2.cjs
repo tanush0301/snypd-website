@@ -175,6 +175,19 @@ const PHONE = { width: 390, height: 664, isMobile: true, hasTouch: true, deviceS
     await page.close();
   }
 
+  // ---- 6c. The no-channel card also hides the old iPhone notice (one card, not two)
+  {
+    const IPH = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1';
+    page = await open('plan=free&trial=1&hunts=1&boot=1&devs=0');
+    await page.setUserAgent(IPH);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await wait(9000);
+    const sh = sel => page.evaluate(sel => { const e = document.querySelector(sel); return !!e && e.getClientRects().length > 0; }, sel);
+    ok(await sh('#no-channel-card'), 'iPhone, 24/7, no device: the no-channel card shows');
+    ok(!(await sh('#notify-note')), 'the old iPhone notice is hidden next to it');
+    await page.close();
+  }
+
   // ---- 7. Claim receipt: one neutral review link, for everyone, no score
   {
     const html = fs.readFileSync(path.join(root, 'dashboard.html'), 'utf8');
