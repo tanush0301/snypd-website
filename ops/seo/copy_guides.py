@@ -726,7 +726,7 @@ GUIDES = {
              '<ul><li><strong>Notification push</strong> sur ton téléphone ou ton ordinateur. Plusieurs annonces trouvées à la suite arrivent groupées dans un seul push (jusqu’à 5 annonces listées).</li>'
              '<li><strong>Le tableau de bord</strong>, qui montre toutes les nouvelles annonces trouvées.</li>'
              '<li><strong>Discord</strong>\xa0: avec un abonnement, le Pass 30 jours ou un essai en cours, un fil privé sur le serveur Discord SNYPD.</li></ul>'
-             '<p>Pas de Telegram, pas d’e-mail pour les alertes.</p>'),
+             '<p>Pas de Telegram, pas d’e-mail pour les alertes. Ce que valent les bots Telegram et que choisir\xa0: <a href="/fr/alerte-vinted-telegram">alerte Vinted sur Telegram</a>.</p>'),
             ('reglages', 'Régler l’alerte pour ne pas être noyé',
              '<p>Une recherche trop large peut sortir des centaines d’annonces par jour. Quatre réglages font la différence\xa0:</p>'
              '<ul><li><strong>Un prix maximum.</strong> C’est le filtre le plus efficace\xa0: mets-le dans ta recherche Vinted avant de copier le lien.</li>'
@@ -758,6 +758,51 @@ GUIDES = {
              'Sur iPhone, les alertes ne fonctionnent qu’une fois SNYPD ajouté à l’écran d’accueil et ouvert depuis cette icône. Active ensuite les alertes depuis l’appli. Pas à pas\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.'),
             ('Je reçois trop d’alertes, que faire\xa0?',
              'Ajoute un prix maximum à ta recherche, utilise des mots plus précis, ou passe la recherche en mode Calme (un résumé toutes les 15 ou 30 minutes) ou en «\xa0Seulement les moins chères\xa0» (plans payants, Pass 30 jours et essai en cours). Toutes les options d’alerte\xa0: <a href="{notify}">alertes Vinted pour les nouvelles annonces</a>.'),
+        ],
+        cta_h='Crée ta première alerte Vinted'),
+  },
+  # ======================================================================== TELEGRAM (FR only, 22 Nov 2026)
+  # Target: "alerte vinted telegram". SNYPD facts = outreach/00-fact-sheet.md (line 39: no Telegram alerts);
+  # Telegram tools = only what compare_data.py already states; plan numbers = plans.py tokens.
+  'telegram': {
+    'slugs': {'fr': '/fr/alerte-vinted-telegram'},
+    'fr': dict(
+        title='Alerte Vinted Telegram\xa0: bots, Discord ou push (2026) | SNYPD',
+        desc='Alerte Vinted sur Telegram\xa0: ce que sont les bots Telegram pour Vinted, ce que SNYPD envoie à la place et que choisir entre Telegram, Discord et push.',
+        eyebrow='GUIDE ALERTES VINTED',
+        h1='Alerte Vinted sur Telegram\xa0: comment ça marche et que choisir\xa0?',
+        lead='Ce que sont les bots Telegram pour Vinted, ce que SNYPD envoie à la place, et comment choisir entre Telegram, Discord et les notifications push.',
+        answer='SNYPD n’envoie pas d’alertes Telegram. Il vérifie ta recherche Vinted environ toutes les 30 secondes à une minute et t’envoie une notification push sur ton téléphone ou ton ordinateur, sans passer par un store d’applications. Avec un abonnement, le Pass 30 jours ou un essai en cours, les alertes arrivent aussi dans un fil privé sur le serveur Discord SNYPD. Si tu tiens à Telegram, il faut un autre outil.',
+        toc=[('bots', 'Les bots Telegram pour Vinted'), ('snypd', 'Ce que SNYPD envoie'), ('choisir', 'Telegram, Discord ou push')],
+        sections=[
+            ('bots', 'Les bots Telegram pour Vinted, c’est quoi\xa0?',
+             '<p>Un bot d’alertes Vinted surveille une recherche et te prévient quand une nouvelle annonce correspond. Ceux qui passent par Telegram t’envoient l’annonce dans une conversation Telegram. On en trouve de deux sortes\xa0:</p>'
+             '<ul><li><strong>Les scripts open source sur GitHub</strong>, que tu héberges toi-même. Certains postent sur Telegram, d’autres sur Discord ou par e-mail. Gratuits, mais c’est toi qui gères le serveur et qui répares quand Vinted change quelque chose.</li>'
+             '<li><strong>Les services tiers</strong>, avec un bot Telegram auquel tu t’abonnes. Certains n’alertent que dans Telegram, d’autres proposent Telegram parmi plusieurs canaux.</li></ul>'
+             '<p>Prix, canaux et plans gratuits de chaque outil, côte à côte\xa0: <a href="/fr/comparatif-bot-vinted">comparatif des bots Vinted</a>. Ce que fait un bot d’alertes en général\xa0: <a href="{bot}">SNYPD, le bot d’alertes Vinted</a>.</p>'),
+            ('snypd', 'Ce que SNYPD envoie à la place',
+             '<ul><li><strong>Une notification push</strong> sur ton téléphone ou ton ordinateur, sur tous les plans, Free compris. Pas d’appli à installer depuis un store. Sur iPhone, ajoute d’abord SNYPD à l’écran d’accueil\xa0: Apple n’autorise les notifications web que là. Pas à pas\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.</li>'
+             '<li><strong>Le tableau de bord</strong>, qui liste toutes les nouvelles annonces trouvées.</li>'
+             '<li><strong>Discord</strong>\xa0: avec un abonnement, le Pass 30 jours ou un essai en cours, un fil privé sur le serveur Discord SNYPD.</li></ul>'
+             '<p>Pas de Telegram, pas d’e-mail pour les alertes. SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte jamais à ton compte, n’achète rien et n’écrit pas aux vendeurs. La mise en place complète\xa0: <a href="/fr/alerte-vinted-nouvelle-annonce">recevoir une alerte pour chaque nouvelle annonce Vinted</a>.</p>'),
+            ('choisir', 'Telegram ou Discord ou push\xa0: que choisir\xa0?',
+             '<ul><li><strong>Tu veux le moins d’étapes possible</strong>\xa0: le push. Pas d’autre appli, pas d’autre compte, et il fonctionne sur le plan Free.</li>'
+             '<li><strong>Tu passes déjà tes journées sur Discord</strong>\xa0: Discord, pour avoir tes trouvailles à côté du reste (abonnement, Pass 30 jours ou essai en cours).</li>'
+             '<li><strong>Tu es sur iPhone et tu ne veux pas ajouter SNYPD à l’écran d’accueil</strong>\xa0: Discord, dont l’appli te prévient sans cette étape.</li>'
+             '<li><strong>Tu veux absolument Telegram</strong>\xa0: il te faut un autre outil, script à héberger ou service tiers\xa0; SNYPD ne l’envoie pas.</li></ul>'
+             '<p>Quel que soit le canal, SNYPD vérifie ta recherche à la même fréquence\xa0: environ toutes les 30 secondes à une minute, sur tous les plans. C’est la fréquence de vérification, pas un délai d’arrivée\xa0: Vinted affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne.</p>'),
+        ],
+        faq=[
+            ('SNYPD envoie-t-il des alertes Vinted sur Telegram\xa0?',
+             'Non. Les alertes SNYPD arrivent en notification push, dans le tableau de bord et, avec un abonnement, le Pass 30 jours ou un essai en cours, dans un fil privé sur le serveur Discord SNYPD.'),
+            ('Un bot Telegram pour Vinted est-il gratuit\xa0?',
+             'Les scripts open source sur GitHub sont gratuits, mais tu les héberges et les répares toi-même. Les services tiers ont leurs propres prix, côte à côte dans le <a href="/fr/comparatif-bot-vinted">comparatif des bots Vinted</a>.'),
+            ('SNYPD est-il gratuit\xa0?',
+             'Oui pour commencer. Le plan Free fait tourner ta première recherche 24h/24 avec les alertes pendant @@trial_days@@ jours, puis seulement quand le tableau de bord est ouvert. Les abonnements tournent 24h/24 dès @@price:solo@@ par mois\xa0; le Pass coûte @@price:pass@@ en une fois pour @@pass_days@@ jours.'),
+            ('Faut-il installer une appli pour recevoir les alertes SNYPD\xa0?',
+             'Non. Les notifications push passent par ton navigateur, sans store d’applications. Sur iPhone, ajoute SNYPD à l’écran d’accueil et ouvre-le depuis cette icône. Pas à pas\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.'),
+            ('Dois-je donner mon mot de passe Vinted\xa0?',
+             'Non. SNYPD ne te demande jamais ton mot de passe Vinted et ne se connecte jamais à ton compte.'),
         ],
         cta_h='Crée ta première alerte Vinted'),
   },

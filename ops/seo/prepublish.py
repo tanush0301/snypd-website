@@ -58,6 +58,7 @@ PAGES = [
     ('/vinted-price-drop-notifications', 'vinted-price-drop-notifications.html', None),
     # French-only guide (21 Nov 2026): one language, so the hreflang loop below skips it.
     ('/fr/alerte-vinted-nouvelle-annonce', 'fr/alerte-vinted-nouvelle-annonce.html', None),
+    ('/fr/alerte-vinted-telegram', 'fr/alerte-vinted-telegram.html', None),
     # English-only guide (22 Nov 2026).
     ('/vinted-alerts-push-vs-discord', 'vinted-alerts-push-vs-discord.html', None),
     ('/vinted-alerts-uk-us', 'vinted-alerts-uk-us.html', None),
