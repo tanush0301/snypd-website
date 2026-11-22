@@ -2234,6 +2234,16 @@ body[data-first-days] #claim-hint { margin-top: 16px; }
   <div class="feed-stat"><span class="feed-stat__val" id="fs-holding">&mdash;</span><span class="feed-stat__lbl">Holding</span></div>
 </div>
 <div class="bd">
+<!-- No alert channel on the whole account (21 Nov 2026): searches run 24/7 but nothing can be sent. Logic: paintNoChannel(). -->
+<div class="elite-banner" id="no-channel-card" style="display:none" role="status" aria-labelledby="no-channel-title">
+  <div>
+    <div class="elite-banner__title" id="no-channel-title">Your finds are not reaching you</div>
+    <div class="elite-banner__text" id="no-channel-text">Your searches run 24/7, but no phone or computer on this account has alerts on, and Discord is not connected. Nothing is sent to you until one of them is set up.</div>
+  </div>
+  <div class="controls" style="margin:0;flex-wrap:wrap"><button class="btn btn-prim" id="no-channel-alerts" type="button">Turn on alerts</button>
+  <button class="btn btn-ghost" id="no-channel-discord" type="button">Use Discord</button>
+  <button class="btn btn-ghost" id="no-channel-later" type="button">Hide for today</button></div>
+</div>
 <div class="elite-banner" id="alerts-setup-card" style="display:none" aria-labelledby="alerts-setup-title">
   <div>
     <div class="elite-banner__title" id="alerts-setup-title">Finish setting up alerts on this device</div>
@@ -4409,6 +4419,7 @@ const HEARTBEAT_URL = (() => {
         try { localStorage.setItem(SNOOZE_KEY, String(Date.now() + 30 * 86400000)); } catch (e) {}
         if (setupCard) setupCard.style.display = 'none';
       });
+      let noChannelShown = false;
       let paintVersion = 0;
       async function paintAlertSetup() {
         const version = ++paintVersion;
@@ -4417,7 +4428,7 @@ const HEARTBEAT_URL = (() => {
         if (version !== paintVersion) return;
         // Only states the user can act on here; blocked = the chip, on = nothing, a browser without push = its own note.
         const actionable = status.state === 'off' || status.state === 'error' || status.state === 'ios-install';
-        setupCard.style.display = (actionable && !cardSnoozed()) ? '' : 'none';
+        setupCard.style.display = (actionable && !cardSnoozed() && !noChannelShown) ? '' : 'none';
       }
       window.addEventListener('snypd:alerts-changed', () => { paintAlertSetup().catch(console.error); });
       window.addEventListener('snypd:hunts-changed', () => {
@@ -4432,6 +4443,75 @@ const HEARTBEAT_URL = (() => {
           }).catch(console.error);
       });
       paintAlertSetup().catch(console.error);
+
+      // No alert channel on the whole account (21 Nov 2026). Shown only when ALL of these are known to be true:
+      // the account is checked 24/7 (paid plan, running trial or bonus days), it has an active search, the server
+      // lists no push device for the account, this device's alerts are not on, and no Discord link is enabled.
+      // Any lookup that fails or answers in an unknown shape = the notice stays hidden. "Hide for today" hides it
+      // on this device for 24 hours; it is never hidden for longer.
+      const noChannelCard = document.getElementById('no-channel-card');
+      const NO_CHANNEL_KEY = 'snypd_no_channel_hide';
+      function noChannelHidden() { try { return Number(localStorage.getItem(NO_CHANNEL_KEY) || 0) > Date.now(); } catch (e) { return false; } }
+      function setNoChannel(show) {
+        noChannelShown = !!show;
+        if (noChannelCard) noChannelCard.style.display = show ? '' : 'none';
+        if (show && setupCard) setupCard.style.display = 'none';
+      }
+      let noChannelVersion = 0;
+      async function paintNoChannel() {
+        const version = ++noChannelVersion;
+        if (!noChannelCard) return;
+        const always = effectivePlan !== 'free' ||
+          (profile.free_trial_started_at && trialEndMs(profile) > Date.now()) || bonusActive(profile);
+        if (!always || !hasSavedHunt || noChannelHidden() || !window.SNYPD.alertsStatus) { setNoChannel(false); return; }
+        let show = false;
+        try {
+          const status = await window.SNYPD.alertsStatus();
+          if (status && status.state !== 'on') {
+            const active = await sb.from('user_searches').select('id', { count: 'exact', head: true }).eq('user_id', uid).eq('is_active', true);
+            const s = await sb.auth.getSession();
+            const tok = s && s.data && s.data.session && s.data.session.access_token;
+            if (tok && !active.error && Number.isInteger(active.count) && active.count > 0) {
+              // Asked twice, a few seconds apart: the route also answers an empty list when its own lookup fails,
+              // so one empty answer is not proof. Both must say "ready, no devices".
+              const noDevices = async () => {
+                const res = await fetch('https://api.snypd.store/api/v1/push/status', { headers: { Authorization: 'Bearer ' + tok } });
+                const body = res.ok ? await res.json() : null;
+                return !!(body && body.ready === true && Array.isArray(body.devices) && body.devices.length === 0);
+              };
+              let none = await noDevices();
+              if (none) { await new Promise(r => setTimeout(r, 4000)); none = await noDevices(); }
+              if (none) {
+                const dc = await sb.from('discord_links').select('enabled').maybeSingle();
+                if (dc && !dc.error && !(dc.data && dc.data.enabled)) show = true;
+              }
+            }
+          }
+        } catch (e) { console.error('SNYPD: no-channel check failed', e); show = false; }
+        if (version !== noChannelVersion) return;
+        setNoChannel(show);
+        if (!show) paintAlertSetup().catch(console.error);
+      }
+      if (noChannelCard) {
+        const ncAlerts = document.getElementById('no-channel-alerts');
+        const ncDiscord = document.getElementById('no-channel-discord');
+        const ncLater = document.getElementById('no-channel-later');
+        if (ncAlerts) ncAlerts.addEventListener('click', () => { window.SNYPD.showAlertsStep(); });
+        if (ncDiscord) ncDiscord.addEventListener('click', () => {
+          const tab = document.querySelector('[data-view="profile"]'); if (tab) tab.click();
+          const b = document.getElementById('prof-discord-btn'); if (b && !b.disabled) b.click();
+          try { document.getElementById('prof-discord-row').scrollIntoView({ block: 'center' }); } catch (e) {}
+        });
+        if (ncLater) ncLater.addEventListener('click', () => {
+          try { localStorage.setItem(NO_CHANNEL_KEY, String(Date.now() + 86400000)); } catch (e) {}
+          setNoChannel(false);
+          paintAlertSetup().catch(console.error);
+        });
+        window.addEventListener('snypd:alerts-changed', () => { paintNoChannel().catch(console.error); });
+        window.addEventListener('snypd:hunts-changed', () => { setTimeout(() => { paintNoChannel().catch(console.error); }, 1500); });
+        window.addEventListener('snypd:discord-changed', () => { paintNoChannel().catch(console.error); });
+        paintNoChannel().catch(console.error);
+      }
 
       // Re-read the server-stamped trial start after saving a first hunt.
       // Existing legacy hunts with no timestamp must not be promised 7 new days.
@@ -9985,6 +10065,7 @@ const HEARTBEAT_URL = (() => {
   };
   function t(k, n) { var v = T[k][fr() ? 1 : 0]; return n ? v.replace('{n}', n) : v; }
   var linked = null;
+  var lastLinked = null;
   function sb() { return (window.SNYPD && window.SNYPD.supabase) || null; }
   async function token() {
     var c = sb(); if (!c) { return null; }
@@ -9994,6 +10075,11 @@ const HEARTBEAT_URL = (() => {
     btn.disabled = false; btn.textContent = linked ? t('disconnect') : t('connect');
     note.textContent = msg || (linked ? t('on', linked.discord_username || 'Discord') : t('idle'));
     paintWiz();
+    var nowLinked = !!linked;
+    if (nowLinked !== lastLinked) {
+      lastLinked = nowLinked;
+      try { window.dispatchEvent(new CustomEvent('snypd:discord-changed')); } catch (e) {}
+    }
   }
   async function load() {
     var c = sb(); if (!c) { return; }

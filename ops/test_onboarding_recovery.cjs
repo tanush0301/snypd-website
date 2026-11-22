@@ -36,7 +36,7 @@ class Element {
 function base() {
   const elements = new Map(), events = {};
   const el = id => { if (!elements.has(id)) elements.set(id, new Element(id)); return elements.get(id); };
-  const g = { console: { error() {}, warn() {}, log() {} }, Date, Promise, Number, String, Uint8Array,
+  const g = { console: { error() {}, warn() {}, log() {} }, Date, Promise, Number, String, Uint8Array, setTimeout, clearTimeout,
     Event: class { constructor(type) { this.type = type; } },
     document: { getElementById: el, querySelectorAll: () => [] },
     localStorage: { getItem: () => null, setItem() {}, removeItem() {} },

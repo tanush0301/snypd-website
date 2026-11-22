@@ -689,6 +689,19 @@
       return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     }
     if (u.indexOf('/api/v1/push/status') !== -1) {
+      /* ?devs=<n> = push devices registered on the whole account (the live route's `devices` list); ?devs=err = the call fails. Absent = no list, as before. */
+      var dv = params.get('devs');
+      window.__pushStatusCalls = (window.__pushStatusCalls || 0) + 1;
+      if (dv === 'err') return Promise.resolve(new Response(JSON.stringify({ detail: 'down' }), { status: 500 }));
+      /* ?devs=flaky = the first answer wrongly says "no devices" (the live route does that when its lookup fails), later answers list one. */
+      if (dv === 'flaky') {
+        if (!window.__pushFlakyAt) window.__pushFlakyAt = Date.now();
+        dv = Date.now() - window.__pushFlakyAt < 3000 ? '0' : '1';
+      }
+      if (dv !== null && /^\d+$/.test(dv)) {
+        var dl = []; for (var di = 0; di < Number(dv); di++) dl.push({ id: 'dev' + di, user_agent: 'QA', created_at: new Date().toISOString() });
+        return Promise.resolve(new Response(JSON.stringify({ configured: true, storage_ok: true, ready: true, devices: dl }), { status: 200 }));
+      }
       return Promise.resolve(new Response(JSON.stringify({ status: 'ready', ready: true }), { status: 200 }));
     }
     // Keep my plan (website outreach/62 move 6): ?keep=tech | cost | none | unused = the member's plan is set to end, with

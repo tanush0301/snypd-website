@@ -1757,3 +1757,13 @@ for _k, _v in {
     'Not now': 'Pas maintenant',
 }.items():
     FR.setdefault(_k, _v)
+# ===== No alert channel on the whole account (21 Nov 2026): searches run 24/7 but nothing can be sent.
+for _k, _v in {
+    'Your finds are not reaching you': 'Tes trouvailles ne t’arrivent pas',
+    'Your searches run 24/7, but no phone or computer on this account has alerts on, and Discord is not connected. Nothing is sent to you until one of them is set up.':
+        'Tes recherches tournent 24h/24, mais aucun téléphone ni ordinateur de ce compte n’a les alertes activées, et Discord n’est pas connecté. Rien ne t’est envoyé tant que l’un des deux n’est pas configuré.',
+    'Turn on alerts': 'Activer les alertes',
+    'Use Discord': 'Utiliser Discord',
+    'Hide for today': 'Masquer pour aujourd’hui',
+}.items():
+    FR.setdefault(_k, _v)
