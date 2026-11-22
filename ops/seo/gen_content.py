@@ -1077,7 +1077,7 @@ def page_notify(lang):
     <li>Colle-la dans SNYPD et active-la.</li>
     <li>SNYPD la vérifie environ toutes les 30 secondes à une minute et envoie une notification push sur ton téléphone ou ton ordinateur quand une nouvelle annonce correspond. L’alerte ouvre l’annonce sur Vinted.</li>
   </ol>
-  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>.</p>
+  <p>SNYPD ne demande jamais tes identifiants Vinted. Le plan gratuit fait tourner une recherche 24h/24 pendant les @@trial_days@@ premiers jours, puis tant que ton tableau de bord est ouvert ; les plans payants, à partir de @@price:solo@@ par mois, vérifient 24h/24. Plus de détails : <a href="{SLUGS['bot']['fr']}">SNYPD, le bot d’alertes Vinted</a>. Le guide complet, réglages et erreurs à éviter compris : <a href="/fr/alerte-vinted-nouvelle-annonce">recevoir une alerte pour chaque nouvelle annonce Vinted</a>.</p>
   {figure('feed', 'fr')}
 </section>
 {push_setup('fr')}
@@ -1632,7 +1632,7 @@ def page_monitor(lang):
 </section>
 <section id="snypd">
   <h2>SNYPD, un monitor Vinted</h2>
-  <p>Colle un lien de recherche Vinted, active-le, et SNYPD le vérifie environ toutes les 30 secondes à une minute. Les nouvelles annonces arrivent dans ton tableau de bord avec leur prix, le prix protection acheteurs incluse et leur état, et en notification push sur ton téléphone. Il ne demande jamais ton mot de passe Vinted, n’achète rien et n’écrit jamais aux vendeurs. Pro et Elite ajoutent le Market Report : le prix demandé typique d’un article sur Vinted selon son état.</p>
+  <p>Colle un lien de recherche Vinted, active-le, et SNYPD le vérifie environ toutes les 30 secondes à une minute. Les nouvelles annonces arrivent dans ton tableau de bord avec leur prix, le prix protection acheteurs incluse et leur état, et en notification push sur ton téléphone. Il ne demande jamais ton mot de passe Vinted, n’achète rien et n’écrit jamais aux vendeurs. Pro et Elite ajoutent le Market Report : le prix demandé typique d’un article sur Vinted selon son état. La mise en place pas à pas : <a href="/fr/alerte-vinted-nouvelle-annonce">recevoir une alerte pour chaque nouvelle annonce Vinted</a>.</p>
   {table(PLANS_HEAD['fr'], PLANS_ROWS['fr'])}
 </section>
 <section id="questions">
