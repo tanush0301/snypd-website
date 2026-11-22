@@ -4588,6 +4588,8 @@ const HEARTBEAT_URL = (() => {
             if (wqMax) wqMax.value = '';
           }
           paintWqNote();
+          const keptEl = document.getElementById('wiz-q-carried');
+          if (keptEl) keptEl.style.display = (wqF && wqF.site === wqSite.value) ? '' : 'none';
           if (changedCurrency && wqNote) wqNote.textContent = document.documentElement && document.documentElement.lang === 'fr'
             ? 'Les prix ont été effacés car la devise a changé. Saisis ton budget dans la devise affichée ; aucune conversion n’a été appliquée.'
             : 'Prices were cleared because the currency changed. Enter your budget in the displayed currency; no conversion was applied.';
@@ -4596,6 +4598,7 @@ const HEARTBEAT_URL = (() => {
         // Explicit builder intent preserves country and decimal bounds. Legacy
         // price-guide intents keep their old words/max behavior. This only fills
         // a form; the user must review and save it.
+        let wqF = null;   // filters carried from a Vinted search page: { site, f }
         try {
           const hi = JSON.parse(localStorage.getItem('snypd_hunt_intent') || 'null');
           if (hi && typeof hi.q === 'string' && hi.q.trim() && Date.now() - Number(hi.t) >= 0 && Date.now() - Number(hi.t) < 864e5) {
@@ -4607,6 +4610,14 @@ const HEARTBEAT_URL = (() => {
               if (wqMin) { wqMin.value = intent.min; minEdited = true; }
               if (wqMax) wqMax.value = intent.max;
               wqWords.value = intent.q;
+              if (intent.f) {
+                wqF = { site: intent.site, f: intent.f };
+                const kept = document.createElement('p');
+                kept.className = 'wiz-quick__note';
+                kept.id = 'wiz-q-carried';
+                kept.textContent = 'Your other Vinted filters (brand, size, condition) are kept for this search.';
+                if (wqNote && wqNote.parentNode) wqNote.parentNode.insertBefore(kept, wqNote.nextSibling);
+              }
             } else {
               wqWords.value = hi.q.trim().slice(0, 80);
               if (wqMax && Number(hi.max) > 0) {
@@ -4659,7 +4670,17 @@ const HEARTBEAT_URL = (() => {
             return;
           }
           if (mx) mx.hide(mxBox);
-          await saveSearch(words, vq.build(wqSite.value, words, maxText, min));
+          let huntUrl = vq.build(wqSite.value, words, maxText, min);
+          if (wqF && wqF.site === wqSite.value) {
+            try {
+              const x = new URL(huntUrl);
+              x.searchParams.delete('order');
+              window.SNYPDSearch.filterPairs(wqF.f).forEach(pair => x.searchParams.append(pair[0], pair[1]));
+              x.searchParams.set('order', 'newest_first');
+              huntUrl = x.toString();
+            } catch (e) {}
+          }
+          await saveSearch(words, huntUrl);
         });
         wqWords.addEventListener('input', () => { wqKept = null; if (window.SNYPD.hw) window.SNYPD.hw.hide(document.getElementById('wiz-q-hw')); });
         wqWords.addEventListener('keydown', e => { if (e.key === 'Enter') wqSave.click(); });

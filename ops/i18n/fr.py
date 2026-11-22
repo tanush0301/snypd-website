@@ -1767,3 +1767,8 @@ for _k, _v in {
     'Hide for today': 'Masquer pour aujourd’hui',
 }.items():
     FR.setdefault(_k, _v)
+for _k, _v in {
+    'Your other Vinted filters (brand, size, condition) are kept for this search.':
+        'Tes autres filtres Vinted (marque, taille, état) sont conservés pour cette recherche.',
+}.items():
+    FR.setdefault(_k, _v)

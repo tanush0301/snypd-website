@@ -27,29 +27,59 @@
     if (n > 1000000 || (!allowZero && n <= 0)) throw new Error('amount');
     return String(n);
   }
+  /* Extra Vinted filters carried from a search page (browser extension): "brand_ids:53,88;size_ids:207;catalog:1206".
+     Only id lists the dashboard's link check accepts (catalog and *_ids, digits only). Returns the canonical text. */
+  function filters(text) {
+    var s = String(text == null ? '' : text).trim();
+    if (!s) return '';
+    if (s.length > 600) throw new Error('filters');
+    var seen = {}, total = 0;
+    return s.split(';').map(function (part) {
+      var m = /^(catalog|[a-z][a-z0-9_]{0,30}_ids):([0-9]{1,12}(,[0-9]{1,12})*)$/.exec(part);
+      if (!m || seen[m[1]]) throw new Error('filters');
+      seen[m[1]] = true;
+      total += m[2].split(',').length;
+      if (total > 40) throw new Error('filters');
+      return m[1] + ':' + m[2];
+    }).join(';');
+  }
+  /* The same list as [name, id] pairs in Vinted's own parameter form, for building a link. */
+  function filterPairs(text) {
+    var out = [];
+    filters(text).split(';').forEach(function (part) {
+      if (!part) return;
+      var i = part.indexOf(':');
+      part.slice(i + 1).split(',').forEach(function (id) { out.push([part.slice(0, i) + '[]', id]); });
+    });
+    return out;
+  }
   function normalize(value) {
     if (!value || !market(value.site)) throw new Error('site');
     var q = String(value.q || '').trim().replace(/\s+/g, ' ');
     if (!q || q.length > 80 || /[\x00-\x1f\x7f]/.test(q)) throw new Error('words');
     var min = amount(value.min, true), max = amount(value.max, false);
     if (min !== '' && max !== '' && Number(min) >= Number(max)) throw new Error('range');
-    return { q: q, site: value.site, min: min, max: max };
+    var out = { q: q, site: value.site, min: min, max: max }, f = filters(value.f);
+    if (f) out.f = f;
+    return out;
   }
   function build(value) {
     var v = normalize(value), u = new URL('https://www.' + v.site + '/catalog');
     u.searchParams.set('search_text', v.q);
     if (v.min !== '') u.searchParams.set('price_from', v.min);
     if (v.max !== '') u.searchParams.set('price_to', v.max);
+    filterPairs(v.f).forEach(function (pair) { u.searchParams.append(pair[0], pair[1]); });
     u.searchParams.set('order', 'newest_first');
     return u.toString();
   }
   function fromParams(qs) {
-    return normalize({ q: qs.get('hunt'), site: qs.get('site'), min: qs.get('min'), max: qs.get('max') });
+    return normalize({ q: qs.get('hunt'), site: qs.get('site'), min: qs.get('min'), max: qs.get('max'), f: qs.get('f') });
   }
   function signup(value, lang) {
     var v = normalize(value), qs = new URLSearchParams({ hunt: v.q, site: v.site, min: v.min, lang: lang === 'fr' ? 'fr' : 'en' });
     if (v.max !== '') qs.set('max', v.max);
+    if (v.f) qs.set('f', v.f);
     return '/signup?' + qs.toString();
   }
-  root.SNYPDSearch = { markets: markets, market: market, normalize: normalize, build: build, fromParams: fromParams, signup: signup };
+  root.SNYPDSearch = { markets: markets, market: market, normalize: normalize, filters: filters, filterPairs: filterPairs, build: build, fromParams: fromParams, signup: signup };
 })(typeof window !== 'undefined' ? window : globalThis);
