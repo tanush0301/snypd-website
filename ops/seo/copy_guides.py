@@ -788,7 +788,7 @@ GUIDES = {
             ('snypd', 'Le plan Free de SNYPD : un essai, puis une recherche tableau de bord ouvert',
              '<p>Le plan Free fait tourner ta première recherche 24h/24 avec les alertes pendant @@trial_days@@ jours après ta première recherche dans SNYPD. Si elle ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois. Ensuite, elle ne tourne que quand le tableau de bord est ouvert. Le plan Free comprend une recherche, sans carte bancaire.</p>'
              '<ul><li><strong>Pendant l’essai</strong> : vérification environ toutes les 30 secondes à une minute, notifications push sur ton téléphone ou ton ordinateur, et alertes Discord dans un fil privé du serveur SNYPD si tu le relies.</li>'
-             '<li><strong>Après l’essai</strong> : la recherche ne tourne que quand le tableau de bord est ouvert, et le push ne part plus. Les alertes Discord sont réservées aux plans payants, au Pass 30 jours et à un essai en cours.</li>'
+             '<li><strong>Après l’essai</strong> : la recherche n’est vérifiée que quand le tableau de bord est ouvert, donc les alertes push n’arrivent que pendant qu’il est ouvert. Pour le push 24h/24 : un plan payant ou le Pass 30 jours. Les alertes Discord sont réservées aux plans payants, au Pass 30 jours et à un essai en cours.</li>'
              '<li><strong>Pour continuer 24h/24</strong> : un plan payant dès @@price:solo@@ par mois, ou le Pass 30 jours, @@price:pass@@ en une fois pour 1 recherche pendant @@pass_days@@ jours, sans abonnement. Détails : <a href="/plans">la page des tarifs</a>.</li></ul>'
              '<p>SNYPD ne demande jamais ton mot de passe Vinted, ne se connecte pas à ton compte, n’achète rien et n’écrit pas aux vendeurs. Plus de détails : <a href="{bot}">SNYPD, le bot d’alertes Vinted</a>.</p>'),
             ('choisir', 'Que choisir',
@@ -803,7 +803,7 @@ GUIDES = {
             ('Le plan Free de SNYPD, c’est vraiment gratuit ?',
              'Oui, sans carte bancaire. Le plan Free fait tourner ta première recherche 24h/24 avec les alertes pendant @@trial_days@@ jours après ta première recherche dans SNYPD. Si elle ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois. Ensuite, elle ne tourne que quand le tableau de bord est ouvert. Les plans payants tournent 24h/24 dès @@price:solo@@ par mois.'),
             ('Est-ce que je reçois des notifications push avec le plan Free ?',
-             'Oui pendant l’essai. Après, la recherche ne tourne que tableau de bord ouvert et le push ne part plus. Pour garder le push 24h/24 : un plan payant ou le Pass 30 jours.'),
+             'Oui. Pendant l’essai, ta recherche tourne 24h/24. Après, elle n’est vérifiée que quand le tableau de bord est ouvert, donc les alertes push n’arrivent que pendant qu’il est ouvert. Pour le push 24h/24 : un plan payant ou le Pass 30 jours.'),
             ('Les alertes Discord sont-elles gratuites ?',
              'Seulement pendant un essai en cours. Ensuite, elles sont réservées aux plans payants et au Pass 30 jours.'),
             ('Et sans abonnement ?',
