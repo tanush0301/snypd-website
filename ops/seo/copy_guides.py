@@ -711,15 +711,14 @@ GUIDES = {
              ('reglages', 'Régler l’alerte'), ('exemples', 'Trois exemples de recherche'), ('erreurs', 'Cinq erreurs fréquentes')],
         sections=[
             ('vinted', 'Ce que Vinted propose déjà',
-             '<p>Vinted te permet de sauvegarder une recherche depuis la barre de recherche. Le centre d’aide (<a href="{h435}" rel="nofollow noopener">Comment sauvegarder une recherche\xa0?</a>) précise que tu peux en garder un nombre illimité et qu’une recherche sauvegardée affiche un nombre suivi d’un signe plus\xa0: le nombre de nouveaux articles mis en ligne depuis ta dernière consultation, remis à zéro quand tu la consultes.</p>'
-             '<p>Côté notifications (<a href="{h433}" rel="nofollow noopener">Comment gérer tes notifications\xa0?</a>), Vinted cite entre autres un membre que tu suis qui met en ligne un article, la baisse de prix d’un favori et la vente d’un favori. Les nouveaux résultats d’une recherche sauvegardée ne figurent pas dans cette liste. Tu vois donc le compteur quand tu ouvres l’appli, mais rien ne te prévient au moment où une annonce arrive.</p>'
+             '<p>Sur Vinted, une recherche sauvegardée affiche un compteur «\xa0+N\xa0» des nouveaux articles depuis ta dernière visite (<a href="{h435}" rel="nofollow noopener">Comment sauvegarder une recherche\xa0?</a>). Mais Vinted n’envoie aucun push quand un nouveau résultat arrive\xa0: tu ne le vois qu’en ouvrant l’appli.</p>'
              '<p>Tout sur les recherches sauvegardées\xa0: <a href="{saved}">recherches enregistrées Vinted</a>. Si tes notifications Vinted habituelles n’arrivent plus\xa0: <a href="{notwork}">notification Vinted qui ne fonctionne pas</a>.</p>'),
             ('etapes', 'La mise en place avec SNYPD, étape par étape',
              '<ol><li><strong>Fais ta recherche sur Vinted</strong> dans un navigateur, avec tous tes filtres\xa0: marque, taille, état, prix maximum.</li>'
              '<li><strong>Copie le lien</strong> dans la barre d’adresse. Il contient <code>/catalog?</code>. Tous les filtres du lien sont repris tels quels\xa0; un lien avec un paramètre inconnu est refusé plutôt que coupé en silence.</li>'
              '<li><strong>Crée ton compte SNYPD</strong> (pas de carte bancaire pour le plan Free).</li>'
              '<li><strong>Colle le lien</strong> et lance la recherche. SNYPD la vérifie environ toutes les 30 secondes à une minute.</li>'
-             '<li><strong>Active les alertes.</strong> Sur ordinateur, autorise les notifications quand le navigateur le demande. Sur iPhone, ajoute d’abord SNYPD à l’écran d’accueil (Partager, puis «\xa0Sur l’écran d’accueil\xa0»), ouvre SNYPD depuis cette icône, puis active les alertes\xa0: Apple n’autorise les notifications web que là. Guide détaillé\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.</li>'
+             '<li><strong>Active les alertes.</strong> Sur ordinateur, autorise les notifications quand le navigateur le demande\xa0; sur iPhone, suis d’abord le guide <a href="{phone}">alertes Vinted sur téléphone</a>.</li>'
              '<li><strong>En option, Discord</strong>\xa0: avec un abonnement, le Pass 30 jours ou un essai en cours, relie ton compte au serveur Discord SNYPD pour recevoir aussi tes alertes dans un fil privé.</li></ol>'
              '<p>La fréquence de vérification n’est pas un délai d’arrivée\xa0: Vinted affiche lui-même une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne. SNYPD ne se connecte jamais à ton compte Vinted, n’achète rien et n’écrit pas aux vendeurs. L’alerte ouvre l’annonce sur Vinted, c’est toi qui décides.</p>'),
             ('ou', 'Où arrivent les alertes',
@@ -742,7 +741,7 @@ GUIDES = {
              '<ol><li><strong>Plusieurs marques dans une seule recherche.</strong> Vinted veut tous les mots dans la même annonce\xa0: la recherche ne trouve presque rien. Fais une recherche par marque.</li>'
              '<li><strong>Pas de prix maximum.</strong> Tu reçois tout, y compris ce que tu n’achèteras jamais, et tu finis par ignorer les alertes.</li>'
              '<li><strong>Les alertes jamais activées.</strong> La recherche tourne, mais sans autorisation de notification, rien n’arrive sur ton appareil.</li>'
-             '<li><strong>iPhone sans l’icône sur l’écran d’accueil.</strong> Dans Safari seul, Apple ne permet pas les notifications web. Ajoute SNYPD à l’écran d’accueil et ouvre-le depuis l’icône.</li>'
+             '<li><strong>iPhone sans l’icône sur l’écran d’accueil.</strong> Sans elle, pas de notification\xa0: voir <a href="{phone}">alertes Vinted sur téléphone</a>.</li>'
              '<li><strong>Attendre une alerte à la seconde où l’annonce est postée.</strong> Vinted affiche une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne\xa0; SNYPD ne peut la voir qu’à partir de ce moment.</li></ol>'),
         ],
         faq=[

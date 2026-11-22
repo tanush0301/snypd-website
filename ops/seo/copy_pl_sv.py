@@ -146,7 +146,7 @@ WAY_CELLS = {
         cost={'pl': '19,99&ndash;44,99&nbsp;&pound;' + _M['pl'], 'sv': '19,99&ndash;44,99&nbsp;&pound;' + _M['sv']}),
     'SNYPD': dict(
         get={'pl': 'Każde nowe ogłoszenie z wklejonego linku wyszukiwania Vinted, ze wszystkimi filtrami', 'sv': 'Varje ny annons för söklänken från Vinted som du klistrar in, med alla filter'},
-        how={'pl': 'Push na telefon i komputer, bez sklepu z aplikacjami', 'sv': 'Push till mobil och dator, ingen appbutik'},
+        how={'pl': 'Push na telefon i komputer, bez sklepu z aplikacjami, oraz prywatny wątek na Discordzie (plan płatny, Hunt Pass, okres próbny)', 'sv': 'Push till mobil och dator, ingen appbutik, och en privat Discord-tråd (betalt abonnemang, Hunt Pass, provperiod)'},
         cost={'pl': 'Za darmo: 1 wyszukiwanie, @@trial_days@@ dni 24/7; płatnie od @@price:solo@@ / mies. lub @@price:pass@@ jednorazowo za @@pass_days@@ dni',
               'sv': 'Gratis: 1 sökning, dygnet runt i @@trial_days@@ dagar; betalt från @@price:solo@@ / mån. eller @@price:pass@@ en gång för @@pass_days@@ dagar'}),
 }
@@ -256,7 +256,7 @@ def _bot_copy(lang):
         body = f"""
 <section id="podsumowanie">
   <h2>SNYPD w jednym akapicie</h2>
-  <div class="lg-box lg-mint"><p>SNYPD to bot Vinted do powiadomień, nazywany też monitorem Vinted, dla resellerów. Wklejasz link do wyszukiwania na Vinted ze swoimi filtrami (marka, rozmiar, cena, stan), a SNYPD sprawdza to wyszukiwanie mniej więcej co 30 sekund do minuty. Gdy pojawi się nowe pasujące ogłoszenie, trafia do twojego panelu, a ty dostajesz powiadomienie push na telefon albo komputer. SNYPD nigdy nie prosi o hasło do Vinted, nigdy nie loguje się na twoje konto, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy obsługuje jedno wyszukiwanie: 24/7 przez pierwsze @@trial_days@@ dni, potem tak długo, jak masz otwarty panel. Plany płatne, od @@price:solo@@ miesięcznie, pilnują 24/7.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD to bot Vinted do powiadomień, nazywany też monitorem Vinted, dla resellerów. Wklejasz link do wyszukiwania na Vinted ze swoimi filtrami (marka, rozmiar, cena, stan), a SNYPD sprawdza to wyszukiwanie mniej więcej co 30 sekund do minuty. Gdy pojawi się nowe pasujące ogłoszenie, trafia do twojego panelu, a ty dostajesz powiadomienie push na telefon albo komputer. W planie płatnym, z Hunt Passem lub w trakcie okresu próbnego dostajesz je też w prywatnym wątku na Discordzie SNYPD. SNYPD nigdy nie prosi o hasło do Vinted, nigdy nie loguje się na twoje konto, niczego nie kupuje i nie pisze do sprzedających. Plan darmowy obsługuje jedno wyszukiwanie: 24/7 przez pierwsze @@trial_days@@ dni, potem tak długo, jak masz otwarty panel. Plany płatne, od @@price:solo@@ miesięcznie, pilnują 24/7.</p></div>
 </section>
 <section id="rodzaje">
   <h2>Trzy rodzaje botów Vinted</h2>
@@ -326,7 +326,7 @@ def _bot_copy(lang):
     body = f"""
 <section id="sammanfattning">
   <h2>SNYPD i ett stycke</h2>
-  <div class="lg-box lg-mint"><p>SNYPD är en Vinted bot för bevakning, även kallad Vinted monitor, för dig som köper för att sälja vidare. Du klistrar in en söklänk från Vinted med dina filter (märke, storlek, pris, skick) och SNYPD kontrollerar sökningen ungefär var 30:e sekund till en gång i minuten. När en ny annons matchar dyker den upp i din panel och du får en pushnotis i mobilen eller datorn. SNYPD frågar aldrig efter ditt Vinted-lösenord, loggar aldrig in på ditt konto, köper ingenting och skriver inte till säljare. Gratisplanen bevakar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan så länge din panel är öppen. Betalda abonnemang, från @@price:solo@@ i månaden, bevakar dygnet runt.</p></div>
+  <div class="lg-box lg-mint"><p>SNYPD är en Vinted bot för bevakning, även kallad Vinted monitor, för dig som köper för att sälja vidare. Du klistrar in en söklänk från Vinted med dina filter (märke, storlek, pris, skick) och SNYPD kontrollerar sökningen ungefär var 30:e sekund till en gång i minuten. När en ny annons matchar dyker den upp i din panel och du får en pushnotis i mobilen eller datorn. Med ett betalt abonnemang, Hunt Pass eller under en pågående provperiod får du den också i en privat tråd på SNYPD:s Discord. SNYPD frågar aldrig efter ditt Vinted-lösenord, loggar aldrig in på ditt konto, köper ingenting och skriver inte till säljare. Gratisplanen bevakar en sökning: dygnet runt de första @@trial_days@@ dagarna, sedan så länge din panel är öppen. Betalda abonnemang, från @@price:solo@@ i månaden, bevakar dygnet runt.</p></div>
 </section>
 <section id="typer">
   <h2>Tre sorters Vinted botar</h2>
