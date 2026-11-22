@@ -470,35 +470,35 @@ def cta(lang):
     if lang in cps.CTA:
         return cps.CTA[lang]
     if lang == 'it':
-        return ('<div class="lg-box lg-mint"><p><strong>Inizia gratis con una ricerca.</strong> Nessuna carta, nessun limite di tempo, nessun limite di notifiche. I primi @@trial_days@@ giorni funziona 24 ore su 24 con le notifiche. '
+        return ('<div class="lg-box lg-mint"><p><strong>Inizia gratis con una ricerca.</strong> Nessuna carta, nessun limite di tempo, nessun limite di notifiche. I primi @@trial_days@@ giorni funziona 24 ore su 24 con le notifiche. Se in quel periodo la ricerca non trova nulla, aggiungiamo @@trial_ext_days@@ giorni, una sola volta. '
                 'Passa a un piano a pagamento quando vuoi che la ricerca continui anche con la dashboard chiusa.</p>'
                 '<p class="ct-note">Per ora registrazione e pagamento sono in inglese.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">INIZIA GRATIS</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">VEDI I PIANI</a></div></div>')
     if lang == 'es':
-        return ('<div class="lg-box lg-mint"><p><strong>Empieza gratis con una búsqueda.</strong> Sin tarjeta, sin límite de tiempo, sin límite de notificaciones. Los primeros @@trial_days@@ días funciona 24/7 con notificaciones. '
+        return ('<div class="lg-box lg-mint"><p><strong>Empieza gratis con una búsqueda.</strong> Sin tarjeta, sin límite de tiempo, sin límite de notificaciones. Los primeros @@trial_days@@ días funciona 24/7 con notificaciones. Si en ese tiempo tu búsqueda no encuentra nada, añadimos @@trial_ext_days@@ días más, una sola vez. '
                 'Pásate a un plan de pago cuando quieras que la búsqueda siga funcionando con el panel cerrado.</p>'
                 '<p class="ct-note">De momento, el registro y el pago están en inglés.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">EMPEZAR GRATIS</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">VER PLANES</a></div></div>')
     if lang == 'de':
-        return ('<div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten @@trial_days@@ Tage laufen rund um die Uhr mit Benachrichtigungen. '
+        return ('<div class="lg-box lg-mint"><p><strong>Starte mit einer Suche, kostenlos.</strong> Keine Karte, kein Zeitlimit, keine Grenze bei Benachrichtigungen. Die ersten @@trial_days@@ Tage laufen rund um die Uhr mit Benachrichtigungen. Findet deine Suche in dieser Zeit nichts, geben wir einmalig @@trial_ext_days@@ Tage dazu. '
                 'Wechsle zu einem bezahlten Tarif, wenn deine Suche auch bei geschlossenem Dashboard weiterlaufen soll.</p>'
                 '<p class="ct-note">Anmeldung und Bezahlung sind vorerst auf Englisch.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">KOSTENLOS STARTEN</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">TARIFE ANSEHEN</a></div></div>')
     if lang == 'nl':
-        return ('<div class="lg-box lg-mint"><p><strong>Begin gratis met één zoekopdracht.</strong> Geen kaart, geen tijdslimiet, geen limiet op meldingen. De eerste @@trial_days@@ dagen draaien 24/7 met meldingen. '
+        return ('<div class="lg-box lg-mint"><p><strong>Begin gratis met één zoekopdracht.</strong> Geen kaart, geen tijdslimiet, geen limiet op meldingen. De eerste @@trial_days@@ dagen draaien 24/7 met meldingen. Vindt je zoekopdracht in die tijd niets, dan krijg je er eenmalig @@trial_ext_days@@ dagen bij. '
                 'Stap over op een betaald abonnement als je zoekopdracht ook met gesloten dashboard moet blijven lopen.</p>'
                 '<p class="ct-note">Registreren en betalen gaan voorlopig in het Engels.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">GRATIS BEGINNEN</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">ABONNEMENTEN BEKIJKEN</a></div></div>')
     if lang == 'en':
-        return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. The first @@trial_days@@ days run 24/7 with alerts. '
+        return ('<div class="lg-box lg-mint"><p><strong>Start with one search, free.</strong> No card, no time limit, no cap on notifications. The first @@trial_days@@ days run 24/7 with alerts. If it finds nothing in that time, we add @@trial_ext_days@@ more days once. '
                 'Upgrade when you want it to keep watching with your dashboard closed.</p>'
                 '<div class="ct-actions"><a class="ct-btn" href="/signup">START FREE</a>'
                 '<a class="ct-btn ct-ghost" href="/plans">SEE PLANS</a></div></div>')
-    return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les @@trial_days@@ premiers jours tournent 24h/24 avec les alertes. '
+    return ('<div class="lg-box lg-mint"><p><strong>Commence avec une recherche, gratuitement.</strong> Sans carte, sans limite de durée ni de notifications. Les @@trial_days@@ premiers jours tournent 24h/24 avec les alertes. Si ta recherche ne trouve rien pendant ce temps, on ajoute @@trial_ext_days@@ jours de plus, une seule fois. '
             'Passe à un plan payant quand tu veux que la surveillance continue tableau de bord fermé.</p>'
             '<p class="ct-note">Inscription et paiement en français.</p>'
             '<div class="ct-actions"><a class="ct-btn" href="/signup">COMMENCER GRATUITEMENT</a>'

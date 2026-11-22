@@ -63,12 +63,12 @@ def ui(discord):
 
 
 CTA = {
-    'pl': ('<div class="lg-box lg-mint"><p><strong>Zacznij za darmo od jednego wyszukiwania.</strong> Bez karty, bez limitu czasu, bez limitu powiadomień. Przez pierwsze @@trial_days@@ dni działa 24/7 z powiadomieniami. '
+    'pl': ('<div class="lg-box lg-mint"><p><strong>Zacznij za darmo od jednego wyszukiwania.</strong> Bez karty, bez limitu czasu, bez limitu powiadomień. Przez pierwsze @@trial_days@@ dni działa 24/7 z powiadomieniami. Jeśli w tym czasie wyszukiwanie niczego nie znajdzie, jednorazowo dodajemy @@trial_ext_days@@ dni. '
            'Przejdź na plan płatny, gdy chcesz, żeby wyszukiwanie działało także przy zamkniętym panelu.</p>'
            '<p class="ct-note">Rejestracja i płatność są na razie po angielsku. Ceny planów są w euro.</p>'
            '<div class="ct-actions"><a class="ct-btn" href="/signup">ZACZNIJ ZA DARMO</a>'
            '<a class="ct-btn ct-ghost" href="/plans">ZOBACZ PLANY</a></div></div>'),
-    'sv': ('<div class="lg-box lg-mint"><p><strong>Börja gratis med en sökning.</strong> Inget kort, ingen tidsgräns, ingen gräns för notiser. De första @@trial_days@@ dagarna körs den dygnet runt med notiser. '
+    'sv': ('<div class="lg-box lg-mint"><p><strong>Börja gratis med en sökning.</strong> Inget kort, ingen tidsgräns, ingen gräns för notiser. De första @@trial_days@@ dagarna körs den dygnet runt med notiser. Hittar sökningen inget under den tiden får du @@trial_ext_days@@ dagar till, en gång. '
            'Uppgradera när du vill att sökningen ska fortsätta med panelen stängd.</p>'
            '<p class="ct-note">Registrering och betalning är på engelska tills vidare. Abonnemangen kostar i euro.</p>'
            '<div class="ct-actions"><a class="ct-btn" href="/signup">BÖRJA GRATIS</a>'
