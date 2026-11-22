@@ -827,7 +827,7 @@ GUIDES = {
   'ukus': {
     'slugs': {'en': '/vinted-alerts-uk-us'},
     'en': dict(
-        title='Vinted alerts for new listings in the UK and US (2026) | SNYPD',
+        title='Vinted alerts for new listings in the UK and US | SNYPD',
         desc='How to get an alert for each new Vinted listing on vinted.co.uk or vinted.com: copy your search link, paste it into SNYPD, turn on push or Discord alerts.',
         eyebrow='VINTED ALERTS GUIDE',
         h1='How do I get alerts for new Vinted listings in the UK or the US?',
