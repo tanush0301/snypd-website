@@ -702,7 +702,7 @@ GUIDES = {
     'slugs': {'fr': '/fr/alerte-vinted-nouvelle-annonce'},
     'fr': dict(
         title='Alerte Vinted à chaque nouvelle annonce\xa0: le guide (2026) | SNYPD',
-        desc='Comment recevoir une alerte pour chaque nouvelle annonce Vinted qui correspond à ta recherche\xa0: ce que Vinted propose, la mise en place pas à pas, les réglages et les erreurs à éviter.',
+        desc='Recevoir une alerte pour chaque nouvelle annonce Vinted\xa0: ce que Vinted propose, la mise en place pas à pas et les bons réglages.',
         eyebrow='GUIDE ALERTES VINTED',
         h1='Comment recevoir une alerte pour chaque nouvelle annonce Vinted\xa0?',
         lead='Un guide pratique\xa0: ce que Vinted fait déjà (centre d’aide lu le {read}), comment mettre en place une alerte par nouvelle annonce en quelques minutes, et comment la régler pour ne pas être noyé sous les notifications.',
@@ -720,7 +720,7 @@ GUIDES = {
              '<li><strong>Crée ton compte SNYPD</strong> (pas de carte bancaire pour le plan Free).</li>'
              '<li><strong>Colle le lien</strong> et lance la recherche. SNYPD la vérifie environ toutes les 30 secondes à une minute.</li>'
              '<li><strong>Active les alertes.</strong> Sur ordinateur, autorise les notifications quand le navigateur le demande. Sur iPhone, ajoute d’abord SNYPD à l’écran d’accueil (Partager, puis «\xa0Sur l’écran d’accueil\xa0»), ouvre SNYPD depuis cette icône, puis active les alertes\xa0: Apple n’autorise les notifications web que là. Guide détaillé\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.</li>'
-             '<li><strong>En option, Discord</strong>\xa0: relie ton compte au serveur Discord SNYPD pour recevoir aussi tes alertes dans un fil privé.</li></ol>'
+             '<li><strong>En option, Discord</strong>\xa0: avec un abonnement, le Pass 30 jours ou un essai en cours, relie ton compte au serveur Discord SNYPD pour recevoir aussi tes alertes dans un fil privé.</li></ol>'
              '<p>La fréquence de vérification n’est pas un délai d’arrivée\xa0: Vinted affiche lui-même une nouvelle annonce dans sa recherche quelques minutes après sa mise en ligne. SNYPD ne se connecte jamais à ton compte Vinted, n’achète rien et n’écrit pas aux vendeurs. L’alerte ouvre l’annonce sur Vinted, c’est toi qui décides.</p>'),
             ('ou', 'Où arrivent les alertes',
              '<ul><li><strong>Notification push</strong> sur ton téléphone ou ton ordinateur. Plusieurs annonces trouvées à la suite arrivent groupées dans un seul push (jusqu’à 5 annonces listées).</li>'
@@ -728,10 +728,10 @@ GUIDES = {
              '<li><strong>Discord</strong>\xa0: avec un abonnement, le Pass 30 jours ou un essai en cours, un fil privé sur le serveur Discord SNYPD.</li></ul>'
              '<p>Pas de Telegram, pas d’e-mail pour les alertes.</p>'),
             ('reglages', 'Régler l’alerte pour ne pas être noyé',
-             '<p>Une recherche trop large peut sortir des centaines d’annonces par jour. Quatre réglages changent tout\xa0:</p>'
+             '<p>Une recherche trop large peut sortir des centaines d’annonces par jour. Quatre réglages font la différence\xa0:</p>'
              '<ul><li><strong>Un prix maximum.</strong> C’est le filtre le plus efficace\xa0: mets-le dans ta recherche Vinted avant de copier le lien.</li>'
              '<li><strong>Des mots précis.</strong> La recherche Vinted demande que tous les mots soient dans une même annonce. «\xa0ralph lauren pull\xa0» fonctionne\xa0; une liste comme «\xa0Ralph Lauren, Nike, Adidas\xa0» ne trouve presque rien. Une marque = une recherche.</li>'
-             '<li><strong>Le mode Calme</strong>\xa0: la première trouvaille tout de suite, puis au plus un résumé toutes les 15 ou 30 minutes au lieu de «\xa0Chaque annonce\xa0».</li>'
+             '<li><strong>Le mode Calme</strong>\xa0: la première trouvaille tout de suite, puis au plus un résumé toutes les 15 ou 30 minutes au lieu du mode «\xa0Chaque annonce\xa0».</li>'
              '<li><strong>Seulement les moins chères</strong>\xa0: un push seulement pour une annonce moins chère que 75\xa0% de ce que cette recherche a trouvé dans la semaine (prix demandés, même état). Les annonces pas encore évaluées passent quand même, et le tableau de bord montre tout. Disponible sur les plans payants, le Pass 30 jours et pendant l’essai, pas sur le plan Free.</li></ul>'),
             ('exemples', 'Trois exemples de recherche',
              '<p>Des idées de structure, à adapter à ce que tu cherches. Le prix maximum, c’est toi qui le fixes selon ton budget\xa0:</p>'
@@ -757,7 +757,7 @@ GUIDES = {
             ('Pourquoi je ne reçois rien sur mon iPhone\xa0?',
              'Sur iPhone, les alertes ne fonctionnent qu’une fois SNYPD ajouté à l’écran d’accueil et ouvert depuis cette icône. Active ensuite les alertes depuis l’appli. Pas à pas\xa0: <a href="{phone}">alertes Vinted sur téléphone</a>.'),
             ('Je reçois trop d’alertes, que faire\xa0?',
-             'Ajoute un prix maximum à ta recherche, utilise des mots plus précis, ou passe la recherche en mode Calme (un résumé toutes les 15 ou 30 minutes) ou en «\xa0Seulement les moins chères\xa0» (pas sur le plan Free). Toutes les options d’alerte\xa0: <a href="{notify}">alertes Vinted pour les nouvelles annonces</a>.'),
+             'Ajoute un prix maximum à ta recherche, utilise des mots plus précis, ou passe la recherche en mode Calme (un résumé toutes les 15 ou 30 minutes) ou en «\xa0Seulement les moins chères\xa0» (plans payants, Pass 30 jours et essai en cours). Toutes les options d’alerte\xa0: <a href="{notify}">alertes Vinted pour les nouvelles annonces</a>.'),
         ],
         cta_h='Crée ta première alerte Vinted'),
   },
