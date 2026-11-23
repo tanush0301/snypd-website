@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!-- v3c (23 Nov 2026): 14 s product video for the homepage, 1080x1350 (4:5), no sound, captions on screen.
+     window.setT(seconds) puts every element in its state for that moment (deterministic, no timers),
+     so render_v3.js can step frame by frame.
+     Storyboard: 0-3.0 hook + the alert on a lock screen | 3.0-6.6 the feed, zoom on the price rating, the why |
+     6.6-9.6 how: the search is typed | 9.6-11.6 you buy on Vinted yourself | 11.6-14 end card.
+     Scenes slide (in from the right, out to the left); buttons get a tap mark.
+     Dashboard images in shots/ are real dashboard.html screenshots taken against ops/qa_mock.js
+     (capture_v3.js); the listings are sample data and the alert is labelled SAMPLE.
+     Facts: outreach/00-fact-sheet.md only (no "instant", no speed claims beyond the measured check pace). -->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family: 'Cabinet'; src: url('../../../assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; }
+@font-face { font-family: 'DMMono'; src: url('../../../assets/fonts/dm-mono-400-latin.woff2') format('woff2'); font-weight: 400; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1350px; background: #0A0A0B; overflow: hidden; }
+body { color: #FFF; font-family: 'DMMono', monospace; position: relative; }
+.glow { position: absolute; left: -200px; right: -200px; top: -300px; height: 900px; background: radial-gradient(closest-side, rgba(162,0,255,.22), rgba(162,0,255,0)); }
+.sc { position: absolute; inset: 0; visibility: hidden; }
+.cap { position: absolute; left: 72px; right: 72px; top: 84px; }
+.eyebrow { font-size: 26px; letter-spacing: .16em; color: #00E5A0; text-transform: uppercase; }
+.h { font-family: 'Cabinet', sans-serif; font-weight: 900; font-size: 84px; line-height: .98; letter-spacing: -.02em; margin-top: 22px; }
+.h.s { font-size: 68px; }
+.mint { color: #00E5A0; }
+.p { font-size: 32px; line-height: 1.45; color: #B8BCBF; margin-top: 26px; }
+.tap { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 5px solid #FFF; background: rgba(255,255,255,.25); opacity: 0; pointer-events: none; }
+/* the search form */
+.form { position: absolute; left: 72px; right: 72px; top: 420px; background: #121214; border: 1px solid #2A2B2F; padding: 44px 40px; }
+.form .lab { font-size: 24px; letter-spacing: .14em; color: #00E5A0; }
+.form .row { display: flex; gap: 18px; margin-top: 22px; }
+.form .in { background: #0A0A0B; border: 1px solid #2A2B2F; height: 104px; display: flex; align-items: center; padding: 0 28px; font-size: 38px; color: #FFF; white-space: nowrap; }
+.form .in.w { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.form .in.m { flex: 0 0 280px; }
+.form .ph { color: #5C6165; }
+.caret { display: inline-block; width: 3px; height: 44px; background: #00E5A0; margin-left: 4px; }
+.form .go { position: relative; margin-top: 22px; height: 108px; background: #A200FF; display: flex; align-items: center; justify-content: center; font-size: 34px; letter-spacing: .1em; color: #FFF; }
+.form .ok { margin-top: 26px; font-size: 28px; color: #00E5A0; opacity: 0; }
+/* lock screen */
+.stage { position: absolute; left: 0; right: 0; top: 330px; bottom: 0; overflow: hidden; }
+.lock { position: absolute; left: 50%; top: 40px; width: 780px; height: 1300px; margin-left: -390px; border-radius: 70px; background: linear-gradient(180deg, #15101A 0%, #0A0A0B 60%); border: 12px solid #26272B; box-shadow: 0 40px 120px rgba(0,0,0,.7); }
+.lock .isl { position: absolute; left: 50%; top: 26px; width: 170px; height: 44px; margin-left: -85px; border-radius: 22px; background: #000; }
+.lock .time { margin-top: 120px; text-align: center; font-family: 'Cabinet'; font-weight: 900; font-size: 150px; letter-spacing: -.02em; line-height: 1; }
+.lock .date { text-align: center; font-size: 26px; color: #B8BCBF; margin-top: 8px; }
+.notif { position: absolute; left: 26px; right: 26px; top: 420px; background: rgba(40,41,46,.96); border-radius: 30px; padding: 24px 24px; display: flex; gap: 20px; align-items: flex-start; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+.notif img { flex: 0 0 92px; width: 92px; height: 92px; border-radius: 21px; }
+.notif .tx { flex: 1 1 auto; min-width: 0; }
+.notif .app { font-size: 24px; color: #9CA1A5; letter-spacing: .08em; display: flex; justify-content: space-between; }
+.notif .app b { font-weight: 400; color: #FFB020; }
+.notif .ti { font-size: 36px; color: #FFF; margin-top: 6px; }
+.notif .bo { font-size: 31px; color: #D5D8DA; line-height: 1.35; margin-top: 4px; }
+.notif .rk { font-size: 31px; color: #00E5A0; margin-top: 4px; }
+/* feed + card */
+.phone { position: absolute; left: 50%; top: 20px; width: 520px; height: 1126px; margin-left: -260px; border-radius: 54px; background: #000; border: 10px solid #26272B; overflow: hidden; box-shadow: 0 40px 120px rgba(0,0,0,.7); }
+.phone img { display: block; width: 100%; }
+.ring { position: absolute; border: 4px solid #00E5A0; border-radius: 10px; box-shadow: 0 0 0 6px rgba(0,229,160,.18); opacity: 0; }
+.card { position: absolute; left: 50%; top: 10px; width: 560px; margin-left: -280px; border-radius: 18px; overflow: hidden; border: 1px solid #2A2B2F; box-shadow: 0 40px 120px rgba(0,0,0,.7); }
+.card img { display: block; width: 100%; }
+.end { position: absolute; left: 72px; right: 72px; top: 250px; }
+.word { font-family: 'Cabinet'; font-weight: 900; font-size: 150px; letter-spacing: .02em; }
+.cta { display: inline-block; margin-top: 54px; background: #A200FF; color: #FFF; font-size: 44px; padding: 30px 52px; letter-spacing: .06em; }
+.fine { font-size: 27px; color: #8B9094; line-height: 1.5; margin-top: 50px; }
+</style></head><body>
+<div class="glow"></div>
+
+<section class="sc" id="s0">
+  <div class="cap">
+    <div class="h s" id="hook" style="margin-top:0">The good Vinted listings are <span class="mint">gone before you look.</span></div>
+  </div>
+  <div class="stage">
+    <div class="lock" id="lock">
+      <div class="isl"></div>
+      <div class="time">09:41</div>
+      <div class="date">Monday 23 November</div>
+      <div class="notif" id="n1">
+        <img src="../../../assets/home/logo.png" alt="">
+        <div class="tx">
+          <div class="app"><span>SNYPD &middot; now</span><b>SAMPLE</b></div>
+          <div class="ti">New find</div>
+          <div class="bo">Polo Ralph Lauren cable knit jumper &mdash; &euro;12</div>
+          <div class="rk">Cheaper than 82% of this week's finds</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sc" id="s1">
+  <div class="cap">
+    <div class="eyebrow">SNYPD</div>
+    <div class="h" id="s2a">It watches.</div>
+    <div class="h s" id="s2b" style="position:absolute;left:0;top:48px;opacity:0">It tells you if <span class="mint">the price is good.</span></div>
+  </div>
+  <div class="stage">
+    <div class="phone" id="phone">
+      <img src="shots/v3_screen.png" alt="">
+      <div class="ring" id="ring2" style="left:10.3%;top:58.9%;width:79.4%;height:8.6%"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sc" id="s2">
+  <div class="cap">
+    <div class="eyebrow">How</div>
+    <div class="h s">Type what you want. <span class="mint">Once.</span></div>
+  </div>
+  <div class="form" id="form">
+    <div class="lab">WHAT ARE YOU HUNTING?</div>
+    <div class="row">
+      <div class="in w"><span id="typed"></span><span class="ph" id="ph0">e.g. jordan 1 travis scott</span><span class="caret" id="c0"></span></div>
+      <div class="in m"><span id="typedm"></span><span class="ph" id="ph1">Max price</span><span class="caret" id="c1"></span></div>
+    </div>
+    <div class="go" id="go">WATCH IT FOR ME<div class="tap" id="tap2" style="left:50%;top:50%"></div></div>
+    <div class="ok" id="ok">&#10003; SNYPD is watching. About every 30 seconds to a minute.</div>
+  </div>
+</section>
+
+<section class="sc" id="s3">
+  <div class="cap">
+    <div class="eyebrow">You stay in control</div>
+    <div class="h s">You buy on Vinted <span class="mint">yourself.</span></div>
+    <div class="p">SNYPD never logs in, buys or messages for you.</div>
+  </div>
+  <div class="stage" style="top:470px">
+    <div class="card" id="card3">
+      <img src="shots/v3_card0.png" alt="">
+      <div class="ring" id="ring3" style="left:3%;top:90.5%;width:41.5%;height:7.5%"></div>
+      <div class="tap" id="tap3" style="left:24%;top:94.2%"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sc" id="s4">
+  <div class="end">
+    <div class="word">SNYPD</div>
+    <div class="h s">New Vinted listings, <span class="mint">sent to your phone.</span></div>
+    <div class="p">Free: your first search runs 24/7 for 3 days. No card.</div>
+    <div class="cta" id="cta">START FREE</div>
+    <div class="fine">Never needs your Vinted password.<br>Not affiliated with Vinted.</div>
+  </div>
+</section>
+
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+const $ = (id) => document.getElementById(id);
+// [id, start, end] in seconds; a scene slides in from the right over SL s while the one before slides out to the left.
+const SCENES = [['s0', 0, 3.0], ['s1', 3.0, 6.6], ['s2', 6.6, 9.6], ['s3', 9.6, 11.6], ['s4', 11.6, 14.0]];
+const SL = 0.45;
+const WORDS = 'ralph lauren', MAX = '40';
+function tap(el, t, at) {   // a tap mark: grows and fades over 0.4 s from "at"
+  const k = clamp((t - at) / 0.4);
+  el.style.opacity = t < at || k >= 1 ? 0 : (1 - k).toFixed(3);
+  el.style.transform = 'scale(' + (0.4 + 0.9 * k).toFixed(3) + ')';
+}
+window.DURATION = 14;
+window.KEYS = [0.4, 1.6, 2.7, 3.2, 4.2, 5.8, 6.8, 7.7, 9.1, 10.5, 11.8, 13.2];
+window.setT = function (t) {
+  SCENES.forEach(([id, a, b], i) => {
+    const el = $(id), last = i === SCENES.length - 1;
+    const e = i === 0 ? 1 : ease((t - a) / SL), x = last ? 0 : ease((t - b) / SL);
+    el.style.visibility = t >= a && (last || t <= b + SL) ? 'visible' : 'hidden';
+    el.style.transform = 'translateX(' + ((1 - e) * 1080 - x * 1080).toFixed(1) + 'px)';
+  });
+  // s0: the hook is there from frame 1; the alert drops in at 1.0
+  const n = ease((t - 1.0) / 0.45);
+  $('n1').style.opacity = n;
+  $('n1').style.transform = 'translateY(' + ((1 - n) * -60).toFixed(1) + 'px) scale(' + (0.96 + 0.04 * n).toFixed(3) + ')';
+  $('lock').style.transform = 'translateY(' + ((1 - ease(t / 0.6)) * 40).toFixed(1) + 'px)';
+  // s1: zoom into the price rating; "It watches." -> "It tells you if the price is good."
+  const z = ease((t - 3.9) / 0.9);
+  $('phone').style.transformOrigin = '50% 64%';
+  $('phone').style.transform = 'scale(' + (1 + 0.75 * z).toFixed(3) + ')';
+  $('s2a').style.opacity = 1 - ease((t - 4.0) / 0.3);
+  $('s2b').style.opacity = ease((t - 4.25) / 0.3);
+  $('ring2').style.opacity = ease((t - 4.8) / 0.3);
+  // s2: words typed 7.0-7.8, max price 7.9-8.1, tap at 8.3, confirmation after
+  const nw = Math.round(clamp((t - 7.0) / 0.8) * WORDS.length), nm = Math.round(clamp((t - 7.9) / 0.2) * MAX.length);
+  $('typed').textContent = WORDS.slice(0, nw);
+  $('ph0').style.display = nw ? 'none' : 'inline';
+  $('typedm').textContent = nm ? '€' + MAX.slice(0, nm) : '';
+  $('ph1').style.display = nm ? 'none' : 'inline';
+  $('c0').style.display = t < 7.85 ? 'inline-block' : 'none';
+  $('c1').style.display = t >= 7.85 && t < 8.25 ? 'inline-block' : 'none';
+  const press = ease((t - 8.3) / 0.1) - ease((t - 8.45) / 0.15);
+  $('go').style.transform = 'scale(' + (1 - 0.04 * press).toFixed(3) + ')';
+  tap($('tap2'), t, 8.3);
+  $('ok').style.opacity = ease((t - 8.55) / 0.25);
+  // s3: a slow push-in on the card, Open on Vinted ringed and tapped
+  const push = clamp((t - 9.6) / 2.4);
+  $('card3').style.transformOrigin = '30% 90%';
+  $('card3').style.transform = 'translateY(' + (-push * 300).toFixed(1) + 'px) scale(' + (1 + 0.26 * ease(push * 1.5)).toFixed(3) + ')';
+  $('ring3').style.opacity = ease((t - 10.3) / 0.25);
+  tap($('tap3'), t, 10.8);
+  // s4: the button settles with a small pulse
+  const pu = ease((t - 12.4) / 0.25) - ease((t - 12.7) / 0.3);
+  $('cta').style.transform = 'scale(' + (1 + 0.05 * pu).toFixed(3) + ')';
+};
+window.setT(0);
+</script>
+</body></html>

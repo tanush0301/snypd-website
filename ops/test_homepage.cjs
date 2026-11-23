@@ -99,18 +99,41 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(/qs\.get\('hunt'\)/.test(auth) && /qs\.get\('max'\)/.test(auth) && /snypd_hunt_intent/.test(auth), 'assets/auth.js still stores hunt + max for the first-hunt wizard');
   }
 
+  // ---- v11: product video, loaded only on tap ------------------------------------------------------------------
+  {
+    const { page, ctx } = await open('');
+    const seen = [];
+    page.on('request', r => seen.push(r.url()));
+    ok(fs.existsSync(path.join(root, 'assets/home/video/snypd-home-4x5.mp4')) && fs.existsSync(path.join(root, 'assets/home/video/snypd-home-4x5-poster.jpg')), 'v11: the video and its poster are in the repo');
+    ok(fs.statSync(path.join(root, 'assets/home/video/snypd-home-4x5.mp4')).size < 3e6, 'v11: the video stays under 3 MB');
+    eq(await page.$$eval('video', v => v.length), 0, 'v11: no video element before the tap');
+    await page.$eval('#vid-play', e => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await wait(600);
+    ok(!seen.some(u => /\.mp4/.test(u)), 'v11: the video file is not requested before the tap');
+    ok(await page.$eval('#vid-play img', i => i.complete && i.naturalWidth > 0 && !!i.alt), 'v11: the poster image loads and has a description');
+    ok(await page.$eval('#watch a.hp-btn', a => a.getAttribute('href') === '/signup'), 'v11: the video section has a sign-up button');
+    await page.click('#vid-play');
+    await wait(900);
+    ok(seen.some(u => /\/assets\/home\/video\/snypd-home-4x5\.mp4/.test(u)), 'v11: the tap requests the video file');
+    ok(await page.$eval('#vid-el', v => v.muted && v.controls && v.playsInline), 'v11: the video is muted, inline and has controls');
+    eq(await page.$$eval('#vid-play', b => b.length), 0, 'v11: the play button is replaced by the video');
+    await ctx.close();
+  }
+
   // ---- plan links, counters, no leftovers from v5 --------------------------------------------------------------
   {
     const { page, ctx } = await open('');
     const links = await page.$$eval('a[href^="/signup"]', as => as.map(a => a.getAttribute('href') + ' | ' + a.textContent.trim()));
-    // v9: Hunt Pass and Solo are one-line text links; Kickstart is reached through "Compare all plans" (/plans)
-    for (const want of ['/signup?plan=pass | Hunt Pass', '/signup?plan=solo | Solo', '/signup?plan=pro | START PRO', '/signup?plan=elite | Elite']) {
+    // v11: every paid plan is a card with its own button again (Hunt Pass first, Kickstart back on the page)
+    for (const want of ['/signup?plan=pass | GET HUNT PASS', '/signup?plan=solo | START SOLO', '/signup?plan=kickstart | START KICKSTART', '/signup?plan=pro | START PRO', '/signup?plan=elite | START ELITE']) {
       ok(links.includes(want), 'plan link present: ' + want);
     }
     ok(await page.$eval('#pricing a[href="/plans"]', a => /Compare all plans/.test(a.textContent)), 'pricing links to the full plan list');
     ok((await page.$$('#stat-listings')).length === 1 && (await page.$$('#stat-listings-asof')).length === 1, 'one listings figure and one date for prepublish.py');
     const text = await page.evaluate(() => document.body.innerText);
-    ok(!/outnumbered|spots left|SEE HOW IT WORKS/i.test(text), 'the v5 hero and founding line are gone');
+    ok(!/spots left|SEE HOW IT WORKS/i.test(text), 'the founding line and the v5 hero button are gone');
+    ok(/New Vinted listings, sent to your phone\./.test(await page.$eval('.hp-h1', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the headline says what it does');
+    ok(/YOU.RE NOT SLOW\. YOU.RE OUTNUMBERED\./.test(await page.$eval('#hero .hp-eyebrow', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the emotional line sits above the headline');
     ok(/SAMPLE/.test(text), 'the example alerts are labelled as samples');
     const main = await page.$eval('#hero-alert-main', e => e.innerText.replace(/\s+/g, ' '));
     // v9: item and price first, the rating on its own line under them
@@ -119,13 +142,15 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     eq(await page.$$eval('#hero-alerts .hp-alert', a => a.length), 3, 'v9: three sample alerts arrive in the hero (desktop)');
     // Pro leads the plans; Free sits next to it; Hunt Pass and Solo follow as one line each
     const order = await page.$$eval('#pricing .hp-plan', ps => ps.map(p => p.querySelector('.name').textContent.trim()));
-    eq(order, ['PRO', 'FREE'], 'plan order: Pro first, Free beside it');
-    eq(await page.$$eval('#price-rest li', l => l.length), 2, 'v9: Hunt Pass and Solo as one line each');
+    eq(order, ['HUNT PASS', 'SOLO', 'KICKSTART', 'PRO', 'ELITE'], 'v11 plan order: Hunt Pass first, every paid plan a card');
+    eq(await page.$$eval('#pricing .hp-plan a.hp-btn', l => l.length), 5, 'v11: every paid plan card has its own button');
+    ok(await page.$eval('#price-free a.hp-btn', a => a.getAttribute('href') === '/signup' && a.textContent.trim() === 'START FREE'), 'v11: Free is one line with its button');
+    ok((await page.$$('#faq-invite')).length === 0, 'v11: the free-days answer is not on the homepage');
     ok(await page.$eval('#price-pro a.hp-btn', a => !a.classList.contains('ghost') && a.getAttribute('href') === '/signup?plan=pro'), 'the Pro card has the solid button');
     // v8: trial price checks, the number from plans.json
     const tc = JSON.parse(fs.readFileSync(path.join(root, 'ops/seo/data/plans.json'), 'utf8')).market_report.trial_checks;
     ok(Number.isInteger(tc) && tc > 0, 'plans.json carries the trial price checks');
-    ok(new RegExp('Your trial includes ' + tc + ' price checks for any item you type').test(await page.$eval('#free-trial-checks', e => e.innerText)), 'the Free card says how many price checks the trial includes');
+    ok((await page.$$('#free-trial-checks')).length === 0, 'v11: the pricing section does not advertise the trial price checks (the demo and the research section still do)');
     ok(new RegExp('PRO . ELITE . ' + tc + ' IN THE TRIAL').test(await page.$eval('#research', e => e.innerText)), 'the Check a price card carries the trial tag');
     ok(new RegExp('During the free trial you get ' + tc + ' of these').test(await page.$eval('#pc', e => e.innerText)), 'the demo says the trial includes checks');
     const all = await page.evaluate(() => document.querySelector('.hp').textContent);   // includes folded FAQ answers

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!-- Design B "Cinematic" v2 (23 Nov 2026): 15 s, 1080x1350, no sound. Same rules as scene_v3.html:
+     window.setT(seconds) is deterministic; shots/ are real dashboard screenshots against ops/qa_mock.js
+     (sample listings, the founder's own listing photos); facts from outreach/00-fact-sheet.md only.
+     Storyboard: 0-2.8 words blur in | 2.7-5.0 the search is typed and the button tapped | 4.9-6.0 white pill |
+     5.9-9.3 feed tilted in 3D + callouts | 9.2-11.8 the price rating close up | 11.7-12.8 white pill |
+     12.7-15 logo end card. -->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family: 'Cabinet'; src: url('../../../assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; }
+@font-face { font-family: 'DMMono'; src: url('../../../assets/fonts/dm-mono-400-latin.woff2') format('woff2'); font-weight: 400; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1350px; background: #07070A; overflow: hidden; }
+body { color: #FFF; font-family: 'DMMono', monospace; position: relative; }
+.bg { position: absolute; inset: 0; background: radial-gradient(ellipse 900px 420px at 50% 108%, rgba(162,0,255,.55), rgba(162,0,255,0) 70%), radial-gradient(ellipse 1200px 700px at 50% -10%, rgba(0,229,160,.08), rgba(0,0,0,0) 70%); }
+.sc { position: absolute; inset: 0; opacity: 0; }
+.big { position: absolute; left: 80px; right: 80px; top: 430px; text-align: center; font-family: 'Cabinet'; font-weight: 900; font-size: 104px; line-height: 1.04; letter-spacing: -.02em; }
+.big span { display: inline-block; white-space: pre; }
+.grad { background: linear-gradient(90deg, #00E5A0, #B46BFF); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.white { position: absolute; inset: 0; background: linear-gradient(180deg, #FFFFFF, #EDE3FF); opacity: 0; }
+.pillwrap { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; }
+.halo { position: absolute; border-radius: 999px; background: rgba(162,0,255,.13); }
+.pill { position: relative; background: #FFF; color: #0A0A0B; font-family: 'Cabinet'; font-weight: 900; font-size: 64px; letter-spacing: -.01em; padding: 38px 76px; border-radius: 999px; box-shadow: 0 20px 60px rgba(120,0,200,.35); display: flex; gap: 26px; align-items: center; white-space: nowrap; }
+.chk { width: 62px; height: 62px; border-radius: 50%; background: #00C98C; color: #FFF; font-size: 40px; display: flex; align-items: center; justify-content: center; font-family: 'DMMono'; }
+.title { position: absolute; left: 0; right: 0; top: 0; padding: 80px 0 60px; z-index: 5; background: linear-gradient(180deg, #07070A 62%, rgba(7,7,10,0)); text-align: center; font-family: 'Cabinet'; font-weight: 900; font-size: 72px; letter-spacing: -.02em; }
+/* the typed search */
+.form { position: absolute; left: 80px; right: 80px; top: 430px; background: rgba(18,18,22,.96); border: 2px solid rgba(180,107,255,.5); border-radius: 26px; padding: 46px 42px; box-shadow: 0 0 90px rgba(162,0,255,.45), 0 50px 120px rgba(0,0,0,.8); }
+.form .lab { font-size: 24px; letter-spacing: .14em; color: #00E5A0; }
+.form .row { display: flex; gap: 18px; margin-top: 22px; }
+.form .in { background: #07070A; border: 1px solid #2A2B2F; border-radius: 12px; height: 108px; display: flex; align-items: center; padding: 0 28px; font-size: 40px; color: #FFF; white-space: nowrap; }
+.form .in.w { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.form .in.m { flex: 0 0 270px; }
+.form .ph { color: #5C6165; }
+.caret { display: inline-block; width: 3px; height: 46px; background: #00E5A0; margin-left: 4px; }
+.form .go { position: relative; margin-top: 22px; height: 112px; border-radius: 12px; background: #A200FF; display: flex; align-items: center; justify-content: center; font-size: 34px; letter-spacing: .1em; color: #FFF; }
+.tap { position: absolute; left: 50%; top: 50%; width: 130px; height: 130px; margin: -65px 0 0 -65px; border-radius: 50%; border: 5px solid #FFF; background: rgba(255,255,255,.25); opacity: 0; }
+.persp { position: absolute; left: 0; right: 0; top: 210px; bottom: 0; perspective: 1800px; }
+.scr { position: absolute; left: 50%; top: 0; width: 560px; margin-left: -280px; border-radius: 34px; overflow: hidden; border: 2px solid rgba(180,107,255,.5); box-shadow: 0 0 90px rgba(162,0,255,.45), 0 50px 120px rgba(0,0,0,.8); }
+.scr img { display: block; width: 100%; }
+.call { position: absolute; background: rgba(18,18,22,.94); border: 1px solid #00E5A0; color: #FFF; font-size: 30px; padding: 16px 24px; border-radius: 14px; box-shadow: 0 0 40px rgba(0,229,160,.3); opacity: 0; white-space: nowrap; }
+.call b { color: #00E5A0; font-weight: 400; }
+.cardw { position: absolute; left: 50%; top: 250px; width: 640px; margin-left: -320px; border-radius: 22px; overflow: hidden; border: 2px solid rgba(180,107,255,.5); box-shadow: 0 0 90px rgba(162,0,255,.45), 0 50px 120px rgba(0,0,0,.8); }
+.cardw img { display: block; width: 100%; }
+.ring { position: absolute; left: 3%; top: 74.4%; width: 80%; height: 12.4%; border: 4px solid #00E5A0; border-radius: 10px; box-shadow: 0 0 0 8px rgba(0,229,160,.18), 0 0 50px rgba(0,229,160,.5); opacity: 0; }
+.end { position: absolute; left: 80px; right: 80px; top: 300px; text-align: center; }
+.end img { width: 190px; height: 190px; border-radius: 44px; box-shadow: 0 0 90px rgba(162,0,255,.6); }
+.end .w { font-family: 'Cabinet'; font-weight: 900; font-size: 130px; letter-spacing: .02em; margin-top: 30px; }
+.end .t { font-family: 'Cabinet'; font-weight: 900; font-size: 58px; letter-spacing: -.01em; margin-top: 6px; }
+.end .f { font-size: 30px; color: #B8BCBF; margin-top: 30px; }
+.end .cta { display: inline-block; margin-top: 46px; background: #A200FF; font-size: 42px; padding: 28px 54px; letter-spacing: .06em; }
+.end .n { font-size: 25px; color: #8B9094; margin-top: 40px; }
+</style></head><body>
+<div class="bg"></div>
+
+<section class="sc" id="s0"><div class="big" id="words"></div></section>
+
+<section class="sc" id="st">
+  <div class="title">Type what you want. <span class="grad">Once.</span></div>
+  <div class="form" id="form">
+    <div class="lab">WHAT ARE YOU HUNTING?</div>
+    <div class="row">
+      <div class="in w"><span id="typed"></span><span class="ph" id="ph0">e.g. jordan 1 travis scott</span><span class="caret" id="c0"></span></div>
+      <div class="in m"><span id="typedm"></span><span class="ph" id="ph1">Max price</span><span class="caret" id="c1"></span></div>
+    </div>
+    <div class="go" id="go">WATCH IT FOR ME<div class="tap" id="tap"></div></div>
+  </div>
+</section>
+
+<div class="white" id="w1"></div>
+<section class="sc" id="p1"><div class="pillwrap"><div class="halo" id="h1a"></div><div class="halo" id="h1b"></div><div class="pill"><span class="chk">&#10003;</span>SNYPD is watching.</div></div></section>
+
+<section class="sc" id="s2">
+  <div class="title">It lands in <span class="grad">your feed.</span></div>
+  <div class="persp">
+    <div class="scr" id="scr"><img src="shots/v3_screen.png" alt=""></div>
+    <div class="call" id="c1x" style="left:60px;top:150px"><b>&#9679;</b> New find, 2 min ago</div>
+    <div class="call" id="c2x" style="right:50px;top:560px"><b>&#9679;</b> &euro;12, very good</div>
+    <div class="call" id="c3x" style="left:50px;top:790px"><b>&#9679;</b> Rated against this week</div>
+  </div>
+</section>
+
+<section class="sc" id="s3">
+  <div class="title">Know if <span class="grad">the price is good.</span></div>
+  <div class="cardw" id="cardw"><img src="shots/v3_card0.png" alt=""><div class="ring" id="ring"></div></div>
+</section>
+
+<div class="white" id="w2"></div>
+<section class="sc" id="p2"><div class="pillwrap"><div class="halo" id="h2a"></div><div class="halo" id="h2b"></div><div class="pill"><span class="chk">&#10003;</span>Cheaper than 82%</div></div></section>
+
+<section class="sc" id="s5">
+  <div class="end">
+    <img src="../../../assets/home/logo.png" alt="">
+    <div class="w">SNYPD</div>
+    <div class="t">New Vinted listings, <span class="grad">sent to your phone.</span></div>
+    <div class="f">Free: your first search runs 24/7 for 3 days. No card.</div>
+    <div class="cta" id="cta">START FREE</div>
+    <div class="n">Sample listings. You buy on Vinted yourself. Not affiliated with Vinted.</div>
+  </div>
+</section>
+
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+const $ = (id) => document.getElementById(id);
+// words: [text, gradient?, line break after?]
+const W = [['The ', 0], ['good ', 0], ['Vinted ', 0], ['listings ', 0, 1], ['are ', 0], ['gone ', 1, 1], ['before ', 1], ['you ', 1], ['look.', 1]];
+W.forEach((w, i) => {
+  const s = document.createElement('span'); s.textContent = w[0]; s.id = 'wd' + i; if (w[1]) s.className = 'grad';
+  $('words').appendChild(s); if (w[2]) $('words').appendChild(document.createElement('br'));
+});
+const WORDS = 'ralph lauren', MAX = '40';
+function fade(id, t, a, b, f) { f = f || 0.3; const v = t < a || t > b ? 0 : Math.min(ease((t - a) / f), 1 - ease((t - (b - f)) / f)); $(id).style.opacity = v; return v; }
+function pill(t, a, b, white, sec, ha, hb) {
+  const v = t < a || t > b ? 0 : Math.min(ease((t - a) / 0.22), 1 - ease((t - (b - 0.22)) / 0.22));
+  $(white).style.opacity = v; $(sec).style.opacity = v;
+  const k = clamp((t - a) / (b - a));
+  $(sec).style.transform = 'scale(' + (0.92 + 0.1 * ease(k * 2)).toFixed(3) + ')';
+  [[ha, 800, 260], [hb, 1020, 420]].forEach(([id, w, h], i) => {
+    const g = 1 + 0.25 * k * (i + 1);
+    $(id).style.width = (w * g) + 'px'; $(id).style.height = (h * g) + 'px';
+  });
+}
+window.DURATION = 15;
+window.KEYS = [0.5, 1.6, 3.0, 3.6, 4.2, 4.5, 5.4, 7.0, 8.6, 10.6, 12.2, 14.2];
+window.setT = function (t) {
+  // s0: words blur in one by one from 0.15, 0.2 s apart
+  $('s0').style.opacity = t < 2.5 ? 1 : 1 - ease((t - 2.5) / 0.3);
+  W.forEach((w, i) => {
+    const k = ease((t - 0.15 - i * 0.2) / 0.45), el = $('wd' + i);
+    el.style.opacity = k; el.style.filter = 'blur(' + ((1 - k) * 18).toFixed(1) + 'px)';
+    el.style.transform = 'translateY(' + ((1 - k) * 26).toFixed(1) + 'px)';
+  });
+  // st: the form rises, words typed 3.1-3.9, max price 4.0-4.2, tap at 4.35
+  fade('st', t, 2.7, 5.05);
+  const kf = ease((t - 2.7) / 0.5);
+  $('form').style.transform = 'translateY(' + ((1 - kf) * 50).toFixed(1) + 'px) scale(' + (0.96 + 0.04 * kf).toFixed(3) + ')';
+  const nw = Math.round(clamp((t - 3.1) / 0.8) * WORDS.length), nm = Math.round(clamp((t - 4.0) / 0.2) * MAX.length);
+  $('typed').textContent = WORDS.slice(0, nw);
+  $('ph0').style.display = nw ? 'none' : 'inline';
+  $('typedm').textContent = nm ? '€' + MAX.slice(0, nm) : '';
+  $('ph1').style.display = nm ? 'none' : 'inline';
+  $('c0').style.display = t < 3.95 ? 'inline-block' : 'none';
+  $('c1').style.display = t >= 3.95 && t < 4.3 ? 'inline-block' : 'none';
+  const press = ease((t - 4.35) / 0.1) - ease((t - 4.5) / 0.15);
+  $('go').style.transform = 'scale(' + (1 - 0.04 * press).toFixed(3) + ')';
+  const kt = clamp((t - 4.35) / 0.4);
+  $('tap').style.opacity = t < 4.35 || kt >= 1 ? 0 : (1 - kt).toFixed(3);
+  $('tap').style.transform = 'scale(' + (0.4 + 0.9 * kt).toFixed(3) + ')';
+  pill(t, 4.9, 6.0, 'w1', 'p1', 'h1a', 'h1b');
+  // s2: the feed tilted in 3D, slowly turning flat; callouts pop one by one
+  fade('s2', t, 5.9, 9.3);
+  const k2 = ease((t - 5.95) / 3.0);
+  $('scr').style.transform = 'rotateX(' + (26 - 20 * k2).toFixed(2) + 'deg) rotateY(' + (-24 + 18 * k2).toFixed(2) + 'deg) rotateZ(' + (5 - 4 * k2).toFixed(2) + 'deg) scale(' + (0.86 + 0.1 * k2).toFixed(3) + ')';
+  [['c1x', 6.7], ['c2x', 7.3], ['c3x', 7.9]].forEach(([id, at]) => {
+    const k = ease((t - at) / 0.3); $(id).style.opacity = k;
+    $(id).style.transform = 'translateY(' + ((1 - k) * 18).toFixed(1) + 'px) scale(' + (0.94 + 0.06 * k).toFixed(3) + ')';
+  });
+  // s3: the card pushes in on the rating
+  fade('s3', t, 9.2, 11.85);
+  const k3 = ease((t - 9.25) / 2.2);
+  $('cardw').style.transformOrigin = '45% 80%';
+  $('cardw').style.transform = 'translateY(' + (-k3 * 330).toFixed(1) + 'px) scale(' + (1 + 0.42 * k3).toFixed(3) + ')';
+  $('ring').style.opacity = ease((t - 10.2) / 0.3);
+  pill(t, 11.7, 12.8, 'w2', 'p2', 'h2a', 'h2b');
+  // s5: logo end card rises
+  const k5 = ease((t - 12.7) / 0.5);
+  $('s5').style.opacity = k5;
+  $('s5').style.transform = 'translateY(' + ((1 - k5) * 40).toFixed(1) + 'px)';
+  const pu = ease((t - 13.9) / 0.25) - ease((t - 14.2) / 0.3);
+  $('cta').style.transform = 'scale(' + (1 + 0.06 * pu).toFixed(3) + ')';
+};
+window.setT(0);
+</script>
+</body></html>

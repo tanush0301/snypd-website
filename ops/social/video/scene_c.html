@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!-- Design C "Kinetic" (23 Nov 2026): 13.5 s, 1080x1350, no sound. Same rules as scene_v3.html:
+     window.setT(seconds) is deterministic; shots/ are real dashboard screenshots against ops/qa_mock.js
+     (sample listings); facts from outreach/00-fact-sheet.md and the homepage only.
+     The counter ends on the homepage's own figure (#stat-listings, 17,520,665 as of 22 Nov 2026):
+     update COUNT and ASOF when prepublish.py refreshes it.
+     Storyboard: 0-2.8 hook over a moving wall of listings | 2.8-6.2 alerts stack on a lock screen |
+     6.2-8.8 counter | 8.8-11 the price rating | 11-13.5 end card. -->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family: 'Cabinet'; src: url('../../../assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; }
+@font-face { font-family: 'DMMono'; src: url('../../../assets/fonts/dm-mono-400-latin.woff2') format('woff2'); font-weight: 400; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1350px; background: #0A0A0B; overflow: hidden; }
+body { color: #FFF; font-family: 'DMMono', monospace; position: relative; }
+.sc { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+.mint { color: #00E5A0; }
+.wall { position: absolute; left: -20px; right: -20px; top: 0; display: flex; gap: 16px; transform: rotate(-4deg) scale(1.12); }
+.col { flex: 1 1 0; display: flex; flex-direction: column; gap: 16px; }
+.col img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,11,.86), rgba(10,10,11,.7) 45%, rgba(10,10,11,.92)); }
+.hook { position: absolute; left: 70px; right: 70px; top: 420px; font-family: 'Cabinet'; font-weight: 900; font-size: 124px; line-height: .96; letter-spacing: -.03em; }
+.hook div { overflow: hidden; }
+.hook span { display: block; }
+.cap { position: absolute; left: 0; right: 0; top: 0; padding: 80px 72px 50px; z-index: 5; background: linear-gradient(180deg, #0A0A0B 70%, rgba(10,10,11,0)); }
+.eyebrow { font-size: 26px; letter-spacing: .16em; color: #00E5A0; }
+.h { font-family: 'Cabinet'; font-weight: 900; font-size: 72px; line-height: 1; letter-spacing: -.02em; margin-top: 20px; }
+.lock { position: absolute; left: 50%; top: 320px; width: 820px; height: 1300px; margin-left: -410px; border-radius: 70px; background: linear-gradient(180deg, #15101A 0%, #0A0A0B 60%); border: 12px solid #26272B; box-shadow: 0 40px 120px rgba(0,0,0,.7); }
+.lock .isl { position: absolute; left: 50%; top: 26px; width: 170px; height: 44px; margin-left: -85px; border-radius: 22px; background: #000; }
+.lock .time { margin-top: 96px; text-align: center; font-family: 'Cabinet'; font-weight: 900; font-size: 120px; line-height: 1; }
+.notif { position: absolute; left: 26px; right: 26px; background: rgba(40,41,46,.97); border-radius: 30px; padding: 22px 24px; display: flex; gap: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.6); opacity: 0; }
+.notif img { flex: 0 0 84px; width: 84px; height: 84px; border-radius: 19px; }
+.notif .tx { flex: 1 1 auto; min-width: 0; }
+.notif .app { font-size: 22px; color: #9CA1A5; letter-spacing: .08em; display: flex; justify-content: space-between; }
+.notif .app b { font-weight: 400; color: #FFB020; }
+.notif .bo { font-size: 30px; color: #FFF; line-height: 1.3; margin-top: 6px; }
+.notif .rk { font-size: 28px; color: #00E5A0; margin-top: 4px; }
+.num { position: absolute; left: 0; right: 0; top: 440px; text-align: center; font-family: 'Cabinet'; font-weight: 900; font-size: 168px; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.numl { position: absolute; left: 80px; right: 80px; top: 640px; text-align: center; font-size: 36px; line-height: 1.45; color: #B8BCBF; }
+.numl small { display: block; font-size: 26px; color: #8B9094; margin-top: 14px; }
+.bar { position: absolute; left: 140px; right: 140px; top: 860px; height: 8px; background: #1D1D20; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #A200FF, #00E5A0); }
+.pace { position: absolute; left: 80px; right: 80px; top: 900px; text-align: center; font-size: 30px; color: #00E5A0; opacity: 0; }
+.cardw { position: absolute; left: 50%; top: 300px; width: 620px; margin-left: -310px; border-radius: 20px; overflow: hidden; border: 1px solid #2A2B2F; box-shadow: 0 50px 120px rgba(0,0,0,.8); }
+.cardw img { display: block; width: 100%; }
+.ring { position: absolute; left: 3%; top: 74.4%; width: 80%; height: 12.4%; border: 4px solid #00E5A0; border-radius: 10px; box-shadow: 0 0 0 8px rgba(0,229,160,.18); opacity: 0; }
+.end { position: absolute; left: 72px; right: 72px; top: 270px; }
+.word { font-family: 'Cabinet'; font-weight: 900; font-size: 170px; letter-spacing: .01em; line-height: 1; }
+.end .t { font-family: 'Cabinet'; font-weight: 900; font-size: 70px; line-height: 1; letter-spacing: -.02em; margin-top: 26px; }
+.end .f { font-size: 32px; line-height: 1.45; color: #B8BCBF; margin-top: 30px; }
+.cta { display: inline-block; margin-top: 50px; background: #A200FF; font-size: 44px; padding: 30px 54px; letter-spacing: .06em; }
+.end .n { font-size: 26px; color: #8B9094; line-height: 1.5; margin-top: 46px; }
+</style></head><body>
+
+<section class="sc" id="s0">
+  <div class="wall" id="wall"></div>
+  <div class="shade"></div>
+  <div class="hook">
+    <div><span id="l0">The good</span></div>
+    <div><span id="l1">Vinted listings</span></div>
+    <div><span id="l2" class="mint">are gone before</span></div>
+    <div><span id="l3" class="mint">you look.</span></div>
+  </div>
+</section>
+
+<section class="sc" id="s1">
+  <div class="cap"><div class="eyebrow">SO LET SNYPD WATCH</div><div class="h">Your phone <span class="mint">tells you.</span></div></div>
+  <div class="lock" id="lock">
+    <div class="isl"></div><div class="time">09:41</div>
+    <div class="notif" id="n0" style="top:270px"><img src="../../../assets/home/logo.png" alt=""><div class="tx"><div class="app"><span>SNYPD &middot; now</span><b>SAMPLE</b></div><div class="bo">Polo Ralph Lauren cable knit jumper &mdash; &euro;12</div><div class="rk">Cheaper than 82% of this week's finds</div></div></div>
+    <div class="notif" id="n1" style="top:270px"><img src="../../../assets/home/logo.png" alt=""><div class="tx"><div class="app"><span>SNYPD &middot; now</span><b>SAMPLE</b></div><div class="bo">Polo Ralph Lauren puffer jacket &mdash; &euro;22</div><div class="rk">&euro;8 under this hunt's usual price</div></div></div>
+    <div class="notif" id="n2" style="top:270px"><img src="../../../assets/home/logo.png" alt=""><div class="tx"><div class="app"><span>SNYPD &middot; now</span><b>SAMPLE</b></div><div class="bo">Ralph Lauren zip sweater navy &mdash; &euro;8</div><div class="rk">Cheaper than 80% of this week's finds</div></div></div>
+  </div>
+</section>
+
+<section class="sc" id="s2">
+  <div class="cap"><div class="eyebrow">IT KEEPS WATCHING</div><div class="h">While you do <span class="mint">something else.</span></div></div>
+  <div class="num" id="num">0</div>
+  <div class="numl">listings matched to users' searches<small id="asof"></small></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="pace" id="pace">Checks your search about every 30 seconds to a minute.</div>
+</section>
+
+<section class="sc" id="s3">
+  <div class="cap"><div class="eyebrow">AND IT TELLS YOU</div><div class="h">If the price <span class="mint">is good.</span></div></div>
+  <div class="cardw" id="cardw"><img src="shots/v3_card0.png" alt=""><div class="ring" id="ring"></div></div>
+</section>
+
+<section class="sc" id="s4">
+  <div class="end">
+    <div class="word">SNYPD</div>
+    <div class="t">New Vinted listings, <span class="mint">sent to your phone.</span></div>
+    <div class="f">Free: your first search runs 24/7 for 3 days. No card.</div>
+    <div class="cta" id="cta">START FREE</div>
+    <div class="n">Sample listings. You buy on Vinted yourself.<br>Never needs your Vinted password. Not affiliated with Vinted.</div>
+  </div>
+</section>
+
+<script>
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+const out = (x) => { x = clamp(x); return 1 - Math.pow(1 - x, 3); };
+const $ = (id) => document.getElementById(id);
+const COUNT = 17520665, ASOF = 'As of 22 Nov 2026';
+$('asof').textContent = ASOF;
+const IMG = ['9f56', 'at41', 'd046', 'ehdt', 'fm52', 'jx9i', 'ohpf', 'so89'];
+for (let c = 0; c < 3; c++) {
+  const col = document.createElement('div'); col.className = 'col'; col.id = 'col' + c;
+  for (let i = 0; i < 12; i++) { const im = document.createElement('img'); im.src = '../../../assets/home/wall/' + IMG[(i * 3 + c * 5) % 8] + '.webp'; col.appendChild(im); }
+  $('wall').appendChild(col);
+}
+function fade(id, t, a, b, last) { const f = 0.3; const v = t < a || t > b ? 0 : Math.min(a === 0 ? 1 : ease((t - a) / f), last ? 1 : 1 - ease((t - (b - f)) / f)); $(id).style.opacity = v; }
+window.DURATION = 13.5;
+window.KEYS = [0.3, 1.0, 2.2, 3.4, 4.4, 5.6, 6.6, 7.4, 8.4, 9.4, 10.6, 12.6];
+window.setT = function (t) {
+  // s0: the wall drifts, the four lines rise out of their masks
+  fade('s0', t, 0, 2.9);
+  [[-900, 170], [-300, -150], [-1100, 210]].forEach(([y0, v], c) => { $('col' + c).style.transform = 'translateY(' + (y0 + v * t).toFixed(1) + 'px)'; });
+  [0, 1, 2, 3].forEach(i => { $('l' + i).style.transform = 'translateY(' + ((1 - out((t - 0.1 - i * 0.22) / 0.5)) * 130).toFixed(1) + 'px)'; });
+  // s1: three alerts arrive; each new one pushes the older ones down
+  fade('s1', t, 2.8, 6.3);
+  $('lock').style.transform = 'translateY(' + ((1 - out((t - 2.8) / 0.6)) * 80).toFixed(1) + 'px)';
+  const at = [3.3, 4.1, 4.9];
+  at.forEach((a, i) => {
+    const k = ease((t - a) / 0.4);
+    let down = 0; for (let j = i + 1; j < 3; j++) down += ease((t - at[j]) / 0.4);
+    $('n' + i).style.opacity = k * (1 - 0.18 * down);
+    $('n' + i).style.transform = 'translateY(' + ((1 - k) * -70 + down * 222).toFixed(1) + 'px) scale(' + (0.95 + 0.05 * k - 0.02 * down).toFixed(3) + ')';
+  });
+  // s2: the counter runs up
+  fade('s2', t, 6.2, 8.9);
+  const kc = out((t - 6.4) / 1.5);
+  $('num').textContent = Math.round(COUNT * kc).toLocaleString('en-US');
+  $('bar').style.width = (kc * 100).toFixed(1) + '%';
+  $('pace').style.opacity = ease((t - 7.7) / 0.3);
+  // s3: the card pushes in on the rating
+  fade('s3', t, 8.8, 11.1);
+  const k3 = ease((t - 8.8) / 2.2);
+  $('cardw').style.transformOrigin = '45% 80%';
+  $('cardw').style.transform = 'translateY(' + (-k3 * 150).toFixed(1) + 'px) scale(' + (1 + 0.22 * k3).toFixed(3) + ')';
+  $('ring').style.opacity = ease((t - 9.6) / 0.3);
+  // s4: end card
+  fade('s4', t, 11.0, 99, true);
+  $('s4').style.transform = 'translateY(' + ((1 - out((t - 11.0) / 0.5)) * 40).toFixed(1) + 'px)';
+  const pu = ease((t - 12.0) / 0.25) - ease((t - 12.3) / 0.3);
+  $('cta').style.transform = 'scale(' + (1 + 0.06 * pu).toFixed(3) + ')';
+};
+window.setT(0);
+</script>
+</body></html>

@@ -307,6 +307,27 @@
   .hp-plans.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hp-plan .price.sm { font-size: 34px; }
 
+  /* Homepage v11: product video, loaded on tap */
+  .hp-sec > .hp-wrap.hp-watch { flex-direction: row; align-items: center; justify-content: space-between; gap: 48px; }
+  .hp-vid { flex: 0 0 auto; width: 360px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .hp-vid button { position: relative; display: block; width: 100%; padding: 0; border: 1px solid #2A2B2F; background: #0A0A0B; cursor: pointer; }
+  .hp-vid img, .hp-vid video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; }
+  .hp-vid video { border: 1px solid #2A2B2F; background: #0A0A0B; }
+  .hp-vid-btn { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #A200FF; color: #FFFFFF; font-size: 13px; letter-spacing: .12em; padding: 16px 22px; white-space: nowrap; }
+  .hp-vid-note { font-size: 11.5px; color: #8B9094; }
+  @media (max-width: 959.98px) {
+    .hp-sec > .hp-wrap.hp-watch { flex-direction: column; align-items: stretch; gap: 24px; }
+    .hp-vid { width: 100%; max-width: 420px; align-self: center; }
+  }
+
+  /* Homepage v11 (23 Nov 2026): every paid plan is a card with a button */
+  .hp-p5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .hp-plan.pass { border-color: #00E5A0; background: rgba(0, 229, 160, .05); }
+  .hp-plan .q { min-height: 0; }
+  .hp-freeline { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; border: 1px solid #1D1D20; padding: 14px 18px; font-size: 13.5px; line-height: 1.5; color: #A6ADB1; }
+  .hp-freeline b { color: #E8EAEB; }
+  @media (max-width: 959.98px) { .hp-p5 { grid-template-columns: minmax(0, 1fr); } }
+
   /* the three small motions: each plays once; all off under reduced motion */
   @keyframes hpAlertIn { from { opacity: 0; transform: translateY(-14px) scale(.98); } to { opacity: 1; transform: none; } }
   @keyframes hpMarkIn { from { left: 88%; } to { left: 24%; } }
@@ -578,8 +599,8 @@
 
     <div class="hp-hero-in">
       <div class="hp-hero-card">
-        <span class="hp-eyebrow mint">VINTED ALERTS + PRICE CHECK &middot; 26 SITES</span>
-        <h1 class="hp-h1">Vinted alerts that tell you <em>if the price is good.</em></h1>
+        <span class="hp-eyebrow mint">YOU&rsquo;RE NOT SLOW. YOU&rsquo;RE OUTNUMBERED.</span>
+        <h1 class="hp-h1">New Vinted listings, <em>sent to your phone.</em></h1>
         <p class="hp-sub"><span class="sub-l">SNYPD checks your Vinted searches about every 30 seconds to a minute. On busy searches, new finds come with a price rating.</span><span class="sub-s">Checks your Vinted searches about every 30 seconds to a minute. Busy searches get a price rating.</span><span class="hp-wide"> You buy on Vinted yourself.</span></p>
         <div class="hp-alert big hp-phone" id="hero-alert-phone" aria-hidden="true">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
@@ -635,12 +656,46 @@
     <div id="proof" class="hp-proof1">
       <p class="who"><b>Built by a Belgian sneaker reseller:</b> 150+ sales, 3.8k Instagram followers. Made in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
       <ul>
-        <li><b>~1 min</b> between checks (measured median)</li>
+        <li><b>~30 s</b> between checks (measured median)</li>
         <li><b id="stat-listings">17,520,665</b> listings matched to users' searches <span id="stat-listings-asof">As of 22 Nov 2026</span></li>
         <li><b>0</b> Vinted logins: public listings only</li>
       </ul>
     </div>
   </div>
+
+  <div id="watch" class="hp-sec" style="border-top:0;">
+    <div class="hp-wrap hp-watch">
+      <div class="hp-head">
+        <span class="hp-eyebrow mint">SEE IT &middot; 15 SECONDS</span>
+        <h2 class="hp-h2">From new listing to your phone.</h2>
+        <p class="hp-lead">A new find lands in your feed, rated against what your search found this week. You buy on Vinted yourself. No sound needed.</p>
+        <a class="hp-btn" href="/signup" style="align-self:flex-start;">START FREE</a>
+      </div>
+      <div class="hp-vid" id="vid">
+        <button type="button" id="vid-play" aria-label="Play the 15 second video">
+          <img src="/assets/home/video/snypd-home-4x5-poster.jpg" alt="A SNYPD feed card: Polo Ralph Lauren cable knit jumper, 12 euros, cheaper than 82% of this hunt's finds this week" width="1080" height="1350" loading="lazy" decoding="async">
+          <span class="hp-vid-btn" aria-hidden="true">&#9654; PLAY</span>
+        </button>
+        <span class="hp-vid-note">Sample listings on the real dashboard.</span>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function () {
+    var b = document.getElementById('vid-play');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var v = document.createElement('video');
+      v.id = 'vid-el'; v.controls = true; v.muted = true; v.playsInline = true; v.autoplay = true;
+      v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
+      v.width = 1080; v.height = 1350;
+      v.poster = '/assets/home/video/snypd-home-4x5-poster.jpg';
+      v.src = '/assets/home/video/snypd-home-4x5.mp4';
+      b.parentNode.replaceChild(v, b);
+      var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+    });
+  })();
+  </script>
 
   <div id="try" class="hp-sec" style="border-top:0;">
     <div class="hp-wrap">
@@ -710,6 +765,27 @@
     </div>
   </div>
 
+  <div id="stock" class="hp-sec">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">FOR RESELLERS &middot; STOCK &middot; COMING SOON</span>
+        <h2 class="hp-h2">Know what you hold and what you made.</h2>
+        <p class="hp-lead">A stock list inside your SNYPD dashboard: what you bought, what it cost, what it sold for. Not open to accounts yet.</p>
+      </div>
+      <div class="hp-rs">
+        <div class="hp-rs-card">
+          <h3>Every item, one list</h3>
+          <p>Add an item with its buy price, or import a CSV or Excel file. A find you claim in your feed lands in the list by itself.</p>
+        </div>
+        <div class="hp-rs-card">
+          <h3>Profit per item and per month</h3>
+          <p>Mark an item sold and see the profit after the fees and costs you entered, added up per month.</p>
+        </div>
+      </div>
+      <p class="hp-rs-foot">Your numbers are the ones you type in. SNYPD does not read your Vinted account.</p>
+    </div>
+  </div>
+
   <div id="how" class="hp-sec">
     <div class="hp-wrap">
       <div class="hp-head">
@@ -728,7 +804,30 @@
     <div class="hp-wrap">
       <div class="hp-head">
         <span class="hp-eyebrow">PRICING</span>
-        <h2 class="hp-h2">Free to start. Pro when you resell.</h2>
+        <h2 class="hp-h2">Pick how long you need it.</h2>
+      </div>
+      <div class="hp-p5" id="price-cards">
+        <div class="hp-plan pass" id="price-pass">
+          <span class="for">ONE ITEM &middot; NO SUBSCRIPTION</span>
+          <span class="name">HUNT PASS</span>
+          <span class="price sm"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once</small></span>
+          <p class="q"><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></p>
+          <a class="hp-btn block" href="/signup?plan=pass">GET HUNT PASS</a>
+        </div>
+        <div class="hp-plan" id="price-solo">
+          <span class="for">ONE SEARCH, ALWAYS ON</span>
+          <span class="name">SOLO</span>
+          <span class="price sm"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
+        </div>
+        <div class="hp-plan" id="price-kickstart">
+          <span class="for">TWO SEARCHES</span>
+          <span class="name">KICKSTART</span>
+          <span class="price sm"><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=kickstart">START KICKSTART</a>
+        </div>
       </div>
       <div class="hp-top2">
         <div class="hp-plan pro" id="price-pro">
@@ -741,23 +840,19 @@
             <li><span class="hp-tick">&#10003;</span> Check a price, What's moving, weekly report</li>
           </ul>
           <a class="hp-btn block" href="/signup?plan=pro">START PRO</a>
-          <span class="under">Need 10 searches? <a href="/signup?plan=elite">Elite</a>, <!--plans:price-mo:elite-->&euro;34.99 / mo<!--/plans:price-mo:elite-->.</span>
         </div>
-        <div class="hp-plan free" id="price-free">
-          <span class="for">TRY IT FIRST</span>
-          <span class="name">FREE</span>
-          <span class="price"><!--plans:price:free-->&euro;0<!--/plans:price:free--> <small>no card</small></span>
-          <ul>
-            <li><span class="hp-tick">&#10003;</span> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line--></li>
-            <li id="free-trial-checks"><span class="hp-tick">&#10003;</span> <!--plans:home-trial-checks-->Your trial includes 10 price checks for any item you type.<!--/plans:home-trial-checks--></li>
-          </ul>
-          <a class="hp-btn ghost block" href="/signup">START FREE</a>
+        <div class="hp-plan" id="price-elite">
+          <span class="for">HEAVY RESELLING</span>
+          <span class="name">ELITE</span>
+          <span class="price sm"><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=elite">START ELITE</a>
         </div>
       </div>
-      <ul id="price-rest" class="hp-rest">
-        <li><b>One item, then done?</b> <a href="/signup?plan=pass">Hunt Pass</a>, <!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> once: <!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line-->.</li>
-        <li><b>One search, always on?</b> <a href="/signup?plan=solo">Solo</a>, <!--plans:price-mo:solo-->&euro;5.99 / mo<!--/plans:price-mo:solo-->.</li>
-      </ul>
+      <div class="hp-freeline" id="price-free">
+        <span><b>Not sure yet?</b> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line-->. No card.</span>
+        <a class="hp-btn ghost" href="/signup">START FREE</a>
+      </div>
       <div class="hp-foot-note">
         <a href="/plans">Compare all plans &rarr;</a>
         <span>VAT included. Card &middot; Apple Pay &middot; Google Pay.</span>
@@ -777,7 +872,6 @@
         <details><summary>Are these the prices items sold for?</summary><p>No. They are asking prices of listings SNYPD saw. Vinted does not publish what items sell for, so SNYPD does not show sale prices or guess them.</p></details>
         <details><summary><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></summary><p><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></p></details>
         <details><summary>Alerts on iPhone?</summary><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></details>
-        <details id="faq-invite"><summary>Can I get free days?</summary><p>Yes, by inviting friends. Every account has an invite link. When a friend's first hunt finds a listing, they get 2 extra days of 24/7 hunting and you get 3. If they subscribe, you get 30% off a renewal. <a href="/signup">Create your free account</a> to get your link.</p></details>
       </div>
       <p class="hp-faq-more">Something else? Read the <a href="/faq">full FAQ</a> or ask on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
     </div>
@@ -786,12 +880,12 @@
   <div id="closing" class="hp-sec">
     <div class="hp-wrap hp-close">
       <div class="l">
-        <h2 class="hp-h2" style="max-width:20ch;">Let it watch. Know what the price means.</h2>
+        <h2 class="hp-h2" style="max-width:20ch;">Let it watch for you.</h2>
         <p class="hp-lead" style="font-size:14px;">Free account, no card.</p>
       </div>
       <div class="r">
         <a class="hp-btn" href="/signup">START FREE</a>
-        <a class="hp-btn ghost" href="/signup?plan=pro">START PRO</a>
+        <a class="hp-btn ghost" href="/signup?plan=pass">GET HUNT PASS</a>
       </div>
     </div>
   </div>
