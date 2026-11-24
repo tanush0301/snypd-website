@@ -20,7 +20,16 @@ const server = http.createServer((req, res) => {
   let f = path.join(root, p);
   if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(root, p + '.html');
   if (!f.startsWith(root) || p.startsWith('/ops/') || !fs.existsSync(f)) { res.writeHead(404); return res.end('nope'); }
-  res.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream', 'cache-control': 'no-store' });
+  const type = path.extname(f) === '.mp4' ? 'video/mp4' : (MIME[path.extname(f)] || 'application/octet-stream');
+  const size = fs.statSync(f).size;
+  // part of a file on request (the video check jumps to the end of the video)
+  const rg = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || '');
+  if (rg) {
+    const a = +rg[1], b = rg[2] ? Math.min(+rg[2], size - 1) : size - 1;
+    res.writeHead(206, { 'content-type': type, 'accept-ranges': 'bytes', 'content-range': 'bytes ' + a + '-' + b + '/' + size, 'content-length': b - a + 1, 'cache-control': 'no-store' });
+    return fs.createReadStream(f, { start: a, end: b }).pipe(res);
+  }
+  res.writeHead(200, { 'content-type': type, 'accept-ranges': 'bytes', 'cache-control': 'no-store' });
   res.end(fs.readFileSync(f));
 });
 let passed = 0;
@@ -128,6 +137,20 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await page.click('#vid-play');
     await wait(2200);
     ok(await page.$eval('#vid-el', v => !v.paused && v.currentTime > 0.3) && await page.$eval('#vid-play', b => b.hidden), 'v11: the tap plays the video');
+    await ctx.close();
+  }
+
+  // ---- v11: the video plays twice by itself, then rests with a Replay button ------------------------------------
+  {
+    const { page, ctx } = await open('');
+    await page.$eval('#vid-el', e => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await wait(3000);
+    const end = () => page.evaluate(() => { const v = document.getElementById('vid-el'); v.currentTime = v.duration - 0.4; });
+    await end(); await wait(2000);
+    ok(await page.$eval('#vid-el', v => !v.paused && v.currentTime < 5), 'v11: after the first play the video starts once more');
+    await end(); await wait(2000);
+    ok(await page.$eval('#vid-el', v => v.paused), 'v11: after the second play the video rests');
+    ok(await page.$eval('#vid-play', b => !b.hidden && /REPLAY/.test(b.textContent)), 'v11: a Replay button shows after the second play');
     await ctx.close();
   }
 
