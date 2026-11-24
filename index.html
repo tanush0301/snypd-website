@@ -397,6 +397,13 @@
     .hp-stk-top, .hp-stk-sum { padding-left: 12px; padding-right: 12px; }
   }
 
+  /* Homepage v11: what you get (alert channels, Vinted sites, devices) */
+  .hp-gets { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .hp-gets li { border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .hp-gets b { font-weight: 500; font-size: 14.5px; color: #FFFFFF; }
+  .hp-gets span { font-size: 13px; line-height: 1.55; color: #A6ADB1; }
+  @media (max-width: 959.98px) { .hp-gets { grid-template-columns: minmax(0, 1fr); } }
+
   /* Homepage v11 (23 Nov 2026): every paid plan is a card with a button */
   .hp-p5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
   .hp-plan.pass { border-color: #00E5A0; background: rgba(0, 229, 160, .05); }
@@ -739,6 +746,14 @@
     </div>
   </div>
 
+  <div id="gets" class="hp-wrap" style="padding-top:12px;padding-bottom:4px;">
+    <ul class="hp-gets">
+      <li><b>Alerts where you want them</b><span>Push on your phone or computer, or in your own private Discord thread. Discord alerts come with every paid plan, the Hunt Pass and a running trial.</span></li>
+      <li><b>Every Vinted site in Europe and the US</b><span>26 sites, from vinted.fr and vinted.co.uk to vinted.com. Paste a search link from yours.</span></li>
+      <li><b>Phone and computer</b><span>A web app for iPhone, Android, Windows and Mac. Nothing to download from a store.</span></li>
+    </ul>
+  </div>
+
   <div id="how" class="hp-sec">
     <div class="hp-wrap">
       <div class="hp-head">
@@ -890,6 +905,7 @@
         <!--/plans:home-market-->
         <button type="button" class="hp-mb-more" id="mb-more" aria-expanded="false">SHOW THE 5-WEEK CHART</button>
       </div>
+      <a class="hp-btn hw-cta" id="market-cta" href="/signup">TRY IT FREE &middot; NO CARD</a>
     </div>
   </div>
 
@@ -996,6 +1012,7 @@
         <details><summary>What happens when the free days end?</summary><p>Nothing is charged: SNYPD has no card of yours. Your search then runs only while your dashboard is open, until you pick a plan.</p></details>
         <details><summary>How do I cancel?</summary><p>Plans are billed monthly through Whop. Cancel any time; access runs to the end of the paid month. The Hunt Pass is one payment and ends by itself.</p></details>
         <details><summary>Can I get my money back?</summary><p>Yes. A full refund on the first payment of a plan, within 14 days.</p></details>
+        <details><summary>How do I get extra free days?</summary><p>Invite a friend with the link on your Account page. Once their first search finds a listing, within 7 days of signing up, you get 3 extra days of 24/7 checking and they get 2.</p></details>
         <details><summary>Alerts on iPhone?</summary><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></details>
       </div>
       <p class="hp-faq-more">Something else? Read the <a href="/faq">full FAQ</a> or ask on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>

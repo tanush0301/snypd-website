@@ -174,6 +174,25 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ph.ctx.close();
   }
 
+  // ---- v11: what you get (Discord alerts, Vinted sites, devices), free-days FAQ, market button --------------------
+  {
+    const { page, ctx } = await open('');
+    const g = await page.$$eval('#gets .hp-gets li', l => l.map(e => e.textContent.replace(/\s+/g, ' ').trim()));
+    eq(g.length, 3, 'v11: three "what you get" items');
+    ok(/private Discord thread/.test(g[0]) && /every paid plan, the Hunt Pass and a running trial/.test(g[0]), 'v11: Discord alerts are named with their plan limit');
+    ok(/Every Vinted site in Europe and the US/.test(g[1]) && /26 sites/.test(g[1]), 'v11: the Vinted sites are named as Europe and the US, 26 sites');
+    ok(/iPhone, Android, Windows and Mac/.test(g[2]) && /Phone and computer/.test(g[2]), 'v11: phone and computer are both named');
+    ok(!/all countries|worldwide|instant|real-time/i.test(g.join(' ')), 'v11: no "all countries" or speed claims in the row');
+    const faq = await page.$$eval('#faq-list details', d => d.map(x => x.querySelector('summary').textContent.trim() + ' :: ' + x.querySelector('p').textContent.trim()));
+    ok(faq.some(f => /^How do I get extra free days\?/.test(f) && /you get 3 extra days of 24\/7 checking and they get 2/.test(f) && /first search finds a listing, within 7 days/.test(f)), 'v11: FAQ explains the extra free days with their condition');
+    eq(await page.$eval('#market-cta', a => a.getAttribute('href')), '/signup', 'v11: the market section ends with a sign-up button');
+    await ctx.close();
+    const ph = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
+    ok(await ph.page.$eval('#market-cta', a => getComputedStyle(a).display === 'none'), 'v11: on phones the market button is hidden (the sticky bar has it)');
+    ok(await ph.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'v11: no sideways scroll on a phone with the new row');
+    await ph.ctx.close();
+  }
+
   // ---- plan links, counters, no leftovers from v5 --------------------------------------------------------------
   {
     const { page, ctx } = await open('');
