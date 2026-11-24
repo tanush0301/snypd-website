@@ -106,17 +106,28 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     page.on('request', r => seen.push(r.url()));
     ok(fs.existsSync(path.join(root, 'assets/home/video/snypd-home-4x5.mp4')) && fs.existsSync(path.join(root, 'assets/home/video/snypd-home-4x5-poster.jpg')), 'v11: the video and its poster are in the repo');
     ok(fs.statSync(path.join(root, 'assets/home/video/snypd-home-4x5.mp4')).size < 3e6, 'v11: the video stays under 3 MB');
-    eq(await page.$$eval('video', v => v.length), 0, 'v11: no video element before the tap');
-    await page.$eval('#vid-play', e => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
-    await wait(600);
-    ok(!seen.some(u => /\.mp4/.test(u)), 'v11: the video file is not requested before the tap');
-    ok(await page.$eval('#vid-play img', i => i.complete && i.naturalWidth > 0 && !!i.alt), 'v11: the poster image loads and has a description');
-    ok(await page.$eval('#watch a.hp-btn', a => a.getAttribute('href') === '/signup'), 'v11: the video section has a sign-up button');
-    await page.click('#vid-play');
+    ok(await page.$eval('#hero #watch #vid-el', v => v.muted && v.playsInline && !v.controls && /poster\.jpg$/.test(v.poster) && !!v.getAttribute('aria-label')), 'v11: the video sits in the first screen, muted, inline, with a poster and a description');
+    eq(await page.$$eval('#watch .hp-vidpts li', l => l.length), 3, 'v11: the three points of the video are repeated as text');
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-vid-auto')), 'on', 'v11: autoplay is on for a first visit');
+    await page.$eval('#vid-el', e => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await wait(2600);
+    ok(seen.some(u => /\/assets\/home\/video\/snypd-home-4x5\.mp4/.test(u)) || await page.$eval('#vid-el', v => !!v.getAttribute('src')), 'v11: a first visit loads the video file');
+    ok(await page.$eval('#vid-el', v => !v.paused && v.currentTime > 0.3), 'v11: a first visit plays the video by itself');
+    ok(await page.$eval('#vid-play', b => b.hidden), 'v11: the Play button is hidden while the video plays');
+    eq(await page.$$eval('#watch .hp-vidpts li.on', l => l.length), 1, 'v11: one point is lit while the video plays');
+    ok(await page.evaluate(() => localStorage.getItem('snypd_vid_seen') === '1'), 'v11: the first play is remembered on this device');
+    // a later visit: poster and Play only, the file is not loaded until the tap
+    seen.length = 0;
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await wait(900);
-    ok(seen.some(u => /\/assets\/home\/video\/snypd-home-4x5\.mp4/.test(u)), 'v11: the tap requests the video file');
-    ok(await page.$eval('#vid-el', v => v.muted && v.controls && v.playsInline), 'v11: the video is muted, inline and has controls');
-    eq(await page.$$eval('#vid-play', b => b.length), 0, 'v11: the play button is replaced by the video');
+    await page.$eval('#vid-el', e => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await wait(1200);
+    eq(await page.evaluate(() => document.documentElement.getAttribute('data-vid-auto')), 'off', 'v11: no autoplay on a later visit');
+    ok(!seen.some(u => /\.mp4/.test(u)) && await page.$eval('#vid-el', v => v.paused && !v.getAttribute('src')), 'v11: a later visit does not load the video file');
+    ok(await page.$eval('#vid-play', b => !b.hidden), 'v11: a later visit shows the Play button');
+    await page.click('#vid-play');
+    await wait(2200);
+    ok(await page.$eval('#vid-el', v => !v.paused && v.currentTime > 0.3) && await page.$eval('#vid-play', b => b.hidden), 'v11: the tap plays the video');
     await ctx.close();
   }
 
@@ -135,11 +146,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(/New Vinted listings, sent to your phone\./.test(await page.$eval('.hp-h1', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the headline says what it does');
     ok(/YOU.RE NOT SLOW\. YOU.RE OUTNUMBERED\./.test(await page.$eval('#hero .hp-eyebrow', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the emotional line sits above the headline');
     ok(/SAMPLE/.test(text), 'the example alerts are labelled as samples');
-    const main = await page.$eval('#hero-alert-main', e => e.innerText.replace(/\s+/g, ' '));
+    const main = await page.$eval('#hero-alert-phone', e => e.textContent.replace(/\s+/g, ' '));
     // v9: item and price first, the rating on its own line under them
     ok(/Jordan 1 Low Travis Scott . €180\s*Cheaper than 76% of this week's finds/.test(main), 'the worked example: item and price first, then the rating: ' + main);
     ok((await page.$$('#hero-ex')).length === 0, 'v9: no rating explanation in the hero (it lives in the FAQ)');
-    eq(await page.$$eval('#hero-alerts .hp-alert', a => a.length), 3, 'v9: three sample alerts arrive in the hero (desktop)');
+    eq(await page.$$eval('#hero-alerts', a => a.length), 0, 'v11: the video replaces the three sample alerts (desktop)');
     // Pro leads the plans; Free sits next to it; Hunt Pass and Solo follow as one line each
     const order = await page.$$eval('#pricing .hp-plan', ps => ps.map(p => p.querySelector('.name').textContent.trim()));
     eq(order, ['HUNT PASS', 'SOLO', 'KICKSTART', 'PRO', 'ELITE'], 'v11 plan order: Hunt Pass first, every paid plan a card');
@@ -254,8 +265,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await p2.goto(base + '/', { waitUntil: 'domcontentloaded' }); await wait(900);
     // v9: the three alerts arrive one by one; with reduced motion none of them (and not the chart line) moves
     const rm = await p2.evaluate(() => ({ wait: document.querySelector('.hp-chart').classList.contains('wait'),
-      anims: Array.prototype.map.call(document.querySelectorAll('#hero-alerts .hp-alert'), e => getComputedStyle(e).animationName) }));
-    eq(rm, { wait: false, anims: ['none', 'none', 'none'] }, 'with reduced motion the three alerts and the chart line do not move');
+      anims: Array.prototype.map.call(document.querySelectorAll('#hero .hp-alert'), e => getComputedStyle(e).animationName) }));
+    eq(rm, { wait: false, anims: ['none'] }, 'with reduced motion the sample alert and the chart line do not move');
     await c2.close();
   }
 
@@ -283,7 +294,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       const nav = document.getElementById('nav-start'), set = document.querySelector('.snc-bar [data-snc="settings"]').getBoundingClientRect(), rej = document.querySelector('.snc-bar [data-snc="reject"]').getBoundingClientRect();
       return { bar: Math.round(r('.snc-bar').top), ih: innerHeight, h1: Math.round(r('.hp-h1').top), sub: Math.round(r('.hp-sub').bottom), aTop: Math.round(r('#hero-alert-phone').top), aBot: Math.round(r('#hero-alert-phone').bottom),
         goTop: Math.round(r('#qs-go').top), go: Math.round(r('#qs-go').bottom), fieldTop: Math.round(r('#qs-words').top), goH: Math.round(r('#qs-go').height), field: Math.round(r('#qs-words').height), fieldW: Math.round(r('#qs-words').width),
-        text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: shown('#hero-alert-main'), max: shown('#qs-max'), ex: !!document.getElementById('hero-ex'),
+        text: document.getElementById('hero-alert-phone').innerText.replace(/\s+/g, ' '), main: !!document.getElementById('hero-alerts'), max: shown('#qs-max'), ex: !!document.getElementById('hero-ex'),
         navText: nav.innerText.trim(), navH: Math.round(nav.getBoundingClientRect().height), navLine: Math.round(parseFloat(getComputedStyle(nav).lineHeight) || 0),
         subText: document.querySelector('.hp-sub').innerText.trim(), goText: document.getElementById('qs-go').innerText.trim(),
         settingsOnRow: Math.abs((set.top + set.height / 2) - (rej.top + rej.height / 2)) <= 2, sw: document.documentElement.scrollWidth, iw: innerWidth };
@@ -308,7 +319,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   }
   {
     const d = await open('', { width: 1440, height: 900 });
-    eq(await d.page.evaluate(() => ['#hero-alert-phone', '#hero-alert-main', '#qs-max'].map(s => getComputedStyle(document.querySelector(s)).display !== 'none')), [false, true, true], 'desktop: claim left, proof right, as before');
+    eq(await d.page.evaluate(() => ['#hero-alert-phone', '#vid-el', '#qs-max'].map(s => getComputedStyle(document.querySelector(s)).display !== 'none')), [false, true, true], 'desktop: claim left, proof right, as before');
     eq(await d.page.evaluate(() => [document.getElementById('nav-start').innerText.trim(), document.getElementById('qs-go').innerText.trim(), document.querySelector('.hp-sub').innerText.includes('You buy on Vinted yourself.')]), ['START FREE', 'WATCH IT FOR ME', true], 'desktop: full labels and the full line');
     await d.ctx.close();
   }

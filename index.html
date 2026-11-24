@@ -320,6 +320,28 @@
     .hp-vid { width: 100%; max-width: 420px; align-self: center; }
   }
 
+  /* Homepage v11: the video sits in the first screen */
+  .hp-herovid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px; justify-self: center; }
+  .hp-herovid .hp-vid { width: 100%; max-width: none; align-self: stretch; }
+  .hp-herovid .hp-vid button, .hp-herovid .hp-vid video { box-shadow: 0 20px 70px rgba(0, 0, 0, .7); }
+  .hp-vidpts { list-style: none; margin: 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: rgba(10, 10, 11, .88); border: 1px solid #1D1D20; font-size: 13px; line-height: 1.45; color: #E8EAEB; }
+
+  /* Homepage v11 previews: video frame, autoplay, synced points */
+  .pv-phone { position: relative; padding: 10px; border: 1px solid #2A2B2F; border-radius: 30px; background: linear-gradient(160deg, #1B1B1F, #0A0A0B 60%); box-shadow: 0 30px 90px rgba(162, 0, 255, .22), 0 20px 70px rgba(0, 0, 0, .7); }
+  .pv-box { position: relative; border-radius: 22px; overflow: hidden; background: #0A0A0B; }
+  .pv-box video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border: 0; box-shadow: none; }
+  .hp-vid .pv-play, .pv-play { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: rgba(10, 10, 11, .28); cursor: pointer; }
+  .pv-play[hidden] { display: none; }
+  [data-pt] { transition: color .35s ease, border-color .35s ease, background .35s ease, transform .35s ease; }
+  .hp-vidpts li.on { color: #FFFFFF; }
+  .hp-vidpts li.on .hp-tick { color: #A200FF; }
+  @media (prefers-reduced-motion: reduce) { [data-pt] { transition: none; } }
+  .hp-herovid { max-width: 400px; }
+  @media (min-width: 960px) and (prefers-reduced-motion: no-preference) {
+    .hp-herovid .pv-phone { animation: pvfloat 7s ease-in-out infinite; }
+    @keyframes pvfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  }
+
   /* Homepage v11 (23 Nov 2026): every paid plan is a card with a button */
   .hp-p5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
   .hp-plan.pass { border-color: #00E5A0; background: rgba(0, 229, 160, .05); }
@@ -622,32 +644,21 @@
         <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--> Never needs your Vinted password.</p>
       </div>
 
-      <div id="hero-alerts" class="hp-alerts" role="img" aria-label="Three sample alerts: a Jordan 1 Low Travis Scott at 180 euros, cheaper than 76 percent of this week's finds; a Kindle Paperwhite at 45 euros; 12 new Nike Dunk Low matches from 15 euros">
-        <div class="hp-alerts-top"><span>WHAT ARRIVES ON YOUR PHONE</span><b>SAMPLE</b></div>
-        <div class="hp-alert big" id="hero-alert-main">
-          <img src="/assets/home/logo.png" alt="" width="38" height="38">
-          <span>
-            <span class="hp-alert-meta"><span>SNYPD</span><span>now</span></span>
-            <span class="hp-alert-title">New find</span>
-            <span class="hp-alert-body">Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i><b class="rank">Cheaper than 76% of this week's finds</b></span>
-          </span>
+      <div id="watch" class="hp-herovid">
+        <div class="hp-alerts-top"><span>SEE IT &middot; 14 SECONDS &middot; NO SOUND</span><b>SAMPLE</b></div>
+        <div class="hp-vid" id="vid">
+        <div class="pv-phone">
+          <div class="pv-box">
+            <video id="vid-el" muted playsinline preload="none" width="1080" height="1350" poster="/assets/home/video/snypd-home-4x5-poster.jpg" aria-label="A SNYPD feed card: Polo Ralph Lauren cable knit jumper, 12 euros, cheaper than 82% of this hunt's finds this week"></video>
+            <button type="button" id="vid-play" class="pv-play" aria-label="Play the 14 second video"><span class="hp-vid-btn" aria-hidden="true">&#9654; PLAY</span></button>
+          </div>
         </div>
-        <div class="hp-alert s2">
-          <img src="/assets/home/logo.png" alt="" width="38" height="38">
-          <span>
-            <span class="hp-alert-meta"><span>SNYPD</span><span>4 min ago</span></span>
-            <span class="hp-alert-title">New find</span>
-            <span class="hp-alert-body">Amazon Kindle Paperwhite &mdash; <i>&euro;45</i></span>
-          </span>
         </div>
-        <div class="hp-alert s3">
-          <img src="/assets/home/logo.png" alt="" width="38" height="38">
-          <span>
-            <span class="hp-alert-meta"><span>SNYPD</span><span>15 min ago</span></span>
-            <span class="hp-alert-title">12 new matches - nike dunk low</span>
-            <span class="hp-alert-body">From <i>&euro;15</i>. Tap to see them.</span>
-          </span>
-        </div>
+        <ul class="hp-vidpts">
+          <li data-pt="0"><span class="hp-tick">&#10003;</span> A new find lands in your feed</li>
+          <li data-pt="1"><span class="hp-tick">&#10003;</span> Rated against what your search found this week</li>
+          <li data-pt="2"><span class="hp-tick">&#10003;</span> You buy on Vinted yourself</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -663,37 +674,64 @@
     </div>
   </div>
 
-  <div id="watch" class="hp-sec" style="border-top:0;">
-    <div class="hp-wrap hp-watch">
+  <div id="how" class="hp-sec">
+    <div class="hp-wrap">
       <div class="hp-head">
-        <span class="hp-eyebrow mint">SEE IT &middot; 15 SECONDS</span>
-        <h2 class="hp-h2">From new listing to your phone.</h2>
-        <p class="hp-lead">A new find lands in your feed, rated against what your search found this week. You buy on Vinted yourself. No sound needed.</p>
-        <a class="hp-btn" href="/signup" style="align-self:flex-start;">START FREE</a>
+        <span class="hp-eyebrow">HOW IT WORKS</span>
+        <h2 class="hp-h2">Three steps. Then your phone does the watching.</h2>
       </div>
-      <div class="hp-vid" id="vid">
-        <button type="button" id="vid-play" aria-label="Play the 15 second video">
-          <img src="/assets/home/video/snypd-home-4x5-poster.jpg" alt="A SNYPD feed card: Polo Ralph Lauren cable knit jumper, 12 euros, cheaper than 82% of this hunt's finds this week" width="1080" height="1350" loading="lazy" decoding="async">
-          <span class="hp-vid-btn" aria-hidden="true">&#9654; PLAY</span>
-        </button>
-        <span class="hp-vid-note">Sample listings on the real dashboard.</span>
-      </div>
+      <ol class="hp-steps hp-steps3">
+        <li><span class="k">1</span><div><h3>Say what you want</h3><p>A few words and a max price, or a Vinted search link.</p></div></li>
+        <li><span class="k">2</span><div><h3>SNYPD checks Vinted</h3><p>About every 30 seconds to a minute, around the clock.</p></div></li>
+        <li><span class="k">3</span><div><h3>You get the alert</h3><p>You buy on Vinted. SNYPD never buys or messages for you.</p></div></li>
+      </ol>
     </div>
   </div>
+
   <script>
   (function () {
-    var b = document.getElementById('vid-play');
-    if (!b) return;
-    b.addEventListener('click', function () {
-      var v = document.createElement('video');
-      v.id = 'vid-el'; v.controls = true; v.muted = true; v.playsInline = true; v.autoplay = true;
-      v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
-      v.width = 1080; v.height = 1350;
-      v.poster = '/assets/home/video/snypd-home-4x5-poster.jpg';
-      v.src = '/assets/home/video/snypd-home-4x5.mp4';
-      b.parentNode.replaceChild(v, b);
-      var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+    var v = document.getElementById('vid-el'), btn = document.getElementById('vid-play');
+    if (!v || !btn) return;
+    var SRC = '/assets/home/video/snypd-home-4x5.mp4';
+    var label = btn.querySelector('.hp-vid-btn');
+    var pts = [].slice.call(document.querySelectorAll('[data-pt]'));
+    var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var save = !!(navigator.connection && navigator.connection.saveData);
+    var seen = false;
+    try { seen = localStorage.getItem('snypd_vid_seen') === '1'; } catch (e) {}
+    var plays = 0, byUser = false, resting = false;
+    function mark(i) { pts.forEach(function (p, k) { p.classList.toggle('on', k === i); }); }
+    function start() {
+      if (!v.getAttribute('src')) v.src = SRC;
+      v.muted = true;
+      var pr = v.play();
+      if (pr && pr.then) {
+        pr.then(function () {
+          btn.hidden = true; resting = false;
+          try { localStorage.setItem('snypd_vid_seen', '1'); } catch (e) {}
+        }).catch(function () { btn.hidden = false; });
+      } else { btn.hidden = true; }
+    }
+    v.addEventListener('timeupdate', function () {
+      if (!v.duration) return;
+      mark(Math.min(2, Math.floor(v.currentTime / v.duration * 3)));
     });
+    v.addEventListener('ended', function () {
+      plays++;
+      if (!byUser && plays < 2) { v.currentTime = 0; start(); return; }
+      resting = true; mark(-1);
+      label.innerHTML = '&#8635; REPLAY';
+      btn.hidden = false;
+    });
+    btn.addEventListener('click', function () { byUser = true; plays = 0; v.currentTime = 0; start(); });
+    document.documentElement.setAttribute('data-vid-auto', (reduce || save || seen) ? 'off' : 'on');
+    if (reduce || save || seen || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (resting || byUser) return;
+        if (e.isIntersecting) start(); else if (!v.paused) v.pause();
+      });
+    }, { threshold: 0.5 }).observe(v);
   })();
   </script>
 
@@ -768,9 +806,9 @@
   <div id="stock" class="hp-sec">
     <div class="hp-wrap">
       <div class="hp-head">
-        <span class="hp-eyebrow">FOR RESELLERS &middot; STOCK &middot; COMING SOON</span>
+        <span class="hp-eyebrow">FOR RESELLERS &middot; STOCK</span>
         <h2 class="hp-h2">Know what you hold and what you made.</h2>
-        <p class="hp-lead">A stock list inside your SNYPD dashboard: what you bought, what it cost, what it sold for. Not open to accounts yet.</p>
+        <p class="hp-lead">A stock list inside your SNYPD dashboard: what you bought, what it cost, what it sold for.</p>
       </div>
       <div class="hp-rs">
         <div class="hp-rs-card">
@@ -783,20 +821,6 @@
         </div>
       </div>
       <p class="hp-rs-foot">Your numbers are the ones you type in. SNYPD does not read your Vinted account.</p>
-    </div>
-  </div>
-
-  <div id="how" class="hp-sec">
-    <div class="hp-wrap">
-      <div class="hp-head">
-        <span class="hp-eyebrow">HOW IT WORKS</span>
-        <h2 class="hp-h2">Three steps. Then your phone does the watching.</h2>
-      </div>
-      <ol class="hp-steps hp-steps3">
-        <li><span class="k">1</span><div><h3>Say what you want</h3><p>A few words and a max price, or a Vinted search link.</p></div></li>
-        <li><span class="k">2</span><div><h3>SNYPD checks Vinted</h3><p>About every 30 seconds to a minute, around the clock.</p></div></li>
-        <li><span class="k">3</span><div><h3>You get the alert</h3><p>You buy on Vinted. SNYPD never buys or messages for you.</p></div></li>
-      </ol>
     </div>
   </div>
 

@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SNYPD - Vinted Bot &amp; Monitor for New Listing Alerts</title>
+<meta name="description" content="Vinted bot and monitor for resellers: SNYPD watches your saved searches and alerts you to new matching listings. No autobuy, no Vinted login needed. Free plan.">
+<link rel="canonical" href="https://www.snypd.store/">
+<meta property="og:title" content="SNYPD - Vinted Bot &amp; Monitor for New Listing Alerts">
+<meta property="og:description" content="Vinted bot and monitor for resellers: SNYPD watches your saved searches and alerts you to new matching listings. No autobuy, no Vinted login needed. Free plan.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.snypd.store/">
+<meta property="og:site_name" content="SNYPD">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNYPD - Vinted bot and monitor for new listing alerts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SNYPD - Vinted Bot &amp; Monitor for New Listing Alerts">
+<meta name="twitter:description" content="Vinted bot and monitor for resellers: SNYPD watches your saved searches and alerts you to new matching listings. No autobuy, no Vinted login needed. Free plan.">
+<meta name="twitter:image" content="https://www.snypd.store/assets/og/og-v5.png">
+<meta name="theme-color" content="#0A0A0B">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/dm-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/dm-mono.css">
+<link rel="preload" href="/assets/home/CabinetGrotesk-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<style>
+  @font-face { font-family: 'Cabinet Grotesk'; src: url('/assets/home/CabinetGrotesk-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+  html, body { margin: 0; background: #0A0A0B; font-family: 'DM Mono', ui-monospace, monospace; }
+  a { color: #00E5A0; text-decoration: none; }
+  a:hover { color: #57FFC8; }
+  button, select, input { font-family: inherit; }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+  @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes wallUp { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+  @keyframes scanY { from { top: -200px; } to { top: 100%; } }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: #0A0A0B; }
+  ::-webkit-scrollbar-thumb { background: #26262A; }
+  ::selection { background: #A200FF; color: #FFFFFF; }
+  /* Port of the design's {{ desktop }} / {{ mobile }} switches (window.innerWidth < 700). */
+  [hidden] { display: none !important; }
+  @media (max-width: 699.98px) { .dc-desk { display: none !important; } }
+  @media (min-width: 700px) { .dc-mob { display: none !important; } }
+  /* Pro price on phones: keep "/ mo incl. VAT" together and, when it has to move
+     under the price, drop it directly below instead of leaving a 64px-tall gap. */
+  @media (max-width: 699.98px) { .dc-price { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .12em; row-gap: 6px; } }
+  /* Hover states (not in the design; desktop pointers only, so touch never sticks). */
+  @media (hover: hover) and (pointer: fine) {
+    a[style*="background:#A200FF"], button[style*="background:#A200FF"] { transition: filter .15s ease; }
+    a[style*="background:#A200FF"]:hover, button[style*="background:#A200FF"]:hover { filter: brightness(1.18); }
+    a[style*="background:#141416"], button[style*="background:#141416"] { transition: background-color .15s ease, border-color .15s ease; }
+    a[style*="background:#141416"]:hover, button[style*="background:#141416"]:hover { background-color: #1C1C1F !important; border-color: #3A3A40 !important; }
+  }
+  @media (prefers-reduced-motion: reduce) { a, button { transition: none !important; } }
+  /* WCAG 2.2.2: the hero wall and scan line move for longer than 5 s, so they get a pause control. */
+  #hero.motion-paused #hero-wall > div > div, #hero.motion-paused #hero-scan { animation-play-state: paused !important; }
+  /* Also paused while the hero is off-screen or the tab is hidden: no GPU work nobody sees. */
+  #hero.motion-off #hero-wall > div > div, #hero.motion-off #hero-scan { animation-play-state: paused !important; }
+  #hero-motion:hover { color: #FFFFFF; border-color: #55555C; }
+  #hero-motion:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+  /* ---- Homepage v6 (10 Nov 2026, outreach/54): class-based layout; colours and type are the v5 system. ---- */
+  .hp { background: #0A0A0B; font-family: 'DM Mono', ui-monospace, monospace; color: #E8EAEB; min-height: 100vh; }
+  .hp-wrap { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+  .hp-display { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; color: #FFFFFF; }
+  .hp-eyebrow { display: block; font-size: 11px; letter-spacing: .16em; color: #8B9094; }
+  .hp-eyebrow.mint { color: #00E5A0; }
+  .hp-h2 { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(32px, 5vw, 50px); line-height: 1; letter-spacing: -.04em; color: #FFFFFF; text-wrap: balance; }
+  .hp-lead { margin: 0; font-size: 16px; line-height: 1.6; color: #A6ADB1; max-width: 62ch; text-wrap: pretty; }
+  .hp-sec { border-top: 1px solid #1D1D20; }
+  .hp-sec.alt { background: #0C0C0D; }
+  .hp-sec > .hp-wrap { padding-top: 72px; padding-bottom: 72px; display: flex; flex-direction: column; gap: 30px; }
+  .hp-head { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+  .hp-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; font-size: 13px; letter-spacing: .09em; color: #FFFFFF; background: #A200FF; border: 0; cursor: pointer; text-align: center; }
+  .hp-btn:hover { color: #FFFFFF; }
+  .hp-btn.ghost { background: #141416; border: 1px solid #26262A; color: #E8EAEB; }
+  .hp-btn.block { display: flex; width: 100%; box-sizing: border-box; }
+  @media (hover: hover) and (pointer: fine) {
+    .hp-btn { transition: filter .15s ease, background-color .15s ease, border-color .15s ease; }
+    .hp-btn:hover { filter: brightness(1.18); }
+    .hp-btn.ghost:hover { filter: none; background: #1C1C1F; border-color: #3A3A40; }
+  }
+  .hp-tick { color: #00E5A0; }
+
+  /* hero */
+  .hp-hero { position: relative; overflow: hidden; border-bottom: 1px solid #1D1D20; }
+  .hp-hero-wall { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; padding: 0 10px; opacity: .22; pointer-events: none; overflow: hidden; }
+  .hp-hero-in { position: relative; max-width: 1320px; margin: 0 auto; padding: 64px 20px 72px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 36px; align-items: center; }
+  .hp-hero-card { background: #0A0A0B; border: 1px solid #1D1D20; padding: clamp(22px, 4.4vw, 44px); display: flex; flex-direction: column; gap: 22px; box-shadow: 0 20px 70px rgba(0, 0, 0, .7); }
+  .hp-h1 { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: clamp(40px, 6.2vw, 72px); line-height: .96; letter-spacing: -.045em; color: #FFFFFF; text-wrap: balance; }
+  .hp-h1 em { font-style: normal; color: #00E5A0; }
+  .hp-sub { margin: 0; font-size: 17px; line-height: 1.6; color: #A6ADB1; max-width: 50ch; text-wrap: pretty; }
+  .hp-qs { display: flex; flex-direction: column; gap: 10px; border: 1px solid #26262A; background: #121214; padding: 16px; }
+  .hp-qs-label { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-qs-row { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 10px; }
+  .hp-qs input { box-sizing: border-box; width: 100%; min-height: 52px; padding: 0 14px; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #33333A; border-radius: 0; -webkit-appearance: none; appearance: none; }
+  .hp-qs input::placeholder { color: #6E7377; }
+  .hp-qs input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+  .hp-qs-note { margin: 0; font-size: 12px; line-height: 1.5; color: #8B9094; }
+  .hp-checks { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .hp-checks li { font-size: 13.5px; line-height: 1.5; color: #E8EAEB; }
+  .hp-checks li.dim { color: #8B9094; font-size: 12.5px; }
+
+  /* sample alerts */
+  .hp-alerts { display: flex; flex-direction: column; gap: 12px; }
+  .hp-alerts-top { display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .14em; color: #A6ADB1; background: rgba(10, 10, 11, .88); border: 1px solid #1D1D20; padding: 10px 12px; }
+  .hp-alerts-top b { font-weight: 400; color: #FFB020; letter-spacing: .1em; }
+  .hp-alert { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start; background: rgba(18, 18, 20, .96); border: 1px solid #2A2A2F; border-radius: 16px; padding: 14px; box-shadow: 0 14px 40px rgba(0, 0, 0, .6); }
+  .hp-alert img { width: 38px; height: 38px; border-radius: 9px; background: #0A0A0B; object-fit: contain; display: block; }
+  .hp-alert-meta { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; letter-spacing: .08em; color: #8B9094; }
+  .hp-alert-title { display: block; margin-top: 4px; font-size: 14px; color: #FFFFFF; }
+  .hp-alert-body { display: block; margin-top: 2px; font-size: 13px; line-height: 1.45; color: #C9CED1; }
+  .hp-alert-body i { font-style: normal; color: #00E5A0; }
+
+  /* proof strip */
+  .hp-proof { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .hp-proof > div { background: #0C0C0D; padding: 22px 20px; display: flex; flex-direction: column; gap: 7px; }
+  .hp-proof .n { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 36px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; }
+  .hp-proof .t { font-size: 12.5px; line-height: 1.5; color: #E8EAEB; }
+  .hp-proof .s { font-size: 12px; color: #8B9094; }
+
+  /* how it works */
+  .hp-how { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 40px; align-items: start; }
+  .hp-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid #1D1D20; }
+  .hp-steps li { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 16px; padding: 22px 20px; border-bottom: 1px solid #1D1D20; background: #0C0C0D; }
+  .hp-steps li:last-child { border-bottom: 0; }
+  .hp-steps .k { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 34px; line-height: 1; color: #00E5A0; letter-spacing: -.03em; }
+  .hp-steps h3 { margin: 0 0 6px; font-size: 16px; font-weight: 500; color: #FFFFFF; letter-spacing: 0; }
+  .hp-steps p { margin: 0; font-size: 13.5px; line-height: 1.65; color: #A6ADB1; }
+  .hp-shot { margin: 0; border: 1px solid #1D1D20; background: #0C0C0D; padding: 12px; }
+  .hp-shot img { width: 100%; height: auto; display: block; }
+  .hp-shot figcaption { font-size: 12px; line-height: 1.5; color: #8B9094; padding: 10px 2px 0; }
+
+  /* never does */
+  .hp-never { border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 20px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 24px; }
+  .hp-never span { font-size: 13px; color: #E8EAEB; }
+  .hp-never .hp-eyebrow { color: #8B9094; font-size: 11px; }
+  .hp-built { margin: 0; font-size: 13px; line-height: 1.6; color: #8B9094; }
+  .hp-built b { font-weight: 400; color: #E8EAEB; }
+
+  /* plans */
+  .hp-free { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; border: 1px solid rgba(0, 229, 160, .38); background: rgba(0, 229, 160, .05); padding: 20px; }
+  .hp-free .a { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1 1 320px; }
+  .hp-free .a b { font-weight: 400; font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-free .a span { font-size: 14px; line-height: 1.55; color: #E8EAEB; }
+  .hp-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .hp-plan { background: #121214; border: 1px solid #1D1D20; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .hp-plan .for { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-plan .q { margin: 0; font-size: 13.5px; line-height: 1.55; color: #A6ADB1; min-height: 3.1em; }
+  .hp-plan .name { font-size: 11px; letter-spacing: .14em; color: #8B9094; }
+  .hp-plan .price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; }
+  .hp-plan .price small { font-family: 'DM Mono', ui-monospace, monospace; font-weight: 400; font-size: 12px; letter-spacing: 0; color: #8B9094; }
+  .hp-plan ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .hp-plan li { font-size: 13px; line-height: 1.5; color: #E8EAEB; }
+  .hp-plan li.dim { color: #8B9094; font-size: 12.5px; }
+  .hp-plan li a { color: #00E5A0; }
+  .hp-foot-note { display: flex; gap: 10px 24px; flex-wrap: wrap; align-items: baseline; font-size: 12px; color: #8B9094; }
+  .hp-foot-note a { font-size: 12px; letter-spacing: .05em; padding: 12px 0; }
+
+  /* faq */
+  .hp-faq { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 28px 32px; }
+  .hp-faq > div { display: flex; flex-direction: column; gap: 8px; }
+  .hp-faq h3 { margin: 0; font-size: 14.5px; font-weight: 500; color: #FFFFFF; }
+  .hp-faq p { margin: 0; font-size: 13.5px; line-height: 1.6; color: #A6ADB1; }
+
+  /* closing */
+  .hp-close { display: flex; justify-content: space-between; align-items: flex-end; gap: 26px; flex-wrap: wrap; flex-direction: row !important; }
+  .hp-close .l { display: flex; flex-direction: column; gap: 14px; }
+  .hp-close .r { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  @media (max-width: 959.98px) {
+    .hp-hero-in { grid-template-columns: minmax(0, 1fr); padding: 28px 16px 44px; gap: 22px; }
+    .hp-how { grid-template-columns: minmax(0, 1fr); }
+    .hp-shot { max-width: 320px; }
+    .hp-plans { grid-template-columns: minmax(0, 1fr); }
+    .hp-plan .q { min-height: 0; }
+    .hp-proof { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-sec > .hp-wrap { padding-top: 52px; padding-bottom: 52px; gap: 24px; }
+    .hp-hero-in { padding: 16px 12px 36px; }
+    .hp-hero-card { gap: 16px; padding: 20px 18px 22px; }
+    .hp-h1 { font-size: clamp(31px, 9.2vw, 40px); }
+    .hp-sub { font-size: 15px; line-height: 1.55; }
+    .hp-qs { padding: 14px; }
+    .hp-qs-row { grid-template-columns: minmax(0, 1fr); }
+    .hp-proof .n { font-size: 30px; }
+    .hp-steps li { grid-template-columns: 40px minmax(0, 1fr); padding: 18px 16px; }
+    .hp-steps .k { font-size: 28px; }
+    .hp-btn { min-height: 54px; }
+    .hp-qs .hp-btn { width: 100%; box-sizing: border-box; }
+  }
+  @media (max-width: 699.98px) {
+    .hp-proof > div { padding: 16px 14px; }
+    .hp-proof .t { font-size: 12px; }
+    .hp-shot { max-width: 250px; }
+  }
+  @media (max-width: 339.98px) {
+    .hp-proof { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hp-btn { transition: none !important; } }
+
+  /* ---- v7 (11 Nov 2026, outreach/55): worked alert example, price-check demo, price research, Pro-first plans ---- */
+  .hp-alert.big { border-color: rgba(0, 229, 160, .55); background: #101412; }
+  .hp-alert-body .rank { font-weight: 400; color: #00E5A0; }
+  .hp-ex { background: rgba(10, 10, 11, .92); border: 1px solid #1D1D20; padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 9px; }
+  .hp-ex-h { font-size: 11px; letter-spacing: .14em; color: #8B9094; }
+  .hp-ex-bar { position: relative; height: 10px; margin-top: 26px; background: linear-gradient(90deg, #00E5A0 0, #00E5A0 25%, #3A3F43 25%, #3A3F43 75%, #5A4A2A 75%); }
+  .hp-ex-bar .mark { position: absolute; left: 24%; top: -6px; width: 2px; height: 22px; background: #FFFFFF; }
+  .hp-ex-bar .mark b { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); font-weight: 400; font-size: 12px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #33333A; padding: 2px 6px; white-space: nowrap; }
+  .hp-ex-scale { display: flex; justify-content: space-between; font-size: 11px; color: #8B9094; }
+  .hp-ex p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #A6ADB1; }
+
+  /* price-check demo */
+  .hp-pc { border: 1px solid #26262A; background: #0C0C0D; padding: 22px; display: flex; flex-direction: column; gap: 18px; max-width: 980px; }
+  .hp-pc-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .hp-pc-pick label { font-size: 11px; letter-spacing: .14em; color: #00E5A0; }
+  .hp-pc select { box-sizing: border-box; min-height: 52px; min-width: min(320px, 100%); padding: 0 40px 0 14px; font-family: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238B9094' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center; border: 1px solid #33333A; border-radius: 0; -webkit-appearance: none; appearance: none; }
+  .hp-pc select:focus, .hp-pc input:focus { outline: 2px solid #00E5A0; outline-offset: 0; border-color: #00E5A0; }
+  .hp-pc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hp-pc-chips button { min-height: 44px; padding: 0 14px; font-family: inherit; font-size: 12.5px; color: #C9CED1; background: #141416; border: 1px solid #26262A; cursor: pointer; }
+  .hp-pc-chips button[aria-pressed="true"] { color: #0A0A0B; background: #00E5A0; border-color: #00E5A0; }
+  .hp-pc-res { display: flex; flex-direction: column; gap: 16px; }
+  .hp-pc-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+  .hp-pc-name b { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 28px; line-height: 1; letter-spacing: -.02em; color: #FFFFFF; }
+  .hp-pc-name span { font-size: 12.5px; color: #8B9094; }
+  .hp-pc-three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .hp-pc-three > div { background: #0A0A0B; padding: 18px 16px; display: flex; flex-direction: column; gap: 7px; }
+  .hp-pc-three .mid { background: #101412; }
+  .hp-pc-three .k { font-size: 11px; letter-spacing: .14em; color: #8B9094; }
+  .hp-pc-three .mid .k { color: #00E5A0; }
+  .hp-pc-three .v { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 40px; line-height: 1; letter-spacing: -.03em; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-pc-three .d { font-size: 12px; line-height: 1.45; color: #8B9094; }
+  .hp-pc-pay { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 14px; color: #E8EAEB; }
+  .hp-pc-pay input { box-sizing: border-box; width: 84px; min-height: 48px; padding: 0 10px; font-family: inherit; font-size: 16px; color: #FFFFFF; background: #0A0A0B; border: 1px solid #33333A; border-radius: 0; }
+  .hp-pc-pay .arrow { color: #8B9094; }
+  .hp-pc-pay .out b { font-weight: 400; color: #00E5A0; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .hp-pc-go { display: flex; flex-wrap: wrap; gap: 10px; }
+  #pc-alert { gap: .6ch; }
+  .hp-pc-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 22px; font-size: 12px; color: #8B9094; }
+  .hp-pc-links a { font-size: 12.5px; letter-spacing: .04em; padding: 10px 0; color: #00E5A0; }
+  .hp-pc-foot { margin: 0; font-size: 12.5px; line-height: 1.6; color: #8B9094; max-width: 78ch; }
+
+  /* price research */
+  .hp-rs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .hp-rs-card { background: #121214; border: 1px solid #1D1D20; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .hp-rs-card.wide { grid-column: 1 / -1; }
+  .hp-rs-top { display: flex; align-items: center; gap: 12px; }
+  .hp-rs-top .num { font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; color: #00E5A0; }
+  .hp-rs-top .tag { font-size: 11px; letter-spacing: .12em; color: #C9CED1; border: 1px solid #33333A; padding: 5px 9px; }
+  .hp-rs-card h3 { margin: 0; font-family: 'Cabinet Grotesk', 'DM Mono', sans-serif; font-weight: 900; font-size: 26px; line-height: 1.05; letter-spacing: -.02em; color: #FFFFFF; text-wrap: balance; }
+  .hp-rs-card p { margin: 0; font-size: 14px; line-height: 1.65; color: #A6ADB1; max-width: 70ch; }
+  .hp-rs-card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .hp-rs-card li { position: relative; padding-left: 16px; font-size: 13px; line-height: 1.55; color: #C9CED1; }
+  .hp-rs-card li::before { content: ''; position: absolute; left: 0; top: .6em; width: 6px; height: 6px; background: #00E5A0; }
+  .hp-rs-card-ex { border: 1px solid #26262A; background: #0A0A0B; padding: 14px; display: flex; flex-direction: column; gap: 5px; }
+  .hp-rs-card-ex .l1 { font-size: 13.5px; color: #E8EAEB; }
+  .hp-rs-card-ex .l1 b { font-weight: 400; color: #FFFFFF; font-size: 18px; margin-right: 6px; }
+  .hp-rs-card-ex .l2 { font-size: 13.5px; color: #00E5A0; }
+  .hp-rs-card-ex .l3 { font-size: 12px; color: #8B9094; }
+  .hp-rs-link { font-size: 12.5px; letter-spacing: .05em; color: #00E5A0; padding: 10px 0; margin-top: auto; }
+  .hp-rs-foot { margin: 0; font-size: 13px; line-height: 1.6; color: #8B9094; max-width: 82ch; }
+
+  /* market board sample + chart */
+  .hp-mb { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: start; }
+  .hp-mb-list, .hp-chart { margin: 0; border: 1px solid #26262A; background: #0A0A0B; padding: 16px; min-width: 0; }
+  .hp-mb-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; margin-bottom: 12px; }
+  .hp-mb-top b { font-weight: 400; font-size: 15px; color: #FFFFFF; }
+  .hp-mb-top span { font-size: 12px; color: #8B9094; }
+  .hp-mb-h { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; padding: 10px 0 6px; border-bottom: 1px solid #1D1D20; }
+  .hp-mb ul { list-style: none; margin: 0; padding: 0; display: block; }
+  .hp-mb li { display: grid; grid-template-columns: minmax(0, 1fr) auto 52px; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #1D1D20; font-size: 13.5px; color: #FFFFFF; }
+  .hp-mb li::before { content: none; }
+  .hp-mb li .n small { display: block; font-size: 11.5px; color: #8B9094; }
+  .hp-mb li .p { color: #C9CED1; font-variant-numeric: tabular-nums; }
+  .hp-mb li .c { text-align: right; font-variant-numeric: tabular-nums; }
+  .hp-mb .up { color: #00E5A0; } .hp-mb .down { color: #FFB020; }
+  .hp-mb-h.up, .hp-mb-h.down { color: #8B9094; }
+  .hp-mb-note { margin: 12px 0 0 !important; font-size: 12px !important; line-height: 1.5 !important; color: #8B9094 !important; }
+  .hp-chart figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; margin-bottom: 10px; }
+  .hp-chart figcaption b { font-weight: 400; font-size: 15px; color: #FFFFFF; }
+  .hp-chart figcaption span { font-size: 12px; color: #8B9094; }
+  .hp-chart figcaption i { font-style: normal; }
+  .hp-chart svg { display: block; width: 100%; height: 200px; }
+  .hp-chart .band { fill: #23262A; }
+  .hp-chart .bars rect { fill: #33373B; }
+  .hp-chart .line { fill: none; stroke: #FFFFFF; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .hp-chart-axis { display: flex; justify-content: space-between; font-size: 11.5px; color: #8B9094; padding-top: 4px; }
+  .hp-chart-key { margin: 8px 0 0 !important; font-size: 12px !important; line-height: 1.5 !important; color: #8B9094 !important; }
+  .hp-chart-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; margin-top: 12px; }
+  .hp-chart-tiles > div { background: #0C0C0D; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .hp-chart-tiles b { font-weight: 400; font-size: 15px; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-chart-tiles span { font-size: 11.5px; color: #8B9094; }
+  .hp-chart-say { margin: 12px 0 0 !important; font-size: 13.5px !important; line-height: 1.55 !important; color: #E8EAEB !important; }
+
+  /* Pro-first plans */
+  .hp-top2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
+  .hp-plan.pro { border-color: #A200FF; background: #15101A; box-shadow: 0 0 0 1px rgba(162, 0, 255, .35); }
+  .hp-plan.pro .for { color: #D9A6FF; }
+  .hp-plan.free { border-color: rgba(0, 229, 160, .38); background: rgba(0, 229, 160, .04); }
+  .hp-plan .under { font-size: 12.5px; line-height: 1.5; color: #8B9094; }
+  .hp-plan .under a { color: #00E5A0; }
+  .hp-plan.pro li, .hp-plan.free li { font-size: 13.5px; }
+  .hp-plans.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hp-plan .price.sm { font-size: 34px; }
+
+  /* Homepage v11: product video, loaded on tap */
+  .hp-sec > .hp-wrap.hp-watch { flex-direction: row; align-items: center; justify-content: space-between; gap: 48px; }
+  .hp-vid { flex: 0 0 auto; width: 360px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .hp-vid button { position: relative; display: block; width: 100%; padding: 0; border: 1px solid #2A2B2F; background: #0A0A0B; cursor: pointer; }
+  .hp-vid img, .hp-vid video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; }
+  .hp-vid video { border: 1px solid #2A2B2F; background: #0A0A0B; }
+  .hp-vid-btn { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #A200FF; color: #FFFFFF; font-size: 13px; letter-spacing: .12em; padding: 16px 22px; white-space: nowrap; }
+  .hp-vid-note { font-size: 11.5px; color: #8B9094; }
+  @media (max-width: 959.98px) {
+    .hp-sec > .hp-wrap.hp-watch { flex-direction: column; align-items: stretch; gap: 24px; }
+    .hp-vid { width: 100%; max-width: 420px; align-self: center; }
+  }
+
+  /* Homepage v11: the video sits in the first screen */
+  .hp-herovid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px; justify-self: center; }
+  .hp-herovid .hp-vid { width: 100%; max-width: none; align-self: stretch; }
+  .hp-herovid .hp-vid button, .hp-herovid .hp-vid video { box-shadow: 0 20px 70px rgba(0, 0, 0, .7); }
+  .hp-vidpts { list-style: none; margin: 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: rgba(10, 10, 11, .88); border: 1px solid #1D1D20; font-size: 13px; line-height: 1.45; color: #E8EAEB; }
+
+  /* Homepage v11 previews: video frame, autoplay, synced points */
+  .pv-phone { position: relative; padding: 10px; border: 1px solid #2A2B2F; border-radius: 30px; background: linear-gradient(160deg, #1B1B1F, #0A0A0B 60%); box-shadow: 0 30px 90px rgba(162, 0, 255, .22), 0 20px 70px rgba(0, 0, 0, .7); }
+  .pv-box { position: relative; border-radius: 22px; overflow: hidden; background: #0A0A0B; }
+  .pv-box video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border: 0; box-shadow: none; }
+  .hp-vid .pv-play, .pv-play { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: rgba(10, 10, 11, .28); cursor: pointer; }
+  .pv-play[hidden] { display: none; }
+  [data-pt] { transition: color .35s ease, border-color .35s ease, background .35s ease, transform .35s ease; }
+  .hp-vidpts li.on { color: #FFFFFF; }
+  .hp-vidpts li.on .hp-tick { color: #A200FF; }
+  @media (prefers-reduced-motion: reduce) { [data-pt] { transition: none; } }
+  .hp-hero-in { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 40px; }
+  .hp-hero-card { width: 100%; max-width: 820px; }
+  .pv-stage { width: 100%; max-width: 980px; display: grid; grid-template-columns: minmax(0, 1fr) 340px minmax(0, 1fr); gap: 28px; align-items: center; }
+  .pv-stage .pv-mid { display: flex; flex-direction: column; gap: 12px; }
+  .pv-call { background: rgba(10, 10, 11, .9); border: 1px solid #1D1D20; padding: 16px 16px; font-size: 14px; line-height: 1.45; color: #A6ADB1; }
+  .pv-call b { display: block; font-size: 11px; letter-spacing: .14em; color: #8B9094; font-weight: 400; margin-bottom: 6px; }
+  .pv-call.on { color: #FFFFFF; border-color: #A200FF; background: rgba(162, 0, 255, .1); transform: translateY(-3px); }
+  .pv-call.on b { color: #C77DFF; }
+  .pv-side { display: flex; flex-direction: column; gap: 14px; }
+  @media (max-width: 959.98px) {
+    .hp-hero-in { gap: 22px; }
+    .pv-stage { grid-template-columns: minmax(0, 1fr); max-width: 420px; gap: 12px; }
+    .pv-stage .pv-mid { order: -1; }
+  }
+
+  /* Homepage v11 (23 Nov 2026): every paid plan is a card with a button */
+  .hp-p5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .hp-plan.pass { border-color: #00E5A0; background: rgba(0, 229, 160, .05); }
+  .hp-plan .q { min-height: 0; }
+  .hp-freeline { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; border: 1px solid #1D1D20; padding: 14px 18px; font-size: 13.5px; line-height: 1.5; color: #A6ADB1; }
+  .hp-freeline b { color: #E8EAEB; }
+  @media (max-width: 959.98px) { .hp-p5 { grid-template-columns: minmax(0, 1fr); } }
+
+  /* the three small motions: each plays once; all off under reduced motion */
+  @keyframes hpAlertIn { from { opacity: 0; transform: translateY(-14px) scale(.98); } to { opacity: 1; transform: none; } }
+  @keyframes hpMarkIn { from { left: 88%; } to { left: 24%; } }
+  .hp-alert.big { animation: hpAlertIn .5s cubic-bezier(.2, .8, .2, 1) .25s both; }
+  .hp-ex-bar .mark { animation: hpMarkIn .9s cubic-bezier(.2, .8, .2, 1) .8s both; }
+  .hp-chart .line { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .hp-chart.wait .line { stroke-dashoffset: 1; }
+  .hp-chart.draw .line { transition: stroke-dashoffset 1.4s ease-out; stroke-dashoffset: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    .hp-alert.big, .hp-ex-bar .mark { animation: none; }
+    .hp-chart.draw .line, .hp-chart.wait .line { transition: none; stroke-dashoffset: 0; }
+  }
+
+  @media (max-width: 959.98px) {
+    .hp-rs { grid-template-columns: minmax(0, 1fr); }
+    .hp-mb { grid-template-columns: minmax(0, 1fr); }
+    .hp-top2 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-pc { padding: 16px 14px; }
+    .hp-pc select { width: 100%; }
+    .hp-pc-three { grid-template-columns: minmax(0, 1fr); }
+    .hp-pc-three > div { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px; }
+    .hp-pc-three .k { flex: 0 0 104px; }
+    .hp-pc-three .v { font-size: 30px; }
+    .hp-pc-three .d { flex: 1 1 100%; }
+    .hp-pc-go .hp-btn { width: 100%; box-sizing: border-box; }
+    .hp-rs-card { padding: 20px 16px; }
+    .hp-rs-card h3 { font-size: 23px; }
+    .hp-plans.two { grid-template-columns: minmax(0, 1fr); }
+    .hp-chart-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hp-chart svg { height: 170px; }
+    #how .hp-shot { display: none; }
+    #pc-chips { display: none; }
+    .hp-pc-pay .arrow { display: none; }
+    .hp-alerts .hp-alert:not(.big) { display: none; }
+    .hp-mb-note, .hp-chart-key { display: none; }
+    .hp-sec > .hp-wrap { padding-top: 44px; padding-bottom: 44px; }
+    .hp-plans.two .hp-plan .q { display: none; }
+    .hp-plans.two .hp-plan { padding: 18px 16px; gap: 10px; }
+  }
+
+  /* ---- v8 (11 Nov 2026, outreach/57): phone first screen shows the sample alert and the button above the cookie bar,
+     honest wording about the rating, shorter page (FAQ folds, one-line steps) ---- */
+  .hp-phone { display: none; }
+  .hp-alert-meta .sample { color: #FFB020; letter-spacing: .1em; }
+  .hp-ex p.hp-ex-note { font-size: 12px; color: #8B9094; }
+  .hp-plan.pro .q { min-height: 0; color: #E8EAEB; }
+  .hp-faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; align-items: start; }
+  .hp-faq details { border-bottom: 1px solid #1D1D20; }
+  .hp-faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 14px; min-height: 52px; padding: 6px 0; font-size: 14.5px; font-weight: 500; color: #FFFFFF; }
+  .hp-faq summary::-webkit-details-marker { display: none; }
+  .hp-faq summary::after { content: '+'; flex: 0 0 auto; font-size: 20px; line-height: 1; color: #00E5A0; }
+  .hp-faq details[open] summary::after { content: '\2212'; }
+  .hp-faq summary:focus-visible { outline: 2px solid #00E5A0; outline-offset: 2px; }
+  .hp-faq details p { margin: 0; padding: 0 0 16px; font-size: 13.5px; line-height: 1.6; color: #A6ADB1; max-width: 62ch; }
+  .hp-faq-more { margin: 0; font-size: 13px; color: #8B9094; }
+  @media (max-width: 959.98px) {
+    .hp-faq { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-phone { display: grid; }
+    .hp-wide { display: none; }
+    #hero-alerts .hp-alerts-top, #hero-alert-main { display: none; }
+    #hero-alert-phone { padding: 12px; border-radius: 14px; box-shadow: none; }
+    #qs-max { display: none; }
+    .hp-hero-card { gap: 14px; }
+    .hp-qs-note { display: none; }
+    .hp-steps li { padding: 14px 16px; }
+    .hp-steps h3 { margin-bottom: 3px; }
+    .hp-never { padding: 14px 16px; gap: 6px 18px; }
+    .hp-rs-card { gap: 12px; }
+    .hp-chart-tiles { display: none; }
+    .hp-sec > .hp-wrap { padding-top: 38px; padding-bottom: 38px; gap: 20px; }
+  }
+
+  /* Phones, first screen (v8 fix, 11 Nov 2026). A real phone browser shows less than the screen's height (about
+     390 x 664 on an 844 px iPhone with its bars), and the cookie bar takes 127 px of that on a first visit. So on
+     every phone the hero is compact: no eyebrow, the alert without its title line, the search box as one row.
+     Width rules only: a height rule would flip the layout when the browser's bars slide away. */
+  .sub-s, .go-s, .nav-s { display: none; }
+  #nav-start { white-space: nowrap; }
+  @media (max-width: 699.98px) {
+    .hp-hero-in { padding: 10px 10px 32px; }
+    .hp-hero-card { padding: 16px 16px 20px; gap: 12px; }
+    .hp-hero-card .hp-eyebrow { display: none; }
+    #hero-alert-phone .hp-alert-title { display: none; }
+    .hp-qs { flex-direction: row; align-items: stretch; gap: 8px; padding: 10px; }
+    .hp-qs-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .hp-qs-row { flex: 1 1 auto; min-width: 0; }
+    .hp-qs input { padding: 0 12px; }
+    .hp-qs input::placeholder { font-size: 14px; }
+    .hp-qs .hp-btn { width: auto; flex: 0 0 auto; min-height: 52px; padding: 0 14px; }
+    .go-l { display: none; } .go-s { display: inline; }
+  }
+  /* Under 360 px (320 x 568 is the smallest phone still in use): shorter header button, smaller type, shorter line. */
+  @media (max-width: 359.98px) {
+    .nav-l { display: none; } .nav-s { display: inline; }
+    #site-nav-inner { padding: 4px 12px !important; }
+    .hp-hero-in { padding: 8px 8px 28px; }
+    .hp-hero-card { padding: 12px 14px 16px; gap: 9px; }
+    .hp-h1 { font-size: 28px; }
+    .hp-sub { font-size: 13.5px; line-height: 1.45; }
+    .sub-l { display: none; } .sub-s { display: inline; }
+    #hero-alert-phone { grid-template-columns: minmax(0, 1fr); padding: 9px 12px; }
+    #hero-alert-phone img { display: none; }
+    .hp-qs { padding: 8px; }
+    .hp-qs input, .hp-qs .hp-btn { min-height: 48px; }
+    .hp-qs .hp-btn { padding: 0 12px; }
+  }
+
+  /* ---- v9 (11 Nov 2026, homepage trim): one mention per fact, alerts arrive one by one, one reseller block ---- */
+  /* alerts: item and price first, the rating on its own line under them */
+  .hp-alert-body .rank { display: block; margin-top: 2px; font-size: 12.5px; }
+  /* the three desktop alerts arrive one after another, like pushes; each plays once */
+  .hp-alert.s2 { animation: hpAlertIn .5s cubic-bezier(.2, .8, .2, 1) 1s both; }
+  .hp-alert.s3 { animation: hpAlertIn .5s cubic-bezier(.2, .8, .2, 1) 1.7s both; }
+  /* hero: trial + password in one line */
+  .hp-checks1 { margin: 0; font-size: 13.5px; line-height: 1.55; color: #E8EAEB; }
+  /* proof: founder line + three facts in one slim row */
+  .hp-proof1 { border: 1px solid #1D1D20; background: #0C0C0D; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .hp-proof1 .who { margin: 0; font-size: 14px; line-height: 1.55; color: #A6ADB1; }
+  .hp-proof1 .who b { font-weight: 400; color: #FFFFFF; }
+  .hp-proof1 ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 26px; }
+  .hp-proof1 li { font-size: 12.5px; line-height: 1.5; color: #8B9094; }
+  .hp-proof1 li b { font-weight: 400; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-proof1 #stat-listings-asof { color: #6B7074; }
+  .hp-proof1 #stat-listings-asof::before { content: '('; } .hp-proof1 #stat-listings-asof::after { content: ')'; }
+  /* reseller block: three one-line features, then the board */
+  .hp-feat { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-width: 86ch; }
+  .hp-feat li { position: relative; padding-left: 16px; font-size: 14px; line-height: 1.6; color: #A6ADB1; }
+  .hp-feat li::before { content: ''; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; background: #00E5A0; }
+  .hp-feat li b { font-weight: 400; color: #FFFFFF; }
+  .hp-feat .tag { display: inline-block; margin-left: 4px; font-size: 10.5px; letter-spacing: .1em; color: #8B9094; border: 1px solid #33333A; padding: 2px 6px; vertical-align: 1px; white-space: nowrap; }
+  .hp-mbwrap { display: flex; flex-direction: column; gap: 12px; }
+  .hp-mb-more { display: none; min-height: 48px; font-family: inherit; font-size: 12px; letter-spacing: .1em; color: #E8EAEB; background: #141416; border: 1px solid #26262A; cursor: pointer; }
+  /* steps: three in a row on wide screens */
+  .hp-steps3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #1D1D20; border: 1px solid #1D1D20; }
+  .hp-steps3 li { background: #0C0C0D; }
+  /* the other plans as one line each */
+  .hp-rest { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .hp-rest li { font-size: 13.5px; line-height: 1.55; color: #A6ADB1; }
+  .hp-rest li b { font-weight: 400; color: #FFFFFF; }
+  @media (prefers-reduced-motion: reduce) {
+    .hp-alert.s2, .hp-alert.s3 { animation: none; }
+  }
+  @media (max-width: 959.98px) {
+    .hp-steps3 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 699.98px) {
+    .hp-proof1 { padding: 14px 16px; }
+    .hp-proof1 ul { flex-direction: column; gap: 4px; }
+    .hp-feat li { font-size: 13.5px; }
+    /* phone: the board shows, the chart waits for a tap */
+    .hp-mb-more { display: block; }
+    #mb:not(.open) .hp-chart { display: none; }
+    #mb.open .hp-mb-more { display: none; }
+  }
+</style>
+
+<!-- Supabase REST. This page makes two public calls (the listings counter and
+     ref_clicks), so plain fetch instead of the 110 KB supabase-js client, which
+     blocked rendering from the <head>. Same anon key and headers it sent. -->
+<script>
+  window.SNYPD = window.SNYPD || {};
+  SNYPD.rest = function (path, init) {
+    var key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnYnVxYW5qb2NmbWFobHp6dXBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTY4OTgsImV4cCI6MjA3MTg5Mjg5OH0.iAF7dzPqrfbd3YZmnhKOTnMcNVslR5AMo8cBxxwpaJQ';
+    init = init || {};
+    init.headers = Object.assign({ apikey: key, Authorization: 'Bearer ' + key }, init.headers || {});
+    return fetch('https://igbuqanjocfmahlzzupc.supabase.co/rest/v1/' + path, init);
+  };
+</script>
+
+
+<!-- Cookie consent: Google Analytics and the Whop pixel load only after the visitor agrees -->
+<script src="/assets/consent.js" data-ga="G-VBC0SXPR6F" data-whop="biz_FO7MS9yTf8rm6n"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VBC0SXPR6F');
+  // The page's ga() helper calls this; forward its events to GA4.
+  window.snypdTrack = function (name, params) { try { gtag('event', name, params || {}); } catch (e) {} };
+</script>
+<script>
+  // A signed-in visitor goes straight to the dashboard (unchanged behaviour).
+  try {
+    var sessionKey = Object.keys(localStorage).find(function (k) { return k.startsWith('sb-') && k.endsWith('-auth-token'); });
+    if (sessionKey) {
+      var sess = JSON.parse(localStorage.getItem(sessionKey));
+      if (sess && sess.access_token) window.location.replace('/dashboard');
+    }
+  } catch (e) {}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.snypd.store/#org",
+      "description": "SNYPD is a Vinted monitor from Belgium that checks your Vinted searches about every 30 seconds to a minute and sends a push alert when a new matching listing appears; it never logs in to your Vinted account and never buys for you.",
+      "name": "SNYPD",
+      "url": "https://www.snypd.store/",
+      "logo": "https://www.snypd.store/assets/icons/icon-512.png",
+      "email": "heysnypd@gmail.com",
+      "sameAs": ["https://discord.gg/gjKD4auXhK", "https://www.instagram.com/snypd_/", "https://whop.com/snypdstore/"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.snypd.store/#website",
+      "name": "SNYPD",
+      "url": "https://www.snypd.store/",
+      "publisher": { "@id": "https://www.snypd.store/#org" },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.snypd.store/#app",
+      "name": "SNYPD",
+      "url": "https://www.snypd.store/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, iOS, Android, Windows, macOS",
+      "description": "Vinted alert bot and monitor for resellers: watches your saved Vinted searches and alerts you when a new matching listing appears. It never logs in to your Vinted account and never buys for you.",
+      "publisher": { "@id": "https://www.snypd.store/#org" },
+      "offers": [
+        { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Solo", "price": "5.99", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Kickstart", "price": "14.99", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Pro", "price": "24.99", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Elite", "price": "34.99", "priceCurrency": "EUR" },
+        { "@type": "Offer", "name": "Hunt Pass", "price": "3.99", "priceCurrency": "EUR" }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<div class="hp">
+
+  <div id="site-nav" style="position:sticky;top:0;z-index:30;background:rgba(10,10,11,.82);border-bottom:1px solid #1D1D20;transition:background .25s ease, box-shadow .25s ease;">
+    <div id="site-nav-inner" style="max-width:1320px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:10px 18px;transition:padding .25s ease;">
+      <a href="/" style="display:flex;align-items:center;gap:9px;color:#FFFFFF;min-height:44px;">
+        <img src="/assets/home/logo.png" alt="SNYPD" style="width:22px;height:22px;object-fit:contain;display:block;">
+        <span style="font-size:15.5px;font-weight:700;letter-spacing:.02em;">SNYPD<span style="color:#FFFFFF;animation:blink 1.2s step-end infinite;">_</span></span>
+      </a>
+        <div class="dc-desk" style="display:flex;gap:4px;flex:1;">
+          <a href="#how" style="font-size:12px;letter-spacing:.1em;color:#8B9094;padding:14px 10px;">HOW IT WORKS</a>
+          <a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;letter-spacing:.1em;color:#8B9094;padding:14px 10px;">DISCORD</a>
+          <a href="/plans" style="font-size:12px;letter-spacing:.1em;color:#8B9094;padding:14px 10px;">PRICING</a>
+        </div>
+        <a class="dc-desk" href="/login" style="font-size:12px;letter-spacing:.1em;color:#8B9094;padding:14px 10px;">LOG IN</a>
+      <span class="dc-mob" style="flex:1;"></span>
+      <a href="/signup" style="font-size:12px;letter-spacing:.1em;color:#FFFFFF;background:#A200FF;padding:14px 16px;" id="nav-start"><span class="nav-l">START FREE</span><span class="nav-s">START</span></a>
+        <button type="button" id="menu-btn" class="dc-mob" aria-expanded="false" aria-controls="mobile-menu" style="min-width:64px;min-height:46px;background:#141416;border:1px solid #26262A;color:#E8EAEB;font-size:12px;letter-spacing:.1em;padding:0 12px;cursor:pointer;">MENU</button>
+    </div>
+      <nav id="mobile-menu" class="dc-mob" hidden aria-label="Menu" style="border-top:1px solid #1D1D20;background:#0A0A0B;display:flex;flex-direction:column;">
+        <a href="#how" data-close-menu style="font-size:13px;letter-spacing:.1em;color:#E8EAEB;min-height:52px;padding:0 20px;display:flex;align-items:center;border-bottom:1px solid #1D1D20;">HOW IT WORKS</a>
+        <a href="/plans" data-close-menu style="font-size:13px;letter-spacing:.1em;color:#E8EAEB;min-height:52px;padding:0 20px;display:flex;align-items:center;border-bottom:1px solid #1D1D20;">PRICING</a>
+        <a href="https://discord.gg/gjKD4auXhK" style="font-size:13px;letter-spacing:.1em;color:#E8EAEB;min-height:52px;padding:0 20px;display:flex;align-items:center;border-bottom:1px solid #1D1D20;">DISCORD</a>
+        <a href="/login" style="font-size:13px;letter-spacing:.1em;color:#E8EAEB;min-height:52px;padding:0 20px;display:flex;align-items:center;">LOG IN</a>
+      </nav>
+  </div>
+
+  <div id="hero" class="hp-hero">
+    <div aria-hidden="true" id="hero-wall" class="hp-hero-wall"></div>
+
+    <div class="hp-hero-in">
+      <div class="hp-hero-card">
+        <span class="hp-eyebrow mint">YOU&rsquo;RE NOT SLOW. YOU&rsquo;RE OUTNUMBERED.</span>
+        <h1 class="hp-h1">New Vinted listings, <em>sent to your phone.</em></h1>
+        <p class="hp-sub"><span class="sub-l">SNYPD checks your Vinted searches about every 30 seconds to a minute. On busy searches, new finds come with a price rating.</span><span class="sub-s">Checks your Vinted searches about every 30 seconds to a minute. Busy searches get a price rating.</span><span class="hp-wide"> You buy on Vinted yourself.</span></p>
+        <div class="hp-alert big hp-phone" id="hero-alert-phone" aria-hidden="true">
+          <img src="/assets/home/logo.png" alt="" width="38" height="38">
+          <span>
+            <span class="hp-alert-meta"><span>SNYPD &middot; now</span><span class="sample">SAMPLE</span></span>
+            <span class="hp-alert-title">New find</span>
+            <span class="hp-alert-body">Jordan 1 Low Travis Scott &mdash; <i>&euro;180</i><b class="rank">Cheaper than 76% of this week's finds</b></span>
+          </span>
+        </div>
+        <form id="qs" class="hp-qs" action="/signup" method="get" novalidate>
+          <label class="hp-qs-label" for="qs-words">WHAT ARE YOU HUNTING?</label>
+          <div class="hp-qs-row">
+            <input id="qs-words" name="hunt" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="e.g. jordan 1 travis scott">
+            <input id="qs-max" name="max" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="go" placeholder="Max price" aria-label="Maximum price (optional)">
+          </div>
+          <a id="qs-go" class="hp-btn" href="/signup"><span class="go-l">WATCH IT FOR ME</span><span class="go-s">WATCH IT</span></a>
+          <p class="hp-qs-note">Have a Vinted link with your own filters? Paste it after sign-up.</p>
+        </form>
+        <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--> Never needs your Vinted password.</p>
+      </div>
+
+      <div id="watch" class="pv-stage">
+        <div class="pv-side">
+          <div class="pv-call" data-pt="0"><b>1 &middot; FOUND</b>A new find lands in your feed, with its photo and price.</div>
+          <div class="pv-call" data-pt="1"><b>2 &middot; RATED</b>Rated against what your search found this week.</div>
+        </div>
+        <div class="pv-mid hp-vid" id="vid">
+          <div class="hp-alerts-top"><span>SEE IT &middot; 14 SECONDS &middot; NO SOUND</span><b>SAMPLE</b></div>
+        <div class="pv-phone">
+          <div class="pv-box">
+            <video id="vid-el" muted playsinline preload="none" width="1080" height="1350" poster="/assets/home/video/snypd-home-4x5-poster.jpg" aria-label="A SNYPD feed card: Polo Ralph Lauren cable knit jumper, 12 euros, cheaper than 82% of this hunt's finds this week"></video>
+            <button type="button" id="vid-play" class="pv-play" aria-label="Play the 14 second video"><span class="hp-vid-btn" aria-hidden="true">&#9654; PLAY</span></button>
+          </div>
+        </div>
+        </div>
+        <div class="pv-side">
+          <div class="pv-call" data-pt="2"><b>3 &middot; YOURS</b>You buy on Vinted yourself. SNYPD never buys or messages for you.</div>
+          <a class="hp-btn" href="/signup">START FREE</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hp-wrap" style="padding-top:28px;padding-bottom:4px;">
+    <div id="proof" class="hp-proof1">
+      <p class="who"><b>Built by a Belgian sneaker reseller:</b> 150+ sales, 3.8k Instagram followers. Made in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
+      <ul>
+        <li><b>~30 s</b> between checks (measured median)</li>
+        <li><b id="stat-listings">17,520,665</b> listings matched to users' searches <span id="stat-listings-asof">As of 22 Nov 2026</span></li>
+        <li><b>0</b> Vinted logins: public listings only</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="how" class="hp-sec">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">HOW IT WORKS</span>
+        <h2 class="hp-h2">Three steps. Then your phone does the watching.</h2>
+      </div>
+      <ol class="hp-steps hp-steps3">
+        <li><span class="k">1</span><div><h3>Say what you want</h3><p>A few words and a max price, or a Vinted search link.</p></div></li>
+        <li><span class="k">2</span><div><h3>SNYPD checks Vinted</h3><p>About every 30 seconds to a minute, around the clock.</p></div></li>
+        <li><span class="k">3</span><div><h3>You get the alert</h3><p>You buy on Vinted. SNYPD never buys or messages for you.</p></div></li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var v = document.getElementById('vid-el'), btn = document.getElementById('vid-play');
+    if (!v || !btn) return;
+    var SRC = '/assets/home/video/snypd-home-4x5.mp4';
+    var label = btn.querySelector('.hp-vid-btn');
+    var pts = [].slice.call(document.querySelectorAll('[data-pt]'));
+    var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var save = !!(navigator.connection && navigator.connection.saveData);
+    var seen = false;
+    try { seen = localStorage.getItem('snypd_vid_seen') === '1'; } catch (e) {}
+    var plays = 0, byUser = false, resting = false;
+    function mark(i) { pts.forEach(function (p, k) { p.classList.toggle('on', k === i); }); }
+    function start() {
+      if (!v.getAttribute('src')) v.src = SRC;
+      v.muted = true;
+      var pr = v.play();
+      if (pr && pr.then) {
+        pr.then(function () {
+          btn.hidden = true; resting = false;
+          try { localStorage.setItem('snypd_vid_seen', '1'); } catch (e) {}
+        }).catch(function () { btn.hidden = false; });
+      } else { btn.hidden = true; }
+    }
+    v.addEventListener('timeupdate', function () {
+      if (!v.duration) return;
+      mark(Math.min(2, Math.floor(v.currentTime / v.duration * 3)));
+    });
+    v.addEventListener('ended', function () {
+      plays++;
+      if (!byUser && plays < 2) { v.currentTime = 0; start(); return; }
+      resting = true; mark(-1);
+      label.innerHTML = '&#8635; REPLAY';
+      btn.hidden = false;
+    });
+    btn.addEventListener('click', function () { byUser = true; plays = 0; v.currentTime = 0; start(); });
+    document.documentElement.setAttribute('data-vid-auto', (reduce || save || seen) ? 'off' : 'on');
+    if (reduce || save || seen || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (resting || byUser) return;
+        if (e.isIntersecting) start(); else if (!v.paused) v.pause();
+      });
+    }, { threshold: 0.5 }).observe(v);
+  })();
+  </script>
+
+  <div id="try" class="hp-sec" style="border-top:0;">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow mint">TRY IT &middot; NO SIGN-UP</span>
+        <h2 class="hp-h2">What is it worth on Vinted? Check a price.</h2>
+        <p class="hp-lead">Pick an item, set your margin, see the most you should pay.</p>
+      </div>
+      <div class="hp-pc" id="pc">
+        <div class="hp-pc-pick">
+          <label for="pc-item">ITEM</label>
+          <select id="pc-item" disabled><option>Nike Dunk Low</option></select>
+          <div class="hp-pc-chips" id="pc-chips" hidden></div>
+        </div>
+        <!--plans:home-demo-->
+          <div class="hp-pc-res" id="pc-res" data-id="nike-dunk-low" data-n-items="34">
+            <div class="hp-pc-name"><b id="pc-name">Nike Dunk Low</b><span id="pc-meta">3,941 listings &middot; vinted.be &middot; 18 October to 1 November 2026</span></div>
+            <div class="hp-pc-three">
+              <div><span class="k">QUICK SALE</span><span class="v" id="pc-lo">&euro;17</span><span class="d">a quarter of listings ask less</span></div>
+              <div class="mid"><span class="k">TYPICAL</span><span class="v" id="pc-mid">&euro;26</span><span class="d">half ask less, half ask more</span></div>
+              <div><span class="k">PATIENT</span><span class="v" id="pc-hi">&euro;50</span><span class="d">a quarter of listings ask more</span></div>
+            </div>
+            <div class="hp-pc-pay"><label for="pc-margin">Your margin</label><input id="pc-margin" type="number" inputmode="numeric" min="0" max="90" step="5" value="40"><span>%</span><span class="arrow">&rarr;</span><span class="out">Pay at most <b id="pc-pay">&euro;15.60</b></span></div>
+            <div class="hp-pc-go"><a class="hp-btn" id="pc-alert" href="/signup?hunt=nike+dunk+low&amp;max=15">ALERT ME UNDER <span id="pc-alert-p">&euro;15</span></a><a class="hp-btn ghost" id="pc-more" href="/vinted-price-guide/nike-dunk-low">PRICES BY CONDITION</a></div>
+          </div>
+          <!--/plans:home-demo-->
+<!--plans:home-data-->
+        <div class="hp-pc-links"><a href="/vinted-price-guide">All 34 items in the free Vinted price guide &rarr;</a><a href="/vinted-market-report/november-2026">Vinted Market Report, November 2026: 629,839 listings &rarr;</a></div>
+        <!--/plans:home-data-->
+        <p class="hp-pc-foot"><span id="pc-count">This demo covers the items of the free price guide.</span> <!--plans:home-trial-checks-demo-->During the free trial you get 10 of these.<!--/plans:home-trial-checks-demo--></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="research" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">FOR RESELLERS</span>
+        <h2 class="hp-h2">Know the price before you buy.</h2>
+      </div>
+      <ul class="hp-feat">
+        <li><b>A price rating on your finds.</b> Each new find is compared with what your search found this week, in the same condition. <span class="tag">PAID PLANS &middot; TRIAL</span></li>
+        <li><b>Check a price.</b> Type any item: quick-sale, typical and patient price by condition. <span class="tag"><!--plans:home-trial-checks-tag-->PRO &middot; ELITE &middot; 10 IN THE TRIAL<!--/plans:home-trial-checks-tag--></span></li>
+        <li><b>What's moving.</b> About 200 popular items, followed every day: where sellers now ask more, or less. <span class="tag">PRO &middot; ELITE &middot; TRIAL</span></li>
+      </ul>
+      <div class="hp-mbwrap" id="mb">
+        <!--plans:home-market-->
+        <div class="hp-mb" id="mb-sample" data-date="2026-11-11">
+          <div class="hp-mb-list">
+            <div class="hp-mb-top"><b>What&rsquo;s moving</b><span>EU asking prices (EUR) &middot; board of 11 Nov 2026</span></div>
+            <span class="hp-mb-h up">ASKING PRICES RISING</span><ul><li><span class="n">Palace hoodie<small>Tops &amp; knitwear</small></span><span class="p">&euro;70</span><span class="c up">+18%</span></li><li><span class="n">Stone Island hoodie<small>Tops &amp; knitwear</small></span><span class="p">&euro;105</span><span class="c up">+16%</span></li><li><span class="n">Yeezy Foam Runner<small>Sneakers</small></span><span class="p">&euro;45</span><span class="c up">+13%</span></li></ul>
+            <span class="hp-mb-h down">ASKING PRICES FALLING</span><ul><li><span class="n">Adidas Handball<small>Sneakers</small></span><span class="p">&euro;40</span><span class="c down">&minus;20%</span></li><li><span class="n">Adidas Spezial<small>Sneakers</small></span><span class="p">&euro;40</span><span class="c down">&minus;18%</span></li><li><span class="n">Levi&#x27;s 501<small>Trousers</small></span><span class="p">&euro;20.50</span><span class="c down">&minus;16%</span></li></ul>
+            <p class="hp-mb-note">75 items were on the board that day; 4 more were hidden because their mix of listings changed too much to call a direction.</p>
+          </div>
+          <figure class="hp-chart">
+            <figcaption><b>Adidas Handball</b><span>2 Oct 2026 to 11 Nov 2026 &middot; <i class="down">&minus;20%</i></span></figcaption>
+            <svg viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="Adidas Handball: typical asking price per day from 2 Oct 2026 to 11 Nov 2026, with the normal range and the number of listings"><path class="band" d="M0.0,8.0 L15.0,11.4 L30.0,11.4 L45.0,28.1 L60.0,11.4 L75.0,11.4 L90.0,28.1 L105.0,28.1 L120.0,28.1 L135.0,28.1 L150.0,28.1 L165.0,28.1 L180.0,28.1 L195.0,28.1 L210.0,11.4 L225.0,28.1 L240.0,28.1 L255.0,28.1 L270.0,28.1 L285.0,28.1 L300.0,11.4 L315.0,28.1 L330.0,11.4 L345.0,11.4 L360.0,11.4 L375.0,11.4 L390.0,11.4 L405.0,28.1 L420.0,28.1 L435.0,28.1 L450.0,28.1 L465.0,44.9 L480.0,44.9 L495.0,61.6 L510.0,61.6 L525.0,61.6 L540.0,61.6 L555.0,95.1 L570.0,78.4 L585.0,78.4 L600.0,78.4 L600.0,132.0 L585.0,132.0 L570.0,132.0 L555.0,132.0 L540.0,132.0 L525.0,132.0 L510.0,132.0 L495.0,132.0 L480.0,132.0 L465.0,132.0 L450.0,132.0 L435.0,128.6 L420.0,132.0 L405.0,132.0 L390.0,132.0 L375.0,145.4 L360.0,145.4 L345.0,142.0 L330.0,145.4 L315.0,145.4 L300.0,145.4 L285.0,145.4 L270.0,145.4 L255.0,145.4 L240.0,145.4 L225.0,145.4 L210.0,145.4 L195.0,145.4 L180.0,150.0 L165.0,148.7 L150.0,145.4 L135.0,148.7 L120.0,145.4 L105.0,145.4 L90.0,145.4 L75.0,145.4 L60.0,145.4 L45.0,145.4 L30.0,145.4 L15.0,145.4 L0.0,145.4 Z"/><g class="bars"><rect x="-4.5" y="166.6" width="9.0" height="25.4"/><rect x="10.5" y="166.7" width="9.0" height="25.3"/><rect x="25.5" y="166.4" width="9.0" height="25.6"/><rect x="40.5" y="168.2" width="9.0" height="23.8"/><rect x="55.5" y="166.0" width="9.0" height="26.0"/><rect x="70.5" y="166.0" width="9.0" height="26.0"/><rect x="85.5" y="164.9" width="9.0" height="27.1"/><rect x="100.5" y="162.6" width="9.0" height="29.4"/><rect x="115.5" y="162.0" width="9.0" height="30.0"/><rect x="130.5" y="164.1" width="9.0" height="27.9"/><rect x="145.5" y="162.0" width="9.0" height="30.0"/><rect x="160.5" y="166.4" width="9.0" height="25.6"/><rect x="175.5" y="164.5" width="9.0" height="27.5"/><rect x="190.5" y="164.6" width="9.0" height="27.4"/><rect x="205.5" y="167.3" width="9.0" height="24.7"/><rect x="220.5" y="166.7" width="9.0" height="25.3"/><rect x="235.5" y="166.3" width="9.0" height="25.7"/><rect x="250.5" y="165.6" width="9.0" height="26.4"/><rect x="265.5" y="165.9" width="9.0" height="26.1"/><rect x="280.5" y="165.4" width="9.0" height="26.6"/><rect x="295.5" y="166.3" width="9.0" height="25.7"/><rect x="310.5" y="166.2" width="9.0" height="25.8"/><rect x="325.5" y="166.4" width="9.0" height="25.6"/><rect x="340.5" y="164.8" width="9.0" height="27.2"/><rect x="355.5" y="168.1" width="9.0" height="23.9"/><rect x="370.5" y="165.7" width="9.0" height="26.3"/><rect x="385.5" y="166.2" width="9.0" height="25.8"/><rect x="400.5" y="166.8" width="9.0" height="25.2"/><rect x="415.5" y="164.5" width="9.0" height="27.5"/><rect x="430.5" y="166.9" width="9.0" height="25.1"/><rect x="445.5" y="166.3" width="9.0" height="25.7"/><rect x="460.5" y="163.0" width="9.0" height="29.0"/><rect x="475.5" y="165.6" width="9.0" height="26.4"/><rect x="490.5" y="166.1" width="9.0" height="25.9"/><rect x="505.5" y="164.1" width="9.0" height="27.9"/><rect x="520.5" y="166.3" width="9.0" height="25.7"/><rect x="535.5" y="163.7" width="9.0" height="28.3"/><rect x="550.5" y="162.9" width="9.0" height="29.1"/><rect x="565.5" y="165.8" width="9.0" height="26.2"/><rect x="580.5" y="162.3" width="9.0" height="29.7"/><rect x="595.5" y="163.4" width="9.0" height="28.6"/></g><path class="line" pathLength="1" d="M0.0,78.4 L15.0,78.4 L30.0,95.1 L45.0,95.1 L60.0,83.4 L75.0,78.4 L90.0,95.1 L105.0,95.1 L120.0,95.1 L135.0,95.3 L150.0,95.1 L165.0,101.8 L180.0,100.1 L195.0,95.5 L210.0,95.1 L225.0,111.9 L240.0,111.9 L255.0,111.9 L270.0,97.3 L285.0,101.8 L300.0,95.1 L315.0,101.8 L330.0,95.1 L345.0,95.1 L360.0,78.4 L375.0,78.4 L390.0,78.4 L405.0,95.1 L420.0,95.1 L435.0,95.1 L450.0,111.9 L465.0,128.6 L480.0,128.6 L495.0,128.6 L510.0,128.6 L525.0,128.6 L540.0,128.6 L555.0,128.6 L570.0,128.6 L585.0,128.6 L600.0,128.6"/></svg>
+            <div class="hp-chart-axis"><span>2 Oct 2026</span><span>11 Nov 2026</span></div>
+            <p class="hp-chart-key">Line: typical asking price. Band: normal range (the middle half of asking prices). Bars: listings seen.</p>
+            <div class="hp-chart-tiles"><div><b>&euro;40</b><span>Typical now</span></div><div><b>&euro;39&ndash;&euro;55</b><span>Normal range</span></div><div><b>942</b><span>Listings (7 days)</span></div><div><b>463</b><span>Sellers</span></div></div>
+            <p class="hp-chart-say">Sellers now ask 20% less than 8 to 21 days ago. Cheaper to source than it was; harder to sell at the old price.</p>
+          </figure>
+        </div>
+        <!--/plans:home-market-->
+        <button type="button" class="hp-mb-more" id="mb-more" aria-expanded="false">SHOW THE 5-WEEK CHART</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stock" class="hp-sec">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">FOR RESELLERS &middot; STOCK</span>
+        <h2 class="hp-h2">Know what you hold and what you made.</h2>
+        <p class="hp-lead">A stock list inside your SNYPD dashboard: what you bought, what it cost, what it sold for.</p>
+      </div>
+      <div class="hp-rs">
+        <div class="hp-rs-card">
+          <h3>Every item, one list</h3>
+          <p>Add an item with its buy price, or import a CSV or Excel file. A find you claim in your feed lands in the list by itself.</p>
+        </div>
+        <div class="hp-rs-card">
+          <h3>Profit per item and per month</h3>
+          <p>Mark an item sold and see the profit after the fees and costs you entered, added up per month.</p>
+        </div>
+      </div>
+      <p class="hp-rs-foot">Your numbers are the ones you type in. SNYPD does not read your Vinted account.</p>
+    </div>
+  </div>
+
+  <div id="pricing" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">PRICING</span>
+        <h2 class="hp-h2">Pick how long you need it.</h2>
+      </div>
+      <div class="hp-p5" id="price-cards">
+        <div class="hp-plan pass" id="price-pass">
+          <span class="for">ONE ITEM &middot; NO SUBSCRIPTION</span>
+          <span class="name">HUNT PASS</span>
+          <span class="price sm"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once</small></span>
+          <p class="q"><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></p>
+          <a class="hp-btn block" href="/signup?plan=pass">GET HUNT PASS</a>
+        </div>
+        <div class="hp-plan" id="price-solo">
+          <span class="for">ONE SEARCH, ALWAYS ON</span>
+          <span class="name">SOLO</span>
+          <span class="price sm"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
+        </div>
+        <div class="hp-plan" id="price-kickstart">
+          <span class="for">TWO SEARCHES</span>
+          <span class="name">KICKSTART</span>
+          <span class="price sm"><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=kickstart">START KICKSTART</a>
+        </div>
+      </div>
+      <div class="hp-top2">
+        <div class="hp-plan pro" id="price-pro">
+          <span class="for">FOR RESELLERS &middot; MOST COMPLETE</span>
+          <span class="name">PRO</span>
+          <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
+          <ul>
+            <li><span class="hp-tick">&#10003;</span> <!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
+            <li><span class="hp-tick">&#10003;</span> Price rating and &ldquo;only the cheap ones&rdquo; alerts</li>
+            <li><span class="hp-tick">&#10003;</span> Check a price, What's moving, weekly report</li>
+          </ul>
+          <a class="hp-btn block" href="/signup?plan=pro">START PRO</a>
+        </div>
+        <div class="hp-plan" id="price-elite">
+          <span class="for">HEAVY RESELLING</span>
+          <span class="name">ELITE</span>
+          <span class="price sm"><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=elite">START ELITE</a>
+        </div>
+      </div>
+      <div class="hp-freeline" id="price-free">
+        <span><b>Not sure yet?</b> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line-->. No card.</span>
+        <a class="hp-btn ghost" href="/signup">START FREE</a>
+      </div>
+      <div class="hp-foot-note">
+        <a href="/plans">Compare all plans &rarr;</a>
+        <span>VAT included. Card &middot; Apple Pay &middot; Google Pay.</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="faq" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">QUESTIONS</span>
+        <h2 class="hp-h2">Before you start.</h2>
+      </div>
+      <div class="hp-faq" id="faq-list">
+        <details open><summary>Does SNYPD touch my Vinted account?</summary><p>No. It reads public listings only. It never logs in, buys or messages.</p></details>
+        <details id="faq-rating"><summary>Why does an alert have no price rating?</summary><p>The rating needs 30 finds in the same condition in one week. A busy search gets there in a day or two. A narrow one, like one exact item in one size, often has fewer. The alert still arrives, just without the rating.</p></details>
+        <details><summary>Are these the prices items sold for?</summary><p>No. They are asking prices of listings SNYPD saw. Vinted does not publish what items sell for, so SNYPD does not show sale prices or guess them.</p></details>
+        <details><summary><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></summary><p><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></p></details>
+        <details><summary>Alerts on iPhone?</summary><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></details>
+      </div>
+      <p class="hp-faq-more">Something else? Read the <a href="/faq">full FAQ</a> or ask on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
+    </div>
+  </div>
+
+  <div id="closing" class="hp-sec">
+    <div class="hp-wrap hp-close">
+      <div class="l">
+        <h2 class="hp-h2" style="max-width:20ch;">Let it watch for you.</h2>
+        <p class="hp-lead" style="font-size:14px;">Free account, no card.</p>
+      </div>
+      <div class="r">
+        <a class="hp-btn" href="/signup">START FREE</a>
+        <a class="hp-btn ghost" href="/signup?plan=pass">GET HUNT PASS</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #1D1D20;">
+    <div style="max-width:1320px;margin:0 auto;padding:24px 20px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <span style="font-size:11px;letter-spacing:.1em;color:#8B9094;">SNYPD · NOT AFFILIATED WITH VINTED</span>
+        <span style="font-size:12px;color:#8B9094;">Reads public listings only.</span>
+        <span style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;"><a href="/faq" style="font-size:12px;">FAQ</a><a href="/support" style="font-size:12px;">Support</a><a href="https://discord.gg/gjKD4auXhK" style="font-size:12px;">Discord</a></span>
+        <span style="display:flex;gap:8px 16px;flex-wrap:wrap;"><!--plans:home-foot-links--><a href="/vinted-bot" style="font-size:12px;">Vinted bot</a><a href="/vinted-monitor" style="font-size:12px;">Vinted monitor</a><a href="/vinted-saved-search-alerts" style="font-size:12px;">Vinted notifications</a><a href="/vinted-notifications-not-working" style="font-size:12px;">Vinted notifications not working</a><a href="/vinted-saved-searches" style="font-size:12px;">Vinted saved searches</a><a href="/vinted-price-drop-notifications" style="font-size:12px;">Vinted price drop alerts</a><a href="/vinted-bot-comparison" style="font-size:12px;">Vinted bots compared</a><a href="/vinted-price-guide" style="font-size:12px;">Vinted price guide</a><a href="/vinted-price-checker" style="font-size:12px;">Vinted price checker</a><a href="/vinted-sold-items" style="font-size:12px;">Can you see sold items on Vinted?</a><a href="/vinted-market-report" style="font-size:12px;">Vinted market report</a><a href="/vinted-deals" style="font-size:12px;">Vinted deals</a><a href="/vinted-fees" style="font-size:12px;">Vinted fees</a><a href="/fr/bot-vinted" hreflang="fr" lang="fr" style="font-size:12px;">Bot Vinted (FR)</a><a href="/de/vinted-bot" hreflang="de" lang="de" style="font-size:12px;">Vinted Bot (DE)</a><a href="/nl/vinted-bot" hreflang="nl" lang="nl" style="font-size:12px;">Vinted bot (NL)</a><a href="/it/bot-vinted" hreflang="it" lang="it" style="font-size:12px;">Bot Vinted (IT)</a><a href="/es/bot-vinted" hreflang="es" lang="es" style="font-size:12px;">Bot de Vinted (ES)</a><a href="/pl/bot-vinted" hreflang="pl" lang="pl" style="font-size:12px;">Bot Vinted (PL)</a><a href="/sv/vinted-bot" hreflang="sv" lang="sv" style="font-size:12px;">Vinted bot (SV)</a><!--/plans:home-foot-links--></span>
+      </div>
+      <nav id="legal-links" aria-label="Legal" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;min-height:20px;"><a href="/privacy" style="font-size:12px;">Privacy</a><a href="/terms" style="font-size:12px;">Terms</a><a href="mailto:heysnypd@gmail.com" style="font-size:12px;">Contact</a><a href="/cookies" style="font-size:12px;">Cookies</a><a href="/cookies" data-cookie-settings style="font-size:12px;">Cookie settings</a></nav>
+    </div>
+  </div>
+
+  <div class="dc-mob" style="height:76px;"></div>
+    <div id="sticky-bar" class="dc-mob" hidden style="position:fixed;left:0;right:0;bottom:0;z-index:40;background:#0A0A0B;border-top:1px solid #26262A;padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;box-shadow:0 -8px 28px rgba(0,0,0,.6);">
+      <span style="flex:1;min-width:0;font-size:12px;letter-spacing:.04em;color:#8B9094;line-height:1.4;">Free plan, no card.</span>
+      <a href="/signup" style="font-size:12px;letter-spacing:.09em;color:#FFFFFF;background:#A200FF;padding:15px 22px;">START FREE</a>
+    </div>
+</div>
+<script>
+/* Homepage v6 (10 Nov 2026, outreach/54). Plain script, no framework: the hero photo wall, the menu and the
+   sticky bar, the "what are you hunting?" box, sign-up click events and the live listings figure.
+   v7 (outreach/55): price-check demo, chart. v8 (outreach/57): scroll depth and demo / plan click events. */
+(function () {
+  var WALL = ['so89','at41','ehdt','fm52','9f56','d046','jx9i','ohpf'].map(function (id) { return '/assets/home/wall/' + id + '.webp'; });
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var s = { menuOpen: false, pastHero: false };
+  var $ = function (id) { return document.getElementById(id); };
+  var isMobile = function () { return window.innerWidth > 0 ? window.innerWidth < 700 : false; };
+
+  /* ---------- referral code (?r=) carried onto sign-up links ---------- */
+  var ref = null;
+  try { ref = new URLSearchParams(location.search).get('r'); if (ref && !/^[a-z2-9]{4,8}$/.test(ref)) ref = null; } catch (e) {}
+  function withRef(href) {
+    if (!ref) return href;
+    try { var u = new URL(href, location.origin); u.searchParams.set('r', ref); return u.pathname + u.search; } catch (e) { return href; }
+  }
+
+  function ga(name, params) {
+    try {
+      window.dispatchEvent(new CustomEvent('snypd:track', { detail: { name: name, params: params || {} } }));
+      if (typeof window.snypdTrack === 'function') window.snypdTrack(name, params || {});
+    } catch (e) {}
+  }
+
+  /* ---------- hero photo wall (decorative; pausable, and paused off-screen) ---------- */
+  function buildWall() {
+    var wall = $('hero-wall'); if (!wall) return;
+    var speeds = [64, 82, 56, 74, 90, 60], html = '';
+    speeds.forEach(function (sp, i) {
+      var imgs = WALL.slice(i * 3 % 8).concat(WALL.slice(0, i * 3 % 8)); imgs = imgs.concat(imgs);
+      var a = reduce ? 'none' : 'wallUp ' + sp + 's linear infinite' + (i % 2 ? ' reverse' : '');
+      html += '<div style="min-width:0;overflow:hidden;"><div style="display:flex;flex-direction:column;gap:10px;animation:' + a + ';">';
+      imgs.forEach(function (src) {
+        html += '<img src="' + src + '" alt="" width="260" height="260" decoding="async" style="width:100%;height:auto;aspect-ratio:1;object-fit:cover;display:block;background:#121214;">';
+      });
+      html += '</div></div>';
+    });
+    wall.innerHTML = html;
+    if (reduce) return;
+    var hero = $('hero'), btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'hero-motion';
+    btn.className = 'dc-desk';
+    btn.textContent = 'PAUSE MOTION';
+    btn.style.cssText = 'position:absolute;right:12px;bottom:12px;z-index:2;min-height:44px;padding:0 14px;font-family:inherit;font-size:11px;letter-spacing:.1em;color:#8B9094;background:rgba(10,10,11,.88);border:1px solid #26262A;cursor:pointer;';
+    btn.addEventListener('click', function () {
+      var paused = !hero.classList.contains('motion-paused');
+      hero.classList.toggle('motion-paused', paused);
+      btn.textContent = paused ? 'PLAY MOTION' : 'PAUSE MOTION';
+      ga('hero_motion', { paused: paused });
+    });
+    hero.appendChild(btn);
+    var onScreen = true;
+    var idle = function () { hero.classList.toggle('motion-off', !onScreen || document.hidden); };
+    if (typeof IntersectionObserver === 'function') {
+      new IntersectionObserver(function (es) { onScreen = es[es.length - 1].isIntersecting; idle(); }).observe(hero);
+    }
+    document.addEventListener('visibilitychange', idle);
+    idle();
+  }
+
+  /* ---------- "What are you hunting?": carries the words (and a price limit) to sign-up ----------
+     /signup?hunt=<words>&max=<price> is the address the price guide's "Alert me" buttons already use:
+     the sign-up page keeps it for a day and the first-hunt wizard opens with it filled in. The button is
+     a real link, so the campaign and entry-page tags that consent.js adds to links apply to it too. */
+  function setupQuickStart() {
+    var form = $('qs'), words = $('qs-words'), max = $('qs-max'), go = $('qs-go');
+    if (!form || !words || !go) return;
+    // On a phone the box is one row (field + button) and its label is for screen readers only: the field says it.
+    if (isMobile()) words.setAttribute('placeholder', 'e.g. nike dunk');
+    function target() {
+      var w = words.value.trim().replace(/\s+/g, ' ').slice(0, 80);
+      var m = max ? Math.round(Number(max.value)) : 0;
+      var u = new URL('/signup', location.origin);
+      if (w) {
+        u.searchParams.set('hunt', w);
+        if (m > 0 && m < 100000) u.searchParams.set('max', String(m));
+      }
+      return withRef(u.pathname + u.search);
+    }
+    function sync() { go.setAttribute('href', target()); }
+    words.addEventListener('input', sync);
+    if (max) max.addEventListener('input', sync);
+    // The address is kept current on every keystroke; consent.js then adds its tags when the link is used.
+    go.addEventListener('click', function () {
+      ga('home_hero_submit', { words: words.value.trim() ? 1 : 0, max: max && Number(max.value) > 0 ? 1 : 0 });
+    });
+    // Enter in either field does what the button does (a form with two fields and a link has no submit of its own).
+    var enter = function (e) { if (e.key === 'Enter') { e.preventDefault(); sync(); go.click(); } };
+    words.addEventListener('keydown', enter);
+    if (max) max.addEventListener('keydown', enter);
+    form.addEventListener('submit', function (e) { e.preventDefault(); sync(); go.click(); });
+    sync();
+  }
+
+  /* ---------- v7: "Check a price" demo ----------
+     Reads /assets/data/price-index.json (public, written by ops/seo/gen_price_guide.py: only the items the price
+     guide publishes). The first item is already in the HTML (region home-demo), so the numbers show without this
+     script. Nothing typed or picked leaves the browser; one event per item picked (item id only). */
+  function money(cents) {
+    var v = cents % 100 === 0 ? String(Math.floor(cents / 100)) : (cents / 100).toFixed(2);
+    var p = v.split('.');
+    return '€' + p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (p[1] ? '.' + p[1] : '');
+  }
+  var MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function windowText(w) {
+    try {
+      var a = w.from.split('-'), b = w.to.split('-');
+      return Number(a[2]) + ' ' + MON[Number(a[1]) - 1] + ' to ' + Number(b[2]) + ' ' + MON[Number(b[1]) - 1] + ' ' + b[0];
+    } catch (e) { return ''; }
+  }
+  // Numbers run to their new value once (0.4 s); with reduced motion they are simply set.
+  function setMoney(el, cents) {
+    if (!el) return;
+    var from = Number(el.getAttribute('data-c'));
+    el.setAttribute('data-c', String(cents));
+    if (reduce || !isFinite(from) || !el.hasAttribute('data-ready') || typeof requestAnimationFrame !== 'function') {
+      el.setAttribute('data-ready', '1'); el.textContent = money(cents); return;
+    }
+    var t0 = null, dur = 400;
+    (function step(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / dur), now = Math.round((from + (cents - from) * (1 - Math.pow(1 - k, 3))) / 100) * 100;
+      if (Number(el.getAttribute('data-c')) !== cents) return;   // a newer value took over
+      el.textContent = money(k < 1 ? now : cents);
+      if (k < 1) requestAnimationFrame(step);
+    })(typeof performance !== 'undefined' ? performance.now() : 0);
+  }
+  function setupPriceDemo() {
+    var box = $('pc'), res = $('pc-res'), sel = $('pc-item'), chips = $('pc-chips'), margin = $('pc-margin');
+    if (!box || !res || !sel || !margin || !window.fetch) return;
+    var items = [], cur = null, win = '', picked = {};
+    // The alert's price limit is the lower of the quick-sale price and "pay at most", in whole euros, so the alert
+    // never asks for more than the margin allows. Both follow the margin field.
+    function pay() {
+      if (!cur) return;
+      var m = Math.max(0, Math.min(90, Math.round(Number(margin.value)) || 0));
+      var most = Math.round(cur.typical * (100 - m) / 100);
+      setMoney($('pc-pay'), most);
+      var cap = Math.max(1, Math.floor(Math.min(cur.p25, most) / 100));
+      $('pc-alert-p').textContent = money(cap * 100);
+      var u = new URL('/signup', location.origin);
+      u.searchParams.set('hunt', cur.q); u.searchParams.set('max', String(cap));
+      $('pc-alert').setAttribute('href', withRef(u.pathname + u.search));
+    }
+    function show(it, byUser) {
+      cur = it;
+      $('pc-name').textContent = it.name.en;
+      $('pc-meta').textContent = String(it.n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' listings · vinted.be' + (win ? ' · ' + win : '');
+      setMoney($('pc-lo'), it.p25); setMoney($('pc-mid'), it.typical); setMoney($('pc-hi'), it.p75);
+      pay();
+      $('pc-more').setAttribute('href', it.url.en);
+      res.setAttribute('data-id', it.id);
+      if (sel.value !== it.id) sel.value = it.id;
+      Array.prototype.forEach.call(chips.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-id') === it.id ? 'true' : 'false'); });
+      if (byUser && !picked[it.id]) { picked[it.id] = 1; ga('home_demo_item', { item: it.id }); }
+    }
+    // the item already in the HTML: read its numbers so the first change can run from them
+    ['pc-lo', 'pc-mid', 'pc-hi', 'pc-pay'].forEach(function (id) { var e = $(id); if (e) e.setAttribute('data-ready', '1'); });
+    margin.addEventListener('input', function () { pay(); });
+    var alertBtn = $('pc-alert');
+    if (alertBtn) alertBtn.addEventListener('click', function () { ga('home_demo_alert', { item: res.getAttribute('data-id') || '' }); });
+    fetch('/assets/data/price-index.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !d.items || !d.items.length) return;
+      items = d.items.slice().sort(function (a, b) { return a.name.en < b.name.en ? -1 : 1; });
+      win = windowText(d.window || {});
+      var groups = {}, order = [], LABEL = { sneakers: 'Sneakers', clothing: 'Clothing', accessories: 'Bags, watches, jewellery' };
+      items.forEach(function (it) { if (!groups[it.cat]) { groups[it.cat] = []; order.push(it.cat); } groups[it.cat].push(it); });
+      sel.textContent = '';
+      order.forEach(function (cat) {
+        var g = document.createElement('optgroup'); g.label = LABEL[cat] || cat;
+        groups[cat].forEach(function (it) { var o = document.createElement('option'); o.value = it.id; o.textContent = it.name.en; g.appendChild(o); });
+        sel.appendChild(g);
+      });
+      sel.disabled = false;
+      var byId = {}; items.forEach(function (it) { byId[it.id] = it; });
+      ['nike-dunk-low', 'adidas-samba', 'carhartt-detroit-jacket', 'ralph-lauren-quarter-zip', 'the-north-face-nuptse'].forEach(function (id) {
+        if (!byId[id]) return;
+        var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-id', id); b.textContent = byId[id].name.en;
+        b.addEventListener('click', function () { show(byId[id], true); });
+        chips.appendChild(b);
+      });
+      chips.hidden = !chips.children.length;
+      sel.addEventListener('change', function () { if (byId[sel.value]) show(byId[sel.value], true); });
+      var first = byId[res.getAttribute('data-id')] || items[0];
+      ['pc-lo', 'pc-mid', 'pc-hi', 'pc-pay'].forEach(function (id) { var e = $(id); if (e) e.removeAttribute('data-ready'); });
+      show(first, false);
+      $('pc-count').textContent = 'This demo covers ' + items.length + ' items of the free price guide.';
+    }, function () {});
+  }
+
+  /* ---------- v7: the chart line draws once when it scrolls into view ---------- */
+  function setupChart() {
+    // v9: on phones the board shows and the chart waits for a tap (CSS hides it until #mb has .open)
+    var mb = $('mb'), more = $('mb-more');
+    if (mb && more) more.addEventListener('click', function () {
+      mb.classList.add('open'); more.setAttribute('aria-expanded', 'true');
+      ga('home_chart_open', {});
+    });
+    var fig = document.querySelector('.hp-chart');
+    if (!fig || reduce || typeof IntersectionObserver !== 'function') return;
+    fig.classList.add('wait');
+    var io = new IntersectionObserver(function (es) {
+      if (!es[es.length - 1].isIntersecting) return;
+      io.disconnect();
+      fig.classList.add('draw'); fig.classList.remove('wait');
+    }, { threshold: 0.35 });
+    io.observe(fig);
+  }
+
+  /* ---------- v8: how far down the page people get (25 / 50 / 75 / 100 %, each once per visit) ----------
+     Goes through the same ga() as every other event: nothing is sent unless analytics was accepted. */
+  function setupScrollDepth() {
+    var marks = [25, 50, 75, 100], sent = {};
+    function check() {
+      var doc = document.documentElement, total = doc.scrollHeight - window.innerHeight;
+      if (total <= 0) return;
+      var pct = Math.min(100, Math.round((window.scrollY + 1) / total * 100));
+      marks.forEach(function (m) { if (pct >= m && !sent[m]) { sent[m] = 1; ga('home_scroll', { percent: m }); } });
+    }
+    window.addEventListener('scroll', check, { passive: true });
+  }
+
+  /* ---------- nav: mobile menu, scroll state, sticky bar ---------- */
+  var menuBtn, menu, nav, inner, bar, lastMob = null, navOn = false;
+  function setMenu(open) {
+    s.menuOpen = open;
+    menu.hidden = !(isMobile() && open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.textContent = open ? 'CLOSE' : 'MENU';
+  }
+  function onResize() {
+    var m = isMobile();
+    if (lastMob !== null && m !== lastMob) setMenu(false);
+    lastMob = m;
+    bar.hidden = !(m && s.pastHero);
+  }
+  function onScroll() {
+    var hero = $('hero');
+    var ok = hero && hero.offsetHeight > 100;
+    // The bar's job is to bring the sign-up button back once the hero's own button has scrolled away.
+    var card = hero && hero.querySelector('.hp-hero-card');
+    var edge = card ? card.getBoundingClientRect().bottom + window.scrollY : (hero ? hero.offsetTop + hero.offsetHeight : 0);
+    var c = !!(ok && window.scrollY > 0 && window.scrollY > edge - 60);
+    if (c !== s.pastHero) { s.pastHero = c; bar.hidden = !(isMobile() && c); }
+    if (c === navOn) return; navOn = c;
+    nav.style.background = c ? '#0A0A0B' : 'rgba(10,10,11,.82)';
+    nav.style.boxShadow = c ? '0 6px 24px rgba(0,0,0,.55)' : 'none';
+    inner.style.paddingTop = inner.style.paddingBottom = c ? '4px' : '8px';
+  }
+
+  /* ---------- boot ---------- */
+  buildWall();
+  setupQuickStart();
+  setupPriceDemo();
+  setupChart();
+  setupScrollDepth();
+  menuBtn = $('menu-btn'); menu = $('mobile-menu'); nav = $('site-nav'); inner = $('site-nav-inner'); bar = $('sticky-bar');
+  if (reduce) { nav.style.transition = 'none'; inner.style.transition = 'none'; }
+  menuBtn.addEventListener('click', function () { setMenu(!s.menuOpen); });
+  menu.addEventListener('click', function (e) { if (e.target.closest('[data-close-menu]')) setMenu(false); });
+
+  if (ref) document.querySelectorAll('a[href^="/signup"]').forEach(function (a) { a.setAttribute('href', withRef(a.getAttribute('href'))); });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="/signup"]');
+    if (!a) return;
+    var u = new URL(a.getAttribute('href'), location.origin), sec = a.closest('[id]');
+    var plan = u.searchParams.get('plan') || 'free';
+    ga('signup_click', { plan: plan, section: sec ? sec.id : 'page' });
+    if (a.closest('#pricing')) ga('home_plan_click', { plan: plan });
+  });
+
+  window.addEventListener('resize', onResize);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  ['load', 'pageshow', 'visibilitychange', 'focus'].forEach(function (ev) { window.addEventListener(ev, function () { onResize(); onScroll(); }); });
+  if (typeof ResizeObserver === 'function') new ResizeObserver(function () { onResize(); onScroll(); }).observe(document.documentElement);
+  onResize(); onScroll();
+
+  /* ---------- listings counter ----------
+     public_stats is one cached row per figure, refreshed every 15 min by
+     pg_cron (backend repo, migrations 033 + 038: a running total of matches) - too
+     much for every page view. Any failure keeps the static figure in the
+     markup, which was true on the date it states. */
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+  function groupThousands(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  try {
+    SNYPD.rest('public_stats?select=value,as_of&key=eq.listings_matched', { headers: { 'Accept-Profile': 'public' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (rows) {
+        var row = rows && rows[0], when = row && new Date(row.as_of);
+        if (!row || typeof row.value !== 'number' || row.value <= 0 || !when || isNaN(when.getTime())) return;
+        $('stat-listings').textContent = groupThousands(row.value);
+        $('stat-listings-asof').textContent = 'As of ' + when.getUTCDate() + ' ' + MONTHS[when.getUTCMonth()] + ' ' + when.getUTCFullYear();
+      }, function () {});
+  } catch (e) {}
+})();
+</script>
+
+<!-- SNYPD click attribution -->
+<script>
+(function () {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var code = params.get('r');
+    if (!code || !/^[a-z2-9]{4,8}$/.test(code)) return;
+
+    // Remember it. If they sign up later in this browser we can still tell
+    // which outreach message brought them here. Storing it on the device is
+    // marketing, so it waits for that consent (/assets/consent.js); the code
+    // stays in this closure, so saying yes later on this page still keeps it.
+    if (window.SNYPDConsent) {
+      SNYPDConsent.whenGranted('marketing', function () {
+        try { localStorage.setItem('snypd_ref', code); } catch (e) {}
+      });
+    }
+
+    // 1. Only count a visit once a human has actually looked at the page.
+    //    Meta fetches every link sent in a DM to build the preview card, and
+    //    that fetch runs this script. It is why 178 of 178 recorded clicks
+    //    landed a median of 4.4s after the message was sent, every one with a
+    //    facebook.com referrer, and not one ever arrived later. Counting them
+    //    made a campaign with zero real visitors read as 99.3% click-through.
+    var counted = false;
+    function countVisit() {
+      if (counted || document.visibilityState !== 'visible') return;
+      counted = true;
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'dm_click', { ref_code: code, source: 'instagram_dm' });
+      }
+      // Fire and forget: a failure here must never affect the page.
+      if (window.SNYPD && window.SNYPD.rest) {
+        window.SNYPD.rest('ref_clicks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Content-Profile': 'public', Prefer: 'return=minimal' },
+          body: JSON.stringify({ code: code, referrer: document.referrer || null })
+        }).then(function () {}, function () {});
+      }
+    }
+
+    // 2. A prerender or a crawler is never 'visible'; a real reader is. Dwell
+    //    catches someone who reads without touching anything, interaction is
+    //    the fast path for someone who does.
+    function armDwell() { setTimeout(countVisit, 4000); }
+    if (document.visibilityState === 'visible') {
+      armDwell();
+    } else {
+      document.addEventListener('visibilitychange', function onVis() {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', onVis);
+        armDwell();
+      });
+    }
+    ['pointerdown', 'touchstart', 'keydown', 'scroll'].forEach(function (ev) {
+      window.addEventListener(ev, countVisit, { once: true, passive: true });
+    });
+
+    // 3. Tidy the address bar. The visitor arrived on a link with a tracking
+    //    code on the end; there is no reason for them to keep looking at it.
+    if (window.history && window.history.replaceState) {
+      params.delete('r');
+      var q = params.toString();
+      window.history.replaceState({}, '',
+        window.location.pathname + (q ? '?' + q : '') + window.location.hash);
+    }
+  } catch (e) { /* attribution must never break the page */ }
+})();
+</script>
+</body>
+</html>
