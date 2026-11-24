@@ -404,6 +404,12 @@
   .hp-gets span { font-size: 13px; line-height: 1.55; color: #A6ADB1; }
   @media (max-width: 959.98px) { .hp-gets { grid-template-columns: minmax(0, 1fr); } }
 
+  /* Homepage v11: "Continue with Google" under the search box */
+  .hp-gbtn { gap: 12px; width: 100%; box-sizing: border-box; }
+  .hp-gbtn[hidden] { display: none; }
+  .hp-gbtn svg { flex: 0 0 auto; }
+  @media (max-width: 699.98px) { .hp-gbtn { min-height: 46px; font-size: 12px; } }
+
   /* Homepage v11 (23 Nov 2026): every paid plan is a card with a button */
   .hp-p5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
   .hp-plan.pass { border-color: #00E5A0; background: rgba(0, 229, 160, .05); }
@@ -684,8 +690,8 @@
     <div class="hp-hero-in">
       <div class="hp-hero-card">
         <span class="hp-eyebrow mint">YOU&rsquo;RE NOT SLOW. YOU&rsquo;RE OUTNUMBERED.</span>
-        <h1 class="hp-h1">New Vinted listings, <em>sent to your phone.</em></h1>
-        <p class="hp-sub"><span class="sub-l">SNYPD checks your Vinted searches about every 30 seconds to a minute. On busy searches, new finds come with a price rating.</span><span class="sub-s">Checks your Vinted searches about every 30 seconds to a minute. Busy searches get a price rating.</span><span class="hp-wide"> You buy on Vinted yourself.</span></p>
+        <h1 class="hp-h1">New Vinted listings, <em>sent to you.</em></h1>
+        <p class="hp-sub"><span class="sub-l">SNYPD checks your Vinted searches about every 30 seconds to a minute. Busy searches get a price rating.</span><span class="sub-s">Checks your Vinted searches about every 30 seconds to a minute. Busy searches get a price rating.</span></p>
         <div class="hp-alert big hp-phone" id="hero-alert-phone" aria-hidden="true">
           <img src="/assets/home/logo.png" alt="" width="38" height="38">
           <span>
@@ -701,13 +707,13 @@
             <input id="qs-max" name="max" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="go" placeholder="Max price" aria-label="Maximum price (optional)">
           </div>
           <a id="qs-go" class="hp-btn" href="/signup"><span class="go-l">WATCH IT FOR ME</span><span class="go-s">WATCH IT</span></a>
-          <p class="hp-qs-note">Have a Vinted link with your own filters? Paste it after sign-up.</p>
         </form>
-        <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--> After that, from &euro;3.99. Never needs your Vinted password.</p>
+        <a id="qs-google" class="hp-btn ghost hp-gbtn" href="/signup?with=google"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.150 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg><span>CONTINUE WITH GOOGLE</span></a>
+        <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free for 3 days: your first search runs 24/7 with alerts. No card.<!--/plans:home-hero-trial--> Then from &euro;3.99. No Vinted password needed.</p>
       </div>
 
       <div id="watch" class="hp-herovid">
-        <div class="hp-alerts-top"><span>SEE IT &middot; 14 SECONDS &middot; NO SOUND</span><b>SAMPLE</b></div>
+        <div class="hp-alerts-top"><span>14 SECONDS &middot; NO SOUND</span><b>SAMPLE</b></div>
         <div class="hp-vid" id="vid">
         <div class="pv-phone">
           <div class="pv-box">
@@ -718,7 +724,7 @@
         </div>
         <ul class="hp-vidpts">
           <li data-pt="0"><span class="hp-tick">&#10003;</span> A new find lands in your feed</li>
-          <li data-pt="1"><span class="hp-tick">&#10003;</span> Rated against what your search found this week</li>
+          <li data-pt="1"><span class="hp-tick">&#10003;</span> Rated against this week&rsquo;s finds</li>
           <li data-pt="2"><span class="hp-tick">&#10003;</span> You buy on Vinted yourself</li>
         </ul>
       </div>
@@ -788,7 +794,7 @@
   (function () {
     var v = document.getElementById('vid-el'), btn = document.getElementById('vid-play');
     if (!v || !btn) return;
-    var watch = document.getElementById('watch'), sub = document.getElementById('qs');
+    var watch = document.getElementById('watch'), sub = document.getElementById('qs-google') || document.getElementById('qs');
     var home = watch ? watch.parentNode : null;
     var mq = window.matchMedia ? window.matchMedia('(max-width: 699.98px)') : null;
     function place() {
@@ -1122,17 +1128,24 @@
     if (!form || !words || !go) return;
     // On a phone the box is one row (field + button) and its label is for screen readers only: the field says it.
     if (isMobile()) words.setAttribute('placeholder', 'e.g. nike dunk');
-    function target() {
+    var gbtn = $('qs-google');
+    function target(g) {
       var w = words.value.trim().replace(/\s+/g, ' ').slice(0, 80);
       var m = max ? Math.round(Number(max.value)) : 0;
       var u = new URL('/signup', location.origin);
+      if (g) u.searchParams.set('with', 'google');
       if (w) {
         u.searchParams.set('hunt', w);
         if (m > 0 && m < 100000) u.searchParams.set('max', String(m));
       }
       return withRef(u.pathname + u.search);
     }
-    function sync() { go.setAttribute('href', target()); }
+    function sync() { go.setAttribute('href', target()); if (gbtn) gbtn.setAttribute('href', target(true)); }
+    if (gbtn) {
+      // Google refuses sign-in inside in-app browsers (Instagram, TikTok ...): there only the main button shows.
+      if (/Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Snapchat/i.test(navigator.userAgent || '')) gbtn.hidden = true;
+      gbtn.addEventListener('click', function () { sync(); ga('home_hero_google', { words: words.value.trim() ? 1 : 0 }); });
+    }
     words.addEventListener('input', sync);
     if (max) max.addEventListener('input', sync);
     // The address is kept current on every keystroke; consent.js then adds its tags when the link is used.

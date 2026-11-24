@@ -120,7 +120,8 @@ const PHONE_MAX_FR = 190;   // French runs one line longer
   for (const w of [820, 1440]) {
     const { page, ctx } = await open('/', { width: w, height: 900 });
     const b = await bar(page);
-    ok(b.long && !b.short, w + ': the full sentence is shown');
+    ok(b.short && !b.long, w + ': the short sentence is shown on wide screens too (24 Nov 2026)');
+    eq(b.shortText, SHORT, w + ': short sentence text');
     ok(sameLook(b.reject, b.accept), w + ': Reject and Accept equal');
     ok(b.reject.h >= 46, w + ': button height unchanged');
     await ctx.close();

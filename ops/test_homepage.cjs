@@ -143,7 +143,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(q[2].t.includes('takes just one click, which makes the whole experience really smooth and efficient') && /free trial/.test(q[2].c), 'v11: quote 3 word for word, labelled as a trial user');
     const vt = await page.$eval('#voices', e => e.textContent);
     ok(!/hyponso|\bW\b|best one|fastest|#1/i.test(vt), 'v11: no customer names and no comparison claims in the quotes');
-    ok((await page.$eval('#hero-trial', e => e.textContent)).includes('After that, from €3.99.'), 'v11: the lowest price follows the trial line');
+    ok((await page.$eval('#hero-trial', e => e.textContent)).includes('Then from €3.99.'), 'v11: the lowest price follows the trial line');
     const faq = await page.$$eval('#faq-list details', d => d.map(x => x.querySelector('summary').textContent.trim() + ' :: ' + x.querySelector('p').textContent.trim()));
     ok(faq.some(f => /^What happens when the free days end\?/.test(f) && /Nothing is charged/.test(f)), 'v11: FAQ says what happens after the free days');
     ok(faq.some(f => /^How do I cancel\?/.test(f) && /Cancel any time; access runs to the end of the paid month/.test(f)), 'v11: FAQ says how cancelling works');
@@ -205,7 +205,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok((await page.$$('#stat-listings')).length === 1 && (await page.$$('#stat-listings-asof')).length === 1, 'one listings figure and one date for prepublish.py');
     const text = await page.evaluate(() => document.body.innerText);
     ok(!/spots left|SEE HOW IT WORKS/i.test(text), 'the founding line and the v5 hero button are gone');
-    ok(/New Vinted listings, sent to your phone\./.test(await page.$eval('.hp-h1', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the headline says what it does');
+    ok(/New Vinted listings, sent to you\./.test(await page.$eval('.hp-h1', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the headline says what it does');
     ok(/YOU.RE NOT SLOW\. YOU.RE OUTNUMBERED\./.test(await page.$eval('#hero .hp-eyebrow', e => e.innerText.replace(/\s+/g, ' '))), 'v11: the emotional line sits above the headline');
     ok(/SAMPLE/.test(text), 'the example alerts are labelled as samples');
     const main = await page.$eval('#hero-alert-phone', e => e.textContent.replace(/\s+/g, ' '));
@@ -230,7 +230,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(!/Pro and Elite only/i.test(all), 'nothing still says Check a price is Pro and Elite only');
     // v8: the rating is promised for busy searches only
     ok(!/every (new )?(find|alert)\b/i.test(all), 'the page never promises a rating on "every find" or "every alert"');
-    ok(/On busy searches, new finds come with a price rating/.test(await page.$eval('.hp-sub', e => e.textContent)), 'the hero line limits the rating to busy searches');
+    ok(/Busy searches get a price rating\./.test(await page.$eval('.hp-sub .sub-l', e => e.textContent)) && /Busy searches get a price rating\./.test(await page.$eval('.hp-sub .sub-s', e => e.textContent)), 'the hero line limits the rating to busy searches');
     // v9: the rating rule is stated once, in the FAQ (it was repeated three times in v8)
     eq((all.match(/30 finds in the same condition/g) || []).length, 1, 'v9: the 30-finds rule appears exactly once (FAQ)');
     const fq = await page.$eval('#faq-rating', e => e.textContent);
@@ -383,7 +383,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   {
     const d = await open('', { width: 1440, height: 900 });
     eq(await d.page.evaluate(() => ['#hero-alert-phone', '#vid-el', '#qs-max'].map(s => getComputedStyle(document.querySelector(s)).display !== 'none')), [false, true, true], 'desktop: claim left, proof right, as before');
-    eq(await d.page.evaluate(() => [document.getElementById('nav-start').innerText.trim(), document.getElementById('qs-go').innerText.trim(), document.querySelector('.hp-sub').innerText.includes('You buy on Vinted yourself.')]), ['START FREE', 'WATCH IT FOR ME', true], 'desktop: full labels and the full line');
+    eq(await d.page.evaluate(() => [document.getElementById('nav-start').innerText.trim(), document.getElementById('qs-go').innerText.trim(), document.querySelector('.hp-sub').innerText.includes('Busy searches get a price rating.')]), ['START FREE', 'WATCH IT FOR ME', true], 'desktop: full labels and the full line');
     await d.ctx.close();
   }
 

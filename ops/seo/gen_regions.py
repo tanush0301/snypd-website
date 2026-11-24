@@ -361,7 +361,7 @@ TEMPLATES = {
     'home-pass-line': '@@searches:pass@@ search &middot; 24/7 for @@pass_days@@ days &middot; paid once, no subscription',
     'home-kickstart-line': '@@searches:kickstart@@ searches &middot; runs 24/7, even with your dashboard closed',
     'home-elite-line': 'Everything in Pro + @@searches:elite@@ searches',
-    'home-hero-trial': 'Free: your first search runs 24/7 with alerts for @@trial_days@@ days (@@trial_hours@@ h). No card.',
+    'home-hero-trial': 'Free for @@trial_days@@ days: your first search runs 24/7 with alerts. No card.',
     # Trial price checks (11 Nov 2026): the number comes from plans.json market_report.trial_checks.
     'home-trial-checks': 'Your trial includes @@trial_checks@@ price checks for any item you type.',
     'home-trial-checks-tag': 'PRO &middot; ELITE &middot; @@trial_checks@@ IN THE TRIAL',

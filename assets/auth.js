@@ -859,6 +859,14 @@
       openDashboard(sess.user.email || '');
       return;
     }
+    /* Homepage "Continue with Google" (/signup?with=google): start Google at once for a signed-out visitor.
+       Once per browser tab, so the Back button from Google shows the form instead of looping. Never inside
+       an in-app browser: Google refuses sign-in there and the form explains it. */
+    if (PAGE === 'signup' && qs.get('with') === 'google' && !IN_APP) {
+      var gAuto = false;
+      try { gAuto = sessionStorage.getItem('snypd_g_auto') === '1'; sessionStorage.setItem('snypd_g_auto', '1'); } catch (e) { gAuto = true; }
+      if (!gAuto) { google(); return; }
+    }
     if (PAGE === 'login' && qs.get('reason') === 'expired') {
       S.email = lsGet(LAST_EMAIL_KEY) || '';
       S.status = 'expired'; render();
