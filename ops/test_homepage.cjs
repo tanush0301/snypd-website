@@ -334,9 +334,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       tiles: [...b.querySelectorAll('.hp-chart-tiles b')].map(e => e.textContent), top: b.querySelector('.hp-mb-top').innerText, line: (b.querySelector('svg .line').getAttribute('d') || '').split('L').length,
       wait: b.querySelector('.hp-chart').classList.contains('wait') }; });
     eq(m.date, sample.board.date, 'the board sample carries its date');
-    ok(m.top.includes('11 Nov 2026') || m.top.includes(String(Number(sample.board.date.slice(8)))), 'the date is printed on the page: ' + m.top);
+    const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+    const printed = Number(sample.board.date.slice(8)) + ' ' + MON[Number(sample.board.date.slice(5, 7)) - 1] + ' ' + sample.board.date.slice(0, 4);
+    ok(m.top.includes(printed), 'the date is printed on the page (' + printed + '): ' + m.top);
     eq([m.lists[0].length, m.lists[1].length], [sample.board.rising.length, sample.board.falling.length], 'rising and falling rows as in the data file');
-    ok(m.lists[1][0].startsWith(sample.board.falling[0].name) && /−20%/.test(m.lists[1][0]), 'falling rows use a real minus sign: ' + m.lists[1][0]);
+    ok(m.lists[1][0].startsWith(sample.board.falling[0].name) && m.lists[1][0].includes('−' + Math.abs(sample.board.falling[0].change_pct) + '%'), 'falling rows use a real minus sign: ' + m.lists[1][0]);
     eq(m.tiles[0], '€' + (last[1] / 100), 'chart tile "typical now" equals the last day of the series');
     eq(m.line, sample.chart.series.length, 'the line has one point per day of the series');
     ok(m.wait, 'before it is on screen the line waits');

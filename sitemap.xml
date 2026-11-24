@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.snypd.store/</loc>
-    <lastmod>2026-11-22</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/plans</loc>
@@ -17,7 +17,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/signup</loc>
-    <lastmod>2026-11-22</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://www.snypd.store/support</loc>
@@ -38,7 +38,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/vinted-bot</loc>
-    <lastmod>2026-11-22</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
@@ -230,7 +230,7 @@
   </url>
   <url>
     <loc>https://www.snypd.store/fr/bot-vinted</loc>
-    <lastmod>2026-11-22</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.snypd.store/vinted-bot"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://www.snypd.store/fr/bot-vinted"/>
     <xhtml:link rel="alternate" hreflang="de" href="https://www.snypd.store/de/vinted-bot"/>
