@@ -151,6 +151,29 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ctx.close();
   }
 
+  // ---- v11: each step shows a sample of the product; the Stock section shows a sample list -----------------------
+  {
+    const { page, ctx } = await open('');
+    eq(await page.$$eval('#how .hp-how > li', l => l.length), 3, 'v11: three steps');
+    eq(await page.$$eval('#how .hp-how > li .hw-vis', l => l.length), 3, 'v11: every step has a product sample');
+    eq(await page.$$eval('#how .hw-vis .hw-tag', l => l.map(e => e.textContent.trim())), ['SAMPLE', 'SAMPLE', 'SAMPLE'], 'v11: every step sample is marked SAMPLE');
+    const hw = await page.$eval('#how', e => e.textContent.replace(/\s+/g, ' '));
+    ok(/Polo Ralph Lauren cable knit . €12/.test(hw) && /Cheaper than 82% of this week’s finds/.test(hw), 'v11: the step-3 alert is the item shown in the video');
+    ok(/A few words and a max price, or a Vinted search link\./.test(hw) && /About every 30 seconds to a minute, around the clock\./.test(hw) && /SNYPD never buys or messages for you\./.test(hw), 'v11: the three step texts are unchanged');
+    ok(!/instant|real-time|fastest/i.test(hw), 'v11: no speed claims in the steps');
+    await page.$eval('#how', e => e.scrollIntoView()); await wait(700);
+    ok(await page.$eval('#how .hw-alert img', i => i.complete && i.naturalWidth > 0), 'v11: the sample alert photo loads');
+    eq(await page.$eval('#how .hw-cta', a => a.getAttribute('href')), '/signup', 'v11: the button under the steps goes to sign-up');
+    const st = await page.$eval('#stock-sample', e => e.textContent.replace(/\s+/g, ' '));
+    ok(/SAMPLE/.test(st) && /\+€19/.test(st) && /\+€21/.test(st) && /Profit this month \+€40/.test(st), 'v11: the sample stock list is marked SAMPLE and its profits add up (19 + 21 = 40)');
+    ok(34 - 12 - 3 === 19 && 65 - 40 - 4 === 21 && /€12\s*€34\s*€3\s*\+€19/.test(st) && /€40\s*€65\s*€4\s*\+€21/.test(st), 'v11: each sample row is sold minus bought minus costs');
+    await ctx.close();
+    const ph = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
+    ok(await ph.page.$eval('#how .hw-cta', a => getComputedStyle(a).display === 'none'), 'v11: on phones the button under the steps is hidden (the sticky bar has it)');
+    ok(await ph.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'v11: no sideways scroll on a phone with the samples');
+    await ph.ctx.close();
+  }
+
   // ---- plan links, counters, no leftovers from v5 --------------------------------------------------------------
   {
     const { page, ctx } = await open('');
