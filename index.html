@@ -342,6 +342,22 @@
     @keyframes pvfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
   }
 
+  /* Homepage v11: proof (numbers, customer quotes) and the video inside the first card on phones */
+  .hp-proof1 .asof { color: #6B7074; }
+  .hp-voices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .hp-voices figure { margin: 0; border: 1px solid #1D1D20; background: #0C0C0D; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; justify-content: space-between; }
+  .hp-voices blockquote { margin: 0; font-size: 15px; line-height: 1.5; color: #FFFFFF; }
+  .hp-voices figcaption { font-size: 12px; line-height: 1.45; color: #8B9094; }
+  @media (max-width: 959.98px) { .hp-voices { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 699.98px) {
+    #hero-alert-phone { display: none; }
+    .hp-hero-card #watch { max-width: 264px; align-self: center; gap: 8px; }
+    .hp-hero-card #watch .hp-vidpts { display: none; }
+    .hp-hero-card #watch .hp-alerts-top { padding: 7px 10px; font-size: 10px; }
+    .hp-hero-card #watch .pv-phone { padding: 6px; border-radius: 20px; box-shadow: none; }
+    .hp-hero-card #watch .pv-box { border-radius: 15px; }
+  }
+
   /* Homepage v11 (23 Nov 2026): every paid plan is a card with a button */
   .hp-p5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
   .hp-plan.pass { border-color: #00E5A0; background: rgba(0, 229, 160, .05); }
@@ -641,7 +657,7 @@
           <a id="qs-go" class="hp-btn" href="/signup"><span class="go-l">WATCH IT FOR ME</span><span class="go-s">WATCH IT</span></a>
           <p class="hp-qs-note">Have a Vinted link with your own filters? Paste it after sign-up.</p>
         </form>
-        <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--> Never needs your Vinted password.</p>
+        <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free: your first search runs 24/7 with alerts for 3 days (72 h). No card.<!--/plans:home-hero-trial--> After that, from &euro;3.99. Never needs your Vinted password.</p>
       </div>
 
       <div id="watch" class="hp-herovid">
@@ -667,10 +683,20 @@
     <div id="proof" class="hp-proof1">
       <p class="who"><b>Built by a Belgian sneaker reseller:</b> 150+ sales, 3.8k Instagram followers. Made in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
       <ul>
+        <li><b id="stat-accounts">890+</b> accounts</li>
+        <li><b id="stat-bought">340</b> purchases logged by users with &ldquo;I bought it&rdquo; <span class="asof">(24 Nov 2026)</span></li>
         <li><b>~30 s</b> between checks (measured median)</li>
         <li><b id="stat-listings">17,520,665</b> listings matched to users' searches <span id="stat-listings-asof">As of 22 Nov 2026</span></li>
         <li><b>0</b> Vinted logins: public listings only</li>
       </ul>
+    </div>
+  </div>
+
+  <div id="voices" class="hp-wrap" style="padding-top:18px;padding-bottom:4px;">
+    <div class="hp-voices">
+      <figure><blockquote>&ldquo;The whole sniper is working great&rdquo;</blockquote><figcaption>Pro customer &middot; on Discord, 8 Nov 2026</figcaption></figure>
+      <figure><blockquote>&ldquo;Your website is genuinely impressive for a tool that&rsquo;s only been around for a month.&rdquo;</blockquote><figcaption>Reseller, used the free trial &middot; on Discord, 14 Nov 2026</figcaption></figure>
+      <figure><blockquote>&ldquo;Getting into an item&rsquo;s listing takes just one click, which makes the whole experience really smooth and efficient.&rdquo;</blockquote><figcaption>Reseller, used the free trial &middot; on Discord, 14 Nov 2026</figcaption></figure>
     </div>
   </div>
 
@@ -692,6 +718,15 @@
   (function () {
     var v = document.getElementById('vid-el'), btn = document.getElementById('vid-play');
     if (!v || !btn) return;
+    var watch = document.getElementById('watch'), sub = document.getElementById('qs');
+    var home = watch ? watch.parentNode : null;
+    var mq = window.matchMedia ? window.matchMedia('(max-width: 699.98px)') : null;
+    function place() {
+      if (!watch || !sub || !mq || !home) return;
+      if (mq.matches) sub.parentNode.insertBefore(watch, sub.nextSibling); else home.appendChild(watch);
+    }
+    place();
+    if (mq && mq.addEventListener) mq.addEventListener('change', place);
     var SRC = '/assets/home/video/snypd-home-4x5.mp4';
     var label = btn.querySelector('.hp-vid-btn');
     var pts = [].slice.call(document.querySelectorAll('[data-pt]'));
@@ -895,6 +930,9 @@
         <details id="faq-rating"><summary>Why does an alert have no price rating?</summary><p>The rating needs 30 finds in the same condition in one week. A busy search gets there in a day or two. A narrow one, like one exact item in one size, often has fewer. The alert still arrives, just without the rating.</p></details>
         <details><summary>Are these the prices items sold for?</summary><p>No. They are asking prices of listings SNYPD saw. Vinted does not publish what items sell for, so SNYPD does not show sale prices or guess them.</p></details>
         <details><summary><!--plans:home-faq-free-q-->Does it run with my laptop closed?<!--/plans:home-faq-free-q--></summary><p><!--plans:home-faq-free-a-->Paid plans, always. Free: 24/7 for the first 3 days after you save your first search, then only while your dashboard is open.<!--/plans:home-faq-free-a--></p></details>
+        <details><summary>What happens when the free days end?</summary><p>Nothing is charged: SNYPD has no card of yours. Your search then runs only while your dashboard is open, until you pick a plan.</p></details>
+        <details><summary>How do I cancel?</summary><p>Plans are billed monthly through Whop. Cancel any time; access runs to the end of the paid month. The Hunt Pass is one payment and ends by itself.</p></details>
+        <details><summary>Can I get my money back?</summary><p>Yes. A full refund on the first payment of a plan, within 14 days.</p></details>
         <details><summary>Alerts on iPhone?</summary><p>Add SNYPD to your Home Screen from Safari first. Apple requires that for web alerts.</p></details>
       </div>
       <p class="hp-faq-more">Something else? Read the <a href="/faq">full FAQ</a> or ask on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>

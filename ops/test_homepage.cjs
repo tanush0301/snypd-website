@@ -131,6 +131,26 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ctx.close();
   }
 
+  // ---- v11: proof (numbers, customer quotes), price after the trial line, FAQ on trial end, cancel, refund --------
+  {
+    const { page, ctx } = await open('');
+    eq(await page.$eval('#stat-accounts', e => e.textContent.trim()), '890+', 'v11: the account count is the measured one (896 on 24 Nov 2026), not rounded up');
+    eq(await page.$eval('#stat-bought', e => e.textContent.trim()), '340', 'v11: purchases logged with "I bought it"');
+    const q = await page.$$eval('#voices figure', f => f.map(x => ({ t: x.querySelector('blockquote').textContent.trim(), c: x.querySelector('figcaption').textContent.replace(/\s+/g, ' ').trim() })));
+    eq(q.length, 3, 'v11: three customer quotes');
+    ok(/^“The whole sniper is working great”$/.test(q[0].t) && /^Pro customer/.test(q[0].c), 'v11: quote 1 word for word, from the Pro customer');
+    ok(q[1].t.includes('genuinely impressive for a tool that’s only been around for a month') && /free trial/.test(q[1].c), 'v11: quote 2 word for word, labelled as a trial user');
+    ok(q[2].t.includes('takes just one click, which makes the whole experience really smooth and efficient') && /free trial/.test(q[2].c), 'v11: quote 3 word for word, labelled as a trial user');
+    const vt = await page.$eval('#voices', e => e.textContent);
+    ok(!/hyponso|\bW\b|best one|fastest|#1/i.test(vt), 'v11: no customer names and no comparison claims in the quotes');
+    ok((await page.$eval('#hero-trial', e => e.textContent)).includes('After that, from €3.99.'), 'v11: the lowest price follows the trial line');
+    const faq = await page.$$eval('#faq-list details', d => d.map(x => x.querySelector('summary').textContent.trim() + ' :: ' + x.querySelector('p').textContent.trim()));
+    ok(faq.some(f => /^What happens when the free days end\?/.test(f) && /Nothing is charged/.test(f)), 'v11: FAQ says what happens after the free days');
+    ok(faq.some(f => /^How do I cancel\?/.test(f) && /Cancel any time; access runs to the end of the paid month/.test(f)), 'v11: FAQ says how cancelling works');
+    ok(faq.some(f => /^Can I get my money back\?/.test(f) && /full refund on the first payment of a plan, within 14 days/.test(f)), 'v11: FAQ states the 14-day refund');
+    await ctx.close();
+  }
+
   // ---- plan links, counters, no leftovers from v5 --------------------------------------------------------------
   {
     const { page, ctx } = await open('');
@@ -301,10 +321,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     });
     ok(m.bar < m.ih && m.ih - m.bar <= 170, name + ': the cookie bar is showing and compact (' + (m.ih - m.bar) + ' px)');
     ok(m.settingsOnRow, name + ': the bar keeps Settings on the button row');
-    ok(m.h1 >= 0 && m.sub <= m.aTop, name + ': headline and its line come first, then the sample alert');
-    ok(m.aTop >= 0 && m.aBot <= m.bar, name + ': the sample alert is on the first screen above the cookie bar (' + m.aTop + '-' + m.aBot + ' of ' + m.bar + ')');
-    ok(m.goTop >= m.aBot && m.go <= m.bar, name + ': the main button is on the first screen above the cookie bar (' + m.go + ' of ' + m.bar + ')');
-    ok(/SAMPLE/.test(m.text) && /Jordan 1 Low Travis Scott . €180\s*Cheaper than 76% of this week's finds/.test(m.text), name + ': the alert is the Travis Scott sample, item and price first, then the rating: ' + m.text);
+    ok(m.h1 >= 0 && m.sub <= m.goTop, name + ': headline and its line come first, then the search box');
+    ok(m.aTop === 0 && m.aBot === 0, name + ': v11: the sample alert is not shown on phones (the video takes its place)');
+    ok(m.go <= m.bar, name + ': the main button is on the first screen above the cookie bar (' + m.go + ' of ' + m.bar + ')');
+    const vd = await page.evaluate(() => { const v = document.getElementById('vid-el').getBoundingClientRect(); return { top: Math.round(v.top), w: Math.round(v.width), inCard: !!document.querySelector('.hp-hero-card #watch #vid-el'), pts: getComputedStyle(document.querySelector('#watch .hp-vidpts')).display }; });
+    ok(vd.inCard && vd.top >= m.go && vd.w >= 200 && vd.pts === 'none', name + ': v11: the video sits in the first card, directly under the search box (' + JSON.stringify(vd) + ')');
     ok(/busy searches/i.test(m.subText) && /price rating/.test(m.subText), name + ': the line under the headline still limits the rating to busy searches: ' + m.subText);
     eq([m.main, m.max, m.ex], [false, false, false], name + ': one copy of the alert, no max-price field, no rating explanation (v9: FAQ only)');
     ok(m.goH >= 44 && m.field >= 44 && m.fieldW >= 110, name + ': the field and the button are big enough to use (' + [m.fieldW, m.field, m.goH] + ')');
