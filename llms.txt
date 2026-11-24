@@ -15,6 +15,9 @@ This optional navigation summary is not an access policy or a promise of search 
 - Coverage: 26 Vinted sites, including vinted.co.uk, vinted.fr, vinted.com, vinted.be, vinted.de and vinted.nl.
 - Price rating: on busy searches, each new find is rated against what the same search found that
   week, in the same condition. These are asking prices, not sales.
+- Chrome extension (optional): "SNYPD: watch this Vinted search" sets up an alert for the Vinted
+  search open in the browser tab, in one click. It reads only the address of that tab.
+  https://chromewebstore.google.com/detail/midjfdncgmkfcfcapcnlkbalfaggmhil
 - Alerts only: no automatic buying and no Vinted login or password.
 
 ## Public sources

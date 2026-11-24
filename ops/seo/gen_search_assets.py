@@ -54,6 +54,9 @@ def render():
             '- Coverage: 26 Vinted sites, including vinted.co.uk, vinted.fr, vinted.com, vinted.be, vinted.de and vinted.nl.\n'
             '- Price rating: on busy searches, each new find is rated against what the same search found that\n'
             '  week, in the same condition. These are asking prices, not sales.\n'
+            '- Chrome extension (optional): "SNYPD: watch this Vinted search" sets up an alert for the Vinted\n'
+            '  search open in the browser tab, in one click. It reads only the address of that tab.\n'
+            '  https://chromewebstore.google.com/detail/midjfdncgmkfcfcapcnlkbalfaggmhil\n'
             '- Alerts only: no automatic buying and no Vinted login or password.\n\n'
             '## Public sources\n\n'
             + '\n'.join('- [%s](%s%s)' % (name, content.SITE, url) for name, url in links)

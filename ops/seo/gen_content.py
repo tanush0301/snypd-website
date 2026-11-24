@@ -900,7 +900,7 @@ def page_bot(lang):
 </section>
 <section id="account">
   <h2>What SNYPD needs from you</h2>
-  <p>An email address for your SNYPD account. No Vinted password, no Vinted login and no browser extension. SNYPD reads public listings with its own systems: the same search results anyone can open on Vinted without an account.</p>
+  <p>An email address for your SNYPD account. No Vinted password and no Vinted login. A browser extension is not needed either. An optional <a href="https://chromewebstore.google.com/detail/midjfdncgmkfcfcapcnlkbalfaggmhil" rel="noopener">Chrome extension</a> sets up an alert for the Vinted search open in your tab, in one click, and reads only the address of that tab. SNYPD reads public listings with its own systems: the same search results anyone can open on Vinted without an account.</p>
   <p>Because SNYPD never signs in as you, nothing it does happens on your Vinted account. When you buy, you buy through Vinted like any other buyer.</p>
 </section>
 <section id="faq">
@@ -969,7 +969,7 @@ def page_bot(lang):
 </section>
 <section id="compte">
   <h2>Ce dont SNYPD a besoin</h2>
-  <p>Une adresse e-mail pour ton compte SNYPD. Pas de mot de passe Vinted, pas de connexion Vinted, pas d’extension de navigateur. SNYPD lit les annonces publiques avec ses propres systèmes : les mêmes résultats de recherche que n’importe qui peut ouvrir sur Vinted sans compte.</p>
+  <p>Une adresse e-mail pour ton compte SNYPD. Pas de mot de passe Vinted, pas de connexion Vinted. Aucune extension de navigateur n’est nécessaire non plus. Une <a href="https://chromewebstore.google.com/detail/midjfdncgmkfcfcapcnlkbalfaggmhil" rel="noopener">extension Chrome</a> facultative crée en un clic une alerte pour la recherche Vinted ouverte dans ton onglet, et ne lit que l’adresse de cet onglet. SNYPD lit les annonces publiques avec ses propres systèmes : les mêmes résultats de recherche que n’importe qui peut ouvrir sur Vinted sans compte.</p>
   <p>Comme SNYPD ne se connecte jamais à ta place, rien de ce qu’il fait ne se passe sur ton compte Vinted. Quand tu achètes, tu achètes sur Vinted comme n’importe quel acheteur.</p>
 </section>
 <section id="questions">
