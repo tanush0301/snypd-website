@@ -94,6 +94,25 @@ const INSTA = IPHONE + ' Instagram 300.0.0.0';
     await ctx.close();
   }
 
+  // ---- homepage -> real click on the Google button -> Google: the source of the sign-up survives (27 Nov 2026) ----
+  // Before: the click handler rewrote the address after consent.js had tagged it, so accounts were saved
+  // without their entry page and campaign tag.
+  for (const typed of [true, false]) {
+    const { page, ctx, oauth } = await open('/?utm_source=chatgpt.com');
+    await page.waitForSelector('#qs-google', { timeout: 8000 }); await wait(800);
+    if (typed) await page.type('#qs-words', 'nike dunk');
+    await page.click('#qs-google');
+    for (let i = 0; i < 60 && !oauth.length; i++) await wait(150);
+    const label = typed ? 'with a typed search' : 'without a typed search';
+    eq(oauth.length, 1, 'homepage Google button ' + label + ': one trip to Google');
+    const at = new URL(page.url());
+    eq([at.pathname, at.searchParams.get('with'), at.searchParams.get('hunt')], ['/signup', 'google', typed ? 'nike dunk' : null], label + ': the sign-up address carries the marker and the search');
+    const back = new URL(new URL(oauth[0]).searchParams.get('redirect_to'));
+    eq([back.pathname, back.searchParams.get('from'), back.searchParams.get('entry_basis'), back.searchParams.get('utm_source')],
+      ['/login', 'home', 'nav-v1', 'chatgpt.com'], label + ': Google returns with the entry page and the campaign tag (' + back.search + ')');
+    await ctx.close();
+  }
+
   // ---- sign-up page: the marker starts Google once -------------------------------------------------------
   {
     const { page, ctx, oauth } = await open('/signup?with=google&hunt=nike+tech+fleece&max=40&utm_source=test');

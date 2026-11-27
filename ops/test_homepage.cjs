@@ -157,8 +157,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   // ---- v11: proof (numbers, customer quotes), price after the trial line, FAQ on trial end, cancel, refund --------
   {
     const { page, ctx } = await open('');
-    eq(await page.$eval('#stat-accounts', e => e.textContent.trim()), '890+', 'v11: the account count is the measured one (896 on 24 Nov 2026), not rounded up');
-    eq(await page.$eval('#stat-bought', e => e.textContent.trim()), '340', 'v11: purchases logged with "I bought it"');
+    eq(await page.$eval('#stat-accounts', e => e.textContent.trim()), '940+', 'v11: the account count is the measured one (948 on 27 Nov 2026), not rounded up');
+    eq(await page.$eval('#stat-bought', e => e.textContent.trim()), '433', 'v11: purchases logged with "I bought it"');
     const q = await page.$$eval('#voices figure', f => f.map(x => ({ t: x.querySelector('blockquote').textContent.trim(), c: x.querySelector('figcaption').textContent.replace(/\s+/g, ' ').trim() })));
     eq(q.length, 3, 'v11: three customer quotes');
     ok(/^“The whole sniper is working great”$/.test(q[0].t) && /^Pro customer/.test(q[0].c), 'v11: quote 1 word for word, from the Pro customer');

@@ -735,8 +735,8 @@
     <div id="proof" class="hp-proof1">
       <p class="who"><b>Built by a Belgian sneaker reseller:</b> 150+ sales, 3.8k Instagram followers. Made in the open with resellers on <a href="https://discord.gg/gjKD4auXhK">Discord</a>.</p>
       <ul>
-        <li><b id="stat-accounts">890+</b> accounts</li>
-        <li><b id="stat-bought">340</b> purchases logged by users with &ldquo;I bought it&rdquo; <span class="asof">(24 Nov 2026)</span></li>
+        <li><b id="stat-accounts">940+</b> accounts</li>
+        <li><b id="stat-bought">433</b> purchases logged by users with &ldquo;I bought it&rdquo; <span class="asof">(27 Nov 2026)</span></li>
         <li><b>~30 s</b> between checks (measured median)</li>
         <li><b id="stat-listings">17,774,390</b> listings matched to users' searches <span id="stat-listings-asof">As of 24 Nov 2026</span></li>
         <li><b>0</b> Vinted logins: public listings only</li>
@@ -1144,7 +1144,9 @@
     if (gbtn) {
       // Google refuses sign-in inside in-app browsers (Instagram, TikTok ...): there only the main button shows.
       if (/Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Snapchat/i.test(navigator.userAgent || '')) gbtn.hidden = true;
-      gbtn.addEventListener('click', function () { sync(); ga('home_hero_google', { words: words.value.trim() ? 1 : 0 }); });
+      // No sync() here: the address is current after every keystroke, and rewriting it on the click would wipe
+      // the entry-page and campaign tags consent.js has just added (accounts were saved without their source).
+      gbtn.addEventListener('click', function () { ga('home_hero_google', { words: words.value.trim() ? 1 : 0 }); });
     }
     words.addEventListener('input', sync);
     if (max) max.addEventListener('input', sync);
