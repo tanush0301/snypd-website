@@ -159,6 +159,12 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     const { page, ctx } = await open('');
     eq(await page.$eval('#stat-accounts', e => e.textContent.trim()), '940+', 'v11: the account count is the measured one (948 on 27 Nov 2026), not rounded up');
     eq(await page.$eval('#stat-bought', e => e.textContent.trim()), '433', 'v11: purchases logged with "I bought it"');
+    // 27 Nov 2026: one proof line on the first screen, and the plans directly after the three steps
+    const hp = await page.evaluate(() => { const e = document.getElementById('hero-proof'), r = e.getBoundingClientRect(), g = document.getElementById('qs-google').getBoundingClientRect(); return { t: e.textContent.replace(/\s+/g, ' ').trim(), top: r.top, bottom: r.bottom, gBottom: g.bottom, vh: innerHeight, b: [...e.querySelectorAll('b')].map(x => x.textContent.trim()) }; });
+    ok(/^940\+ accounts . 433 purchases logged by users \(27 Nov 2026\)$/.test(hp.t), 'the first screen carries one dated proof line (' + hp.t + ')');
+    eq(hp.b, [await page.$eval('#stat-accounts', e => e.textContent.trim()), await page.$eval('#stat-bought', e => e.textContent.trim())], 'the proof line and the proof strip show the same two numbers');
+    ok(hp.top >= hp.gBottom && hp.bottom <= hp.vh, 'the proof line sits under the Google button, inside the first desktop screen');
+    eq(await page.$$eval('#how, #pricing, #try, #research, #stock, #faq, #closing', l => l.map(e => e.id)), ['how', 'pricing', 'try', 'research', 'stock', 'faq', 'closing'], 'the plans come directly after the three steps');
     const q = await page.$$eval('#voices figure', f => f.map(x => ({ t: x.querySelector('blockquote').textContent.trim(), c: x.querySelector('figcaption').textContent.replace(/\s+/g, ' ').trim() })));
     eq(q.length, 3, 'v11: three customer quotes');
     ok(/^“The whole sniper is working great”$/.test(q[0].t) && /^Pro customer/.test(q[0].c), 'v11: quote 1 word for word, from the Pro customer');
@@ -194,6 +200,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     const ph = await open('', { width: 390, height: 844, isMobile: true, hasTouch: true });
     ok(await ph.page.$eval('#how .hw-cta', a => getComputedStyle(a).display === 'none'), 'v11: on phones the button under the steps is hidden (the sticky bar has it)');
     ok(await ph.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'v11: no sideways scroll on a phone with the samples');
+    const pp = await ph.page.evaluate(() => { const r = i => document.getElementById(i).getBoundingClientRect(); return { g: r('qs-google').bottom, pt: r('hero-proof').top, pb: r('hero-proof').bottom, v: r('watch').top, vid: r('vid-el').top, vh: innerHeight, plans: r('pricing').top + scrollY, tryTop: r('try').top + scrollY, right: r('hero-proof').right, w: innerWidth }; });
+    ok(pp.pt >= pp.g && pp.pb <= pp.v && pp.right <= pp.w, 'phone: the proof line sits between the Google button and the video, inside the screen');
+    ok(pp.vid < pp.vh, 'phone: the video still starts inside the first screen (' + Math.round(pp.vid) + ' of ' + pp.vh + ' px)');
+    ok(pp.plans < pp.tryTop && pp.plans < 4200, 'phone: the plans start before the price check, within about five screens (' + Math.round(pp.plans) + ' px; was about 6,400)');
     await ph.ctx.close();
   }
 

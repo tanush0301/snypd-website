@@ -407,6 +407,10 @@
   /* Homepage v11: "Continue with Google" under the search box */
   .hp-gbtn { gap: 12px; width: 100%; box-sizing: border-box; }
   .hp-gbtn[hidden] { display: none; }
+  .hp-heroproof { margin: 0; font-size: 12.5px; line-height: 1.5; color: #8B9094; }
+  .hp-heroproof b { font-weight: 400; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+  .hp-heroproof .asof { color: #6B7074; }
+  @media (max-width: 699.98px) { .hp-heroproof { font-size: 12px; text-align: center; } }
   .hp-gbtn svg { flex: 0 0 auto; }
   @media (max-width: 699.98px) { .hp-gbtn { min-height: 46px; font-size: 12px; } }
 
@@ -709,6 +713,7 @@
           <a id="qs-go" class="hp-btn" href="/signup"><span class="go-l">WATCH IT FOR ME</span><span class="go-s">WATCH IT</span></a>
         </form>
         <a id="qs-google" class="hp-btn ghost hp-gbtn" href="/signup?with=google"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.150 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg><span>CONTINUE WITH GOOGLE</span></a>
+        <p class="hp-heroproof" id="hero-proof"><b>940+</b> accounts &middot; <b>433</b> purchases logged by users <span class="asof">(27 Nov 2026)</span></p>
         <p class="hp-checks1" id="hero-trial"><span class="hp-tick">&#10003;</span> <!--plans:home-hero-trial-->Free for 3 days: your first search runs 24/7 with alerts. No card.<!--/plans:home-hero-trial--> Then from &euro;3.99. No Vinted password needed.</p>
       </div>
 
@@ -794,7 +799,7 @@
   (function () {
     var v = document.getElementById('vid-el'), btn = document.getElementById('vid-play');
     if (!v || !btn) return;
-    var watch = document.getElementById('watch'), sub = document.getElementById('qs-google') || document.getElementById('qs');
+    var watch = document.getElementById('watch'), sub = document.getElementById('hero-proof') || document.getElementById('qs-google') || document.getElementById('qs');
     var home = watch ? watch.parentNode : null;
     var mq = window.matchMedia ? window.matchMedia('(max-width: 699.98px)') : null;
     function place() {
@@ -845,6 +850,66 @@
     }, { threshold: 0.5 }).observe(v);
   })();
   </script>
+
+  <div id="pricing" class="hp-sec alt">
+    <div class="hp-wrap">
+      <div class="hp-head">
+        <span class="hp-eyebrow">PRICING</span>
+        <h2 class="hp-h2">Pick how long you need it.</h2>
+      </div>
+      <div class="hp-p5" id="price-cards">
+        <div class="hp-plan pass" id="price-pass">
+          <span class="for">ONE ITEM &middot; NO SUBSCRIPTION</span>
+          <span class="name">HUNT PASS</span>
+          <span class="price sm"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once</small></span>
+          <p class="q"><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></p>
+          <a class="hp-btn block" href="/signup?plan=pass">GET HUNT PASS</a>
+        </div>
+        <div class="hp-plan" id="price-solo">
+          <span class="for">ONE SEARCH, ALWAYS ON</span>
+          <span class="name">SOLO</span>
+          <span class="price sm"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
+        </div>
+        <div class="hp-plan" id="price-kickstart">
+          <span class="for">TWO SEARCHES</span>
+          <span class="name">KICKSTART</span>
+          <span class="price sm"><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=kickstart">START KICKSTART</a>
+        </div>
+      </div>
+      <div class="hp-top2">
+        <div class="hp-plan pro" id="price-pro">
+          <span class="for">FOR RESELLERS &middot; MOST COMPLETE</span>
+          <span class="name">PRO</span>
+          <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
+          <ul>
+            <li><span class="hp-tick">&#10003;</span> <!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
+            <li><span class="hp-tick">&#10003;</span> Price rating and &ldquo;only the cheap ones&rdquo; alerts</li>
+            <li><span class="hp-tick">&#10003;</span> Check a price, What's moving, weekly report</li>
+          </ul>
+          <a class="hp-btn block" href="/signup?plan=pro">START PRO</a>
+        </div>
+        <div class="hp-plan" id="price-elite">
+          <span class="for">HEAVY RESELLING</span>
+          <span class="name">ELITE</span>
+          <span class="price sm"><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--> <small>/ mo</small></span>
+          <p class="q"><!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line--></p>
+          <a class="hp-btn ghost block" href="/signup?plan=elite">START ELITE</a>
+        </div>
+      </div>
+      <div class="hp-freeline" id="price-free">
+        <span><b>Not sure yet?</b> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line-->. No card.</span>
+        <a class="hp-btn ghost" href="/signup">START FREE</a>
+      </div>
+      <div class="hp-foot-note">
+        <a href="/plans">Compare all plans &rarr;</a>
+        <span>VAT included. Card &middot; Apple Pay &middot; Google Pay.</span>
+      </div>
+    </div>
+  </div>
 
   <div id="try" class="hp-sec" style="border-top:0;">
     <div class="hp-wrap">
@@ -941,66 +1006,6 @@
         </div>
       </div>
       <p class="hp-rs-foot">Your numbers are the ones you type in. SNYPD does not read your Vinted account.</p>
-    </div>
-  </div>
-
-  <div id="pricing" class="hp-sec alt">
-    <div class="hp-wrap">
-      <div class="hp-head">
-        <span class="hp-eyebrow">PRICING</span>
-        <h2 class="hp-h2">Pick how long you need it.</h2>
-      </div>
-      <div class="hp-p5" id="price-cards">
-        <div class="hp-plan pass" id="price-pass">
-          <span class="for">ONE ITEM &middot; NO SUBSCRIPTION</span>
-          <span class="name">HUNT PASS</span>
-          <span class="price sm"><!--plans:price:pass-->&euro;3.99<!--/plans:price:pass--> <small>once</small></span>
-          <p class="q"><!--plans:home-pass-line-->1 search &middot; 24/7 for 30 days &middot; paid once, no subscription<!--/plans:home-pass-line--></p>
-          <a class="hp-btn block" href="/signup?plan=pass">GET HUNT PASS</a>
-        </div>
-        <div class="hp-plan" id="price-solo">
-          <span class="for">ONE SEARCH, ALWAYS ON</span>
-          <span class="name">SOLO</span>
-          <span class="price sm"><!--plans:price:solo-->&euro;5.99<!--/plans:price:solo--> <small>/ mo</small></span>
-          <p class="q"><!--plans:home-solo-line-->1 search &middot; runs 24/7, even with your dashboard closed<!--/plans:home-solo-line--></p>
-          <a class="hp-btn ghost block" href="/signup?plan=solo">START SOLO</a>
-        </div>
-        <div class="hp-plan" id="price-kickstart">
-          <span class="for">TWO SEARCHES</span>
-          <span class="name">KICKSTART</span>
-          <span class="price sm"><!--plans:price:kickstart-->&euro;14.99<!--/plans:price:kickstart--> <small>/ mo</small></span>
-          <p class="q"><!--plans:home-kickstart-line-->2 searches &middot; runs 24/7, even with your dashboard closed<!--/plans:home-kickstart-line--></p>
-          <a class="hp-btn ghost block" href="/signup?plan=kickstart">START KICKSTART</a>
-        </div>
-      </div>
-      <div class="hp-top2">
-        <div class="hp-plan pro" id="price-pro">
-          <span class="for">FOR RESELLERS &middot; MOST COMPLETE</span>
-          <span class="name">PRO</span>
-          <span class="price"><!--plans:price:pro-->&euro;24.99<!--/plans:price:pro--> <small>/ mo &middot; VAT incl.</small></span>
-          <ul>
-            <li><span class="hp-tick">&#10003;</span> <!--plans:home-pro-searches-->5 active Vinted searches<!--/plans:home-pro-searches-->, running 24/7</li>
-            <li><span class="hp-tick">&#10003;</span> Price rating and &ldquo;only the cheap ones&rdquo; alerts</li>
-            <li><span class="hp-tick">&#10003;</span> Check a price, What's moving, weekly report</li>
-          </ul>
-          <a class="hp-btn block" href="/signup?plan=pro">START PRO</a>
-        </div>
-        <div class="hp-plan" id="price-elite">
-          <span class="for">HEAVY RESELLING</span>
-          <span class="name">ELITE</span>
-          <span class="price sm"><!--plans:price:elite-->&euro;34.99<!--/plans:price:elite--> <small>/ mo</small></span>
-          <p class="q"><!--plans:home-elite-line-->Everything in Pro + 10 searches<!--/plans:home-elite-line--></p>
-          <a class="hp-btn ghost block" href="/signup?plan=elite">START ELITE</a>
-        </div>
-      </div>
-      <div class="hp-freeline" id="price-free">
-        <span><b>Not sure yet?</b> <!--plans:home-free-line-->1 search &middot; 24/7 for 3 days, then while your dashboard is open &middot; free Discord<!--/plans:home-free-line-->. No card.</span>
-        <a class="hp-btn ghost" href="/signup">START FREE</a>
-      </div>
-      <div class="hp-foot-note">
-        <a href="/plans">Compare all plans &rarr;</a>
-        <span>VAT included. Card &middot; Apple Pay &middot; Google Pay.</span>
-      </div>
     </div>
   </div>
 
