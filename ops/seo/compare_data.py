@@ -177,8 +177,8 @@ COMPETITORS = [
         money_range('28', '60', 'gbp', L(' <small>VAT incl.</small>', ' <small>TVA incl.</small>', ' <small>inkl. MwSt.</small>', ' <small>incl. btw</small>', ' <small>IVA incl.</small>', ' <small>IVA incl.</small>')),
         L('Free Discord + delayed UK sample feed', 'Discord gratuit + flux d’exemple UK en différé', 'Kostenloser Discord + verzögerter UK-Beispielfeed',
           'Gratis Discord + vertraagde Britse voorbeeldfeed', 'Discord gratuito + feed di esempio UK in differita', 'Discord gratis + feed de muestra de Reino Unido con retraso')]},
-    # vinti.shop (+ /policies/refund-policy)
-    {'name': 'VINTI', 'url': 'https://vinti.shop', 'kind': 'autobuy', 'cells': [
+    # vintibot.com (vinti.shop 308s there since Nov 2026; + /policies/refund-policy)
+    {'name': 'VINTI', 'url': 'https://vintibot.com', 'kind': 'autobuy', 'cells': [
         ALERTS_AUTOBUY,
         L('&ldquo;Below market value&rdquo; label, no method stated', 'Étiquette « sous la valeur du marché », sans méthode', 'Label &bdquo;unter Marktwert&ldquo;, Methode nicht angegeben',
           'Label &lsquo;onder marktwaarde&rsquo;, methode niet vermeld', 'Etichetta &laquo;sotto il valore di mercato&raquo;, metodo non indicato', 'Etiqueta &laquo;por debajo del valor de mercado&raquo;, sin método'),
